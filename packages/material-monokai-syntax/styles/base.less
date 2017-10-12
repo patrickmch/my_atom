@@ -1,0 +1,366 @@
+@import "syntax-variables";
+atom-text-editor {
+  background-color: @syntax-background-color;
+  color: @syntax-text-color;
+}
+atom-text-editor {
+  .gutter {
+    background-color: @syntax-gutter-background-color;
+    color: @syntax-gutter-text-color;
+    
+    .line-number.cursor-line {
+      background-color: @syntax-gutter-background-color-selected;
+      color: @syntax-gutter-text-color-selected;
+    }
+    .line-number.cursor-line-no-selection {
+      color: @syntax-gutter-text-color-selected;
+    }
+  }
+  .wrap-guide {
+    color: @syntax-wrap-guide-color;
+  }
+  .indent-guide {
+    color: @syntax-indent-guide-color;
+  }
+  .invisible-character {
+    color: @syntax-invisible-character-color;
+  }
+  .search-results .syntax--marker {
+    &.current-result .region {
+      border: @syntax-result-marker-color-selected;
+    }
+    .region {
+      background-color: transparent;
+      border: @syntax-result-marker-color;
+    }
+  }
+}
+atom-text-editor.is-focused {
+  .cursor {
+    border-color: @syntax-cursor-color;
+  }
+  .selection .region {
+    background-color: @syntax-selection-color;
+  }
+  .line.cursor-line, 
+  .line-number.cursor-line-no-selection {
+    background-color: rgba(0, 0, 0, 0.19);
+  }
+}
+.syntax--comment,
+.syntax--punctuation.syntax--definition.syntax--comment {
+  color: @syntax-comments-color;
+}
+.syntax--punctuation.syntax--definition {
+  &.syntax--parameters,
+  &.syntax--array {
+    color: @syntax-text-color;
+  }
+  &.syntax--variable {
+    color: @variable;
+  }
+}
+.syntax--none {
+  color: rgba(217, 245, 221, 1);
+}
+.syntax--keyword {
+  color: @keyword;
+  &.syntax--operator {
+    color: @keyword;
+  }
+}
+.syntax--variable {
+  color: @variable;
+}
+.syntax--meta.syntax--require,
+.syntax--meta.syntax--function-call,
+.syntax--meta.syntax--block-level {
+  color: @entity02;
+  
+  & > {
+    color: inherit;
+  }
+}
+.syntax--support {
+  &.syntax--type,
+  &.syntax--class {
+    font-style: italic;
+    color: @storage;
+  }
+  &.syntax--function {
+    color: @storage;
+  }
+}
+.syntax--entity.syntax--name.syntax--class,
+.syntax--entity.syntax--name.syntax--type.syntax--class {
+  color: @entity02;
+  text-decoration: underline;
+}
+.syntax--meta.syntax--class {
+  color: #fff;
+}
+.syntax--storage {
+  color: @storage;
+}
+.syntax--constant.syntax--other.syntax--color,
+.syntax--meta.syntax--tag,
+.syntax--punctuation.syntax--definition.syntax--tag,
+.syntax--punctuation.syntax--separator.syntax--inheritance.syntax--php,
+.syntax--punctuation.syntax--definition.syntax--tag.syntax--html,
+.syntax--punctuation.syntax--definition.syntax--tag.syntax--begin.syntax--html,
+.syntax--punctuation.syntax--definition.syntax--tag.syntax--end.syntax--html {
+  color: #80cbc4;
+}
+.syntax--string {
+  color: @string;
+}
+.syntax--entity.syntax--other.syntax--inherited-class {
+  color: #c3e88d;
+}
+.syntax--none {
+  color: #f77669;
+}
+.syntax--constant {
+  color: @constant;
+  
+  &.syntax--variable {
+    color: @variable;
+  }
+}
+.syntax--entity {
+  color: @entity02;
+  
+  &.syntax--name {
+    &.syntax--function {
+      color: @entity02;
+    }
+    &.syntax--tag {
+      color: @entity;
+    }
+    &.syntax--class {
+      color: @entity02;
+      text-decoration: underline;
+    }
+  }
+  
+  &.syntax--other  {
+    &.syntax--inherited-class {
+      font-style: italic;
+      text-decoration: underline;
+      color: @entity02;
+    }
+    &.syntax--attribute-name {
+      color: @entity02;
+      
+      &.syntax--id {
+        color: #fad430;
+      }
+    }
+  }
+}
+.syntax--meta.syntax--selector {
+  color: rgba(199, 146, 234, 1);
+}
+.syntax--markup.syntax--heading .syntax--punctuation.syntax--definition.syntax--heading,
+.syntax--entity.syntax--name.syntax--section {
+  color: rgba(120, 204, 240, 1);
+}
+.syntax--keyword.syntax--other.syntax--unit {
+  color: #f77669;
+}
+.syntax--markup.syntax--bold,
+.syntax--punctuation.syntax--definition.syntax--bold {
+  font-weight: bold;
+  color: #ffcb6b;
+}
+.syntax--markup.syntax--italic,
+.syntax--punctuation.syntax--definition.syntax--italic {
+  font-style: italic;
+  color: rgba(199, 146, 234, 1);
+}
+.syntax--markup.syntax--raw.syntax--inline, .syntax--markup.syntax--raw {
+  color: #f1e655;
+}
+.syntax--string.syntax--other.syntax--link,
+.syntax--punctuation.syntax--definition.syntax--string.syntax--end.syntax--markdown {
+  color: #ff5370;
+}
+[data-grammar*="gfm"] {
+  .syntax--markup.syntax--underline.syntax--link {
+    color: lighten(#ff5370, 10%);
+
+    span.syntax--punctuation {
+      color: #ff5370;
+    }
+  }
+  .syntax--markup.syntax--strike {
+    position: relative;
+    color: fade(@syntax-text-color, 50%);
+
+    &::after {
+      content: "";
+      position: absolute;
+      top: calc(50% + 4px);
+      left: 0;
+      right: 0;
+      height: 1px;
+      background-color: fade(@syntax-text-color, 20%);
+    }
+  }
+  .syntax--table .syntax--border {
+    color: fade(@syntax-text-color, 50%);
+  }
+  .syntax--markup.syntax--heading {
+    color: #82b1ff;
+  }
+  .syntax--punctuation.syntax--definition.syntax--begin, .syntax--punctuation.syntax--definition.syntax--end {
+    color: #82b1ff;
+  }
+  .syntax--punctuation.syntax--definition.syntax--begin + span:not(.syntax--function.parameter) {
+    color: lighten(#82b1ff, 5%);
+  }
+}
+.syntax--meta.syntax--link {
+  color: #f77669;
+}
+.syntax--markup.syntax--list {
+  color: rgba(255, 83, 112, 1);
+}
+.syntax--markup.syntax--quote {
+  color: #f77669;
+}
+.syntax--meta.syntax--separator {
+  color: rgba(217, 245, 221, 1);
+  background-color: rgba(30, 52, 69, 1);
+}
+.syntax--markup.syntax--inserted {
+  color: #f1e655;
+}
+.syntax--markup.syntax--deleted {
+  color: rgba(255, 83, 112, 1);
+}
+.syntax--markup.syntax--changed {
+  color: rgba(199, 146, 234, 1);
+}
+.syntax--constant.syntax--other.syntax--color,
+.syntax--meta.syntax--property-value .syntax--support.syntax--constant.named-color.syntax--css {
+  color: #ffeb95;
+}
+.syntax--string {
+  .syntax--constant.syntax--character.syntax--escape {
+    color: @red;
+  }
+
+  &.syntax--regexp {
+    color: @cyan;
+
+    .syntax--source.syntax--ruby.syntax--embedded,
+    .syntax--string.syntax--regexp.syntax--arbitrary-repitition {
+      color: @red;
+    }
+  }
+}
+.syntax--constant.syntax--character.syntax--escape {
+  color: #80cbc4;
+}
+.syntax--punctuation.syntax--section.syntax--embedded,
+.syntax--variable.syntax--interpolation {
+  color: rgba(211, 66, 62, 1);
+}
+.syntax--invalid.syntax--illegal {
+  color: rgba(255, 255, 255, 1);
+  background-color: #ec5f67;
+}
+.syntax--invalid.syntax--broken {
+  color: rgba(2, 14, 20, 1);
+  background-color: #f77669;
+}
+.syntax--invalid.syntax--deprecated {
+  color: rgba(255, 255, 255, 1);
+  background-color: rgba(211, 66, 62, 1);
+}
+.syntax--invalid.syntax--unimplemented {
+  color: rgba(255, 255, 255, 1);
+  background-color: #8bd649;
+}
+.sublimelinter.annotations {
+  color: rgba(123, 81, 87, 1);
+  background-color: rgba(255, 255, 247, 1);
+}
+.sublimelinter.outline.syntax--illegal {
+  color: rgba(255, 255, 255, 1);
+  background-color: rgba(255, 149, 153, 1);
+}
+.sublimelinter.syntax--underline.syntax--illegal {
+  background-color: rgba(255, 73, 65, 1);
+}
+.sublimelinter.outline.syntax--warning {
+  color: rgba(255, 255, 255, 1);
+  background-color: #ffcf1b;
+}
+.sublimelinter.syntax--underline.syntax--warning {
+  background-color: rgba(255, 73, 65, 1);
+}
+.sublimelinter.outline.violation {
+  color: rgba(255, 255, 255, 1);
+  background-color: rgba(255, 255, 255, 0.2);
+}
+.sublimelinter.syntax--underline.violation {
+  background-color: rgba(255, 73, 65, 1);
+}
+.sublimelinter.syntax--mark.syntax--error {
+  color: rgba(255, 87, 45, 1);
+}
+.sublimelinter.syntax--mark.syntax--warning {
+  color: rgba(255, 207, 27, 1);
+}
+.sublimelinter.gutter-mark {
+  color: rgba(255, 255, 255, 1);
+}
+.syntax--markup.syntax--deleted.git_gutter {
+  color: #ec5f67;
+}
+.syntax--markup.syntax--changed.git_gutter {
+  color: #ffcf1b;
+}
+.syntax--markup.syntax--inserted.git_gutter {
+  color: #c3e88d;
+}
+.syntax--markup.syntax--ignored.git_gutter {
+  color: #546e7a;
+}
+.syntax--comment.line.syntax--double-slash .syntax--punctuation.syntax--definition.syntax--comment,
+.syntax--meta.syntax--structure.syntax--array .syntax--comment.syntax--block.syntax--json .syntax--punctuation.syntax--definition.syntax--comment {
+  color: @syntax-comments-color;
+}
+.syntax--support.syntax--type.syntax--property-name {
+  font-style: italic;
+  color: @storage;
+}
+.syntax--meta.syntax--property-list .syntax--meta.syntax--property-name {
+  font-style: italic;
+  color: @storage;
+}
+.syntax--source.syntax--css .syntax--keyword.syntax--other.syntax--unit,
+.syntax--source.syntax--less .syntax--keyword.syntax--other.syntax--unit,
+.syntax--source.syntax--scss .syntax--keyword.syntax--other.syntax--unit,
+.syntax--source.syntax--sass .syntax--keyword.syntax--other.syntax--unit {
+  color: #ffeb95;
+}
+.syntax--entity.syntax--other.syntax--less.syntax--mixin {
+  color: #7986cb;
+}
+.syntax--constant.syntax--other.syntax--color.syntax--rgb-value .syntax--punctuation.syntax--definition.syntax--constant {
+  color: #f77669;
+}
+.syntax--meta.syntax--attribute-selector .syntax--string.syntax--unquoted.syntax--attribute-value {
+  color: #c3e88d;
+}
+.syntax--meta.syntax--attribute-selector .syntax--entity.syntax--other.syntax--attribute-name.syntax--attribute {
+  color: #f77669;
+}
+.bracket-matcher .region {
+  border-bottom: 1px solid @syntax-cursor-color;
+  box-sizing: border-box;
+  background-color: @syntax-bracket-matcher-background-color;
+}

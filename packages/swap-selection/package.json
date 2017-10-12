@@ -1,0 +1,63 @@
+{
+  "_args": [
+    [
+      {
+        "raw": "/private/var/folders/dp/vj05cwss7pz9mjl62ccqzysm0000gp/T/d-117911-91015-1nq5imo.4pbupojemi/package.tgz",
+        "scope": null,
+        "escapedName": null,
+        "name": null,
+        "rawSpec": "/private/var/folders/dp/vj05cwss7pz9mjl62ccqzysm0000gp/T/d-117911-91015-1nq5imo.4pbupojemi/package.tgz",
+        "spec": "/private/var/folders/dp/vj05cwss7pz9mjl62ccqzysm0000gp/T/d-117911-91015-1nq5imo.4pbupojemi/package.tgz",
+        "type": "local"
+      },
+      "/private/var/folders/dp/vj05cwss7pz9mjl62ccqzysm0000gp/T/apm-install-dir-117911-91015-k5vfxv.rh27c766r"
+    ]
+  ],
+  "_from": "../d-117911-91015-1nq5imo.4pbupojemi/package.tgz",
+  "_id": "swap-selection@0.4.0",
+  "_inCache": true,
+  "_location": "/swap-selection",
+  "_phantomChildren": {},
+  "_requested": {
+    "raw": "/private/var/folders/dp/vj05cwss7pz9mjl62ccqzysm0000gp/T/d-117911-91015-1nq5imo.4pbupojemi/package.tgz",
+    "scope": null,
+    "escapedName": null,
+    "name": null,
+    "rawSpec": "/private/var/folders/dp/vj05cwss7pz9mjl62ccqzysm0000gp/T/d-117911-91015-1nq5imo.4pbupojemi/package.tgz",
+    "spec": "/private/var/folders/dp/vj05cwss7pz9mjl62ccqzysm0000gp/T/d-117911-91015-1nq5imo.4pbupojemi/package.tgz",
+    "type": "local"
+  },
+  "_requiredBy": [
+    "#USER"
+  ],
+  "_resolved": "file:../d-117911-91015-1nq5imo.4pbupojemi/package.tgz",
+  "_shasum": "a8659c5285ccfa62a8793e71583fa8ec26719e2e",
+  "_shrinkwrap": null,
+  "_spec": "/private/var/folders/dp/vj05cwss7pz9mjl62ccqzysm0000gp/T/d-117911-91015-1nq5imo.4pbupojemi/package.tgz",
+  "_where": "/private/var/folders/dp/vj05cwss7pz9mjl62ccqzysm0000gp/T/apm-install-dir-117911-91015-k5vfxv.rh27c766r",
+  "activationCommands": {
+    "atom-text-editor": "swap-selection:right"
+  },
+  "bugs": {
+    "url": "https://github.com/RocketScienceAbteilung/swap-selection/issues"
+  },
+  "dependencies": {},
+  "description": "swaps/cycles/transposes your current text selections",
+  "devDependencies": {},
+  "engines": {
+    "atom": ">=0.174.0 <2.0.0"
+  },
+  "homepage": "https://github.com/RocketScienceAbteilung/swap-selection#readme",
+  "keywords": [],
+  "license": "MIT",
+  "main": "./lib/swap-selection",
+  "name": "swap-selection",
+  "optionalDependencies": {},
+  "readme": "# Swap Selection ![travis](https://travis-ci.org/RocketScienceAbteilung/swap-selection.svg?branch=master)\n\nAn atom plugin which swaps/cycles/transposes your current editors text selections with a single keypress.\nSimilar to [atom-transpose](https://atom.io/packages/atom-transpose) but supports more than two selections.\n\n![cycle it](https://cloud.githubusercontent.com/assets/72940/8087278/33a2d014-0f9a-11e5-9b41-56141c8fc80a.gif)\n\n## Usage\n\n* make two or more selections\n* use `alt-t` to swap/cycle selections in foreward (right) direction\n* use `shift-alt-t` to swap/cycle selections in backward (left) direction\n\n## Featues\n\n* supports two or more selections\n* cycles forwards or backwards\n* if no selections are made, but multiple cursors are set, these lines are swapped.\n",
+  "readmeFilename": "README.md",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/RocketScienceAbteilung/swap-selection.git"
+  },
+  "version": "0.4.0"
+}

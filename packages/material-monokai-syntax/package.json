@@ -1,0 +1,75 @@
+{
+  "_args": [
+    [
+      {
+        "raw": "/private/var/folders/dp/vj05cwss7pz9mjl62ccqzysm0000gp/T/d-117829-13023-lb68t3.k7zc40a4i/package.tgz",
+        "scope": null,
+        "escapedName": null,
+        "name": null,
+        "rawSpec": "/private/var/folders/dp/vj05cwss7pz9mjl62ccqzysm0000gp/T/d-117829-13023-lb68t3.k7zc40a4i/package.tgz",
+        "spec": "/private/var/folders/dp/vj05cwss7pz9mjl62ccqzysm0000gp/T/d-117829-13023-lb68t3.k7zc40a4i/package.tgz",
+        "type": "local"
+      },
+      "/private/var/folders/dp/vj05cwss7pz9mjl62ccqzysm0000gp/T/apm-install-dir-117829-13023-16fudwn.3yc39885mi"
+    ]
+  ],
+  "_from": "../d-117829-13023-lb68t3.k7zc40a4i/package.tgz",
+  "_id": "material-monokai-syntax@1.0.1",
+  "_inCache": true,
+  "_location": "/material-monokai-syntax",
+  "_phantomChildren": {},
+  "_requested": {
+    "raw": "/private/var/folders/dp/vj05cwss7pz9mjl62ccqzysm0000gp/T/d-117829-13023-lb68t3.k7zc40a4i/package.tgz",
+    "scope": null,
+    "escapedName": null,
+    "name": null,
+    "rawSpec": "/private/var/folders/dp/vj05cwss7pz9mjl62ccqzysm0000gp/T/d-117829-13023-lb68t3.k7zc40a4i/package.tgz",
+    "spec": "/private/var/folders/dp/vj05cwss7pz9mjl62ccqzysm0000gp/T/d-117829-13023-lb68t3.k7zc40a4i/package.tgz",
+    "type": "local"
+  },
+  "_requiredBy": [
+    "#USER"
+  ],
+  "_resolved": "file:../d-117829-13023-lb68t3.k7zc40a4i/package.tgz",
+  "_shasum": "caf5120f4656fd00b9d6c777aba711375f47d5d6",
+  "_shrinkwrap": null,
+  "_spec": "/private/var/folders/dp/vj05cwss7pz9mjl62ccqzysm0000gp/T/d-117829-13023-lb68t3.k7zc40a4i/package.tgz",
+  "_where": "/private/var/folders/dp/vj05cwss7pz9mjl62ccqzysm0000gp/T/apm-install-dir-117829-13023-16fudwn.3yc39885mi",
+  "bugs": {
+    "url": "https://github.com/brendanblackwood/material-monokai-syntax/issues"
+  },
+  "dependencies": {},
+  "description": "My take on monokai for material-ui",
+  "devDependencies": {},
+  "engines": {
+    "atom": ">=1.13.0 <2.0.0"
+  },
+  "homepage": "https://github.com/brendanblackwood/material-monokai-syntax",
+  "keywords": [
+    "syntax",
+    "theme",
+    "material",
+    "dark"
+  ],
+  "license": "MIT",
+  "name": "material-monokai-syntax",
+  "optionalDependencies": {},
+  "readme": "# material-monokai-syntax theme\n\nAn Atom monokai syntax theme meant to be used with [Material UI](https://atom.io/themes/atom-material-ui).\n\n![A screenshot of your theme](https://github.com/brendanblackwood/material-monokai-syntax/raw/master/screenshot.png)\n",
+  "readmeFilename": "README.md",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/brendanblackwood/material-monokai-syntax.git"
+  },
+  "theme": "syntax",
+  "version": "1.0.1",
+  "_atomModuleCache": {
+    "version": 1,
+    "dependencies": [],
+    "extensions": {
+      ".json": [
+        "package.json"
+      ]
+    },
+    "folders": []
+  }
+}

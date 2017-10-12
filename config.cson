@@ -1,0 +1,68 @@
+"*":
+  "advanced-open-file":
+    fuzzyMatch: true
+    helmDirSwitch: true
+  "atom-beautify":
+    general:
+      _analyticsUserId: "57d65fa5-cb86-468f-a653-bbe65e34f933"
+  "autocomplete-python":
+    useKite: false
+  core:
+    disabledPackages: [
+      "welcome"
+      "linter-python-pep8"
+      "linter-pylint"
+      "goto-definition"
+      "fonts"
+    ]
+    packagesWithKeymapsDisabled: []
+    telemetryConsent: "limited"
+    themes: [
+      "atom-material-ui"
+      "atom-material-syntax"
+    ]
+  editor:
+    fontFamily: "Source Code Pro for Powerline"
+    fontSize: 18
+    showIndentGuide: true
+    showInvisibles: true
+  "exception-reporting":
+    userId: "bf1a28f2-4481-4777-b187-9b8e1da674c0"
+  "find-and-replace":
+    projectSearchResultsPaneSplitDirection: "down"
+  fonts:
+    fontFamily: "Inconsolata-g"
+  "git-blame":
+    columnWidth: 412
+  "linter-flake8":
+    ignoreErrorCodes: [
+      "F821 E302"
+    ]
+    maxLineLength: 100
+  "linter-jshint": {}
+  "linter-ui-default":
+    panelHeight: 63
+  minimap:
+    plugins:
+      bookmarks: true
+      bookmarksDecorationsZIndex: 0
+      cursorline: true
+      cursorlineDecorationsZIndex: 0
+      "find-and-replace": true
+      "find-and-replaceDecorationsZIndex": 0
+      "git-diff": true
+      "git-diffDecorationsZIndex": 0
+      "highlight-selected": true
+      "highlight-selectedDecorationsZIndex": 0
+    scrollAnimation: true
+  "platformio-ide-terminal":
+    iconColors:
+      blue: "#f1fffd"
+      green: "#028000"
+    style:
+      fontFamily: "Source Code Pro for Powerline"
+  python:
+    linting:
+      pylintArgs: [
+        "--disable=R,C"
+      ]

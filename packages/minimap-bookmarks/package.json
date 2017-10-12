@@ -1,0 +1,73 @@
+{
+  "_args": [
+    [
+      {
+        "raw": "/private/var/folders/dp/vj05cwss7pz9mjl62ccqzysm0000gp/T/d-11796-31821-1wwe627.x9tm3ac3di/package.tgz",
+        "scope": null,
+        "escapedName": null,
+        "name": null,
+        "rawSpec": "/private/var/folders/dp/vj05cwss7pz9mjl62ccqzysm0000gp/T/d-11796-31821-1wwe627.x9tm3ac3di/package.tgz",
+        "spec": "/private/var/folders/dp/vj05cwss7pz9mjl62ccqzysm0000gp/T/d-11796-31821-1wwe627.x9tm3ac3di/package.tgz",
+        "type": "local"
+      },
+      "/private/var/folders/dp/vj05cwss7pz9mjl62ccqzysm0000gp/T/apm-install-dir-11796-31821-14us017.1orufmvx6r"
+    ]
+  ],
+  "_from": "../d-11796-31821-1wwe627.x9tm3ac3di/package.tgz",
+  "_id": "minimap-bookmarks@0.4.2",
+  "_inCache": true,
+  "_location": "/minimap-bookmarks",
+  "_phantomChildren": {},
+  "_requested": {
+    "raw": "/private/var/folders/dp/vj05cwss7pz9mjl62ccqzysm0000gp/T/d-11796-31821-1wwe627.x9tm3ac3di/package.tgz",
+    "scope": null,
+    "escapedName": null,
+    "name": null,
+    "rawSpec": "/private/var/folders/dp/vj05cwss7pz9mjl62ccqzysm0000gp/T/d-11796-31821-1wwe627.x9tm3ac3di/package.tgz",
+    "spec": "/private/var/folders/dp/vj05cwss7pz9mjl62ccqzysm0000gp/T/d-11796-31821-1wwe627.x9tm3ac3di/package.tgz",
+    "type": "local"
+  },
+  "_requiredBy": [
+    "#USER"
+  ],
+  "_resolved": "file:../d-11796-31821-1wwe627.x9tm3ac3di/package.tgz",
+  "_shasum": "0fcdeebf04d07dccbc995b09501160e88c6566e2",
+  "_shrinkwrap": null,
+  "_spec": "/private/var/folders/dp/vj05cwss7pz9mjl62ccqzysm0000gp/T/d-11796-31821-1wwe627.x9tm3ac3di/package.tgz",
+  "_where": "/private/var/folders/dp/vj05cwss7pz9mjl62ccqzysm0000gp/T/apm-install-dir-11796-31821-14us017.1orufmvx6r",
+  "bugs": {
+    "url": "https://github.com/atom-minimap/minimap-bookmarks/issues"
+  },
+  "consumedServices": {
+    "minimap": {
+      "versions": {
+        "1.0.0": "consumeMinimapServiceV1"
+      }
+    }
+  },
+  "dependencies": {
+    "atom-utils": "*"
+  },
+  "description": "Displays Atom bookmarks in the minimap",
+  "devDependencies": {},
+  "engines": {
+    "atom": ">=0.184.0"
+  },
+  "homepage": "https://github.com/atom-minimap/minimap-bookmarks#readme",
+  "keywords": [
+    "minimap",
+    "bookmarks",
+    "bookmark"
+  ],
+  "license": "MIT",
+  "main": "./lib/minimap-bookmarks",
+  "name": "minimap-bookmarks",
+  "optionalDependencies": {},
+  "readme": "# minimap-bookmarks package [![Build Status](https://travis-ci.org/atom-minimap/minimap-bookmarks.svg?branch=master)](https://travis-ci.org/atom-minimap/minimap-bookmarks)\n\nDisplays Atom bookmarks in the minimap.\n\n![Minimap Bookmarks Screenshot](https://github.com/atom-minimap/minimap-bookmarks/blob/master/screenshot.gif?raw=true)\n\nCustomization\n\nIf you want to change the color of the minimap bookmarks use the following CSS rules in your user stylesheet:\n\n```css\n.minimap .bookmark {\n  background: #09C;\n}\n```\n",
+  "readmeFilename": "README.md",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/atom-minimap/minimap-bookmarks.git"
+  },
+  "version": "0.4.2"
+}
