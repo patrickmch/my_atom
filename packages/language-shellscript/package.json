@@ -1,0 +1,63 @@
+{
+  "_args": [
+    [
+      {
+        "raw": "/private/var/folders/dp/vj05cwss7pz9mjl62ccqzysm0000gp/T/d-1171111-5182-wsorhr.katzh93sor/package.tgz",
+        "scope": null,
+        "escapedName": null,
+        "name": null,
+        "rawSpec": "/private/var/folders/dp/vj05cwss7pz9mjl62ccqzysm0000gp/T/d-1171111-5182-wsorhr.katzh93sor/package.tgz",
+        "spec": "/private/var/folders/dp/vj05cwss7pz9mjl62ccqzysm0000gp/T/d-1171111-5182-wsorhr.katzh93sor/package.tgz",
+        "type": "local"
+      },
+      "/private/var/folders/dp/vj05cwss7pz9mjl62ccqzysm0000gp/T/apm-install-dir-1171111-5182-1vtwedo.tp8ixm9529"
+    ]
+  ],
+  "_from": "../d-1171111-5182-wsorhr.katzh93sor/package.tgz",
+  "_id": "language-shellscript@0.26.0-0",
+  "_inCache": true,
+  "_location": "/language-shellscript",
+  "_phantomChildren": {},
+  "_requested": {
+    "raw": "/private/var/folders/dp/vj05cwss7pz9mjl62ccqzysm0000gp/T/d-1171111-5182-wsorhr.katzh93sor/package.tgz",
+    "scope": null,
+    "escapedName": null,
+    "name": null,
+    "rawSpec": "/private/var/folders/dp/vj05cwss7pz9mjl62ccqzysm0000gp/T/d-1171111-5182-wsorhr.katzh93sor/package.tgz",
+    "spec": "/private/var/folders/dp/vj05cwss7pz9mjl62ccqzysm0000gp/T/d-1171111-5182-wsorhr.katzh93sor/package.tgz",
+    "type": "local"
+  },
+  "_requiredBy": [
+    "#USER"
+  ],
+  "_resolved": "file:../d-1171111-5182-wsorhr.katzh93sor/package.tgz",
+  "_shasum": "e4b068577bf964c43a8ccd17de0cd986eed524c8",
+  "_shrinkwrap": null,
+  "_spec": "/private/var/folders/dp/vj05cwss7pz9mjl62ccqzysm0000gp/T/d-1171111-5182-wsorhr.katzh93sor/package.tgz",
+  "_where": "/private/var/folders/dp/vj05cwss7pz9mjl62ccqzysm0000gp/T/apm-install-dir-1171111-5182-1vtwedo.tp8ixm9529",
+  "bugs": {
+    "url": "https://github.com/atom/language-shellscript/issues"
+  },
+  "dependencies": {
+    "tree-sitter-bash": "^0.3.0"
+  },
+  "description": "ShellScript language support in Atom",
+  "devDependencies": {
+    "coffeelint": "^1.10.1"
+  },
+  "engines": {
+    "atom": "*",
+    "node": "*"
+  },
+  "homepage": "http://atom.github.io/language-shellscript",
+  "license": "MIT",
+  "name": "language-shellscript",
+  "optionalDependencies": {},
+  "readme": "# ShellScript language support in Atom\n[![macOS Build Status](https://travis-ci.org/atom/language-shellscript.svg?branch=master)](https://travis-ci.org/atom/language-shellscript)\n[![Windows Build Status](https://ci.appveyor.com/api/projects/status/p4um3lowgrg8y0ty/branch/master?svg=true)](https://ci.appveyor.com/project/Atom/language-shellscript/branch/master)\n[![Dependency Status](https://david-dm.org/atom/language-shellscript.svg)](https://david-dm.org/atom/language-shellscript)\n\nAdds syntax highlighting and snippets to shell scripts in Atom.\n\nOriginally [converted](http://flight-manual.atom.io/hacking-atom/sections/converting-from-textmate) from the [ShellScript TextMate bundle](https://github.com/textmate/shellscript.tmbundle).\n\nContributions are greatly appreciated. Please fork this repository and open a pull request to add snippets, make grammar tweaks, etc.\n",
+  "readmeFilename": "README.md",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/atom/language-shellscript.git"
+  },
+  "version": "0.26.0-0"
+}

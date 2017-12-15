@@ -1,0 +1,108 @@
+@import 'variables';
+@import "content";
+
+kite-curated-example {
+  flex-direction: column;
+
+  .example-wrapper {
+    overflow-y: auto;
+    flex-direction: column;
+    flex: 1 1 auto;
+
+    .kite-code;
+    .kite-table;
+
+    .related-examples {
+      .kite-examples-list;
+    }
+
+    .example-code {
+      background: @background-color-highlight;
+      border-radius: @component-border-radius;
+      padding: @half-padding;
+
+      figcaption {
+        margin-top: @component-padding;
+        font-size: 0.8em;
+        font-weight: 300;
+        font-style: italic;
+      }
+    }
+
+    img {
+      max-width: 100%;
+    }
+
+    pre {
+      flex: 0 0 auto;
+      background: transparent;
+      padding: 0;
+      margin-bottom: @component-padding;
+
+      a {
+        color: inherit;
+      }
+
+      code {
+        white-space: pre;
+      }
+
+      &.output {
+        display: inline-block;
+      }
+
+      &.input {
+        background: @background-color-highlight;
+        border-radius: @component-border-radius;
+        padding: @half-padding;
+      }
+    }
+
+    table, ul.list-tree.root, pre.output {
+      width: auto;
+      background: @base-background-color;
+      padding: @half-padding;
+      border-radius: @component-border-radius;
+
+      figcaption + & {
+        margin-top: -@half-padding;
+      }
+    }
+
+    table, ul.list-tree.root, pre {
+      margin-bottom: @component-padding;
+
+      &:last-child {
+        margin-bottom: 0;
+      }
+    }
+
+    ul.list-tree.root {
+      display: inline-block;
+      padding-right: @component-padding;
+    }
+
+    ul.list-tree {
+      li {
+        font-size: 1em;
+
+        & + li {
+          margin-top: 0;
+        }
+      }
+    }
+
+    table {
+      border-radius: @component-border-radius;
+      border-collapse: separate !important;
+
+      th, td {
+        border: none
+      }
+
+      td:not(:last-child) {
+        padding-right: 3rem;
+      }
+    }
+  }
+}

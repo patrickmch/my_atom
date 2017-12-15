@@ -1,0 +1,25 @@
+[
+  {
+    title: "CMS"
+    group: "NOLS CMS"
+    paths: [
+      "/Users/mchey/code/cms"
+    ]
+    icon: "icon-heart"
+  }
+  {
+    title: "Website"
+    group: "NOLS Website"
+    paths: [
+      "/Users/mchey/code/website"
+    ]
+    icon: "icon-zap"
+  }
+  {
+    title: "Atom Mgmt"
+    paths: [
+      "/Users/mchey/dotfiles/.atom"
+    ]
+    icon: "icon-rocket"
+  }
+]

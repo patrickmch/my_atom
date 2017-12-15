@@ -9,43 +9,23 @@
 # atom.workspace.observeTextEditors (editor) ->
 #   editor.onDidSave ->
 #     console.log "Saved! #{editor.getPath()}"
-atom.commands.add '.tree-view', 'custom:expand-item-down': ->
-  fs = require 'fs'
-  for panel in atom.workspace.getLeftPanels()
-    if panel.item.constructor.name == "TreeView"
-      atom.commands.dispatch(panel.item.element, 'core:move-down')
-      if fs.lstatSync(panel.item.selectedPath).isDirectory()
-        return
-      else
-        panel.item.openSelectedEntry(pending: true, activatePane: false)
-        return
-atom.commands.add '.tree-view', 'custom:expand-item-up': ->
-  fs = require 'fs'
-  for panel in atom.workspace.getLeftPanels()
-    if panel.item.constructor.name == "TreeView"
-      atom.commands.dispatch(panel.item.element, 'core:move-up')
-      if fs.lstatSync(panel.item.selectedPath).isDirectory()
-        return
-      else
-        panel.item.openSelectedEntry(pending: true, activatePane: false)
-        return
-
-#if you want to work on this a good starting spot would be atom.workspace.getPanes()
-# atom.commands.add '.advanced-open-file', 'custom:expand-item-down': ->
+# atom.commands.add '.tree-view', 'custom:expand-item-down': ->
 #   fs = require 'fs'
-#   for panel in atom.workspace.getPanes()
-#     if panel.item.className == "advanced-open-file"
+#   for panel in atom.workspace.getLeftPanels()
+#     if panel.item.constructor.name == "TreeView"
 #       atom.commands.dispatch(panel.item.element, 'core:move-down')
+#       console.log('test')
 #       if fs.lstatSync(panel.item.selectedPath).isDirectory()
 #         return
 #       else
 #         panel.item.openSelectedEntry(pending: true, activatePane: false)
 #         return
-# atom.commands.add '.advanced-open-file', 'custom:expand-item-up': ->
+# atom.commands.add '.tree-view', 'custom:expand-item-up': ->
 #   fs = require 'fs'
-#   for panel in atom.workspace.getPanes()
-#     if panel.item.className == "advanced-open-file"
+#   for panel in atom.workspace.getLeftPanels()
+#     if panel.item.constructor.name == "TreeView"
 #       atom.commands.dispatch(panel.item.element, 'core:move-up')
+#       console.log('test')
 #       if fs.lstatSync(panel.item.selectedPath).isDirectory()
 #         return
 #       else

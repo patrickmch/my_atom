@@ -1,0 +1,179 @@
+@import 'variables';
+@import 'content';
+
+kite-status-panel {
+  display: flex;
+  flex-direction: column;
+  background: @hover-background-color;
+  box-shadow: 0 0 10px rgba(0,0,0,0.4);
+  padding: @component-padding;
+  position: fixed;
+  min-width: 200px;
+  transform: translate(-100%, -100%);
+  border-radius: 4px;
+
+  .enterprise {
+    vertical-align: middle;
+
+    svg {
+      path, polygon {
+        fill: @text-color-highlight;
+      }
+    }
+  }
+
+  .pro {
+    height: 16px;
+    display: inline-block;
+    vertical-align: middle;
+  }
+
+  .pro,
+  kite-logo {
+    margin-right: @half-padding;
+    svg {
+      height: 16px;
+
+      polygon, path {
+        fill: @text-color-highlight;
+      }
+    }
+  }
+
+  .pro-badge {
+    background: @text-color-highlight;
+    color: @hover-background-color;
+    display: inline-block;
+    padding: 0 0.3em 0.1em;
+    border-radius: 3px;
+    margin: 0 0.5em;
+    text-transform: uppercase;
+  }
+
+  .subscription {
+    margin-bottom: @component-padding;
+  }
+
+  .split-line {
+    .kite-split-line;
+
+    > * {
+      white-space: nowrap;
+    }
+  }
+  .links {
+    list-style: none;
+    padding: 0 @half-padding 0;
+
+    &:nth-child(1n+2) {
+      padding: @component-padding @half-padding 0;
+      border-top: 1px solid @base-background-color;
+    }
+
+    li + li {
+      margin-top: @half-padding;
+    }
+
+    a:not(.btn) {
+      &, &:active, &:visited, &:focus {
+        color: @text-color-highlight;
+        font-size: 1.1em;
+
+      }
+      &.kite-gift {
+        &, &:active, &:visited, &:focus {
+          color: @text-color-error;
+        }
+      }
+    }
+  }
+
+  .status {
+    text-align: right;
+    padding: @half-padding @half-padding 0;
+
+    & > div {
+      margin-bottom: @half-padding;
+      white-space: nowrap;
+
+      & + .btn {
+        margin-top: @half-padding;
+      }
+    }
+
+    .btn + .btn {
+      margin-top: @component-padding;
+    }
+
+    &:nth-child(1n+2) {
+      padding: @component-padding @half-padding 0;
+      border-top: 1px solid @base-background-color;
+    }
+
+    .dot {
+      font-size: 2.4em;
+      line-height: 0.5em;
+      vertical-align: sub;
+      display: inline-block;
+    }
+
+    .ready .dot {
+      color: @text-color-info;
+    }
+  }
+
+  a:not(.btn) {
+    &, &:active, &:visited, &:focus {
+      color: @text-color-info;
+      text-decoration: none;
+
+      &:hover {
+        text-decoration: underline;
+      }
+    }
+
+  }
+  .no-account a:not(.btn).account-dependent {
+    opacity: 0.5;
+    pointer-events: none;
+  }
+
+
+  .kite-warning-box {
+    background: fadeout(@text-color-error, 80%);
+    color: @text-color-highlight;
+    padding: @half-padding @component-padding;
+    margin: @component-padding 0;
+    border-radius: 0.3em;
+
+    .actions {
+      display: block;
+      text-align: right;
+      margin-top: @component-padding;
+    }
+
+    a, a:active, a:visited, a:focus {
+      color: @text-color-highlight;
+      text-decoration: underline;
+    }
+  }
+
+  .kite-info-box {
+    background: fadeout(@text-color-info, 80%);
+    color: @text-color-highlight;
+    padding: @half-padding @component-padding;
+    margin: @component-padding 0;
+    border-radius: 0.3em;
+
+    .actions {
+      display: block;
+      text-align: right;
+      margin-top: @component-padding;
+    }
+
+    a, a:active, a:visited, a:focus {
+      color: @text-color-highlight;
+      text-decoration: underline;
+    }
+  }
+}

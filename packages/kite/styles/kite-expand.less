@@ -1,0 +1,106 @@
+@import "ui-variables";
+@import "variables";
+
+kite-expand {
+  display: flex;
+  flex-direction: column;
+  color: @text-color;
+  padding: @half-padding;
+  font-family: @font-family;
+  font-size: 0.9em;
+  max-height: 50vh;
+  overflow-y: auto;
+  position: relative;
+
+  .debug {
+    margin-top: @half-padding;
+
+    pre {
+      cursor: text;
+      -webkit-user-select: all;
+      user-select: all;
+      max-height: 300px;
+      max-width: 500px;
+      overflow: auto;
+
+      > * {
+        pointer-events: none;
+      }
+    }
+  }
+
+  kite-navigable-stack-breadcrumb {
+    flex: 0 0 auto;
+    align-items: center;
+    bottom: @half-padding;
+    position: absolute;
+    background: inherit;
+    z-index: 2;
+
+    ul.breadcrumb {
+      display: none;
+    }
+  }
+
+  kite-navigable-stack {
+    flex: 1 1 auto;
+    overflow: hidden;
+
+    > * {
+      height: auto;
+
+      .sections-wrapper {
+        flex: 1 1 auto;
+        overflow-y: auto;
+      }
+
+      footer {
+        display: block;
+        margin-top: @component-padding;
+      }
+    }
+
+    kite-members-list, kite-examples-list, kite-links-list {
+      padding-bottom: 2.5em;
+    }
+  }
+}
+
+// In an overlay decoration or in debug mode
+atom-overlay > kite-expand, body > kite-expand {
+  background: @base-background-color;
+  border: 1px solid @border-color;
+  border-radius: @component-border-radius;
+  max-width: 40em;
+  min-width: 20em;
+  box-shadow: 0 0.5em 1em rgba(0,0,0,0.1);
+}
+
+// In a block decoration
+kite-expand[data-screen-row] {
+  width: 100%;
+  background: @base-background-color;
+  border: 1px solid @border-color;
+}
+
+// kite-expand kite-navigable-stack-breadcrumb ul.breadcrumb [class*="item-"] {
+//   display: none;
+// }
+//
+// .breadcrumb-visibility(@counter) when (@counter >= 0) {
+//   .breadcrumb-visibility((@counter - 1));
+//
+//   @counter-1: @counter - 1;
+//
+//   kite-expand kite-navigable-stack-breadcrumb[depth="@{counter}"] ul.breadcrumb {
+//     .item-@{counter-1} {
+//       display: inline-block;
+//     }
+//
+//     .item-@{counter} {
+//       display: inline-block;
+//     }
+//   }
+// }
+//
+// .breadcrumb-visibility(20);

@@ -1,0 +1,54 @@
+@import "ui-variables";
+
+kite-status {
+  kite-logo svg {
+    height: 16px;
+  }
+
+  kite-logo[sync] {
+    display: none;
+  }
+
+  &[is-syncing] {
+    kite-logo[sync] {
+      display: inline-block;
+    }
+
+    kite-logo[small] {
+      display: none;
+    }
+  }
+
+  &[status="unknown"] {
+    kite-logo svg path,
+    kite-logo svg polygon {
+      fill: @text-color;
+    }
+  }
+
+  &[status="whitelisted"] {
+    kite-logo svg path,
+    kite-logo svg polygon {
+      fill: @text-color-info;
+    }
+  }
+
+  &[status="authenticated"],
+  &[status="whitelisted"][size-exceeds-limit] {
+    kite-logo svg path,
+    kite-logo svg polygon {
+      fill: @text-color;
+    }
+  }
+
+  &[status="reachable"],
+  &[status="uninstalled"],
+  &[status="unsupported"],
+  &[status="running"],
+  &[status="installed"] {
+    kite-logo svg path,
+    kite-logo svg polygon {
+      fill: @text-color-error;
+    }
+  }
+}

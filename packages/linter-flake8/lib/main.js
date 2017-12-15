@@ -2,12 +2,30 @@
 
 // eslint-disable-next-line import/extensions, import/no-extraneous-dependencies
 import { CompositeDisposable } from 'atom';
-import fs from 'fs-plus';
-import path from 'path';
-import * as helpers from 'atom-linter';
+
+let fs;
+let path;
+let helpers;
+let semver;
+
+function loadDeps() {
+  if (!semver) {
+    semver = require('semver');
+  }
+  if (!fs) {
+    fs = require('fs-plus');
+  }
+  if (!helpers) {
+    helpers = require('atom-linter');
+  }
+  if (!path) {
+    path = require('path');
+  }
+}
 
 // Local variables
 const parseRegex = /(\d+):(\d+):\s(([A-Z])\d{2,3})\s+(.*)/g;
+const execPathVersions = new Map();
 
 const applySubstitutions = (givenExecPath, projDir) => {
   let execPath = givenExecPath;
@@ -28,8 +46,10 @@ const getVersionString = async (versionPath) => {
     getVersionString.cache = new Map();
   }
   if (!getVersionString.cache.has(versionPath)) {
-    getVersionString.cache.set(versionPath,
-      await helpers.exec(versionPath, ['--version']));
+    getVersionString.cache.set(
+      versionPath,
+      await helpers.exec(versionPath, ['--version']),
+    );
   }
   return getVersionString.cache.get(versionPath);
 };
@@ -73,6 +93,22 @@ const generateInvalidPointTrace = async (execPath, match, filePath, textEditor, 
   };
 };
 
+const determineExecVersion = async (execPath) => {
+  const versionString = await helpers.exec(execPath, ['--version'], { ignoreExitCode: true });
+  const versionPattern = /^[^\s]+/g;
+  const match = versionString.match(versionPattern);
+  if (match !== null) {
+    execPathVersions.set(execPath, match[0]);
+  }
+};
+
+const getFlake8Version = async (execPath) => {
+  if (!execPathVersions.has(execPath)) {
+    await determineExecVersion(execPath);
+  }
+  return execPathVersions.get(execPath);
+};
+
 export default {
   activate() {
     this.idleCallbacks = new Set();
@@ -90,6 +126,7 @@ export default {
       if (typeof atom.config.get('linter-flake8.disableTimeout') !== 'undefined') {
         atom.config.unset('linter-flake8.disableTimeout');
       }
+      loadDeps();
     };
     packageDepsID = window.requestIdleCallback(linterFlake8Deps);
     this.idleCallbacks.add(packageDepsID);
@@ -142,14 +179,35 @@ export default {
       scope: 'file',
       lintOnFly: true,
       lint: async (textEditor) => {
+        if (!atom.workspace.isTextEditor(textEditor)) {
+          // Invalid TextEditor
+          return null;
+        }
+
         const filePath = textEditor.getPath();
+        if (!filePath) {
+          // Invalid path
+          return null;
+        }
         const fileText = textEditor.getText();
+
+        // Load dependencies if they aren't already
+        loadDeps();
 
         const parameters = ['--format=default'];
 
         const projectPath = atom.project.relativizePath(filePath)[0];
         const baseDir = projectPath !== null ? projectPath : path.dirname(filePath);
         const configFilePath = await helpers.findCachedAsync(baseDir, this.projectConfigFile);
+        const execPath = fs.normalize(applySubstitutions(this.executablePath, baseDir));
+
+        // get the version of Flake8
+        const version = await getFlake8Version(execPath);
+
+        // stdin-display-name available since 3.0.0
+        if (semver.valid(version) && semver.gte(version, '3.0.0')) {
+          parameters.push('--stdin-display-name', filePath);
+        }
 
         if (this.projectConfigFile && baseDir !== null && configFilePath !== null) {
           parameters.push('--config', configFilePath);
@@ -176,11 +234,10 @@ export default {
 
         parameters.push('-');
 
-        const execPath = fs.normalize(applySubstitutions(this.executablePath, baseDir));
         const forceTimeout = 1000 * 60 * 5; // (ms * s * m) = Five minutes
         const options = {
           stdin: fileText,
-          cwd: path.dirname(textEditor.getPath()),
+          cwd: baseDir,
           ignoreExitCode: true,
           timeout: forceTimeout,
           uniqueKey: `linter-flake8:${filePath}`,
@@ -233,8 +290,7 @@ export default {
             });
           } catch (point) {
             // generateRange encountered an invalid point
-            messages.push(generateInvalidPointTrace(
-              execPath, match, filePath, textEditor, point));
+            messages.push(generateInvalidPointTrace(execPath, match, filePath, textEditor, point));
           }
 
           match = parseRegex.exec(result);

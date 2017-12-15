@@ -1,0 +1,38 @@
+@import "variables";
+@import "content";
+
+kite-links-list {
+  overflow-y: auto;
+  flex-direction: column;
+
+  ul {
+    width: 100%;
+    padding-right: 0 !important;
+    margin-top: 0 !important;
+    display: flex;
+    flex-direction: column;
+  }
+
+  // li {
+  //   padding-bottom: @component-padding;
+  // }
+
+  .links-list {
+    flex: 1 1 0;
+    overflow-y: auto;
+
+    .split-line {
+      .name {
+        flex: 1 1 auto;
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
+      .type {
+        flex: 0 0 auto;
+      }
+    }
+
+    .kite-examples-list;
+    .kite-caption;
+  }
+}

@@ -1,0 +1,604 @@
+@import "ui-variables";
+@import "variables";
+
+.unreachable {
+  &, &:hover, &:active, &:focus {
+    color: @text-color;
+    opacity: 0.6;
+    text-decoration: none;
+  }
+
+  * {
+    color: @text-color;
+  }
+}
+
+.kite-section-strike {
+  h4 {
+    background-color: @app-background-color;
+    display: inline-block;
+    padding-right: @component-padding;
+
+    kite-active-search & {
+      background: @hover-background-color;
+    }
+
+    &:before {
+      content: '';
+      border-top: 1px solid @text-color;
+      position: absolute;
+      display: block;
+      z-index: -1;
+      width: 100%;
+      top: 0.5em;
+    }
+  }
+}
+
+.kite-caption {
+  caption, figcaption {
+    padding: 0;
+    color: @text-color-highlight;
+    margin-bottom: @half-padding;
+  }
+}
+
+.kite-table {
+  .kite-caption;
+  table {
+    width: 100%;
+    margin-bottom: @half-padding;
+
+
+    th, td {
+      padding: 0.4em;
+      border: 1px solid @border-color;
+    }
+  }
+}
+
+.kite-code {
+  pre {
+    -webkit-user-select: text;
+    cursor: text;
+  }
+}
+
+.kite-icon-list {
+  ul li {
+    position: relative;
+
+    > .icon {
+      position: absolute;
+      top: 0.2em;
+    }
+
+    > a, > span {
+      padding-left: 1.5em;
+      padding-right: 1.5em;
+
+      span {
+        display: inline-block;
+      }
+
+      .icon {
+        position: absolute;
+        top: 0.2em;
+        right: 0;
+      }
+    }
+  }
+}
+
+.kite-examples-list {
+  .kite-icon-list;
+}
+
+.kite-split-line {
+  display: flex;
+  flex-direction: row;
+  width: 100%;
+  align-items: center;
+
+  > * {
+    flex: 1 1 0;
+  }
+
+  > :last-child {
+    text-align: right;
+    padding-left: @component-padding;
+    &:empty {
+      display: none;
+    }
+  }
+
+  & + .split-line {
+    margin-top: @half-padding;
+  }
+
+  .name {
+    padding-left: @component-padding;
+    text-indent: -@component-padding;
+  }
+}
+
+.kite-content {
+  .kite-code;
+
+  cursor: default;
+
+  .debug {
+    margin-top: @half-padding;
+    flex: 0 1 auto;
+    display: flex;
+    max-height: 300px;
+
+    pre {
+      flex: 1 1 auto;
+      cursor: text;
+      -webkit-user-select: all;
+      user-select: all;
+      overflow: auto;
+
+      > * {
+        pointer-events: none;
+      }
+    }
+  }
+
+  kite-expand-module, kite-expand-function, kite-expand-instance {
+    flex-direction: column;
+
+    .expand-header, .expand-extend {
+      flex: 0 0 auto;
+      margin-bottom: @component-padding;
+      overflow-x: auto;
+
+      .signature a.kwargs {
+        pointer-events: none;
+        color: @text-color;
+
+        .parameter-name {
+          color: @text-color;
+        }
+      }
+    }
+
+    section.summary,
+    section.examples,
+    section.links,
+    section.usages,
+    section.examples-from-your-code {
+      .kite-section-strike;
+    }
+
+    section .kite-pro-features {
+      margin-bottom: @component-padding;
+    }
+
+    section.summary {
+      // flex: 0 1 auto;
+      // overflow-y: auto;
+
+      pre code {
+        white-space: pre;
+      }
+
+      .kite-table;
+    }
+
+    section.kwargs,
+    section.parameters {
+      flex: 0 0 auto;
+      display: flex;
+      flex-direction: column;
+
+      dl {
+        margin-top: 0;
+      }
+
+      .section-content {
+        flex: 0 1 auto;
+        overflow-y: auto;
+      }
+    }
+  }
+
+  a {
+    * {
+      pointer-events: none;
+    }
+
+    &[href] {
+      &, &:hover, &:active, &:focus, code {
+        color: @text-color-info;
+      }
+    }
+
+    &:not([href]) {
+      pointer-events: none;
+      &, &:hover, &:active, &:focus, code {
+        color: inherit;
+      }
+    }
+
+    &.external_link::after {
+      content: "\f07f";
+      font-family: 'Octicons Regular';
+    }
+
+    &.unreachable {
+      .unreachable;
+    }
+
+    i {
+      font-style: normal;
+      font-size: 0.8em;
+      font-weight: lighter;
+    }
+  }
+
+  .scroll-wrapper {
+    flex: 1 1 auto;
+    position: relative;
+    transform: translateZ(0);
+
+    .sections-wrapper {
+      overflow-y: auto;
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+    }
+  }
+
+  h4 {
+    font-weight: 400;
+    margin: 0;
+    color: @text-color-highlight;
+    font-size: 1.2em;
+
+    .sticky {
+      padding: @component-padding 0;
+
+      &.fixed {
+        cursor: pointer;
+        position: fixed;
+        box-sizing: border-box;
+        z-index: 10;
+
+        &:hover {
+          text-decoration: underline;
+        }
+      }
+    }
+  }
+
+  .highlight-title h4 {
+    color: @text-color-selected;
+  }
+
+  .type {
+    white-space: nowrap;
+  }
+
+  .type, .signature {
+    color: @text-color;
+    word-break: break-word
+  }
+
+  .split-line {
+    .kite-split-line;
+  }
+
+  section {
+    margin: 0;
+
+    .section-content {
+      margin-left: @component-padding;
+    }
+  }
+  .expand-header {
+    font-size: 1.4em;
+    color: @text-color-highlight;
+  }
+
+  .expand-extend {
+    font-size: 1.2em;
+  }
+
+  section {
+    margin-bottom: @triple-padding;
+
+    .section-content {
+      margin-top: @component-padding;
+    }
+  }
+
+  section.collapsible {
+    .section-content + * {
+      margin-bottom: @component-padding;
+    }
+
+    &.collapse .section-content {
+      max-height: 250px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    &.collapse.overflow .section-content::after {
+      content: '';
+      position: absolute;
+      height: 30px;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background-image: linear-gradient(to top, @app-background-color 0%, transparent 100%);
+    }
+  }
+
+  section.summary {
+    .description {
+      margin-top: @component-padding;
+      font-size: 1em;
+      color: @text-color-highlight;
+
+      h1, h2, h3, h4 {
+        font-size: inherit;
+        margin: inherit;
+        line-height: inherit;
+      }
+    }
+  }
+
+  section.collapsed {
+    > :not(h4) {
+      display: none !important;
+    }
+
+    h4 {
+      margin-bottom: 0;
+    }
+  }
+
+  section.top-attributes,
+  section.top-members {
+    .split-line {
+      .name {
+        flex: 1 1 auto;
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
+      .type {
+        flex: 0 0 auto;
+      }
+    }
+
+    a.more-members {
+      display: block;
+      margin-top: @component-padding;
+      // margin-bottom: @double-padding;
+    }
+  }
+
+  section.examples {
+    a.more-examples {
+      display: block;
+      margin-top: @component-padding;
+      margin-bottom: @double-padding;
+    }
+
+    .kite-examples-list;
+  }
+
+  section.links {
+    a.more-links {
+      display: block;
+      margin-top: @component-padding;
+      margin-bottom: @double-padding;
+    }
+
+    .kite-examples-list;
+  }
+
+  section.definition {
+    .kite-icon-list;
+  }
+
+  section.patterns,
+  section.examples-from-your-code {
+    .kite-pro-features {
+      font-size: 1.2em;
+      padding-left: @component-padding;
+    }
+
+    pre {
+      white-space: pre-wrap;
+    }
+  }
+
+  section.examples-from-your-code {
+    .section-content {
+      .usages-box {
+        .usage-container {
+          display: flex;
+          align-items: center;
+          align-content: center;
+          justify-content: space-between;
+        }
+
+        .usage-bullet {
+          width: 0.8em;
+          height: 0.8em;
+          border-radius: 50%;
+          background-color: @background-color-highlight;
+          margin-right: 0.5em;
+          flex-grow: 0;
+          flex-shrink: 0;
+        }
+
+        .usage {
+          flex-grow: 1;
+          padding: 0.5em;
+          // padding-left: 2em;
+          margin: 0;
+
+          & + .usage {
+            margin-top: 1px;
+          }
+
+          // &::before {
+          //   content: '\25cf';
+          //   color: lighten(@background-color-selected, 20%);
+          //   position: absolute;
+          //   left: 0.5em;
+          // }
+
+          pre {
+            margin: 0;
+            background-color: transparent;
+            font-family: inherit;
+            padding: 0;
+            overflow-x: auto;
+            white-space: pre;
+
+            code {
+              font-family: inherit;
+            }
+          }
+
+          .links {
+            display: inline-block;
+            white-space: nowrap;
+
+            .web-link {
+              cursor: pointer;
+              opacity: 0.7;
+              border-radius: 0.25em;
+              padding: 0.25em 0.5em;
+              background-color: lighten(@background-color-selected, 8%);
+              color: lighten(@text-color, 8%);
+              &:hover {
+                opacity: 1;
+                text-decoration: none;
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+
+  ul {
+    margin: 0 0 @double-padding;
+    padding: 0;
+    list-style: none;
+
+    li {
+      overflow: hidden;
+
+      & + li {
+        margin-top: @half-padding;
+      }
+
+      .icon::before {
+        margin: 0;
+      }
+
+      .icon, > .file, > .example, > .link {
+        display: inline-block;
+        vertical-align: middle;
+      }
+
+      .file, .example, .link {
+        font-weight: 300;
+        color: @text-color-highlight;
+
+        .icon {
+          color: @text-color;
+          font-weight: 0.8em;
+        }
+      }
+
+      .icon {
+        line-height: 1em;
+      }
+
+      .icon-file-code::before {
+        color: @text-color-info;
+        font-size: 1.2em;
+        line-height: 1em;
+        height: 1em;
+      }
+
+      .icon-code::before {
+        color: @text-color-success;
+        font-size: 1.2em;
+        line-height: 1em;
+        height: 1em;
+      }
+
+      pre {
+        clear: both;
+        margin-top: @half-padding;
+        margin-left: @double-padding;
+      }
+    }
+  }
+
+  dl, ul {
+    // padding-right: @component-padding;
+    margin: @component-padding 0 0;
+
+    dt, li {
+      color: @text-color;
+      font-weight: normal;
+      font-size: 1.2em;
+
+      .name {
+        a, a:hover, a:active, a:focus {
+          // color: @text-color-highlight;
+
+          &.unreachable {
+            .unreachable;
+          }
+        }
+      }
+    }
+
+    dd {
+      p {
+        margin: 0;
+      }
+
+      a {
+        font-size: 0.9em;
+      }
+    }
+
+    dt, dd, li {
+      & + dt, & + li {
+        margin-top: @component-padding;
+      }
+    }
+  }
+
+  pre {
+    color: @text-color-highlight;
+    font-size: inherit;
+    margin-bottom: @half-padding;
+
+    a.icon {
+      &, &:hover, &:active, &:focus,  {
+        color: @text-color-info;
+      }
+    }
+  }
+
+  p {
+    /* Default Atom p margin is assymetrical. Overriding for sanity */
+    margin: 0.5em 0;
+
+  }
+}

@@ -1,0 +1,6 @@
+npm-debug.log
+
+# Python stuff
+ENV
+__pycache__/
+*.py[cod]

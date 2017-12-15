@@ -1,19 +1,21 @@
 'use babel';
 
 import { join } from 'path';
-// eslint-disable-next-line import/no-extraneous-dependencies
-import { beforeEach, it } from 'jasmine-fix';
-// NOTE: If using fit you must add it to the list above!
+// eslint-disable-next-line no-unused-vars
+import { it, fit, wait, beforeEach, afterEach } from 'jasmine-fix';
+
+const { lint } = require('../lib/main.js').provideLinter();
 
 const fixturePath = join(__dirname, 'fixtures');
+const fixtureWithConfigPath = join(__dirname, 'fixtures', 'with-config-file');
 const goodPath = join(fixturePath, 'good.py');
 const badPath = join(fixturePath, 'bad.py');
+const badIgnoredPath = join(fixtureWithConfigPath, 'bad-ignored.py');
+const badSubdirIgnoredPath = join(fixtureWithConfigPath, 'subdir', 'bad-ignored.py');
 const errwarnPath = join(fixturePath, 'errwarn.py');
 const builtinsPath = join(fixturePath, 'builtins.py');
 
 describe('The flake8 provider for Linter', () => {
-  const lint = require('../lib/main.js').provideLinter().lint;
-
   beforeEach(async () => {
     // Info about this beforeEach() implementation:
     // https://github.com/AtomLinter/Meta/issues/15
@@ -27,12 +29,10 @@ describe('The flake8 provider for Linter', () => {
   });
 
   it('should be in the packages list', () =>
-    expect(atom.packages.isPackageLoaded('linter-flake8')).toBe(true),
-  );
+    expect(atom.packages.isPackageLoaded('linter-flake8')).toBe(true));
 
   it('should be an active package', () =>
-    expect(atom.packages.isPackageActive('linter-flake8')).toBe(true),
-  );
+    expect(atom.packages.isPackageActive('linter-flake8')).toBe(true));
 
   describe('checks bad.py and', () => {
     let editor = null;
@@ -83,6 +83,26 @@ describe('The flake8 provider for Linter', () => {
       atom.config.set('linter-flake8.pycodestyleErrorsToWarnings', false);
       const messages = await lint(editor);
       expect(messages[0].type).toBe('Error');
+    });
+  });
+
+  describe('use configuration file and', () => {
+    let editor = null;
+
+    beforeEach(async () => {
+      atom.project.addPath(fixtureWithConfigPath);
+      editor = await atom.workspace.open(badIgnoredPath);
+    });
+
+    it('ignores file excluded in configuration file', async () => {
+      const messages = await lint(editor);
+      expect(messages.length).toBe(0);
+    });
+
+    it('ignores file excluded in configuration file using relative path', async () => {
+      editor = await atom.workspace.open(badSubdirIgnoredPath);
+      const messages = await lint(editor);
+      expect(messages.length).toBe(0);
     });
   });
 
@@ -164,7 +184,8 @@ describe('The flake8 provider for Linter', () => {
     });
 
     it('normalizes executable path', async () => {
-      atom.config.set('linter-flake8.executablePath',
+      atom.config.set(
+        'linter-flake8.executablePath',
         join(fixturePath, '..', 'fixtures', 'flake8'),
       );
       await lint(editor);
@@ -174,7 +195,8 @@ describe('The flake8 provider for Linter', () => {
     it('finds backup executable', async () => {
       const flakeNotFound = join('$PROJECT', 'flake8_notfound');
       const flakeBackup = join(fixturePath, 'flake8_backup');
-      atom.config.set('linter-flake8.executablePath',
+      atom.config.set(
+        'linter-flake8.executablePath',
         `${flakeNotFound};${flakeBackup}`,
       );
       await lint(editor);

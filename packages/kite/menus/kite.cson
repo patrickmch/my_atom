@@ -1,0 +1,10 @@
+menu: [
+  label: 'Packages'
+  submenu: [
+    label: 'Kite'
+    submenu: [
+      {label: 'Settings', command: 'kite:open-settings'}
+      {label: 'Permissions', command: 'kite:open-permissions'}
+    ]
+  ]
+]

@@ -1,0 +1,124 @@
+{
+  "type": "curated_code_example",
+  "id": 3240,
+  "saved_as": "src.py",
+  "relativeTitle": "",
+  "inputFiles": [
+    {
+      "name": "sample.csv",
+      "contents_base64": "YSwxCmIsMgo=",
+      "mime_type": "text/csv; charset=utf-8",
+      "highlight_syntax": false
+    }
+  ],
+  "collapsed": false,
+  "title": "Read a CSV file",
+  "prelude": [
+    {
+      "type": "code",
+      "output_type": "",
+      "content": {
+        "code": "import csv\n",
+        "wrapped": null,
+        "references": [
+          {
+            "begin": 7,
+            "end": 10,
+            "expression": "csv",
+            "fully_qualified": "csv",
+            "instance": false,
+            "node_type": "import"
+          }
+        ]
+      }
+    }
+  ],
+  "code": [
+    {
+      "type": "code",
+      "output_type": "",
+      "content": {
+        "code": "reader = csv.reader(open(\"sample.csv\"))\nfor row in reader:\n    print row",
+        "wrapped": null,
+        "references": [
+          {
+            "begin": 0,
+            "end": 6,
+            "expression": "reader",
+            "fully_qualified": "_csv.reader",
+            "instance": false,
+            "node_type": "name"
+          },
+          {
+            "begin": 9,
+            "end": 12,
+            "expression": "csv",
+            "fully_qualified": "csv",
+            "instance": false,
+            "node_type": "name"
+          },
+          {
+            "begin": 13,
+            "end": 19,
+            "expression": "reader",
+            "fully_qualified": "csv.reader",
+            "instance": false,
+            "node_type": "attribute"
+          },
+          {
+            "begin": 20,
+            "end": 24,
+            "expression": "open",
+            "fully_qualified": "__builtin__.open",
+            "instance": false,
+            "node_type": "name"
+          },
+          {
+            "begin": 51,
+            "end": 57,
+            "expression": "reader",
+            "fully_qualified": "_csv.reader",
+            "instance": false,
+            "node_type": "name"
+          }
+        ]
+      }
+    },
+    {
+      "type": "output",
+      "output_type": "plaintext",
+      "content": {
+        "expression": "",
+        "value": "['a', '1']\n['b', '2']\n"
+      }
+    }
+  ],
+  "postlude": [],
+  "package": "csv",
+  "related": [
+    {
+      "id": 4447,
+      "relativeTitle": "<b>Close</b> a CSV file <b>after</b> <b>reading</b>",
+      "title": "Close a CSV file after reading",
+      "package": "csv"
+    },
+    {
+      "id": 3245,
+      "relativeTitle": "<b>Write</b> <b>rows</b> <b>to</b> a CSV file",
+      "title": "Write rows to a CSV file",
+      "package": "csv"
+    },
+    {
+      "id": 3262,
+      "relativeTitle": "Read a <b>tab-separated</b> <b>values</b> file",
+      "title": "Read a tab-separated values file",
+      "package": "csv"
+    },
+    {
+      "id": 3257,
+      "relativeTitle": "Read a CSV file <b>using</b> <b>semicolons</b> <b>as</b> <b>delimiters</b>",
+      "title": "Read a CSV file using semicolons as delimiters",
+      "package": "csv"
+    }
+  ]
+}

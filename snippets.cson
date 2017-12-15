@@ -21,6 +21,14 @@
 # http://flight-manual.atom.io/using-atom/sections/basic-customization/#_cson
 
 '.source.python':
-  'insert pdb trace':
+  'insert ipdb trace':
     'prefix': 'ip'
     'body': 'import ipdb; ipdb.set_trace()'
+
+  'insert bpdb trace':
+    'prefix': 'bpd'
+    'body': 'import bpdb; bpdb.set_trace()'
+
+  'insert pdb trace':
+    'prefix': 'pdb'
+    'body': 'import pdb; pdb.set_trace()'

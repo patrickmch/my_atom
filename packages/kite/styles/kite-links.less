@@ -1,0 +1,39 @@
+@import "variables";
+
+kite-links {
+  line-height: normal;
+  display: block;
+  text-align: right;
+  margin-top: @component-padding;
+
+  a, a:hover, a:focus, a:active {
+    color: @text-color-info;
+    font-size: 0.9em;
+  }
+
+  a {
+    opacity: 0.85;
+  }
+
+  a:hover {
+    opacity: 1;
+    text-decoration: underline;
+  }
+
+  a + a {
+    margin-left: @component-padding/3;
+  }
+
+  kite-logo {
+    width: 0.9rem;
+    opacity: 0.5;
+    margin-left: 1rem;
+    flex-grow: 0;
+    flex-shrink: 0;
+    flex-basis: 0.9rem;
+
+    svg polygon {
+      fill: @text-color-highlight;
+    }
+  }
+}

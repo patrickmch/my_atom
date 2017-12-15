@@ -1,0 +1,93 @@
+@import "variables";
+
+kite-tour {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: space-around;
+  font-size: 1.2rem;
+  background: @base-background-color;
+
+  p {
+    margin-bottom: @component-padding;
+  }
+
+  a, a:visited, a:active, a:focus, a:hover {
+    color: @text-color-info;
+  }
+
+  h5 {
+    font-size: 1.2em;
+    margin-top: @double-padding;
+
+    kite-logo {
+      margin-right: @component-padding;
+    }
+
+    span, kite-logo {
+      display: inline-block;
+      vertical-align: middle;
+    }
+  }
+
+  kite-logo svg {
+    height: 1.2em;
+    polygon {
+      fill: @text-color-highlight;
+    }
+  }
+
+  section {
+    display: flex;
+    width: 640px;
+    max-width: 100%;
+    flex-direction: row;
+    align-items: center;
+    padding: 0 @double-padding;
+
+    & + section {
+      margin-top: @double-padding;
+    }
+    & + p {
+      margin-top: @double-padding;
+    }
+
+    figure {
+      flex: 0 0 auto;
+      width: 220px;
+      background: @background-color-selected;
+      margin-right: @triple-padding;
+
+      img {
+        width: 100%;
+      }
+    }
+  }
+
+  .control-group {
+    line-height: 1em;
+  }
+
+  .kite-tour-scroll-section {
+    flex: 1 1 auto;
+    overflow-y: scroll;
+    margin: @component-padding 0;
+
+    p {
+      text-align: center;
+    }
+
+    section p {
+      text-align: left;
+    }
+  }
+
+  .kite-tour-gutter {
+    max-width: 100%;
+    width: 600px;
+    // text-align: center;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+}

@@ -1,0 +1,105 @@
+@import './variables';
+@import "../node_modules/kite-installer/styles/styles.less";
+
+.install-flow .title::before {
+  content: none !important;
+}
+
+.icon-kite::before {
+  content: '';
+  display: inline-block;
+  vertical-align: middle;
+  width: 16px;
+  height: 16px;
+   mask-image: url('atom://kite/assets/logo-no-text.svg');
+   mask-size: contain;
+   mask-repeat: no-repeat;
+  -webkit-mask-image: url('atom://kite/assets/logo-no-text.svg');
+  -webkit-mask-repeat: no-repeat;
+  -webkit-mask-size: contain;
+  background-color: @text-color-highlight;
+}
+
+.icon-so::before {
+  content: '';
+  display: inline-block;
+  vertical-align: middle;
+  font-size: 1.2em;
+  line-height: 1em;
+  height: 1em;
+  width: 1em;
+  background-image: url('atom://kite/assets/so.svg');
+}
+
+.icon-kite-gift::before {
+  content: '';
+  display: inline-block;
+  vertical-align: middle;
+  font-size: 1.2em;
+  line-height: 1em;
+  height: 1em;
+  width: 1em;
+  background-size: 100%;
+}
+.platform-darwin .icon-kite-gift::before {
+  background-image: url('atom://kite/assets/icon-gift.png');
+}
+
+.platfor-win32 .icon-kite-gift::before {
+  background-image: url('atom://kite/assets/icon-gift-windows.png');
+}
+
+.tooltip.kite-tooltip {
+  .tooltip-arrow {
+    border-top-color: @background-color-selected !important;
+  }
+
+  .tooltip-inner {
+    background: @background-color-selected;
+  }
+}
+
+.btn.btn-purple {
+  color: @text-color-highlight;
+  text-shadow: none;
+  border: 1px solid @button-border-color;
+  background-color: @purple-color;
+  background-image: linear-gradient(darken(@purple-color, 0.2), @purple-color);
+  color: white;
+}
+
+atom-text-editor .kite-hyperclick {
+  .region {
+    z-index: 1;
+    pointer-events: auto;
+    border-bottom: 1px solid @text-color-info;
+    cursor: pointer;
+  }
+}
+
+atom-text-editor[data-grammar="source python"] .autocomplete-suggestion-list.select-list.popover-list .kite-completions .suggestion-description-content {
+  white-space: normal !important;
+  .kite-completion-description {
+    max-width: 600px;
+    overflow: hidden;
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical;
+  }
+
+  // .kite-completion-footer {
+  //   padding-top: @component-padding;
+  //
+  //   a, a:visited, a:active, a:focus {
+  //     color: @text-color-info;
+  //     opacity: 0.85;
+  //   }
+  //
+  //   a.additional-margin {
+  //     margin-right: @component-padding/4;
+  //   }
+  //
+  //   }
+  // }
+
+}

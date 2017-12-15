@@ -1,0 +1,67 @@
+@import "ui-variables";
+@import "variables";
+
+kite-hover {
+  display: flex;
+  flex-direction: column;
+  background: @hover-background-color;
+  color: @text-color-highlight;
+  border: 1px solid @border-color;
+  padding: (@component-padding / 4) (@component-padding / 2);
+  border-radius: @component-border-radius;
+  font-family: @font-family;
+  max-width: 600px;
+
+  .debug {
+    margin-top: @half-padding;
+
+    pre {
+      cursor: text;
+      -webkit-user-select: all;
+      user-select: all;
+      max-height: 300px;
+      max-width: 500px;
+      overflow: auto;
+
+      > * {
+        pointer-events: none;
+      }
+    }
+  }
+
+  .auto-cursor;
+
+  .definition {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    line-height: normal;
+
+    .type, .signature, a, a:hover, a:focus, a:active {
+      color: @text-color;
+      pointer-events: none;
+    }
+
+    > * {
+      flex: 1 1 0;
+      &:empty {
+        display: none;
+      }
+
+      &:not(:first-child) {
+        text-align: right;
+        margin-left: @component-padding;
+      }
+    }
+  }
+
+  kite-links {
+    display: flex;
+    align-items: center;
+    align-content: center;
+
+    .flex-separator {
+      flex-grow: 1;
+    }
+  }
+}

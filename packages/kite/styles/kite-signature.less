@@ -1,0 +1,112 @@
+@import "variables";
+@import "content";
+
+kite-signature {
+  display: block;
+  padding: @component-padding;
+  background: @app-background-color;
+  font-size: 1em;
+  font-family: @font-family;
+  max-width: 30em;
+  min-width: 20em;
+
+  .kite-content;
+
+  h4 {
+    font-size: 0.9em;
+    margin: 15px 0 2px;
+  }
+
+  .kite-signature-wrapper {
+    margin: 0;
+  }
+
+  pre {
+    font-family: inherit;
+    font-size: 1em;
+    padding: 0;
+    background: transparent;
+    margin-left: @half-padding;
+    color: @text-color;
+    cursor: default;
+
+    .line {
+      white-space: pre-wrap;
+      word-break: normal;
+    }
+  }
+
+  h4 {
+    cursor: default;
+  }
+
+  .parameter.ellipsis {
+    color: @text-color-subtle;
+  }
+
+  .kite-pro-features{
+    font-size: 0.9em;
+    opacity: 0.7;
+  }
+
+  .parameter-name {
+    color: @text-color;
+  }
+
+  .parameter-highlight .parameter-name {
+    padding: 0 3px;
+    font-weight: bold;
+    border-radius: 2px;
+    display: inline-block;
+    color: @text-color-highlight;
+  }
+
+  .parameter-highlight a .parameter-name,
+  a .parameter-name{
+    color: @text-color-info;
+  }
+
+  &[no-documentation] + .suggestion-description {
+    display: none !important;
+  }
+
+  section.kwargs {
+    display: none;
+
+    kite-links {
+      text-align: left;
+    }
+
+    dl {
+      overflow-y: auto;
+      max-height: 200px;
+      margin-top: 0;
+      margin-left: @half-padding;
+
+    }
+
+    dt {
+      font-size: 1em;
+
+      & + dt {
+        margin-top: 0;
+      }
+
+      &.highlight .parameter-name {
+        color: @text-color-highlight;
+      }
+    }
+  }
+
+  section.kwargs.visible {
+    display: block;
+  }
+}
+
+atom-text-editor kite-signature {
+  display: none;
+}
+
+atom-text-editor[data-grammar="source python"] kite-signature {
+  display: block;
+}

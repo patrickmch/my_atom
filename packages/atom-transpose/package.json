@@ -2,39 +2,39 @@
   "_args": [
     [
       {
-        "raw": "/private/var/folders/dp/vj05cwss7pz9mjl62ccqzysm0000gp/T/d-117814-47132-17tq7bk.7lp42kpgb9/package.tgz",
+        "raw": "/private/var/folders/dp/vj05cwss7pz9mjl62ccqzysm0000gp/T/d-1171027-1003-8627dj.r3lkgldi/package.tgz",
         "scope": null,
         "escapedName": null,
         "name": null,
-        "rawSpec": "/private/var/folders/dp/vj05cwss7pz9mjl62ccqzysm0000gp/T/d-117814-47132-17tq7bk.7lp42kpgb9/package.tgz",
-        "spec": "/private/var/folders/dp/vj05cwss7pz9mjl62ccqzysm0000gp/T/d-117814-47132-17tq7bk.7lp42kpgb9/package.tgz",
+        "rawSpec": "/private/var/folders/dp/vj05cwss7pz9mjl62ccqzysm0000gp/T/d-1171027-1003-8627dj.r3lkgldi/package.tgz",
+        "spec": "/private/var/folders/dp/vj05cwss7pz9mjl62ccqzysm0000gp/T/d-1171027-1003-8627dj.r3lkgldi/package.tgz",
         "type": "local"
       },
-      "/private/var/folders/dp/vj05cwss7pz9mjl62ccqzysm0000gp/T/apm-install-dir-117814-47132-iegwn9.090jksm7vi"
+      "/private/var/folders/dp/vj05cwss7pz9mjl62ccqzysm0000gp/T/apm-install-dir-1171027-1003-1dj1eeg.gzzvdeu3di"
     ]
   ],
-  "_from": "../d-117814-47132-17tq7bk.7lp42kpgb9/package.tgz",
-  "_id": "atom-transpose@0.3.4",
+  "_from": "../d-1171027-1003-8627dj.r3lkgldi/package.tgz",
+  "_id": "atom-transpose@0.3.5",
   "_inCache": true,
   "_location": "/atom-transpose",
   "_phantomChildren": {},
   "_requested": {
-    "raw": "/private/var/folders/dp/vj05cwss7pz9mjl62ccqzysm0000gp/T/d-117814-47132-17tq7bk.7lp42kpgb9/package.tgz",
+    "raw": "/private/var/folders/dp/vj05cwss7pz9mjl62ccqzysm0000gp/T/d-1171027-1003-8627dj.r3lkgldi/package.tgz",
     "scope": null,
     "escapedName": null,
     "name": null,
-    "rawSpec": "/private/var/folders/dp/vj05cwss7pz9mjl62ccqzysm0000gp/T/d-117814-47132-17tq7bk.7lp42kpgb9/package.tgz",
-    "spec": "/private/var/folders/dp/vj05cwss7pz9mjl62ccqzysm0000gp/T/d-117814-47132-17tq7bk.7lp42kpgb9/package.tgz",
+    "rawSpec": "/private/var/folders/dp/vj05cwss7pz9mjl62ccqzysm0000gp/T/d-1171027-1003-8627dj.r3lkgldi/package.tgz",
+    "spec": "/private/var/folders/dp/vj05cwss7pz9mjl62ccqzysm0000gp/T/d-1171027-1003-8627dj.r3lkgldi/package.tgz",
     "type": "local"
   },
   "_requiredBy": [
     "#USER"
   ],
-  "_resolved": "file:../d-117814-47132-17tq7bk.7lp42kpgb9/package.tgz",
-  "_shasum": "f379b2c6a6a79565da3dc47cf941cd9be63ae6e2",
+  "_resolved": "file:../d-1171027-1003-8627dj.r3lkgldi/package.tgz",
+  "_shasum": "4f43d84db73bf934831cbd827042385cb94d33ad",
   "_shrinkwrap": null,
-  "_spec": "/private/var/folders/dp/vj05cwss7pz9mjl62ccqzysm0000gp/T/d-117814-47132-17tq7bk.7lp42kpgb9/package.tgz",
-  "_where": "/private/var/folders/dp/vj05cwss7pz9mjl62ccqzysm0000gp/T/apm-install-dir-117814-47132-iegwn9.090jksm7vi",
+  "_spec": "/private/var/folders/dp/vj05cwss7pz9mjl62ccqzysm0000gp/T/d-1171027-1003-8627dj.r3lkgldi/package.tgz",
+  "_where": "/private/var/folders/dp/vj05cwss7pz9mjl62ccqzysm0000gp/T/apm-install-dir-1171027-1003-1dj1eeg.gzzvdeu3di",
   "activationCommands": {
     "atom-workspace": "atom-transpose:transpose"
   },
@@ -52,24 +52,11 @@
   "main": "./lib/atom-transpose",
   "name": "atom-transpose",
   "optionalDependencies": {},
-  "readme": "Atom Transpose\n==============\n\nTranspose your text. Behave transpose action like Sublime Text 2/3.\n\n#### Usage\n\nRun `alt-t` or `ctrl-shift-t` to transpose your texts.\n",
+  "readme": "Atom Transpose\n==============\n\nTranspose your text. Behave transpose action like Sublime Text 2/3.\n\n![demo](https://raw.githubusercontent.com/lyfeyaj/atom-transpose/master/screenshots/demo.gif)\n\n#### Usage\n\nRun `alt-t` or `ctrl-shift-t` to transpose your texts.\n",
   "readmeFilename": "README.md",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/lyfeyaj/atom-transpose.git"
   },
-  "version": "0.3.4",
-  "_atomModuleCache": {
-    "version": 1,
-    "dependencies": [],
-    "extensions": {
-      ".coffee": [
-        "lib/atom-transpose.coffee"
-      ],
-      ".json": [
-        "package.json"
-      ]
-    },
-    "folders": []
-  }
+  "version": "0.3.5"
 }

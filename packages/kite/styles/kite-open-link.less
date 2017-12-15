@@ -1,0 +1,110 @@
+@import "ui-variables";
+
+kite-open-link {
+  display: block;
+  transition: 125ms opacity;
+  margin-right: 0.5em;
+  text-decoration: none;
+  margin: -10px;
+  padding: 10px;
+  color: @text-color;
+  cursor: pointer;
+
+  &:hover {
+    background: @text-color-info;
+
+    a[href] span {
+      color: @text-color-highlight;
+    }
+
+    kite-logo svg polygon {
+      fill: @text-color-highlight;
+    }
+  }
+
+  a[href] span {
+    background: transparent;
+    padding: 0;
+    display: inline;
+    color: @text-color;
+  }
+
+  kite-logo {
+    display: inline-block;
+    margin-left: 5px;
+    svg {
+      width: 1.2em;
+
+      polygon {
+        fill: @text-color;
+      }
+    }
+  }
+
+  kbd {
+    display: none;
+  }
+
+  // display: block;
+  // text-align: right;
+  //
+  // a {
+  //   display: inline-block;
+  //   transition: 125ms opacity;
+  //   margin-right: 0.5em;
+  //
+  //   &, &:active, &:focus, &:visited {
+  //     color: @text-color-info;
+  //     text-decoration: none;
+  //
+  //     span {
+  //       color: @text-color;
+  //       opacity: 0.6;
+  //     }
+  //
+  //     &:hover {
+  //       text-decoration: underline;
+  //
+  //       span {
+  //         text-decoration: none;
+  //         opacity: 1;
+  //       }
+  //     }
+  //   }
+  //
+  //   > * {
+  //     pointer-events: none;
+  //   }
+  //
+  //   i {
+  //     font-style: normal;
+  //     font-weight: normal;
+  //   }
+  //
+  //   span {
+  //     background-color: fadeout(@background-color-highlight, 0.5);
+  //     padding: 0.25em 0.5em;
+  //     border-radius: 0.25em;
+  //
+  //     i, kbd {
+  //       display: inline-block;
+  //       vertical-align: middle;
+  //     }
+  //   }
+  //
+  //   kbd {
+  //     font-size: 1.2em;
+  //     font-weight: lighter;
+  //     font-family: @font-family;
+  //     margin-left: 0.5em;
+  //     background-color: transparent;
+  //     padding: 0;
+  //   }
+  //
+  //   span, kite-logo {
+  //     vertical-align: middle;
+  //     display: inline-block;
+  //   }
+  // }
+  //
+}

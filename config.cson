@@ -1,5 +1,7 @@
 "*":
   "advanced-open-file":
+    createDirectories: true
+    createFileInstantly: true
     fuzzyMatch: true
     helmDirSwitch: true
   "atom-beautify":
@@ -14,6 +16,7 @@
       "linter-pylint"
       "goto-definition"
       "fonts"
+      "language-shellscript"
     ]
     packagesWithKeymapsDisabled: []
     telemetryConsent: "limited"
@@ -34,6 +37,8 @@
     fontFamily: "Inconsolata-g"
   "git-blame":
     columnWidth: 412
+  kite:
+    showKiteTourOnStartup: false
   "linter-flake8":
     ignoreErrorCodes: [
       "F821 E302"
@@ -56,13 +61,25 @@
       "highlight-selectedDecorationsZIndex": 0
     scrollAnimation: true
   "platformio-ide-terminal":
+    ansiColors:
+      normal:
+        green: "#05bf00"
+        red: "#a51400"
+        white: "#ffffff"
+      zBright:
+        brightBlack: "#f2f2f2"
     iconColors:
       blue: "#f1fffd"
       green: "#028000"
     style:
-      fontFamily: "Source Code Pro for Powerline"
+      fontFamily: "Inconsolata Nerd Font Mono"
+      fontSize: "18"
+      theme: "pro"
   python:
     linting:
       pylintArgs: [
         "--disable=R,C"
       ]
+  "split-diff":
+    colors:
+      overrideThemeColors: true

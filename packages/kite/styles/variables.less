@@ -1,0 +1,20 @@
+@import "syntax-variables";
+@import "ui-variables";
+
+// Using the git-diff colors so they are visible on your syntax theme.
+@red-color: @syntax-color-removed;
+@green-color: @syntax-color-added;
+@blue-color: @syntax-color-renamed;
+@purple-color: #9B92FB;
+@border-color: mix(@text-color-highlight, @overlay-background-color, 25%);
+@hover-background-color: mix(@text-color-highlight, @overlay-background-color, 10%);
+
+@half-padding: @component-padding / 2;
+@double-padding: @component-padding * 2;
+@triple-padding: @component-padding * 3;
+@quadruple-padding: @component-padding * 4;
+
+// Atom overrides standard Blink cursor behavior for code text. This overrides the override in our UI.
+.auto-cursor {
+	cursor: default;
+}

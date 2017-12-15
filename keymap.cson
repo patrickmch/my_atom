@@ -41,7 +41,4 @@
   'alt-p':'custom:insert-pdb-trace'
   'cmd-shift-v': 'clipboard-plus:toggle'
   'cmd-shift-e': 'platformio-ide-terminal:fullscreen'
-
-'.tree-view':
-  'down': 'custom:expand-item-down',
-  'up': 'custom:expand-item-up'
+  'ctrl-/': 'advanced-open-file:delete-path-component'

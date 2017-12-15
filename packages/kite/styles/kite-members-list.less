@@ -1,0 +1,67 @@
+@import "variables";
+
+kite-members-list {
+  flex-direction: column;
+
+  ul {
+    width: 100%;
+    padding-left: @component-padding !important;
+    padding-right: 0 !important;
+    margin-top: 0 !important;
+    display: flex;
+    flex-direction: column;
+  }
+
+  li {
+    padding-bottom: @component-padding;
+
+    p {
+      margin-bottom: 0;
+    }
+  }
+
+  .character-match {
+    color: @text-color-highlight;
+  }
+
+  header.settings-view {
+    flex-direction: column;
+
+    .row {
+      display: flex;
+      flex-direction: row;
+      margin-bottom: @half-padding;
+
+      atom-text-editor[mini] {
+        font-size: 1em;
+        flex: 1 1 0;
+      }
+
+      select.form-control {
+        margin-left: 0.25em;
+        width: auto;
+        flex: 0 0 auto;
+        font-size: 1.1em;
+      }
+    }
+    .members-count {
+      margin-bottom: @component-padding;
+    }
+  }
+
+  .members-list {
+    flex: 1 1 0;
+    overflow-y: auto;
+
+    .split-line {
+      .name {
+        flex: 1 1 auto;
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
+      .type {
+        flex: 0 0 auto;
+      }
+    }
+  }
+}

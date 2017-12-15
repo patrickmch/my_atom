@@ -1,0 +1,188 @@
+{
+  "_args": [
+    [
+      {
+        "raw": "/private/var/folders/dp/vj05cwss7pz9mjl62ccqzysm0000gp/T/d-1171114-20749-zu8br7.j5besl9pb9/package.tgz",
+        "scope": null,
+        "escapedName": null,
+        "name": null,
+        "rawSpec": "/private/var/folders/dp/vj05cwss7pz9mjl62ccqzysm0000gp/T/d-1171114-20749-zu8br7.j5besl9pb9/package.tgz",
+        "spec": "/private/var/folders/dp/vj05cwss7pz9mjl62ccqzysm0000gp/T/d-1171114-20749-zu8br7.j5besl9pb9/package.tgz",
+        "type": "local"
+      },
+      "/private/var/folders/dp/vj05cwss7pz9mjl62ccqzysm0000gp/T/apm-install-dir-1171114-20749-1y4qtip.dpkph0vn29"
+    ]
+  ],
+  "_from": "../d-1171114-20749-zu8br7.j5besl9pb9/package.tgz",
+  "_id": "kite@0.58.0",
+  "_inCache": true,
+  "_location": "/kite",
+  "_phantomChildren": {},
+  "_requested": {
+    "raw": "/private/var/folders/dp/vj05cwss7pz9mjl62ccqzysm0000gp/T/d-1171114-20749-zu8br7.j5besl9pb9/package.tgz",
+    "scope": null,
+    "escapedName": null,
+    "name": null,
+    "rawSpec": "/private/var/folders/dp/vj05cwss7pz9mjl62ccqzysm0000gp/T/d-1171114-20749-zu8br7.j5besl9pb9/package.tgz",
+    "spec": "/private/var/folders/dp/vj05cwss7pz9mjl62ccqzysm0000gp/T/d-1171114-20749-zu8br7.j5besl9pb9/package.tgz",
+    "type": "local"
+  },
+  "_requiredBy": [
+    "#USER"
+  ],
+  "_resolved": "file:../d-1171114-20749-zu8br7.j5besl9pb9/package.tgz",
+  "_shasum": "6eae7f936e7270dc73087db1c9062435babe68ea",
+  "_shrinkwrap": null,
+  "_spec": "/private/var/folders/dp/vj05cwss7pz9mjl62ccqzysm0000gp/T/d-1171114-20749-zu8br7.j5besl9pb9/package.tgz",
+  "_where": "/private/var/folders/dp/vj05cwss7pz9mjl62ccqzysm0000gp/T/apm-install-dir-1171114-20749-1y4qtip.dpkph0vn29",
+  "bugs": {
+    "url": "https://github.com/kiteco/atom-plugin/issues"
+  },
+  "configSchema": {
+    "showKiteTourOnStartup": {
+      "type": "boolean",
+      "default": true,
+      "title": "Show Kite Tour On Startup",
+      "description": "Whether to display the Kite tour on startup."
+    },
+    "enableCompletions": {
+      "type": "boolean",
+      "default": true,
+      "title": "Enable Completions",
+      "description": "Show auto-completions from Kite as Atom suggestions"
+    },
+    "enableHoverUI": {
+      "type": "boolean",
+      "default": true,
+      "title": "Enable Hover UI",
+      "description": "Show hover informations when placing the mouse over a symbol"
+    },
+    "sidebarPosition": {
+      "type": "string",
+      "default": "right",
+      "enum": [
+        "left",
+        "right"
+      ],
+      "description": "Defines where to place the sidebar in the Atom UI."
+    },
+    "sidebarWidth": {
+      "type": "integer",
+      "default": 400,
+      "description": "Defines the width of the sidebar. When the sidebar is displayed using the new dock API this value will serve as the preferred width."
+    },
+    "useDockForSidebar": {
+      "type": "boolean",
+      "default": false
+    },
+    "openSidebarOnStartup": {
+      "type": "boolean",
+      "default": false,
+      "description": "Makes the sidebar appears on startup when enabled."
+    },
+    "maxVisibleSuggestionsAlongSignature": {
+      "type": "integer",
+      "default": 3
+    },
+    "activeSearchPosition": {
+      "type": "string",
+      "default": "top-right",
+      "enum": [
+        "top-right",
+        "bottom-right",
+        "hidden"
+      ]
+    },
+    "hideDocumentationWhenSignatureIsAvailable": {
+      "type": "boolean",
+      "default": true,
+      "description": "If both a signature and documentation is available at the same only the signature will be visible."
+    },
+    "collapseLongSummaries": {
+      "type": "boolean",
+      "default": true
+    },
+    "loggingLevel": {
+      "type": "string",
+      "default": "info",
+      "enum": [
+        "silly",
+        "verbose",
+        "debug",
+        "info",
+        "warning",
+        "error"
+      ],
+      "description": "The verbosity level of Kite's logs."
+    },
+    "pollingInterval": {
+      "type": "integer",
+      "default": 15000,
+      "min": 1000,
+      "max": 60000
+    },
+    "developerMode": {
+      "type": "boolean",
+      "default": false,
+      "description": "Enable Kite developer mode, displaying received data in the various UIs."
+    }
+  },
+  "consumedServices": {
+    "status-bar": {
+      "versions": {
+        "^1.0.0": "consumeStatusBar"
+      }
+    }
+  },
+  "dependencies": {
+    "analytics-node": "^3.1.1",
+    "element-resize-detector": "^1.1.11",
+    "fuzzaldrin-plus": "^0.4.1",
+    "getmac": "^1.2.1",
+    "kite-installer": "^0.24.1",
+    "md5": "^2.2.0",
+    "rollbar-browser": "1.9.3",
+    "underscore-plus": "^1"
+  },
+  "description": "Python programming copilot — Kite shows cloud-powered completions, documentation, and examples.",
+  "devDependencies": {
+    "babel-eslint": "^6.1.2",
+    "eslint": "^3.11.1",
+    "eslint-config": "^0.3.0",
+    "eslint-config-fbjs": "^1.1.1",
+    "eslint-plugin-babel": "^3.3.0",
+    "eslint-plugin-flowtype": "^2.29.1",
+    "eslint-plugin-jasmine": "^2.2.0",
+    "eslint-plugin-prefer-object-spread": "^1.1.0",
+    "eslint-plugin-react": "^5.2.2",
+    "fbjs": "^0.8.6",
+    "javascript-obfuscator": "^0.8.3"
+  },
+  "engines": {
+    "atom": ">=1.0.0 <2.0.0"
+  },
+  "homepage": "https://github.com/kiteco/atom-plugin#readme",
+  "keywords": [],
+  "license": "SEE LICENSE IN LICENSE",
+  "main": "./lib/kite",
+  "name": "kite",
+  "optionalDependencies": {},
+  "providedServices": {
+    "autocomplete.provider": {
+      "versions": {
+        "2.0.0": "completions"
+      }
+    }
+  },
+  "readme": "## Atom Kite Plugin Documentation\n\n### Supported Atom Versions\n\nAll Atom versions greater than or equal to `v1.13.0` are supported.\n\n### Supported Operating Systems\n\nAll OS's supported by Kite are also supported by the Atom plugin, currently it supports:\n- OSX (10.10 and higher)\n- Windows (7 and higher)\n\n### Supported languages\n\nThe plugin's features are only available in file types supported by the Kite engine:\n\n- Python: All files with a `.py` extension are supported.\n\n### Install\n\nYou can install the Atom plugin from Kite directly. You can also install the plugin by searching for \"Kite\" in the package manager or by running `apm install kite` in your terminal.\n\n### Startup\n\nWhen starting Atom with Kite plugin for the first time, a brief tour about Kite will be displayed in the active pane.\n\n![kite tour](./docs/images/kite-tour.png)\n\nThis tour will only be displayed once. If you want to see it again on next startup you can activate the `Show Kite Tour On Startup` setting.\n\n### Status Bar\n\nThe Kite icon in the status bar displays the state of Kite for the current file. Clicking on the icon will open the status panel with additional information.\n\nThe icon in the status bar can take three different colors:\n\n- blue: The Kite Engine is available and functioning properly.<br/>![kite tour](./docs/images/kite-status-ready.png)\n- gray: There's either no open file or, if there's an active file, the file is either not supported or not whitelisted.<br/>![kite tour](./docs/images/kite-status-not-whitelisted.png)\n- red: Something went wrong when the plugin tried to contact the Kite service on your computer. Depending on the issue, the status panel can offer actions to solve the problem.<br/>![kite tour](./docs/images/kite-status-not-running.png)\n\n### Editor Features\n\n#### Hover documentation\n\nWhen you move the mouse over a symbol, Kite can display a popup with a quick summary of what this symbol represents and links to additional documentation.\n\n![kite hover](./docs/images/kite-hover.png)\n\nYou can see up to three links in the popup:\n\n- `def` will open the file where this symbol is defined (this may not be available if Kite cannot find the definition)\n- `web` will open the symbol documentation page in your browser\n- `more` will open the [Kite sidebar panel](#sidebar-panel) with additional documentation for this symbol\n\n#### Context Menu\n\nKite also provides contextual menus with actions related to the symbol below the mouse.\n\n![kite sidebar](./docs/images/kite-context-menu.png)\n\n#### Completions\n\nKite exposes an `autocomplete-plus` provider. When in a supported file, you'll be able to see Kite's suggestions as well as some additional documentation and links in the `autocomplete-plus` panel.\n\n![kite completions](./docs/images/kite-completions.png)\n\nThe links at the bottom have the same behaviour of those in the [hover UI](#hover-documentation).\n\n#### Functions Signatures\n\nWhen typing inside a function's parentheses Kite will display the function signature with information regarding the current argument and links to additional documentation.\n\n![kite signatures](./docs/images/kite-signature.png)\n\nThe links at the bottom have the same behaviour of those in the [hover UI](#hover-documentation).\n\n#### Sidebar Panel\n\nThe Kite sidebar panel offers a more detailed view of a symbol's documentation. You can use the sidebar panel to browse the members of a module or a type, or to access curated examples, StackOverflow topics, and more.\n\n![kite sidebar](./docs/images/kite-sidebar.png)\n\n#### Active Search\n\nWhen working in a supported file, this small overlay will be displayed at the bottom right of the workspace.\n\n![kite sidebar](./docs/images/kite-active-search-collapsed.png)\n\nClicking on it will expand Kite's active search panel. It allows you to search for identifiers from 3rd party packages or your local codebase.\n\n![kite sidebar](./docs/images/kite-active-search.png)\n\n### Commands\n\nKite exposes many commands so that you can setup your own keybindings for them.\n\n|Command|Description|\n|---|---|\n|`kite:active-search`|Expand the active search panel.|\n|`kite:expand-at-cursor`|When the cursor is inside a symbol this command will open the sidebar panel with the symbol's documentation.|\n|`kite:open-permissions`|Opens Kite's permissions into your browser.|\n|`kite:open-settings`|Opens Kite's settings into your browser.|\n|`kite:open-sidebar`|Opens Kite's sidebar panel.|\n|`kite:close-sidebar`|Closes Kite's sidebar panel.|\n|`kite:toggle-sidebar`|Toggle Kite's sidebar panel. This will close the panel if it was open, or vice versa.|\n\n### Settings\n\n\n|Setting|Description|\n|---|---|\n|`Show Kite Tour On Startup`|Whether or not to display the Kite tour on startup.|\n|`Enable Completions`|Show auto-completions from Kite as you code.|\n|`Enable Hover UI`|Show hover  when placing the mouse over a symbol|\n|`Display Expand View As`|This setting defines how the Kite expanded view will be displayed in Atom.|\n|`Sidebar Position`|When `Display Expand View As` is set to `sidebar` this setting defines where to place the sidebar in the Atom UI.|\n|`Sidebar Width`|When `Display Expand View As` is set to `sidebar` this setting defines the width of the sidebar.|\n|`Use Dock For Sidebar`|If the dock API is available in your Atom version Kite will use it to display the sidebar panel.|\n|`Open Sidebar On Startup`|When `Display Expand View As` is set to `sidebar` this setting will make the sidebar appear on startup.|\n|`Max Visible Suggestions Along Signature`|This setting controls the maximum number of completions shown when a function signature is also show|\n|`Active Search Position`|Controls where the active search collapsed panel is displayed.|\n|`Hide Documentation When Signature Is Available`|This settings controls whether or not documentation is also shown when a function signature is shown|\n|`Collapse Long Summaries`|Whether or not to collapse or not long summaries in the sidebar panel.|\n|`Polling Interval`|The interval between status checks for the active file.|\n|`Logging Level`|The verbosity level of Kite's logs.|\n|`Developer Mode`|Enable Kite developer mode, displaying received data in the various UIs.|\n",
+  "readmeFilename": "README.md",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/kiteco/atom-plugin.git"
+  },
+  "scripts": {
+    "lint": "eslint .",
+    "lint:fix": "eslint --fix ."
+  },
+  "version": "0.58.0"
+}

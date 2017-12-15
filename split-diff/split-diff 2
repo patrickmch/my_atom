@@ -1,0 +1,78 @@
+from nose.plugins.attrib import attr
+
+from .page_objects.giving_pages import GiftPage, GiftTypePage
+from payment.gui_tests.page_objects.payment_pages import SuccessPage
+from website.gui_tests.selenium_wrapper.test_case import SeleniumTestCase
+from website.gui_tests.page_objects import test_tools as tools
+from core.gui_tests.page_objects.account_pages import NewAddressPage
+
+# includes header error at top of page
+GIVING_TITLE = 'NOLS - Alumni - Giving'
+REQUIRED_ERROR_MSG = 'This field is required.'
+SUCCESSFUL_GIFT = 'Thank you'
+
+
+class GivingTestBase(SeleniumTestCase):
+    """Collection of GUI test tools for both authenticated an un-authenticated GUI tests """
+
+    def navigate_to_donation_page(self):
+        self.tear_down_browser = True
+        self.gift_type_page = GiftTypePage(self.config)
+        self.gift_type_page.choose_gift_type('credit card')
+        self.gift_page = GiftPage(self.config)
+        self.gift_page.wait_for_element('give-cc-buttons')
+
+    def submit_donation_for_payment(self):
+        self.gift_page.amount.value = '42'
+        self.gift_page.email.value = 'test@example.com'
+        self.payment_page = self.gift_page.submit(submit_btn_text='Give Now')
+        self.assertTrue(self.payment_page.contains('$42'))
+
+    def verify_success_page(self):
+        success_page = SuccessPage(self.config, arrived_on_click=True)
+        self.assertTrue(success_page.contains(SUCCESSFUL_GIFT))
+
+    def verify_required_display(self):
+        self.gift_page.repost_with_errors(submit_btn_text='Give Now')
+        self.assertTrue(self.gift_page.contains(REQUIRED_ERROR_MSG))
+
+
+class TestGivingUnauthenticated(GivingTestBase):
+    def setUp(self):
+        super(TestGivingUnauthenticated, self).setUp()
+        self.navigate_to_donation_page()
+
+    @attr('basic_one_time_gift_functionality', 'giving_unauthenticated', 'smoke')
+    def test_basic_one_time_gift_functionality(self):
+        self.submit_donation_for_payment()
+        # Overflow the address input to test Authnet's draconian limit (60 char)
+        self.payment_page.bill_address_form.line_1.value = 15 * ' 123456789'
+        self.payment_page.enter_default_values()
+        self.payment_page.submit.submit()
+        self.verify_success_page()
+
+    @attr('gift_page_required_display', 'giving_unauthenticated')
+    def test_gift_page_required_display_unauthenticated(self):
+        self.verify_required_display()
+
+
+class TestGivingAuthenticated(GivingTestBase):
+    def setUp(self):
+        super(TestGivingAuthenticated, self).setUp()
+        tools.register_and_login(self.config)
+        self.navigate_to_donation_page()
+
+    @attr('gift_page_required_display_authenticated', 'giving_authenticated')
+    def test_gift_page_required_display_authenticated(self):
+        self.verify_required_display()
+
+    @attr('basic_one_time_gift_functionality_authenticated', 'giving_authenticated')
+    def test_basic_one_time_gift_functionality_authenticated(self):
+        self.submit_donation_for_payment()
+        self.payment_page.bill_addr_link.click()
+        address_form = NewAddressPage(self.config, arrived_on_click=True)
+        address_form.enter_default_values()
+        address_form.save_and_continue()
+        self.payment_page.enter_default_values()
+        self.payment_page.submit.submit()
+        self.verify_success_page()
