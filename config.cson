@@ -14,11 +14,12 @@
       "welcome"
       "linter-python-pep8"
       "linter-pylint"
-      "goto-definition"
       "fonts"
       "language-shellscript"
     ]
-    packagesWithKeymapsDisabled: []
+    packagesWithKeymapsDisabled: [
+      "tool-bar"
+    ]
     telemetryConsent: "limited"
     themes: [
       "atom-material-ui"
@@ -83,3 +84,6 @@
   "split-diff":
     colors:
       overrideThemeColors: true
+  "tool-bar":
+    iconSize: "12px"
+    position: "Bottom"

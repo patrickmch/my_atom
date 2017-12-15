@@ -22,4 +22,11 @@
     ]
     icon: "icon-rocket"
   }
+  {
+    title: "Dotfiles Mgmt"
+    paths: [
+      "/Users/mchey/dotfiles"
+    ]
+    icon: "icon-hubot"
+  }
 ]

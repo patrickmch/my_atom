@@ -42,3 +42,4 @@
   'cmd-shift-v': 'clipboard-plus:toggle'
   'cmd-shift-e': 'platformio-ide-terminal:fullscreen'
   'ctrl-/': 'advanced-open-file:delete-path-component'
+  'ctrl-alt-a': 'tool-bar:toggle'
