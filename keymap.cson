@@ -41,5 +41,6 @@
   'alt-p':'custom:insert-pdb-trace'
   'cmd-shift-v': 'clipboard-plus:toggle'
   'cmd-shift-e': 'platformio-ide-terminal:fullscreen'
-  'ctrl-/': 'advanced-open-file:delete-path-component'
+  'cmd-/': 'advanced-open-file:delete-path-component'
   'ctrl-alt-a': 'tool-bar:toggle'
+  'cmd-q cmd-q': 'application:quit'
