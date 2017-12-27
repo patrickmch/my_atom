@@ -1,0 +1,61 @@
+{
+  "_args": [
+    [
+      {
+        "raw": "/private/var/folders/dp/vj05cwss7pz9mjl62ccqzysm0000gp/T/d-1171119-47021-8ql3sn.xsia7cik9/package.tgz",
+        "scope": null,
+        "escapedName": null,
+        "name": null,
+        "rawSpec": "/private/var/folders/dp/vj05cwss7pz9mjl62ccqzysm0000gp/T/d-1171119-47021-8ql3sn.xsia7cik9/package.tgz",
+        "spec": "/private/var/folders/dp/vj05cwss7pz9mjl62ccqzysm0000gp/T/d-1171119-47021-8ql3sn.xsia7cik9/package.tgz",
+        "type": "local"
+      },
+      "/private/var/folders/dp/vj05cwss7pz9mjl62ccqzysm0000gp/T/apm-install-dir-1171119-47021-tt3mg0.caxd1dzpvi"
+    ]
+  ],
+  "_from": "../d-1171119-47021-8ql3sn.xsia7cik9/package.tgz",
+  "_id": "atom-copy-on-select@1.4.0",
+  "_inCache": true,
+  "_location": "/atom-copy-on-select",
+  "_phantomChildren": {},
+  "_requested": {
+    "raw": "/private/var/folders/dp/vj05cwss7pz9mjl62ccqzysm0000gp/T/d-1171119-47021-8ql3sn.xsia7cik9/package.tgz",
+    "scope": null,
+    "escapedName": null,
+    "name": null,
+    "rawSpec": "/private/var/folders/dp/vj05cwss7pz9mjl62ccqzysm0000gp/T/d-1171119-47021-8ql3sn.xsia7cik9/package.tgz",
+    "spec": "/private/var/folders/dp/vj05cwss7pz9mjl62ccqzysm0000gp/T/d-1171119-47021-8ql3sn.xsia7cik9/package.tgz",
+    "type": "local"
+  },
+  "_requiredBy": [
+    "#USER"
+  ],
+  "_resolved": "file:../d-1171119-47021-8ql3sn.xsia7cik9/package.tgz",
+  "_shasum": "c0416993214b09684cc49a0fe8d0af7de8ff9246",
+  "_shrinkwrap": null,
+  "_spec": "/private/var/folders/dp/vj05cwss7pz9mjl62ccqzysm0000gp/T/d-1171119-47021-8ql3sn.xsia7cik9/package.tgz",
+  "_where": "/private/var/folders/dp/vj05cwss7pz9mjl62ccqzysm0000gp/T/apm-install-dir-1171119-47021-tt3mg0.caxd1dzpvi",
+  "bugs": {
+    "url": "https://github.com/robballou/atom-copy-on-select/issues"
+  },
+  "dependencies": {
+    "jquery": "^2"
+  },
+  "description": "Automatically copy the selected text",
+  "devDependencies": {},
+  "engines": {
+    "atom": ">0.50.0"
+  },
+  "homepage": "https://github.com/robballou/atom-copy-on-select#readme",
+  "license": "MIT",
+  "main": "./lib/atom-copy-on-select",
+  "name": "atom-copy-on-select",
+  "optionalDependencies": {},
+  "readme": "# atom-copy-on-select package\n\nCopies the selection to the clipboard automatically. Currently a very alpha/WIP in progress release. Pull requests and ideas are definitely welcome!\n\nSee: https://github.com/robballou/atom-copy-on-select/\n\n## Installation\n\n### Via apm\n\n    apm install atom-copy-on-select\n\n\n### Via git\n\n    pushd ~/.atom/packages\n    git clone git@github.com:robballou/atom-copy-on-select.git\n    popd\n\nYou likely need to restart atom or reload views.\n\n## Configuration\n\nThere are a couple of configuration options currently:\n\n### delay\n\nThe package works on a delay (to make sure you're done selecting things) which\nis normally 1000ms. This can be changed with:\n\n    \"atom-copy-on-select\":\n      delay: 800\n\n### copyOnMultipleSelections\n\nBy default, the package will not copy text if you've made multiple selections.\nYou can enable this if you want. Only the most recent selection is copied.\n\n    \"atom-copy-on-select\":\n      copyOnMultipleSelections: true\n",
+  "readmeFilename": "README.md",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/robballou/atom-copy-on-select.git"
+  },
+  "version": "1.4.0"
+}

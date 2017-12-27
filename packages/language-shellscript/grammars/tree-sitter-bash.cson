@@ -1,4 +1,3 @@
-scopeName: 'text.tree-sitter'
 id: 'bash'
 name: 'Bash'
 type: 'tree-sitter'
@@ -8,6 +7,8 @@ legacyScopeName: 'source.shell'
 fileTypes: [
   'sh'
 ]
+
+contentRegExp: '^#!.*\\b(bash|sh)\\r?\\n'
 
 folds: [
   {

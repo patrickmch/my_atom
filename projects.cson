@@ -12,6 +12,7 @@
     group: "NOLS Website"
     paths: [
       "/Users/mchey/code/website"
+      "/Users/mchey/Documents"
     ]
     icon: "icon-zap"
   }

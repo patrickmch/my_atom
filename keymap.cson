@@ -32,11 +32,12 @@
 # http://flight-manual.atom.io/using-atom/sections/basic-customization/#_cson
 
 'atom-text-editor':
-  'cmd-b': 'python-tools:goto-definition'
-  'ctrl-alt-left':'pane:split-left-and-copy-active-item'
-  'ctrl-alt-right':'pane:split-right-and-copy-active-item'
-  'ctrl-alt-up':'pane:split-up-and-copy-active-item'
-  'ctrl-alt-down':'pane:split-down-and-copy-active-item'
+  'cmd-b': 'autocomplete-python:go-to-definition'
+  # 'cmd-b': 'python-tools:goto-definition'
+  'ctrl-alt-left':'window:move-active-item-to-pane-on-left'
+  'ctrl-alt-right':'window:move-active-item-to-pane-on-right'
+  'ctrl-alt-up':'window:move-active-item-to-pane-above'
+  'ctrl-alt-down':'window:move-active-item-to-pane-below'
   'ctrl-alt-r':'pane:reopen-closed-item'
   'alt-p':'custom:insert-pdb-trace'
   'cmd-shift-v': 'clipboard-plus:toggle'

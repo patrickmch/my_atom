@@ -7,11 +7,21 @@
   "atom-beautify":
     general:
       _analyticsUserId: "57d65fa5-cb86-468f-a653-bbe65e34f933"
-  "autocomplete-python":
-    useKite: false
+  "atom-clock":
+    showClockIcon: true
+    showTooltip: true
+  "atom-copy-on-select":
+    delay: 500
+  "atom-ide-ui":
+    use:
+      "atom-ide-code-highlight": false
+  "autocomplete-python": {}
   core:
     disabledPackages: [
       "welcome"
+      "my-package"
+      "python-tools"
+      "atom-ide-ui"
     ]
     packagesWithKeymapsDisabled: [
       "tool-bar"
@@ -35,6 +45,7 @@
   "git-blame":
     columnWidth: 412
   kite:
+    enableCompletions: false
     showKiteTourOnStartup: false
   "linter-flake8":
     ignoreErrorCodes: [
