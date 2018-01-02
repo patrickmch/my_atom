@@ -13,15 +13,50 @@
   "atom-copy-on-select":
     delay: 500
   "atom-ide-ui":
-    use:
-      "atom-ide-code-highlight": false
-  "autocomplete-python": {}
+    "atom-ide-diagnostics-ui": {}
+    hyperclick:
+      darwinTriggerKeys: "altKey"
+    use: {}
+  "atom-material-ui":
+    colors:
+      abaseColor: "#2196f3"
+      accentColor: "#ff8b2e"
+      genAccent: true
+      paintCursor: true
+      predefinedColor: "Blue"
+    tabs:
+      compactTabs: true
+    ui:
+      panelContrast: true
+      panelShadows: true
+  "atom-terminal":
+    app: "iTerm.app"
+    setWorkingDirectory: false
+    surpressDirectoryArgument: false
+  "autocomplete-python":
+    showTooltips: true
   core:
+    customFileTypes:
+      "source.ini": [
+        ".buckconfig"
+        ".hgrc"
+      ]
+      "source.json": [
+        "BUCK.autodeps"
+      ]
+      "source.python": [
+        "BUCK"
+      ]
     disabledPackages: [
       "welcome"
       "my-package"
-      "python-tools"
+      "python-indent"
+      "linter"
+      "linter-ui-default"
+      "autocomplete-python"
+      "clipboard-plus"
       "atom-ide-ui"
+      "tree-view"
     ]
     packagesWithKeymapsDisabled: [
       "tool-bar"
@@ -34,6 +69,7 @@
   editor:
     fontFamily: "Source Code Pro for Powerline"
     fontSize: 18
+    preferredLineLength: 100
     showIndentGuide: true
     showInvisibles: true
   "exception-reporting":
@@ -44,6 +80,23 @@
     fontFamily: "Inconsolata-g"
   "git-blame":
     columnWidth: 412
+  "hey-pane":
+    expandedWidth: 99
+  "ide-python":
+    pylsPlugins:
+      jedi_completion: {}
+      jedi_definition: {}
+      jedi_references: {}
+      jedi_symbols:
+        all_scopes: true
+      mccabe:
+        enabled: false
+      pycodestyle:
+        enabled: false
+      pyflakes:
+        enabled: false
+      yapf:
+        enabled: false
   kite:
     enableCompletions: false
     showKiteTourOnStartup: false
@@ -52,9 +105,9 @@
       "F821 E302"
     ]
     maxLineLength: 100
+    pycodestyleErrorsToWarnings: true
   "linter-jshint": {}
-  "linter-ui-default":
-    panelHeight: 99.203125
+  "linter-ui-default": {}
   minimap:
     absoluteMode: true
     plugins:
@@ -71,6 +124,26 @@
       "minimap-autohider": true
       "minimap-autohiderDecorationsZIndex": 0
     scrollAnimation: true
+  nuclide:
+    hyperclick:
+      darwinTriggerKeys: "altKey,metaKey"
+    "nuclide-definition-preview": {}
+    "nuclide-distraction-free-mode":
+      hideFindAndReplace: true
+      hideStatusBar: true
+      hideToolBar: true
+    "nuclide-home":
+      showHome: false
+    "nuclide-python":
+      enableLinting: false
+      lintOnFly: true
+    use:
+      "nuclide-blame": false
+      "nuclide-blame-provider-hg": false
+      "nuclide-bookshelf": false
+      "nuclide-buck": false
+      "nuclide-buck-ios": false
+      "nuclide-clang": false
   "platformio-ide-terminal":
     ansiColors:
       normal:
@@ -97,3 +170,6 @@
   "tool-bar":
     iconSize: "12px"
     position: "Bottom"
+".reason.source":
+  editor:
+    preferredLineLength: 110

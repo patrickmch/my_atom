@@ -13,6 +13,7 @@
     paths: [
       "/Users/mchey/code/website"
       "/Users/mchey/Documents"
+      "/Library/Python/2.7/site-packages/pyls/config"
     ]
     icon: "icon-zap"
   }

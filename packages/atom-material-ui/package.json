@@ -2,39 +2,39 @@
   "_args": [
     [
       {
-        "raw": "/private/var/folders/dp/vj05cwss7pz9mjl62ccqzysm0000gp/T/d-117914-7606-li23ti.rw4i5p14i/package.tgz",
+        "raw": "/private/var/folders/dp/vj05cwss7pz9mjl62ccqzysm0000gp/T/d-11802-73568-1whr85w.qnk7f1or/package.tgz",
         "scope": null,
         "escapedName": null,
         "name": null,
-        "rawSpec": "/private/var/folders/dp/vj05cwss7pz9mjl62ccqzysm0000gp/T/d-117914-7606-li23ti.rw4i5p14i/package.tgz",
-        "spec": "/private/var/folders/dp/vj05cwss7pz9mjl62ccqzysm0000gp/T/d-117914-7606-li23ti.rw4i5p14i/package.tgz",
+        "rawSpec": "/private/var/folders/dp/vj05cwss7pz9mjl62ccqzysm0000gp/T/d-11802-73568-1whr85w.qnk7f1or/package.tgz",
+        "spec": "/private/var/folders/dp/vj05cwss7pz9mjl62ccqzysm0000gp/T/d-11802-73568-1whr85w.qnk7f1or/package.tgz",
         "type": "local"
       },
-      "/private/var/folders/dp/vj05cwss7pz9mjl62ccqzysm0000gp/T/apm-install-dir-117914-7606-kdzt3g.j03jysnhfr"
+      "/private/var/folders/dp/vj05cwss7pz9mjl62ccqzysm0000gp/T/apm-install-dir-11802-73568-l4h3zi.hccwn4s4i"
     ]
   ],
-  "_from": "../d-117914-7606-li23ti.rw4i5p14i/package.tgz",
-  "_id": "atom-material-ui@2.0.6",
+  "_from": "../d-11802-73568-1whr85w.qnk7f1or/package.tgz",
+  "_id": "atom-material-ui@2.1.0",
   "_inCache": true,
   "_location": "/atom-material-ui",
   "_phantomChildren": {},
   "_requested": {
-    "raw": "/private/var/folders/dp/vj05cwss7pz9mjl62ccqzysm0000gp/T/d-117914-7606-li23ti.rw4i5p14i/package.tgz",
+    "raw": "/private/var/folders/dp/vj05cwss7pz9mjl62ccqzysm0000gp/T/d-11802-73568-1whr85w.qnk7f1or/package.tgz",
     "scope": null,
     "escapedName": null,
     "name": null,
-    "rawSpec": "/private/var/folders/dp/vj05cwss7pz9mjl62ccqzysm0000gp/T/d-117914-7606-li23ti.rw4i5p14i/package.tgz",
-    "spec": "/private/var/folders/dp/vj05cwss7pz9mjl62ccqzysm0000gp/T/d-117914-7606-li23ti.rw4i5p14i/package.tgz",
+    "rawSpec": "/private/var/folders/dp/vj05cwss7pz9mjl62ccqzysm0000gp/T/d-11802-73568-1whr85w.qnk7f1or/package.tgz",
+    "spec": "/private/var/folders/dp/vj05cwss7pz9mjl62ccqzysm0000gp/T/d-11802-73568-1whr85w.qnk7f1or/package.tgz",
     "type": "local"
   },
   "_requiredBy": [
     "#USER"
   ],
-  "_resolved": "file:../d-117914-7606-li23ti.rw4i5p14i/package.tgz",
-  "_shasum": "60804c1d4ba1ed8e6c0fe68a8e617375316f83d6",
+  "_resolved": "file:../d-11802-73568-1whr85w.qnk7f1or/package.tgz",
+  "_shasum": "7d35e2a0e21aafa9d37b34806018afaa230ce2a6",
   "_shrinkwrap": null,
-  "_spec": "/private/var/folders/dp/vj05cwss7pz9mjl62ccqzysm0000gp/T/d-117914-7606-li23ti.rw4i5p14i/package.tgz",
-  "_where": "/private/var/folders/dp/vj05cwss7pz9mjl62ccqzysm0000gp/T/apm-install-dir-117914-7606-kdzt3g.j03jysnhfr",
+  "_spec": "/private/var/folders/dp/vj05cwss7pz9mjl62ccqzysm0000gp/T/d-11802-73568-1whr85w.qnk7f1or/package.tgz",
+  "_where": "/private/var/folders/dp/vj05cwss7pz9mjl62ccqzysm0000gp/T/apm-install-dir-11802-73568-l4h3zi.hccwn4s4i",
   "bugs": {
     "url": "https://github.com/atom-material/atom-material-ui/issues"
   },
@@ -139,6 +139,12 @@
           "description": "Prevents tabs from overflowing off the tab bar.",
           "type": "boolean",
           "default": false
+        },
+        "stretchedTabs": {
+          "title": "Stretched tabs",
+          "description": "Stretch tabs to full available width of the tab bar.",
+          "type": "boolean",
+          "default": false
         }
       }
     },
@@ -195,5 +201,5 @@
     "url": "git+https://github.com/atom-material/atom-material-ui.git"
   },
   "theme": "ui",
-  "version": "2.0.6"
+  "version": "2.1.0"
 }

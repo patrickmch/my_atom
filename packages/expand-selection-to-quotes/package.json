@@ -1,0 +1,70 @@
+{
+  "_args": [
+    [
+      {
+        "raw": "/private/var/folders/dp/vj05cwss7pz9mjl62ccqzysm0000gp/T/d-11801-45406-r2hsvj.ir498me7b9/package.tgz",
+        "scope": null,
+        "escapedName": null,
+        "name": null,
+        "rawSpec": "/private/var/folders/dp/vj05cwss7pz9mjl62ccqzysm0000gp/T/d-11801-45406-r2hsvj.ir498me7b9/package.tgz",
+        "spec": "/private/var/folders/dp/vj05cwss7pz9mjl62ccqzysm0000gp/T/d-11801-45406-r2hsvj.ir498me7b9/package.tgz",
+        "type": "local"
+      },
+      "/private/var/folders/dp/vj05cwss7pz9mjl62ccqzysm0000gp/T/apm-install-dir-11801-45406-i5a202.u5xqjmj9k9"
+    ]
+  ],
+  "_from": "../d-11801-45406-r2hsvj.ir498me7b9/package.tgz",
+  "_id": "expand-selection-to-quotes@0.11.0",
+  "_inCache": true,
+  "_location": "/expand-selection-to-quotes",
+  "_phantomChildren": {},
+  "_requested": {
+    "raw": "/private/var/folders/dp/vj05cwss7pz9mjl62ccqzysm0000gp/T/d-11801-45406-r2hsvj.ir498me7b9/package.tgz",
+    "scope": null,
+    "escapedName": null,
+    "name": null,
+    "rawSpec": "/private/var/folders/dp/vj05cwss7pz9mjl62ccqzysm0000gp/T/d-11801-45406-r2hsvj.ir498me7b9/package.tgz",
+    "spec": "/private/var/folders/dp/vj05cwss7pz9mjl62ccqzysm0000gp/T/d-11801-45406-r2hsvj.ir498me7b9/package.tgz",
+    "type": "local"
+  },
+  "_requiredBy": [
+    "#USER"
+  ],
+  "_resolved": "file:../d-11801-45406-r2hsvj.ir498me7b9/package.tgz",
+  "_shasum": "125efaf244bf5b02f9ca4a500dd6d45e5c9d4394",
+  "_shrinkwrap": null,
+  "_spec": "/private/var/folders/dp/vj05cwss7pz9mjl62ccqzysm0000gp/T/d-11801-45406-r2hsvj.ir498me7b9/package.tgz",
+  "_where": "/private/var/folders/dp/vj05cwss7pz9mjl62ccqzysm0000gp/T/apm-install-dir-11801-45406-i5a202.u5xqjmj9k9",
+  "activationCommands": {
+    "atom-text-editor": [
+      "expand-selection-to-quotes:toggle"
+    ]
+  },
+  "bugs": {
+    "url": "https://github.com/clessg/atom-expand-selection-to-quotes/issues"
+  },
+  "dependencies": {},
+  "description": "Expands selections to single or double quotes.",
+  "devDependencies": {},
+  "engines": {
+    "atom": ">0.50.0"
+  },
+  "homepage": "https://github.com/clessg/atom-expand-selection-to-quotes#readme",
+  "keywords": [
+    "quotes",
+    "selection",
+    "expand selection",
+    "expand selection to quotes"
+  ],
+  "license": "MIT",
+  "main": "./lib/expand-selection-to-quotes",
+  "name": "expand-selection-to-quotes",
+  "optionalDependencies": {},
+  "readme": "# Atom expand-selection-to-quotes\n\nExpands selections in the Atom editor to single or double quotes.\n\nThe default keybinding is Ctrl+' and Cmd+'.\n\nOriginally written by Ben Johnson. The original package seems to have disappeared and has deprecations, so I am reposting it with fixes.\n\nThis project is based on the awesome work of kek in [sublime-expand-selection-to-quotes](https://github.com/kek/sublime-expand-selection-to-quotes).\n\nNow supports multiple selections! Thanks [@de-monkeyz](https://github.com/de-monkeyz).\n\n## Known Issues\n* It assumes that the type of quote to the left of the cursor is the one we want, which is stupid and not always true.\n",
+  "readmeFilename": "README.md",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/clessg/atom-expand-selection-to-quotes.git"
+  },
+  "version": "0.11.0"
+}

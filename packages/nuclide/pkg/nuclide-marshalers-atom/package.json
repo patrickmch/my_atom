@@ -1,0 +1,11 @@
+{
+  "name": "nuclide-marshalers-atom",
+  "main": "./lib/main.js",
+  "version": "0.0.0",
+  "description": "Marshalers for Nuclide in the Atom process",
+  "nuclide": {
+    "packageType": "Node",
+    "testRunner": "apm"
+  },
+  "atomTestRunner": "../../lib/test-runner-entry.js"
+}

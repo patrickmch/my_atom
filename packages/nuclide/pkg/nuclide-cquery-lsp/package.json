@@ -1,0 +1,40 @@
+{
+  "name": "nuclide-cquery-lsp",
+  "main": "./lib/main.js",
+  "version": "0.0.0",
+  "description": "Client for the cquery LSP",
+  "private": true,
+  "atomTestRunner": "../../lib/test-runner-entry.js",
+  "nuclide": {
+    "packageType": "Atom",
+    "testRunner": "apm",
+    "configMetadata": {
+      "pathComponents": [
+        "Language",
+        "Cquery"
+      ]
+    },
+    "config": {
+      "use-cquery": {
+        "title": "Use cquery instead of libclang (experimental)",
+        "type": "boolean",
+        "default": "false",
+        "description": "Still in early development. You need cquery in your PATH and a restart is required"
+      }
+    }
+  },
+  "consumedServices": {
+    "find-references-view": {
+      "versions": {
+        "0.1.0": "consumeReferencesView"
+      }
+    }
+  },
+  "activationHooks": [
+    "language-c:grammar-used",
+    "language-cpp14:grammar-used",
+    "language-objective-c:grammar-used"
+  ],
+  "activationCommands": {
+  }
+}

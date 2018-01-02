@@ -2,39 +2,39 @@
   "_args": [
     [
       {
-        "raw": "/private/var/folders/dp/vj05cwss7pz9mjl62ccqzysm0000gp/T/d-1171118-10946-1xqu67p.kylxflxr/package.tgz",
+        "raw": "/private/var/folders/dp/vj05cwss7pz9mjl62ccqzysm0000gp/T/d-1171130-2573-t4m5wm.uhqazfflxr/package.tgz",
         "scope": null,
         "escapedName": null,
         "name": null,
-        "rawSpec": "/private/var/folders/dp/vj05cwss7pz9mjl62ccqzysm0000gp/T/d-1171118-10946-1xqu67p.kylxflxr/package.tgz",
-        "spec": "/private/var/folders/dp/vj05cwss7pz9mjl62ccqzysm0000gp/T/d-1171118-10946-1xqu67p.kylxflxr/package.tgz",
+        "rawSpec": "/private/var/folders/dp/vj05cwss7pz9mjl62ccqzysm0000gp/T/d-1171130-2573-t4m5wm.uhqazfflxr/package.tgz",
+        "spec": "/private/var/folders/dp/vj05cwss7pz9mjl62ccqzysm0000gp/T/d-1171130-2573-t4m5wm.uhqazfflxr/package.tgz",
         "type": "local"
       },
-      "/private/var/folders/dp/vj05cwss7pz9mjl62ccqzysm0000gp/T/apm-install-dir-1171118-10946-w5yh77.8ayelba9k9"
+      "/private/var/folders/dp/vj05cwss7pz9mjl62ccqzysm0000gp/T/apm-install-dir-1171130-2573-56bcpv.2yxriicnmi"
     ]
   ],
-  "_from": "../d-1171118-10946-1xqu67p.kylxflxr/package.tgz",
-  "_id": "atom-ide-ui@0.7.0",
+  "_from": "../d-1171130-2573-t4m5wm.uhqazfflxr/package.tgz",
+  "_id": "atom-ide-ui@0.7.1",
   "_inCache": true,
   "_location": "/atom-ide-ui",
   "_phantomChildren": {},
   "_requested": {
-    "raw": "/private/var/folders/dp/vj05cwss7pz9mjl62ccqzysm0000gp/T/d-1171118-10946-1xqu67p.kylxflxr/package.tgz",
+    "raw": "/private/var/folders/dp/vj05cwss7pz9mjl62ccqzysm0000gp/T/d-1171130-2573-t4m5wm.uhqazfflxr/package.tgz",
     "scope": null,
     "escapedName": null,
     "name": null,
-    "rawSpec": "/private/var/folders/dp/vj05cwss7pz9mjl62ccqzysm0000gp/T/d-1171118-10946-1xqu67p.kylxflxr/package.tgz",
-    "spec": "/private/var/folders/dp/vj05cwss7pz9mjl62ccqzysm0000gp/T/d-1171118-10946-1xqu67p.kylxflxr/package.tgz",
+    "rawSpec": "/private/var/folders/dp/vj05cwss7pz9mjl62ccqzysm0000gp/T/d-1171130-2573-t4m5wm.uhqazfflxr/package.tgz",
+    "spec": "/private/var/folders/dp/vj05cwss7pz9mjl62ccqzysm0000gp/T/d-1171130-2573-t4m5wm.uhqazfflxr/package.tgz",
     "type": "local"
   },
   "_requiredBy": [
     "#USER"
   ],
-  "_resolved": "file:../d-1171118-10946-1xqu67p.kylxflxr/package.tgz",
-  "_shasum": "7570058d84d70f1b2763998a11e997ffac3b4ccd",
+  "_resolved": "file:../d-1171130-2573-t4m5wm.uhqazfflxr/package.tgz",
+  "_shasum": "c1430cfb33e0b37b1b0ab92f3ff5c6c2544d1315",
   "_shrinkwrap": null,
-  "_spec": "/private/var/folders/dp/vj05cwss7pz9mjl62ccqzysm0000gp/T/d-1171118-10946-1xqu67p.kylxflxr/package.tgz",
-  "_where": "/private/var/folders/dp/vj05cwss7pz9mjl62ccqzysm0000gp/T/apm-install-dir-1171118-10946-w5yh77.8ayelba9k9",
+  "_spec": "/private/var/folders/dp/vj05cwss7pz9mjl62ccqzysm0000gp/T/d-1171130-2573-t4m5wm.uhqazfflxr/package.tgz",
+  "_where": "/private/var/folders/dp/vj05cwss7pz9mjl62ccqzysm0000gp/T/apm-install-dir-1171130-2573-56bcpv.2yxriicnmi",
   "bugs": {
     "url": "https://github.com/facebook-atom/atom-ide-ui/issues"
   },
@@ -56,20 +56,21 @@
     "mkdirp": "0.5.1",
     "mv": "2.1.1",
     "nullthrows": "1.0.0",
-    "react": "16.0.0",
-    "react-dom": "16.0.0",
+    "react": "16.2.0",
+    "react-dom": "16.2.0",
     "redux": "3.6.0",
     "redux-logger": "3.0.6",
     "reselect": "3.0.1",
     "resolve-from": "2.0.0",
     "rimraf": "2.6.2",
-    "rxjs": "5.3.1",
+    "rxjs": "5.5.5",
     "semver": "5.3.0",
     "shallowequal": "0.2.2",
     "shell-quote": "1.6.1",
     "tabbable": "1.1.0",
     "temp": "0.8.3",
-    "uuid": "3.0.1"
+    "uuid": "3.0.1",
+    "vscode-uri": "1.0.1"
   },
   "description": "A collection of Atom UIs to support language services.",
   "devDependencies": {
@@ -100,7 +101,7 @@
     "eslint-plugin-prettier": "2.3.1",
     "eslint-plugin-react": "7.4.0",
     "eslint-plugin-rulesdir": "0.1.0",
-    "flow-bin": "0.60.1",
+    "flow-bin": "0.61.0",
     "jasmine-node": "1.14.5",
     "nyc": "11.2.1",
     "prettier": "1.9.1",
@@ -130,5 +131,5 @@
     "release-transpile": "./modules/nuclide-node-transpiler/bin/release-transpile.js",
     "test": "npm run flow && npm run lint-all && ./scripts/test.js"
   },
-  "version": "0.7.0"
+  "version": "0.7.1"
 }
