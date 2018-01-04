@@ -48,7 +48,7 @@
   'cmd-k cmd-l': 'window:toggle-left-dock'
   'cmd-k cmd-r': 'window:toggle-right-dock'
 
-  'shift-alt-h': 'hey-pane:toggle-follow-mode'
+  'shift-alt-k': 'hey-pane:toggle-follow-mode'
   'cmd-b': 'python-tools:goto-definition'
   'ctrl-alt-r':'pane:reopen-closed-item'
   'alt-shift-v': 'clipboard-plus:toggle'
@@ -57,5 +57,5 @@
   'cmd-q cmd-q': 'application:quit'
   'ctrl-=': 'expand-selection-to-quotes:toggle'
   'ctrl--': 'bracket-matcher:select-inside-brackets'
-  'ctrl-cmd-o': 'advanced-open-file:toggle'
-  # 'ctrl-cmd-o': 'nuclide-open-filenames-provider:toggle-provider'
+  'alt-cmd-o': 'advanced-open-file:toggle'
+  'ctrl-cmd-o': 'nuclide-open-filenames-provider:toggle-provider'

@@ -75,7 +75,8 @@
   "exception-reporting":
     userId: "bf1a28f2-4481-4777-b187-9b8e1da674c0"
   "find-and-replace":
-    projectSearchResultsPaneSplitDirection: "down"
+    closeFindPanelAfterSearch: true
+    focusEditorAfterSearch: true
   fonts:
     fontFamily: "Inconsolata-g"
   "git-blame":
