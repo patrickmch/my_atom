@@ -62,6 +62,7 @@
     excludeVcsIgnoredPaths: false
     packagesWithKeymapsDisabled: [
       "tool-bar"
+      "line-jumper"
     ]
     telemetryConsent: "limited"
     themes: [

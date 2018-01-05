@@ -66,10 +66,17 @@
   'ctrl-shift-down': 'line-jumper:select-down'
   'ctrl-up': 'line-jumper:move-up'
   'ctrl-shift-up': 'line-jumper:select-up'
+  'alt-enter': 'jumpy:toggle'
 
   # Key bindings for multi-cursor-plus
-  'alt-x':                'multi-cursor-plus:mark'
+  'ctrl-alt-x':           'multi-cursor-plus:mark'
   'ctrl-alt-up':          'multi-cursor-plus:move-up'
   'ctrl-alt-down':        'multi-cursor-plus:move-down'
   'ctrl-alt-left':        'multi-cursor-plus:move-left'
   'ctrl-alt-right':       'multi-cursor-plus:move-right'
+  'ctrl-alt-cmd-left':    'multi-cursor-plus:move-to-beginning-of-word'
+  'ctrl-alt-cmd-right':   'multi-cursor-plus:move-to-end-of-word'
+  'alt-shift-up':         'multi-cursor-plus:select-up'
+  'alt-shift-down':       'multi-cursor-plus:select-down'
+  'alt-shift-left':       'multi-cursor-plus:select-left'
+  'alt-shift-right':      'multi-cursor-plus:select-right'
