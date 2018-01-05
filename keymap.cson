@@ -44,9 +44,9 @@
   'cmd-k alt-up':'pane:split-up-and-move-active-item'
   'cmd-k alt-down':'pane:split-down-and-move-active-item'
 
-  'cmd-k cmd-b': 'window:toggle-bottom-dock'
-  'cmd-k cmd-l': 'window:toggle-left-dock'
-  'cmd-k cmd-r': 'window:toggle-right-dock'
+  'cmd-k b': 'window:toggle-bottom-dock'
+  'cmd-k l': 'window:toggle-left-dock'
+  'cmd-k r': 'window:toggle-right-dock'
 
   'shift-alt-k': 'hey-pane:toggle-follow-mode'
   'cmd-b': 'python-tools:goto-definition'
@@ -59,3 +59,17 @@
   'ctrl--': 'bracket-matcher:select-inside-brackets'
   'alt-cmd-o': 'advanced-open-file:toggle'
   'ctrl-cmd-o': 'nuclide-open-filenames-provider:toggle-provider'
+  'shift-cmd-j': 'atom-notes:toggle'
+  'shift-cmd-alt-t': 'markdown-writer:toggle-task'
+  'shift-cmd-alt-x': 'markdown-writer:toggle-taskdone'
+  'ctrl-down': 'line-jumper:move-down'
+  'ctrl-shift-down': 'line-jumper:select-down'
+  'ctrl-up': 'line-jumper:move-up'
+  'ctrl-shift-up': 'line-jumper:select-up'
+
+  # Key bindings for multi-cursor-plus
+  'alt-x':                'multi-cursor-plus:mark'
+  'ctrl-alt-up':          'multi-cursor-plus:move-up'
+  'ctrl-alt-down':        'multi-cursor-plus:move-down'
+  'ctrl-alt-left':        'multi-cursor-plus:move-left'
+  'ctrl-alt-right':       'multi-cursor-plus:move-right'

@@ -1,0 +1,151 @@
+{
+  "projectName": "atom-notes",
+  "projectOwner": "lexicalunit",
+  "files": [
+    "README.md"
+  ],
+  "imageSize": 100,
+  "commit": true,
+  "contributors": [
+    {
+      "login": "lexicalunit",
+      "name": "Amy Troschinetz",
+      "avatar_url": "https://avatars1.githubusercontent.com/u/1903876?v=4",
+      "profile": "http://lexicalunit.com",
+      "contributions": [
+        "code",
+        "doc",
+        "bug"
+      ]
+    },
+    {
+      "login": "seongjaelee",
+      "name": "Seongjae Lee",
+      "avatar_url": "https://avatars1.githubusercontent.com/u/948301?v=4",
+      "profile": "http://bluebrown.net",
+      "contributions": [
+        "code",
+        "doc",
+        "bug"
+      ]
+    },
+    {
+      "login": "jonmagic",
+      "name": "Jonathan Hoyt",
+      "avatar_url": "https://avatars1.githubusercontent.com/u/623?v=4",
+      "profile": "http://theprogrammingbutler.com",
+      "contributions": [
+        "bug",
+        "code"
+      ]
+    },
+    {
+      "login": "philip-hodder",
+      "name": "Philip Hodder",
+      "avatar_url": "https://avatars1.githubusercontent.com/u/6660636?v=4",
+      "profile": "http://www.encodis.com",
+      "contributions": [
+        "bug"
+      ]
+    },
+    {
+      "login": "alflanagan",
+      "name": "A. Lloyd Flanagan",
+      "avatar_url": "https://avatars1.githubusercontent.com/u/1546080?v=4",
+      "profile": "http://adrian-l-flanagan.herokuapp.com",
+      "contributions": [
+        "bug"
+      ]
+    },
+    {
+      "login": "webdev-skynet",
+      "name": "webdev-skynet",
+      "avatar_url": "https://avatars2.githubusercontent.com/u/31057217?v=4",
+      "profile": "https://github.com/webdev-skynet",
+      "contributions": [
+        "bug"
+      ]
+    },
+    {
+      "login": "lakonis",
+      "name": "lakonis",
+      "avatar_url": "https://avatars0.githubusercontent.com/u/9479788?v=4",
+      "profile": "https://github.com/lakonis",
+      "contributions": [
+        "bug"
+      ]
+    },
+    {
+      "login": "wassname",
+      "name": "Mike Clark",
+      "avatar_url": "https://avatars1.githubusercontent.com/u/1103714?v=4",
+      "profile": "http://wassname.org",
+      "contributions": [
+        "bug"
+      ]
+    },
+    {
+      "login": "sdaza",
+      "name": "Sebastian Daza",
+      "avatar_url": "https://avatars1.githubusercontent.com/u/2096246?v=4",
+      "profile": "http://sdaza.com",
+      "contributions": [
+        "bug"
+      ]
+    },
+    {
+      "login": "OmeGak",
+      "name": "Alejandro Avilés",
+      "avatar_url": "https://avatars3.githubusercontent.com/u/716307?v=4",
+      "profile": "http://twitter.com/OmeGak",
+      "contributions": [
+        "bug"
+      ]
+    },
+    {
+      "login": "mshenfield",
+      "name": "Max Shenfield",
+      "avatar_url": "https://avatars0.githubusercontent.com/u/4812055?v=4",
+      "profile": "https://www.eventbrite.com",
+      "contributions": [
+        "bug"
+      ]
+    },
+    {
+      "login": "rsshel",
+      "name": "Rob",
+      "avatar_url": "https://avatars1.githubusercontent.com/u/19962963?v=4",
+      "profile": "https://github.com/rsshel",
+      "contributions": [
+        "bug"
+      ]
+    },
+    {
+      "login": "Cutuchiqueno",
+      "name": "Niels-Oliver Walkowski",
+      "avatar_url": "https://avatars2.githubusercontent.com/u/306064?v=4",
+      "profile": "http://nowalkowski.de",
+      "contributions": [
+        "bug"
+      ]
+    },
+    {
+      "login": "phdd",
+      "name": "Peter",
+      "avatar_url": "https://avatars0.githubusercontent.com/u/1544436?v=4",
+      "profile": "https://google.com/+PeterHeisig",
+      "contributions": [
+        "code"
+      ]
+    },
+    {
+      "login": "yanivdll",
+      "name": "Yaniv Gilad",
+      "avatar_url": "https://avatars2.githubusercontent.com/u/675472?v=4",
+      "profile": "http://prodissues.com",
+      "contributions": [
+        "bug"
+      ]
+    }
+  ]
+}

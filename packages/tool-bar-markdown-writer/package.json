@@ -1,0 +1,78 @@
+{
+  "_args": [
+    [
+      {
+        "raw": "/private/var/folders/dp/vj05cwss7pz9mjl62ccqzysm0000gp/T/d-11804-18216-12p3t5k.ro4mgw4s4i/package.tgz",
+        "scope": null,
+        "escapedName": null,
+        "name": null,
+        "rawSpec": "/private/var/folders/dp/vj05cwss7pz9mjl62ccqzysm0000gp/T/d-11804-18216-12p3t5k.ro4mgw4s4i/package.tgz",
+        "spec": "/private/var/folders/dp/vj05cwss7pz9mjl62ccqzysm0000gp/T/d-11804-18216-12p3t5k.ro4mgw4s4i/package.tgz",
+        "type": "local"
+      },
+      "/private/var/folders/dp/vj05cwss7pz9mjl62ccqzysm0000gp/T/apm-install-dir-11804-18216-1c6sv31.n2zlvoyldi"
+    ]
+  ],
+  "_from": "../d-11804-18216-12p3t5k.ro4mgw4s4i/package.tgz",
+  "_id": "tool-bar-markdown-writer@0.3.1",
+  "_inCache": true,
+  "_location": "/tool-bar-markdown-writer",
+  "_phantomChildren": {},
+  "_requested": {
+    "raw": "/private/var/folders/dp/vj05cwss7pz9mjl62ccqzysm0000gp/T/d-11804-18216-12p3t5k.ro4mgw4s4i/package.tgz",
+    "scope": null,
+    "escapedName": null,
+    "name": null,
+    "rawSpec": "/private/var/folders/dp/vj05cwss7pz9mjl62ccqzysm0000gp/T/d-11804-18216-12p3t5k.ro4mgw4s4i/package.tgz",
+    "spec": "/private/var/folders/dp/vj05cwss7pz9mjl62ccqzysm0000gp/T/d-11804-18216-12p3t5k.ro4mgw4s4i/package.tgz",
+    "type": "local"
+  },
+  "_requiredBy": [
+    "#USER"
+  ],
+  "_resolved": "file:../d-11804-18216-12p3t5k.ro4mgw4s4i/package.tgz",
+  "_shasum": "86d556a374ca8b76a12731c0b6a5141ff0df2164",
+  "_shrinkwrap": null,
+  "_spec": "/private/var/folders/dp/vj05cwss7pz9mjl62ccqzysm0000gp/T/d-11804-18216-12p3t5k.ro4mgw4s4i/package.tgz",
+  "_where": "/private/var/folders/dp/vj05cwss7pz9mjl62ccqzysm0000gp/T/apm-install-dir-11804-18216-1c6sv31.n2zlvoyldi",
+  "bugs": {
+    "url": "https://github.com/zhuochun/tool-bar-md-writer/issues"
+  },
+  "consumedServices": {
+    "tool-bar": {
+      "versions": {
+        "^0 || ^1": "consumeToolBar"
+      }
+    }
+  },
+  "dependencies": {
+    "atom-package-deps": "^4.3.1"
+  },
+  "description": "A tool-bar plugin that adds Markdown editing actions",
+  "devDependencies": {},
+  "engines": {
+    "atom": ">=1.0.0 <2.0.0"
+  },
+  "homepage": "https://github.com/zhuochun/tool-bar-md-writer#readme",
+  "keywords": [
+    "tool-bar",
+    "markdown",
+    "markdown-writer",
+    "writing"
+  ],
+  "license": "MIT",
+  "main": "./lib/tool-bar-markdown-writer",
+  "name": "tool-bar-markdown-writer",
+  "optionalDependencies": {},
+  "package-deps": [
+    "tool-bar",
+    "markdown-writer"
+  ],
+  "readme": "# Toolbar for Markdown-Writer\n\n[![Apm Version](https://img.shields.io/apm/v/tool-bar-markdown-writer.svg)](https://atom.io/packages/tool-bar-markdown-writer)\n[![Apm Downloads](https://img.shields.io/apm/dm/tool-bar-markdown-writer.svg)](https://atom.io/packages/tool-bar-markdown-writer)\n\nA tool-bar plugin that adds Markdown editing buttons.\n\nPowered with [Markdown Writer](https://atom.io/packages/markdown-writer) and [Atom Tool Bar](https://atom.io/packages/tool-bar).\n\n![Toolbar for Markdown-Writer](http://i.imgur.com/GK5zB1L.png)\n\n## Installation\n\n```\napm install tool-bar markdown-writer tool-bar-markdown-writer\n```\n\n## Tricks\n\n- `shift` + **New Post**: Add New Draft\n- `shift` + **Insert Link**: Open Link in Browser\n- `shift` + **Code**: Insert Code Block\n- `shift` + **Ordered List**: Format Ordered List Numbers\n- `shift` + **Task List**: Toggle Task Done/Undone\n\n## Configuration\n\n- **Visibility**:\n  - `showToolbarOnMarkdown`: show toolbar in Markdown files.\n  - `showButtonsOnMarkdown`: show Markdown buttons in Markdown files. Useful when you have multiple plugins installed.\n  - `showButtonsOnAll`: always show toolbar and Markdown buttons\n- **Grammars**:\n  - An array of file types to be treated as Markdown files.\n\nHappy writing!\n",
+  "readmeFilename": "README.md",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/zhuochun/tool-bar-md-writer.git"
+  },
+  "version": "0.3.1"
+}

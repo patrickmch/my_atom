@@ -57,7 +57,9 @@
       "clipboard-plus"
       "atom-ide-ui"
       "tree-view"
+      "language-gfm"
     ]
+    excludeVcsIgnoredPaths: false
     packagesWithKeymapsDisabled: [
       "tool-bar"
     ]
@@ -68,7 +70,7 @@
     ]
   editor:
     fontFamily: "Source Code Pro for Powerline"
-    fontSize: 18
+    fontSize: 16
     preferredLineLength: 100
     showIndentGuide: true
     showInvisibles: true
@@ -171,6 +173,9 @@
   "tool-bar":
     iconSize: "12px"
     position: "Bottom"
+    visible: false
+  "tool-bar-markdown-writer":
+    visibility: "showToolbarOnMarkdown"
 ".reason.source":
   editor:
     preferredLineLength: 110
