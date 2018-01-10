@@ -21,12 +21,6 @@ function _load_nuclideUri() {
   return _nuclideUri = _interopRequireDefault(require('nuclide-commons/nuclideUri'));
 }
 
-var _nuclideDebuggerBase;
-
-function _load_nuclideDebuggerBase() {
-  return _nuclideDebuggerBase = require('../../nuclide-debugger-base');
-}
-
 var _Button;
 
 function _load_Button() {
@@ -56,6 +50,29 @@ var _rxjsBundlesRxMinJs = require('rxjs/bundles/Rx.min.js');
 function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+// TODO those should be managed by the debugger store state
+/**
+ * Copyright (c) 2015-present, Facebook, Inc.
+ * All rights reserved.
+ *
+ * This source code is licensed under the license found in the LICENSE file in
+ * the root directory of this source tree.
+ *
+ * 
+ * @format
+ */
+/* global localStorage */
+
+function setLastUsedDebugger(host, action, debuggerDisplayName) {
+  const key = 'NUCLIDE_DEBUGGER_LAST_USED_' + host + '_' + action;
+  localStorage.setItem(key, debuggerDisplayName);
+}
+
+function getLastUsedDebugger(host, action) {
+  const key = 'NUCLIDE_DEBUGGER_LAST_USED_' + host + '_' + action;
+  return localStorage.getItem(key);
+}
 
 class DebuggerLaunchAttachUI extends _react.Component {
 
@@ -98,7 +115,7 @@ class DebuggerLaunchAttachUI extends _react.Component {
     // button is clicked.
     const host = (_nuclideUri || _load_nuclideUri()).default.isRemote(this.props.connection) ? (_nuclideUri || _load_nuclideUri()).default.getHostname(this.props.connection) : 'local';
     if (this.state.selectedProviderTab != null) {
-      (0, (_nuclideDebuggerBase || _load_nuclideDebuggerBase()).setLastUsedDebugger)(host, this.props.dialogMode, this.state.selectedProviderTab || '');
+      setLastUsedDebugger(host, this.props.dialogMode, this.state.selectedProviderTab || '');
     }
   }
 
@@ -107,7 +124,7 @@ class DebuggerLaunchAttachUI extends _react.Component {
 
     this._filterProviders(host);
     this.setState({
-      selectedProviderTab: (0, (_nuclideDebuggerBase || _load_nuclideDebuggerBase()).getLastUsedDebugger)(host, this.props.dialogMode)
+      selectedProviderTab: getLastUsedDebugger(host, this.props.dialogMode)
     });
   }
 
@@ -116,7 +133,7 @@ class DebuggerLaunchAttachUI extends _react.Component {
 
     this._filterProviders(host);
     this.setState({
-      selectedProviderTab: (0, (_nuclideDebuggerBase || _load_nuclideDebuggerBase()).getLastUsedDebugger)(host, nextProps.dialogMode)
+      selectedProviderTab: getLastUsedDebugger(host, nextProps.dialogMode)
     });
   }
 
@@ -255,13 +272,4 @@ class DebuggerLaunchAttachUI extends _react.Component {
     );
   }
 }
-exports.DebuggerLaunchAttachUI = DebuggerLaunchAttachUI; /**
-                                                          * Copyright (c) 2015-present, Facebook, Inc.
-                                                          * All rights reserved.
-                                                          *
-                                                          * This source code is licensed under the license found in the LICENSE file in
-                                                          * the root directory of this source tree.
-                                                          *
-                                                          * 
-                                                          * @format
-                                                          */
+exports.DebuggerLaunchAttachUI = DebuggerLaunchAttachUI;

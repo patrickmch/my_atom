@@ -7,18 +7,21 @@ exports.DebuggerStore = exports.DebuggerMode = undefined;
 
 var _atom = require('atom');
 
-var _DebuggerSettings;
-
-function _load_DebuggerSettings() {
-  return _DebuggerSettings = require('./DebuggerSettings');
-}
-
 var _DebuggerDispatcher;
 
 function _load_DebuggerDispatcher() {
   return _DebuggerDispatcher = require('./DebuggerDispatcher');
 }
 
+const DebuggerMode = exports.DebuggerMode = Object.freeze({
+  STARTING: 'starting',
+  RUNNING: 'running',
+  PAUSED: 'paused',
+  STOPPING: 'stopping',
+  STOPPED: 'stopped'
+});
+
+// This is to work around flow's missing support of enums.
 /**
  * Copyright (c) 2015-present, Facebook, Inc.
  * All rights reserved.
@@ -30,15 +33,6 @@ function _load_DebuggerDispatcher() {
  * @format
  */
 
-const DebuggerMode = exports.DebuggerMode = Object.freeze({
-  STARTING: 'starting',
-  RUNNING: 'running',
-  PAUSED: 'paused',
-  STOPPING: 'stopping',
-  STOPPED: 'stopped'
-});
-
-// This is to work around flow's missing support of enums.
 DebuggerMode;
 
 const DEBUGGER_CHANGE_EVENT = 'change';
@@ -56,7 +50,12 @@ class DebuggerStore {
     this._emitter = new _atom.Emitter();
     this._dispatcherToken = this._dispatcher.register(this._handlePayload.bind(this));
 
-    this._debuggerSettings = new (_DebuggerSettings || _load_DebuggerSettings()).DebuggerSettings();
+    this._debuggerSettings = {
+      supportThreadsWindow: false,
+      singleThreadStepping: false,
+      customThreadColumns: [],
+      threadsComponentTitle: 'Threads'
+    };
     this._debuggerInstance = null;
     this._error = null;
     this._evaluationExpressionProviders = new Set();
@@ -197,8 +196,14 @@ class DebuggerStore {
       case (_DebuggerDispatcher || _load_DebuggerDispatcher()).ActionTypes.TOGGLE_PAUSE_ON_EXCEPTION:
         const pauseOnException = payload.data;
         this._togglePauseOnException = pauseOnException;
+        if (!this._togglePauseOnException) {
+          this._togglePauseOnCaughtException = false;
+        }
         if (this.isDebugging()) {
           this.getBridge().setPauseOnException(pauseOnException);
+          if (!pauseOnException) {
+            this.getBridge().setPauseOnCaughtException(this._togglePauseOnCaughtException);
+          }
         }
         break;
       case (_DebuggerDispatcher || _load_DebuggerDispatcher()).ActionTypes.TOGGLE_PAUSE_ON_CAUGHT_EXCEPTION:

@@ -245,16 +245,18 @@ function _load_process() {
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-const ADB = 'adb'; /**
-                    * Copyright (c) 2015-present, Facebook, Inc.
-                    * All rights reserved.
-                    *
-                    * This source code is licensed under the license found in the LICENSE file in
-                    * the root directory of this source tree.
-                    *
-                    * 
-                    * @format
-                    */
+/**
+ * Copyright (c) 2015-present, Facebook, Inc.
+ * All rights reserved.
+ *
+ * This source code is licensed under the license found in the LICENSE file in
+ * the root directory of this source tree.
+ *
+ * 
+ * @format
+ */
+
+const ADB = 'adb';
 
 function getDeviceInfo(device) {
   return new (_Adb || _load_Adb()).Adb(device).getDeviceInfo().publish();
@@ -264,8 +266,8 @@ function getProcesses(device, timeout) {
   return new (_Processes || _load_Processes()).Processes(new (_Adb || _load_Adb()).Adb(device)).fetch(timeout).publish();
 }
 
-function getDeviceList() {
-  return new (_Devices || _load_Devices()).Devices((_Adb || _load_Adb()).Adb).getDeviceList().publish();
+function getDeviceList(options) {
+  return new (_Devices || _load_Devices()).Devices((_Adb || _load_Adb()).Adb).getDeviceList(options).publish();
 }
 
 function installPackage(device, packagePath) {

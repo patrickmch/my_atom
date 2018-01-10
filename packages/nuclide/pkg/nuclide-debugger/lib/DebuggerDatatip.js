@@ -51,10 +51,10 @@ function _load_bindObservableAsProps() {
   return _bindObservableAsProps = require('nuclide-commons-ui/bindObservableAsProps');
 }
 
-var _nuclideDebuggerBase;
+var _nuclideDebuggerCommon;
 
-function _load_nuclideDebuggerBase() {
-  return _nuclideDebuggerBase = require('../../nuclide-debugger-base');
+function _load_nuclideDebuggerCommon() {
+  return _nuclideDebuggerCommon = require('nuclide-debugger-common');
 }
 
 var _DebuggerStore;
@@ -83,7 +83,7 @@ function getEvaluationExpression(model, editor, position) {
     }
   }
   // eslint-disable-next-line eqeqeq
-  return matchingProvider === null ? Promise.resolve((0, (_nuclideDebuggerBase || _load_nuclideDebuggerBase()).getDefaultEvaluationExpression)(editor, position)) : matchingProvider.getEvaluationExpression(editor, position);
+  return matchingProvider === null ? Promise.resolve((0, (_nuclideDebuggerCommon || _load_nuclideDebuggerCommon()).getDefaultEvaluationExpression)(editor, position)) : matchingProvider.getEvaluationExpression(editor, position);
 } /**
    * Copyright (c) 2015-present, Facebook, Inc.
    * All rights reserved.

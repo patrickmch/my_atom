@@ -46,7 +46,7 @@ function _load_FileTreeSelectionManager() {
 var _immutable;
 
 function _load_immutable() {
-  return _immutable = _interopRequireDefault(require('immutable'));
+  return _immutable = _interopRequireWildcard(require('immutable'));
 }
 
 var _atom = require('atom');
@@ -111,6 +111,12 @@ function _load_promise() {
   return _promise = require('nuclide-commons/promise');
 }
 
+var _nullthrows;
+
+function _load_nullthrows() {
+  return _nullthrows = _interopRequireDefault(require('nullthrows'));
+}
+
 var _FileTreeSelectionRange;
 
 function _load_FileTreeSelectionRange() {
@@ -123,9 +129,13 @@ function _load_nuclideRemoteConnection() {
   return _nuclideRemoteConnection = require('../../nuclide-remote-connection');
 }
 
+function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
+
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 // Used to ensure the version we serialized is the same version we are deserializing.
+const VERSION = 1;
+// $FlowFixMe(>=0.53.0) Flow suppress
 /**
  * Copyright (c) 2015-present, Facebook, Inc.
  * All rights reserved.
@@ -137,21 +147,19 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
  * @format
  */
 
-const VERSION = 1;
-// $FlowFixMe(>=0.53.0) Flow suppress
 const DEFAULT_CONF = exports.DEFAULT_CONF = {
-  vcsStatuses: new (_immutable || _load_immutable()).default.Map(),
+  vcsStatuses: (_immutable || _load_immutable()).Map(),
   workingSet: new (_nuclideWorkingSetsCommon || _load_nuclideWorkingSetsCommon()).WorkingSet(),
   editedWorkingSet: new (_nuclideWorkingSetsCommon || _load_nuclideWorkingSetsCommon()).WorkingSet(),
   hideIgnoredNames: true,
   excludeVcsIgnoredPaths: true,
-  ignoredPatterns: new (_immutable || _load_immutable()).default.Set(),
+  ignoredPatterns: (_immutable || _load_immutable()).Set(),
   usePreviewTabs: false,
   focusEditorOnFileSelection: true,
   isEditingWorkingSet: false,
   openFilesWorkingSet: new (_nuclideWorkingSetsCommon || _load_nuclideWorkingSetsCommon()).WorkingSet(),
   reposByRoot: {},
-  fileChanges: new (_immutable || _load_immutable()).default.Map()
+  fileChanges: (_immutable || _load_immutable()).Map()
 };
 
 const FETCH_TIMEOUT = 20000;
@@ -184,23 +192,23 @@ class FileTreeStore {
   }
 
   constructor() {
-    this.roots = new (_immutable || _load_immutable()).default.OrderedMap();
+    this.roots = (_immutable || _load_immutable()).OrderedMap();
     this._dispatcher = (_FileTreeDispatcher || _load_FileTreeDispatcher()).default.getInstance();
     this._emitter = new _atom.Emitter();
     this._dispatcher.register(this._onDispatch.bind(this));
     this._logger = (0, (_log4js || _load_log4js()).getLogger)('nuclide-file-tree');
-    this._fileChanges = new (_immutable || _load_immutable()).default.Map();
+    this._fileChanges = (_immutable || _load_immutable()).Map();
     this.reorderPreviewStatus = null;
 
     this._usePrefixNav = false;
     this._autoExpandSingleChild = true;
-    this._isLoadingMap = new (_immutable || _load_immutable()).default.Map();
-    this._repositories = new (_immutable || _load_immutable()).default.Set();
+    this._isLoadingMap = (_immutable || _load_immutable()).Map();
+    this._repositories = (_immutable || _load_immutable()).Set();
     this.selectionManager = new (_FileTreeSelectionManager || _load_FileTreeSelectionManager()).FileTreeSelectionManager(this._emitChange.bind(this));
 
     this._conf = Object.assign({}, DEFAULT_CONF, { selectionManager: this.selectionManager });
     this._filter = '';
-    this._extraProjectSelectionContent = new (_immutable || _load_immutable()).default.List();
+    this._extraProjectSelectionContent = (_immutable || _load_immutable()).List();
     this.foldersExpanded = true;
     this.openFilesExpanded = true;
     this.uncommittedChangesExpanded = true;
@@ -216,7 +224,7 @@ class FileTreeStore {
    * [1]: https://atom.io/docs/latest/behind-atom-serialization-in-atom
    */
   exportData() {
-    const rootKeys = this.roots.map(root => root.uri).toArray();
+    const rootKeys = this.roots.valueSeq().toArray().map(root => root.uri);
 
     return {
       version: VERSION,
@@ -248,7 +256,7 @@ class FileTreeStore {
         isExpanded: true,
         isSelected: false,
         isLoading: true,
-        children: new (_immutable || _load_immutable()).default.OrderedMap(),
+        children: (_immutable || _load_immutable()).OrderedMap(),
         isCwd: false,
         connectionTitle: (_FileTreeHelpers || _load_FileTreeHelpers()).default.getDisplayTitle(rootUri) || ''
       }, this._conf);
@@ -271,7 +279,7 @@ class FileTreeStore {
     const pathsMissingInData = normalizedAtomPaths.filter(rootUri => normalizedDataPaths.indexOf(rootUri) === -1);
     const combinedPaths = normalizedDataPaths.concat(pathsMissingInData);
 
-    this._setRoots(new (_immutable || _load_immutable()).default.OrderedMap(combinedPaths.map(rootUri => [rootUri, buildRootNode(rootUri)])));
+    this._setRoots((_immutable || _load_immutable()).OrderedMap(combinedPaths.map(rootUri => [rootUri, buildRootNode(rootUri)])));
   }
 
   _setExcludeVcsIgnoredPaths(excludeVcsIgnoredPaths) {
@@ -296,7 +304,7 @@ class FileTreeStore {
    * update the store with them.
    */
   _setIgnoredNames(ignoredNames) {
-    const ignoredPatterns = (_immutable || _load_immutable()).default.Set(ignoredNames).map(ignoredName => {
+    const ignoredPatterns = (_immutable || _load_immutable()).Set(ignoredNames).map(ignoredName => {
       if (ignoredName === '') {
         return null;
       }
@@ -540,7 +548,6 @@ class FileTreeStore {
 
       return this._bubbleUp(node, predicate(node));
     });
-
     this._setRoots(roots);
   }
 
@@ -571,7 +578,7 @@ class FileTreeStore {
   _setRoots(roots) {
     // Explicitly test for the empty case, otherwise configuration changes with an empty
     // tree will not emit changes.
-    const changed = !(_immutable || _load_immutable()).default.is(roots, this.roots) || roots.isEmpty();
+    const changed = !(_immutable || _load_immutable()).is(roots, this.roots) || roots.isEmpty();
     if (changed) {
       this.roots = roots;
       let prevRoot = null;
@@ -653,7 +660,7 @@ class FileTreeStore {
   }
 
   getRootKeys() {
-    return this.roots.toArray().map(root => root.uri);
+    return this.roots.valueSeq().toArray().map(root => root.uri);
   }
 
   getCwdKey() {
@@ -689,14 +696,13 @@ class FileTreeStore {
       }
     });
 
-    this._fileChanges = new (_immutable || _load_immutable()).default.Map(updatedFileChanges);
+    this._fileChanges = (_immutable || _load_immutable()).Map(updatedFileChanges);
   }
 
   _setFileChanges(rootKey, vcsStatuses) {
-    const fileChanges = new Map();
-    Object.keys(vcsStatuses).forEach(filePath => {
-      const statusCode = vcsStatuses[filePath];
-      fileChanges.set(filePath, (_nuclideVcsBase || _load_nuclideVcsBase()).HgStatusToFileChangeStatus[statusCode]);
+    let fileChanges = (_immutable || _load_immutable()).Map();
+    vcsStatuses.forEach((statusCode, filePath) => {
+      fileChanges = fileChanges.set(filePath, (_nuclideVcsBase || _load_nuclideVcsBase()).HgStatusToFileChangeStatus[statusCode]);
     });
 
     this._fileChanges = this._fileChanges.set(rootKey, fileChanges);
@@ -714,7 +720,7 @@ class FileTreeStore {
     // tree, since the reported VCS status may be for a node that is not yet present in the
     // fetched tree, and so it it can't affect its parents statuses. To have the roots colored
     // consistently we manually add all parents of all of the modified nodes up till the root
-    const enrichedVcsStatuses = Object.assign({}, vcsStatuses);
+    const enrichedVcsStatuses = new Map(vcsStatuses);
 
     const ensurePresentParents = uri => {
       if (uri === rootKey) {
@@ -725,16 +731,15 @@ class FileTreeStore {
       while (current !== rootKey) {
         current = (_FileTreeHelpers || _load_FileTreeHelpers()).default.getParentKey(current);
 
-        if (enrichedVcsStatuses[current] != null) {
+        if (enrichedVcsStatuses.has(current)) {
           return;
         }
 
-        enrichedVcsStatuses[current] = (_hgConstants || _load_hgConstants()).StatusCodeNumber.MODIFIED;
+        enrichedVcsStatuses.set(current, (_hgConstants || _load_hgConstants()).StatusCodeNumber.MODIFIED);
       }
     };
 
-    Object.keys(vcsStatuses).forEach(uri => {
-      const status = vcsStatuses[uri];
+    vcsStatuses.forEach((status, uri) => {
       if (status === (_hgConstants || _load_hgConstants()).StatusCodeNumber.MODIFIED || status === (_hgConstants || _load_hgConstants()).StatusCodeNumber.ADDED || status === (_hgConstants || _load_hgConstants()).StatusCodeNumber.REMOVED) {
         try {
           // An invalid URI might cause an exception to be thrown
@@ -745,28 +750,9 @@ class FileTreeStore {
       }
     });
 
-    if (this._vcsStatusesAreDifferent(rootKey, enrichedVcsStatuses)) {
-      this._updateConf(conf => {
-        conf.vcsStatuses = conf.vcsStatuses.set(rootKey, enrichedVcsStatuses);
-      });
-    }
-  }
-
-  _vcsStatusesAreDifferent(rootKey, newVcsStatuses) {
-    const currentStatuses = this._conf.vcsStatuses.get(rootKey);
-    if (currentStatuses == null || newVcsStatuses == null) {
-      if (currentStatuses !== newVcsStatuses) {
-        return true;
-      }
-    }
-
-    const currentKeys = Object.keys(currentStatuses);
-    const newKeys = Object.keys(newVcsStatuses);
-    if (currentKeys.length !== newKeys.length) {
-      return true;
-    }
-
-    return newKeys.some(key => currentStatuses[key] !== newVcsStatuses[key]);
+    this._updateConf(conf => {
+      conf.vcsStatuses = conf.vcsStatuses.set(rootKey, enrichedVcsStatuses);
+    });
   }
 
   _setUsePreviewTabs(usePreviewTabs) {
@@ -804,7 +790,7 @@ class FileTreeStore {
 
     return (0, _asyncToGenerator.default)(function* () {
       const shownChildrenUris = function (node) {
-        return node.children.toArray().filter(function (n) {
+        return node.children.valueSeq().toArray().filter(function (n) {
           return n.shouldBeShown;
         }).map(function (n) {
           return n.uri;
@@ -826,7 +812,7 @@ class FileTreeStore {
   }
 
   getSelectedNodes() {
-    return new (_immutable || _load_immutable()).default.List(this.selectionManager.selectedNodes().values());
+    return (_immutable || _load_immutable()).List(this.selectionManager.selectedNodes().values());
   }
 
   // Retrieves target node in an immutable list if it's set, or all selected
@@ -835,7 +821,7 @@ class FileTreeStore {
     if (this._targetNodeKeys) {
       const targetNode = this.getNode(this._targetNodeKeys.rootKey, this._targetNodeKeys.nodeKey);
       if (targetNode) {
-        return new (_immutable || _load_immutable()).default.List([targetNode]);
+        return (_immutable || _load_immutable()).List([targetNode]);
       }
     }
     return this.getSelectedNodes();
@@ -936,7 +922,7 @@ class FileTreeStore {
         return node.set({
           isExpanded: false,
           isLoading: false,
-          children: new (_immutable || _load_immutable()).default.OrderedMap()
+          children: (_immutable || _load_immutable()).OrderedMap()
         });
       });
 
@@ -1305,7 +1291,7 @@ class FileTreeStore {
       _this3._clearSelection();
 
       try {
-        yield (_FileTreeHgHelpers || _load_FileTreeHgHelpers()).default.moveNodes(selectedNodes.toJS(), targetNode.uri);
+        yield (_FileTreeHgHelpers || _load_FileTreeHgHelpers()).default.moveNodes(selectedNodes.toArray(), targetNode.uri);
       } catch (e) {
         atom.notifications.addError('Failed to move entries: ' + e.message);
       }
@@ -1318,7 +1304,7 @@ class FileTreeStore {
     return (0, _asyncToGenerator.default)(function* () {
       const selectedNodes = _this4.getSelectedNodes();
       try {
-        yield (_FileTreeHgHelpers || _load_FileTreeHgHelpers()).default.deleteNodes(selectedNodes.toJS());
+        yield (_FileTreeHgHelpers || _load_FileTreeHgHelpers()).default.deleteNodes(selectedNodes.toArray());
         _this4._clearSelectionRange();
       } catch (e) {
         atom.notifications.addError('Failed to delete entries: ' + e.message);
@@ -1685,7 +1671,7 @@ class FileTreeStore {
     if (selectedNodes.isEmpty()) {
       nodeToSelect = this.roots.first();
     } else {
-      const selectedNode = selectedNodes.first();
+      const selectedNode = (0, (_nullthrows || _load_nullthrows()).default)(selectedNodes.first());
       nodeToSelect = selectedNode.findNext();
     }
 
@@ -1711,9 +1697,9 @@ class FileTreeStore {
 
     let nodeToSelect;
     if (selectedNodes.isEmpty()) {
-      nodeToSelect = this.roots.last().findLastRecursiveChild();
+      nodeToSelect = (0, (_nullthrows || _load_nullthrows()).default)(this.roots.last()).findLastRecursiveChild();
     } else {
-      const selectedNode = selectedNodes.first();
+      const selectedNode = (0, (_nullthrows || _load_nullthrows()).default)(selectedNodes.first());
       nodeToSelect = selectedNode.findPrevious();
     }
 
@@ -1747,7 +1733,17 @@ class FileTreeStore {
     }
 
     const lastRoot = this.roots.last();
+
+    if (!(lastRoot != null)) {
+      throw new Error('Invariant violation: "lastRoot != null"');
+    }
+
     const lastChild = lastRoot.findLastRecursiveChild();
+
+    if (!(lastChild != null)) {
+      throw new Error('Invariant violation: "lastChild != null"');
+    }
+
     this._setSelectedAndFocusedNode(lastChild.rootUri, lastChild.uri);
   }
 
@@ -1782,13 +1778,14 @@ class FileTreeStore {
       }, this._conf);
     });
 
-    const roots = new (_immutable || _load_immutable()).default.OrderedMap(rootNodes.map(root => [root.uri, root]));
+    const roots = (_immutable || _load_immutable()).OrderedMap(rootNodes.map(root => [root.uri, root]));
     const removedRoots = this.roots.filter(root => !roots.has(root.uri));
     removedRoots.forEach(root => root.traverse(node => node.isExpanded, node => {
       if (node.subscription != null) {
         node.subscription.dispose();
       }
     }));
+
     this._setRoots(roots);
 
     // Just in case there's a race between the update of the root keys and the cwdKey and the cwdKey
@@ -2029,7 +2026,7 @@ class FileTreeStore {
 
     // Reset data store.
     this._conf = Object.assign({}, DEFAULT_CONF, { selectionManager: this.selectionManager });
-    this._setRoots(new (_immutable || _load_immutable()).default.OrderedMap());
+    this._setRoots((_immutable || _load_immutable()).OrderedMap());
     this.selectionManager.clearSelected();
     this.selectionManager.clearFocused();
     this._trackedRootKey = null;

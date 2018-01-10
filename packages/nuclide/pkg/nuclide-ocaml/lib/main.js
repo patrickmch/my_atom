@@ -19,7 +19,7 @@ let activate = exports.activate = (() => {
         if (editor) {
           (0, (_DestructureHelpers || _load_DestructureHelpers()).cases)(editor, editor.getCursorScreenPosition());
         }
-      }), atom.packages.serviceHub.provide('outline-view', '0.1.0', provideOutlines()), atom.packages.serviceHub.provide('nuclide-type-hint.provider', '0.0.0', createTypeHintProvider()), atom.packages.serviceHub.provide('autocomplete.provider', '2.0.0', createAutocompleteProvider()), atom.packages.serviceHub.provide('hyperclick', '0.1.0', getHyperclickProvider()), atom.packages.serviceHub.provide('linter', '1.0.0', provideLinter()), atom.packages.serviceHub.provide('code-format.file', '0.1.0', createCodeFormatProvider()));
+      }), atom.packages.serviceHub.provide('outline-view', '0.1.0', provideOutlines()), atom.packages.serviceHub.provide('nuclide-type-hint.provider', '0.0.0', createTypeHintProvider()), atom.packages.serviceHub.provide('nuclide-autocomplete.provider', '0.0.0', createAutocompleteProvider()), atom.packages.serviceHub.provide('hyperclick', '0.1.0', getHyperclickProvider()), atom.packages.serviceHub.provide('linter', '1.0.0', provideLinter()), atom.packages.serviceHub.provide('code-format.file', '0.1.0', createCodeFormatProvider()));
     }
   });
 
@@ -45,12 +45,6 @@ exports.provideLinter = provideLinter;
 exports.provideOutlines = provideOutlines;
 exports.createTypeHintProvider = createTypeHintProvider;
 exports.createCodeFormatProvider = createCodeFormatProvider;
-
-var _nuclideAnalytics;
-
-function _load_nuclideAnalytics() {
-  return _nuclideAnalytics = require('../../nuclide-analytics');
-}
 
 var _HyperclickProvider;
 
@@ -136,14 +130,15 @@ function getHyperclickProvider() {
 }
 
 function createAutocompleteProvider() {
-  const getSuggestions = request => {
-    return (0, (_nuclideAnalytics || _load_nuclideAnalytics()).trackTiming)('nuclide-ocaml:getAutocompleteSuggestions', () => (_AutoComplete || _load_AutoComplete()).default.getAutocompleteSuggestions(request));
-  };
   return {
+    analytics: {
+      eventName: 'nuclide-ocaml',
+      shouldLogInsertedSuggestion: false
+    },
     selector: '.source.ocaml, .source.reason',
     inclusionPriority: 1,
     disableForSelector: '.source.ocaml .comment, .source.reason .comment',
-    getSuggestions
+    getSuggestions: (_AutoComplete || _load_AutoComplete()).default.getAutocompleteSuggestions
   };
 }
 

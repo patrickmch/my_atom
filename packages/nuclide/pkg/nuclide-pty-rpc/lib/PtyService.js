@@ -3,7 +3,7 @@
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.PtyImplementation = exports.spawn = undefined;
+exports.PtyImplementation = exports.useTitleAsPath = exports.spawn = undefined;
 
 var _asyncToGenerator = _interopRequireDefault(require('async-to-generator'));
 
@@ -28,8 +28,27 @@ let spawn = exports.spawn = (() => {
   };
 })();
 
+let useTitleAsPath = exports.useTitleAsPath = (() => {
+  var _ref2 = (0, _asyncToGenerator.default)(function* (client) {
+    try {
+      const config = yield (0, (_shellConfig || _load_shellConfig()).readConfig)();
+      if (config != null && config.useTitleAsPath != null) {
+        return config.useTitleAsPath;
+      }
+    } catch (error) {
+      client.onOutput(`Error reading ~/.nuclide-terminal.json:\r\n${error}\r\n`);
+    }
+
+    return false;
+  });
+
+  return function useTitleAsPath(_x3) {
+    return _ref2.apply(this, arguments);
+  };
+})();
+
 let getCommand = (() => {
-  var _ref2 = (0, _asyncToGenerator.default)(function* (info, client) {
+  var _ref3 = (0, _asyncToGenerator.default)(function* (info, client) {
     // Client-specified command is highest precedence.
     if (info.command != null) {
       return info.command;
@@ -63,13 +82,13 @@ let getCommand = (() => {
     };
   });
 
-  return function getCommand(_x3, _x4) {
-    return _ref2.apply(this, arguments);
+  return function getCommand(_x4, _x5) {
+    return _ref3.apply(this, arguments);
   };
 })();
 
 let getDefaultShellCommand = (() => {
-  var _ref3 = (0, _asyncToGenerator.default)(function* () {
+  var _ref4 = (0, _asyncToGenerator.default)(function* () {
     if (process.platform === 'win32') {
       return {
         file: 'cmd.exe',
@@ -113,7 +132,7 @@ let getDefaultShellCommand = (() => {
   });
 
   return function getDefaultShellCommand() {
-    return _ref3.apply(this, arguments);
+    return _ref4.apply(this, arguments);
   };
 })();
 
@@ -122,7 +141,7 @@ let getDefaultShellCommand = (() => {
 
 
 let getEnvironment = (() => {
-  var _ref4 = (0, _asyncToGenerator.default)(function* (info) {
+  var _ref5 = (0, _asyncToGenerator.default)(function* (info) {
     const newEnv = Object.assign({}, (yield (0, (_process || _load_process()).getOriginalEnvironment)()));
     for (const x of filteredVariables) {
       delete newEnv[x];
@@ -132,8 +151,8 @@ let getEnvironment = (() => {
     });
   });
 
-  return function getEnvironment(_x5) {
-    return _ref4.apply(this, arguments);
+  return function getEnvironment(_x6) {
+    return _ref5.apply(this, arguments);
   };
 })();
 

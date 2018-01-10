@@ -62,12 +62,9 @@ const MATCH_BYTE_LIMIT = 2 * 1024 * 1024;
  * @returns An observable that emits match events.
  */
 function search(directory, regex, subdirs) {
-  // Matches are stored in a Map of filename => Array<Match>.
-  const matchesByFile = new Map();
-
   if (!subdirs || subdirs.length === 0) {
     // Since no subdirs were specified, run search on the root directory.
-    return searchInSubdir(matchesByFile, directory, '.', regex);
+    return searchInSubdir(directory, '.', regex);
   } else if (subdirs.find(subdir => subdir.includes('*'))) {
     // Mimic Atom and use minimatch for glob matching.
     const matchers = subdirs.map(subdir => {
@@ -79,7 +76,7 @@ function search(directory, regex, subdirs) {
       return new (_minimatch || _load_minimatch()).Minimatch(pattern, { matchBase: true, dot: true });
     });
     // TODO: This should walk the subdirectories and filter by glob before searching.
-    return searchInSubdir(matchesByFile, directory, '.', regex).filter(result => Boolean(matchers.find(matcher => matcher.match(result.filePath))));
+    return searchInSubdir(directory, '.', regex).filter(result => Boolean(matchers.find(matcher => matcher.match(result.filePath))));
   } else {
     // Run the search on each subdirectory that exists.
     return _rxjsBundlesRxMinJs.Observable.from(subdirs).concatMap((() => {
@@ -87,7 +84,7 @@ function search(directory, regex, subdirs) {
         try {
           const stat = yield (_fsPromise || _load_fsPromise()).default.lstat((_nuclideUri || _load_nuclideUri()).default.join(directory, subdir));
           if (stat.isDirectory()) {
-            return searchInSubdir(matchesByFile, directory, subdir, regex);
+            return searchInSubdir(directory, subdir, regex);
           } else {
             return _rxjsBundlesRxMinJs.Observable.empty();
           }
@@ -106,7 +103,7 @@ function search(directory, regex, subdirs) {
 // Helper function that runs the search command on the given directory
 // `subdir`, relative to `directory`. The function returns an Observable that emits
 // search$FileResult objects.
-function searchInSubdir(matchesByFile, directory, subdir, regex) {
+function searchInSubdir(directory, subdir, regex) {
   // Try running search commands, falling through to the next if there is an error.
   const vcsargs = (regex.ignoreCase ? ['-i'] : []).concat(['-n', '-E', regex.source]);
   const grepargs = (regex.ignoreCase ? ['-i'] : []).concat(['-rHn', '-E', '-e', regex.source, '.']);

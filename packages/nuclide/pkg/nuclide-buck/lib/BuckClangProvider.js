@@ -38,6 +38,12 @@ function _load_nuclideUri() {
   return _nuclideUri = _interopRequireDefault(require('nuclide-commons/nuclideUri'));
 }
 
+var _featureConfig;
+
+function _load_featureConfig() {
+  return _featureConfig = _interopRequireDefault(require('nuclide-commons-atom/feature-config'));
+}
+
 var _BuckTaskRunner;
 
 function _load_BuckTaskRunner() {
@@ -52,9 +58,6 @@ function _load_ClangFlagsFileWatcher() {
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-const WARNING_HINT = 'Hint: Try **Nuclide > Clang > Clean and Rebuild** once fixed.';
-
-// Strip off remote error, which is JSON object on last line of error message.
 /**
  * Copyright (c) 2015-present, Facebook, Inc.
  * All rights reserved.
@@ -66,6 +69,10 @@ const WARNING_HINT = 'Hint: Try **Nuclide > Clang > Clean and Rebuild** once fix
  * @format
  */
 
+const WARNING_HINT = 'Hint: Try **Nuclide > Clang > Clean and Rebuild** once fixed.';
+const SHOW_NOTIFICATION_CONFIG = 'nuclide-buck.buildDbErrorNotify';
+
+// Strip off remote error, which is JSON object on last line of error message.
 function cleanupErrorMessage(message) {
   const trimmed = message.trim();
   const lastNewline = trimmed.lastIndexOf('\n');
@@ -85,6 +92,14 @@ function constructNotificationOptions(clickCallback) {
         clickCallback();
       }
     }
+  }, {
+    text: 'Never show again',
+    onDidClick: () => {
+      (_featureConfig || _load_featureConfig()).default.set(SHOW_NOTIFICATION_CONFIG, false);
+      if (clickCallback) {
+        clickCallback();
+      }
+    }
   }];
   return { dismissable: true, buttons };
 }
@@ -94,9 +109,11 @@ function emitCompilationDbWarnings(db, consolePrinter) {
     if (consolePrinter) {
       db.warnings.forEach(text => consolePrinter({ text, level: 'warning' }));
     }
-    const notification = atom.notifications.addWarning(['Buck: warnings detected while fetching compile commands,', 'some language services may not work properly.', WARNING_HINT].join(' '), constructNotificationOptions(() =>
-    // Notification doesn't dismiss itself on click.
-    notification.dismiss()));
+    if ((_featureConfig || _load_featureConfig()).default.get(SHOW_NOTIFICATION_CONFIG)) {
+      const notification = atom.notifications.addWarning(['Buck: warnings detected while fetching compile commands,', 'some language services may not work properly.', WARNING_HINT].join(' '), constructNotificationOptions(() =>
+      // Notification doesn't dismiss itself on click.
+      notification.dismiss()));
+    }
   }
 }
 
@@ -104,7 +121,9 @@ function emitCompilationDbError(errorMessage, consolePrinter) {
   if (consolePrinter) {
     consolePrinter({ text: cleanupErrorMessage(errorMessage), level: 'error' });
   }
-  const notification = atom.notifications.addError(['Buck error: build failed while fetching compile commands.', WARNING_HINT].join(' '), constructNotificationOptions(() => notification.dismiss()));
+  if ((_featureConfig || _load_featureConfig()).default.get(SHOW_NOTIFICATION_CONFIG)) {
+    const notification = atom.notifications.addError(['Buck error: build failed while fetching compile commands.', WARNING_HINT].join(' '), constructNotificationOptions(() => notification.dismiss()));
+  }
 }
 
 class Provider {

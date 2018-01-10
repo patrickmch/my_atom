@@ -12,6 +12,12 @@ function _load_analytics() {
   return _analytics = _interopRequireDefault(require('nuclide-commons-atom/analytics'));
 }
 
+var _getFragmentGrammar;
+
+function _load_getFragmentGrammar() {
+  return _getFragmentGrammar = _interopRequireDefault(require('nuclide-commons-atom/getFragmentGrammar'));
+}
+
 var _collection;
 
 function _load_collection() {
@@ -26,16 +32,18 @@ function _load_log4js() {
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-const logger = (0, (_log4js || _load_log4js()).getLogger)('nuclide-type-hint'); /**
-                                                                                 * Copyright (c) 2015-present, Facebook, Inc.
-                                                                                 * All rights reserved.
-                                                                                 *
-                                                                                 * This source code is licensed under the license found in the LICENSE file in
-                                                                                 * the root directory of this source tree.
-                                                                                 *
-                                                                                 * 
-                                                                                 * @format
-                                                                                 */
+/**
+ * Copyright (c) 2015-present, Facebook, Inc.
+ * All rights reserved.
+ *
+ * This source code is licensed under the license found in the LICENSE file in
+ * the root directory of this source tree.
+ *
+ * 
+ * @format
+ */
+
+const logger = (0, (_log4js || _load_log4js()).getLogger)('nuclide-type-hint');
 
 class TypeHintManager {
 
@@ -83,7 +91,11 @@ class TypeHintManager {
       const markedStrings = hint.map(function (h) {
         // Flow doesn't like it when I don't specify these as literals.
         if (h.type === 'snippet') {
-          return { type: 'snippet', value: h.value, grammar };
+          return {
+            type: 'snippet',
+            value: h.value,
+            grammar: (0, (_getFragmentGrammar || _load_getFragmentGrammar()).default)(grammar)
+          };
         } else {
           return { type: 'markdown', value: h.value };
         }

@@ -73,13 +73,13 @@ function _load_shallowequal() {
 var _bindObservableAsProps;
 
 function _load_bindObservableAsProps() {
-  return _bindObservableAsProps = require('../../../../modules/nuclide-commons-ui/bindObservableAsProps');
+  return _bindObservableAsProps = require('nuclide-commons-ui/bindObservableAsProps');
 }
 
 var _renderReactRoot;
 
 function _load_renderReactRoot() {
-  return _renderReactRoot = require('../../../../modules/nuclide-commons-ui/renderReactRoot');
+  return _renderReactRoot = require('nuclide-commons-ui/renderReactRoot');
 }
 
 var _memoizeUntilChanged;
@@ -91,19 +91,13 @@ function _load_memoizeUntilChanged() {
 var _observable;
 
 function _load_observable() {
-  return _observable = require('../../../../modules/nuclide-commons/observable');
+  return _observable = require('nuclide-commons/observable');
 }
 
 var _UniversalDisposable;
 
 function _load_UniversalDisposable() {
   return _UniversalDisposable = _interopRequireDefault(require('nuclide-commons/UniversalDisposable'));
-}
-
-var _observable2;
-
-function _load_observable2() {
-  return _observable2 = require('nuclide-commons/observable');
 }
 
 var _RegExpFilter;
@@ -161,6 +155,8 @@ const WORKSPACE_VIEW_URI = exports.WORKSPACE_VIEW_URI = 'atom://nuclide/console'
                                                                                    * 
                                                                                    * @format
                                                                                    */
+
+/* eslint-env browser */
 
 const ERROR_TRANSCRIBING_MESSAGE = "// Nuclide couldn't find the right text to display";
 const INITIAL_RECORD_HEIGHT = 21;
@@ -221,7 +217,7 @@ class Console {
       });
 
       this._model.setState({ displayableRecords: nextDisplayableRecords });
-      callback();
+      requestAnimationFrame(callback);
     };
 
     const {
@@ -357,7 +353,7 @@ class Console {
     // $FlowIssue: Flow doesn't know about Symbol.observable
     _rxjsBundlesRxMinJs.Observable.from(this._store))
     // Don't re-render when the console isn't visible.
-    .let((0, (_observable || _load_observable()).toggle)((0, (_observePaneItemVisibility || _load_observePaneItemVisibility()).default)(this))).audit(() => (_observable2 || _load_observable2()).nextAnimationFrame).map(([localState, globalState]) => {
+    .let((0, (_observable || _load_observable()).toggle)((0, (_observePaneItemVisibility || _load_observePaneItemVisibility()).default)(this))).audit(() => (_observable || _load_observable()).nextAnimationFrame).map(([localState, globalState]) => {
       const {
         invalid,
         selectedSourceIds,

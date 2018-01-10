@@ -40,6 +40,12 @@ function _load_nuclideUri() {
 
 var _atom = require('atom');
 
+var _nullthrows;
+
+function _load_nullthrows() {
+  return _nullthrows = _interopRequireDefault(require('nullthrows'));
+}
+
 var _nuclideRemoteConnection;
 
 function _load_nuclideRemoteConnection() {
@@ -55,7 +61,7 @@ function _load_nuclideVcsBase() {
 var _immutable;
 
 function _load_immutable() {
-  return _immutable = _interopRequireDefault(require('immutable'));
+  return _immutable = _interopRequireWildcard(require('immutable'));
 }
 
 function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
@@ -311,6 +317,11 @@ class FileSystemActions {
     }
 
     const node = targetNodes.first();
+
+    if (!(node != null)) {
+      throw new Error('Invariant violation: "node != null"');
+    }
+
     const nodePath = node.localPath;
     (0, (_FileActionModal || _load_FileActionModal()).openDialog)({
       iconClassName: 'icon-arrow-right',
@@ -342,7 +353,12 @@ class FileSystemActions {
 
   openNextDuplicateDialog(nodes, onDidConfirm) {
     const node = nodes.first();
-    const nodePath = node.localPath;
+
+    if (!(node != null)) {
+      throw new Error('Invariant violation: "node != null"');
+    }
+
+    const nodePath = (0, (_nullthrows || _load_nullthrows()).default)(node).localPath;
     let initialValue = (_nuclideUri || _load_nuclideUri()).default.basename(nodePath);
     const ext = (_nuclideUri || _load_nuclideUri()).default.extname(nodePath);
     initialValue = initialValue.substr(0, initialValue.length - ext.length) + '-copy' + ext;

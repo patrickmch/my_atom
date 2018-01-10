@@ -16,8 +16,10 @@ let createOCamlLanguageService = (() => {
       logLevel: 'INFO',
       fileNotifier,
       host,
-      projectFileNames: ['.merlin'],
-      fileExtensions: ['.ml', '.mli'],
+      projectFileNames: ['esy', 'esy.json', 'package.json', '.merlin'],
+      projectFileSearchStrategy: 'priority',
+      useOriginalEnvironment: true,
+      fileExtensions: ['.ml', '.mli', '.re', '.rei'],
       initializationOptions: {
         codelens: {
           unicode: true
@@ -39,7 +41,7 @@ let createOCamlLanguageService = (() => {
           rtop: 'rtop'
         },
         server: {
-          languages: ['ocaml']
+          languages: ['ocaml', 'reason']
         }
       }
     });
@@ -91,7 +93,7 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
 function createLanguageService() {
   const atomConfig = {
     name: 'OCaml',
-    grammars: ['source.ocaml'],
+    grammars: ['source.ocaml', 'source.reason'],
     outline: {
       version: '0.1.0',
       priority: 1,
@@ -119,16 +121,16 @@ function createLanguageService() {
       analyticsEventName: 'ocaml.findReferences'
     },
     autocomplete: {
-      version: '2.0.0',
       inclusionPriority: 1,
       // OCaml completions are more relevant than snippets.
       suggestionPriority: 3,
       disableForSelector: null,
       excludeLowerPriority: false,
-      analyticsEventName: 'ocaml.getAutocompleteSuggestions',
-      autocompleteCacherConfig: null,
-      onDidInsertSuggestionAnalyticsEventName: 'ocaml.autocompleteChosen',
-      trackAdditionalInfo: false
+      analytics: {
+        eventName: 'nuclide-ocaml',
+        shouldLogInsertedSuggestion: false
+      },
+      autocompleteCacherConfig: null
     },
     diagnostics: {
       version: '0.2.0',

@@ -914,7 +914,7 @@ module.exports = _client => {
         location: {
           type: "source",
           fileName: "rpc-types.js",
-          line: 70
+          line: 66
         },
         name: "Progress"
       })]).then(([args, id]) => _client.callRemoteMethod(id, "setTitle", "void", args));
@@ -1056,27 +1056,6 @@ module.exports = _client => {
           name: "Progress"
         });
       });
-    }
-
-    syncProgress(arg0) {
-      return Promise.all([_client.marshalArguments(Array.from(arguments), [{
-        name: "expected",
-        type: {
-          kind: "set",
-          type: {
-            kind: "named",
-            name: "Progress"
-          }
-        }
-      }]), _client.marshal(this, {
-        kind: "named",
-        location: {
-          type: "source",
-          fileName: "rpc-types.js",
-          line: 20
-        },
-        name: "HostServices"
-      })]).then(([args, id]) => _client.callRemoteMethod(id, "syncProgress", "void", args));
     }
 
     showActionRequired(arg0, arg1) {
@@ -1339,13 +1318,15 @@ Object.defineProperty(module.exports, "defs", {
         }, {
           name: "compilationDbDir",
           type: {
-            kind: "string"
+            kind: "named",
+            name: "NuclideUri"
           },
           optional: false
         }, {
           name: "flagsFile",
           type: {
-            kind: "string"
+            kind: "named",
+            name: "NuclideUri"
           },
           optional: false
         }, {
@@ -1419,13 +1400,15 @@ Object.defineProperty(module.exports, "defs", {
           }, {
             name: "compilationDbDir",
             type: {
-              kind: "string"
+              kind: "named",
+              name: "NuclideUri"
             },
             optional: false
           }, {
             name: "flagsFile",
             type: {
-              kind: "string"
+              kind: "named",
+              name: "NuclideUri"
             },
             optional: false
           }, {
@@ -3150,8 +3133,8 @@ Object.defineProperty(module.exports, "defs", {
       kind: "alias",
       location: {
         type: "source",
-        fileName: "rpc-types.js",
-        line: 12
+        fileName: "types.js",
+        line: 53
       },
       name: "NuclideEvaluationExpression",
       definition: {
@@ -4074,7 +4057,7 @@ Object.defineProperty(module.exports, "defs", {
       location: {
         type: "source",
         fileName: "rpc-types.js",
-        line: 70
+        line: 66
       },
       constructorArgs: null,
       staticMethods: {},
@@ -4083,7 +4066,7 @@ Object.defineProperty(module.exports, "defs", {
           location: {
             type: "source",
             fileName: "rpc-types.js",
-            line: 71
+            line: 67
           },
           kind: "function",
           argumentTypes: [{
@@ -4100,7 +4083,7 @@ Object.defineProperty(module.exports, "defs", {
           location: {
             type: "source",
             fileName: "rpc-types.js",
-            line: 72
+            line: 68
           },
           kind: "function",
           argumentTypes: [],
@@ -4250,32 +4233,11 @@ Object.defineProperty(module.exports, "defs", {
             }
           }
         },
-        syncProgress: {
-          location: {
-            type: "source",
-            fileName: "rpc-types.js",
-            line: 49
-          },
-          kind: "function",
-          argumentTypes: [{
-            name: "expected",
-            type: {
-              kind: "set",
-              type: {
-                kind: "named",
-                name: "Progress"
-              }
-            }
-          }],
-          returnType: {
-            kind: "void"
-          }
-        },
         showActionRequired: {
           location: {
             type: "source",
             fileName: "rpc-types.js",
-            line: 54
+            line: 50
           },
           kind: "function",
           argumentTypes: [{
@@ -4310,7 +4272,7 @@ Object.defineProperty(module.exports, "defs", {
           location: {
             type: "source",
             fileName: "rpc-types.js",
-            line: 59
+            line: 55
           },
           kind: "function",
           argumentTypes: [],
@@ -4322,7 +4284,7 @@ Object.defineProperty(module.exports, "defs", {
           location: {
             type: "source",
             fileName: "rpc-types.js",
-            line: 63
+            line: 59
           },
           kind: "function",
           argumentTypes: [{
@@ -4344,7 +4306,7 @@ Object.defineProperty(module.exports, "defs", {
           location: {
             type: "source",
             fileName: "rpc-types.js",
-            line: 65
+            line: 61
           },
           kind: "function",
           argumentTypes: [{

@@ -3,7 +3,7 @@
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.getReactNativeLaunchProcessInfo = exports.getReactNativeAttachProcessInfo = exports.getNodeAttachProcessInfo = exports.getNodeLaunchProcessInfo = exports.getPrepackLaunchProcessInfo = exports.getPythonScriptLaunchProcessInfo = exports.getPythonParLaunchProcessInfo = exports.REACT_NATIVE_PACKAGER_DEFAULT_PORT = undefined;
+exports.getReactNativeLaunchProcessInfo = exports.getReactNativeAttachProcessInfo = exports.getNodeAttachProcessInfo = exports.getOCamlLaunchProcessInfo = exports.getNodeLaunchProcessInfo = exports.getPrepackLaunchProcessInfo = exports.getPythonScriptLaunchProcessInfo = exports.getPythonParLaunchProcessInfo = exports.REACT_NATIVE_PACKAGER_DEFAULT_PORT = undefined;
 
 var _asyncToGenerator = _interopRequireDefault(require('async-to-generator'));
 
@@ -115,61 +115,71 @@ let getNodeLaunchProcessInfo = exports.getNodeLaunchProcessInfo = (() => {
   };
 })();
 
+let getOCamlLaunchProcessInfo = exports.getOCamlLaunchProcessInfo = (() => {
+  var _ref10 = (0, _asyncToGenerator.default)(function* (targetUri, launchTarget) {
+    const adapterInfo = yield getAdapterExecutableWithProperNode('ocaml', targetUri);
+    return new (_VspProcessInfo || _load_VspProcessInfo()).default(targetUri, 'launch', (_main || _load_main()).VsAdapterTypes.OCAML, adapterInfo, false, // showThreads
+    { config: launchTarget });
+  });
+
+  return function getOCamlLaunchProcessInfo(_x24, _x25) {
+    return _ref10.apply(this, arguments);
+  };
+})();
+
 let getNodeAttachProcessInfo = exports.getNodeAttachProcessInfo = (() => {
-  var _ref10 = (0, _asyncToGenerator.default)(function* (targetUri, port) {
+  var _ref11 = (0, _asyncToGenerator.default)(function* (targetUri, port) {
     const adapterInfo = yield getNodeAdapterInfo(targetUri);
     return new (_VspProcessInfo || _load_VspProcessInfo()).default(targetUri, 'attach', (_main || _load_main()).VsAdapterTypes.NODE, adapterInfo, false, // showThreads
     getAttachNodeConfig(port));
   });
 
-  return function getNodeAttachProcessInfo(_x24, _x25) {
-    return _ref10.apply(this, arguments);
-  };
-})();
-
-let getNodeAdapterInfo = (() => {
-  var _ref11 = (0, _asyncToGenerator.default)(function* (path) {
-    return getAdapterExecutableWithProperNode('node', path);
-  });
-
-  return function getNodeAdapterInfo(_x26) {
+  return function getNodeAttachProcessInfo(_x26, _x27) {
     return _ref11.apply(this, arguments);
   };
 })();
 
-let getReactNativeAttachProcessInfo = exports.getReactNativeAttachProcessInfo = (() => {
-  var _ref12 = (0, _asyncToGenerator.default)(function* (workspacePath, port) {
-    const scriptPath = (_nuclideUri || _load_nuclideUri()).default.getPath((_nuclideUri || _load_nuclideUri()).default.join(workspacePath, '.vscode/launchReactNative.js'));
-    const adapterInfo = yield getReactNativeAdapterInfo(scriptPath);
-    return new (_VspProcessInfo || _load_VspProcessInfo()).default(scriptPath, 'attach', (_main || _load_main()).VsAdapterTypes.REACT_NATIVE, adapterInfo, false, // showThreads
-    getReactNativeScriptConfig(scriptPath, port));
+let getNodeAdapterInfo = (() => {
+  var _ref12 = (0, _asyncToGenerator.default)(function* (path) {
+    return getAdapterExecutableWithProperNode('node', path);
   });
 
-  return function getReactNativeAttachProcessInfo(_x27, _x28) {
+  return function getNodeAdapterInfo(_x28) {
     return _ref12.apply(this, arguments);
   };
 })();
 
-let getReactNativeLaunchProcessInfo = exports.getReactNativeLaunchProcessInfo = (() => {
-  var _ref13 = (0, _asyncToGenerator.default)(function* (workspacePath, port, platform) {
-    const scriptPath = (_nuclideUri || _load_nuclideUri()).default.getPath((_nuclideUri || _load_nuclideUri()).default.join(workspacePath, '.vscode/launchReactNative.js'));
-    const adapterInfo = yield getReactNativeAdapterInfo(scriptPath);
-    return new (_VspProcessInfo || _load_VspProcessInfo()).default(scriptPath, 'launch', (_main || _load_main()).VsAdapterTypes.REACT_NATIVE, adapterInfo, false, // showThreads
-    getReactNativeScriptConfig(scriptPath, port, platform));
+let getReactNativeAttachProcessInfo = exports.getReactNativeAttachProcessInfo = (() => {
+  var _ref13 = (0, _asyncToGenerator.default)(function* (args) {
+    const adapterInfo = yield getReactNativeAdapterInfo(args.program);
+    return new (_VspProcessInfo || _load_VspProcessInfo()).default(args.program, 'attach', (_main || _load_main()).VsAdapterTypes.REACT_NATIVE, adapterInfo, false, // showThreads
+    args);
   });
 
-  return function getReactNativeLaunchProcessInfo(_x29, _x30, _x31) {
+  return function getReactNativeAttachProcessInfo(_x29) {
     return _ref13.apply(this, arguments);
   };
 })();
 
+let getReactNativeLaunchProcessInfo = exports.getReactNativeLaunchProcessInfo = (() => {
+  var _ref14 = (0, _asyncToGenerator.default)(function* (args) {
+    const adapterInfo = yield getReactNativeAdapterInfo(args.program);
+    return new (_VspProcessInfo || _load_VspProcessInfo()).default(args.program, 'launch', (_main || _load_main()).VsAdapterTypes.REACT_NATIVE, adapterInfo, false, // showThreads
+    args);
+  });
+
+  return function getReactNativeLaunchProcessInfo(_x30) {
+    return _ref14.apply(this, arguments);
+  };
+})();
+
 let getReactNativeAdapterInfo = (() => {
-  var _ref14 = (0, _asyncToGenerator.default)(function* (path) {
+  var _ref15 = (0, _asyncToGenerator.default)(function* (path) {
     return getAdapterExecutableWithProperNode('react-native', path);
   });
 
-  return function getReactNativeAdapterInfo(_x32) {
-    return _ref14.apply(this, arguments);
+  return function getReactNativeAdapterInfo(_x31) {
+    return _ref15.apply(this, arguments);
   };
 })();
 
@@ -339,17 +349,6 @@ function getNodeScriptConfig(scriptPath, nodePath, cwd, args, env, outFiles) {
   };
 }
 
-function getReactNativeScriptConfig(scriptPath, port, platform) {
-  return {
-    protocol: 'inspector',
-    stopOnEntry: false,
-    platform,
-    program: scriptPath,
-    // TODO(pelmers): do we need to supply outdir?,
-    port
-  };
-}
-
 function getAttachNodeConfig(port) {
   return { port };
 }
@@ -378,7 +377,7 @@ function listenToRemoteDebugCommands() {
       return _rxjsBundlesRxMinJs.Observable.empty();
     }).map(command => ({ rootUri, command }));
   }).let((0, (_observable || _load_observable()).fastDebounce)(500)).subscribe((() => {
-    var _ref15 = (0, _asyncToGenerator.default)(function* ({ rootUri, command }) {
+    var _ref16 = (0, _asyncToGenerator.default)(function* ({ rootUri, command }) {
       const attachProcessInfo = yield getPythonAttachTargetProcessInfo(rootUri, command.target);
       const debuggerService = yield getDebuggerService();
       const instance = debuggerService.getDebuggerInstance();
@@ -397,8 +396,8 @@ function listenToRemoteDebugCommands() {
       // Otherwise, we're already debugging that target.
     });
 
-    return function (_x33) {
-      return _ref15.apply(this, arguments);
+    return function (_x32) {
+      return _ref16.apply(this, arguments);
     };
   })()));
 }

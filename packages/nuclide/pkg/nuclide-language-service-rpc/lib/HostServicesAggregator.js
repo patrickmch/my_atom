@@ -130,25 +130,6 @@ class HostServicesAggregator {
     return this._selfRelay().showProgress(title, options);
   }
 
-  syncProgress(expected) {
-    if (!false) {
-      throw new Error('syncProgress is for internal use only.');
-    }
-  }
-
-  aggregateSyncProgress() {
-    if (this.isDisposed()) {
-      return;
-    }
-    const currentProgress = new Set();
-    for (const [, relay] of this._childRelays) {
-      for (const [, parentProgress] of relay._progressWrappers) {
-        currentProgress.add(parentProgress);
-      }
-    }
-    this._parent.syncProgress(currentProgress);
-  }
-
   showActionRequired(title, options) {
     return this._selfRelay().showActionRequired(title, options);
   }
@@ -209,11 +190,13 @@ class HostServicesAggregator {
 }
 
 class HostServicesRelay {
-  //
+  // _childIsDisposed is consumed by using observable.takeUntil(_childIsDisposed),
+  // which unsubscribes from 'obs' as soon as _childIsDisposed.next() gets
+  // fired. It is signaled by calling _disposables.dispose(), which fires
+  // the _childIsDisposed.next().
   constructor(aggregator, id, child) {
     this._childIsDisposed = new _rxjsBundlesRxMinJs.Subject();
     this._disposables = new (_UniversalDisposable || _load_UniversalDisposable()).default();
-    this._progressWrappers = new Map();
 
     this._aggregator = aggregator;
     this._id = id;
@@ -222,15 +205,7 @@ class HostServicesRelay {
       this._childIsDisposed.next();
     });
   }
-
-  // _progressWrappers is a hack to work around message-loss in nuclide-rpc.
-  // It maps from the Progress wrappers we have returned from showProgress, to
-  // the underlying Progress that we got from our parent. See also syncProgress.
-
-  // _childIsDisposed is consumed by using observable.takeUntil(_childIsDisposed),
-  // which unsubscribes from 'obs' as soon as _childIsDisposed.next() gets
-  // fired. It is signaled by calling _disposables.dispose(), which fires
-  // the _childIsDisposed.next().
+  //
 
 
   consoleNotification(source, level, text) {
@@ -290,9 +265,10 @@ class HostServicesRelay {
       // Should a cancellation come while we're waiting for our parent,
       // then we'll immediately return a no-op wrapper and ensure that
       // the one from our parent will eventually be disposed.
-      // The "or" check below is in case both parentPromise and cancel were
-      // both signalled, and parentPromise happened to win the race.
-      if (progress == null || _this2._aggregator.isDisposed()) {
+      // The "or" check below is in case parentProgress returned something
+      // but also either the parent aggregator or the child aggregator
+      // were disposed.
+      if (progress == null || _this2._aggregator.isDisposed() || _this2._disposables.disposed) {
         parentPromise.then(function (progress2) {
           return progress2.dispose();
         });
@@ -311,34 +287,14 @@ class HostServicesRelay {
         dispose: function () {
           _this2._disposables.remove(wrapper);
           if (progress != null) {
-            _this2._progressWrappers.delete(wrapper);
             progress.dispose();
             progress = null;
-            _this2._aggregator.aggregateSyncProgress();
           }
         }
       };
       _this2._disposables.add(wrapper);
-      _this2._progressWrappers.set(wrapper, progress);
-      _this2._aggregator.aggregateSyncProgress();
       return wrapper;
     })();
-  }
-
-  syncProgress(expected) {
-    for (const [wrappedProgress, parentProgress] of this._progressWrappers) {
-      if (!expected.has(wrappedProgress)) {
-        this._progressWrappers.delete(wrappedProgress);
-        this._disposables.remove(wrappedProgress);
-        // We'll also call dispose on the parent object, to allow nuclide-rpc
-        // to remove the object from its object-id store. This is opportunistic;
-        // the call to aggregateSyncProgress is the definitive removal.
-        try {
-          parentProgress.dispose();
-        } catch (e) {}
-      }
-    }
-    this._aggregator.aggregateSyncProgress();
   }
 
   showActionRequired(title, options) {

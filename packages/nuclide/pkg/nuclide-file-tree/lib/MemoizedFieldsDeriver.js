@@ -95,8 +95,8 @@ class MemoizedFieldsDeriver {
     if (store.vcsStatuses !== conf.vcsStatuses) {
       store.vcsStatuses = conf.vcsStatuses;
 
-      const rootVcsStatuses = store.vcsStatuses.get(this._rootUri) || {};
-      store.vcsStatusCode = rootVcsStatuses[this._uri] || (_hgConstants || _load_hgConstants()).StatusCodeNumber.CLEAN;
+      const rootVcsStatuses = store.vcsStatuses.get(this._rootUri) || new Map();
+      store.vcsStatusCode = rootVcsStatuses.get(this._uri) || (_hgConstants || _load_hgConstants()).StatusCodeNumber.CLEAN;
     }
 
     return store.vcsStatusCode;

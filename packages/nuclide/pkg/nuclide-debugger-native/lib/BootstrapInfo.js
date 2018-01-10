@@ -7,10 +7,16 @@ exports.BootstrapInfo = undefined;
 
 var _asyncToGenerator = _interopRequireDefault(require('async-to-generator'));
 
-var _nuclideDebuggerBase;
+var _nuclideDebuggerCommon;
 
-function _load_nuclideDebuggerBase() {
-  return _nuclideDebuggerBase = require('../../nuclide-debugger-base');
+function _load_nuclideDebuggerCommon() {
+  return _nuclideDebuggerCommon = require('nuclide-debugger-common');
+}
+
+var _nuclideDebugger;
+
+function _load_nuclideDebugger() {
+  return _nuclideDebugger = require('../../nuclide-debugger');
 }
 
 var _nuclideRemoteConnection;
@@ -33,7 +39,18 @@ function _load_UniversalDisposable() {
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-class BootstrapInfo extends (_nuclideDebuggerBase || _load_nuclideDebuggerBase()).DebuggerProcessInfo {
+/**
+ * Copyright (c) 2015-present, Facebook, Inc.
+ * All rights reserved.
+ *
+ * This source code is licensed under the license found in the LICENSE file in
+ * the root directory of this source tree.
+ *
+ * 
+ * @format
+ */
+
+class BootstrapInfo extends (_nuclideDebuggerCommon || _load_nuclideDebuggerCommon()).DebuggerProcessInfo {
 
   constructor(targetUri, bootstrapInfo) {
     super('lldb', targetUri);
@@ -61,7 +78,7 @@ class BootstrapInfo extends (_nuclideDebuggerBase || _load_nuclideDebuggerBase()
     return (0, _asyncToGenerator.default)(function* () {
       const rpcService = _this._getRpcService();
       let debugSession = null;
-      let outputDisposable = (0, (_nuclideDebuggerBase || _load_nuclideDebuggerBase()).registerConsoleLogging)('LLDB', rpcService.getOutputWindowObservable().refCount());
+      let outputDisposable = (0, (_nuclideDebugger || _load_nuclideDebugger()).registerConsoleLogging)('LLDB', rpcService.getOutputWindowObservable().refCount());
       try {
         yield rpcService.bootstrap(_this._bootstrapInfo).refCount().toPromise();
         // Start websocket server with Chrome after launch completed.
@@ -70,7 +87,7 @@ class BootstrapInfo extends (_nuclideDebuggerBase || _load_nuclideDebuggerBase()
           throw new Error('Invariant violation: "outputDisposable"');
         }
 
-        debugSession = new (_nuclideDebuggerBase || _load_nuclideDebuggerBase()).DebuggerInstance(_this, rpcService, new (_UniversalDisposable || _load_UniversalDisposable()).default(outputDisposable));
+        debugSession = new (_nuclideDebuggerCommon || _load_nuclideDebuggerCommon()).DebuggerInstance(_this, rpcService, new (_UniversalDisposable || _load_UniversalDisposable()).default(outputDisposable));
         outputDisposable = null;
       } finally {
         if (outputDisposable != null) {
@@ -104,13 +121,5 @@ class BootstrapInfo extends (_nuclideDebuggerBase || _load_nuclideDebuggerBase()
     return new service.NativeDebuggerService(debuggerConfig);
   }
 }
-exports.BootstrapInfo = BootstrapInfo; /**
-                                        * Copyright (c) 2015-present, Facebook, Inc.
-                                        * All rights reserved.
-                                        *
-                                        * This source code is licensed under the license found in the LICENSE file in
-                                        * the root directory of this source tree.
-                                        *
-                                        * 
-                                        * @format
-                                        */
+exports.BootstrapInfo = BootstrapInfo;
+// eslint-disable-next-line rulesdir/no-cross-atom-imports

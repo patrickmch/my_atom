@@ -12,6 +12,12 @@ function _load_protocolTypes() {
   return _protocolTypes = _interopRequireWildcard(require('./protocol-types'));
 }
 
+var _vscodeDebugprotocol;
+
+function _load_vscodeDebugprotocol() {
+  return _vscodeDebugprotocol = _interopRequireWildcard(require('vscode-debugprotocol'));
+}
+
 var _collection;
 
 function _load_collection() {
@@ -62,19 +68,17 @@ function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj;
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-function translateStopReason(stopReason) {
-  return stopReason;
-} /**
-   * Copyright (c) 2017-present, Facebook, Inc.
-   * All rights reserved.
-   *
-   * This source code is licensed under the BSD-style license found in the
-   * LICENSE file in the root directory of this source tree. An additional grant
-   * of patent rights can be found in the PATENTS file in the same directory.
-   *
-   * 
-   * @format
-   */
+/**
+ * Copyright (c) 2017-present, Facebook, Inc.
+ * All rights reserved.
+ *
+ * This source code is licensed under the BSD-style license found in the
+ * LICENSE file in the root directory of this source tree. An additional grant
+ * of patent rights can be found in the PATENTS file in the same directory.
+ *
+ * 
+ * @format
+ */
 
 function nuclideDebuggerLocation(scriptId, lineNumber, columnNumber) {
   return {
@@ -158,14 +162,22 @@ class VsDebugSessionTranslator {
     this._handledCommands = new Set();
     this._breakpoints = [];
     this._threadsById = new Map();
-    this._mainThreadId = null;
     this._lastBreakpointId = 0;
     this._configDoneSent = false;
     this._exceptionFilters = [];
+    this._pausedThreadId = null;
     this._files = new (_FileCache || _load_FileCache()).default((method, params) => this._sendMessageToClient({ method, params }));
 
     // Ignore the first fake pause request.
     this._disposables = new (_UniversalDisposable || _load_UniversalDisposable()).default(this._session, this._handleCommands().subscribe(message => this._sendMessageToClient(message)), this._listenToSessionEvents());
+  }
+
+  _updatePausedThreadId(newPausedThreadId) {
+    if (this._pausedThreadId != null) {
+      this._pausedThreadIdPrevious = this._pausedThreadId;
+    }
+
+    this._pausedThreadId = newPausedThreadId;
   }
 
   _handleCommands() {
@@ -177,10 +189,9 @@ class VsDebugSessionTranslator {
     // (indicating readiness to receive config requests).
     this._commandsOfType('Debugger.enable').flatMap(command => _rxjsBundlesRxMinJs.Observable.of(getEmptyResponse(command.id), getFakeLoaderPauseEvent())), this._commandsOfType('Debugger.pause').flatMap(catchCommandError((() => {
       var _ref2 = (0, _asyncToGenerator.default)(function* (command) {
-        const mainThreadId =
-        // flowlint-next-line sketchy-null-number:off
-        _this._mainThreadId || Array.from(_this._threadsById.keys())[0] || -1;
-        yield _this._session.pause({ threadId: mainThreadId });
+        const pausedThreadId = _this._pausedThreadId != null ? _this._pausedThreadId : Array.from(_this._threadsById.keys())[0] || -1;
+        _this._updatePausedThreadId(null);
+        yield _this._session.pause({ threadId: pausedThreadId });
         return getEmptyResponse(command.id);
       });
 
@@ -191,10 +202,8 @@ class VsDebugSessionTranslator {
     // Skip the fake resume command.
     resumeCommands.skip(1).flatMap(catchCommandError((() => {
       var _ref3 = (0, _asyncToGenerator.default)(function* (command) {
-        if (_this._pausedThreadId == null) {
-          return getErrorResponse(command.id, 'No paused thread to resume!');
-        }
-        yield _this._session.continue({ threadId: _this._pausedThreadId });
+        const threadId = _this._pausedThreadId != null ? _this._pausedThreadId : -1;
+        yield _this._session.continue({ threadId });
         return getEmptyResponse(command.id);
       });
 
@@ -202,6 +211,15 @@ class VsDebugSessionTranslator {
         return _ref3.apply(this, arguments);
       };
     })())),
+    // Select thread.
+    this._commandsOfType('Debugger.selectThread').flatMap(command => {
+      if (!(command.method === 'Debugger.selectThread')) {
+        throw new Error('Invariant violation: "command.method === \'Debugger.selectThread\'"');
+      }
+
+      this._updatePausedThreadId(command.params.threadId);
+      return _rxjsBundlesRxMinJs.Observable.of(getEmptyResponse(command.id));
+    }),
     // Step over
     this._commandsOfType('Debugger.stepOver').flatMap(catchCommandError((() => {
       var _ref4 = (0, _asyncToGenerator.default)(function* (command) {
@@ -364,23 +382,37 @@ class VsDebugSessionTranslator {
       return function (_x12) {
         return _ref12.apply(this, arguments);
       };
-    })())), this._commandsOfType('Debugger.getThreadStack').map(command => {
-      if (!(command.method === 'Debugger.getThreadStack')) {
-        throw new Error('Invariant violation: "command.method === \'Debugger.getThreadStack\'"');
-      }
-
-      const { threadId } = command.params;
-      const threadInfo = this._threadsById.get(threadId);
-      const callFrames = threadInfo != null && threadInfo.state === 'paused' ? threadInfo.callFrames : null;
-      const result = {
-        callFrames: callFrames || []
-      };
-      return {
-        id: command.id,
-        result
-      };
-    }), this._commandsOfType('Debugger.evaluateOnCallFrame').flatMap((() => {
+    })())), this._commandsOfType('Debugger.getThreadStack').flatMap((() => {
       var _ref13 = (0, _asyncToGenerator.default)(function* (command) {
+        if (!(command.method === 'Debugger.getThreadStack')) {
+          throw new Error('Invariant violation: "command.method === \'Debugger.getThreadStack\'"');
+        }
+
+        const { threadId } = command.params;
+        const threadInfo = _this._threadsById.get(threadId);
+        let callFrames = null;
+        if (threadInfo != null && threadInfo.state === 'paused') {
+          callFrames = threadInfo.callFrames;
+          if (threadInfo.callFrames == null || threadInfo.callFrames.length === 0 || !threadInfo.callStackLoaded) {
+            // Need to fetch this thread's frames.
+            threadInfo.callFrames = yield _this._getTranslatedCallFramesForThread(command.params.threadId, null);
+            callFrames = threadInfo.callFrames;
+          }
+        }
+        const result = {
+          callFrames: callFrames || []
+        };
+        return {
+          id: command.id,
+          result
+        };
+      });
+
+      return function (_x13) {
+        return _ref13.apply(this, arguments);
+      };
+    })()), this._commandsOfType('Debugger.evaluateOnCallFrame').flatMap((() => {
+      var _ref14 = (0, _asyncToGenerator.default)(function* (command) {
         if (!(command.method === 'Debugger.evaluateOnCallFrame')) {
           throw new Error('Invariant violation: "command.method === \'Debugger.evaluateOnCallFrame\'"');
         }
@@ -393,11 +425,11 @@ class VsDebugSessionTranslator {
         };
       });
 
-      return function (_x13) {
-        return _ref13.apply(this, arguments);
+      return function (_x14) {
+        return _ref14.apply(this, arguments);
       };
     })()), this._commandsOfType('Debugger.setVariableValue').flatMap(catchCommandError((() => {
-      var _ref14 = (0, _asyncToGenerator.default)(function* (command) {
+      var _ref15 = (0, _asyncToGenerator.default)(function* (command) {
         if (!(command.method === 'Debugger.setVariableValue')) {
           throw new Error('Invariant violation: "command.method === \'Debugger.setVariableValue\'"');
         }
@@ -418,11 +450,11 @@ class VsDebugSessionTranslator {
         };
       });
 
-      return function (_x14) {
-        return _ref14.apply(this, arguments);
+      return function (_x15) {
+        return _ref15.apply(this, arguments);
       };
     })())), this._commandsOfType('Runtime.evaluate').flatMap((() => {
-      var _ref15 = (0, _asyncToGenerator.default)(function* (command) {
+      var _ref16 = (0, _asyncToGenerator.default)(function* (command) {
         if (!(command.method === 'Runtime.evaluate')) {
           throw new Error('Invariant violation: "command.method === \'Runtime.evaluate\'"');
         }
@@ -435,8 +467,8 @@ class VsDebugSessionTranslator {
         };
       });
 
-      return function (_x15) {
-        return _ref15.apply(this, arguments);
+      return function (_x16) {
+        return _ref16.apply(this, arguments);
       };
     })()),
     // Error for unhandled commands
@@ -447,18 +479,22 @@ class VsDebugSessionTranslator {
     var _this2 = this;
 
     return (0, _asyncToGenerator.default)(function* () {
-      const { columnNumber, lineNumber, scriptId } = location;
+      const { columnNumber, lineNumber, scriptId, threadId } = location;
       const source = {
         path: (_nuclideUri || _load_nuclideUri()).default.getPath(scriptId),
         name: (_nuclideUri || _load_nuclideUri()).default.basename(scriptId)
       };
       yield _this2._files.registerFile((0, (_helpers || _load_helpers()).pathToUri)(scriptId));
-      yield _this2._session.nuclide_continueToLocation({
+      const args = {
         // flowlint-next-line sketchy-null-number:off
         column: columnNumber || 1,
         line: lineNumber + 1,
         source
-      });
+      };
+      if (threadId != null) {
+        args.threadId = threadId;
+      }
+      yield _this2._session.nuclide_continueToLocation(args);
     })();
   }
 
@@ -473,7 +509,7 @@ class VsDebugSessionTranslator {
         yield _this3._session.observeInitializeEvents().first().toPromise();
       }
     }))).first().flatMap((() => {
-      var _ref17 = (0, _asyncToGenerator.default)(function* (commands) {
+      var _ref18 = (0, _asyncToGenerator.default)(function* (commands) {
         // Upon session start, send the cached breakpoints
         // and other configuration requests.
         try {
@@ -487,14 +523,14 @@ class VsDebugSessionTranslator {
         }
       });
 
-      return function (_x16) {
-        return _ref17.apply(this, arguments);
+      return function (_x17) {
+        return _ref18.apply(this, arguments);
       };
     })()),
     // Following breakpoint requests are handled by
     // immediatelly passing to the active debug session.
     setBreakpointsCommands.flatMap((() => {
-      var _ref18 = (0, _asyncToGenerator.default)(function* (command) {
+      var _ref19 = (0, _asyncToGenerator.default)(function* (command) {
         try {
           return yield _this3._setBulkBreakpoints([command]);
         } catch (error) {
@@ -502,8 +538,8 @@ class VsDebugSessionTranslator {
         }
       });
 
-      return function (_x17) {
-        return _ref18.apply(this, arguments);
+      return function (_x18) {
+        return _ref19.apply(this, arguments);
       };
     })())).flatMap(responses => _rxjsBundlesRxMinJs.Observable.from(responses));
   }
@@ -551,7 +587,7 @@ class VsDebugSessionTranslator {
       }
 
       const responseGroups = yield Promise.all(Array.from(breakpointCommandsByUrl).map((() => {
-        var _ref19 = (0, _asyncToGenerator.default)(function* ([url, breakpointCommands]) {
+        var _ref20 = (0, _asyncToGenerator.default)(function* ([url, breakpointCommands]) {
           const path = (0, (_helpers || _load_helpers()).uriToPath)(url);
 
           const existingTranslatorBreakpoints = _this5._getBreakpointsForFilePath(path).map(function (bp) {
@@ -598,8 +634,8 @@ class VsDebugSessionTranslator {
           });
         });
 
-        return function (_x18) {
-          return _ref19.apply(this, arguments);
+        return function (_x19) {
+          return _ref20.apply(this, arguments);
         };
       })()));
       return (0, (_collection || _load_collection()).arrayFlatten)(responseGroups);
@@ -629,6 +665,20 @@ class VsDebugSessionTranslator {
     })();
   }
 
+  _tryUpdateBreakpoint(breakpoint, vsBreakpoint) {
+    if (!breakpoint.resolved && vsBreakpoint.verified) {
+      breakpoint.resolved = true;
+    }
+
+    if (vsBreakpoint.line != null) {
+      const lineNumber = parseInt(vsBreakpoint.line, 10);
+      if (!Number.isNaN(lineNumber) && lineNumber !== breakpoint.line) {
+        // Breakpoint resolved to a different line number by the engine.
+        breakpoint.lineNumber = lineNumber;
+      }
+    }
+  }
+
   _syncBreakpointsForFilePath(path, breakpoints) {
     var _this7 = this;
 
@@ -654,8 +704,10 @@ class VsDebugSessionTranslator {
         throw new Error(errorMessage);
       }
       vsBreakpoints.forEach(function (vsBreakpoint, i) {
-        breakpoints[i].resolved = vsBreakpoint.verified;
-        breakpoints[i].breakpointId = String(vsBreakpoint.id == null ? _this7._nextBreakpointId() : vsBreakpoint.id);
+        if (breakpoints[i].breakpointId == null) {
+          breakpoints[i].breakpointId = String(vsBreakpoint.id == null ? _this7._nextBreakpointId() : vsBreakpoint.id);
+        }
+        _this7._tryUpdateBreakpoint(breakpoints[i], vsBreakpoint);
       });
     })();
   }
@@ -740,17 +792,11 @@ class VsDebugSessionTranslator {
     }), this._session.observeThreadEvents().subscribe(({ body }) => {
       const { reason, threadId } = body;
       if (reason === 'started') {
-        if (this._mainThreadId == null) {
-          this._mainThreadId = threadId;
-        }
         this._updateThreadsState([threadId], 'running');
       } else if (reason === 'exited') {
         this._threadsById.delete(threadId);
         if (this._pausedThreadId === threadId) {
-          this._pausedThreadId = null;
-        }
-        if (this._mainThreadId === threadId) {
-          this._mainThreadId = null;
+          this._updatePausedThreadId(null);
         }
       } else {
         this._logger.error('Unknown thread event:', body);
@@ -760,37 +806,21 @@ class VsDebugSessionTranslator {
         method: 'Debugger.threadsUpdated',
         params: threadsUpdatedEvent
       });
-    }), this._session.observeStopEvents().subscribe(({ body }) => {
-      const { threadId, allThreadsStopped, reason } = body;
-      if (allThreadsStopped) {
-        this._updateThreadsState(this._threadsById.keys(), 'paused');
-        this._pausedThreadId = Array.from(this._threadsById.keys())[0];
-        if (this._pausedThreadId == null) {
-          this._pausedThreadId = threadId != null ? threadId : Array.from(this._threadsById.keys())[0];
-        }
-      }
-      if (threadId != null) {
-        this._updateThreadsState([threadId], 'paused');
-        if (this._pausedThreadId == null) {
-          this._pausedThreadId = threadId;
-        }
-      }
-      // Even though the python debugger engine pauses all threads,
-      // It only reports the main thread as paused.
-      if (this._adapterType === (_constants || _load_constants()).VsAdapterTypes.PYTHON && reason === 'user request') {
-        Array.from(this._threadsById.values()).forEach(threadInfo => threadInfo.stopReason = reason);
-      }
     }), this._session.observeBreakpointEvents().subscribe(({ body }) => {
       const { breakpoint } = body;
       const bpId = String(breakpoint.id == null ? -1 : breakpoint.id);
-      const existingBreakpoint = this._breakpoints.find(bp => bp.breakpointId === bpId);
+
+      // Find an existing breakpoint. Note the protocol doesn't provide
+      // an original line here, only the resolved line. If the bp had to
+      // be moved by the backend, this fails to find a match.
+      const existingBreakpoint = this._breakpoints.find(bp => bp.breakpointId === bpId || bp.breakpointId == null && bp.lineNumber === (breakpoint.originalLine != null ? breakpoint.originalLine : breakpoint.line) && breakpoint.source != null && bp.path === breakpoint.source.path);
       const hitCount = parseInt(breakpoint.nuclide_hitCount, 10);
 
       if (existingBreakpoint == null) {
         this._logger.warn('Received a breakpoint event, but cannot find the breakpoint');
         return;
-      } else if (!existingBreakpoint.resolved && breakpoint.verified) {
-        existingBreakpoint.resolved = true;
+      } else if (breakpoint.verified) {
+        this._tryUpdateBreakpoint(existingBreakpoint, breakpoint);
         this._sendMessageToClient({
           method: 'Debugger.breakpointResolved',
           params: {
@@ -810,61 +840,132 @@ class VsDebugSessionTranslator {
       } else {
         this._logger.warn('Unknown breakpoint event', body);
       }
-    }), this._session.observeStopEvents().concatMap((() => {
-      var _ref20 = (0, _asyncToGenerator.default)(function* ({ body }) {
-        const { threadId, reason } = body;
-        let callFrames = [];
-        const translatedStopReason = translateStopReason(reason);
-        if (threadId != null) {
-          callFrames = yield _this10._getTranslatedCallFramesForThread(threadId);
-          _this10._threadsById.set(threadId, {
-            state: 'paused',
+    }), this._session.observeStopEvents().flatMap(({ body }) => {
+      const { threadId, reason } = body;
+      let { allThreadsStopped } = body;
+
+      // Compatibility work around:
+      //   Even though the python debugger engine pauses all threads,
+      //   It only reports the main thread as paused. For this engine,
+      //   behave as if allThreadsStopped == true.
+      if (this._adapterType === (_constants || _load_constants()).VsAdapterTypes.PYTHON && reason === 'user request') {
+        allThreadsStopped = true;
+      }
+
+      const stoppedThreadIds = [];
+      if (threadId != null && threadId >= 0) {
+        // If a threadId was specified, always ask for the stack for that
+        // thread.
+        stoppedThreadIds.push(threadId);
+      }
+
+      if (allThreadsStopped) {
+        // If all threads are stopped or no stop thread was specified, ask
+        // for updated stacks from any thread that is not already paused.
+        const allStoppedIds = Array.from(this._threadsById.keys()).filter(id => {
+          const threadInfo = this._threadsById.get(id);
+          return id !== threadId && threadInfo != null && threadInfo.state !== 'paused';
+        });
+
+        if (allStoppedIds.length > 0) {
+          stoppedThreadIds.push(...allStoppedIds);
+        }
+      }
+
+      // If this is the first thread to stop, use the stop thread ID
+      // from this event as the currently selected thread in the UX.
+      if (this._pausedThreadId == null && stoppedThreadIds.length > 0) {
+        this._updatePausedThreadId(stoppedThreadIds[0]);
+      }
+
+      return _rxjsBundlesRxMinJs.Observable.fromPromise(Promise.all(stoppedThreadIds.map((() => {
+        var _ref21 = (0, _asyncToGenerator.default)(function* (id) {
+          let callFrames = [];
+          try {
+            callFrames = _this10._pausedThreadId === threadId ? yield _this10._getTranslatedCallFramesForThread(id, null) : yield _this10._getTranslatedCallFramesForThread(id, 1);
+          } catch (e) {
+            callFrames = [];
+          }
+          const threadSwitchMessage = _this10._pausedThreadIdPrevious != null && _this10._pausedThreadId != null && _this10._pausedThreadIdPrevious !== _this10._pausedThreadId ? `Active thread switched from thread #${_this10._pausedThreadIdPrevious} to thread #${_this10._pausedThreadId}` : null;
+          const pausedEvent = {
             callFrames,
-            stopReason: translatedStopReason
+            reason,
+            stopThreadId: id,
+            threadSwitchMessage
+          };
+          return pausedEvent;
+        });
+
+        return function (_x20) {
+          return _ref21.apply(this, arguments);
+        };
+      })()))).takeUntil(
+      // Stop processing this stop event if a continue event is seen before
+      // the stop event is completely processed and sent to the UX.
+      this._session.observeContinuedEvents().filter(e => e.body.allThreadsContinued === true || e.body.threadId == null || e.body.threadId === threadId)).take(1);
+    }).subscribe(pausedEvents => {
+      for (const pausedEvent of pausedEvents) {
+        // Mark the affected threads as paused and update their call frames.
+        const { stopThreadId } = pausedEvent;
+        if (stopThreadId != null && stopThreadId >= 0) {
+          this._threadsById.set(stopThreadId, {
+            state: 'paused',
+            callFrames: pausedEvent.callFrames,
+            stopReason: pausedEvent.reason,
+            callStackLoaded: this._pausedThreadId === stopThreadId
           });
         }
-        const pausedEvent = {
-          callFrames,
-          reason: translatedStopReason,
-          stopThreadId: _this10._pausedThreadId != null ? _this10._pausedThreadId : threadId,
+      }
+
+      let pausedEvent = null;
+      if (pausedEvents.length === 0) {
+        // This is expected in the case of an async-break where the
+        // target has no threads running. We need to raise a Chrome
+        // event or the UX spins forever and hangs.
+        pausedEvent = {
+          callFrames: [],
+          reason: 'Async-Break',
+          stopThreadId: -1,
           threadSwitchMessage: null
         };
+      } else if (this._pausedThreadId === pausedEvents[0].stopThreadId && pausedEvents[0].stopThreadId != null) {
+        // Only send Debugger.Paused for the first thread that stops
+        // the debugger. Otherwise, we cause the selected thread in the
+        // UX to jump around as additional threads pause.
+        pausedEvent = pausedEvents[0];
+      }
 
-        const threadsUpdatedEvent = _this10._getThreadsUpdatedEvent();
-        return { pausedEvent, threadsUpdatedEvent };
-      });
-
-      return function (_x19) {
-        return _ref20.apply(this, arguments);
-      };
-    })()).subscribe(({ pausedEvent, threadsUpdatedEvent }) => {
-      if (this._previousPauseMsgThreadId !== this._pausedThreadId) {
-        this._previousPauseMsgThreadId = this._pausedThreadId;
+      if (pausedEvent != null) {
         this._sendMessageToClient({
           method: 'Debugger.paused',
           params: pausedEvent
         });
-        if (this._pausedThreadId != null) {
-          threadsUpdatedEvent.stopThreadId = this._pausedThreadId;
-        }
       }
+
+      const threadsUpdatedEvent = this._getThreadsUpdatedEvent();
+      threadsUpdatedEvent.stopThreadId = this._pausedThreadId != null ? this._pausedThreadId : -1;
       this._sendMessageToClient({
         method: 'Debugger.threadsUpdated',
         params: threadsUpdatedEvent
       });
     }, error => this._terminateSessionWithError('Unable to translate stop event / call stack', error)), this._session.observeContinuedEvents().subscribe(({ body }) => {
-      const { allThreadsContinued, threadId } = body;
-      if (allThreadsContinued || threadId === this._pausedThreadId) {
-        this._pausedThreadId = null;
-        this._previousPauseMsgThreadId = null;
+      const { threadId } = body;
+      let { allThreadsContinued } = body;
+
+      if (threadId == null || threadId < 0) {
+        allThreadsContinued = true;
       }
 
-      if (allThreadsContinued) {
-        this._updateThreadsState(this._threadsById.keys(), 'running');
+      if (allThreadsContinued || threadId === this._pausedThreadId) {
+        this._updatePausedThreadId(null);
       }
-      if (threadId != null) {
-        this._updateThreadsState([threadId], 'running');
-      }
+
+      const continuedThreadIds = allThreadsContinued ? Array.from(this._threadsById.keys()).filter(id => {
+        const threadInfo = this._threadsById.get(id);
+        return threadInfo != null && threadInfo.state !== 'running';
+      }) : [threadId];
+
+      this._updateThreadsState(continuedThreadIds, 'running');
       this._sendMessageToClient({ method: 'Debugger.resumed' });
     }), this._session.observeOutputEvents().subscribe(({ body }) => {
       // flowlint-next-line sketchy-null-string:off
@@ -902,7 +1003,7 @@ class VsDebugSessionTranslator {
     for (const threadId of threadIds) {
       const threadInfo = this._threadsById.get(threadId);
       if (threadInfo == null || state === 'running') {
-        this._threadsById.set(threadId, { state });
+        this._threadsById.set(threadId, { state, callStackLoaded: false });
       } else {
         this._threadsById.set(threadId, Object.assign({}, threadInfo, {
           state
@@ -968,17 +1069,22 @@ class VsDebugSessionTranslator {
     this._commands.next(command);
   }
 
-  _getTranslatedCallFramesForThread(threadId) {
+  _getTranslatedCallFramesForThread(threadId, levels = null) {
     var _this12 = this;
 
     return (0, _asyncToGenerator.default)(function* () {
       try {
-        const { body: { stackFrames } } = yield _this12._session.stackTrace({
+        const options = {};
+        if (levels != null && _this12._session.getCapabilities().supportsDelayedStackTraceLoading === true) {
+          options.levels = levels;
+          options.startFrame = 0;
+        }
+        const { body: { stackFrames } } = yield _this12._session.stackTrace(Object.assign({
           threadId
-        });
+        }, options));
         // $FlowFixMe(>=0.55.0) Flow suppress
         return Promise.all(stackFrames.map((() => {
-          var _ref22 = (0, _asyncToGenerator.default)(function* (frame) {
+          var _ref23 = (0, _asyncToGenerator.default)(function* (frame) {
             let scriptId;
             if (frame.source != null && frame.source.path != null) {
               scriptId = frame.source.path;
@@ -992,15 +1098,13 @@ class VsDebugSessionTranslator {
               functionName: frame.name,
               location: nuclideDebuggerLocation(scriptId, frame.line - 1, frame.column - 1),
               hasSource: frame.source != null,
-              scopeChain: yield _this12._getScopesForFrame(frame.id).catch(function (error) {
-                return [];
-              }),
+              scopeChain: yield _this12._getScopesForFrame(frame.id),
               this: undefined
             };
           });
 
-          return function (_x20) {
-            return _ref22.apply(this, arguments);
+          return function (_x21) {
+            return _ref23.apply(this, arguments);
           };
         })()));
       } catch (e) {
@@ -1018,18 +1122,25 @@ class VsDebugSessionTranslator {
     var _this13 = this;
 
     return (0, _asyncToGenerator.default)(function* () {
-      const { body: { scopes } } = yield _this13._session.scopes({ frameId });
-      return scopes.map(function (scope) {
-        return {
-          type: scope.name,
-          name: scope.name,
-          object: {
-            type: 'object',
-            description: scope.name,
-            objectId: String(scope.variablesReference)
-          }
-        };
-      });
+      try {
+        const { body: { scopes } } = yield _this13._session.scopes({ frameId });
+        return scopes.map(function (scope) {
+          return {
+            type: scope.name,
+            name: scope.name,
+            object: {
+              type: 'object',
+              description: scope.name,
+              objectId: String(scope.variablesReference)
+            }
+          };
+        });
+      } catch (e) {
+        // This is expected in some situations, such as if scopes were requested
+        // asynchronously but the target resumed before the request was received.
+        _this13._logger.error('Could not get frame scopes: ', e.message);
+        return [];
+      }
     })();
   }
 

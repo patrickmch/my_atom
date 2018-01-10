@@ -7,33 +7,25 @@ exports.isFileInHackProject = exports.getHackLanguageForUri = exports.hackLangua
 
 var _asyncToGenerator = _interopRequireDefault(require('async-to-generator'));
 
-let getUseLspConnection = (() => {
-  var _ref = (0, _asyncToGenerator.default)(function* () {
-    return (0, (_passesGK || _load_passesGK()).default)('nuclide_hack_use_lsp_connection');
-  });
-
-  return function getUseLspConnection() {
-    return _ref.apply(this, arguments);
-  };
-})();
-
 let getUseFfpAutocomplete = (() => {
-  var _ref2 = (0, _asyncToGenerator.default)(function* () {
+  var _ref = (0, _asyncToGenerator.default)(function* () {
     return (0, (_passesGK || _load_passesGK()).default)('nuclide_hack_use_ffp_autocomplete');
   });
 
   return function getUseFfpAutocomplete() {
-    return _ref2.apply(this, arguments);
+    return _ref.apply(this, arguments);
   };
 })();
 
 let connectionToHackService = (() => {
-  var _ref3 = (0, _asyncToGenerator.default)(function* (connection) {
+  var _ref2 = (0, _asyncToGenerator.default)(function* (connection) {
     const hackService = (0, (_nuclideRemoteConnection || _load_nuclideRemoteConnection()).getServiceByConnection)(HACK_SERVICE_NAME, connection);
     const config = (0, (_config || _load_config()).getConfig)();
     const fileNotifier = yield (0, (_nuclideOpenFiles || _load_nuclideOpenFiles()).getNotifierByConnection)(connection);
 
-    if (yield getUseLspConnection()) {
+    if (config.legacyHackIde) {
+      return hackService.initialize(config.hhClientPath, config.logLevel, fileNotifier);
+    } else {
       const host = yield (0, (_nuclideLanguageService || _load_nuclideLanguageService()).getHostServices)();
       const autocompleteArg = (yield getUseFfpAutocomplete()) ? ['--ffp-autocomplete'] : [];
       const lspService = yield hackService.initializeLsp(config.hhClientPath, // command
@@ -42,19 +34,17 @@ let connectionToHackService = (() => {
       (_constants || _load_constants()).HACK_FILE_EXTENSIONS, // which file-notifications should be sent to LSP
       config.logLevel, fileNotifier, host);
       return lspService || new (_nuclideLanguageServiceRpc || _load_nuclideLanguageServiceRpc()).NullLanguageService();
-    } else {
-      return hackService.initialize(config.hhClientPath, config.logLevel, fileNotifier);
     }
   });
 
   return function connectionToHackService(_x) {
-    return _ref3.apply(this, arguments);
+    return _ref2.apply(this, arguments);
   };
 })();
 
 let createLanguageService = (() => {
-  var _ref4 = (0, _asyncToGenerator.default)(function* () {
-    const usingLsp = yield getUseLspConnection();
+  var _ref3 = (0, _asyncToGenerator.default)(function* () {
+    const usingLsp = !(0, (_config || _load_config()).getConfig)().legacyHackIde;
     const atomConfig = {
       name: 'Hack',
       grammars: (_nuclideHackCommon || _load_nuclideHackCommon()).HACK_GRAMMARS,
@@ -101,21 +91,21 @@ let createLanguageService = (() => {
         matcher: { kind: 'custom', matcher: (_evaluationExpression || _load_evaluationExpression()).getEvaluationExpression }
       },
       autocomplete: {
-        version: '2.0.0',
         inclusionPriority: 1,
         // The context-sensitive hack autocompletions are more relevant than snippets.
         suggestionPriority: 3,
         disableForSelector: null,
         excludeLowerPriority: false,
-        analyticsEventName: 'hack.getAutocompleteSuggestions',
+        analytics: {
+          eventName: 'nuclide-hack',
+          shouldLogInsertedSuggestion: true
+        },
         autocompleteCacherConfig: usingLsp ? {
           updateResults: (_nuclideLanguageService || _load_nuclideLanguageService()).updateAutocompleteResults,
           updateFirstResults: (_nuclideLanguageService || _load_nuclideLanguageService()).updateAutocompleteFirstResults
         } : {
           updateResults: hackUpdateAutocompleteResults
-        },
-        onDidInsertSuggestionAnalyticsEventName: 'hack.autocomplete-chosen',
-        trackAdditionalInfo: true
+        }
       },
       diagnostics: {
         version: '0.2.0',
@@ -127,7 +117,7 @@ let createLanguageService = (() => {
   });
 
   return function createLanguageService() {
-    return _ref4.apply(this, arguments);
+    return _ref3.apply(this, arguments);
   };
 })();
 
@@ -135,24 +125,24 @@ let createLanguageService = (() => {
 
 
 let getHackLanguageForUri = exports.getHackLanguageForUri = (() => {
-  var _ref5 = (0, _asyncToGenerator.default)(function* (uri) {
+  var _ref4 = (0, _asyncToGenerator.default)(function* (uri) {
     return (yield hackLanguageService).getLanguageServiceForUri(uri);
   });
 
   return function getHackLanguageForUri(_x2) {
-    return _ref5.apply(this, arguments);
+    return _ref4.apply(this, arguments);
   };
 })();
 
 let isFileInHackProject = exports.isFileInHackProject = (() => {
-  var _ref6 = (0, _asyncToGenerator.default)(function* (fileUri) {
+  var _ref5 = (0, _asyncToGenerator.default)(function* (fileUri) {
     const fileSystemService = (0, (_nuclideRemoteConnection || _load_nuclideRemoteConnection()).getFileSystemServiceByNuclideUri)(fileUri);
     const foundDir = yield fileSystemService.findNearestAncestorNamed('.hhconfig', fileUri);
     return foundDir != null;
   });
 
   return function isFileInHackProject(_x3) {
-    return _ref6.apply(this, arguments);
+    return _ref5.apply(this, arguments);
   };
 })();
 

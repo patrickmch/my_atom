@@ -55,19 +55,26 @@ function _load_UniversalDisposable() {
   return _UniversalDisposable = _interopRequireDefault(require('nuclide-commons/UniversalDisposable'));
 }
 
+var _BlameToggle;
+
+function _load_BlameToggle() {
+  return _BlameToggle = _interopRequireDefault(require('./BlameToggle'));
+}
+
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-const PACKAGES_MISSING_MESSAGE = 'Could not open blame. Missing at least one blame provider.'; /**
-                                                                                                * Copyright (c) 2015-present, Facebook, Inc.
-                                                                                                * All rights reserved.
-                                                                                                *
-                                                                                                * This source code is licensed under the license found in the LICENSE file in
-                                                                                                * the root directory of this source tree.
-                                                                                                *
-                                                                                                * 
-                                                                                                * @format
-                                                                                                */
+/**
+ * Copyright (c) 2015-present, Facebook, Inc.
+ * All rights reserved.
+ *
+ * This source code is licensed under the license found in the LICENSE file in
+ * the root directory of this source tree.
+ *
+ * 
+ * @format
+ */
 
+const PACKAGES_MISSING_MESSAGE = 'Could not open blame. Missing at least one blame provider.';
 const TOGGLE_BLAME_FILE_TREE_CONTEXT_MENU_PRIORITY = 2000;
 
 class Activation {
@@ -75,6 +82,7 @@ class Activation {
   constructor() {
     this._registeredProviders = new Set();
     this._textEditorToBlameGutter = new Map();
+    this._textEditorToBlameToggle = new Map();
     this._textEditorToDestroySubscription = new Map();
     this._packageDisposables = new (_UniversalDisposable || _load_UniversalDisposable()).default();
     this._packageDisposables.add(atom.contextMenu.add({
@@ -100,14 +108,29 @@ class Activation {
         this._hideBlame();
       }
     }));
+
+    this._packageDisposables.add((0, (_textEditor || _load_textEditor()).observeTextEditors)(editor => {
+      const button = new (_BlameToggle || _load_BlameToggle()).default(editor, this._hasProviderForEditor.bind(this));
+      const disposeButton = () => button.destroy();
+      this._packageDisposables.add(disposeButton);
+
+      this._textEditorToBlameToggle.set(editor, button);
+      this._textEditorToDestroySubscription.set(editor, editor.onDidDestroy(() => {
+        this._packageDisposables.remove(disposeButton);
+        this._editorWasDestroyed(editor);
+      }));
+    }));
   }
   // Map of a TextEditor to the subscription on its ::onDidDestroy.
+
+  // Map of a TextEditor to its BlameToggle, if it exists.
 
 
   dispose() {
     this._packageDisposables.dispose();
     this._registeredProviders.clear();
     this._textEditorToBlameGutter.clear();
+    this._textEditorToBlameToggle.clear();
     for (const disposable of this._textEditorToDestroySubscription.values()) {
       disposable.dispose();
     }
@@ -134,19 +157,13 @@ class Activation {
 
     let blameGutter = this._textEditorToBlameGutter.get(editor);
     if (!blameGutter) {
-      let providerForEditor = null;
-      for (const blameProvider of this._registeredProviders) {
-        if (blameProvider.canProvideBlameForEditor(editor)) {
-          providerForEditor = blameProvider;
-          break;
-        }
-      }
+      const providerForEditor = this._getProviderForEditor(editor);
 
-      if (providerForEditor) {
+      if (editor.isModified()) {
+        atom.notifications.addInfo('There is blame information for this file, but only for saved changes. ' + 'Save, then try again.');
+      } else if (providerForEditor) {
         blameGutter = new (_BlameGutter || _load_BlameGutter()).default('nuclide-blame', editor, providerForEditor);
         this._textEditorToBlameGutter.set(editor, blameGutter);
-        const destroySubscription = editor.onDidDestroy(() => this._editorWasDestroyed(editor));
-        this._textEditorToDestroySubscription.set(editor, destroySubscription);
 
         (0, (_nuclideAnalytics || _load_nuclideAnalytics()).track)('blame-open', {
           editorPath: editor.getPath() || ''
@@ -165,7 +182,18 @@ class Activation {
       blameGutter.destroy();
       this._textEditorToBlameGutter.delete(editor);
     }
-    this._textEditorToDestroySubscription.delete(editor);
+
+    const blameToggle = this._textEditorToBlameToggle.get(editor);
+    if (blameToggle != null) {
+      blameToggle.destroy();
+      this._textEditorToBlameToggle.delete(editor);
+    }
+
+    const subscription = this._textEditorToDestroySubscription.get(editor);
+    if (subscription != null) {
+      subscription.dispose();
+      this._textEditorToDestroySubscription.delete(editor);
+    }
   }
 
   /**
@@ -203,6 +231,20 @@ class Activation {
   /**
    * Section: Consuming Services
    */
+
+  _getProviderForEditor(editor) {
+    for (const blameProvider of this._registeredProviders) {
+      if (blameProvider.canProvideBlameForEditor(editor)) {
+        return blameProvider;
+      }
+    }
+
+    return null;
+  }
+
+  _hasProviderForEditor(editor) {
+    return Boolean(this._getProviderForEditor(editor) != null);
+  }
 
   consumeBlameProvider(provider) {
     this._registeredProviders.add(provider);

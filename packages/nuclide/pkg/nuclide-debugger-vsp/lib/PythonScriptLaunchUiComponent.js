@@ -32,10 +32,10 @@ function _load_string() {
   return _string = require('nuclide-commons/string');
 }
 
-var _nuclideDebuggerBase;
+var _nuclideDebuggerCommon;
 
-function _load_nuclideDebuggerBase() {
-  return _nuclideDebuggerBase = require('../../nuclide-debugger-base');
+function _load_nuclideDebuggerCommon() {
+  return _nuclideDebuggerCommon = require('nuclide-debugger-common');
 }
 
 var _nuclideAnalytics;
@@ -104,7 +104,7 @@ class PythonScriptLaunchUiComponent extends _react.Component {
       const debuggerService = yield (0, (_utils || _load_utils()).getDebuggerService)();
       debuggerService.startDebugging(launchInfo);
 
-      (0, (_nuclideDebuggerBase || _load_nuclideDebuggerBase()).serializeDebuggerConfig)(..._this._getSerializationArgs(), {
+      (0, (_nuclideDebuggerCommon || _load_nuclideDebuggerCommon()).serializeDebuggerConfig)(..._this._getSerializationArgs(), {
         pythonPath: _this.state.pythonPath,
         scriptPath: _this.state.scriptPath,
         args: _this.state.args,
@@ -132,7 +132,7 @@ class PythonScriptLaunchUiComponent extends _react.Component {
   }
 
   componentDidMount() {
-    (0, (_nuclideDebuggerBase || _load_nuclideDebuggerBase()).deserializeDebuggerConfig)(...this._getSerializationArgs(), (transientSettings, savedSettings) => {
+    (0, (_nuclideDebuggerCommon || _load_nuclideDebuggerCommon()).deserializeDebuggerConfig)(...this._getSerializationArgs(), (transientSettings, savedSettings) => {
       const scriptPath = savedSettings.scriptPath || getActiveScriptPath();
       const workingDirectory = savedSettings.workingDirectory || (scriptPath.length > 0 ? (_nuclideUri || _load_nuclideUri()).default.dirname(scriptPath) : '');
       this.setState({

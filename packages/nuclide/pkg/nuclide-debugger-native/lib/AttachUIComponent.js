@@ -31,10 +31,10 @@ function _load_nuclideUri() {
   return _nuclideUri = _interopRequireDefault(require('nuclide-commons/nuclideUri'));
 }
 
-var _nuclideDebuggerBase;
+var _nuclideDebuggerCommon;
 
-function _load_nuclideDebuggerBase() {
-  return _nuclideDebuggerBase = require('../../nuclide-debugger-base');
+function _load_nuclideDebuggerCommon() {
+  return _nuclideDebuggerCommon = require('nuclide-debugger-common');
 }
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
@@ -111,7 +111,7 @@ class AttachUIComponent extends _react.Component {
       if (!this._deserializedSavedSettings && this.state.attachTargetInfos.length > 0) {
         // Deserialize the saved settings the first time the process list updates.
         this._deserializedSavedSettings = true;
-        (0, (_nuclideDebuggerBase || _load_nuclideDebuggerBase()).deserializeDebuggerConfig)(...this._getSerializationArgs(), (transientSettings, savedSettings) => {
+        (0, (_nuclideDebuggerCommon || _load_nuclideDebuggerCommon()).deserializeDebuggerConfig)(...this._getSerializationArgs(), (transientSettings, savedSettings) => {
           newSelectedTarget = this.state.attachTargetInfos.find(target => target.pid === transientSettings.attachPid && target.name === transientSettings.attachName);
           filterText = transientSettings.filterText;
           this.setState({
@@ -300,7 +300,7 @@ class AttachUIComponent extends _react.Component {
         attachTarget.basepath = this.state.attachSourcePath;
       }
       this.props.actions.attachDebugger(attachTarget);
-      (0, (_nuclideDebuggerBase || _load_nuclideDebuggerBase()).serializeDebuggerConfig)(...this._getSerializationArgs(), {
+      (0, (_nuclideDebuggerCommon || _load_nuclideDebuggerCommon()).serializeDebuggerConfig)(...this._getSerializationArgs(), {
         attachSourcePath: this.state.attachSourcePath
       }, {
         attachPid: attachTarget.pid,

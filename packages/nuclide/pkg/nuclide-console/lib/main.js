@@ -169,6 +169,10 @@ class Activation {
   provideAutocomplete() {
     const activation = this;
     return {
+      analytics: {
+        eventName: 'nuclide-console',
+        shouldLogInsertedSuggestion: false
+      },
       labels: ['nuclide-console'],
       selector: '*',
       // Copies Chrome devtools and puts history suggestions at the bottom.

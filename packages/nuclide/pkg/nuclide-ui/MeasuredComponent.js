@@ -7,10 +7,10 @@ exports.MeasuredComponent = undefined;
 
 var _react = _interopRequireWildcard(require('react'));
 
-var _observeElementDimensions;
+var _observableDom;
 
-function _load_observeElementDimensions() {
-  return _observeElementDimensions = require('../commons-atom/observe-element-dimensions');
+function _load_observableDom() {
+  return _observableDom = require('nuclide-commons-ui/observable-dom');
 }
 
 function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
@@ -39,10 +39,16 @@ class MeasuredComponent extends _react.Component {
         this._domNode = null;
         // _updateDomNode is called before component unmount, so don't need to unsubscribe()
         // in componentWillUnmount()
-        this._mutationObserverSubscription.unsubscribe();
+        this._resizeSubscription.unsubscribe();
         return;
       }
-      this._mutationObserverSubscription = (0, (_observeElementDimensions || _load_observeElementDimensions()).observeElementDimensions)(node).subscribe(this.props.onMeasurementsChanged);
+      this._resizeSubscription = new (_observableDom || _load_observableDom()).ResizeObservable(node).subscribe(entries => {
+        if (!(entries.length === 1)) {
+          throw new Error('Invariant violation: "entries.length === 1"');
+        }
+
+        this.props.onMeasurementsChanged(entries[0].contentRect, entries[0].target);
+      });
       this._domNode = node;
     }, _temp;
   }

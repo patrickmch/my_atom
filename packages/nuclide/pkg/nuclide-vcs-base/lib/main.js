@@ -138,7 +138,6 @@ exports.getHgRepositoriesStream = getHgRepositoriesStream;
 exports.getHgRepositoryStream = getHgRepositoryStream;
 exports.repositoryForPath = repositoryForPath;
 exports.repositoryContainsPath = repositoryContainsPath;
-exports.filterMultiRootFileChanges = filterMultiRootFileChanges;
 exports.getMultiRootFileChanges = getMultiRootFileChanges;
 
 var _collection;
@@ -427,20 +426,6 @@ function pathsAreEqual(filePath1, filePath2) {
   const realPath1 = (_nuclideUri || _load_nuclideUri()).default.resolve(filePath1);
   const realPath2 = (_nuclideUri || _load_nuclideUri()).default.resolve(filePath2);
   return realPath1 === realPath2;
-}
-
-function filterMultiRootFileChanges(unfilteredFileChanges) {
-  const filteredFileChanges = new Map();
-  // Filtering the changes to make sure they only show up under the directory the
-  // file exists under.
-  for (const [root, fileChanges] of unfilteredFileChanges) {
-    const filteredFiles = (0, (_collection || _load_collection()).mapFilter)(fileChanges, filePath => filePath.startsWith(root));
-    if (filteredFiles.size !== 0) {
-      filteredFileChanges.set(root, filteredFiles);
-    }
-  }
-
-  return filteredFileChanges;
 }
 
 function getMultiRootFileChanges(fileChanges, rootPaths) {

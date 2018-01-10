@@ -66,6 +66,7 @@ function showModal(contentFactory, options = defaults) {
     className: options.className
   });
   const shouldDismissOnClickOutsideModal = options.shouldDismissOnClickOutsideModal || (() => true);
+  const shouldDismissOnPressEscape = options.shouldDismissOnPressEscape || (() => true);
 
   let panelElement = atomPanel.getElement();
   const previouslyFocusedElement = document.activeElement;
@@ -78,14 +79,20 @@ function showModal(contentFactory, options = defaults) {
       throw new Error('Invariant violation: "target instanceof Node"');
     }
 
-    if (!atomPanel.getItem().contains(target)) {
+    if (!atomPanel.getItem().contains(target) &&
+    // don't count clicks on notifications or tooltips as clicks 'outside'
+    target.closest('atom-notifications, .tooltip') == null) {
       atomPanel.hide();
     }
   }), atomPanel.onDidChangeVisible(visible => {
     if (!visible) {
       disposable.dispose();
     }
-  }), atom.commands.add('atom-workspace', 'core:cancel', () => disposable.dispose()), () => {
+  }), atom.commands.add('atom-workspace', 'core:cancel', () => {
+    if (shouldDismissOnPressEscape()) {
+      disposable.dispose();
+    }
+  }), () => {
     // Call onDismiss before unmounting the component and destroying the panel:
     if (options.onDismiss) {
       options.onDismiss();

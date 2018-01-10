@@ -67,6 +67,8 @@
   'alt-enter': 'jumpy:toggle'
   'ctrl-down': 'multi-cursor:expandDown'
   'ctrl-up':   'multi-cursor:expandUp'
+  'ctrl->': 'pane:move-item-right'
+  'ctrl-<': 'pane:move-item-left'
 
   # Key bindings for multi-cursor-plus
   'ctrl-alt-x':           'multi-cursor-plus:mark'
@@ -85,3 +87,8 @@
   'cmd-alt-e q': 'expand-selection-to-quotes:toggle'
   'cmd-alt-e b': 'bracket-matcher:select-inside-brackets'
   'cmd-alt-e t': 'expand-region:select-tag-attribute'
+
+  # emmet
+  'ctrl-:': 'emmet:remove-tag'
+  'ctrl-w': 'emmet:wrap-with-abbreviation'
+  'shift-space': 'emmet:expand-abbreviation-with-tab'

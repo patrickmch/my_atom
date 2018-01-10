@@ -5,18 +5,16 @@ Object.defineProperty(exports, "__esModule", {
 });
 exports.DebuggerPauseController = undefined;
 
-var _electron = _interopRequireDefault(require('electron'));
-
 var _DebuggerStore;
 
 function _load_DebuggerStore() {
   return _DebuggerStore = require('./DebuggerStore');
 }
 
-var _nuclideDebuggerBase;
+var _AtomServiceContainer;
 
-function _load_nuclideDebuggerBase() {
-  return _nuclideDebuggerBase = require('../../nuclide-debugger-base');
+function _load_AtomServiceContainer() {
+  return _AtomServiceContainer = require('./AtomServiceContainer');
 }
 
 var _UniversalDisposable;
@@ -26,21 +24,6 @@ function _load_UniversalDisposable() {
 }
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-const { remote } = _electron.default; /**
-                                       * Copyright (c) 2015-present, Facebook, Inc.
-                                       * All rights reserved.
-                                       *
-                                       * This source code is licensed under the license found in the LICENSE file in
-                                       * the root directory of this source tree.
-                                       *
-                                       * 
-                                       * @format
-                                       */
-
-if (!(remote != null)) {
-  throw new Error('Invariant violation: "remote != null"');
-}
 
 class DebuggerPauseController {
 
@@ -59,7 +42,7 @@ class DebuggerPauseController {
   }
 
   _scheduleNativeNotification() {
-    const raiseNativeNotification = (0, (_nuclideDebuggerBase || _load_nuclideDebuggerBase()).getNotificationService)();
+    const raiseNativeNotification = (0, (_AtomServiceContainer || _load_AtomServiceContainer()).getNotificationService)();
     if (raiseNativeNotification != null) {
       const pendingNotification = raiseNativeNotification('Nuclide Debugger', 'Paused at a breakpoint', 3000, false);
       if (pendingNotification != null) {
@@ -72,4 +55,13 @@ class DebuggerPauseController {
     this._disposables.dispose();
   }
 }
-exports.DebuggerPauseController = DebuggerPauseController;
+exports.DebuggerPauseController = DebuggerPauseController; /**
+                                                            * Copyright (c) 2015-present, Facebook, Inc.
+                                                            * All rights reserved.
+                                                            *
+                                                            * This source code is licensed under the license found in the LICENSE file in
+                                                            * the root directory of this source tree.
+                                                            *
+                                                            * 
+                                                            * @format
+                                                            */

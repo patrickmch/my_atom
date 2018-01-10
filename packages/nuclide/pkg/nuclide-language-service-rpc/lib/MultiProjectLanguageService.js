@@ -65,17 +65,6 @@ function _load_() {
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-/**
- * Copyright (c) 2015-present, Facebook, Inc.
- * All rights reserved.
- *
- * This source code is licensed under the license found in the LICENSE file in
- * the root directory of this source tree.
- *
- * 
- * @format
- */
-
 class MultiProjectLanguageService {
   // A promise for when AtomLanguageService has called into this feature
 
@@ -86,10 +75,10 @@ class MultiProjectLanguageService {
     });
   }
 
-  initialize(logger, fileCache, host, projectFileNames, fileExtensions, languageServiceFactory) {
+  initialize(logger, fileCache, host, projectFileNames, projectFileSearchStrategy, fileExtensions, languageServiceFactory) {
     this._logger = logger;
     this._resources = new (_UniversalDisposable || _load_UniversalDisposable()).default();
-    this._configCache = new (_ConfigCache || _load_ConfigCache()).ConfigCache(projectFileNames);
+    this._configCache = new (_ConfigCache || _load_ConfigCache()).ConfigCache(projectFileNames, projectFileSearchStrategy != null ? projectFileSearchStrategy : undefined);
 
     this._processes = new (_cache || _load_cache()).Cache(languageServiceFactory, value => {
       value.then(process => {
@@ -423,5 +412,15 @@ class MultiProjectLanguageService {
 }
 
 exports.MultiProjectLanguageService = MultiProjectLanguageService; // Enforces that an instance of MultiProjectLanguageService satisfies the LanguageService type
+/**
+ * Copyright (c) 2015-present, Facebook, Inc.
+ * All rights reserved.
+ *
+ * This source code is licensed under the license found in the LICENSE file in
+ * the root directory of this source tree.
+ *
+ * 
+ * @format
+ */
 
 null;

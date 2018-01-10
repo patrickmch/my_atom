@@ -26,7 +26,7 @@ let getInitializationOptionsWithCompilationDb = (() => {
   var _ref2 = (0, _asyncToGenerator.default)(function* (projectRoot, compilationDbDir) {
     return Object.assign({}, staticInitializationOptions(), {
       compilationDatabaseDirectory: compilationDbDir,
-      cacheDirectory: yield verifyOrCreateFallbackCacheDir((_nuclideUri || _load_nuclideUri()).default.join(compilationDbDir, CQUERY_CACHE_DIR))
+      cacheDirectory: yield verifyOrCreateFallbackCacheDir(compilationDbDir)
     });
   });
 
@@ -39,7 +39,7 @@ let getInitializationOptionsWithoutCompilationDb = (() => {
   var _ref3 = (0, _asyncToGenerator.default)(function* (projectRoot, defaultFlags) {
     return Object.assign({}, staticInitializationOptions(), {
       extraClangArguments: defaultFlags,
-      cacheDirectory: yield verifyOrCreateFallbackCacheDir((_nuclideUri || _load_nuclideUri()).default.join(projectRoot, CQUERY_CACHE_DIR))
+      cacheDirectory: yield verifyOrCreateFallbackCacheDir(projectRoot)
     });
   });
 
@@ -49,14 +49,14 @@ let getInitializationOptionsWithoutCompilationDb = (() => {
 })();
 
 let verifyOrCreateFallbackCacheDir = (() => {
-  var _ref4 = (0, _asyncToGenerator.default)(function* (cacheDir) {
+  var _ref4 = (0, _asyncToGenerator.default)(function* (rootDir) {
     // If the cache directory can't be created, then we fallback to putting it
     // in the system's tempdir. This makes caching unreliable but otherwise
     // cquery would crash.
-    if (!(yield (_fsPromise || _load_fsPromise()).default.access(cacheDir, _fs.default.W_OK + _fs.default.R_OK))) {
-      return (_nuclideUri || _load_nuclideUri()).default.join(_os.default.tmpdir(), cacheDir);
+    if (!(yield (_fsPromise || _load_fsPromise()).default.access(rootDir, _fs.default.W_OK + _fs.default.R_OK))) {
+      return (_nuclideUri || _load_nuclideUri()).default.join(_os.default.tmpdir(), CQUERY_CACHE_DIR);
     }
-    return cacheDir;
+    return (_nuclideUri || _load_nuclideUri()).default.join(rootDir, CQUERY_CACHE_DIR);
   });
 
   return function verifyOrCreateFallbackCacheDir(_x6) {
@@ -75,7 +75,7 @@ var _os = _interopRequireDefault(require('os'));
 var _fsPromise;
 
 function _load_fsPromise() {
-  return _fsPromise = _interopRequireDefault(require('../../../modules/nuclide-commons/fsPromise'));
+  return _fsPromise = _interopRequireDefault(require('nuclide-commons/fsPromise'));
 }
 
 var _fs = _interopRequireDefault(require('fs'));

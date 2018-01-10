@@ -46,8 +46,9 @@ class Modal extends _react.Component {
     var _temp;
 
     return _temp = super(...args), this._handleWindowClick = event => {
-      // If the user clicks outside of the modal, close it.
-      if (this._innerElement && !this._innerElement.contains(event.target)) {
+      // If the user clicks outside of the modal, and not on a tooltip or
+      // notification, close it.
+      if (this._innerElement && !this._innerElement.contains(event.target) && event.target.closest('atom-notifications, .tooltip') == null) {
         this.props.onDismiss();
       }
     }, this._handleContainerInnerElement = el => {

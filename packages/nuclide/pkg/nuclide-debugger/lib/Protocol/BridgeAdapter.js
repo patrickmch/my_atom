@@ -312,6 +312,10 @@ class BridgeAdapter {
   dispose() {
     this._subscriptions.dispose();
   }
+
+  getExpressionEvaluationManager() {
+    return this._expressionEvaluationManager;
+  }
 }
 exports.default = BridgeAdapter; /**
                                   * Copyright (c) 2015-present, Facebook, Inc.

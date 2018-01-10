@@ -7,10 +7,16 @@ exports.VSP_DEBUGGER_SERVICE_NAME = undefined;
 
 var _asyncToGenerator = _interopRequireDefault(require('async-to-generator'));
 
-var _nuclideDebuggerBase;
+var _nuclideDebuggerCommon;
 
-function _load_nuclideDebuggerBase() {
-  return _nuclideDebuggerBase = require('../../nuclide-debugger-base');
+function _load_nuclideDebuggerCommon() {
+  return _nuclideDebuggerCommon = require('nuclide-debugger-common');
+}
+
+var _nuclideDebugger;
+
+function _load_nuclideDebugger() {
+  return _nuclideDebugger = require('../../nuclide-debugger');
 }
 
 var _nuclideRemoteConnection;
@@ -33,18 +39,21 @@ function _load_nuclideAnalytics() {
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-const VSP_DEBUGGER_SERVICE_NAME = exports.VSP_DEBUGGER_SERVICE_NAME = 'vscode-adapter'; /**
-                                                                                         * Copyright (c) 2015-present, Facebook, Inc.
-                                                                                         * All rights reserved.
-                                                                                         *
-                                                                                         * This source code is licensed under the license found in the LICENSE file in
-                                                                                         * the root directory of this source tree.
-                                                                                         *
-                                                                                         * 
-                                                                                         * @format
-                                                                                         */
+// eslint-disable-next-line rulesdir/no-cross-atom-imports
+/**
+ * Copyright (c) 2015-present, Facebook, Inc.
+ * All rights reserved.
+ *
+ * This source code is licensed under the license found in the LICENSE file in
+ * the root directory of this source tree.
+ *
+ * 
+ * @format
+ */
 
-class VspProcessInfo extends (_nuclideDebuggerBase || _load_nuclideDebuggerBase()).DebuggerProcessInfo {
+const VSP_DEBUGGER_SERVICE_NAME = exports.VSP_DEBUGGER_SERVICE_NAME = 'vscode-adapter';
+
+class VspProcessInfo extends (_nuclideDebuggerCommon || _load_nuclideDebuggerCommon()).DebuggerProcessInfo {
 
   constructor(targetUri, debugMode, adapterType, adapterExecutable, showThreads, config) {
     super(VSP_DEBUGGER_SERVICE_NAME, targetUri);
@@ -77,7 +86,7 @@ class VspProcessInfo extends (_nuclideDebuggerBase || _load_nuclideDebuggerBase(
 
     return (0, _asyncToGenerator.default)(function* () {
       const rpcService = _this._getRpcService();
-      const outputDisposable = (0, (_nuclideDebuggerBase || _load_nuclideDebuggerBase()).registerConsoleLogging)(_this._adapterType, rpcService.getOutputWindowObservable().refCount());
+      const outputDisposable = (0, (_nuclideDebugger || _load_nuclideDebugger()).registerConsoleLogging)(_this._adapterType, rpcService.getOutputWindowObservable().refCount());
       (0, (_nuclideAnalytics || _load_nuclideAnalytics()).track)('fb-vscode-debugger-launch', {
         type: _this._adapterType,
         mode: _this._debugMode
@@ -89,7 +98,7 @@ class VspProcessInfo extends (_nuclideDebuggerBase || _load_nuclideDebuggerBase(
 
       try {
         yield rpcService.debug(_this._adapterExecutable, _this._debugMode, _this._config);
-        return new (_nuclideDebuggerBase || _load_nuclideDebuggerBase()).DebuggerInstance(_this, rpcService, new (_UniversalDisposable || _load_UniversalDisposable()).default(outputDisposable));
+        return new (_nuclideDebuggerCommon || _load_nuclideDebuggerCommon()).DebuggerInstance(_this, rpcService, new (_UniversalDisposable || _load_UniversalDisposable()).default(outputDisposable));
       } catch (error) {
         outputDisposable.dispose();
         throw error;

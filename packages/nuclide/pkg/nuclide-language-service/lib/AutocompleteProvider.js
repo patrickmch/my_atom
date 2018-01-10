@@ -34,12 +34,6 @@ function _load_nuclideRemoteConnection() {
   return _nuclideRemoteConnection = require('../../nuclide-remote-connection');
 }
 
-var _nuclideAnalytics;
-
-function _load_nuclideAnalytics() {
-  return _nuclideAnalytics = require('../../nuclide-analytics');
-}
-
 var _nuclideOpenFiles;
 
 function _load_nuclideOpenFiles() {
@@ -60,29 +54,16 @@ function _load_textEdit() {
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-/**
- * Copyright (c) 2015-present, Facebook, Inc.
- * All rights reserved.
- *
- * This source code is licensed under the license found in the LICENSE file in
- * the root directory of this source tree.
- *
- * 
- * @format
- */
-
 class AutocompleteProvider {
 
-  constructor(name, selector, inclusionPriority, suggestionPriority, disableForSelector, excludeLowerPriority, analyticsEventName, onDidInsertSuggestion, onDidInsertSuggestionAnalyticsEventName, autocompleteCacherConfig, connectionToLanguageService, trackAdditionalInfo) {
+  constructor(name, selector, inclusionPriority, suggestionPriority, disableForSelector, excludeLowerPriority, analytics, onDidInsertSuggestion, autocompleteCacherConfig, connectionToLanguageService) {
     this.name = name;
     this.selector = selector;
     this.inclusionPriority = inclusionPriority;
     this.suggestionPriority = suggestionPriority;
     this.disableForSelector = disableForSelector;
     this.excludeLowerPriority = excludeLowerPriority;
-    this._analyticsEventName = analyticsEventName;
     this._connectionToLanguageService = connectionToLanguageService;
-    this._trackAdditionalInfo = trackAdditionalInfo;
 
     if (autocompleteCacherConfig != null) {
       this._autocompleteCacher = new (_AutocompleteCacher || _load_AutocompleteCacher()).default(request => this._getSuggestionsFromLanguageService(request), autocompleteCacherConfig);
@@ -91,178 +72,180 @@ class AutocompleteProvider {
     this._onDidInsertSuggestion = onDidInsertSuggestion;
 
     this.onDidInsertSuggestion = suggestionInsertedRequest => {
-      if (this._trackAdditionalInfo) {
-        const suggestion = suggestionInsertedRequest.suggestion;
-        let suggestionText = suggestion.text;
-        if (suggestionText == null) {
-          suggestionText = suggestion.snippet;
-        }
-        (0, (_nuclideAnalytics || _load_nuclideAnalytics()).track)(onDidInsertSuggestionAnalyticsEventName, {
-          replacementPrefix: suggestion.replacementPrefix,
-          suggestionText
-        });
-      } else {
-        (0, (_nuclideAnalytics || _load_nuclideAnalytics()).track)(onDidInsertSuggestionAnalyticsEventName);
-      }
-      this._handleTextEdits(suggestionInsertedRequest);
+      maybeApplyTextEdits(suggestionInsertedRequest);
       if (this._onDidInsertSuggestion != null) {
         this._onDidInsertSuggestion(suggestionInsertedRequest);
       }
     };
-  }
-  // _trackAdditionalInfo enables logging of the completions chosen and the
-  // replaced prefixes.
 
+    this.analytics = analytics;
+  }
 
   static register(name, grammars, config, onDidInsertSuggestion, connectionToLanguageService) {
-    return atom.packages.serviceHub.provide('autocomplete.provider', config.version, new AutocompleteProvider(name, grammars.map(grammar => '.' + grammar).join(', '), config.inclusionPriority, config.suggestionPriority, config.disableForSelector, config.excludeLowerPriority, config.analyticsEventName, onDidInsertSuggestion, config.onDidInsertSuggestionAnalyticsEventName, config.autocompleteCacherConfig, connectionToLanguageService, config.trackAdditionalInfo));
+    return atom.packages.serviceHub.provide('nuclide-autocomplete.provider', '0.0.0', new AutocompleteProvider(name, grammars.map(grammar => '.' + grammar).join(', '), config.inclusionPriority, config.suggestionPriority, config.disableForSelector, config.excludeLowerPriority, config.analytics, onDidInsertSuggestion, config.autocompleteCacherConfig, connectionToLanguageService));
   }
 
   getSuggestions(request) {
     var _this = this;
 
-    const values = {};
-    return (0, (_nuclideAnalytics || _load_nuclideAnalytics()).trackTiming)(this._analyticsEventName, (0, _asyncToGenerator.default)(function* () {
+    return (0, _asyncToGenerator.default)(function* () {
       let result;
       if (_this._autocompleteCacher != null) {
         result = yield _this._autocompleteCacher.getSuggestions(request);
       } else {
         result = yield _this._getSuggestionsFromLanguageService(request);
       }
-      if (result != null) {
-        values.isEmpty = false;
-        return result.items;
-      } else {
-        values.isEmpty = true;
-        return null;
-      }
-    }), values);
-  }
-
-  _handleTextEdits(arg) {
-    const { editor, suggestion } = arg;
-    const textEdits = suggestion.textEdits;
-    if (textEdits != null) {
-      textEdits.sort((edit1, edit2) => {
-        // applyTextEditsToBuffer expects reverse ordering.
-        return edit2.oldRange.compare(edit1.oldRange);
-      });
-      (0, (_textEdit || _load_textEdit()).applyTextEditsToBuffer)(editor.getBuffer(), textEdits);
-    }
+      return result != null ? result.items : null;
+    })();
   }
 
   _getSuggestionsFromLanguageService(request) {
     var _this2 = this;
 
     return (0, _asyncToGenerator.default)(function* () {
-      const { editor, activatedManually, prefix } = request;
-      // TODO(ljw): the following line uses the position of the cursor --
-      // shouldn't it be using request.bufferPosition instead?
-      const position = editor.getLastCursor().getBufferPosition();
-
-      // In case of automatic requests, we'd like to know what character triggered
-      // the autocomplete request. That information isn't provided to us, so the
-      // best we can do is find the character to the left of the position.
-      let triggerCharacter;
-      if (activatedManually != null && activatedManually) {
-        triggerCharacter = null;
-      } else if (position.column === 0) {
-        triggerCharacter = '\n';
-      } else {
-        const range = new (_simpleTextBuffer || _load_simpleTextBuffer()).Range([position.row, position.column - 1], position);
-        triggerCharacter = editor.getTextInBufferRange(range);
-      }
-
-      // 'prefix' has to do with what's replaced when the user accepts an
-      // autocomplete suggestion. It's based on the current word. For instance,
-      //  '$c|'      => suggestion '$compare'  => hopefully replace '$c'
-      //  'Vec\com|' => suggestion 'compare'   => hopefully replace 'com'
-      // The way autocomplete works is: the language service might say what prefix
-      // its suggestion will replace; and if it doesn't, then autocomplete will
-      // replace whatever prefix was part of the 'request' object.
-      //
-      // Atom has its own way of computing the current word (to support gestures
-      // like cursor-past-word). It bases this on 'editor.nonWordCharacters', by
-      // default roughly [a-zA-Z0-9_]. But language packages can and do override
-      // this -- e.g. PHP allows '$' in identifiers.
-      //
-      // Autocomplete doesn't use Atom's technique (I suspect because the html and
-      // css and xml packages never bothered overriding it). Instead autocomplete
-      // has its own regex, roughly the same but allowing '-' as well. It uses
-      // this to populate 'prefix'.
-      //
-      // Autocomplete's suggestion is wrong for languages like PHP which have
-      // their own regex, is right for languages like HTML which should but don't,
-      // and is wrong for languages like Java which don't provide their own
-      // regex and which don't allow hyphens.
-      //
-      // What we'll do is work around this mess right here as best we can:
-      // if the language-package provides its own regex which gives a different
-      // prefix from Autocomplete's, then we'll suggest that to the language
-      // service, and we'll patch the output of the language service to reflect
-      // this.
-
-      let langSpecificPrefix = prefix;
-      const defaultWordRules = editor.getNonWordCharacters();
-      const scope = editor.scopeDescriptorForBufferPosition(position);
-      const langWordRules = editor.getNonWordCharacters(scope); // {scope} ?
-      if (defaultWordRules !== langWordRules) {
-        langSpecificPrefix = findAtomWordPrefix(editor, position);
-      }
-
-      const path = editor.getPath();
+      const { editor } = request;
+      const languageService = _this2._connectionToLanguageService.getForUri(editor.getPath());
       const fileVersion = yield (0, (_nuclideOpenFiles || _load_nuclideOpenFiles()).getFileVersionOfEditor)(editor);
-
-      const languageService = _this2._connectionToLanguageService.getForUri(path);
       if (languageService == null || fileVersion == null) {
         return { isIncomplete: false, items: [] };
       }
 
-      const results = yield (yield languageService).getAutocompleteSuggestions(fileVersion, position, {
-        activatedManually: activatedManually == null ? false : activatedManually,
-        triggerCharacter,
-        prefix: langSpecificPrefix
+      const langSpecificPrefix = getLanguageSpecificPrefix(request);
+      const results = yield (yield languageService).getAutocompleteSuggestions(fileVersion, getPosition(request), generateAutocompleteRequest(request, langSpecificPrefix));
+      if (results == null) {
+        return null;
+      }
+
+      const uniqueIndex = Math.floor(Math.random() * 1000000000);
+
+      results.items.forEach(function (c, index) {
+        // textEdits aren't part of autocomplete-plus - we handle it in
+        // onDidInsertSuggestion above. We need to make this suggestion a no-op otherwise.
+        // There's no perfect solution at the moment, but the two options are:
+        // 1) Make text equal to the replacement prefix.
+        // 2) Provide an empty replacementPrefix, text, and snippet.
+        //
+        // 1) has the major downside of polluting the undo stack with an extra change.
+        // `autocomplete-plus` also has a default suffix-consuming feature where any text
+        // after the replaced text that matches a suffix of `text` will be deleted!
+        //
+        // 2) has the downside of not showing match highlights in the autocomplete UI.
+        // Between the two, we'll prefer accuracy at the cost of beauty.
+        //
+        // To get a better solution, `autocomplete-plus` needs a new API for custom suggestions.
+        if (c.textEdits != null) {
+          c.text = '';
+          // Atom ignores suggestions with an empty text & snippet.
+          // However, we can provide an empty snippet to trick it!
+          // 1) This works even if snippets are disabled.
+          // 2) Empty snippets don't appear in the undo stack.
+          // 3) autocomplete-plus dedupes snippets, so use unique indexes.
+          c.snippet = `$${uniqueIndex + index}`;
+          // Don't try to replace anything.
+          c.replacementPrefix = '';
+        } else if (c.replacementPrefix == null && langSpecificPrefix !== request.prefix) {
+          // Here's where we patch up the prefix in the results, if necessary
+          c.replacementPrefix = langSpecificPrefix;
+        }
       });
 
-      if (results != null) {
-        const uniqueIndex = Math.floor(Math.random() * 1000000000);
-        results.items.forEach(function (c, index) {
-          // textEdits aren't part of autocomplete-plus - we handle it in
-          // onDidInsertSuggestion above. We need to make this suggestion a no-op otherwise.
-          // There's no perfect solution at the moment, but the two options are:
-          // 1) Make text equal to the replacement prefix.
-          // 2) Provide an empty replacementPrefix, text, and snippet.
-          //
-          // 1) has the major downside of polluting the undo stack with an extra change.
-          // `autocomplete-plus` also has a default suffix-consuming feature where any text
-          // after the replaced text that matches a suffix of `text` will be deleted!
-          //
-          // 2) has the downside of not showing match highlights in the autocomplete UI.
-          // Between the two, we'll prefer accuracy at the cost of beauty.
-          //
-          // To get a better solution, `autocomplete-plus` needs a new API for custom suggestions.
-          if (c.textEdits != null) {
-            c.text = '';
-            // Atom ignores suggestions with an empty text & snippet.
-            // However, we can provide an empty snippet to trick it!
-            // 1) This works even if snippets are disabled.
-            // 2) Empty snippets don't appear in the undo stack.
-            // 3) autocomplete-plus dedupes snippets, so use unique indexes.
-            c.snippet = `$${uniqueIndex + index}`;
-            // Don't try to replace anything.
-            c.replacementPrefix = '';
-          } else if (c.replacementPrefix == null && langSpecificPrefix !== prefix) {
-            // Here's where we patch up the prefix in the results, if necessary
-            c.replacementPrefix = langSpecificPrefix;
-          }
-        });
-      }
       return results;
     })();
   }
 }
 
-exports.AutocompleteProvider = AutocompleteProvider;
+exports.AutocompleteProvider = AutocompleteProvider; /**
+                                                      * Copyright (c) 2015-present, Facebook, Inc.
+                                                      * All rights reserved.
+                                                      *
+                                                      * This source code is licensed under the license found in the LICENSE file in
+                                                      * the root directory of this source tree.
+                                                      *
+                                                      * 
+                                                      * @format
+                                                      */
+
+function maybeApplyTextEdits(insertedSuggestionArgument) {
+  const { editor, suggestion } = insertedSuggestionArgument;
+  const textEdits = suggestion.textEdits;
+  if (textEdits != null) {
+    (0, (_textEdit || _load_textEdit()).applyTextEditsToBuffer)(editor.getBuffer(), textEdits);
+  }
+}
+
+// 'prefix' has to do with what's replaced when the user accepts an
+// autocomplete suggestion. It's based on the current word. For instance,
+//  '$c|'      => suggestion '$compare'  => hopefully replace '$c'
+//  'Vec\com|' => suggestion 'compare'   => hopefully replace 'com'
+// The way autocomplete works is: the language service might say what prefix
+// its suggestion will replace; and if it doesn't, then autocomplete will
+// replace whatever prefix was part of the 'request' object.
+//
+// Atom has its own way of computing the current word (to support gestures
+// like cursor-past-word). It bases this on 'editor.nonWordCharacters', by
+// default roughly [a-zA-Z0-9_]. But language packages can and do override
+// this -- e.g. PHP allows '$' in identifiers.
+//
+// Autocomplete doesn't use Atom's technique (I suspect because the html and
+// css and xml packages never bothered overriding it). Instead autocomplete
+// has its own regex, roughly the same but allowing '-' as well. It uses
+// this to populate 'prefix'.
+//
+// Autocomplete's suggestion is wrong for languages like PHP which have
+// their own regex, is right for languages like HTML which should but don't,
+// and is wrong for languages like Java which don't provide their own
+// regex and which don't allow hyphens.
+//
+// What we'll do is work around this mess right here as best we can:
+// if the language-package provides its own regex which gives a different
+// prefix from Autocomplete's, then we'll suggest that to the language
+// service, and we'll patch the output of the language service to reflect
+// this.
+function getLanguageSpecificPrefix(request) {
+  const { editor } = request;
+  const position = getPosition(request);
+
+  const defaultWordRules = editor.getNonWordCharacters();
+  const scope = editor.scopeDescriptorForBufferPosition(position);
+  const langWordRules = editor.getNonWordCharacters(scope); // {scope} ?
+  if (defaultWordRules !== langWordRules) {
+    return findAtomWordPrefix(editor, position);
+  }
+  return request.prefix;
+}
+
+// In case of automatic requests, we'd like to know what character triggered
+// the autocomplete request. That information isn't provided to us, so the
+// best we can do is find the character to the left of the position.
+function findTriggerCharacter(request) {
+  if (request.activatedManually != null && request.activatedManually) {
+    return null;
+  }
+
+  const position = getPosition(request);
+  if (position.column === 0) {
+    return '\n';
+  }
+
+  const range = new (_simpleTextBuffer || _load_simpleTextBuffer()).Range([position.row, position.column - 1], position);
+  return request.editor.getTextInBufferRange(range);
+}
+
+// TODO(ljw): the following line uses the position of the cursor --
+// shouldn't it be using request.bufferPosition instead?
+function getPosition(request) {
+  return request.editor.getLastCursor().getBufferPosition();
+}
+
+function generateAutocompleteRequest(request, prefix) {
+  const { activatedManually } = request;
+  return {
+    activatedManually: activatedManually == null ? false : activatedManually,
+    triggerCharacter: findTriggerCharacter(request),
+    prefix
+  };
+}
+
 function findAtomWordPrefix(editor, position) {
   const positionOneCharBefore = new (_simpleTextBuffer || _load_simpleTextBuffer()).Point(position.row, Math.max(0, position.column - 1));
   const match = (0, (_range || _load_range()).wordAtPosition)(editor, positionOneCharBefore, {
@@ -270,9 +253,8 @@ function findAtomWordPrefix(editor, position) {
   });
   if (match == null) {
     return '';
-  } else {
-    return editor.getTextInBufferRange(new (_simpleTextBuffer || _load_simpleTextBuffer()).Range(match.range.start, position));
   }
+  return editor.getTextInBufferRange(new (_simpleTextBuffer || _load_simpleTextBuffer()).Range(match.range.start, position));
 }
 
 function padEnd(s, targetLength, padString) {
@@ -326,8 +308,11 @@ function updateAutocompleteFirstResults(request, firstResult) {
 
   const items = [];
   for (const item of firstResult.items) {
+    // If there are text edits, the first one will be used for scoring purposes.
+    const firstTextEdit = item.textEdits != null && item.textEdits.length > 0 ? item.textEdits[0].newText : null;
+    const text =
     // flowlint-next-line sketchy-null-string:off
-    const text = item.displayText || item.snippet || item.text || '';
+    item.displayText || item.snippet || item.text || firstTextEdit || '';
     // flowlint-next-line sketchy-null-string:off
     const filterText = padEnd(item.filterText || text, 40, ' ');
     // If no prefix, then include all items and avoid doing work to score.
@@ -341,10 +326,13 @@ function updateAutocompleteFirstResults(request, firstResult) {
       continue;
     }
     const completion = Object.assign({}, item, {
-      replacementPrefix: prefix,
       // flowlint-next-line sketchy-null-string:off
       sortText: item.sortText || text
     });
+    // If there are no textEdits, then a replacement prefix is needed.
+    if (firstTextEdit == null) {
+      completion.replacementPrefix = prefix;
+    }
     items.push({ filterScore, completion });
   }
 

@@ -37,10 +37,10 @@ function _load_nuclideUri() {
   return _nuclideUri = _interopRequireDefault(require('nuclide-commons/nuclideUri'));
 }
 
-var _nuclideDebuggerBase;
+var _nuclideDebuggerCommon;
 
-function _load_nuclideDebuggerBase() {
-  return _nuclideDebuggerBase = require('../../nuclide-debugger-base');
+function _load_nuclideDebuggerCommon() {
+  return _nuclideDebuggerCommon = require('nuclide-debugger-common');
 }
 
 var _classnames;
@@ -92,7 +92,7 @@ class LaunchUIComponent extends _react.Component {
       // Fire and forget.
       this.props.actions.launchDebugger(launchTarget);
 
-      (0, (_nuclideDebuggerBase || _load_nuclideDebuggerBase()).serializeDebuggerConfig)(...this._getSerializationArgs(), {
+      (0, (_nuclideDebuggerCommon || _load_nuclideDebuggerCommon()).serializeDebuggerConfig)(...this._getSerializationArgs(), {
         launchExecutable: this.state.launchExecutable,
         launchArguments: this.state.launchArguments,
         launchEnvironmentVariables: this.state.launchEnvironmentVariables,
@@ -129,7 +129,7 @@ class LaunchUIComponent extends _react.Component {
   }
 
   componentDidMount() {
-    (0, (_nuclideDebuggerBase || _load_nuclideDebuggerBase()).deserializeDebuggerConfig)(...this._getSerializationArgs(), (transientSettings, savedSettings) => {
+    (0, (_nuclideDebuggerCommon || _load_nuclideDebuggerCommon()).deserializeDebuggerConfig)(...this._getSerializationArgs(), (transientSettings, savedSettings) => {
       this.setState({
         launchExecutable: savedSettings.launchExecutable,
         launchArguments: savedSettings.launchArguments,

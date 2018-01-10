@@ -96,16 +96,18 @@ function _load_libclang() {
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-let subscriptions = null; /**
-                           * Copyright (c) 2015-present, Facebook, Inc.
-                           * All rights reserved.
-                           *
-                           * This source code is licensed under the license found in the LICENSE file in
-                           * the root directory of this source tree.
-                           *
-                           * 
-                           * @format
-                           */
+/**
+ * Copyright (c) 2015-present, Facebook, Inc.
+ * All rights reserved.
+ *
+ * This source code is licensed under the license found in the LICENSE file in
+ * the root directory of this source tree.
+ *
+ * 
+ * @format
+ */
+
+let subscriptions = null;
 
 function activate() {
   subscriptions = new (_UniversalDisposable || _load_UniversalDisposable()).default();
@@ -141,6 +143,10 @@ function activate() {
 /** Provider for autocomplete service. */
 function createAutocompleteProvider() {
   return {
+    analytics: {
+      eventName: 'nuclide-clang',
+      shouldLogInsertedSuggestion: false
+    },
     selector: '.source.objc, .source.objcpp, .source.cpp, .source.c',
     inclusionPriority: 1,
     suggestionPriority: 5, // Higher than the snippets provider.

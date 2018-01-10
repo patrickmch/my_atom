@@ -39,10 +39,10 @@ function _load_featureConfig() {
   return _featureConfig = _interopRequireDefault(require('nuclide-commons-atom/feature-config'));
 }
 
-var _observeElementDimensions;
+var _observableDom;
 
-function _load_observeElementDimensions() {
-  return _observeElementDimensions = require('../../commons-atom/observe-element-dimensions');
+function _load_observableDom() {
+  return _observableDom = require('nuclide-commons-ui/observable-dom');
 }
 
 var _performanceNow;
@@ -123,8 +123,10 @@ class TerminalView {
     const cwd = this._cwd = info.cwd == null ? null : info.cwd;
     this._command = info.command == null ? null : info.command;
     this._title = info.title == null ? 'terminal' : info.title;
+    this._path = cwd;
     this._initialInput = info.initialInput == null ? '' : getSafeInitialInput(info.initialInput);
     this._processExitCallback = () => {};
+    this._useTitleAsPath = false;
 
     this._startTime = (0, (_performanceNow || _load_performanceNow()).default)();
     this._bytesIn = 0;
@@ -195,6 +197,12 @@ class TerminalView {
     this._div.blur = () => terminal.blur();
 
     this._spawn(cwd);
+    this._setUseTitleAsPath(cwd);
+  }
+
+  _setUseTitleAsPath(cwd) {
+    const promise = cwd == null ? (0, (_nuclidePtyRpc || _load_nuclidePtyRpc()).useTitleAsPath)(this) : (0, (_nuclideRemoteConnection || _load_nuclideRemoteConnection()).getPtyServiceByNuclideUri)(cwd).useTitleAsPath(this);
+    promise.then(value => this._useTitleAsPath = value);
   }
 
   _spawn(cwd) {
@@ -234,7 +242,12 @@ class TerminalView {
       startDelay: Math.round(now - this._startTime)
     });
 
-    this._subscriptions.add(this.dispose.bind(this), _rxjsBundlesRxMinJs.Observable.merge(_rxjsBundlesRxMinJs.Observable.fromEvent(this._terminal, 'focus'), _rxjsBundlesRxMinJs.Observable.fromEvent(window, 'resize'), (0, (_observeElementDimensions || _load_observeElementDimensions()).observeElementDimensions)(this._div)).let((0, (_observable || _load_observable()).fastDebounce)(RESIZE_EVENT_DEBOUNCE_MS)).subscribe(() => this._fitAndResize()), _rxjsBundlesRxMinJs.Observable.fromEvent(this._terminal, 'data').subscribe(this._onInput.bind(this)), _rxjsBundlesRxMinJs.Observable.fromEvent(this._terminal, 'title').subscribe(this._setTitle.bind(this)), _rxjsBundlesRxMinJs.Observable.interval(10 * 1000).startWith(0).map(() => atom.workspace.paneForItem(this)).filter(pane => pane != null).first().switchMap(pane => {
+    this._subscriptions.add(this.dispose.bind(this), _rxjsBundlesRxMinJs.Observable.merge(_rxjsBundlesRxMinJs.Observable.fromEvent(this._terminal, 'focus'), _rxjsBundlesRxMinJs.Observable.fromEvent(window, 'resize'), new (_observableDom || _load_observableDom()).ResizeObservable(this._div)).let((0, (_observable || _load_observable()).fastDebounce)(RESIZE_EVENT_DEBOUNCE_MS)).subscribe(() => this._fitAndResize()), _rxjsBundlesRxMinJs.Observable.fromEvent(this._terminal, 'data').subscribe(this._onInput.bind(this)), _rxjsBundlesRxMinJs.Observable.fromEvent(this._terminal, 'title').subscribe(title => {
+      this._setTitle(title);
+      if (this._useTitleAsPath) {
+        this._setPath(title);
+      }
+    }), _rxjsBundlesRxMinJs.Observable.interval(10 * 1000).startWith(0).map(() => atom.workspace.paneForItem(this)).filter(pane => pane != null).first().switchMap(pane => {
       if (!(pane != null)) {
         throw new Error('Invariant violation: "pane != null"');
       }
@@ -319,7 +332,11 @@ class TerminalView {
   _setTitle(title) {
     this._title = title;
     this._emitter.emit('did-change-title', title);
-    this._emitter.emit('did-change-path', title);
+  }
+
+  _setPath(path) {
+    this._path = path;
+    this._emitter.emit('did-change-path', path);
   }
 
   _addEscapePrefix(event) {
@@ -485,7 +502,7 @@ class TerminalView {
   }
 
   getPath() {
-    return this._title;
+    return this._path;
   }
 
   onDidChangePath(callback) {

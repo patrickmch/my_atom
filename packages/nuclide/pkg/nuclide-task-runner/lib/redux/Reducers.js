@@ -3,8 +3,8 @@
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.taskRunnersReady = taskRunnersReady;
-exports.isUpdatingTaskRunners = isUpdatingTaskRunners;
+exports.initialPackagesActivated = initialPackagesActivated;
+exports.readyTaskRunners = readyTaskRunners;
 exports.taskRunners = taskRunners;
 exports.statesForTaskRunners = statesForTaskRunners;
 exports.projectRoot = projectRoot;
@@ -20,50 +20,58 @@ function _load_Actions() {
   return _Actions = _interopRequireWildcard(require('./Actions'));
 }
 
+var _immutable;
+
+function _load_immutable() {
+  return _immutable = _interopRequireWildcard(require('immutable'));
+}
+
 function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
 
-/**
- * Copyright (c) 2015-present, Facebook, Inc.
- * All rights reserved.
- *
- * This source code is licensed under the license found in the LICENSE file in
- * the root directory of this source tree.
- *
- * 
- * @format
- */
-
-function taskRunnersReady(state = false, action) {
+function initialPackagesActivated(state = false, action) {
   switch (action.type) {
     case (_Actions || _load_Actions()).DID_ACTIVATE_INITIAL_PACKAGES:
       return true;
     default:
       return state;
   }
-}
+} /**
+   * Copyright (c) 2015-present, Facebook, Inc.
+   * All rights reserved.
+   *
+   * This source code is licensed under the license found in the LICENSE file in
+   * the root directory of this source tree.
+   *
+   * 
+   * @format
+   */
 
-function isUpdatingTaskRunners(state = true, action) {
+function readyTaskRunners(state = (_immutable || _load_immutable()).Set(), action) {
   switch (action.type) {
     case (_Actions || _load_Actions()).SET_PROJECT_ROOT:
-      return true;
+      return (_immutable || _load_immutable()).Set();
+    case (_Actions || _load_Actions()).SET_STATE_FOR_TASK_RUNNER:
+      return state.add(action.payload.taskRunner);
     case (_Actions || _load_Actions()).SET_STATES_FOR_TASK_RUNNERS:
-      return false;
+      return state.concat(action.payload.statesForTaskRunners.keys());
+    case (_Actions || _load_Actions()).UNREGISTER_TASK_RUNNER:
+      return state.remove(action.payload.taskRunner);
     default:
       return state;
   }
 }
 
-function taskRunners(state = [], action) {
+function taskRunners(state = (_immutable || _load_immutable()).List(), action) {
   switch (action.type) {
     case (_Actions || _load_Actions()).REGISTER_TASK_RUNNER:
       {
         const { taskRunner } = action.payload;
-        return state.concat(taskRunner).sort((a, b) => a.name.toUpperCase().localeCompare(b.name.toUpperCase()));
+        return state.push(taskRunner).sort((a, b) => a.name.toUpperCase().localeCompare(b.name.toUpperCase()));
       }
     case (_Actions || _load_Actions()).UNREGISTER_TASK_RUNNER:
       {
         const { taskRunner } = action.payload;
-        return state.slice().filter(element => element !== taskRunner);
+        return state.delete(state.indexOf(taskRunner));
       }
     default:
       {
@@ -72,19 +80,17 @@ function taskRunners(state = [], action) {
   }
 }
 
-function statesForTaskRunners(state = new Map(), action) {
+function statesForTaskRunners(state = (_immutable || _load_immutable()).Map(), action) {
   switch (action.type) {
     case (_Actions || _load_Actions()).SET_PROJECT_ROOT:
-      return new Map();
+      return (_immutable || _load_immutable()).Map();
     case (_Actions || _load_Actions()).UNREGISTER_TASK_RUNNER:
-      const newMap = new Map(state.entries());
-      newMap.delete(action.payload.taskRunner);
-      return newMap;
+      return state.delete(action.payload.taskRunner);
     case (_Actions || _load_Actions()).SET_STATES_FOR_TASK_RUNNERS:
-      return new Map([...state.entries(), ...action.payload.statesForTaskRunners.entries()]);
+      return state.merge(action.payload.statesForTaskRunners);
     case (_Actions || _load_Actions()).SET_STATE_FOR_TASK_RUNNER:
       const { taskRunner, taskRunnerState } = action.payload;
-      return new Map(state.entries()).set(taskRunner, taskRunnerState);
+      return state.set(taskRunner, taskRunnerState);
     default:
       return state;
   }

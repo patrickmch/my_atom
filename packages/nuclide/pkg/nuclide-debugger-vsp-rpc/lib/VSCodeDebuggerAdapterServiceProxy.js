@@ -195,7 +195,7 @@ Object.defineProperty(module.exports, "defs", {
       location: {
         type: "source",
         fileName: "types.js",
-        line: 26
+        line: 31
       },
       name: "VsAdapterType",
       definition: {
@@ -218,6 +218,9 @@ Object.defineProperty(module.exports, "defs", {
         }, {
           kind: "string-literal",
           value: "prepack"
+        }, {
+          kind: "string-literal",
+          value: "ocaml"
         }]
       }
     },
@@ -226,7 +229,7 @@ Object.defineProperty(module.exports, "defs", {
       location: {
         type: "source",
         fileName: "types.js",
-        line: 21
+        line: 26
       },
       name: "VSAdapterExecutableInfo",
       definition: {
@@ -254,7 +257,7 @@ Object.defineProperty(module.exports, "defs", {
       location: {
         type: "source",
         fileName: "types.js",
-        line: 19
+        line: 24
       },
       name: "DebuggerConfigAction",
       definition: {
@@ -273,7 +276,7 @@ Object.defineProperty(module.exports, "defs", {
       location: {
         type: "source",
         fileName: "types.js",
-        line: 13
+        line: 18
       },
       name: "AtomNotificationType",
       definition: {
@@ -298,7 +301,7 @@ Object.defineProperty(module.exports, "defs", {
       location: {
         type: "source",
         fileName: "types.js",
-        line: 14
+        line: 19
       },
       name: "AtomNotification",
       definition: {

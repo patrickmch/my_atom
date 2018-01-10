@@ -14,10 +14,10 @@ function _load_constants() {
 var _immutable;
 
 function _load_immutable() {
-  return _immutable = _interopRequireDefault(require('immutable'));
+  return _immutable = _interopRequireWildcard(require('immutable'));
 }
 
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
 
 /**
  * Copyright (c) 2015-present, Facebook, Inc.
@@ -34,7 +34,7 @@ function getEmptyRepositoryState() {
   return {
     activeShortHead: (_constants || _load_constants()).EMPTY_SHORTHEAD,
     isRestoring: false,
-    shortHeadsToFileList: (_immutable || _load_immutable()).default.Map()
+    shortHeadsToFileList: (_immutable || _load_immutable()).Map()
   };
 }
 
@@ -131,7 +131,7 @@ function accumulateRepositoryStateUpdateBookmarks(repositoryState_, action) {
 function accumulateUpdatePaneItemState(state, action) {
   const { repositoryPathToEditors } = action.payload;
   return Object.assign({}, state, {
-    repositoryPathToState: (_immutable || _load_immutable()).default.Map(Array.from(state.repositoryPathToState.entries()).map(([repositoryPath, repositoryState]) => {
+    repositoryPathToState: (_immutable || _load_immutable()).Map(Array.from(state.repositoryPathToState.entries()).map(([repositoryPath, repositoryState]) => {
       const fileList = (repositoryPathToEditors.get(repositoryPath) || []).map(textEditor => textEditor.getPath() || '');
       return [repositoryPath, accumulateRepositoryStateUpdatePaneItemState(repositoryState, fileList)];
     }))

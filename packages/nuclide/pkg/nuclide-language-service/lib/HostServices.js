@@ -77,15 +77,9 @@ class RootHostServices {
       dispose: () => {}
     };
     this._consoleSubjects = new Map();
-    this._progressWrappers = new Map();
   }
 
   // lazily created map from source, to how we'll push messages from that source
-
-
-  // _progressWrappers is a hack to work around message loss in nuclide-rpc.
-  // We wouldn't need this field, nor wrappers at all, if we could depend on it.
-  // See also a field of the same name in HostServicesAggregator.js
 
 
   consoleNotification(source, level, text) {
@@ -180,38 +174,11 @@ class RootHostServices {
 
     return (0, _asyncToGenerator.default)(function* () {
       const service = yield _this._getBusySignalService();
-      let busyMessage = service == null ? _this._nullProgressMessage : service.reportBusy(title, Object.assign({}, options));
+      const busyMessage = service == null ? _this._nullProgressMessage : service.reportBusy(title, Object.assign({}, options));
       // The BusyMessage type from atom-ide-busy-signal happens to satisfy the
       // nuclide-rpc-able interface 'Progress': thus, we can return it directly.
-      // return (busyMessage: Progress);
-      // Except: we're not going to, because we have to work around a bug in
-      // nuclide-rpc and construct wrappers:
-      const wrapper = {
-        setTitle: function (title2) {
-          if (busyMessage != null) {
-            busyMessage.setTitle(title2);
-          }
-        },
-        dispose: function () {
-          if (busyMessage != null) {
-            _this._progressWrappers.delete(wrapper);
-            busyMessage.dispose();
-            busyMessage = null;
-          }
-        }
-      };
-      _this._progressWrappers.set(wrapper, busyMessage);
-      return wrapper;
+      return busyMessage;
     })();
-  }
-
-  syncProgress(expected) {
-    // This function's goal is to compensate for flakey message loss.
-    for (const [wrapper] of this._progressWrappers) {
-      if (!expected.has(wrapper)) {
-        wrapper.dispose();
-      }
-    }
   }
 
   showActionRequired(title, options) {

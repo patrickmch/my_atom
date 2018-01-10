@@ -64,15 +64,15 @@ class AtomInput extends _react.Component {
     super(props);
 
     this._onEditorFocus = () => {
-      if (this.isFocussed() && !this._isFocussed) {
-        this._isFocussed = true;
+      if (this.isFocused() && !this._isFocused) {
+        this._isFocused = true;
         this.props.onFocus && this.props.onFocus();
       }
     };
 
     this._onEditorBlur = blurEvent => {
-      if (!this.isFocussed() && this._isFocussed) {
-        this._isFocussed = false;
+      if (!this.isFocused() && this._isFocused) {
+        this._isFocused = false;
         this.props.onBlur && this.props.onBlur(blurEvent);
       }
     };
@@ -200,7 +200,7 @@ class AtomInput extends _react.Component {
     }
   }
 
-  isFocussed() {
+  isFocused() {
     return this._rootNode != null && this._rootNode.contains(document.activeElement);
   }
 

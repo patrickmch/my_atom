@@ -119,22 +119,22 @@ let getLanguageServiceConfig = (() => {
         definitionEventName: 'flow.get-definition'
       },
       autocomplete: {
-        version: '2.0.0',
         disableForSelector: '.source.js .comment',
         excludeLowerPriority,
         // We want to get ranked higher than the snippets provider by default,
         // but it's configurable
         suggestionPriority: flowResultsFirst ? 5 : 1,
         inclusionPriority: 1,
-        analyticsEventName: 'flow.autocomplete',
+        analytics: {
+          eventName: 'nuclide-flow',
+          shouldLogInsertedSuggestion: false
+        },
         autocompleteCacherConfig: {
           updateResults: function (request, results) {
             return (0, (_nuclideFlowCommon || _load_nuclideFlowCommon()).filterResultsByPrefix)(request.prefix, results);
           },
           shouldFilter: (_nuclideFlowCommon || _load_nuclideFlowCommon()).shouldFilter
-        },
-        onDidInsertSuggestionAnalyticsEventName: 'nuclide-flow.autocomplete-chosen',
-        trackAdditionalInfo: false
+        }
       },
       diagnostics: (yield shouldUsePushDiagnostics()) ? {
         version: '0.2.0',

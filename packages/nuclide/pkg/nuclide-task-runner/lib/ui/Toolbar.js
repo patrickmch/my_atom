@@ -43,9 +43,26 @@ function _load_classnames() {
 
 var _react = _interopRequireWildcard(require('react'));
 
+var _immutable;
+
+function _load_immutable() {
+  return _immutable = _interopRequireWildcard(require('immutable'));
+}
+
 function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+/**
+ * Copyright (c) 2015-present, Facebook, Inc.
+ * All rights reserved.
+ *
+ * This source code is licensed under the license found in the LICENSE file in
+ * the root directory of this source tree.
+ *
+ * 
+ * @format
+ */
 
 class Toolbar extends _react.Component {
   render() {
@@ -57,7 +74,7 @@ class Toolbar extends _react.Component {
     let taskRunnerOptions = [];
     let taskRunnerSpecificContent = null;
     let dropdownVisibility = { visibility: 'hidden' };
-    if (taskRunners.length === 0 && !this.props.toolbarDisabled) {
+    if (taskRunners.count() === 0 && !this.props.toolbarDisabled) {
       dropdownVisibility = { display: 'none' };
       taskRunnerSpecificContent = _react.createElement(NoTaskRunnersMessage, null);
     } else if (activeTaskRunner) {
@@ -89,7 +106,7 @@ class Toolbar extends _react.Component {
           _react.createElement((_Dropdown || _load_Dropdown()).Dropdown, {
             buttonComponent: ButtonComponent,
             value: activeTaskRunner,
-            options: taskRunnerOptions,
+            options: Array.from(taskRunnerOptions),
             onChange: value => {
               this.props.selectTaskRunner(value);
             },
@@ -157,17 +174,7 @@ class Toolbar extends _react.Component {
   }
 }
 
-exports.Toolbar = Toolbar; /**
-                            * Copyright (c) 2015-present, Facebook, Inc.
-                            * All rights reserved.
-                            *
-                            * This source code is licensed under the license found in the LICENSE file in
-                            * the root directory of this source tree.
-                            *
-                            * 
-                            * @format
-                            */
-
+exports.Toolbar = Toolbar;
 function tooltip(title) {
   return { title, delay: { show: 500, hide: 0 }, placement: 'bottom' };
 }

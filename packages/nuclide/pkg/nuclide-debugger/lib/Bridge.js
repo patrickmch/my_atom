@@ -36,10 +36,10 @@ function _load_ChromeActionRegistryActions() {
   return _ChromeActionRegistryActions = _interopRequireDefault(require('./ChromeActionRegistryActions'));
 }
 
-var _nuclideDebuggerBase;
+var _AtomServiceContainer;
 
-function _load_nuclideDebuggerBase() {
-  return _nuclideDebuggerBase = require('../../nuclide-debugger-base');
+function _load_AtomServiceContainer() {
+  return _AtomServiceContainer = require('./AtomServiceContainer');
 }
 
 var _log4js;
@@ -144,7 +144,7 @@ class Bridge {
     });
     this._consoleEvent$ = new _rxjsBundlesRxMinJs.Subject();
     this._disposables = new (_UniversalDisposable || _load_UniversalDisposable()).default(debuggerModel.getBreakpointStore().onUserChange(this._handleUserBreakpointChange.bind(this)));
-    const subscription = (0, (_nuclideDebuggerBase || _load_nuclideDebuggerBase()).registerConsoleLogging)('Debugger', this._consoleEvent$);
+    const subscription = (0, (_AtomServiceContainer || _load_AtomServiceContainer()).registerConsoleLogging)('Debugger', this._consoleEvent$);
     if (subscription != null) {
       this._disposables.add(subscription);
     }
@@ -296,10 +296,6 @@ class Bridge {
   _reportEngineWarning(message) {
     const outputMessage = `Debugger engine reports warning: ${message}`;
     logger.warn(outputMessage);
-  }
-
-  _updateDebuggerSettings() {
-    this._commandDispatcher.send('UpdateSettings', this._debuggerModel.getStore().getSettings().getSerializedData());
   }
 
   _syncDebuggerState() {
@@ -466,6 +462,10 @@ class Bridge {
 
   setupNuclideChannel(debuggerInstance) {
     return this._commandDispatcher.setupNuclideChannel(debuggerInstance);
+  }
+
+  getCommandDispatcher() {
+    return this._commandDispatcher;
   }
 }
 exports.default = Bridge;

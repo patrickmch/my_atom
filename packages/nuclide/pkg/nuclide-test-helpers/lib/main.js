@@ -22,6 +22,12 @@ Object.defineProperty(exports, 'generateHgRepo2Fixture', {
     return (_fixtures || _load_fixtures()).generateHgRepo2Fixture;
   }
 });
+Object.defineProperty(exports, 'generateHgRepo3Fixture', {
+  enumerable: true,
+  get: function () {
+    return (_fixtures || _load_fixtures()).generateHgRepo3Fixture;
+  }
+});
 Object.defineProperty(exports, 'copyFixture', {
   enumerable: true,
   get: function () {
@@ -32,6 +38,12 @@ Object.defineProperty(exports, 'copyBuildFixture', {
   enumerable: true,
   get: function () {
     return (_fixtures || _load_fixtures()).copyBuildFixture;
+  }
+});
+Object.defineProperty(exports, 'overwriteFileWithTestContent', {
+  enumerable: true,
+  get: function () {
+    return (_fixtures || _load_fixtures()).overwriteFileWithTestContent;
   }
 });
 

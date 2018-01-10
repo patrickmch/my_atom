@@ -50,6 +50,10 @@ class DebuggerAdapterFactory {
         parseType: 'array',
         parser: _parseNodeSourceMapPathOverrides
       }]])
+    }], [(_constants || _load_constants()).VsAdapterTypes.OCAML, {
+      key: 'ocaml',
+      type: 'ocaml',
+      customArguments: new Map()
     }]]);
     this._targetTypeByFileExtension = new Map([['.py', (_constants || _load_constants()).VsAdapterTypes.PYTHON], ['.js', (_constants || _load_constants()).VsAdapterTypes.NODE]]);
     this._excludeOptions = new Set(['args', 'console', 'diagnosticLogging', 'externalConsole', 'noDebug', 'outputCapture', 'program', 'restart', 'trace', 'verboseDiagnosticLogging']);

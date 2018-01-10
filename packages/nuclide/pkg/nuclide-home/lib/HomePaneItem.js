@@ -8,7 +8,7 @@ exports.WORKSPACE_VIEW_URI = undefined;
 var _immutable;
 
 function _load_immutable() {
-  return _immutable = _interopRequireDefault(require('immutable'));
+  return _immutable = _interopRequireWildcard(require('immutable'));
 }
 
 var _react = _interopRequireWildcard(require('react'));
@@ -49,9 +49,9 @@ function _load_Checkbox() {
   return _Checkbox = require('nuclide-commons-ui/Checkbox');
 }
 
-function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
-
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
 
 /**
  * Copyright (c) 2015-present, Facebook, Inc.
@@ -121,7 +121,7 @@ class HomePaneItem extends _react.Component {
 
     this.state = {
       showOnStartup: Boolean((_featureConfig || _load_featureConfig()).default.get('nuclide-home.showHome')),
-      allHomeFragments: (_immutable || _load_immutable()).default.Set()
+      allHomeFragments: (_immutable || _load_immutable()).Set()
     };
   }
 

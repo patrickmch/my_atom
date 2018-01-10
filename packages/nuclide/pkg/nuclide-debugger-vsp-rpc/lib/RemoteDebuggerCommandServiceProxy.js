@@ -118,7 +118,7 @@ Object.defineProperty(module.exports, "defs", {
       location: {
         type: "source",
         fileName: "types.js",
-        line: 21
+        line: 26
       },
       name: "VSAdapterExecutableInfo",
       definition: {
@@ -308,6 +308,9 @@ Object.defineProperty(module.exports, "defs", {
         }, {
           kind: "string-literal",
           value: "react-native"
+        }, {
+          kind: "string-literal",
+          value: "ocaml"
         }]
       }
     },

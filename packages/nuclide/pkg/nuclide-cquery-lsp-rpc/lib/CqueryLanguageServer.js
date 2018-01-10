@@ -161,7 +161,8 @@ class CqueryLanguageServer extends (_nuclideLanguageServiceRpc || _load_nuclideL
     var _this4 = this;
 
     return (0, _asyncToGenerator.default)(function* () {
-      _this4._projectManager.associateFileWithProject(file, project);
+      // requires await to synchronize with getLanguageServiceForFile
+      yield _this4._projectManager.associateFileWithProject(file, project);
       _this4._processes.get(_this4._projectManager.getProjectKey(project)); // spawn the process ahead of time
     })();
   }

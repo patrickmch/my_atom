@@ -14,6 +14,12 @@ function _load_passesGK() {
   return _passesGK = _interopRequireDefault(require('../../commons-node/passesGK'));
 }
 
+var _OCamlLaunchProvider;
+
+function _load_OCamlLaunchProvider() {
+  return _OCamlLaunchProvider = require('./OCamlLaunchProvider');
+}
+
 var _PythonLaunchAttachProvider;
 
 function _load_PythonLaunchAttachProvider() {
@@ -60,6 +66,17 @@ var _path = _interopRequireDefault(require('path'));
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
+/**
+ * Copyright (c) 2015-present, Facebook, Inc.
+ * All rights reserved.
+ *
+ * This source code is licensed under the license found in the LICENSE file in
+ * the root directory of this source tree.
+ *
+ * 
+ * @format
+ */
+
 class Activation {
 
   constructor() {
@@ -69,6 +86,7 @@ class Activation {
     this._registerNodeDebugProvider();
     this._registerReactNativeDebugProvider();
     this._registerPrepackDebugProvider();
+    this._registerOcamlDebugProvider();
   }
 
   _registerPythonDebugProvider() {
@@ -125,20 +143,26 @@ class Activation {
     })();
   }
 
+  _registerOcamlDebugProvider() {
+    var _this3 = this;
+
+    return (0, _asyncToGenerator.default)(function* () {
+      if (yield (0, (_passesGK || _load_passesGK()).default)('nuclide_debugger_ocaml')) {
+        _this3._registerDebugProvider({
+          name: 'OCaml',
+          getLaunchAttachProvider: function (connection) {
+            return new (_OCamlLaunchProvider || _load_OCamlLaunchProvider()).OcamlLaunchProvider(connection);
+          }
+        });
+      }
+    })();
+  }
+
   dispose() {
     this._subscriptions.dispose();
   }
 }
 // eslint-disable-next-line rulesdir/prefer-nuclide-uri
-/**
- * Copyright (c) 2015-present, Facebook, Inc.
- * All rights reserved.
- *
- * This source code is licensed under the license found in the LICENSE file in
- * the root directory of this source tree.
- *
- * 
- * @format
- */
+
 
 (0, (_createPackage || _load_createPackage()).default)(module.exports, Activation);

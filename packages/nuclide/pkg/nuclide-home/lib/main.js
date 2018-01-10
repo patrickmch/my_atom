@@ -65,7 +65,7 @@ function _load_HomePaneItem2() {
 var _immutable;
 
 function _load_immutable() {
-  return _immutable = _interopRequireDefault(require('immutable'));
+  return _immutable = _interopRequireWildcard(require('immutable'));
 }
 
 var _createPackage;
@@ -105,7 +105,7 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
 class Activation {
   // A stream of all of the fragments. This is essentially the state of our panel.
   constructor(state) {
-    this._allHomeFragmentsStream = new _rxjsBundlesRxMinJs.BehaviorSubject((_immutable || _load_immutable()).default.Set());
+    this._allHomeFragmentsStream = new _rxjsBundlesRxMinJs.BehaviorSubject((_immutable || _load_immutable()).Set());
 
     this._subscriptions = this._registerCommandAndOpener();
     this._considerDisplayingHome();
@@ -138,7 +138,7 @@ class Activation {
   }
 
   dispose() {
-    this._allHomeFragmentsStream.next((_immutable || _load_immutable()).default.Set());
+    this._allHomeFragmentsStream.next((_immutable || _load_immutable()).Set());
     this._subscriptions.dispose();
   }
 

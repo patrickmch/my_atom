@@ -23,8 +23,25 @@ var _net = _interopRequireDefault(require('net'));
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
+const LOG_DELTA = 500000; // log for every half megabyte of transferred data
+
+/**
+ * Copyright (c) 2015-present, Facebook, Inc.
+ * All rights reserved.
+ *
+ * This source code is licensed under the license found in the LICENSE file in
+ * the root directory of this source tree.
+ *
+ * 
+ * @format
+ */
+
 function createTunnel(td, cf) {
   var _this = this;
+
+  const logStatsIfNecessary = getStatLogger(LOG_DELTA);
+  let bytesReceived = 0;
+  let bytesWritten = 0;
 
   return _rxjsBundlesRxMinJs.Observable.create(observer => {
     const descriptor = td;
@@ -43,8 +60,13 @@ function createTunnel(td, cf) {
         observer.next({ type: 'client_connected', clientPort });
 
         // create outgoing connection using connection factory
-        const connectionPromise = cf.createConnection(td.to, new RemoteSocket(socket));
-
+        const localSocket = new LocalSocket(socket);
+        localSocket.onWrite(function (count) {
+          bytesWritten += count;
+          logStatsIfNecessary(bytesWritten, bytesReceived);
+        });
+        const remoteSocket = new RemoteSocket(localSocket);
+        const connectionPromise = cf.createConnection(td.to, remoteSocket);
         connections.set(clientPort, connectionPromise);
 
         // set up socket listeners
@@ -66,7 +88,9 @@ function createTunnel(td, cf) {
         // write data to the outgoing connection
         socket.on('data', function (data) {
           connectionPromise.then(function (connection) {
-            return connection.write(data);
+            connection.write(data);
+            bytesReceived += data.length;
+            logStatsIfNecessary(bytesWritten, bytesReceived);
           });
         });
 
@@ -105,16 +129,7 @@ function createTunnel(td, cf) {
       listener.close();
     };
   }).publish();
-} /**
-   * Copyright (c) 2015-present, Facebook, Inc.
-   * All rights reserved.
-   *
-   * This source code is licensed under the license found in the LICENSE file in
-   * the root directory of this source tree.
-   *
-   * 
-   * @format
-   */
+}
 
 function tunnelDescription(tunnel) {
   return `${shortenHostname(tunnel.from.host)}:${tunnel.from.port}->${shortenHostname(tunnel.to.host)}:${tunnel.to.port}`;
@@ -134,6 +149,27 @@ function shortenHostname(host) {
   return result;
 }
 
+class LocalSocket {
+
+  constructor(socket) {
+    this._socket = socket;
+    this._writeListener = byteCount => {};
+  }
+
+  onWrite(listener) {
+    this._writeListener = listener;
+  }
+
+  write(data) {
+    this._socket.write(data);
+    this._writeListener(data.length);
+  }
+
+  end() {
+    this._socket.end();
+  }
+}
+
 class RemoteSocket {
 
   constructor(socket) {
@@ -150,6 +186,21 @@ class RemoteSocket {
 }
 
 exports.RemoteSocket = RemoteSocket;
+function getStatLogger(delta) {
+  let lastLoggedBytes = 0;
+  return (bytesWritten, bytesReceived) => {
+    const totalBytes = bytesWritten + bytesReceived;
+    if (totalBytes > lastLoggedBytes + delta) {
+      lastLoggedBytes = totalBytes;
+      logStats(bytesWritten, bytesReceived, totalBytes);
+    }
+  };
+}
+
+function logStats(bytesWritten, bytesReceived, totalBytes) {
+  trace(`Tunnel: ${totalBytes} bytes transferred; ${bytesWritten} written, ${bytesReceived} received`);
+}
+
 function trace(message) {
   (0, (_log4js || _load_log4js()).getLogger)('SocketService').trace(message);
 }

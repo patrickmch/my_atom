@@ -22,6 +22,12 @@ function _load_UniversalDisposable() {
   return _UniversalDisposable = _interopRequireDefault(require('nuclide-commons/UniversalDisposable'));
 }
 
+var _nullthrows;
+
+function _load_nullthrows() {
+  return _nullthrows = _interopRequireDefault(require('nullthrows'));
+}
+
 var _FileTreeConstants;
 
 function _load_FileTreeConstants() {
@@ -50,19 +56,18 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
 
 // It's just atom$ContextMenuItem with an optional `callback` property added.
 // I wish flow would let add it in a more elegant way.
+/**
+ * Copyright (c) 2015-present, Facebook, Inc.
+ * All rights reserved.
+ *
+ * This source code is licensed under the license found in the LICENSE file in
+ * the root directory of this source tree.
+ *
+ * 
+ * @format
+ */
 
-// flowlint-next-line untyped-type-import:off
-const PRIORITY_GROUP_SIZE = 1000; /**
-                                   * Copyright (c) 2015-present, Facebook, Inc.
-                                   * All rights reserved.
-                                   *
-                                   * This source code is licensed under the license found in the LICENSE file in
-                                   * the root directory of this source tree.
-                                   *
-                                   * 
-                                   * @format
-                                   */
-
+const PRIORITY_GROUP_SIZE = 1000;
 const PRIORITY_GROUP_SEPARATOR_OFFSET = PRIORITY_GROUP_SIZE - 1;
 
 const WORKING_ROOT_PRIORITY = 0;
@@ -247,7 +252,7 @@ class FileTreeContextMenu {
         if (nodes.isEmpty()) {
           return false;
         }
-        const dirKey = (_FileTreeHelpers || _load_FileTreeHelpers()).default.getParentKey(nodes.first().uri);
+        const dirKey = (_FileTreeHelpers || _load_FileTreeHelpers()).default.getParentKey((0, (_nullthrows || _load_nullthrows()).default)(nodes.first()).uri);
         return nodes.every(n => (_FileTreeHelpers || _load_FileTreeHelpers()).default.getParentKey(n.uri) === dirKey);
       }
     }, {

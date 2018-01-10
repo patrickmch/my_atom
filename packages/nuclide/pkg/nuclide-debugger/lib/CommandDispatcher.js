@@ -222,5 +222,9 @@ class CommandDispatcher {
         throw Error(`_triggerDebuggerAction: unrecognized actionId: ${actionId}`);
     }
   }
+
+  getBridgeAdapter() {
+    return this._bridgeAdapter;
+  }
 }
 exports.default = CommandDispatcher;

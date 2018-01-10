@@ -49,12 +49,6 @@ function _load_semver() {
   return _semver = _interopRequireDefault(require('semver'));
 }
 
-var _patchCommands;
-
-function _load_patchCommands() {
-  return _patchCommands = _interopRequireDefault(require('./patchCommands'));
-}
-
 var _installErrorReporter;
 
 function _load_installErrorReporter() {
@@ -89,11 +83,6 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
 
 // The minimum version of Atom required to run Nuclide. Anything less than this and users will get
 // a redbox and Nuclide will not activate.
-
-// eslint-disable-next-line rulesdir/prefer-nuclide-uri
-const MINIMUM_SUPPORTED_ATOM_VERSION = '1.19.0';
-
-// Install the error reporting even before Nuclide is activated.
 /**
  * Copyright (c) 2015-present, Facebook, Inc.
  * All rights reserved.
@@ -115,6 +104,11 @@ const MINIMUM_SUPPORTED_ATOM_VERSION = '1.19.0';
  *
  */
 
+const MINIMUM_SUPPORTED_ATOM_VERSION = '1.19.0';
+
+// Install the error reporting even before Nuclide is activated.
+
+// eslint-disable-next-line rulesdir/prefer-nuclide-uri
 let errorReporterDisposable = (0, (_installErrorReporter || _load_installErrorReporter()).default)();
 // Install the logger config before Nuclide is activated.
 (0, (_nuclideLogging || _load_nuclideLogging()).initializeLogging)();
@@ -231,11 +225,8 @@ function _activate() {
     (0, (_installDevTools || _load_installDevTools()).default)();
   }
 
-  disposables = new (_UniversalDisposable || _load_UniversalDisposable()).default();
-  disposables.add((0, (_patchCommands || _load_patchCommands()).default)());
-
   // Add the "Nuclide" menu, if it's not there already.
-  disposables.add(atom.menu.add([{
+  disposables = new (_UniversalDisposable || _load_UniversalDisposable()).default(atom.menu.add([{
     // On Windows, menu labels have an & before a letter to indicate which
     // ALT key combination maps to that menu. In our case, Alt+N should open
     // the Nuclide menu.

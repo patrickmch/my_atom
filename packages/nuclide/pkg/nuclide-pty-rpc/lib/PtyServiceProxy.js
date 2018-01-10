@@ -118,6 +118,22 @@ module.exports = _client => {
     });
   };
 
+  remoteModule.useTitleAsPath = function (arg0) {
+    return _client.marshalArguments(Array.from(arguments), [{
+      name: "client",
+      type: {
+        kind: "named",
+        name: "PtyClient"
+      }
+    }]).then(args => {
+      return _client.callRemoteFunction("PtyService/useTitleAsPath", "promise", args);
+    }).then(value => {
+      return _client.unmarshal(value, {
+        kind: "boolean"
+      });
+    });
+  };
+
   remoteModule.PtyImplementation = class {
     constructor(arg0, arg1, arg2, arg3) {
       _client.createRemoteObject("PtyImplementation", this, [arg0, arg1, arg2, arg3], [{
@@ -163,7 +179,7 @@ module.exports = _client => {
         location: {
           type: "source",
           fileName: "PtyService.js",
-          line: 136
+          line: 149
         },
         name: "PtyImplementation"
       })]).then(([args, id]) => _client.callRemoteMethod(id, "resize", "void", args));
@@ -180,7 +196,7 @@ module.exports = _client => {
         location: {
           type: "source",
           fileName: "PtyService.js",
-          line: 136
+          line: 149
         },
         name: "PtyImplementation"
       })]).then(([args, id]) => _client.callRemoteMethod(id, "writeInput", "void", args));
@@ -494,13 +510,43 @@ Object.defineProperty(module.exports, "defs", {
         }
       }
     },
+    useTitleAsPath: {
+      kind: "function",
+      name: "useTitleAsPath",
+      location: {
+        type: "source",
+        fileName: "PtyService.js",
+        line: 38
+      },
+      type: {
+        location: {
+          type: "source",
+          fileName: "PtyService.js",
+          line: 38
+        },
+        kind: "function",
+        argumentTypes: [{
+          name: "client",
+          type: {
+            kind: "named",
+            name: "PtyClient"
+          }
+        }],
+        returnType: {
+          kind: "promise",
+          type: {
+            kind: "boolean"
+          }
+        }
+      }
+    },
     PtyImplementation: {
       kind: "interface",
       name: "PtyImplementation",
       location: {
         type: "source",
         fileName: "PtyService.js",
-        line: 136
+        line: 149
       },
       constructorArgs: [{
         name: "info",
@@ -533,7 +579,7 @@ Object.defineProperty(module.exports, "defs", {
           location: {
             type: "source",
             fileName: "PtyService.js",
-            line: 200
+            line: 213
           },
           kind: "function",
           argumentTypes: [],
@@ -545,7 +591,7 @@ Object.defineProperty(module.exports, "defs", {
           location: {
             type: "source",
             fileName: "PtyService.js",
-            line: 204
+            line: 217
           },
           kind: "function",
           argumentTypes: [{
@@ -567,7 +613,7 @@ Object.defineProperty(module.exports, "defs", {
           location: {
             type: "source",
             fileName: "PtyService.js",
-            line: 210
+            line: 223
           },
           kind: "function",
           argumentTypes: [{

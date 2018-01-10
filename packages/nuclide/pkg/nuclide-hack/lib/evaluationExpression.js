@@ -5,10 +5,10 @@ Object.defineProperty(exports, "__esModule", {
 });
 exports.getEvaluationExpression = getEvaluationExpression;
 
-var _nuclideDebuggerBase;
+var _nuclideDebuggerCommon;
 
-function _load_nuclideDebuggerBase() {
-  return _nuclideDebuggerBase = require('../../nuclide-debugger-base');
+function _load_nuclideDebuggerCommon() {
+  return _nuclideDebuggerCommon = require('nuclide-debugger-common');
 }
 
 /**
@@ -25,7 +25,7 @@ function _load_nuclideDebuggerBase() {
 const HACK_BLACKLISTED_EXPRESSIONS = new Set(['final', 'class', 'public', 'async', 'function', 'Awaitable', 'void', 'string', 'int', 'mixed', 'self', 'null']);
 
 function getEvaluationExpression(editor, position) {
-  const exactExpression = (0, (_nuclideDebuggerBase || _load_nuclideDebuggerBase()).getDefaultEvaluationExpression)(editor, position);
+  const exactExpression = (0, (_nuclideDebuggerCommon || _load_nuclideDebuggerCommon()).getDefaultEvaluationExpression)(editor, position);
   const lineContent = editor.lineTextForBufferRow(position.row);
   if (exactExpression == null || isBlackListedExpression(exactExpression.expression) ||
   // Shouldn't evaluate function expressions.

@@ -103,7 +103,7 @@ function shouldDisplayActionTreeItem(contextMenu, action) {
   } else if (action === 'Add') {
     const nodes = contextMenu.getSelectedNodes();
     return nodes.every(node => {
-      if (node.repo == null || node.repo.getType() !== 'hg') {
+      if (node.repo == null || node.repo.getType() !== 'hg' || typeof node.repo.isStatusUntracked !== 'function') {
         return false;
       }
       return node.repo.isStatusUntracked(node.vcsStatusCode);

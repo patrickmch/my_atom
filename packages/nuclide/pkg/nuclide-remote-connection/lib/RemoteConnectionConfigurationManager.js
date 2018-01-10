@@ -197,7 +197,7 @@ function _load_log4js() {
 var _keytarWrapper;
 
 function _load_keytarWrapper() {
-  return _keytarWrapper = _interopRequireDefault(require('../../commons-atom/keytarWrapper'));
+  return _keytarWrapper = _interopRequireDefault(require('../../commons-node/keytarWrapper'));
 }
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }

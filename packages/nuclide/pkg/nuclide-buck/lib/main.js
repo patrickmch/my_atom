@@ -127,7 +127,10 @@ class Activation {
   provideBuckTaskRunnerService() {
     return {
       getBuildTarget: () => this._taskRunner.getBuildTarget(),
-      setBuildTarget: buildTarget => this._taskRunner.setBuildTarget(buildTarget)
+      setBuildTarget: buildTarget => this._taskRunner.setBuildTarget(buildTarget),
+      onDidCompleteTask: callback => {
+        return new (_UniversalDisposable || _load_UniversalDisposable()).default(this._taskRunner.getCompletedTasks().subscribe(callback));
+      }
     };
   }
 

@@ -96,7 +96,7 @@ class FlowLanguageService extends (_nuclideLanguageServiceRpc || _load_nuclideLa
   constructor(fileCache, host, config) {
     const logger = (0, (_log4js || _load_log4js()).getLogger)('Flow');
     super();
-    this.initialize(logger, fileCache, host, ['.flowconfig'], ['.js', '.jsx'], projectDir => {
+    this.initialize(logger, fileCache, host, ['.flowconfig'], 'nearest', ['.js', '.jsx'], projectDir => {
       const execInfoContainer = getState().getExecInfoContainer();
       const singleProjectLS = new (_FlowSingleProjectLanguageService || _load_FlowSingleProjectLanguageService()).FlowSingleProjectLanguageService(projectDir, execInfoContainer, fileCache);
       const languageService = new (_nuclideLanguageServiceRpc || _load_nuclideLanguageServiceRpc()).ServerLanguageService(fileCache, singleProjectLS);

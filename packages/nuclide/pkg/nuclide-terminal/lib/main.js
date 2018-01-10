@@ -1,5 +1,7 @@
 'use strict';
 
+var _os = _interopRequireDefault(require('os'));
+
 var _dedent;
 
 function _load_dedent() {
@@ -68,6 +70,7 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
  * @format
  */
 
+// for homedir
 const TERMINAL_CONTEXT_MENU_PRIORITY = 100;
 
 class Activation {
@@ -80,6 +83,9 @@ class Activation {
     }), atom.commands.add('atom-workspace', 'nuclide-terminal:new-terminal', event => {
       const cwd = this._getPathOrCwd(event);
       const uri = (0, (_nuclideTerminalUri || _load_nuclideTerminalUri()).uriFromCwd)(cwd);
+      (0, (_goToLocation || _load_goToLocation()).goToLocation)(uri);
+    }), atom.commands.add('atom-workspace', 'nuclide-terminal:new-local-terminal', event => {
+      const uri = (0, (_nuclideTerminalUri || _load_nuclideTerminalUri()).uriFromCwd)(_os.default.homedir());
       (0, (_goToLocation || _load_goToLocation()).goToLocation)(uri);
     }), atom.config.onDidChange('editor.fontSize', this._syncAtomStyle.bind(this)), atom.config.onDidChange('editor.fontFamily', this._syncAtomStyle.bind(this)), atom.config.onDidChange('editor.lineHeight', this._syncAtomStyle.bind(this)), () => this._styleSheet.dispose());
     this._syncAtomStyle();

@@ -7,10 +7,10 @@ exports.AttachProcessInfo = undefined;
 
 var _asyncToGenerator = _interopRequireDefault(require('async-to-generator'));
 
-var _nuclideDebuggerBase;
+var _nuclideDebuggerCommon;
 
-function _load_nuclideDebuggerBase() {
-  return _nuclideDebuggerBase = require('../../nuclide-debugger-base');
+function _load_nuclideDebuggerCommon() {
+  return _nuclideDebuggerCommon = require('nuclide-debugger-common');
 }
 
 var _PhpDebuggerInstance;
@@ -43,6 +43,12 @@ function _load_utils2() {
   return _utils2 = require('./utils');
 }
 
+var _passesGK;
+
+function _load_passesGK() {
+  return _passesGK = _interopRequireDefault(require('../../commons-node/passesGK'));
+}
+
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 /**
@@ -56,7 +62,7 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
  * @format
  */
 
-class AttachProcessInfo extends (_nuclideDebuggerBase || _load_nuclideDebuggerBase()).DebuggerProcessInfo {
+class AttachProcessInfo extends (_nuclideDebuggerCommon || _load_nuclideDebuggerCommon()).DebuggerProcessInfo {
   constructor(targetUri) {
     super('hhvm', targetUri);
   }
@@ -90,20 +96,50 @@ class AttachProcessInfo extends (_nuclideDebuggerBase || _load_nuclideDebuggerBa
     } catch (_) {}
   }
 
-  debug() {
+  _hhvmDebug() {
     var _this = this;
 
     return (0, _asyncToGenerator.default)(function* () {
-      (_utils || _load_utils()).default.info('Connecting to: ' + _this.getTargetUri());
-      _this.preAttachActions();
+      const service = (0, (_nuclideRemoteConnection || _load_nuclideRemoteConnection()).getHhvmDebuggerServiceByNuclideUri)(_this.getTargetUri());
+      const hhvmDebuggerService = new service.HhvmDebuggerService();
 
-      const rpcService = _this._getRpcService();
-      const sessionConfig = (0, (_utils2 || _load_utils2()).getSessionConfig)((_nuclideUri || _load_nuclideUri()).default.getPath(_this.getTargetUri()), false);
+      // Note: not specifying startup document or debug port here, the backend
+      // will use the default parameters. We can surface these options in the
+      // Attach Dialog if users need to be able to customize them in the future.
+      const config = {
+        targetUri: (_nuclideUri || _load_nuclideUri()).default.getPath(_this.getTargetUri()),
+        action: 'attach'
+      };
+
+      (_utils || _load_utils()).default.info(`Connection session config: ${JSON.stringify(config)}`);
+      const result = yield hhvmDebuggerService.debug(config);
+      (_utils || _load_utils()).default.info(`Attach process result: ${result}`);
+      return new (_PhpDebuggerInstance || _load_PhpDebuggerInstance()).PhpDebuggerInstance(_this, hhvmDebuggerService);
+    })();
+  }
+
+  debug() {
+    var _this2 = this;
+
+    return (0, _asyncToGenerator.default)(function* () {
+      const useNewDebugger = yield (0, (_passesGK || _load_passesGK()).default)('nuclide_hhvm_debugger_vscode');
+      if (useNewDebugger) {
+        // TODO: Ericblue - this will be cleaned up when the old debugger
+        // is removed. For now we need to leave both in place until the new
+        // one is ready.
+        return _this2._hhvmDebug();
+      }
+
+      (_utils || _load_utils()).default.info('Connecting to: ' + _this2.getTargetUri());
+      _this2.preAttachActions();
+
+      const rpcService = _this2._getRpcService();
+      const sessionConfig = (0, (_utils2 || _load_utils2()).getSessionConfig)((_nuclideUri || _load_nuclideUri()).default.getPath(_this2.getTargetUri()), false);
       (_utils || _load_utils()).default.info(`Connection session config: ${JSON.stringify(sessionConfig)}`);
       const result = yield rpcService.debug(sessionConfig);
-      (_utils || _load_utils()).default.info(`Launch process result: ${result}`);
+      (_utils || _load_utils()).default.info(`Attach process result: ${result}`);
 
-      return new (_PhpDebuggerInstance || _load_PhpDebuggerInstance()).PhpDebuggerInstance(_this, rpcService);
+      return new (_PhpDebuggerInstance || _load_PhpDebuggerInstance()).PhpDebuggerInstance(_this2, rpcService);
     })();
   }
 

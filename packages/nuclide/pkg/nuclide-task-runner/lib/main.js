@@ -142,7 +142,7 @@ class Activation {
     this._store = (0, (_redux || _load_redux()).createStore)((0, (_redux || _load_redux()).combineReducers)(_Reducers || _load_Reducers()), {
       visible: getInitialVisibility(serializedState, preferencesForWorkingRoots)
     }, (0, (_redux || _load_redux()).applyMiddleware)((0, (_reduxObservable || _load_reduxObservable()).createEpicMiddleware)(rootEpic), (_trackingMiddleware || _load_trackingMiddleware()).trackingMiddleware));
-    const states = _rxjsBundlesRxMinJs.Observable.from(this._store).filter(state => state.taskRunnersReady).distinctUntilChanged().share();
+    const states = _rxjsBundlesRxMinJs.Observable.from(this._store).filter(state => state.initialPackagesActivated).distinctUntilChanged().share();
     this._actionCreators = (0, (_redux || _load_redux()).bindActionCreators)(_Actions || _load_Actions(), this._store.dispatch);
     this._panelRenderer = new (_PanelRenderer || _load_PanelRenderer()).default({
       location: 'top',
@@ -176,8 +176,8 @@ class Activation {
     })),
     // Add a command for each enabled common task with mapped keyboard shortcuts
     (0, (_syncAtomCommands || _load_syncAtomCommands()).default)(states.map(state => {
-      const { activeTaskRunner, isUpdatingTaskRunners } = state;
-      if (isUpdatingTaskRunners || !activeTaskRunner) {
+      const { activeTaskRunner, readyTaskRunners, taskRunners } = state;
+      if (taskRunners.count() > readyTaskRunners.count() || !activeTaskRunner) {
         return [];
       }
       const taskRunnerState = state.statesForTaskRunners.get(activeTaskRunner);
@@ -225,9 +225,24 @@ class Activation {
   }
 
   consumeCurrentWorkingDirectory(api) {
-    this._disposables.add(api.observeCwd(directory => {
-      this._actionCreators.setProjectRoot(directory);
-    }));
+    let pkg = this;
+    const cwdSubscription = api.observeCwd(directory => {
+      if (!(pkg != null)) {
+        throw new Error('callback invoked after package deactivated');
+      }
+
+      pkg._actionCreators.setProjectRoot(directory);
+    });
+    this._disposables.add(cwdSubscription, () => {
+      pkg = null;
+    });
+    return new (_UniversalDisposable || _load_UniversalDisposable()).default(() => {
+      if (pkg != null) {
+        cwdSubscription.dispose();
+        pkg._disposables.remove(cwdSubscription);
+        pkg._actionCreators.setProjectRoot(null);
+      }
+    });
   }
 
   consumeToolBar(getToolBar) {
@@ -247,7 +262,7 @@ class Activation {
     const buttonUpdatesDisposable = new (_UniversalDisposable || _load_UniversalDisposable()).default(
     // $FlowFixMe: Update rx defs to accept ish with Symbol.observable
     _rxjsBundlesRxMinJs.Observable.from(this._store).subscribe(state => {
-      if (state.taskRunners.length > 0) {
+      if (state.taskRunners.count() > 0) {
         element.removeAttribute('hidden');
       } else {
         element.setAttribute('hidden', 'hidden');

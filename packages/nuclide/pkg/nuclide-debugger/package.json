@@ -29,9 +29,9 @@
         "0.0.0": "provideRemoteControlService"
       }
     },
-    "autocomplete.provider": {
+    "nuclide-autocomplete.provider": {
       "versions": {
-        "2.0.0": "createAutocompleteProvider"
+        "0.0.0": "createAutocompleteProvider"
       }
     }
   },
@@ -67,16 +67,6 @@
     "nuclide-debugger.provider": {
       "versions": {
         "0.0.0": "consumeDebuggerProvider"
-      }
-    },
-    "nux-register": {
-      "versions": {
-        "0.0.0": "consumeRegisterNuxService"
-      }
-    },
-    "nux-trigger": {
-      "versions": {
-        "0.0.0": "consumeTriggerNuxService"
       }
     },
     "nuclide-current-working-directory": {

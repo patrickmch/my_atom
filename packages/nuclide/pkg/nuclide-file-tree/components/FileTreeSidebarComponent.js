@@ -170,9 +170,27 @@ function _load_contextMenu() {
   return _contextMenu = require('../../commons-atom/context-menu');
 }
 
+var _immutable;
+
+function _load_immutable() {
+  return _immutable = _interopRequireDefault(require('immutable'));
+}
+
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
+
+/**
+ * Copyright (c) 2015-present, Facebook, Inc.
+ * All rights reserved.
+ *
+ * This source code is licensed under the license found in the LICENSE file in
+ * the root directory of this source tree.
+ *
+ * 
+ * @format
+ */
+/* global HTMLElement */
 
 class FileTreeSidebarComponent extends _react.Component {
 
@@ -306,7 +324,7 @@ class FileTreeSidebarComponent extends _react.Component {
       openFilesUris: [],
       modifiedUris: [],
       activeUri: null,
-      uncommittedFileChanges: new Map(),
+      uncommittedFileChanges: (_immutable || _load_immutable()).default.Map(),
       isCalculatingChanges: false,
       path: 'No Current Working Directory',
       title: 'File Tree',
@@ -430,7 +448,7 @@ class FileTreeSidebarComponent extends _react.Component {
           analyticsSurface: 'file-tree-uncommitted-changes',
           commandPrefix: 'file-tree-sidebar',
           enableInlineActions: true,
-          fileStatuses: (0, (_nuclideVcsBase || _load_nuclideVcsBase()).filterMultiRootFileChanges)(this.state.uncommittedFileChanges),
+          fileStatuses: filterMultiRootFileChanges(this.state.uncommittedFileChanges),
           selectedFile: this.state.activeUri,
           hideEmptyFolders: true,
           onFileChosen: this._onFileChosen,
@@ -705,18 +723,7 @@ All the changes across your entire stacked diff.
   }
 }
 
-exports.default = FileTreeSidebarComponent; /**
-                                             * Copyright (c) 2015-present, Facebook, Inc.
-                                             * All rights reserved.
-                                             *
-                                             * This source code is licensed under the license found in the LICENSE file in
-                                             * the root directory of this source tree.
-                                             *
-                                             * 
-                                             * @format
-                                             */
-/* global HTMLElement */
-
+exports.default = FileTreeSidebarComponent;
 function observeAllModifiedStatusChanges() {
   const paneItemChangeEvents = _rxjsBundlesRxMinJs.Observable.merge((0, (_event || _load_event()).observableFromSubscribeFunction)(atom.workspace.onDidAddPaneItem.bind(atom.workspace)), (0, (_event || _load_event()).observableFromSubscribeFunction)(atom.workspace.onDidDestroyPaneItem.bind(atom.workspace))).startWith(undefined);
 
@@ -741,4 +748,18 @@ function getCurrentBuffers() {
   });
 
   return buffers;
+}
+
+function filterMultiRootFileChanges(unfilteredFileChanges) {
+  const filteredFileChanges = new Map();
+  // Filtering the changes to make sure they only show up under the directory the
+  // file exists under.
+  for (const [root, fileChanges] of unfilteredFileChanges) {
+    const filteredFiles = new Map(fileChanges.filter((_, filePath) => filePath.startsWith(root)));
+    if (filteredFiles.size !== 0) {
+      filteredFileChanges.set(root, filteredFiles);
+    }
+  }
+
+  return filteredFileChanges;
 }

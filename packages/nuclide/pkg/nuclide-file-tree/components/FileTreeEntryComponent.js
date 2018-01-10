@@ -105,8 +105,6 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
  */
 
 const store = (_FileTreeStore || _load_FileTreeStore()).FileTreeStore.getInstance();
-// flowlint-next-line untyped-type-import:off
-
 const getActions = (_FileTreeActions || _load_FileTreeActions()).default.getInstance;
 
 const SUBSEQUENT_FETCH_SPINNER_DELAY = 500;
@@ -197,7 +195,7 @@ class FileTreeEntryComponent extends _react.Component {
       event.stopPropagation();
 
       const nodes = store.getSelectedNodes();
-      if (!this.props.isPreview && nodes.size === 1 && nodes.first().isRoot) {
+      if (!this.props.isPreview && nodes.size === 1 && (0, (_nullthrows || _load_nullthrows()).default)(nodes.first()).isRoot) {
         getActions().reorderDragInto(this.props.node.rootUri);
         return;
       }

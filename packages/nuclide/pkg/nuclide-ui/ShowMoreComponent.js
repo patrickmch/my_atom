@@ -25,25 +25,16 @@ function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj;
  * aligned at the bottom. Clicking "Show More" will remove the max height restriction
  * and expand the component to full height.
  */
-/**
- * Copyright (c) 2015-present, Facebook, Inc.
- * All rights reserved.
- *
- * This source code is licensed under the license found in the LICENSE file in
- * the root directory of this source tree.
- *
- * 
- * @format
- */
-
 class ShowMoreComponent extends _react.Component {
   constructor(props) {
     super(props);
 
-    this._updateMeasurements = newMeasurements => {
-      if (newMeasurements.scrollHeight !== this.state.currentHeight) {
+    this._updateMeasurements = (newMeasurements, target) => {
+      const newHeight = target.scrollHeight;
+
+      if (newHeight !== this.state.currentHeight) {
         this.setState({
-          currentHeight: newMeasurements.scrollHeight
+          currentHeight: newHeight
         });
       }
     };
@@ -104,4 +95,13 @@ class ShowMoreComponent extends _react.Component {
   }
 
 }
-exports.ShowMoreComponent = ShowMoreComponent;
+exports.ShowMoreComponent = ShowMoreComponent; /**
+                                                * Copyright (c) 2015-present, Facebook, Inc.
+                                                * All rights reserved.
+                                                *
+                                                * This source code is licensed under the license found in the LICENSE file in
+                                                * the root directory of this source tree.
+                                                *
+                                                * 
+                                                * @format
+                                                */

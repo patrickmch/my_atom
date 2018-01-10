@@ -76,6 +76,29 @@ class RemoteObjectManager {
 class ExpressionEvaluationManager {
 
   constructor(debuggerDispatcher, runtimeDispatcher) {
+    var _this = this;
+
+    this._getScopeSectionPayloadFor = (() => {
+      var _ref = (0, _asyncToGenerator.default)(function* (scope) {
+        const scopeObjectId = scope.object.objectId;
+
+        if (!(scopeObjectId != null)) {
+          throw new Error('Engine returns a scope without objectId?');
+        }
+
+        const name = scope.object.description || '';
+        _this._remoteObjectManager.addObject(scopeObjectId);
+        return {
+          name,
+          scopeObjectId
+        };
+      });
+
+      return function (_x) {
+        return _ref.apply(this, arguments);
+      };
+    })();
+
     this._debuggerDispatcher = debuggerDispatcher;
     this._runtimeDispatcher = runtimeDispatcher;
     this._evalutionEvent$ = new _rxjsBundlesRxMinJs.Subject();
@@ -169,35 +192,19 @@ class ExpressionEvaluationManager {
     });
   }
 
+  getScopeVariablesFor(remoteObject) {
+    var _this2 = this;
+
+    return (0, _asyncToGenerator.default)(function* () {
+      const response = yield remoteObject.getProperties();
+
+      // TODO: deal with response.exceptionDetails.
+      return _this2._propertiesToExpansionResult(response.result) || [];
+    })();
+  }
+
   updateCurrentFrameScope(scopes) {
-    var _this = this;
-
-    const scopesPromises = scopes.map((() => {
-      var _ref = (0, _asyncToGenerator.default)(function* (scope) {
-        const scopeObjectId = scope.object.objectId;
-
-        if (!(scopeObjectId != null)) {
-          throw new Error('Engine returns a scope without objectId?');
-        }
-
-        const remoteObject = _this._remoteObjectManager.addObject(scopeObjectId);
-        const response = yield remoteObject.getProperties();
-
-        // TODO: deal with response.exceptionDetails.
-        const scopeVariables = _this._propertiesToExpansionResult(response.result);
-        return {
-          name: scope.object.description,
-          scopeVariables,
-          scopeObjectId
-        };
-      });
-
-      return function (_x) {
-        return _ref.apply(this, arguments);
-      };
-    })());
-
-    Promise.all(scopesPromises).then(scopesData => {
+    Promise.all(scopes.map(this._getScopeSectionPayloadFor)).then(scopesData => {
       this._raiseIPCEvent('ScopesUpdate', scopesData);
     });
   }
@@ -214,6 +221,10 @@ class ExpressionEvaluationManager {
   // across bridge boundary.
   _raiseIPCEvent(...args) {
     this._evalutionEvent$.next(args);
+  }
+
+  getRemoteObjectManager() {
+    return this._remoteObjectManager;
   }
 }
 exports.default = ExpressionEvaluationManager;

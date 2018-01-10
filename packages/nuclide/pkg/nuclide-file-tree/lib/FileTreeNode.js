@@ -20,8 +20,10 @@ function _load_nuclideUri() {
 var _immutable;
 
 function _load_immutable() {
-  return _immutable = _interopRequireDefault(require('immutable'));
+  return _immutable = _interopRequireWildcard(require('immutable'));
 }
+
+function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -34,7 +36,7 @@ const DEFAULT_OPTIONS = {
   isLoading: false,
   wasFetched: false,
   isCwd: false,
-  children: new (_immutable || _load_immutable()).default.OrderedMap(),
+  children: (_immutable || _load_immutable()).OrderedMap(),
   connectionTitle: '',
   subscription: null,
   highlightedText: '',
@@ -107,7 +109,7 @@ class FileTreeNode {
    * of FileTreeNode instances
    */
   static childrenFromArray(children) {
-    return new (_immutable || _load_immutable()).default.OrderedMap(children.map(child => [child.name, child]));
+    return (_immutable || _load_immutable()).OrderedMap(children.map(child => [child.name, child]));
   }
 
   /**
@@ -314,7 +316,7 @@ class FileTreeNode {
    * the complete reconstruction of the entire tree branch
    */
   updateConf() {
-    const children = this.children.map(c => c.updateConf(this.conf));
+    const children = this.children.map(c => c.updateConf());
     return this._newNode({ children }, this.conf);
   }
 
@@ -365,6 +367,7 @@ class FileTreeNode {
     }
 
     const children = this.children.map(child => child.setRecursive(prePredicate, postPredicate));
+
     return postPredicate(this.setChildren(children));
   }
 
@@ -506,7 +509,7 @@ class FileTreeNode {
     }
 
     let it = this.children.last();
-    while (!it.shouldBeShown && it != null) {
+    while (it != null && !it.shouldBeShown) {
       it = it.prevSibling;
     }
 
@@ -597,7 +600,7 @@ class FileTreeNode {
       return false;
     }
 
-    if (props.children !== undefined && props.children !== this.children && !(_immutable || _load_immutable()).default.is(this.children, props.children)) {
+    if (props.children !== undefined && props.children !== this.children && !(_immutable || _load_immutable()).is(this.children, props.children)) {
       return false;
     }
 
@@ -642,7 +645,7 @@ class FileTreeNode {
       if (newChild != null) {
         this._handleChildrenChange(node.children, newChild.children);
       } else {
-        this._handleChildrenChange(node.children, new (_immutable || _load_immutable()).default.OrderedMap());
+        this._handleChildrenChange(node.children, (_immutable || _load_immutable()).OrderedMap());
       }
     });
 

@@ -62,6 +62,7 @@ exports.getMetroServiceByNuclideUri = getMetroServiceByNuclideUri;
 exports.getNativeDebuggerServiceByNuclideUri = getNativeDebuggerServiceByNuclideUri;
 exports.getOpenFilesServiceByNuclideUri = getOpenFilesServiceByNuclideUri;
 exports.getPhpDebuggerServiceByNuclideUri = getPhpDebuggerServiceByNuclideUri;
+exports.getHhvmDebuggerServiceByNuclideUri = getHhvmDebuggerServiceByNuclideUri;
 exports.getPtyServiceByNuclideUri = getPtyServiceByNuclideUri;
 exports.getPythonServiceByNuclideUri = getPythonServiceByNuclideUri;
 exports.getReasonServiceByNuclideUri = getReasonServiceByNuclideUri;
@@ -226,6 +227,10 @@ function getOpenFilesServiceByNuclideUri(uri) {
 
 function getPhpDebuggerServiceByNuclideUri(uri) {
   return (0, (_nullthrows || _load_nullthrows()).default)((0, (_serviceManager || _load_serviceManager()).getServiceByNuclideUri)('PhpDebuggerService', uri));
+}
+
+function getHhvmDebuggerServiceByNuclideUri(uri) {
+  return (0, (_nullthrows || _load_nullthrows()).default)((0, (_serviceManager || _load_serviceManager()).getServiceByNuclideUri)('HhvmDebuggerService', uri));
 }
 
 function getPtyServiceByNuclideUri(uri) {

@@ -129,7 +129,7 @@ class SimpleValueComponent extends _react.Component {
     if (expression == null) {
       return _react.createElement(
         'span',
-        null,
+        { tabIndex: -1, className: 'native-key-bindings' },
         displayValue
       );
     }
@@ -142,7 +142,7 @@ class SimpleValueComponent extends _react.Component {
     );
     return _react.createElement(
       'span',
-      null,
+      { tabIndex: -1, className: 'native-key-bindings' },
       renderedExpression,
       ': ',
       displayValue

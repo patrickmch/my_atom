@@ -85,7 +85,7 @@ class ProjectSelection extends _react.Component {
     if (list.isEmpty()) {
       return null;
     }
-    return list.toJS();
+    return list.toArray();
   }
 
   render() {

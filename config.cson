@@ -9,6 +9,9 @@
   "atom-beautify":
     general:
       _analyticsUserId: "57d65fa5-cb86-468f-a653-bbe65e34f933"
+    python:
+      max_line_length: 100
+      sort_imports: true
   "atom-clock":
     showClockIcon: true
     showTooltip: true
@@ -52,19 +55,20 @@
     disabledPackages: [
       "welcome"
       "my-package"
-      "python-indent"
-      "linter"
-      "linter-ui-default"
-      "autocomplete-python"
-      "clipboard-plus"
-      "atom-ide-ui"
       "tree-view"
       "language-gfm"
+      "my-package"
+      "my-package"
+      "my-package"
+      "my-package"
+      "linter"
     ]
     excludeVcsIgnoredPaths: false
     packagesWithKeymapsDisabled: [
       "tool-bar"
       "line-jumper"
+      "atom-css-class-checker"
+      "emmet-simplified"
     ]
     telemetryConsent: "limited"
     themes: [
@@ -73,7 +77,7 @@
     ]
   editor:
     fontFamily: "Source Code Pro for Powerline"
-    fontSize: 16
+    fontSize: 17
     preferredLineLength: 100
     showIndentGuide: true
     showInvisibles: true
@@ -88,6 +92,8 @@
     columnWidth: 412
   "hey-pane":
     expandedWidth: 99
+  "ide-css":
+    lessSupport: false
   "ide-python":
     pylsPlugins:
       jedi_completion: {}
@@ -103,6 +109,7 @@
         enabled: false
       yapf:
         enabled: false
+  "keybinding-cheatsheet": {}
   kite:
     enableCompletions: false
     showKiteTourOnStartup: false

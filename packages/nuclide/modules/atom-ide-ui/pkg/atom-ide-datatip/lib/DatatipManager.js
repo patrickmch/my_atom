@@ -7,14 +7,14 @@ exports.DatatipManager = undefined;
 
 var _asyncToGenerator = _interopRequireDefault(require('async-to-generator'));
 
-let getTopDatatipAndProvider = (() => {
+let getDatatipResults = (() => {
   var _ref5 = (0, _asyncToGenerator.default)(function* (providers, editor, position, invoke) {
     const filteredDatatipProviders = Array.from(providers.getAllProvidersForEditor(editor));
     if (filteredDatatipProviders.length === 0) {
-      return null;
+      return [];
     }
 
-    const datatipPromises = filteredDatatipProviders.map((() => {
+    const promises = filteredDatatipProviders.map((() => {
       var _ref6 = (0, _asyncToGenerator.default)(function* (provider) {
         const name = getProviderName(provider);
         const timingTracker = new (_analytics || _load_analytics()).default.TimingTracker(name + '.datatip');
@@ -42,18 +42,28 @@ let getTopDatatipAndProvider = (() => {
         return _ref6.apply(this, arguments);
       };
     })());
-
-    return (0, (_promise || _load_promise()).asyncFind)(datatipPromises, function (p) {
-      return p;
-    });
+    if ((_featureConfig || _load_featureConfig()).default.get('atom-ide-datatip.onlyTopDatatip')) {
+      const result = yield (0, (_promise || _load_promise()).asyncFind)(promises, function (x) {
+        return x;
+      });
+      return result != null ? [result] : [];
+    } else {
+      return (yield Promise.all(promises)).filter(Boolean);
+    }
   });
 
-  return function getTopDatatipAndProvider(_x, _x2, _x3, _x4) {
+  return function getDatatipResults(_x, _x2, _x3, _x4) {
     return _ref5.apply(this, arguments);
   };
 })();
 
 var _atom = require('atom');
+
+var _promise;
+
+function _load_promise() {
+  return _promise = require('nuclide-commons/promise');
+}
 
 var _react = _interopRequireWildcard(require('react'));
 
@@ -96,18 +106,6 @@ function _load_performanceNow() {
 }
 
 var _rxjsBundlesRxMinJs = require('rxjs/bundles/Rx.min.js');
-
-var _collection;
-
-function _load_collection() {
-  return _collection = require('nuclide-commons/collection');
-}
-
-var _promise;
-
-function _load_promise() {
-  return _promise = require('nuclide-commons/promise');
-}
 
 var _log4js;
 
@@ -155,21 +153,20 @@ function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj;
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-/**
- * Copyright (c) 2017-present, Facebook, Inc.
- * All rights reserved.
- *
- * This source code is licensed under the BSD-style license found in the
- * LICENSE file in the root directory of this source tree. An additional grant
- * of patent rights can be found in the PATENTS file in the same directory.
- *
- * 
- * @format
- */
+const DEFAULT_DATATIP_DEBOUNCE_DELAY = 1000; /**
+                                              * Copyright (c) 2017-present, Facebook, Inc.
+                                              * All rights reserved.
+                                              *
+                                              * This source code is licensed under the BSD-style license found in the
+                                              * LICENSE file in the root directory of this source tree. An additional grant
+                                              * of patent rights can be found in the PATENTS file in the same directory.
+                                              *
+                                              * 
+                                              * @format
+                                              */
 
 /* global performance */
 
-const DEFAULT_DATATIP_DEBOUNCE_DELAY = 1000;
 const DEFAULT_DATATIP_INTERACTED_DEBOUNCE_DELAY = 1000;
 
 function getProviderName(provider) {
@@ -478,22 +475,20 @@ class DatatipManagerForEditor {
     return (0, _asyncToGenerator.default)(function* () {
       _this2._setState(DatatipState.FETCHING);
 
-      let datatipAndProviderPromise;
-      if (_this2._lastPosition != null && position.isEqual(_this2._lastPosition) && _this2._lastDatatipAndProviderPromise != null) {
-        datatipAndProviderPromise = _this2._lastDatatipAndProviderPromise;
+      let results;
+      if (_this2._lastPosition != null && position.isEqual(_this2._lastPosition) && _this2._lastResultsPromise != null) {
+        results = _this2._lastResultsPromise;
       } else {
-        _this2._lastDatatipAndProviderPromise = getTopDatatipAndProvider(_this2._datatipProviders, _this2._editor, position, function (provider) {
+        _this2._lastResultsPromise = getDatatipResults(_this2._datatipProviders, _this2._editor, position, function (provider) {
           return provider.datatip(_this2._editor, position);
         });
-        datatipAndProviderPromise = _this2._lastDatatipAndProviderPromise;
+        results = _this2._lastResultsPromise;
         _this2._lastPosition = position;
       }
 
-      const datatipsAndProviders = (0, (_collection || _load_collection()).arrayCompact)((yield Promise.all([datatipAndProviderPromise, getTopDatatipAndProvider(_this2._modifierDatatipProviders, _this2._editor, position, function (provider) {
+      return (yield results).concat((yield getDatatipResults(_this2._modifierDatatipProviders, _this2._editor, position, function (provider) {
         return provider.modifierDatatip(_this2._editor, position, _this2._heldKeys);
-      })])));
-
-      return datatipsAndProviders;
+      })));
     })();
   }
 

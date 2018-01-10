@@ -25,10 +25,10 @@ function _load_nuclideOpenFiles() {
   return _nuclideOpenFiles = require('../../nuclide-open-files');
 }
 
-var _nuclideDebuggerBase;
+var _nuclideDebuggerCommon;
 
-function _load_nuclideDebuggerBase() {
-  return _nuclideDebuggerBase = require('../../nuclide-debugger-base');
+function _load_nuclideDebuggerCommon() {
+  return _nuclideDebuggerCommon = require('nuclide-debugger-common');
 }
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
@@ -63,7 +63,7 @@ class EvaluationExpressionProvider {
 
     return (0, (_nuclideAnalytics || _load_nuclideAnalytics()).trackTiming)(this._analyticsEventName, (0, _asyncToGenerator.default)(function* () {
       if (_this._matcher.kind === 'default') {
-        return (0, (_nuclideDebuggerBase || _load_nuclideDebuggerBase()).getDefaultEvaluationExpression)(editor, position);
+        return (0, (_nuclideDebuggerCommon || _load_nuclideDebuggerCommon()).getDefaultEvaluationExpression)(editor, position);
       } else if (_this._matcher.kind === 'custom') {
         return _this._matcher.matcher(editor, position);
       } else if (_this._matcher.kind === 'call-service') {

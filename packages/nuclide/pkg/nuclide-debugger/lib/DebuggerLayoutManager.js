@@ -254,12 +254,8 @@ class DebuggerLayoutManager {
       uri: debuggerUriBase + 'threads',
       isLifetimeView: false,
       defaultLocation: 'right',
-      title: () => {
-        return String(this._model.getStore().getSettings().get('threadsComponentTitle'));
-      },
-      isEnabled: () => {
-        return Boolean(this._model.getStore().getSettings().get('SupportThreadsWindow'));
-      },
+      title: () => this._model.getStore().getSettings().threadsComponentTitle,
+      isEnabled: () => this._model.getStore().getSettings().supportThreadsWindow,
       createView: () => _react.createElement((_ThreadsView || _load_ThreadsView()).ThreadsView, { model: this._model }),
       debuggerModeFilter: mode => mode !== (_DebuggerStore || _load_DebuggerStore()).DebuggerMode.STOPPED
     }, {

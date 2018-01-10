@@ -69,7 +69,7 @@ function createPanelItem(store) {
   // become ready; that would cause too many updates in quick succession. So we make the parts of
   // the state related to the selected task "sticky." Other parts of the state, however, we always
   // need to update immediately (e.g. progress).
-  const stickyProps = states.filter(state => state.taskRunnersReady && !state.isUpdatingTaskRunners).startWith(store.getState()).map(state => ({
+  const stickyProps = states.filter(state => state.initialPackagesActivated && state.readyTaskRunners.count() === state.taskRunners.count()).startWith(store.getState()).map(state => ({
     taskRunners: state.taskRunners,
     statesForTaskRunners: state.statesForTaskRunners,
     activeTaskRunner: state.activeTaskRunner,
@@ -78,7 +78,7 @@ function createPanelItem(store) {
   })).distinctUntilChanged((_shallowequal || _load_shallowequal()).default);
 
   const alwaysUpToDateProps = states.map(state => Object.assign({}, staticProps, {
-    toolbarDisabled: !state.taskRunnersReady || state.isUpdatingTaskRunners,
+    toolbarDisabled: !state.initialPackagesActivated || state.readyTaskRunners.count() !== state.taskRunners.count(),
     progress: state.runningTask ? state.runningTask.progress : null,
     taskIsRunning: state.runningTask != null,
     runningTaskIsCancelable: state.runningTask ? state.runningTask.metadata.cancelable !== false : undefined

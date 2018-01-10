@@ -172,6 +172,7 @@ class BuckTaskRunner {
     this._serializedState = initialState;
     this._disposables = new (_UniversalDisposable || _load_UniversalDisposable()).default();
     this._platformService = new (_PlatformService || _load_PlatformService()).PlatformService();
+    this._completedTasksObservable = new _rxjsBundlesRxMinJs.Subject();
   }
 
   getExtraUi() {
@@ -203,6 +204,10 @@ class BuckTaskRunner {
 
   getBuildTarget() {
     this._getStore().getState().buildTarget;
+  }
+
+  getCompletedTasks() {
+    return this._completedTasksObservable;
   }
 
   setBuildTarget(buildTarget) {
@@ -338,10 +343,21 @@ class BuckTaskRunner {
       }
     })));
 
+    task.onDidComplete(() => {
+      this._completedTasksObservable.next({
+        buckRoot,
+        buildRuleType,
+        buildTarget,
+        deploymentTarget: selectedDeploymentTarget,
+        taskSettings
+      });
+    });
+
     return Object.assign({}, task, {
       getTrackingData: () => ({
-        buckRoot,
         buildTarget,
+        deploymentTarget: deploymentTargetString,
+        ruleType: buildRuleType.type,
         taskSettings: state.taskSettings
       })
     });

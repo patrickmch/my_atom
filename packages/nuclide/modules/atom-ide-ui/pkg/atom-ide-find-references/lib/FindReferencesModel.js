@@ -24,6 +24,12 @@ let readFileContents = (() => {
   };
 })();
 
+var _getFragmentGrammar;
+
+function _load_getFragmentGrammar() {
+  return _getFragmentGrammar = _interopRequireDefault(require('nuclide-commons-atom/getFragmentGrammar'));
+}
+
 var _projects;
 
 function _load_projects() {
@@ -44,20 +50,17 @@ function _load_log4js() {
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-const FRAGMENT_GRAMMARS = {
-  'text.html.hack': 'source.hackfragment',
-  'text.html.php': 'source.hackfragment'
-}; /**
-    * Copyright (c) 2017-present, Facebook, Inc.
-    * All rights reserved.
-    *
-    * This source code is licensed under the BSD-style license found in the
-    * LICENSE file in the root directory of this source tree. An additional grant
-    * of patent rights can be found in the PATENTS file in the same directory.
-    *
-    * 
-    * @format
-    */
+/**
+ * Copyright (c) 2017-present, Facebook, Inc.
+ * All rights reserved.
+ *
+ * This source code is licensed under the BSD-style license found in the
+ * LICENSE file in the root directory of this source tree. An additional grant
+ * of patent rights can be found in the PATENTS file in the same directory.
+ *
+ * 
+ * @format
+ */
 
 function compareReference(x, y) {
   return x.range.compare(y.range);
@@ -206,14 +209,9 @@ class FindReferencesModel {
         previewText.push(fileLines.slice(startLine, endLine + 1).join('\n'));
         return { references, startLine, endLine };
       });
-      let grammar = atom.grammars.selectGrammar(uri, fileContents);
-      const fragmentGrammar = FRAGMENT_GRAMMARS[grammar.scopeName];
-      if (fragmentGrammar) {
-        grammar = atom.grammars.grammarForScopeName(fragmentGrammar) || grammar;
-      }
       return {
         uri,
-        grammar,
+        grammar: (0, (_getFragmentGrammar || _load_getFragmentGrammar()).default)(atom.grammars.selectGrammar(uri, fileContents)),
         previewText,
         refGroups
       };

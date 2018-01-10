@@ -126,7 +126,7 @@ let deleteNodes = (() => {
   var _ref4 = (0, _asyncToGenerator.default)(function* (nodes) {
     // Filter out children nodes to avoid ENOENTs that happen when parents are
     // deleted before its children. Convert to List so we can use groupBy.
-    const paths = (_immutable || _load_immutable()).default.List((_nuclideUri || _load_nuclideUri()).default.collapse(nodes.map(function (node) {
+    const paths = (_immutable || _load_immutable()).List((_nuclideUri || _load_nuclideUri()).default.collapse(nodes.map(function (node) {
       return (_FileTreeHelpers || _load_FileTreeHelpers()).default.keyToPath(node.uri);
     })));
     const localPaths = paths.filter(function (path) {
@@ -150,8 +150,8 @@ let deleteNodes = (() => {
       yield Promise.all(pathsByHost.map((() => {
         var _ref5 = (0, _asyncToGenerator.default)(function* (pathGroup) {
           // Batch delete using fs service.
-          const service = (0, (_nuclideRemoteConnection || _load_nuclideRemoteConnection()).getFileSystemServiceByNuclideUri)(pathGroup.get(0));
-          yield service.rmdirAll(pathGroup.toJS());
+          const service = (0, (_nuclideRemoteConnection || _load_nuclideRemoteConnection()).getFileSystemServiceByNuclideUri)((0, (_nullthrows || _load_nullthrows()).default)(pathGroup.get(0)));
+          yield service.rmdirAll(pathGroup.toArray());
         });
 
         return function (_x8) {
@@ -161,7 +161,7 @@ let deleteNodes = (() => {
     }
 
     // 3) Batch hg remove nodes that belong to an hg repo, one request per repo.
-    const nodesByHgRepository = (_immutable || _load_immutable()).default.List(nodes).filter(function (node) {
+    const nodesByHgRepository = (_immutable || _load_immutable()).List(nodes).filter(function (node) {
       return getHgRepositoryForNode(node) != null;
     }).groupBy(function (node) {
       return getHgRepositoryForNode(node);
@@ -169,9 +169,13 @@ let deleteNodes = (() => {
 
     yield Promise.all(nodesByHgRepository.map((() => {
       var _ref6 = (0, _asyncToGenerator.default)(function* ([hgRepository, repoNodes]) {
+        if (!(hgRepository != null)) {
+          throw new Error('Invariant violation: "hgRepository != null"');
+        }
+
         const hgPaths = (_nuclideUri || _load_nuclideUri()).default.collapse(repoNodes.map(function (node) {
           return (_FileTreeHelpers || _load_FileTreeHelpers()).default.keyToPath(node.uri);
-        }).toJS());
+        }).toArray());
         yield hgRepository.remove(hgPaths, true /* after */);
       });
 
@@ -191,7 +195,7 @@ var _electron = require('electron');
 var _immutable;
 
 function _load_immutable() {
-  return _immutable = _interopRequireDefault(require('immutable'));
+  return _immutable = _interopRequireWildcard(require('immutable'));
 }
 
 var _nuclideUri;
@@ -206,6 +210,12 @@ function _load_FileTreeHelpers() {
   return _FileTreeHelpers = _interopRequireDefault(require('./FileTreeHelpers'));
 }
 
+var _nullthrows;
+
+function _load_nullthrows() {
+  return _nullthrows = _interopRequireDefault(require('nullthrows'));
+}
+
 var _promise;
 
 function _load_promise() {
@@ -217,6 +227,8 @@ var _nuclideRemoteConnection;
 function _load_nuclideRemoteConnection() {
   return _nuclideRemoteConnection = require('../../nuclide-remote-connection');
 }
+
+function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 

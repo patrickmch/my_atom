@@ -5,6 +5,12 @@ Object.defineProperty(exports, "__esModule", {
 });
 exports.ScopesComponent = undefined;
 
+var _ScopesStore;
+
+function _load_ScopesStore() {
+  return _ScopesStore = _interopRequireDefault(require('./ScopesStore'));
+}
+
 var _WatchExpressionStore;
 
 function _load_WatchExpressionStore() {
@@ -31,29 +37,47 @@ function _load_Section() {
   return _Section = require('../../nuclide-ui/Section');
 }
 
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
 function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
 
-function isLocalScopeName(scopeName) {
-  return ['Local', 'Locals'].indexOf(scopeName) !== -1;
-} /**
-   * Copyright (c) 2015-present, Facebook, Inc.
-   * All rights reserved.
-   *
-   * This source code is licensed under the license found in the LICENSE file in
-   * the root directory of this source tree.
-   *
-   * 
-   * @format
-   */
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+/**
+ * Copyright (c) 2015-present, Facebook, Inc.
+ * All rights reserved.
+ *
+ * This source code is licensed under the license found in the LICENSE file in
+ * the root directory of this source tree.
+ *
+ * 
+ * @format
+ */
+
+const NO_VARIABLES = _react.createElement(
+  'div',
+  { className: 'nuclide-debugger-expression-value-row' },
+  _react.createElement(
+    'span',
+    { className: 'nuclide-debugger-expression-value-content' },
+    '(no variables)'
+  )
+);
+
+const LOADING = _react.createElement(
+  'div',
+  { className: 'nuclide-debugger-expression-value-row' },
+  _react.createElement(
+    'span',
+    { className: 'nuclide-debugger-expression-value-content' },
+    'Loading...'
+  )
+);
 
 class ScopesComponent extends _react.Component {
 
   constructor(props) {
     super(props);
 
-    this._setVariable = (scopeObjectId, scopeNumber, expression, newValue) => {
+    this._setVariable = (scopeObjectId, scopeName, expression, newValue) => {
       if (Boolean(expression) && Boolean(newValue)) {
         if (!(expression != null)) {
           throw new Error('Invariant violation: "expression != null"');
@@ -63,7 +87,7 @@ class ScopesComponent extends _react.Component {
           throw new Error('Invariant violation: "newValue != null"');
         }
 
-        this.props.scopesStore.sendSetVariableRequest(scopeNumber, Number(scopeObjectId), expression, newValue);
+        this.props.scopesStore.sendSetVariableRequest(scopeObjectId, scopeName, expression, newValue);
       }
     };
 
@@ -106,22 +130,12 @@ class ScopesComponent extends _react.Component {
     return expansionStateId;
   }
 
-  _renderScopeSection(fetchChildren, scope, scopeNumber) {
+  _renderScopeSection(fetchChildren, scope) {
     const { scopesStore } = this.props;
-    const { name, scopeObjectId, scopeVariables } = scope;
+    const { loaded, expanded, name, scopeObjectId, scopeVariables } = scope;
     // Non-local scopes should be collapsed by default since users typically care less about them.
-    const collapsedByDefault = !isLocalScopeName(name);
-    const noLocals = collapsedByDefault || scopeVariables.length > 0 ? null : _react.createElement(
-      'div',
-      { className: 'nuclide-debugger-expression-value-row' },
-      _react.createElement(
-        'span',
-        { className: 'nuclide-debugger-expression-value-content' },
-        '(no variables)'
-      )
-    );
 
-    const setVariableHandler = scopesStore.supportsSetVariable() ? this._setVariable.bind(this, scopeObjectId, scopeNumber) : null;
+    const setVariableHandler = scopesStore.supportsSetVariable() ? this._setVariable.bind(this, scopeObjectId, name) : null;
 
     return (
       // $FlowFixMe(>=0.53.0) Flow suppress
@@ -129,18 +143,18 @@ class ScopesComponent extends _react.Component {
         (_Section || _load_Section()).Section,
         {
           collapsable: true,
+          collapsed: !expanded,
+          onChange: isCollapsed => scopesStore.setExpanded(name, !isCollapsed),
           headline: name,
-          size: 'small',
-          collapsedByDefault: collapsedByDefault },
-        noLocals,
-        scopeVariables.map(this._renderExpression.bind(this, fetchChildren, setVariableHandler))
+          size: 'small' },
+        !expanded ? null : !loaded ? LOADING : scopeVariables.length > 0 ? scopeVariables.map(this._renderExpression.bind(this, fetchChildren, setVariableHandler)) : NO_VARIABLES
       )
     );
   }
 
   render() {
     const { watchExpressionStore, scopes } = this.props;
-    if (scopes == null || scopes.length === 0) {
+    if (scopes == null || scopes.size === 0) {
       return _react.createElement(
         'span',
         null,
@@ -148,7 +162,7 @@ class ScopesComponent extends _react.Component {
       );
     }
     const fetchChildren = watchExpressionStore.getProperties.bind(watchExpressionStore);
-    const scopeSections = scopes.map(this._renderScopeSection.bind(this, fetchChildren));
+    const scopeSections = Array.from(scopes.values()).map(this._renderScopeSection.bind(this, fetchChildren));
     return _react.createElement(
       'div',
       { className: 'nuclide-debugger-expression-value-list' },

@@ -1,0 +1,61 @@
+{
+  "_args": [
+    [
+      {
+        "raw": "/private/var/folders/dp/vj05cwss7pz9mjl62ccqzysm0000gp/T/d-11808-60204-1dvrvdg.gwaaqyqfr/package.tgz",
+        "scope": null,
+        "escapedName": null,
+        "name": null,
+        "rawSpec": "/private/var/folders/dp/vj05cwss7pz9mjl62ccqzysm0000gp/T/d-11808-60204-1dvrvdg.gwaaqyqfr/package.tgz",
+        "spec": "/private/var/folders/dp/vj05cwss7pz9mjl62ccqzysm0000gp/T/d-11808-60204-1dvrvdg.gwaaqyqfr/package.tgz",
+        "type": "local"
+      },
+      "/private/var/folders/dp/vj05cwss7pz9mjl62ccqzysm0000gp/T/apm-install-dir-11808-60204-f9jkql.thayjeb3xr"
+    ]
+  ],
+  "_from": "../d-11808-60204-1dvrvdg.gwaaqyqfr/package.tgz",
+  "_id": "emmet-simplified@2.5.0",
+  "_inCache": true,
+  "_location": "/emmet-simplified",
+  "_phantomChildren": {},
+  "_requested": {
+    "raw": "/private/var/folders/dp/vj05cwss7pz9mjl62ccqzysm0000gp/T/d-11808-60204-1dvrvdg.gwaaqyqfr/package.tgz",
+    "scope": null,
+    "escapedName": null,
+    "name": null,
+    "rawSpec": "/private/var/folders/dp/vj05cwss7pz9mjl62ccqzysm0000gp/T/d-11808-60204-1dvrvdg.gwaaqyqfr/package.tgz",
+    "spec": "/private/var/folders/dp/vj05cwss7pz9mjl62ccqzysm0000gp/T/d-11808-60204-1dvrvdg.gwaaqyqfr/package.tgz",
+    "type": "local"
+  },
+  "_requiredBy": [
+    "#USER"
+  ],
+  "_resolved": "file:../d-11808-60204-1dvrvdg.gwaaqyqfr/package.tgz",
+  "_shasum": "03af5f57fb634747b51110f5990e508f66690326",
+  "_shrinkwrap": null,
+  "_spec": "/private/var/folders/dp/vj05cwss7pz9mjl62ccqzysm0000gp/T/d-11808-60204-1dvrvdg.gwaaqyqfr/package.tgz",
+  "_where": "/private/var/folders/dp/vj05cwss7pz9mjl62ccqzysm0000gp/T/apm-install-dir-11808-60204-f9jkql.thayjeb3xr",
+  "bugs": {
+    "url": "https://github.com/Yatoom/emmet-atom-simplified/issues"
+  },
+  "dependencies": {
+    "atom-space-pen-views": "^2.0.3",
+    "emmet": "^1.3.1"
+  },
+  "description": "Emmet Simplified – the simplified essential tool for web developers",
+  "devDependencies": {},
+  "engines": {
+    "atom": "*"
+  },
+  "homepage": "https://github.com/Yatoom/emmet-atom-simplified#readme",
+  "main": "./lib/emmet",
+  "name": "emmet-simplified",
+  "optionalDependencies": {},
+  "readme": "# Simplified Emmet plugin Atom editor\n\n[Emmet](http://emmet.io) support for [Atom](http://atom.io). This is a fork of the emmet-atom package, and has one key-binding, and one key-binding ony: the <kbd>shift</kbd> + <kbd>space</kbd> key for emmet expanding. This solves all keybinding conflicts with the Atom Core, such as the <kbd>ctrl</kbd> + <kbd>shift</kbd> + <kbd>M</kbd> for toggling the Markdown preview, the <kbd>ctrl</kbd> +  <kbd>,</kbd> for opening the Settings View, and recently <kbd>tab</kbd> for [Atom's new autocomplete](http://blog.atom.io/2015/05/15/new-autocomplete.html).\n\nOther than that, there are - as of yet - no differences with emmet-atom, which means that you have the freedom to manually add any other Emmet triggers you want. To do so, go to _Edit_ > _Open Your Keymap_ and refer to the [original default emmet-atom keymap](https://github.com/emmetio/emmet-atom/blob/master/keymaps/emmet.cson) for a complete list of commands.\n\n### Installation\nIn Atom, open Preferences > Packages, search for the `emmet-simplified` package. Once found, click install to install package. Alternatively, you could run `apm install emmet-simplified`.\n\n### Manual installation\n\nYou can install the latest emmet-simplified version manually from console:\n\n```bash\ncd ~/.atom/packages\ngit clone https://github.com/Yatoom/emmet-atom-simplified emmet-simplified\ncd emmet-simplified\nnpm install\n```\n\nThen restart Atom editor.\n\n## Features:\n\n* Expand abbreviations by <kbd>shift</kbd> + <kbd>space</kbd>.\n\n## Shift-space key\n\nSimplified Emmet expands abbreviations by shift-space key only for HTML, CSS, Sass/SCSS and LESS syntaxes.\n\n## Default Keybindings\n\nYou can change these Preferences > Emmet.\n\nCommand | Darwin | Linux/Windows\n------- | ------ | -------------\nExpand Abbreviation | <kbd>shift</kbd> + <kbd>space</kbd> | <kbd>shift</kbd> + <kbd>space</kbd>\n",
+  "readmeFilename": "README.md",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Yatoom/emmet-atom-simplified.git"
+  },
+  "version": "2.5.0"
+}

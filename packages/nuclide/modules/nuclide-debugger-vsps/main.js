@@ -38,6 +38,12 @@ const _adapters = new Map([['node', {
     args: [(_nuclideUri || _load_nuclideUri()).default.join(__dirname, 'VendorLib/vscode-prepack/adapter/DebugAdapter.js')]
   },
   root: (_nuclideUri || _load_nuclideUri()).default.join(__dirname, 'VendorLib/vscode-prepack')
+}], ['ocaml', {
+  executable: {
+    command: 'node',
+    args: [(_nuclideUri || _load_nuclideUri()).default.join(__dirname, 'vscode-ocaml/vscode-debugger-entry.js')]
+  },
+  root: (_nuclideUri || _load_nuclideUri()).default.join(__dirname, 'vscode-ocaml')
 }]]); /**
        * Copyright (c) 2017-present, Facebook, Inc.
        * All rights reserved.

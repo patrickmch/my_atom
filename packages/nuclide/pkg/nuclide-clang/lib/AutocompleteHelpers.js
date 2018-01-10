@@ -230,13 +230,13 @@ function getCompletionPrefix(editor) {
 class AutocompleteHelpers {
 
   static getAutocompleteSuggestions(request) {
-    return (0, (_nuclideAnalytics || _load_nuclideAnalytics()).trackTiming)('nuclide-clang-atom.autocomplete', (0, _asyncToGenerator.default)(function* () {
+    return (0, _asyncToGenerator.default)(function* () {
       const results = yield AutocompleteHelpers._cacher.getSuggestions(request);
       if (results != null) {
         return [...results];
       }
       return [];
-    }));
+    })();
   }
 
   static _getAutocompleteSuggestions(request) {

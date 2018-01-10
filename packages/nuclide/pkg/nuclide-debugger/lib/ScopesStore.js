@@ -64,7 +64,9 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
  */
 
 class ScopesStore {
-
+  /**
+   * Treat as immutable.
+   */
   constructor(dispatcher, bridge, debuggerStore) {
     this._handlePayload = payload => {
       switch (payload.actionType) {
@@ -73,16 +75,25 @@ class ScopesStore {
           this._handleClearInterface();
           break;
         case (_DebuggerDispatcher || _load_DebuggerDispatcher()).ActionTypes.UPDATE_SCOPES:
-          this._handleUpdateScopes(payload.data);
+          this._handleUpdateScopesAsPayload(payload.data);
           break;
         default:
           return;
       }
     };
 
-    this._setVariable = (scopeNumber, expression, confirmedNewValue) => {
+    this._convertScopeSectionPayloadToScopeSection = scopeSectionPayload => {
+      const expandedState = this._expandedState.get(scopeSectionPayload.name);
+      return Object.assign({}, scopeSectionPayload, {
+        scopeVariables: [],
+        loaded: false,
+        expanded: expandedState != null ? expandedState : ScopesStore.isLocalScopeName(scopeSectionPayload.name)
+      });
+    };
+
+    this._setVariable = (scopeName, expression, confirmedNewValue) => {
       const scopes = this._scopes.getValue();
-      const selectedScope = (0, (_nullthrows || _load_nullthrows()).default)(scopes[scopeNumber]);
+      const selectedScope = (0, (_nullthrows || _load_nullthrows()).default)(scopes.get(scopeName));
       const variableToChangeIndex = selectedScope.scopeVariables.findIndex(v => v.name === expression);
       const variableToChange = (0, (_nullthrows || _load_nullthrows()).default)(selectedScope.scopeVariables[variableToChangeIndex]);
       const newVariable = Object.assign({}, variableToChange, {
@@ -101,19 +112,43 @@ class ScopesStore {
     this._disposables = new (_UniversalDisposable || _load_UniversalDisposable()).default(() => {
       dispatcher.unregister(dispatcherToken);
     });
-    this._scopes = new _rxjsBundlesRxMinJs.BehaviorSubject([]);
+    this._scopes = new _rxjsBundlesRxMinJs.BehaviorSubject(new Map());
+    this._expandedState = new Map();
   }
-  /**
-   * Treat as immutable.
-   */
-
 
   _handleClearInterface() {
-    this._scopes.next([]);
+    this._expandedState.clear();
+    this.getScopesNow().forEach(scope => {
+      this._expandedState.set(scope.name, scope.expanded);
+    });
+    this._scopes.next(new Map());
+  }
+
+  _handleUpdateScopesAsPayload(scopeSectionsPayload) {
+    this._handleUpdateScopes(new Map(scopeSectionsPayload.map(this._convertScopeSectionPayloadToScopeSection).map(section => [section.name, section])));
   }
 
   _handleUpdateScopes(scopeSections) {
     this._scopes.next(scopeSections);
+    scopeSections.forEach(scopeSection => {
+      const { expanded, loaded, name } = scopeSection;
+      if (expanded && !loaded) {
+        this._loadScopeVariablesFor(name);
+      }
+    });
+  }
+
+  _loadScopeVariablesFor(scopeName) {
+    var _this = this;
+
+    return (0, _asyncToGenerator.default)(function* () {
+      const scopes = _this.getScopesNow();
+      const selectedScope = (0, (_nullthrows || _load_nullthrows()).default)(scopes.get(scopeName));
+      const expressionEvaluationManager = (0, (_nullthrows || _load_nullthrows()).default)(_this._bridge.getCommandDispatcher().getBridgeAdapter()).getExpressionEvaluationManager();
+      selectedScope.scopeVariables = yield expressionEvaluationManager.getScopeVariablesFor((0, (_nullthrows || _load_nullthrows()).default)(expressionEvaluationManager.getRemoteObjectManager().getRemoteObjectFromId(selectedScope.scopeObjectId)));
+      selectedScope.loaded = true;
+      _this._handleUpdateScopes(scopes);
+    })();
   }
 
   getScopes() {
@@ -124,16 +159,26 @@ class ScopesStore {
     return this._scopes.getValue();
   }
 
+  setExpanded(scopeName, expanded) {
+    const scopes = this.getScopesNow();
+    const selectedScope = (0, (_nullthrows || _load_nullthrows()).default)(scopes.get(scopeName));
+    selectedScope.expanded = expanded;
+    if (expanded) {
+      selectedScope.loaded = false;
+    }
+    this._handleUpdateScopes(scopes);
+  }
+
   supportsSetVariable() {
     return this._debuggerStore.supportsSetVariable();
   }
 
   // Returns a promise of the updated value after it has been set.
-  sendSetVariableRequest(scopeNumber, scopeObjectId, expression, newValue) {
-    var _this = this;
+  sendSetVariableRequest(scopeObjectId, scopeName, expression, newValue) {
+    var _this2 = this;
 
     return (0, _asyncToGenerator.default)(function* () {
-      const debuggerInstance = _this._debuggerStore.getDebuggerInstance();
+      const debuggerInstance = _this2._debuggerStore.getDebuggerInstance();
       if (debuggerInstance == null) {
         const errorMsg = 'setVariable failed because debuggerInstance is null';
         (0, (_EventReporter || _load_EventReporter()).reportError)(errorMsg);
@@ -153,9 +198,9 @@ class ScopesStore {
             resolve(response.value);
           }
         }
-        _this._bridge.sendSetVariableCommand(scopeObjectId, expression, newValue, callback);
+        _this2._bridge.sendSetVariableCommand(Number(scopeObjectId), expression, newValue, callback);
       }).then(function (confirmedNewValue) {
-        _this._setVariable(scopeNumber, expression, confirmedNewValue);
+        _this2._setVariable(scopeName, expression, confirmedNewValue);
         return confirmedNewValue;
       });
     })();
@@ -163,6 +208,10 @@ class ScopesStore {
 
   dispose() {
     this._disposables.dispose();
+  }
+
+  static isLocalScopeName(scopeName) {
+    return ['Local', 'Locals'].indexOf(scopeName) !== -1;
   }
 }
 exports.default = ScopesStore;

@@ -3,6 +3,7 @@
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
+exports.registerConsoleLogging = undefined;
 
 var _asyncToGenerator = _interopRequireDefault(require('async-to-generator'));
 
@@ -19,9 +20,20 @@ exports.consumeToolBar = consumeToolBar;
 exports.consumeNotifications = consumeNotifications;
 exports.provideRemoteControlService = provideRemoteControlService;
 exports.consumeDatatipService = consumeDatatipService;
-exports.consumeRegisterNuxService = consumeRegisterNuxService;
-exports.consumeTriggerNuxService = consumeTriggerNuxService;
 exports.consumeCurrentWorkingDirectory = consumeCurrentWorkingDirectory;
+
+var _AtomServiceContainer;
+
+function _load_AtomServiceContainer() {
+  return _AtomServiceContainer = require('./AtomServiceContainer');
+}
+
+Object.defineProperty(exports, 'registerConsoleLogging', {
+  enumerable: true,
+  get: function () {
+    return (_AtomServiceContainer || _load_AtomServiceContainer()).registerConsoleLogging;
+  }
+});
 
 var _collection;
 
@@ -101,12 +113,6 @@ var _nuclideRemoteConnection;
 
 function _load_nuclideRemoteConnection() {
   return _nuclideRemoteConnection = require('../../nuclide-remote-connection');
-}
-
-var _nuclideDebuggerBase;
-
-function _load_nuclideDebuggerBase() {
-  return _nuclideDebuggerBase = require('../../nuclide-debugger-base');
 }
 
 var _DebuggerStore;
@@ -226,6 +232,10 @@ function getLineForEvent(editor, event) {
 
 function createAutocompleteProvider() {
   return {
+    analytics: {
+      eventName: 'nuclide-debugger',
+      shouldLogInsertedSuggestion: false
+    },
     labels: ['nuclide-console'],
     selector: '*',
     filterSuggestions: true,
@@ -464,7 +474,7 @@ class Activation {
     if (debuggerInstance == null || !debuggerInstance.getDebuggerProcessInfo().getDebuggerCapabilities().completionsRequest) {
       // As a fallback look at the variable names of currently visible scopes.
       const scopes = this.getModel().getScopesStore().getScopesNow();
-      return Promise.resolve((0, (_collection || _load_collection()).arrayFlatten)(scopes.map(({ scopeVariables }) => scopeVariables.map(({ name }) => ({ text: name, type: 'variable' })))));
+      return Promise.resolve((0, (_collection || _load_collection()).arrayFlatten)(Array.from(scopes.values()).map(({ scopeVariables }) => scopeVariables.map(({ name }) => ({ text: name, type: 'variable' })))));
     }
     return new Promise((resolve, reject) => {
       this.getModel().getBridge().sendCompletionsCommand(text, column + 1, (err, response) => {
@@ -508,12 +518,6 @@ class Activation {
     return this._model;
   }
 
-  consumeRegisterNuxService(addNewNux) {
-    // TODO: No NUX at this time. Add NUX here.
-    const disposable = new _atom.Disposable();
-    return disposable;
-  }
-
   _registerCommandsContextMenuAndOpener() {
     const disposable = new (_UniversalDisposable || _load_UniversalDisposable()).default(atom.workspace.addOpener(uri => {
       return this._layoutManager.getModelForDebuggerUri(uri);
@@ -553,16 +557,6 @@ class Activation {
     }));
     this._layoutManager.registerContextMenus();
     return disposable;
-  }
-
-  setTriggerNux(triggerNux) {
-    this._tryTriggerNux = triggerNux;
-  }
-
-  tryTriggerNux(id) {
-    if (this._tryTriggerNux != null) {
-      this._tryTriggerNux(id);
-    }
   }
 
   _isReadonlyTarget() {
@@ -951,7 +945,7 @@ function deactivate() {
 }
 
 function consumeOutputService(api) {
-  return (0, (_nuclideDebuggerBase || _load_nuclideDebuggerBase()).setOutputService)(api);
+  return (0, (_AtomServiceContainer || _load_AtomServiceContainer()).setOutputService)(api);
 }
 
 function registerConsoleExecutor(watchExpressionStore, registerExecutor) {
@@ -1036,7 +1030,7 @@ function consumeToolBar(getToolBar) {
 }
 
 function consumeNotifications(raiseNativeNotification) {
-  (0, (_nuclideDebuggerBase || _load_nuclideDebuggerBase()).setNotificationService)(raiseNativeNotification);
+  (0, (_AtomServiceContainer || _load_AtomServiceContainer()).setNotificationService)(raiseNativeNotification);
 }
 
 function provideRemoteControlService() {
@@ -1054,20 +1048,6 @@ function consumeDatatipService(service) {
   activation.getModel().getThreadStore().setDatatipService(service);
   activation._disposables.add(disposable);
   return disposable;
-}
-
-function consumeRegisterNuxService(addNewNux) {
-  if (!activation) {
-    throw new Error('Invariant violation: "activation"');
-  }
-
-  return activation.consumeRegisterNuxService(addNewNux);
-}
-
-function consumeTriggerNuxService(tryTriggerNux) {
-  if (activation != null) {
-    activation.setTriggerNux(tryTriggerNux);
-  }
 }
 
 function consumeCurrentWorkingDirectory(cwdApi) {

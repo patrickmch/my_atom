@@ -55,9 +55,11 @@ class DebugBridge {
     }));
   }
 
-  static getDevices() {
+  static getDevices(options) {
+    const { port: optionPort } = options || {};
     return this.configObs.switchMap(config => {
-      const commandObs = config.ports.length > 0 ? _rxjsBundlesRxMinJs.Observable.concat(...config.ports.map(port => (0, (_process || _load_process()).runCommand)(config.path, ['-P', String(port), 'devices']).map(stdout => this._parseDevicesCommandOutput(stdout, port)))) : _rxjsBundlesRxMinJs.Observable.concat((0, (_process || _load_process()).runCommand)(config.path, ['devices']).map(stdout => this._parseDevicesCommandOutput(stdout, -1)));
+      const ports = optionPort != null ? [optionPort] : config.ports;
+      const commandObs = ports.length > 0 ? _rxjsBundlesRxMinJs.Observable.concat(...ports.map(port => (0, (_process || _load_process()).runCommand)(config.path, ['-P', String(port), 'devices']).map(stdout => this._parseDevicesCommandOutput(stdout, port)))) : _rxjsBundlesRxMinJs.Observable.concat((0, (_process || _load_process()).runCommand)(config.path, ['devices']).map(stdout => this._parseDevicesCommandOutput(stdout, -1)));
 
       return commandObs.toArray().switchMap(deviceList => _rxjsBundlesRxMinJs.Observable.of(deviceList.reduce((a, b) => a != null ? a.concat(...b) : b)));
     });

@@ -39,15 +39,15 @@ let createLanguageService = (() => {
     };
 
     const autocompleteConfig = {
-      version: '2.0.0',
       inclusionPriority: 1,
       suggestionPriority: 3,
       excludeLowerPriority: false,
-      analyticsEventName: 'graphql.getAutocompleteSuggestions',
+      analytics: {
+        eventName: 'nuclide-graphql',
+        shouldLogInsertedSuggestion: false
+      },
       disableForSelector: null,
-      autocompleteCacherConfig: null,
-      onDidInsertSuggestionAnalyticsEventName: 'graphql.autocomplete-chosen',
-      trackAdditionalInfo: false
+      autocompleteCacherConfig: null
     };
 
     const atomConfig = {

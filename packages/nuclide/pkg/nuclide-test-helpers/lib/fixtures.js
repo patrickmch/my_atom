@@ -3,7 +3,7 @@
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.copyBuildFixture = exports.generateHgRepo2Fixture = exports.generateHgRepo1Fixture = exports.copyFixture = undefined;
+exports.copyBuildFixture = exports.overwriteFileWithTestContent = exports.generateHgRepo3Fixture = exports.generateHgRepo2Fixture = exports.generateHgRepo1Fixture = exports.copyFixture = undefined;
 
 var _asyncToGenerator = _interopRequireDefault(require('async-to-generator'));
 
@@ -25,19 +25,6 @@ var _asyncToGenerator = _interopRequireDefault(require('async-to-generator'));
  * This should correspond to the spec/ directory with a fixtures/ subdirectory.
  * @returns the path to the temporary directory.
  */
-/**
- * Copyright (c) 2015-present, Facebook, Inc.
- * All rights reserved.
- *
- * This source code is licensed under the license found in the LICENSE file in
- * the root directory of this source tree.
- *
- * 
- * @format
- */
-
-// This is in devDependencies. This file should only be used in tests.
-// eslint-disable-next-line rulesdir/no-unresolved
 let copyFixture = exports.copyFixture = (() => {
   var _ref = (0, _asyncToGenerator.default)(function* (fixtureName, startDir) {
     const fixturePath = (_nuclideUri || _load_nuclideUri()).default.join('fixtures', fixtureName);
@@ -149,6 +136,69 @@ let generateHgRepo2Fixture = exports.generateHgRepo2Fixture = (() => {
 })();
 
 /**
+ * Generates an hg repository with the following structure:
+ *
+ *   o second commit [secondCommit]
+ *  /
+ * |
+ * |
+ * | o first commit [firstCommit]
+ * |/
+ * |
+ * |
+ * o base commit
+ *
+ * @returns the path to the temporary directory that this function creates.
+ */
+
+
+let generateHgRepo3Fixture = exports.generateHgRepo3Fixture = (() => {
+  var _ref4 = (0, _asyncToGenerator.default)(function* (fileName = 'temp.txt') {
+    const testTxt = 'this is the base file\nline 2\n\n  indented line\n';
+    const tempDir = yield (0, (_testHelpers || _load_testHelpers()).generateFixture)('hg_repo_3', new Map([['.watchmanconfig', '{}\n'], [fileName, testTxt]]));
+    const repoPath = yield (_fsPromise || _load_fsPromise()).default.realpath(tempDir);
+    yield (0, (_process || _load_process()).runCommand)('hg', ['init'], { cwd: repoPath }).toPromise();
+    yield (_fsPromise || _load_fsPromise()).default.writeFile((_nuclideUri || _load_nuclideUri()).default.join(repoPath, '.hg', 'hgrc'), '[paths]\ndefault = .\n[ui]\nusername = Test <test@mail.com>\n');
+    yield (_fsPromise || _load_fsPromise()).default.writeFile((_nuclideUri || _load_nuclideUri()).default.join(repoPath, fileName), testTxt);
+    yield (0, (_process || _load_process()).runCommand)('hg', ['commit', '-A', '-m', 'base commit'], {
+      cwd: repoPath
+    }).toPromise();
+    yield (_fsPromise || _load_fsPromise()).default.writeFile((_nuclideUri || _load_nuclideUri()).default.join(repoPath, fileName), testTxt + '\nthis line added on first commit\n');
+    yield (0, (_process || _load_process()).runCommand)('hg', ['bookmark', 'firstCommit'], {
+      cwd: repoPath
+    }).toPromise();
+    yield (0, (_process || _load_process()).runCommand)('hg', ['commit', '-A', '-m', 'first commit'], {
+      cwd: repoPath
+    }).toPromise();
+    yield (0, (_process || _load_process()).runCommand)('hg', ['prev'], {
+      cwd: repoPath
+    }).toPromise();
+    yield (_fsPromise || _load_fsPromise()).default.writeFile((_nuclideUri || _load_nuclideUri()).default.join(repoPath, fileName), testTxt + '\nthis line added on second commit\n');
+    yield (0, (_process || _load_process()).runCommand)('hg', ['bookmark', 'secondCommit'], {
+      cwd: repoPath
+    }).toPromise();
+    yield (0, (_process || _load_process()).runCommand)('hg', ['commit', '-A', '-m', 'second commit'], {
+      cwd: repoPath
+    }).toPromise();
+    return repoPath;
+  });
+
+  return function generateHgRepo3Fixture() {
+    return _ref4.apply(this, arguments);
+  };
+})();
+
+let overwriteFileWithTestContent = exports.overwriteFileWithTestContent = (() => {
+  var _ref5 = (0, _asyncToGenerator.default)(function* (fileName, repoPath, fileContent = testFileContent) {
+    yield (_fsPromise || _load_fsPromise()).default.writeFile((_nuclideUri || _load_nuclideUri()).default.join(repoPath, fileName), fileContent);
+  });
+
+  return function overwriteFileWithTestContent(_x3, _x4) {
+    return _ref5.apply(this, arguments);
+  };
+})();
+
+/**
  * Like `copyMercurialFixture` but looks in the entire fixture directory for
  * `BUCK-rename` and `TARGETS-rename` and inserts a .buckversion if applicable.
  *
@@ -158,7 +208,7 @@ let generateHgRepo2Fixture = exports.generateHgRepo2Fixture = (() => {
 
 
 let copyBuildFixture = exports.copyBuildFixture = (() => {
-  var _ref4 = (0, _asyncToGenerator.default)(function* (fixtureName, source) {
+  var _ref6 = (0, _asyncToGenerator.default)(function* (fixtureName, source) {
     const projectDir = yield copyFixture(fixtureName, source);
 
     yield Promise.all([copyBuckVersion(projectDir), renameBuckFiles(projectDir)]);
@@ -166,13 +216,13 @@ let copyBuildFixture = exports.copyBuildFixture = (() => {
     return projectDir;
   });
 
-  return function copyBuildFixture(_x3, _x4) {
-    return _ref4.apply(this, arguments);
+  return function copyBuildFixture(_x5, _x6) {
+    return _ref6.apply(this, arguments);
   };
 })();
 
 let copyBuckVersion = (() => {
-  var _ref5 = (0, _asyncToGenerator.default)(function* (projectDir) {
+  var _ref7 = (0, _asyncToGenerator.default)(function* (projectDir) {
     const versionFile = '.buckversion';
     const buckVersionDir = yield (_fsPromise || _load_fsPromise()).default.findNearestFile(versionFile, __dirname);
     if (buckVersionDir != null) {
@@ -180,13 +230,13 @@ let copyBuckVersion = (() => {
     }
   });
 
-  return function copyBuckVersion(_x5) {
-    return _ref5.apply(this, arguments);
+  return function copyBuckVersion(_x7) {
+    return _ref7.apply(this, arguments);
   };
 })();
 
 let renameBuckFiles = (() => {
-  var _ref6 = (0, _asyncToGenerator.default)(function* (projectDir) {
+  var _ref8 = (0, _asyncToGenerator.default)(function* (projectDir) {
     const renames = yield (_fsPromise || _load_fsPromise()).default.glob('**/{BUCK,TARGETS}-rename', {
       cwd: projectDir
     });
@@ -197,8 +247,8 @@ let renameBuckFiles = (() => {
     }));
   });
 
-  return function renameBuckFiles(_x6) {
-    return _ref6.apply(this, arguments);
+  return function renameBuckFiles(_x8) {
+    return _ref8.apply(this, arguments);
   };
 })();
 
@@ -239,3 +289,18 @@ function _load_testHelpers() {
 }
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+/**
+ * Copyright (c) 2015-present, Facebook, Inc.
+ * All rights reserved.
+ *
+ * This source code is licensed under the license found in the LICENSE file in
+ * the root directory of this source tree.
+ *
+ * 
+ * @format
+ */
+
+// This is in devDependencies. This file should only be used in tests.
+// eslint-disable-next-line rulesdir/no-unresolved
+const testFileContent = 'this is the base file\nline 2\n\n  indented line\n';

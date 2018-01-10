@@ -7,6 +7,12 @@ exports.LspLanguageService = undefined;
 
 var _asyncToGenerator = _interopRequireDefault(require('async-to-generator'));
 
+var _process;
+
+function _load_process() {
+  return _process = require('../../../modules/nuclide-commons/process');
+}
+
 var _promise;
 
 function _load_promise() {
@@ -25,10 +31,10 @@ function _load_through() {
   return _through = _interopRequireDefault(require('through'));
 }
 
-var _process;
+var _process2;
 
-function _load_process() {
-  return _process = require('nuclide-commons/process');
+function _load_process2() {
+  return _process2 = require('nuclide-commons/process');
 }
 
 var _nuclideUri;
@@ -152,9 +158,13 @@ class LspLanguageService {
 
   // Fields which become live inside start(), when we spawn the LSP process.
   // Disposing of the _lspConnection will dispose of all of them.
-  // tracks which fileversions we've sent to LSP
-  // this is the one we're given
-  constructor(logger, fileCache, host, languageId, command, args, spawnOptions = {}, projectRoot, fileExtensions, initializationOptions, additionalLogFilesRetentionPeriod) {
+  // tracks which fileversions we've received from Nuclide client
+  // supplies the options for spawning a process
+  // this is created per-connection
+  // tracks which fileversions we've received from Nuclide client
+
+  // These fields are provided upon construction
+  constructor(logger, fileCache, host, languageId, command, args, spawnOptions = {}, projectRoot, fileExtensions, initializationOptions, additionalLogFilesRetentionPeriod, useOriginalEnvironment = false) {
     this._state = 'Initial';
     this._stateIndicator = new (_UniversalDisposable || _load_UniversalDisposable()).default();
     this._progressIndicators = new Map();
@@ -183,6 +193,7 @@ class LspLanguageService {
     this._fileExtensions = fileExtensions;
     this._initializationOptions = initializationOptions;
     this._additionalLogFilesRetentionPeriod = additionalLogFilesRetentionPeriod;
+    this._useOriginalEnvironment = useOriginalEnvironment;
   } // tracks which fileversions we've sent to LSP
 
   // Whenever we trigger a new request, we cancel the outstanding request, so
@@ -193,12 +204,8 @@ class LspLanguageService {
 
   // These fields reflect our own state.
   // (Most should be nullable types, but it's not worth the bother.)
-  // tracks which fileversions we've received from Nuclide client
-  // supplies the options for spawning a process
-  // this is created per-connection
-  // tracks which fileversions we've received from Nuclide client
-
-  // These fields are provided upon construction
+  // tracks which fileversions we've sent to LSP
+  // this is the one we're given
 
 
   dispose() {
@@ -313,11 +320,32 @@ class LspLanguageService {
             // if we try to spawn an empty command, node itself throws a "bad
             // type" error, which is jolly confusing. So we catch it ourselves.
           }
-          const childProcessStream = (0, (_process || _load_process()).spawn)(_this._command, _this._args, Object.assign({
+
+          const lspSpawnOptions = Object.assign({
             cwd: _this._projectRoot
           }, _this._spawnOptions, {
             killTreeWhenDone: true
-          })).publish();
+          });
+
+          if (_this._useOriginalEnvironment && !lspSpawnOptions.env) {
+            // NodeJS is the one thing where we need to make sure to use Nuclide's
+            // version.
+            const originalEnvironment = yield (0, (_process || _load_process()).getOriginalEnvironment)();
+            const nodePath = (_nuclideUri || _load_nuclideUri()).default.dirname((yield (0, (_process || _load_process()).runCommand)('which', ['node']).toPromise()));
+            if (originalEnvironment.PATH) {
+              originalEnvironment.PATH = `${nodePath}:${originalEnvironment.PATH}`;
+            } else {
+              _this._logger.error('No path found in original environment.');
+              originalEnvironment.PATH = nodePath;
+            }
+
+            // If they specify both useOriginalEnvironment and an env key in their
+            // spawn options, merge them with the explicitly provided keys taking
+            // precedence.
+            lspSpawnOptions.env = Object.assign({}, originalEnvironment, lspSpawnOptions.env);
+          }
+
+          const childProcessStream = (0, (_process2 || _load_process2()).spawn)(_this._command, _this._args, lspSpawnOptions).publish();
           // disposing of the stream will kill the process, if it still exists
           const processPromise = childProcessStream.take(1).toPromise();
           perConnectionDisposables.add(childProcessStream.connect());
@@ -776,19 +804,19 @@ class LspLanguageService {
     // the path is included in the error message, so we refrain from adding it.
     // In others like EACCESs, the path isn't, so we add it ourselves:
     if (command != null && command !== '' && !msg.includes(command)) {
-      msg = `${command} - ${msg}`;
+      msg = `${command} [spawn] - ${msg}`;
     }
 
     // If the error was a well-formed JsonRPC error, then there's no reason to
     // include stdout: all the contents of stdout are presumably already in
     // the ResponseError object. Otherwise we should include stdout.
     if (!(error instanceof (_vscodeJsonrpc || _load_vscodeJsonrpc()).ResponseError) && this._childOut.stdout != null && this._childOut.stdout !== '') {
-      msg = `${msg} - ${this._childOut.stdout}`;
+      msg = `${msg} - ${this._childOut.stdout} [stdout]`;
     }
 
     // But we'll always want to show stderr stuff if there was any.
     if (this._childOut.stderr !== '') {
-      msg = `${msg} - ${this._childOut.stderr}`;
+      msg = `${msg} - ${this._childOut.stderr} [stderr]`;
     }
 
     return msg;

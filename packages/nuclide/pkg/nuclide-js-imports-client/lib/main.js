@@ -112,15 +112,15 @@ function createLanguageService() {
   };
 
   const autocompleteConfig = {
-    version: '2.0.0',
     inclusionPriority: 1,
     suggestionPriority: 3,
     excludeLowerPriority: false,
-    analyticsEventName: 'jsimports.getAutocompleteSuggestions',
+    analytics: {
+      eventName: 'nuclide-js-imports',
+      shouldLogInsertedSuggestion: false
+    },
     disableForSelector: null,
-    autocompleteCacherConfig: null,
-    onDidInsertSuggestionAnalyticsEventName: 'jsimports.autocomplete-chosen',
-    trackAdditionalInfo: false
+    autocompleteCacherConfig: null
   };
 
   const codeActionConfig = {
@@ -212,11 +212,12 @@ class Activation {
         }
       }
       // Then use nuclide-format-js to properly format the imports
+      const successfulEdits = (result || []).filter(function (edit) {
+        return edit.newText !== '';
+      });
       organizeRequires({
-        addedRequires: result != null,
-        missingExports: (result || []).find(function (edit) {
-          return edit.newText === '';
-        }) != null
+        addedRequires: successfulEdits.length > 0,
+        missingExports: successfulEdits.length !== (result || []).length
       });
       buffer.groupChangesSinceCheckpoint(beforeEditsCheckpoint);
     })));

@@ -45,13 +45,19 @@ function _load_FileTreeStore() {
 var _immutable;
 
 function _load_immutable() {
-  return _immutable = _interopRequireDefault(require('immutable'));
+  return _immutable = _interopRequireWildcard(require('immutable'));
 }
 
 var _nuclideAnalytics;
 
 function _load_nuclideAnalytics() {
   return _nuclideAnalytics = require('../../nuclide-analytics');
+}
+
+var _nullthrows;
+
+function _load_nullthrows() {
+  return _nullthrows = _interopRequireDefault(require('nullthrows'));
 }
 
 var _nuclideUri;
@@ -96,19 +102,24 @@ var _os = _interopRequireDefault(require('os'));
 
 var _electron = require('electron');
 
+function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
+
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
+/**
+ * Copyright (c) 2015-present, Facebook, Inc.
+ * All rights reserved.
+ *
+ * This source code is licensed under the license found in the LICENSE file in
+ * the root directory of this source tree.
+ *
+ * 
+ * @format
+ */
+
+const VALID_FILTER_CHARS = '!#./0123456789-:;?@ABCDEFGHIJKLMNOPQRSTUVWXYZ' + '_abcdefghijklmnopqrstuvwxyz~';
 // $FlowFixMe(>=0.53.0) Flow suppress
-const VALID_FILTER_CHARS = '!#./0123456789-:;?@ABCDEFGHIJKLMNOPQRSTUVWXYZ' + '_abcdefghijklmnopqrstuvwxyz~'; /**
-                                                                                                              * Copyright (c) 2015-present, Facebook, Inc.
-                                                                                                              * All rights reserved.
-                                                                                                              *
-                                                                                                              * This source code is licensed under the license found in the LICENSE file in
-                                                                                                              * the root directory of this source tree.
-                                                                                                              *
-                                                                                                              * 
-                                                                                                              * @format
-                                                                                                              */
+
 
 class ProjectSelectionManager {
 
@@ -133,8 +144,8 @@ class FileTreeController {
     this._actions = (_FileTreeActions || _load_FileTreeActions()).default.getInstance();
     this._store = (_FileTreeStore || _load_FileTreeStore()).FileTreeStore.getInstance();
     this._projectSelectionManager = new ProjectSelectionManager();
-    this._repositories = new (_immutable || _load_immutable()).default.Set();
-    this._disposableForRepository = new (_immutable || _load_immutable()).default.Map();
+    this._repositories = (_immutable || _load_immutable()).Set();
+    this._disposableForRepository = (_immutable || _load_immutable()).Map();
     this._disposables = new (_UniversalDisposable || _load_UniversalDisposable()).default(() => {
       if (this._cwdApiSubscription != null) {
         this._cwdApiSubscription.dispose();
@@ -425,7 +436,7 @@ class FileTreeController {
    */
   _collapseSelection(deep = false) {
     const selectedNodes = this._store.getSelectedNodes();
-    const firstSelectedNode = selectedNodes.first();
+    const firstSelectedNode = (0, (_nullthrows || _load_nullthrows()).default)(selectedNodes.first());
     if (selectedNodes.size === 1 && !firstSelectedNode.isRoot && !(firstSelectedNode.isContainer && firstSelectedNode.isExpanded)) {
       /*
        * Select the parent of the selection if the following criteria are met:
@@ -434,7 +445,7 @@ class FileTreeController {
        *   * The node is not an expanded directory
       */
 
-      const parent = firstSelectedNode.parent;
+      const parent = (0, (_nullthrows || _load_nullthrows()).default)(firstSelectedNode.parent);
       this._selectAndTrackNode(parent);
     } else {
       selectedNodes.forEach(node => {
@@ -489,9 +500,9 @@ class FileTreeController {
     } else {
       let message;
       if (rootPaths.size === 1) {
-        message = `The root directory '${rootPaths.first().nodeName}' can't be removed.`;
+        message = `The root directory '${(0, (_nullthrows || _load_nullthrows()).default)(rootPaths.first()).name}' can't be removed.`;
       } else {
-        const rootPathNames = rootPaths.map(node => `'${node.nodeName}'`).join(', ');
+        const rootPathNames = rootPaths.map(node => `'${node.name}'`).join(', ');
         message = `The root directories ${rootPathNames} can't be removed.`;
       }
 

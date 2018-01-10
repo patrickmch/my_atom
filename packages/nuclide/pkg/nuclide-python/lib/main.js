@@ -109,15 +109,15 @@ const atomConfig = {
     analyticsEventName: 'python.get-references'
   },
   autocomplete: {
-    version: '2.0.0',
     inclusionPriority: 5,
     suggestionPriority: 5, // Higher than the snippets provider.
     disableForSelector: '.source.python .comment, .source.python .string',
     excludeLowerPriority: false,
-    analyticsEventName: 'nuclide-python:getAutocompleteSuggestions',
-    autocompleteCacherConfig: null,
-    onDidInsertSuggestionAnalyticsEventName: 'nuclide-python.autocomplete-chosen',
-    trackAdditionalInfo: false
+    analytics: {
+      eventName: 'nuclide-python',
+      shouldLogInsertedSuggestion: false
+    },
+    autocompleteCacherConfig: null
   },
   definition: {
     version: '0.1.0',

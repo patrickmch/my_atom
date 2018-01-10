@@ -3,6 +3,7 @@
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
+exports.UNREGISTER_TASK_RUNNER = exports.TOGGLE_TOOLBAR_VISIBILITY = exports.TASK_ERRORED = exports.TASK_STOPPED = exports.TASK_STARTED = exports.TASK_MESSAGE = exports.TASK_PROGRESS = exports.TASK_COMPLETED = exports.TASKS_READY = exports.STOP_TASK = exports.SET_TOOLBAR_VISIBILITY = exports.REMOVE_CONSOLE_FOR_TASK_RUNNER = exports.ADD_CONSOLE_FOR_TASK_RUNNER = exports.SET_CONSOLES_FOR_TASK_RUNNERS = exports.SET_CONSOLE_SERVICE = exports.SET_PROJECT_ROOT = exports.SET_STATES_FOR_TASK_RUNNERS = exports.SET_STATE_FOR_TASK_RUNNER = exports.SELECT_TASK_RUNNER = exports.RUN_TASK = exports.REQUEST_TOGGLE_TOOLBAR_VISIBILITY = exports.REGISTER_TASK_RUNNER = exports.DID_ACTIVATE_INITIAL_PACKAGES = undefined;
 exports.didActivateInitialPackages = didActivateInitialPackages;
 exports.registerTaskRunner = registerTaskRunner;
 exports.runTask = runTask;
@@ -19,17 +20,27 @@ exports.stopTask = stopTask;
 exports.requestToggleToolbarVisibility = requestToggleToolbarVisibility;
 exports.toggleToolbarVisibility = toggleToolbarVisibility;
 exports.unregisterTaskRunner = unregisterTaskRunner;
-const DID_ACTIVATE_INITIAL_PACKAGES = exports.DID_ACTIVATE_INITIAL_PACKAGES = 'DID_ACTIVATE_INITIAL_PACKAGES'; /**
-                                                                                                                * Copyright (c) 2015-present, Facebook, Inc.
-                                                                                                                * All rights reserved.
-                                                                                                                *
-                                                                                                                * This source code is licensed under the license found in the LICENSE file in
-                                                                                                                * the root directory of this source tree.
-                                                                                                                *
-                                                                                                                * 
-                                                                                                                * @format
-                                                                                                                */
 
+var _immutable;
+
+function _load_immutable() {
+  return _immutable = _interopRequireWildcard(require('immutable'));
+}
+
+function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
+
+/**
+ * Copyright (c) 2015-present, Facebook, Inc.
+ * All rights reserved.
+ *
+ * This source code is licensed under the license found in the LICENSE file in
+ * the root directory of this source tree.
+ *
+ * 
+ * @format
+ */
+
+const DID_ACTIVATE_INITIAL_PACKAGES = exports.DID_ACTIVATE_INITIAL_PACKAGES = 'DID_ACTIVATE_INITIAL_PACKAGES';
 const REGISTER_TASK_RUNNER = exports.REGISTER_TASK_RUNNER = 'REGISTER_TASK_RUNNER';
 const REQUEST_TOGGLE_TOOLBAR_VISIBILITY = exports.REQUEST_TOGGLE_TOOLBAR_VISIBILITY = 'REQUEST_TOGGLE_TOOLBAR_VISIBILITY';
 const RUN_TASK = exports.RUN_TASK = 'RUN_TASK';

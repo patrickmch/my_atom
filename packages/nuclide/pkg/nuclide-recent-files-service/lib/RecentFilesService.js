@@ -4,6 +4,12 @@ Object.defineProperty(exports, "__esModule", {
   value: true
 });
 
+var _lruCache;
+
+function _load_lruCache() {
+  return _lruCache = _interopRequireDefault(require('lru-cache'));
+}
+
 var _UniversalDisposable;
 
 function _load_UniversalDisposable() {
@@ -26,7 +32,7 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
 class RecentFilesService {
   // Map uses `Map`'s insertion ordering to keep files in order.
   constructor(state) {
-    this._fileList = new Map();
+    this._fileList = (0, (_lruCache || _load_lruCache()).default)({ max: 100 });
     if (state != null && state.filelist != null) {
       // Serialized state is in reverse chronological order. Reverse it to insert items correctly.
       state.filelist.reduceRight((_, fileItem) => {
@@ -48,8 +54,6 @@ class RecentFilesService {
   }
 
   touchFile(path) {
-    // Delete first to force a new insertion.
-    this._fileList.delete(path);
     this._fileList.set(path, Date.now());
   }
 
@@ -57,10 +61,10 @@ class RecentFilesService {
    * Returns a reverse-chronological list of recently opened files.
    */
   getRecentFiles() {
-    return Array.from(this._fileList).reverse().map(pair => ({
+    return this._fileList.dump().map(({ k, v }) => ({
       resultType: 'FILE',
-      path: pair[0],
-      timestamp: pair[1]
+      path: k,
+      timestamp: v
     }));
   }
 

@@ -2290,7 +2290,7 @@ Object.defineProperty(module.exports, "defs", {
       location: {
         type: "source",
         fileName: "types.js",
-        line: 107
+        line: 115
       },
       name: "CompilationDatabaseParams",
       definition: {

@@ -19,7 +19,7 @@ function _load_constants() {
 var _immutable;
 
 function _load_immutable() {
-  return _immutable = _interopRequireDefault(require('immutable'));
+  return _immutable = _interopRequireWildcard(require('immutable'));
 }
 
 var _rxjsBundlesRxMinJs = require('rxjs/bundles/Rx.min.js');
@@ -50,6 +50,8 @@ function _load_nuclideAnalytics() {
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
+function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
+
 /**
  * Copyright (c) 2015-present, Facebook, Inc.
  * All rights reserved.
@@ -63,7 +65,7 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
 
 function getEmptBookShelfState() {
   return {
-    repositoryPathToState: (_immutable || _load_immutable()).default.Map()
+    repositoryPathToState: (_immutable || _load_immutable()).Map()
   };
 }
 
@@ -86,11 +88,11 @@ function deserializeBookShelfState(serializedBookShelfState) {
   if (serializedBookShelfState == null || serializedBookShelfState.repositoryPathToState == null) {
     return getEmptBookShelfState();
   }
-  const repositoryPathToState = (_immutable || _load_immutable()).default.Map(serializedBookShelfState.repositoryPathToState.map(([repositoryPath, repositoryState]) => {
+  const repositoryPathToState = (_immutable || _load_immutable()).Map(serializedBookShelfState.repositoryPathToState.map(([repositoryPath, repositoryState]) => {
     return [repositoryPath, {
       activeShortHead: repositoryState.activeShortHead,
       isRestoring: false,
-      shortHeadsToFileList: (_immutable || _load_immutable()).default.Map(repositoryState.shortHeadsToFileList)
+      shortHeadsToFileList: (_immutable || _load_immutable()).Map(repositoryState.shortHeadsToFileList)
     }];
   }));
   return {

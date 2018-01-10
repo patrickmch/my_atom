@@ -3211,8 +3211,8 @@ Object.defineProperty(module.exports, "defs", {
       kind: "alias",
       location: {
         type: "source",
-        fileName: "rpc-types.js",
-        line: 12
+        fileName: "types.js",
+        line: 53
       },
       name: "NuclideEvaluationExpression",
       definition: {

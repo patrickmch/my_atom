@@ -51,7 +51,7 @@ let createMultiLspLanguageService = exports.createMultiLspLanguageService = (() 
         // We're awaiting until AtomLanguageService has observed diagnostics (to
         // prevent race condition: see below).
 
-        const lsp = new (_LspLanguageService || _load_LspLanguageService()).LspLanguageService(logger, fileCache, (yield (0, (_nuclideLanguageServiceRpc || _load_nuclideLanguageServiceRpc()).forkHostServices)(params.host, logger)), languageId, command, args, params.spawnOptions, projectDir, params.fileExtensions, params.initializationOptions || {}, Number(params.additionalLogFilesRetentionPeriod));
+        const lsp = new (_LspLanguageService || _load_LspLanguageService()).LspLanguageService(logger, fileCache, (yield (0, (_nuclideLanguageServiceRpc || _load_nuclideLanguageServiceRpc()).forkHostServices)(params.host, logger)), languageId, command, args, params.spawnOptions, projectDir, params.fileExtensions, params.initializationOptions || {}, Number(params.additionalLogFilesRetentionPeriod), params.useOriginalEnvironment || false);
 
         lsp.start(); // Kick off 'Initializing'...
         return lsp;
@@ -69,7 +69,7 @@ let createMultiLspLanguageService = exports.createMultiLspLanguageService = (() 
       };
     })();
 
-    result.initialize(logger, fileCache, params.host, params.projectFileNames, params.fileExtensions, languageServiceFactory);
+    result.initialize(logger, fileCache, params.host, params.projectFileNames, params.projectFileSearchStrategy, params.fileExtensions, languageServiceFactory);
     return result;
   });
 

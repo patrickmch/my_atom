@@ -8,6 +8,18 @@ tries to follow the [Keep a CHANGELOG](http://keepachangelog.com) convention.
 
 *   ...
 
+## [v1.1.4](https://github.com/suda/tool-bar/compare/v1.1.3...v1.1.4) - 2018-01-09
+
+* Fixed [Touch Bar slowing down Atom when it's not supported](https://github.com/suda/tool-bar/issues/213) (by [@suda](https://github.com/suda))
+
+## [v1.1.3](https://github.com/suda/tool-bar/compare/v1.1.2...v1.1.3) - 2018-01-08
+
+* Fixed [Touch Bar flickering issue](https://github.com/suda/tool-bar/issues/212) (by [@suda](https://github.com/suda))
+
+## [v1.1.2](https://github.com/suda/tool-bar/compare/v1.1.1...v1.1.2) - 2018-01-07
+
+* Added Touch Bar support [PR #211](https://github.com/suda/tool-bar/pull/211) (by [@suda](https://github.com/suda))
+
 ## [v1.1.1](https://github.com/suda/tool-bar/compare/v1.1.0...v1.1.1) - 2018-01-03
 
 * Added example for multiple callbacks [PR #199](https://github.com/suda/tool-bar/pull/199) (by [@pheraph](https://github.com/pheraph))

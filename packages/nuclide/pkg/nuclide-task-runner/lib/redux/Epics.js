@@ -51,6 +51,12 @@ function _load_Actions() {
   return _Actions = _interopRequireWildcard(require('./Actions'));
 }
 
+var _immutable;
+
+function _load_immutable() {
+  return _immutable = _interopRequireWildcard(require('immutable'));
+}
+
 var _nullthrows;
 
 function _load_nullthrows() {
@@ -63,20 +69,18 @@ function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj;
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-/**
- * Copyright (c) 2015-present, Facebook, Inc.
- * All rights reserved.
- *
- * This source code is licensed under the license found in the LICENSE file in
- * the root directory of this source tree.
- *
- * 
- * @format
- */
-
 function setProjectRootEpic(actions, store) {
   return actions.ofType((_Actions || _load_Actions()).DID_ACTIVATE_INITIAL_PACKAGES).map(() => (_Actions || _load_Actions()).setProjectRoot(store.getState().projectRoot));
-}
+} /**
+   * Copyright (c) 2015-present, Facebook, Inc.
+   * All rights reserved.
+   *
+   * This source code is licensed under the license found in the LICENSE file in
+   * the root directory of this source tree.
+   *
+   * 
+   * @format
+   */
 
 function setProjectRootForNewTaskRunnerEpic(actions, store) {
   return actions.ofType((_Actions || _load_Actions()).REGISTER_TASK_RUNNER).switchMap(action => {
@@ -85,9 +89,9 @@ function setProjectRootForNewTaskRunnerEpic(actions, store) {
     }
 
     const { taskRunner } = action.payload;
-    const { projectRoot, taskRunnersReady } = store.getState();
+    const { projectRoot, initialPackagesActivated } = store.getState();
 
-    if (!taskRunnersReady) {
+    if (!initialPackagesActivated) {
       return _rxjsBundlesRxMinJs.Observable.empty();
     }
 
@@ -97,8 +101,8 @@ function setProjectRootForNewTaskRunnerEpic(actions, store) {
 
 function setConsolesForTaskRunnersEpic(actions, store) {
   return actions.ofType((_Actions || _load_Actions()).SET_CONSOLE_SERVICE, (_Actions || _load_Actions()).DID_ACTIVATE_INITIAL_PACKAGES).switchMap(() => {
-    const { consoleService, taskRunnersReady } = store.getState();
-    if (consoleService == null || !taskRunnersReady) {
+    const { consoleService, initialPackagesActivated } = store.getState();
+    if (consoleService == null || !initialPackagesActivated) {
       return _rxjsBundlesRxMinJs.Observable.empty();
     }
 
@@ -109,8 +113,8 @@ function setConsolesForTaskRunnersEpic(actions, store) {
 
 function addConsoleForTaskRunnerEpic(actions, store) {
   return actions.ofType((_Actions || _load_Actions()).REGISTER_TASK_RUNNER).switchMap(action => {
-    const { consoleService, taskRunnersReady } = store.getState();
-    if (consoleService == null || !taskRunnersReady) {
+    const { consoleService, initialPackagesActivated } = store.getState();
+    if (consoleService == null || !initialPackagesActivated) {
       return _rxjsBundlesRxMinJs.Observable.empty();
     }
 
@@ -126,8 +130,8 @@ function addConsoleForTaskRunnerEpic(actions, store) {
 
 function removeConsoleForTaskRunnerEpic(actions, store) {
   return actions.ofType((_Actions || _load_Actions()).UNREGISTER_TASK_RUNNER).switchMap(action => {
-    const { consoleService, taskRunnersReady } = store.getState();
-    if (consoleService == null || !taskRunnersReady) {
+    const { consoleService, initialPackagesActivated } = store.getState();
+    if (consoleService == null || !initialPackagesActivated) {
       return _rxjsBundlesRxMinJs.Observable.empty();
     }
 
@@ -140,7 +144,7 @@ function removeConsoleForTaskRunnerEpic(actions, store) {
 }
 
 function setActiveTaskRunnerEpic(actions, store, options) {
-  return actions.filter(action => action.type === (_Actions || _load_Actions()).SET_STATES_FOR_TASK_RUNNERS || action.type === (_Actions || _load_Actions()).UNREGISTER_TASK_RUNNER && action.payload.taskRunner === store.getState().activeTaskRunner).switchMap(action => {
+  return actions.filter(action => action.type === (_Actions || _load_Actions()).SET_STATES_FOR_TASK_RUNNERS || action.type === (_Actions || _load_Actions()).SET_STATE_FOR_TASK_RUNNER || action.type === (_Actions || _load_Actions()).UNREGISTER_TASK_RUNNER && action.payload.taskRunner === store.getState().activeTaskRunner).switchMap(action => {
     const { projectRoot } = store.getState();
 
     if (!projectRoot) {
@@ -194,15 +198,19 @@ function setActiveTaskRunnerEpic(actions, store, options) {
 
 function combineTaskRunnerStatesEpic(actions, store, options) {
   return actions.ofType((_Actions || _load_Actions()).SET_PROJECT_ROOT).switchMap(() => {
-    const { projectRoot, taskRunners, taskRunnersReady } = store.getState();
+    const {
+      projectRoot,
+      taskRunners,
+      initialPackagesActivated
+    } = store.getState();
 
-    if (!taskRunnersReady) {
+    if (!initialPackagesActivated) {
       // We will dispatch another set project root when everyone is ready.
       return _rxjsBundlesRxMinJs.Observable.empty();
     }
 
-    if (taskRunners.length === 0) {
-      return _rxjsBundlesRxMinJs.Observable.of((_Actions || _load_Actions()).setStatesForTaskRunners(new Map()));
+    if (taskRunners.count() === 0) {
+      return _rxjsBundlesRxMinJs.Observable.of((_Actions || _load_Actions()).setStatesForTaskRunners((_immutable || _load_immutable()).Map()));
     }
 
     const runnersAndStates = taskRunners.map(taskRunner => getTaskRunnerState(taskRunner, projectRoot));
@@ -216,7 +224,7 @@ function combineTaskRunnerStatesEpic(actions, store, options) {
           statesForTaskRunners.set(result.taskRunner, result.taskRunnerState);
         }
       });
-      return (_Actions || _load_Actions()).setStatesForTaskRunners(statesForTaskRunners);
+      return (_Actions || _load_Actions()).setStatesForTaskRunners((_immutable || _load_immutable()).Map(statesForTaskRunners));
     });
   });
 }

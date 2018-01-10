@@ -16,12 +16,10 @@ function _load_Actions() {
 var _immutable;
 
 function _load_immutable() {
-  return _immutable = _interopRequireDefault(require('immutable'));
+  return _immutable = _interopRequireWildcard(require('immutable'));
 }
 
 var _rxjsBundlesRxMinJs = require('rxjs/bundles/Rx.min.js');
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
 
@@ -36,7 +34,7 @@ function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj;
  * @format
  */
 
-function openTunnels(state = new (_immutable || _load_immutable()).default.Map(), action) {
+function openTunnels(state = (_immutable || _load_immutable()).Map(), action) {
   switch (action.type) {
     case (_Actions || _load_Actions()).ADD_OPEN_TUNNEL:
       const { close, tunnel } = action.payload;
