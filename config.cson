@@ -38,6 +38,10 @@
     app: "iTerm.app"
     setWorkingDirectory: false
     surpressDirectoryArgument: false
+  "autocomplete-plus":
+    backspaceTriggersAutocomplete: true
+    confirmCompletion: "tab"
+    moveToCancel: true
   "autocomplete-python":
     showTooltips: true
   core:

@@ -8,47 +8,9 @@
 #
 # You can create a new keybinding in this file by typing "key" and then hitting
 # tab.
-#
-# Here's an example taken from Atom's built-in keymap:
-#
-# 'atom-text-editor':
-#   'enter': 'editor:newline'
-#
-# 'atom-workspace':
-#   'ctrl-shift-p': 'core:move-up'
-#   'ctrl-p': 'core:move-down'
-#
-# You can find more information about keymaps in these guides:
-# * http://flight-manual.atom.io/using-atom/sections/basic-customization/#_customizing_keybindings
-# * http://flight-manual.atom.io/behind-atom/sections/keymaps-in-depth/
-#
-# If you're having trouble with your keybindings not working, try the
-# Keybinding Resolver: `Cmd+.` on macOS and `Ctrl+.` on other platforms. See the
-# Debugging Guide for more information:
-# * http://flight-manual.atom.io/hacking-atom/sections/debugging/#check-the-keybindings
-#
-# This file uses CoffeeScript Object Notation (CSON).
-# If you are unfamiliar with CSON, you can read more about it in the
-# Atom Flight Manual:
-# http://flight-manual.atom.io/using-atom/sections/basic-customization/#_cson
 
 'atom-text-editor':
-  # pane splitting
-  'cmd-k ctrl-left':'window:move-active-item-to-pane-on-left'
-  'cmd-k ctrl-right':'window:move-active-item-to-pane-on-right'
-  'cmd-k ctrl-up':'window:move-active-item-to-pane-above'
-  'cmd-k ctrl-down':'window:move-active-item-to-pane-below'
 
-  'cmd-k alt-left':'pane:split-left-and-move-active-item'
-  'cmd-k alt-right':'pane:split-right-and-move-active-item'
-  'cmd-k alt-up':'pane:split-up-and-move-active-item'
-  'cmd-k alt-down':'pane:split-down-and-move-active-item'
-
-  'cmd-k b': 'window:toggle-bottom-dock'
-  'cmd-k l': 'window:toggle-left-dock'
-  'cmd-k r': 'window:toggle-right-dock'
-
-  'shift-alt-k': 'hey-pane:toggle-follow-mode'
   'cmd-b': 'python-tools:goto-definition'
   'ctrl-alt-r':'pane:reopen-closed-item'
   'alt-shift-v': 'clipboard-plus:toggle'
@@ -60,6 +22,9 @@
   'shift-cmd-j': 'atom-notes:toggle'
   'shift-cmd-alt-t': 'markdown-writer:toggle-task'
   'shift-cmd-alt-x': 'markdown-writer:toggle-taskdone'
+  'alt-space': 'autocomplete-plus:confirm'
+
+  # movement
   'alt-down': 'line-jumper:move-down'
   'alt-shift-down': 'line-jumper:select-down'
   'alt-up': 'line-jumper:move-up'
@@ -67,8 +32,26 @@
   'alt-enter': 'jumpy:toggle'
   'ctrl-down': 'multi-cursor:expandDown'
   'ctrl-up':   'multi-cursor:expandUp'
+
+  # panes
   'ctrl->': 'pane:move-item-right'
   'ctrl-<': 'pane:move-item-left'
+
+  # pane splitting
+  'cmd-k ctrl-left':'window:move-active-item-to-pane-on-left'
+  'cmd-k ctrl-right':'window:move-active-item-to-pane-on-right'
+  'cmd-k ctrl-up':'window:move-active-item-to-pane-above'
+  'cmd-k ctrl-down':'window:move-active-item-to-pane-below'
+
+  'cmd-k alt-left':'pane:split-left-and-move-active-item'
+  'cmd-k alt-right':'pane:split-right-and-move-active-item'
+  'cmd-k alt-up':'pane:split-up-and-move-active-item'
+  'cmd-k alt-down':'pane:split-down-and-move-active-item'
+  'shift-alt-k': 'hey-pane:toggle-follow-mode'
+
+  'cmd-k b': 'window:toggle-bottom-dock'
+  'cmd-k l': 'window:toggle-left-dock'
+  'cmd-k r': 'window:toggle-right-dock'
 
   # Key bindings for multi-cursor-plus
   'ctrl-alt-x':           'multi-cursor-plus:mark'

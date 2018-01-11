@@ -175,9 +175,9 @@ Places custom checkboxes or radio buttons exist:
 
 12/27/2017
 It’s easy to forget how to include javascript resources in Django templates. Here is a reminder how:
-{% block extra_head %}
+`{% block extra_head %}
 {{ block.super }}
-<script type="text/javascript" src="{% static 'alumni/js/alumni.js' %}"></script>
+<script type="text/javascript" src="{% static 'alumni/js/alumni.js' %}"></script>`
 {% endblock %}
 
 12/28/2017
