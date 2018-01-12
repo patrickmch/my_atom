@@ -2,39 +2,39 @@
   "_args": [
     [
       {
-        "raw": "/private/var/folders/dp/vj05cwss7pz9mjl62ccqzysm0000gp/T/d-11804-15743-v8e777.tihl2i6bt9/package.tgz",
+        "raw": "/private/var/folders/dp/vj05cwss7pz9mjl62ccqzysm0000gp/T/d-118011-13465-npzkaa.s4zz4obt9/package.tgz",
         "scope": null,
         "escapedName": null,
         "name": null,
-        "rawSpec": "/private/var/folders/dp/vj05cwss7pz9mjl62ccqzysm0000gp/T/d-11804-15743-v8e777.tihl2i6bt9/package.tgz",
-        "spec": "/private/var/folders/dp/vj05cwss7pz9mjl62ccqzysm0000gp/T/d-11804-15743-v8e777.tihl2i6bt9/package.tgz",
+        "rawSpec": "/private/var/folders/dp/vj05cwss7pz9mjl62ccqzysm0000gp/T/d-118011-13465-npzkaa.s4zz4obt9/package.tgz",
+        "spec": "/private/var/folders/dp/vj05cwss7pz9mjl62ccqzysm0000gp/T/d-118011-13465-npzkaa.s4zz4obt9/package.tgz",
         "type": "local"
       },
-      "/private/var/folders/dp/vj05cwss7pz9mjl62ccqzysm0000gp/T/apm-install-dir-11804-15743-3sj2pn.6gz6y74x6r"
+      "/private/var/folders/dp/vj05cwss7pz9mjl62ccqzysm0000gp/T/apm-install-dir-118011-13465-qruiqq.chgil4bo6r"
     ]
   ],
-  "_from": "../d-11804-15743-v8e777.tihl2i6bt9/package.tgz",
-  "_id": "atom-notes@1.15.5",
+  "_from": "../d-118011-13465-npzkaa.s4zz4obt9/package.tgz",
+  "_id": "atom-notes@1.15.6",
   "_inCache": true,
   "_location": "/atom-notes",
   "_phantomChildren": {},
   "_requested": {
-    "raw": "/private/var/folders/dp/vj05cwss7pz9mjl62ccqzysm0000gp/T/d-11804-15743-v8e777.tihl2i6bt9/package.tgz",
+    "raw": "/private/var/folders/dp/vj05cwss7pz9mjl62ccqzysm0000gp/T/d-118011-13465-npzkaa.s4zz4obt9/package.tgz",
     "scope": null,
     "escapedName": null,
     "name": null,
-    "rawSpec": "/private/var/folders/dp/vj05cwss7pz9mjl62ccqzysm0000gp/T/d-11804-15743-v8e777.tihl2i6bt9/package.tgz",
-    "spec": "/private/var/folders/dp/vj05cwss7pz9mjl62ccqzysm0000gp/T/d-11804-15743-v8e777.tihl2i6bt9/package.tgz",
+    "rawSpec": "/private/var/folders/dp/vj05cwss7pz9mjl62ccqzysm0000gp/T/d-118011-13465-npzkaa.s4zz4obt9/package.tgz",
+    "spec": "/private/var/folders/dp/vj05cwss7pz9mjl62ccqzysm0000gp/T/d-118011-13465-npzkaa.s4zz4obt9/package.tgz",
     "type": "local"
   },
   "_requiredBy": [
     "#USER"
   ],
-  "_resolved": "file:../d-11804-15743-v8e777.tihl2i6bt9/package.tgz",
-  "_shasum": "3187ea87697eb6269a19cdf10871f27cb5e1329b",
+  "_resolved": "file:../d-118011-13465-npzkaa.s4zz4obt9/package.tgz",
+  "_shasum": "0fa11924f799863321f8e46638e24b79b69e90a9",
   "_shrinkwrap": null,
-  "_spec": "/private/var/folders/dp/vj05cwss7pz9mjl62ccqzysm0000gp/T/d-11804-15743-v8e777.tihl2i6bt9/package.tgz",
-  "_where": "/private/var/folders/dp/vj05cwss7pz9mjl62ccqzysm0000gp/T/apm-install-dir-11804-15743-3sj2pn.6gz6y74x6r",
+  "_spec": "/private/var/folders/dp/vj05cwss7pz9mjl62ccqzysm0000gp/T/d-118011-13465-npzkaa.s4zz4obt9/package.tgz",
+  "_where": "/private/var/folders/dp/vj05cwss7pz9mjl62ccqzysm0000gp/T/apm-install-dir-118011-13465-qruiqq.chgil4bo6r",
   "bugs": {
     "url": "https://github.com/lexicalunit/atom-notes/issues"
   },
@@ -104,5 +104,5 @@
     "generate": "all-contributors generate",
     "lint": "eslint ."
   },
-  "version": "1.15.5"
+  "version": "1.15.6"
 }

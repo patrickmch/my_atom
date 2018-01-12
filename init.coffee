@@ -31,3 +31,17 @@
 #       else
 #         panel.item.openSelectedEntry(pending: true, activatePane: false)
 #         return
+
+atom.commands.add 'atom-text-editor',
+  'custom:insert-space-keep-cursor-place': ->
+    editor = atom.workspace.getActiveTextEditor()
+    currentPosition = editor.getCursorBufferPosition()
+    editor.insertText('\u0020')
+    editor.setCursorBufferPosition(currentPosition)
+
+atom.commands.add 'atom-text-editor',
+  'custom:insert-tab-keep-cursor-place': ->
+    editor = atom.workspace.getActiveTextEditor()
+    currentPosition = editor.getCursorBufferPosition()
+    editor.insertText('\u0009')
+    editor.setCursorBufferPosition(currentPosition)

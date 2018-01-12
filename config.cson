@@ -40,8 +40,6 @@
     surpressDirectoryArgument: false
   "autocomplete-plus":
     backspaceTriggersAutocomplete: true
-    confirmCompletion: "tab"
-    moveToCancel: true
   "autocomplete-python":
     showTooltips: true
   core:
@@ -66,6 +64,7 @@
       "my-package"
       "my-package"
       "linter"
+      "emmet-simplified"
     ]
     excludeVcsIgnoredPaths: false
     packagesWithKeymapsDisabled: [
@@ -73,6 +72,7 @@
       "line-jumper"
       "atom-css-class-checker"
       "emmet-simplified"
+      "ctrl-dir-scroll"
     ]
     telemetryConsent: "limited"
     themes: [
@@ -113,6 +113,9 @@
         enabled: false
       yapf:
         enabled: false
+  jumpy:
+    fontSize: 1
+    highContrast: true
   "keybinding-cheatsheet": {}
   kite:
     enableCompletions: false
@@ -144,7 +147,10 @@
   nuclide:
     hyperclick:
       darwinTriggerKeys: "altKey,metaKey"
-    "nuclide-definition-preview": {}
+    "nuclide-code-search":
+      tool: "ag"
+    "nuclide-definition-preview":
+      editorHeight: 60
     "nuclide-distraction-free-mode":
       hideFindAndReplace: true
       hideStatusBar: true

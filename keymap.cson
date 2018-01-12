@@ -11,9 +11,9 @@
 
 'atom-text-editor':
 
-  'cmd-b': 'python-tools:goto-definition'
+  # 'cmd-b': 'python-tools:goto-definition'
   'ctrl-alt-r':'pane:reopen-closed-item'
-  'alt-shift-v': 'clipboard-plus:toggle'
+  # 'alt-shift-v': 'clipboard-plus:toggle'
   'cmd-shift-e': 'platformio-ide-terminal:fullscreen'
   'alt-/': 'advanced-open-file:delete-path-component'
   'cmd-q cmd-q': 'application:quit'
@@ -22,7 +22,11 @@
   'shift-cmd-j': 'atom-notes:toggle'
   'shift-cmd-alt-t': 'markdown-writer:toggle-task'
   'shift-cmd-alt-x': 'markdown-writer:toggle-taskdone'
-  'alt-space': 'autocomplete-plus:confirm'
+  'alt-w': 'ctrl-dir-scroll:scroll-up'
+  'alt-s': 'ctrl-dir-scroll:scroll-down'
+  'alt-shift-s': 'ctrl-dir-scroll:scroll-down-big'
+  'alt-shift-w': 'ctrl-dir-scroll:scroll-up-big'
+  'alt': 'autocomplete-plus:cancel'
 
   # movement
   'alt-down': 'line-jumper:move-down'
@@ -75,3 +79,7 @@
   'ctrl-:': 'emmet:remove-tag'
   'ctrl-w': 'emmet:wrap-with-abbreviation'
   'shift-space': 'emmet:expand-abbreviation-with-tab'
+
+  # custom
+  'alt-space': 'custom:insert-space-keep-cursor-place'
+  'ctrl-alt-space': 'custom:insert-tab-keep-cursor-place'

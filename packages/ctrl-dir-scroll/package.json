@@ -1,0 +1,65 @@
+{
+  "_args": [
+    [
+      {
+        "raw": "/private/var/folders/dp/vj05cwss7pz9mjl62ccqzysm0000gp/T/d-118011-8767-lkbjfi.cilg8yf1or/package.tgz",
+        "scope": null,
+        "escapedName": null,
+        "name": null,
+        "rawSpec": "/private/var/folders/dp/vj05cwss7pz9mjl62ccqzysm0000gp/T/d-118011-8767-lkbjfi.cilg8yf1or/package.tgz",
+        "spec": "/private/var/folders/dp/vj05cwss7pz9mjl62ccqzysm0000gp/T/d-118011-8767-lkbjfi.cilg8yf1or/package.tgz",
+        "type": "local"
+      },
+      "/private/var/folders/dp/vj05cwss7pz9mjl62ccqzysm0000gp/T/apm-install-dir-118011-8767-t8ary0.82sqo20529"
+    ]
+  ],
+  "_from": "../d-118011-8767-lkbjfi.cilg8yf1or/package.tgz",
+  "_id": "ctrl-dir-scroll@0.2.5",
+  "_inCache": true,
+  "_location": "/ctrl-dir-scroll",
+  "_phantomChildren": {},
+  "_requested": {
+    "raw": "/private/var/folders/dp/vj05cwss7pz9mjl62ccqzysm0000gp/T/d-118011-8767-lkbjfi.cilg8yf1or/package.tgz",
+    "scope": null,
+    "escapedName": null,
+    "name": null,
+    "rawSpec": "/private/var/folders/dp/vj05cwss7pz9mjl62ccqzysm0000gp/T/d-118011-8767-lkbjfi.cilg8yf1or/package.tgz",
+    "spec": "/private/var/folders/dp/vj05cwss7pz9mjl62ccqzysm0000gp/T/d-118011-8767-lkbjfi.cilg8yf1or/package.tgz",
+    "type": "local"
+  },
+  "_requiredBy": [
+    "#USER"
+  ],
+  "_resolved": "file:../d-118011-8767-lkbjfi.cilg8yf1or/package.tgz",
+  "_shasum": "c13d63d9261c0cdb6c835b9f97a90e8dca2d4d6b",
+  "_shrinkwrap": null,
+  "_spec": "/private/var/folders/dp/vj05cwss7pz9mjl62ccqzysm0000gp/T/d-118011-8767-lkbjfi.cilg8yf1or/package.tgz",
+  "_where": "/private/var/folders/dp/vj05cwss7pz9mjl62ccqzysm0000gp/T/apm-install-dir-118011-8767-t8ary0.82sqo20529",
+  "activationCommands": {
+    "atom-text-editor": [
+      "ctrl-dir-scroll:scroll-up",
+      "ctrl-dir-scroll:scroll-down"
+    ]
+  },
+  "bugs": {
+    "url": "https://github.com/callum-ramage/ctrl-dir-scroll/issues"
+  },
+  "dependencies": {},
+  "description": "Imitates the Line Up/Down behaviour from Sublime text",
+  "devDependencies": {},
+  "engines": {
+    "atom": ">0.50.0"
+  },
+  "homepage": "https://github.com/callum-ramage/ctrl-dir-scroll#readme",
+  "license": "MIT",
+  "main": "./lib/ctrl-dir-scroll",
+  "name": "ctrl-dir-scroll",
+  "optionalDependencies": {},
+  "readme": "# ctrl-dir-scroll package\n\nThis project is an [Atom](http://atom.io/) package.\n\nIt's meant to reproduce the Line Up/Down functionality of [Sublime](http://www.sublimetext.com/) and SCI_LINESCROLLUP/DOWN functionality from [Notepad++](http://notepad-plus-plus.org/)\n\nThe desired behaviour is to have `Ctrl-Up` (`Ctrl-Alt-Up` on Mac) scroll the page a single line up, leaving the cursor in place.\nThe same should happen for `Ctrl-Down` (`Ctrl-Alt-Up` on Mac) but in the opposite direction.\n\nYou can also use `Ctrl-Shift-Up/Down` (`Ctrl-Alt-Shift-Up/Down` on Mac) to move 10 lines at a time (amount of lines configurable).\n\nWhen the cursor reaches the end of the page, it should scroll a single line as well to prevent it moving off the page (this can be disabled in settings).\n\nAlso have a look at [line-jumper](https://atom.io/packages/line-jumper) which allows you to move the cursor 10 lines at a time.\n\nAtom version 1.0 compliant thanks to [harai](https://github.com/harai)\nMultiple line jumping thanks to [kankaristo](https://github.com/kankaristo)\n",
+  "readmeFilename": "README.md",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/callum-ramage/ctrl-dir-scroll.git"
+  },
+  "version": "0.2.5"
+}

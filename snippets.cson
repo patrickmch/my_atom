@@ -26,7 +26,7 @@
 
 '.html.django':
   'Insert {%%}':
-    'prefix': '%%'
+    'prefix': '%'
     'body': '{% $1 %}$2'
 
   'Insert {{  }}':
