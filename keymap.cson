@@ -27,6 +27,7 @@
   'alt-shift-s': 'ctrl-dir-scroll:scroll-down-big'
   'alt-shift-w': 'ctrl-dir-scroll:scroll-up-big'
   'alt': 'autocomplete-plus:cancel'
+  'ctrl-cmd-left': 'editor:delete-line'
 
   # movement
   'alt-down': 'line-jumper:move-down'
@@ -83,3 +84,5 @@
   # custom
   'alt-space': 'custom:insert-space-keep-cursor-place'
   'ctrl-alt-space': 'custom:insert-tab-keep-cursor-place'
+  'ctrl-cmd-up': 'my:move-line-up'
+  'ctrl-cmd-down': 'my:move-line-down'

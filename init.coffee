@@ -32,6 +32,7 @@
 #         panel.item.openSelectedEntry(pending: true, activatePane: false)
 #         return
 
+# Adds space chars without moving the cursor
 atom.commands.add 'atom-text-editor',
   'custom:insert-space-keep-cursor-place': ->
     editor = atom.workspace.getActiveTextEditor()
@@ -43,5 +44,24 @@ atom.commands.add 'atom-text-editor',
   'custom:insert-tab-keep-cursor-place': ->
     editor = atom.workspace.getActiveTextEditor()
     currentPosition = editor.getCursorBufferPosition()
-    editor.insertText('\u0009')
+    editor.insertText('\u0020\u0020')
     editor.setCursorBufferPosition(currentPosition)
+
+# Better support for inde
+atom.commands.add 'atom-text-editor', 'my:move-line-up', ->
+  editor = atom.workspace.getActiveTextEditor()
+  if atom.config.get('editor.autoIndent')
+    atom.config.set('editor.autoIndent', false)
+    editor.moveLineUp()
+    atom.config.set('editor.autoIndent', true)
+  else
+    editor.moveLineUp()
+
+atom.commands.add 'atom-text-editor', 'my:move-line-down', ->
+  editor = atom.workspace.getActiveTextEditor()
+  if atom.config.get('editor.autoIndent')
+    atom.config.set('editor.autoIndent', false)
+    editor.moveLineDown()
+    atom.config.set('editor.autoIndent', true)
+  else
+    editor.moveLineDown()

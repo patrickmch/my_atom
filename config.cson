@@ -64,7 +64,6 @@
       "my-package"
       "my-package"
       "linter"
-      "emmet-simplified"
     ]
     excludeVcsIgnoredPaths: false
     packagesWithKeymapsDisabled: [
