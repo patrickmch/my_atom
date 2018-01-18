@@ -28,6 +28,7 @@
   'alt-shift-w': 'ctrl-dir-scroll:scroll-up-big'
   'alt': 'autocomplete-plus:cancel'
   'ctrl-cmd-left': 'editor:delete-line'
+  'ctrl-cmd-right': 'editor:delete-to-end-of-line'
 
   # movement
   'alt-down': 'line-jumper:move-down'
@@ -35,6 +36,7 @@
   'alt-up': 'line-jumper:move-up'
   'alt-shift-up': 'line-jumper:select-up'
   'alt-enter': 'jumpy:toggle'
+  'shift': 'jumpy:clear'
   'ctrl-down': 'multi-cursor:expandDown'
   'ctrl-up':   'multi-cursor:expandUp'
 
@@ -58,8 +60,12 @@
   'cmd-k l': 'window:toggle-left-dock'
   'cmd-k r': 'window:toggle-right-dock'
 
+  # Cursor
+  'alt-,': 'last-cursor-position:previous'
+  'alt-.': 'last-cursor-position:next'
+
   # Key bindings for multi-cursor-plus
-  'ctrl-alt-x':           'multi-cursor-plus:mark'
+  'alt-x':           'multi-cursor-plus:mark'
   'ctrl-alt-up':          'multi-cursor-plus:move-up'
   'ctrl-alt-down':        'multi-cursor-plus:move-down'
   'ctrl-alt-left':        'multi-cursor-plus:move-left'
@@ -86,3 +92,54 @@
   'ctrl-alt-space': 'custom:insert-tab-keep-cursor-place'
   'ctrl-cmd-up': 'my:move-line-up'
   'ctrl-cmd-down': 'my:move-line-down'
+
+
+# vim mode keybindings:
+
+'atom-text-editor.vim-mode-plus:not(.normal-mode)':
+  'j k': 'vim-mode-plus:activate-normal-mode'
+
+'atom-text-editor.vim-mode-plus.insert-mode':
+  'j k': 'vim-mode-plus:activate-normal-mode'
+  'cmd-enter': 'editor:newline-below'
+
+'.advanced-open-file atom-text-editor':
+  'ctrl-k': 'advanced-open-file:move-cursor-up'
+  'ctrl-j': 'advanced-open-file:move-cursor-down'
+
+'atom-text-editor:not(.mini).vim-mode-plus:not(.insert-mode):not(.jumpy-jump-mode), .tree-view':
+  'K': 'jumpy:toggle'
+  'shift': 'jumpy:clear'
+
+# 'atom-text-editor.vim-mode-plus-input-char-waiting':
+  # 'j k': 'core:cancel'
+
+# 'atom-text-editor.vim-mode-plus':
+#   'j k': 'vim-mode-plus:reset-normal-mode'
+
+'atom-text-editor.vim-mode-plus:not(.insert-mode)':
+  'cmd-enter': 'editor:newline-below'
+
+  'alt-j': 'line-jumper:move-down'
+  'alt-k': 'line-jumper:move-up'
+  'ctrl-cmd-k': 'my:move-line-up'
+  'ctrl-cmd-j': 'my:move-line-down'
+
+  # Key bindings for multi-cursor-plus
+  'alt-x':          'multi-cursor-plus:mark'
+  'ctrl-alt-k':         'multi-cursor-plus:move-up'
+  'ctrl-alt-j':       'multi-cursor-plus:move-down'
+  'ctrl-alt-h':       'multi-cursor-plus:move-left'
+  'ctrl-alt-l':      'multi-cursor-plus:move-right'
+  'ctrl-alt-cmd-h':   'multi-cursor-plus:move-to-beginning-of-word'
+  'ctrl-alt-cmd-l':  'multi-cursor-plus:move-to-end-of-word'
+
+  'ctrl-j': 'multi-cursor:expandDown'
+  'ctrl-k': 'multi-cursor:expandUp'
+
+  ')': 'unset!'
+  '(': 'unset!'
+  '}': 'unset!'
+  '{': 'unset!'
+  '<': 'vim-mode-plus:previous-tab'
+  '>': 'vim-mode-plus:next-tab'

@@ -44,10 +44,10 @@ atom.commands.add 'atom-text-editor',
   'custom:insert-tab-keep-cursor-place': ->
     editor = atom.workspace.getActiveTextEditor()
     currentPosition = editor.getCursorBufferPosition()
-    editor.insertText('\u0020\u0020')
+    editor.insertText('\u0020\u0020\u0020\u0020')
     editor.setCursorBufferPosition(currentPosition)
 
-# Better support for inde
+# Better support for indent (from https://github.com/atom/atom/pull/9104)
 atom.commands.add 'atom-text-editor', 'my:move-line-up', ->
   editor = atom.workspace.getActiveTextEditor()
   if atom.config.get('editor.autoIndent')

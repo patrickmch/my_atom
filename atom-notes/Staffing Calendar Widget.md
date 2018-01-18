@@ -36,6 +36,7 @@ The implementation will likely entail:
 - blackout_date_details is a CharField and I probably don't need to modify it for now just the widget
 - Django has a [HiddenInput and MultipleHiddenInput type][0f720fa3]
 - Because we use the std_form_layout to render this form, it will prove difficult to customize. It might entail a custom widget after all.
+- The page is at https://localhost:8888/portal/staffing/wrap/submit/
 
   [cf52e38d]: https://fullcalendar.io "fullcalendar"
   [14c024d0]: https://github.com/NationalOutdoorLeadershipSchool/website/issues/125 "ticket"

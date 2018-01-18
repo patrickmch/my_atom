@@ -25,13 +25,13 @@
       'body': 'HELLO TO YOU'
 
 '.html.django':
-  'Insert {%%}':
-    'prefix': '%'
-    'body': '{% $1 %}$2'
+  'Insert {% %}':
+    'prefix': '??'
+    'body': '$2{% $1 %}'
 
   'Insert {{  }}':
-    'prefix': '}'
-    'body': '{{ $1 }}$2'
+    'prefix': '?'
+    'body': '$2{{ $1 }}'
 
 
 '.source.python':

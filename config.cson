@@ -43,10 +43,12 @@
   "autocomplete-python":
     showTooltips: true
   core:
+    audioBeep: false
     customFileTypes:
       "source.ini": [
         ".buckconfig"
         ".hgrc"
+        ".flowconfig"
       ]
       "source.json": [
         "BUCK.autodeps"
@@ -72,6 +74,7 @@
       "atom-css-class-checker"
       "emmet-simplified"
       "ctrl-dir-scroll"
+      "jumpy"
     ]
     telemetryConsent: "limited"
     themes: [
@@ -81,6 +84,7 @@
   editor:
     fontFamily: "Source Code Pro for Powerline"
     fontSize: 17
+    nonWordCharacters: "/\\()\"':,.;<>~!@#$%^&*|+=[]{}`?…"
     preferredLineLength: 100
     showIndentGuide: true
     showInvisibles: true
@@ -113,7 +117,7 @@
       yapf:
         enabled: false
   jumpy:
-    fontSize: 1
+    fontSize: 0.9
     highContrast: true
   "keybinding-cheatsheet": {}
   kite:
@@ -166,6 +170,10 @@
       "nuclide-buck": false
       "nuclide-buck-ios": false
       "nuclide-clang": false
+      "nuclide-console": false
+      "nuclide-cquery-lsp": false
+      "nuclide-debugger-php": false
+      "nuclide-debugger-vsp": false
   "platformio-ide-terminal":
     ansiColors:
       normal:
@@ -189,12 +197,19 @@
   "split-diff":
     colors:
       overrideThemeColors: true
+    diffWords: true
+    ignoreWhitespace: true
+    leftEditorColor: "red"
+    rightEditorColor: "green"
+    scrollSyncType: "Vertical + Horizontal"
   "tool-bar":
     iconSize: "12px"
     position: "Bottom"
     visible: false
   "tool-bar-markdown-writer":
     visibility: "showToolbarOnMarkdown"
+  "vim-mode-plus":
+    smoothScrollOnMiniScroll: true
 ".reason.source":
   editor:
     preferredLineLength: 110
