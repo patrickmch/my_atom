@@ -163,6 +163,7 @@ class Call {
   cleanup() {
     if (!this._complete) {
       this._complete = true;
+      // $FlowFixMe
       clearTimeout(this._timerId);
       this._timerId = null;
       this._cleanup();

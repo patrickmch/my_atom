@@ -231,7 +231,7 @@ class Activation {
         throw new Error('callback invoked after package deactivated');
       }
 
-      pkg._actionCreators.setProjectRoot(directory);
+      pkg._actionCreators.setProjectRoot(directory == null ? null : directory.getPath());
     });
     this._disposables.add(cwdSubscription, () => {
       pkg = null;
@@ -287,8 +287,16 @@ class Activation {
   }
 
   consumeConsole(service) {
+    let pkg = this;
+    this._disposables.add(() => {
+      pkg = null;
+    });
     this._actionCreators.setConsoleService(service);
-    return new _atom.Disposable(() => this._actionCreators.setConsoleService(null));
+    return new _atom.Disposable(() => {
+      if (pkg != null) {
+        pkg._actionCreators.setConsoleService(null);
+      }
+    });
   }
 
   provideTaskRunnerServiceApi() {

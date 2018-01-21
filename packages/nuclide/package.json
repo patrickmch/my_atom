@@ -2,39 +2,39 @@
   "_args": [
     [
       {
-        "raw": "/private/var/folders/dp/vj05cwss7pz9mjl62ccqzysm0000gp/T/d-118010-91909-1b1ccah.zao2z0vn29/package.tgz",
+        "raw": "/private/var/folders/dp/vj05cwss7pz9mjl62ccqzysm0000gp/T/d-118018-99680-zs276y.ylfwhwu3di/package.tgz",
         "scope": null,
         "escapedName": null,
         "name": null,
-        "rawSpec": "/private/var/folders/dp/vj05cwss7pz9mjl62ccqzysm0000gp/T/d-118010-91909-1b1ccah.zao2z0vn29/package.tgz",
-        "spec": "/private/var/folders/dp/vj05cwss7pz9mjl62ccqzysm0000gp/T/d-118010-91909-1b1ccah.zao2z0vn29/package.tgz",
+        "rawSpec": "/private/var/folders/dp/vj05cwss7pz9mjl62ccqzysm0000gp/T/d-118018-99680-zs276y.ylfwhwu3di/package.tgz",
+        "spec": "/private/var/folders/dp/vj05cwss7pz9mjl62ccqzysm0000gp/T/d-118018-99680-zs276y.ylfwhwu3di/package.tgz",
         "type": "local"
       },
-      "/private/var/folders/dp/vj05cwss7pz9mjl62ccqzysm0000gp/T/apm-install-dir-118010-91909-1hcftpr.nfhmjwcdi"
+      "/private/var/folders/dp/vj05cwss7pz9mjl62ccqzysm0000gp/T/apm-install-dir-118018-99680-1c570r7.35pa79o1or"
     ]
   ],
-  "_from": "../d-118010-91909-1b1ccah.zao2z0vn29/package.tgz",
-  "_id": "nuclide@0.275.0",
+  "_from": "../d-118018-99680-zs276y.ylfwhwu3di/package.tgz",
+  "_id": "nuclide@0.277.0",
   "_inCache": true,
   "_location": "/nuclide",
   "_phantomChildren": {},
   "_requested": {
-    "raw": "/private/var/folders/dp/vj05cwss7pz9mjl62ccqzysm0000gp/T/d-118010-91909-1b1ccah.zao2z0vn29/package.tgz",
+    "raw": "/private/var/folders/dp/vj05cwss7pz9mjl62ccqzysm0000gp/T/d-118018-99680-zs276y.ylfwhwu3di/package.tgz",
     "scope": null,
     "escapedName": null,
     "name": null,
-    "rawSpec": "/private/var/folders/dp/vj05cwss7pz9mjl62ccqzysm0000gp/T/d-118010-91909-1b1ccah.zao2z0vn29/package.tgz",
-    "spec": "/private/var/folders/dp/vj05cwss7pz9mjl62ccqzysm0000gp/T/d-118010-91909-1b1ccah.zao2z0vn29/package.tgz",
+    "rawSpec": "/private/var/folders/dp/vj05cwss7pz9mjl62ccqzysm0000gp/T/d-118018-99680-zs276y.ylfwhwu3di/package.tgz",
+    "spec": "/private/var/folders/dp/vj05cwss7pz9mjl62ccqzysm0000gp/T/d-118018-99680-zs276y.ylfwhwu3di/package.tgz",
     "type": "local"
   },
   "_requiredBy": [
     "#USER"
   ],
-  "_resolved": "file:../d-118010-91909-1b1ccah.zao2z0vn29/package.tgz",
-  "_shasum": "3a3be37dd1da217ac85696e8c5aa142997cbfa08",
+  "_resolved": "file:../d-118018-99680-zs276y.ylfwhwu3di/package.tgz",
+  "_shasum": "0a47dc1bfed24f689ecc1aaca80b3d8adfb58aaa",
   "_shrinkwrap": null,
-  "_spec": "/private/var/folders/dp/vj05cwss7pz9mjl62ccqzysm0000gp/T/d-118010-91909-1b1ccah.zao2z0vn29/package.tgz",
-  "_where": "/private/var/folders/dp/vj05cwss7pz9mjl62ccqzysm0000gp/T/apm-install-dir-118010-91909-1hcftpr.nfhmjwcdi",
+  "_spec": "/private/var/folders/dp/vj05cwss7pz9mjl62ccqzysm0000gp/T/d-118018-99680-zs276y.ylfwhwu3di/package.tgz",
+  "_where": "/private/var/folders/dp/vj05cwss7pz9mjl62ccqzysm0000gp/T/apm-install-dir-118018-99680-1c570r7.35pa79o1or",
   "atomTestRunner": "./lib/test-runner-entry.js",
   "bin": {
     "nuclide-start-server": "./pkg/nuclide-server/nuclide-start-server"
@@ -83,13 +83,13 @@
     "lodash": "4.17.4",
     "log4js": "1.1.1",
     "lru-cache": "4.0.2",
-    "marked": "0.3.6",
+    "marked": "0.3.9",
     "mime-types": "2.1.16",
     "minimatch": "3.0.4",
     "mkdirp": "0.5.1",
     "mv": "2.1.1",
     "node-fetch": "1.6.3",
-    "nuclide-prebuilt-libs": "0.3.2",
+    "nuclide-prebuilt-libs": "0.3.3",
     "nullthrows": "1.0.0",
     "plist": "2.0.1",
     "q": "1.4.1",
@@ -171,7 +171,7 @@
     "eslint-plugin-prettier": "2.3.1",
     "eslint-plugin-react": "7.4.0",
     "eslint-plugin-rulesdir": "0.1.0",
-    "flow-bin": "0.61.0",
+    "flow-bin": "0.63.1",
     "fs-extra": "2.0.0",
     "jasmine-node": "1.14.5",
     "mock-spawn": "0.2.6",
@@ -243,7 +243,7 @@
     "test": "npm run lint-all && npm run flow"
   },
   "urlMain": "./lib/url-main-entry.js",
-  "version": "0.275.0",
+  "version": "0.277.0",
   "warnings": [
     {
       "code": "ENOTSUP",
@@ -251,7 +251,7 @@
         "atom": ">=1.23.2",
         "node": ">=7.4.0"
       },
-      "pkgid": "nuclide@0.275.0"
+      "pkgid": "nuclide@0.277.0"
     },
     {
       "code": "ENOTSUP",
@@ -259,7 +259,7 @@
         "atom": ">=1.23.2",
         "node": ">=7.4.0"
       },
-      "pkgid": "nuclide@0.275.0"
+      "pkgid": "nuclide@0.277.0"
     }
   ],
   "workspaces": [

@@ -1,90 +1,91 @@
-{% load widget_tweaks field_initial input_type %}
-{% load widget_tools %}
-{% load mathfilters %}
+{% load static from staticfiles %}
 
-{% if form.errors %} 
-    {% if not form.group_errorlists %} 
-        {% if hide_form_level_error_header %} 
-            {% if form.non_field_errors %} 
-                <div class="form-group"> 
-                    <div data-closable class="column small-10 alert callout"> 
-                        <button type="button" class="close-button" data-close aria-label="Dismiss alert"> 
-                            <span aria-hidden="true">&times;</span> 
-                        </button> 
-                        {{ form.non_field_errors }} 
-                    </div> 
-                </div> 
-            {% endif %} 
-        {% else %}
-            <div class="form-group">
-                <div data-closable class="column small-10 alert callout">
-                    <button type="button" class="close-button" data-close aria-label="Dismiss alert">
-                        <span aria-hidden="true">&times;</span>
-                    </button> 
-                    <p class="errorlist">There is an error, please correct the appropriate field(s).<p> 
-                    {{ form.non_field_errors }} 
-                </div> 
-            </div> 
-        {% endif %} 
-    {% endif %} 
-{% endif %}
+<form id="payment" action="." method="post" autocomplete="off" class="form-horizontal">
 
-{% for field in form %}
-    {% if field.field.custom_template %}
-        {% include field.field.custom_template %}
-    {% elif field.is_hidden %}
-        {{ field }}
-    {% elif not field.field.is_custom_render %}
-        {% if field.field.is_collapsed %}
-            <div id="id_{{ field.html_name }}_collapse" class="hide" data-toggler=".hide">
-        {% endif %}
-        <div class="fieldwrapper form-group{% if use_feedback %} has-feedback{% endif %}{% if field.errors %} error{% endif %}">
-        {% if field.errors and not right_errors %}
-            {% include 'dataentry/fragments/error_form_layout.html' %}
-        {% endif %}
-        {% if field|is_checkbox %}
-            {% include 'dataentry/fragments/checkbox_form_layout.html' %}
-        {% elif field|is_radio %}
-            {% include 'dataentry/fragments/radio_form_layout.html' %}
-        {% else %}
-          {% include 'dataentry/fragments/general_input_form_layout.html' %}
-        {% endif %}
-        </div>
-        <div class="clearfix"></div>
-        {% if field.field.detail_text %}
-            {% include 'dataentry/fragments/detail_text.html' %}
-        {% endif %}
-        {% if field.field.is_collapsed %}
-            </div><!--{{ field.name }}_collapse -->
-            {% if field.name == 'name_suffix' %}
-                <div class="form-group">
-                    <div class="column small-12">
-                        <a class="name_collapse" data-toggle="id_{{ field.html_name }}_collapse">
-                            {% if name_field_button_text %}
-                                {{ name_field_button_text|safe }}
-                            {% else %}
-                                Show
-                                <span id='{{ form_name }}more-less'>
-                                    more
-                                </span>
-                                name fields (e.g. preferred name, suffix).
-                            {% endif %}
-                        </a>
-                    </div>
-                </div>
-                <script>
-                    $('.{{ form_name }}_field_collapse').on('show.bs.collapse', function() {
-                        $('#{{form_name}}more-less')[0].innerHTML = 'fewer'
-                    })
-                    $('.{{ form_name }}_field_collapse').on('hide.bs.collapse', function() {
-                        $('#{{form_name }}more-less')[0].innerHTML = 'more'
-                    })
-                </script>
-            {% endif %}
-        {% endif %}
+    {# Visa/MC logos #}
+    <p class="normal">
+        <label>&nbsp;<img src="{% static "payment/img/logo_ccVisa.gif" %}" alt="Visa accepted"/>
+            <img src="{% static "payment/img/logo_ccMC.gif" %}" alt="MasterCard accepted"/></label>
+        <span class="subtle">Visa &amp; MasterCard accepted</span>
+    </p>
+
+    {# Display testmode information if needed, including fake cc data #}
+    {% if testmode %}
+        <div style="color:red;">{{ testmode|safe }}</div>
     {% endif %}
-{% endfor %}
 
-{% if not hide_csrf_token %}
-{% csrf_token %}
-{% endif %}
+	{% if form.errors or contact_form.errors %}
+    <div data-closable class="row callout alert">
+      <button type="button" class="close-button" data-close data-dismiss="alert" aria-hidden="true">&times</button>
+    	<p class="errorlist">There is an error, please correct the appropriate field(s).<p>
+	    {{ contact_form.non_field_errors }}
+	    {{ form.non_field_errors }}
+        </p>
+    </div>
+	{% endif %}
+
+    {# Cardholder name and card data #}
+    {% if testmode %}
+      <!-- For Sandbox/Testing use -->
+      <script type="text/javascript" src="https://jstest.authorize.net/v1/Accept.js" charset="utf-8"></script>
+      <script type="text/javascript">var forceDelay = false;</script>
+    {% else %}
+      <script type="text/javascript" src="https://js.authorize.net/v1/Accept.js" charset="utf-8"></script>
+      <script type="text/javascript">var forceDelay = true;</script>
+    {% endif %}
+    <script src="{% static 'payment/js/authorize.js' %}"></script>
+    {% include 'payment/credit_card_info.html' %}
+
+    {# Address form #}
+    {% if include_billing_address_label %}
+        <div class="form-group">
+            <label class="control-label column medium-3">Billing Address</label>
+        </div>
+    {% endif %}
+      {% with "True" as hide_form_level_error_header %}
+    {% with form_template="dataentry/bs_responsive_form_layout.html" label_columns=3 input_columns=4 %}
+      {% if is_anonymous and not address_form %}
+        {% with contact_form as address_form %}
+          {% include "core/fragments/address_form_layout.html" %}
+        {% endwith %}
+
+      {% else %}
+        {% with contact_form as contact_info_form %}
+          {% with input_columns=6 %}
+            {% include "core/fragments/contact_info.html" %}
+          {% endwith %}
+        {% endwith %}
+        {% if address_form %}
+          <div class="address-form">
+            {% with address_form as form %}
+              {% include form_template %}
+            {% endwith %}
+	        </div>
+        {% endif %}
+      {% if include_billing_address_label or address_form %}
+          <div class="subtle-divider"></div>
+      {% endif %}
+    {% endif %}
+    <br/>
+    {% endwith %}
+    {% endwith %}
+
+    <div class="subtle-divider"></div>
+    <div class="row bottom-buttons">
+        <div class="column small-12 medium-6">
+          {% if include_db_button %}
+            <a class="button button--hollow" href="{% url 'dashboard:csr_detail' csr_id=csr.pk %}">
+          {% elif back_to_account_button %}
+            <a class="button button--hollow" href="{% url 'account_home' %}">
+          {% else %}
+          <a class="button button--hollow" onclick="window.history.back()">
+            <span>Back</span>
+          {% endif %}
+          </a>
+        </div>
+        <div class="column small-12 medium-6">
+            <input id="payment-submit" class="button small-float-none float-right" type="submit" value="Submit"
+                  onclick="validateAndSendToAuthNet(event, '{{ api_login }}', '{{ client_key }}')"/>
+        </div>
+    </div>
+</form>

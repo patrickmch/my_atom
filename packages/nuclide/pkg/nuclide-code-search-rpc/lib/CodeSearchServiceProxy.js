@@ -21,8 +21,25 @@ module.exports = _client => {
     });
   };
 
-  remoteModule.searchWithTool = function (arg0, arg1, arg2, arg3) {
+  remoteModule.codeSearch = function (arg0, arg1, arg2, arg3, arg4) {
     return Observable.fromPromise(_client.marshalArguments(Array.from(arguments), [{
+      name: "directory",
+      type: {
+        kind: "named",
+        name: "NuclideUri"
+      }
+    }, {
+      name: "regex",
+      type: {
+        kind: "named",
+        name: "RegExp"
+      }
+    }, {
+      name: "useVcsSearch",
+      type: {
+        kind: "boolean"
+      }
+    }, {
       name: "tool",
       type: {
         kind: "nullable",
@@ -31,27 +48,60 @@ module.exports = _client => {
         }
       }
     }, {
+      name: "maxResults",
+      type: {
+        kind: "number"
+      }
+    }])).switchMap(args => {
+      return _client.callRemoteFunction("CodeSearchService/codeSearch", "observable", args);
+    }).concatMap(value => {
+      return _client.unmarshal(value, {
+        kind: "named",
+        name: "CodeSearchResult"
+      });
+    }).publish();
+  };
+
+  remoteModule.remoteAtomSearch = function (arg0, arg1, arg2, arg3, arg4) {
+    return Observable.fromPromise(_client.marshalArguments(Array.from(arguments), [{
       name: "directory",
       type: {
         kind: "named",
         name: "NuclideUri"
       }
     }, {
-      name: "query",
+      name: "regex",
       type: {
-        kind: "string"
+        kind: "named",
+        name: "RegExp"
       }
     }, {
-      name: "maxResults",
+      name: "subdirs",
       type: {
-        kind: "number"
+        kind: "array",
+        type: {
+          kind: "string"
+        }
+      }
+    }, {
+      name: "useVcsSearch",
+      type: {
+        kind: "boolean"
+      }
+    }, {
+      name: "tool",
+      type: {
+        kind: "nullable",
+        type: {
+          kind: "string"
+        }
       }
     }])).switchMap(args => {
-      return _client.callRemoteFunction("CodeSearchService/searchWithTool", "observable", args);
+      return _client.callRemoteFunction("CodeSearchService/remoteAtomSearch", "observable", args);
     }).concatMap(value => {
       return _client.unmarshal(value, {
         kind: "named",
-        name: "CodeSearchResult"
+        name: "search$FileResult"
       });
     }).publish();
   };
@@ -128,13 +178,13 @@ Object.defineProperty(module.exports, "defs", {
       location: {
         type: "source",
         fileName: "CodeSearchService.js",
-        line: 38
+        line: 29
       },
       type: {
         location: {
           type: "source",
           fileName: "CodeSearchService.js",
-          line: 38
+          line: 29
         },
         kind: "function",
         argumentTypes: [{
@@ -157,7 +207,7 @@ Object.defineProperty(module.exports, "defs", {
       location: {
         type: "source",
         fileName: "types.js",
-        line: 12
+        line: 14
       },
       name: "CodeSearchResult",
       definition: {
@@ -165,7 +215,8 @@ Object.defineProperty(module.exports, "defs", {
         fields: [{
           name: "file",
           type: {
-            kind: "string"
+            kind: "named",
+            name: "NuclideUri"
           },
           optional: false
         }, {
@@ -189,39 +240,45 @@ Object.defineProperty(module.exports, "defs", {
         }]
       }
     },
-    searchWithTool: {
+    codeSearch: {
       kind: "function",
-      name: "searchWithTool",
+      name: "codeSearch",
       location: {
         type: "source",
         fileName: "CodeSearchService.js",
-        line: 65
+        line: 53
       },
       type: {
         location: {
           type: "source",
           fileName: "CodeSearchService.js",
-          line: 65
+          line: 53
         },
         kind: "function",
         argumentTypes: [{
-          name: "tool",
-          type: {
-            kind: "nullable",
-            type: {
-              kind: "string"
-            }
-          }
-        }, {
           name: "directory",
           type: {
             kind: "named",
             name: "NuclideUri"
           }
         }, {
-          name: "query",
+          name: "regex",
           type: {
-            kind: "string"
+            kind: "named",
+            name: "RegExp"
+          }
+        }, {
+          name: "useVcsSearch",
+          type: {
+            kind: "boolean"
+          }
+        }, {
+          name: "tool",
+          type: {
+            kind: "nullable",
+            type: {
+              kind: "string"
+            }
           }
         }, {
           name: "maxResults",
@@ -234,6 +291,137 @@ Object.defineProperty(module.exports, "defs", {
           type: {
             kind: "named",
             name: "CodeSearchResult"
+          }
+        }
+      }
+    },
+    search$Match: {
+      kind: "alias",
+      location: {
+        type: "source",
+        fileName: "types.js",
+        line: 21
+      },
+      name: "search$Match",
+      definition: {
+        kind: "object",
+        fields: [{
+          name: "lineText",
+          type: {
+            kind: "string"
+          },
+          optional: false
+        }, {
+          name: "lineTextOffset",
+          type: {
+            kind: "number"
+          },
+          optional: false
+        }, {
+          name: "matchText",
+          type: {
+            kind: "string"
+          },
+          optional: false
+        }, {
+          name: "range",
+          type: {
+            kind: "array",
+            type: {
+              kind: "array",
+              type: {
+                kind: "number"
+              }
+            }
+          },
+          optional: false
+        }]
+      }
+    },
+    search$FileResult: {
+      kind: "alias",
+      location: {
+        type: "source",
+        fileName: "types.js",
+        line: 28
+      },
+      name: "search$FileResult",
+      definition: {
+        kind: "object",
+        fields: [{
+          name: "filePath",
+          type: {
+            kind: "named",
+            name: "NuclideUri"
+          },
+          optional: false
+        }, {
+          name: "matches",
+          type: {
+            kind: "array",
+            type: {
+              kind: "named",
+              name: "search$Match"
+            }
+          },
+          optional: false
+        }]
+      }
+    },
+    remoteAtomSearch: {
+      kind: "function",
+      name: "remoteAtomSearch",
+      location: {
+        type: "source",
+        fileName: "CodeSearchService.js",
+        line: 76
+      },
+      type: {
+        location: {
+          type: "source",
+          fileName: "CodeSearchService.js",
+          line: 76
+        },
+        kind: "function",
+        argumentTypes: [{
+          name: "directory",
+          type: {
+            kind: "named",
+            name: "NuclideUri"
+          }
+        }, {
+          name: "regex",
+          type: {
+            kind: "named",
+            name: "RegExp"
+          }
+        }, {
+          name: "subdirs",
+          type: {
+            kind: "array",
+            type: {
+              kind: "string"
+            }
+          }
+        }, {
+          name: "useVcsSearch",
+          type: {
+            kind: "boolean"
+          }
+        }, {
+          name: "tool",
+          type: {
+            kind: "nullable",
+            type: {
+              kind: "string"
+            }
+          }
+        }],
+        returnType: {
+          kind: "observable",
+          type: {
+            kind: "named",
+            name: "search$FileResult"
           }
         }
       }

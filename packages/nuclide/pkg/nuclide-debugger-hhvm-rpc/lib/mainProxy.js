@@ -15,7 +15,7 @@ module.exports = _client => {
         location: {
           type: "source",
           fileName: "main.js",
-          line: 51
+          line: 54
         },
         name: "HhvmDebuggerService"
       })])).switchMap(([args, id]) => _client.callRemoteMethod(id, "getOutputWindowObservable", "observable", args)).concatMap(value => {
@@ -31,7 +31,7 @@ module.exports = _client => {
         location: {
           type: "source",
           fileName: "main.js",
-          line: 51
+          line: 54
         },
         name: "HhvmDebuggerService"
       })])).switchMap(([args, id]) => _client.callRemoteMethod(id, "getAtomNotificationObservable", "observable", args)).concatMap(value => {
@@ -48,7 +48,7 @@ module.exports = _client => {
         location: {
           type: "source",
           fileName: "main.js",
-          line: 51
+          line: 54
         },
         name: "HhvmDebuggerService"
       })])).switchMap(([args, id]) => _client.callRemoteMethod(id, "getNotificationObservable", "observable", args)).concatMap(value => {
@@ -65,7 +65,7 @@ module.exports = _client => {
         location: {
           type: "source",
           fileName: "main.js",
-          line: 51
+          line: 54
         },
         name: "HhvmDebuggerService"
       })])).switchMap(([args, id]) => _client.callRemoteMethod(id, "getServerMessageObservable", "observable", args)).concatMap(value => {
@@ -183,7 +183,7 @@ module.exports = _client => {
         location: {
           type: "source",
           fileName: "main.js",
-          line: 51
+          line: 54
         },
         name: "HhvmDebuggerService"
       })]).then(([args, id]) => _client.callRemoteMethod(id, "debug", "promise", args)).then(value => {
@@ -204,7 +204,7 @@ module.exports = _client => {
         location: {
           type: "source",
           fileName: "main.js",
-          line: 51
+          line: 54
         },
         name: "HhvmDebuggerService"
       })]).then(([args, id]) => _client.callRemoteMethod(id, "sendCommand", "promise", args)).then(value => {
@@ -226,13 +226,61 @@ module.exports = _client => {
         location: {
           type: "source",
           fileName: "main.js",
-          line: 51
+          line: 54
         },
         name: "HhvmDebuggerService"
       })]).then(([args, id]) => _client.callRemoteMethod(id, "getLaunchArgs", "promise", args)).then(value => {
         return _client.unmarshal(value, {
           kind: "named",
           name: "Object"
+        });
+      });
+    }
+
+    createLogFilePaste() {
+      return Promise.all([_client.marshalArguments(Array.from(arguments), []), _client.marshal(this, {
+        kind: "named",
+        location: {
+          type: "source",
+          fileName: "main.js",
+          line: 54
+        },
+        name: "HhvmDebuggerService"
+      })]).then(([args, id]) => _client.callRemoteMethod(id, "createLogFilePaste", "promise", args)).then(value => {
+        return _client.unmarshal(value, {
+          kind: "string"
+        });
+      });
+    }
+
+    getAttachTargetList() {
+      return Promise.all([_client.marshalArguments(Array.from(arguments), []), _client.marshal(this, {
+        kind: "named",
+        location: {
+          type: "source",
+          fileName: "main.js",
+          line: 54
+        },
+        name: "HhvmDebuggerService"
+      })]).then(([args, id]) => _client.callRemoteMethod(id, "getAttachTargetList", "promise", args)).then(value => {
+        return _client.unmarshal(value, {
+          kind: "array",
+          type: {
+            kind: "object",
+            fields: [{
+              name: "pid",
+              type: {
+                kind: "number"
+              },
+              optional: false
+            }, {
+              name: "command",
+              type: {
+                kind: "string"
+              },
+              optional: false
+            }]
+          }
         });
       });
     }
@@ -313,7 +361,7 @@ Object.defineProperty(module.exports, "defs", {
       location: {
         type: "source",
         fileName: "main.js",
-        line: 26
+        line: 29
       },
       name: "HHVMLaunchConfig",
       definition: {
@@ -389,7 +437,7 @@ Object.defineProperty(module.exports, "defs", {
       location: {
         type: "source",
         fileName: "main.js",
-        line: 38
+        line: 41
       },
       name: "HHVMAttachConfig",
       definition: {
@@ -480,7 +528,7 @@ Object.defineProperty(module.exports, "defs", {
       location: {
         type: "source",
         fileName: "main.js",
-        line: 51
+        line: 54
       },
       constructorArgs: [],
       staticMethods: {},
@@ -489,7 +537,7 @@ Object.defineProperty(module.exports, "defs", {
           location: {
             type: "source",
             fileName: "main.js",
-            line: 58
+            line: 61
           },
           kind: "function",
           argumentTypes: [],
@@ -504,7 +552,7 @@ Object.defineProperty(module.exports, "defs", {
           location: {
             type: "source",
             fileName: "main.js",
-            line: 62
+            line: 65
           },
           kind: "function",
           argumentTypes: [],
@@ -520,7 +568,7 @@ Object.defineProperty(module.exports, "defs", {
           location: {
             type: "source",
             fileName: "main.js",
-            line: 69
+            line: 72
           },
           kind: "function",
           argumentTypes: [],
@@ -536,7 +584,7 @@ Object.defineProperty(module.exports, "defs", {
           location: {
             type: "source",
             fileName: "main.js",
-            line: 73
+            line: 76
           },
           kind: "function",
           argumentTypes: [],
@@ -551,7 +599,7 @@ Object.defineProperty(module.exports, "defs", {
           location: {
             type: "source",
             fileName: "main.js",
-            line: 77
+            line: 80
           },
           kind: "function",
           argumentTypes: [{
@@ -668,7 +716,7 @@ Object.defineProperty(module.exports, "defs", {
           location: {
             type: "source",
             fileName: "main.js",
-            line: 103
+            line: 106
           },
           kind: "function",
           argumentTypes: [{
@@ -688,7 +736,7 @@ Object.defineProperty(module.exports, "defs", {
           location: {
             type: "source",
             fileName: "main.js",
-            line: 135
+            line: 138
           },
           kind: "function",
           argumentTypes: [{
@@ -706,11 +754,57 @@ Object.defineProperty(module.exports, "defs", {
             }
           }
         },
+        createLogFilePaste: {
+          location: {
+            type: "source",
+            fileName: "main.js",
+            line: 206
+          },
+          kind: "function",
+          argumentTypes: [],
+          returnType: {
+            kind: "promise",
+            type: {
+              kind: "string"
+            }
+          }
+        },
+        getAttachTargetList: {
+          location: {
+            type: "source",
+            fileName: "main.js",
+            line: 281
+          },
+          kind: "function",
+          argumentTypes: [],
+          returnType: {
+            kind: "promise",
+            type: {
+              kind: "array",
+              type: {
+                kind: "object",
+                fields: [{
+                  name: "pid",
+                  type: {
+                    kind: "number"
+                  },
+                  optional: false
+                }, {
+                  name: "command",
+                  type: {
+                    kind: "string"
+                  },
+                  optional: false
+                }]
+              }
+            }
+          }
+        },
         dispose: {
           location: {
             type: "source",
             fileName: "main.js",
-            line: 257
+            line: 302
           },
           kind: "function",
           argumentTypes: [],

@@ -47,22 +47,26 @@ function _load_featureConfig() {
   return _featureConfig = _interopRequireDefault(require('nuclide-commons-atom/feature-config'));
 }
 
+var _escapeStringRegexp;
+
+function _load_escapeStringRegexp() {
+  return _escapeStringRegexp = _interopRequireDefault(require('escape-string-regexp'));
+}
+
 function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-/**
- * Copyright (c) 2015-present, Facebook, Inc.
- * All rights reserved.
- *
- * This source code is licensed under the license found in the LICENSE file in
- * the root directory of this source tree.
- *
- * 
- * @format
- */
-
-const directoriesObs = new _rxjsBundlesRxMinJs.Subject();
+const directoriesObs = new _rxjsBundlesRxMinJs.Subject(); /**
+                                                           * Copyright (c) 2015-present, Facebook, Inc.
+                                                           * All rights reserved.
+                                                           *
+                                                           * This source code is licensed under the license found in the LICENSE file in
+                                                           * the root directory of this source tree.
+                                                           *
+                                                           * 
+                                                           * @format
+                                                           */
 
 const SEARCH_TIMEOUT = 10000;
 
@@ -99,8 +103,9 @@ const CodeSearchProvider = exports.CodeSearchProvider = {
       const projectRoot = directory.getPath();
       let lastPath = null;
       const config = (_featureConfig || _load_featureConfig()).default.get('nuclide-code-search');
+      const regexp = new RegExp((0, (_escapeStringRegexp || _load_escapeStringRegexp()).default)(query), 'i');
 
-      return (0, (_nuclideRemoteConnection || _load_nuclideRemoteConnection()).getCodeSearchServiceByNuclideUri)(projectRoot).searchWithTool(config.tool.length === 0 ? null : config.tool, projectRoot, query, config.maxResults).refCount().map(function (match) {
+      return (0, (_nuclideRemoteConnection || _load_nuclideRemoteConnection()).getCodeSearchServiceByNuclideUri)(projectRoot).codeSearch(projectRoot, regexp, config.useVcsSearch, config.tool.length === 0 ? null : config.tool, config.maxResults).refCount().map(function (match) {
         const result = {
           isFirstResultForPath: match.file !== lastPath,
           path: match.file,

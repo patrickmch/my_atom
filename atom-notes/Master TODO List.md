@@ -1,9 +1,10 @@
 # Master TODO List
 
 Finish Giving Page Revisions:
-- [ ] Put gift_credit_card on bs_responsive
+- [x] Put gift_credit_card on bs_responsive
 - [ ] Should we preserve order.description in the payment template
-- [ ] Do we need logic in the payment template?
+- [ ] Test payment stuff
+- [x] Do we need logic in the payment template?
 
 Other:
 - [ ] Figure out what percentage of non-null blackout dates are in the WRAPS
@@ -26,8 +27,8 @@ See [1-15-2018 Notes](./1-15-2018.md)
 See [1-16-2018 Notes](./1-16-2018.md)
 Wrap is_applying_for_wild_med_work Addition
 - [ ] Add in a field to check if the instructor is a WildMed instructor who is also applying for WildMed work
-  - [ ] Make sure I can test WRAPS
-  - [ ] Add field and update model
+  - [x] Make sure I can test WRAPS
+  - [x] Add field and update model
     - [ ] Show staffing draft and get the verbage right
   - [ ] Use API to query the db and see if they are a WildMed instructor
     - [ ] Add a dependency to NOLS API Client (steve says we stop and think before adding a dependency)

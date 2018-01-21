@@ -2,10 +2,20 @@
 
 var _asyncToGenerator = _interopRequireDefault(require('async-to-generator'));
 
+var _querystring = _interopRequireDefault(require('querystring'));
+
+var _atom = require('atom');
+
 var _nuclideRemoteConnection;
 
 function _load_nuclideRemoteConnection() {
   return _nuclideRemoteConnection = require('../../nuclide-remote-connection');
+}
+
+var _UniversalDisposable;
+
+function _load_UniversalDisposable() {
+  return _UniversalDisposable = _interopRequireDefault(require('nuclide-commons/UniversalDisposable'));
 }
 
 var _goToLocation;
@@ -24,6 +34,12 @@ var _featureConfig;
 
 function _load_featureConfig() {
   return _featureConfig = _interopRequireDefault(require('nuclide-commons-atom/feature-config'));
+}
+
+var _log4js;
+
+function _load_log4js() {
+  return _log4js = require('log4js');
 }
 
 var _textEditor;
@@ -46,24 +62,30 @@ function _load_nuclideOpenFiles() {
   return _nuclideOpenFiles = require('../../nuclide-open-files');
 }
 
+var _electron = require('electron');
+
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-const REMOTE_COMMAND_SERVICE = 'RemoteCommandService'; /**
-                                                        * Copyright (c) 2015-present, Facebook, Inc.
-                                                        * All rights reserved.
-                                                        *
-                                                        * This source code is licensed under the license found in the LICENSE file in
-                                                        * the root directory of this source tree.
-                                                        *
-                                                        * 
-                                                        * @format
-                                                        */
+/**
+ * Copyright (c) 2015-present, Facebook, Inc.
+ * All rights reserved.
+ *
+ * This source code is licensed under the license found in the LICENSE file in
+ * the root directory of this source tree.
+ *
+ * 
+ * @format
+ */
+
+const REMOTE_COMMAND_SERVICE = 'RemoteCommandService';
+const ATOM_URI_ADD_PATH = 'add-path';
 
 class Activation {
 
   constructor() {
     var _this = this;
 
+    this._disposables = new (_UniversalDisposable || _load_UniversalDisposable()).default();
     this._commands = {
       openFile(uri, line, column, isWaiting) {
         return openFile(uri, line, column, isWaiting);
@@ -74,24 +96,31 @@ class Activation {
         }
         return openFile(uri, line, column, isWaiting);
       },
-      addProject(projectPath) {
+      addProject(projectPath, newWindow) {
         return (0, _asyncToGenerator.default)(function* () {
           if ((_nuclideUri || _load_nuclideUri()).default.isLocal(projectPath)) {
-            atom.project.addPath(projectPath);
+            atom.applicationDelegate.open({
+              pathsToOpen: [projectPath],
+              newWindow,
+              devMode: atom.devMode,
+              safeMode: atom.inSafeMode()
+            });
           } else {
-            // As of Atom 1.12 atom.project.addPath won't work for remote dirs.
-            const serverConnection = (_nuclideRemoteConnection || _load_nuclideRemoteConnection()).ServerConnection.getForUri(projectPath);
-            if (serverConnection != null) {
-              // Creating the RemoteConnection should add it to the FileTree
-              yield (_nuclideRemoteConnection || _load_nuclideRemoteConnection()).RemoteConnection.findOrCreateFromConnection(serverConnection, (_nuclideUri || _load_nuclideUri()).default.getPath(projectPath), '');
+            let queryParams = {
+              path: projectPath
+            };
+            if (newWindow) {
+              queryParams = Object.assign({}, queryParams, { target: '_blank' });
             }
+            const url = `atom://nuclide/${ATOM_URI_ADD_PATH}?` + _querystring.default.stringify(queryParams);
+            _electron.shell.openExternal(url);
           }
         })();
       },
       dispose() {}
     };
 
-    this._disposables = new (_nuclideRemoteConnection || _load_nuclideRemoteConnection()).ConnectionCache((() => {
+    this._disposables.add(new (_nuclideRemoteConnection || _load_nuclideRemoteConnection()).ConnectionCache((() => {
       var _ref = (0, _asyncToGenerator.default)(function* (connection) {
         // If connection is null, this indicates a local connection. Because usage
         // of the local command server is low and it introduces the cost of
@@ -109,7 +138,56 @@ class Activation {
       return function (_x) {
         return _ref.apply(this, arguments);
       };
+    })()));
+  }
+
+  consumeRemoteProjectsService(service) {
+    this._remoteProjectsService = service;
+    const disposable = new _atom.Disposable(() => {
+      this._remoteProjectsService = null;
+    });
+    this._disposables.add(disposable);
+    return disposable;
+  }
+
+  consumeDeepLinkService(service) {
+    var _this2 = this;
+
+    const disposable = service.subscribeToPath(ATOM_URI_ADD_PATH, (() => {
+      var _ref2 = (0, _asyncToGenerator.default)(function* (params) {
+        const { path: projectPath } = params;
+
+        if (!(typeof projectPath === 'string')) {
+          throw new Error('Invariant violation: "typeof projectPath === \'string\'"');
+        }
+
+        if (!(_nuclideUri || _load_nuclideUri()).default.isRemote(projectPath)) {
+          (0, (_log4js || _load_log4js()).getLogger)(`Expected remote Nuclide URI but got ${projectPath}.`);
+          return;
+        }
+
+        const remoteProjectsService = _this2._remoteProjectsService;
+        if (remoteProjectsService == null) {
+          (0, (_log4js || _load_log4js()).getLogger)('No provider for nuclide-remote-projects was found.');
+          return;
+        }
+
+        (0, (_log4js || _load_log4js()).getLogger)().info(`Attempting to addProject(${projectPath}).`);
+        const hostname = (_nuclideUri || _load_nuclideUri()).default.getHostname(projectPath);
+        const cwd = (_nuclideUri || _load_nuclideUri()).default.getPath(projectPath);
+        yield remoteProjectsService.createRemoteConnection({
+          host: hostname,
+          cwd,
+          displayTitle: hostname
+        });
+      });
+
+      return function (_x2) {
+        return _ref2.apply(this, arguments);
+      };
     })());
+    this._disposables.add(disposable);
+    return disposable;
   }
 
   dispose() {

@@ -54,13 +54,18 @@ let getHgExecParams = (() => {
       // have the progressfile extension write to 'progress' in the repo's .hg directory
       '--config', `progress.statefile=${options_.cwd}/.hg/progress`,
       // Without assuming hg is being run in a tty, the progress extension won't get used
-      '--config', 'progress.assume-tty=1');
+      '--config', 'progress.assume-tty=1',
+      // Prevent user-specified merge tools from attempting to
+      // open interactive editors.
+      '--config', 'ui.merge=:merge',
+      // Prevent scary error message on amend in the middle of a stack
+      '--config', 'fbamend.education=');
     }
     const [hgCommandName] = args;
     if (EXCLUDE_FROM_HG_BLACKBOX_COMMANDS.has(hgCommandName)) {
       args.push('--config', 'extensions.blackbox=!');
     }
-    let options = Object.assign({}, options_, {
+    const options = Object.assign({}, options_, {
       env: Object.assign({}, (yield (0, (_process || _load_process()).getOriginalEnvironment)()), {
         ATOM_BACKUP_EDITOR: 'false'
       })
@@ -73,16 +78,13 @@ let getHgExecParams = (() => {
       options.env.HGEDITOR = options.HGEDITOR;
     }
 
-    let command;
+    const command = 'hg';
     if (options.TTY_OUTPUT) {
-      [command, args, options] = (0, (_process || _load_process()).scriptifyCommand)('hg', args, options);
       // HG commit/amend have unconventional ways of escaping slashes from messages.
       // We have to 'unescape' to make it work correctly.
       args = args.map(function (arg) {
         return arg.replace(/\\\\/g, '\\');
       });
-    } else {
-      command = 'hg';
     }
     return { command, args, options };
   });
@@ -179,7 +181,6 @@ const EXCLUDE_FROM_HG_BLACKBOX_COMMANDS = new Set([
 'diff', 'log', 'show', 'status']);function hgObserveExecution(args_, options_) {
   // TODO(T17463635)
   return _rxjsBundlesRxMinJs.Observable.fromPromise(getHgExecParams(args_, Object.assign({}, options_, {
-    // Ensure that the hg command gets scriptified.
     TTY_OUTPUT: process.platform !== 'win32'
   }))).switchMap(({ command, args, options }) => {
     return (0, (_process || _load_process()).observeProcess)(command, args, Object.assign({}, options, {

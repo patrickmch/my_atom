@@ -3,6 +3,7 @@
   "main": "./lib/main.js",
   "version": "0.0.0",
   "description": "Allows debugging of PHP from Nuclide",
+  "author": "NEEDS OWNER",
   "atomTestRunner": "../../lib/test-runner-entry.js",
   "nuclide": {
     "configMetadata": {
@@ -91,6 +92,12 @@
       "description": "PHP debugger provider.",
       "versions": {
         "0.0.0": "createDebuggerProvider"
+      }
+    },
+    "additional-log-files": {
+      "description": "HHVM debugger log files",
+      "versions": {
+        "0.0.0": "createAdditionalLogFilesProvider"
       }
     },
     "nuclide-home.homeFragments": {

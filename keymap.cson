@@ -9,7 +9,14 @@
 # You can create a new keybinding in this file by typing "key" and then hitting
 # tab.
 
+'atom-workspace':
+  'ctrl-k': 'core:move-up'
+  'ctrl-j': 'core:move-down'
+  'ctrl-h': 'core:move-left'
+  'ctrl-l': 'core:move-right'
+
 'atom-text-editor':
+  'ctrl-k': 'unset!'
 
   # 'cmd-b': 'python-tools:goto-definition'
   'ctrl-alt-r':'pane:reopen-closed-item'
@@ -29,6 +36,7 @@
   'alt': 'autocomplete-plus:cancel'
   'ctrl-cmd-left': 'editor:delete-line'
   'ctrl-cmd-right': 'editor:delete-to-end-of-line'
+  'alt-space': 'choose-pane:start'
 
   # movement
   'alt-down': 'line-jumper:move-down'
@@ -37,34 +45,30 @@
   'alt-shift-up': 'line-jumper:select-up'
   'alt-enter': 'jumpy:toggle'
   'shift': 'jumpy:clear'
-  'ctrl-down': 'multi-cursor:expandDown'
-  'ctrl-up':   'multi-cursor:expandUp'
+  'ctrl-down': 'multi-cursor:expanddown'
+  'ctrl-up':   'multi-cursor:expandup'
 
   # panes
   'ctrl->': 'pane:move-item-right'
   'ctrl-<': 'pane:move-item-left'
 
   # pane splitting
-  'cmd-k ctrl-left':'window:move-active-item-to-pane-on-left'
-  'cmd-k ctrl-right':'window:move-active-item-to-pane-on-right'
-  'cmd-k ctrl-up':'window:move-active-item-to-pane-above'
-  'cmd-k ctrl-down':'window:move-active-item-to-pane-below'
+  'cmd-; ctrl-left':'window:move-active-item-to-pane-on-left'
+  'cmd-; ctrl-right':'window:move-active-item-to-pane-on-right'
+  'cmd-; ctrl-up':'window:move-active-item-to-pane-above'
+  'cmd-; ctrl-down':'window:move-active-item-to-pane-below'
 
-  'cmd-k alt-left':'pane:split-left-and-move-active-item'
-  'cmd-k alt-right':'pane:split-right-and-move-active-item'
-  'cmd-k alt-up':'pane:split-up-and-move-active-item'
-  'cmd-k alt-down':'pane:split-down-and-move-active-item'
-  'shift-alt-k': 'hey-pane:toggle-follow-mode'
+  'cmd-; alt-left':'pane:split-left-and-move-active-item'
+  'cmd-; alt-right':'pane:split-right-and-move-active-item'
+  'cmd-; alt-up':'pane:split-up-and-move-active-item'
+  'cmd-; alt-down':'pane:split-down-and-move-active-item'
+  'alt-;': 'hey-pane:toggle-follow-mode'
 
-  'cmd-k b': 'window:toggle-bottom-dock'
-  'cmd-k l': 'window:toggle-left-dock'
-  'cmd-k r': 'window:toggle-right-dock'
-
-  # Cursor
+  # cursor
   'alt-,': 'last-cursor-position:previous'
   'alt-.': 'last-cursor-position:next'
 
-  # Key bindings for multi-cursor-plus
+  # key bindings for multi-cursor-plus
   'alt-x':           'multi-cursor-plus:mark'
   'ctrl-alt-up':          'multi-cursor-plus:move-up'
   'ctrl-alt-down':        'multi-cursor-plus:move-down'
@@ -88,44 +92,41 @@
   'shift-space': 'emmet:expand-abbreviation-with-tab'
 
   # custom
-  'alt-space': 'custom:insert-space-keep-cursor-place'
+  'shift-cmd-space': 'custom:insert-space-keep-cursor-place'
   'ctrl-alt-space': 'custom:insert-tab-keep-cursor-place'
   'ctrl-cmd-up': 'my:move-line-up'
   'ctrl-cmd-down': 'my:move-line-down'
 
-
 # vim mode keybindings:
-
-'atom-text-editor.vim-mode-plus:not(.normal-mode)':
-  'j k': 'vim-mode-plus:activate-normal-mode'
-
-'atom-text-editor.vim-mode-plus.insert-mode':
-  'j k': 'vim-mode-plus:activate-normal-mode'
   'cmd-enter': 'editor:newline-below'
 
-'.advanced-open-file atom-text-editor':
-  'ctrl-k': 'advanced-open-file:move-cursor-up'
-  'ctrl-j': 'advanced-open-file:move-cursor-down'
-
 'atom-text-editor:not(.mini).vim-mode-plus:not(.insert-mode):not(.jumpy-jump-mode), .tree-view':
-  'K': 'jumpy:toggle'
+  'cmd-f': 'jumpy:toggle'
   'shift': 'jumpy:clear'
-
-# 'atom-text-editor.vim-mode-plus-input-char-waiting':
-  # 'j k': 'core:cancel'
-
-# 'atom-text-editor.vim-mode-plus':
-#   'j k': 'vim-mode-plus:reset-normal-mode'
 
 'atom-text-editor.vim-mode-plus:not(.insert-mode)':
   'cmd-enter': 'editor:newline-below'
 
-  'alt-j': 'line-jumper:move-down'
-  'alt-k': 'line-jumper:move-up'
+  # pane splitting
+  'space ctrl-h':'window:move-active-item-to-pane-on-left'
+  'space ctrl-l':'window:move-active-item-to-pane-on-right'
+  'space ctrl-k':'window:move-active-item-to-pane-above'
+  'space ctrl-j':'window:move-active-item-to-pane-below'
+
+  'space alt-h':'pane:split-left-and-move-active-item'
+  'space alt-l':'pane:split-right-and-move-active-item'
+  'space alt-k':'pane:split-up-and-move-active-item'
+  'space alt-j':'pane:split-down-and-move-active-item'
+  'alt-;': 'hey-pane:toggle-follow-mode'
+
+  'shift-alt-j': 'vim-mode-plus:move-down-to-edge'
+  'shift-alt-k': 'vim-mode-plus:move-up-to-edge'
+  'ctrl-j': 'line-jumper:move-down'
+  'ctrl-k': 'line-jumper:move-up'
   'ctrl-cmd-k': 'my:move-line-up'
   'ctrl-cmd-j': 'my:move-line-down'
 
-  # Key bindings for multi-cursor-plus
+  # key bindings for multi-cursor-plus
   'alt-x':          'multi-cursor-plus:mark'
   'ctrl-alt-k':         'multi-cursor-plus:move-up'
   'ctrl-alt-j':       'multi-cursor-plus:move-down'
@@ -134,12 +135,50 @@
   'ctrl-alt-cmd-h':   'multi-cursor-plus:move-to-beginning-of-word'
   'ctrl-alt-cmd-l':  'multi-cursor-plus:move-to-end-of-word'
 
-  'ctrl-j': 'multi-cursor:expandDown'
-  'ctrl-k': 'multi-cursor:expandUp'
+  'alt-j': 'multi-cursor:expandDown'
+  'alt-k': 'multi-cursor:expandUp'
+
+  'space j': 'focus-pane-or-panel:focus-below'
+  'space k': 'focus-pane-or-panel:focus-above'
+  'space h': 'focus-pane-or-panel:focus-on-left'
+  'space l': 'focus-pane-or-panel:focus-on-right'
+
+  'space e': 'editor:delete-to-end-of-line'
+  'space d': 'editor:delete-line'
+  'space b': 'editor:delete-to-beginning-of-line'
+
+  'space o': 'vim-mode-plus:move-to-beginning-of-line'
+  '>': 'vim-mode-plus:move-to-last-character-of-line'
+  '<': 'vim-mode-plus:move-to-first-character-of-line'
+
+  'v i space w': 'expand-region:select-word-include-dash'
+  'c i space w': 'keystroke v i space w cmd-x i'
+  'd i space w': 'keystroke v i space w cmd-x'
 
   ')': 'unset!'
   '(': 'unset!'
   '}': 'unset!'
   '{': 'unset!'
-  '<': 'vim-mode-plus:previous-tab'
-  '>': 'vim-mode-plus:next-tab'
+  ']': 'unset!'
+  '[': 'unset!'
+  'shift-j': 'vim-mode-plus:previous-tab'
+  'shift-k': 'vim-mode-plus:next-tab'
+
+# Package specific keymaps
+'.tree-view':
+  'ctrl-h': 'focus-pane-or-panel:focus-on-left'
+  'ctrl-l': 'focus-pane-or-panel:focus-on-right'
+
+# for cmd-f panel
+'.platform-darwin .find-and-replace atom-text-editor':
+  'ctrl-j': 'focus-pane-or-panel:focus-below'
+  'ctrl-k': 'focus-pane-or-panel:focus-above'
+
+# for cmd-shift-f panel
+'.platform-darwin .project-find atom-text-editor':
+  'ctrl-j': 'focus-pane-or-panel:focus-below'
+  'ctrl-k': 'focus-pane-or-panel:focus-above'
+
+'.platform-darwin .advanced-open-file':
+  'ctrl-j': 'advanced-open-file:move-cursor-down'
+  'ctrl-k': 'advanced-open-file:move-cursor-up'

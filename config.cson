@@ -83,11 +83,12 @@
     ]
   editor:
     fontFamily: "Source Code Pro for Powerline"
-    fontSize: 17
-    nonWordCharacters: "/\\()\"':,.;<>~!@#$%^&*|+=[]{}`?…"
+    fontSize: 15
+    nonWordCharacters: "/\\()\"':,.;<>~!@#$%^&*|+=[]{}`?…-"
     preferredLineLength: 100
     showIndentGuide: true
     showInvisibles: true
+    softWrap: true
   "exception-reporting":
     userId: "bf1a28f2-4481-4777-b187-9b8e1da674c0"
   "find-and-replace":
@@ -98,7 +99,7 @@
   "git-blame":
     columnWidth: 412
   "hey-pane":
-    expandedWidth: 99
+    expandedWidth: 97
   "ide-css":
     lessSupport: false
   "ide-python":
@@ -118,7 +119,6 @@
         enabled: false
   jumpy:
     fontSize: 0.9
-    highContrast: true
   "keybinding-cheatsheet": {}
   kite:
     enableCompletions: false
@@ -140,7 +140,7 @@
       cursorlineDecorationsZIndex: 0
       "find-and-replace": true
       "find-and-replaceDecorationsZIndex": 0
-      "git-diff": true
+      "git-diff": false
       "git-diffDecorationsZIndex": 0
       "highlight-selected": true
       "highlight-selectedDecorationsZIndex": 0
@@ -209,7 +209,19 @@
   "tool-bar-markdown-writer":
     visibility: "showToolbarOnMarkdown"
   "vim-mode-plus":
+    automaticallyEscapeInsertModeOnActivePaneItemChange: true
+    defaultScrollRowsOnMiniScroll: 2
+    keymapCCToChangeInnerSmartWord: true
+    keymapYToYankToLastCharacterOfLine: true
+    sequentialPaste: true
+    smoothScrollOnFullScrollMotion: true
+    smoothScrollOnFullScrollMotionDuration: 100
+    smoothScrollOnHalfScrollMotion: true
+    smoothScrollOnHalfScrollMotionDuration: 100
     smoothScrollOnMiniScroll: true
+    smoothScrollOnMiniScrollDuration: 100
+    smoothScrollOnRedrawCursorLine: true
+    smoothScrollOnRedrawCursorLineDuration: 100
 ".reason.source":
   editor:
     preferredLineLength: 110

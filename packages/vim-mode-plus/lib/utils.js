@@ -1,6 +1,7 @@
-let fs, semver
+let fs, semver, Diff
 const settings = require("./settings")
 const {Range, Point} = require("atom")
+const NEWLINE_REG_EXP = /\n/g
 
 // [Borrowed from underscore/underscore-plus
 function escapeRegExp(s) {
@@ -561,11 +562,17 @@ function shrinkRangeEndToBeforeNewLine(range) {
     : range
 }
 
-function collectRangeInBufferRow(editor, row, regex) {
-  const ranges = []
-  const scanRange = editor.bufferRangeForBufferRow(row)
-  editor.scanInBufferRange(regex, scanRange, ({range}) => ranges.push(range))
-  return ranges
+function collectRangeByScan(editor, regex, options) {
+  const result = []
+  const collect = event => result.push(event.range)
+
+  if (!options) {
+    editor.scan(regex, collect)
+  } else {
+    const scanRange = options.scanRange || editor.bufferRangeForBufferRow(options.row)
+    editor.scanInBufferRange(regex, scanRange, collect)
+  }
+  return result
 }
 
 // take bufferPosition
@@ -659,7 +666,9 @@ const isNotEmpty = negateFunction(isEmpty)
 const isSingleLineRange = range => range.isSingleLine()
 const isNotSingleLineRange = negateFunction(isSingleLineRange)
 
-const isLeadingWhiteSpaceRange = (editor, range) => /^[\t ]*$/.test(editor.getTextInBufferRange(range))
+const isLeadingWhiteSpaceRange = (editor, range) => {
+  return range.start.column === 0 && /^[\t ]*$/.test(editor.getTextInBufferRange(range))
+}
 const isNotLeadingWhiteSpaceRange = negateFunction(isLeadingWhiteSpaceRange)
 
 function isEscapedCharRange(editor, range) {
@@ -984,21 +993,21 @@ function rangeContainsPointWithEndExclusive(range, point) {
 }
 
 function traverseTextFromPoint(point, text) {
-  return point.traverse(getTraversalForText(text))
+  return Point.fromObject(point).traverse(getTraversalForText(text))
 }
 
 function getTraversalForText(text) {
-  let row = 0,
-    column = 0
-  for (const char of text) {
-    if (char === "\n") {
-      row++
-      column = 0
-    } else {
-      column++
-    }
+  NEWLINE_REG_EXP.lastIndex = 0
+
+  let row = 0
+  let colum = 0
+
+  let lastIndex = 0
+  while (NEWLINE_REG_EXP.exec(text)) {
+    row++
+    lastIndex = NEWLINE_REG_EXP.lastIndex
   }
-  return new Point(row, column)
+  return new Point(row, text.length - lastIndex)
 }
 
 function getRowAmongFoldedRowIntersectsBufferRow(editor, bufferRow, which) {
@@ -1147,6 +1156,38 @@ function getHunkRangeAtBufferRow(editor, row) {
   }
 }
 
+// Replace given text by character based diff
+// Purpose: to minimize amount of range to be replaced, which lead cleaner flash highlight
+// On undo/redo highlight
+function replaceTextInRangeViaDiff(editor, range, newText) {
+  if (!Diff) Diff = require("diff")
+
+  let row = range.start.row
+  let column = range.start.column
+  const point = [0, 0]
+
+  const oldText = editor.getTextInBufferRange(range)
+  const changes = Diff.diffChars(oldText, newText)
+  editor.transact(() => {
+    for (const change of changes) {
+      point[0] = row
+      point[1] = column
+
+      if (change.added) {
+        const newPoint = editor.setTextInBufferRange([point, point], change.value).end
+        row = newPoint.row
+        column = newPoint.column
+      } else if (change.removed) {
+        editor.setTextInBufferRange([point, [row, column + change.count]], "")
+      } else {
+        const newPoint = traverseTextFromPoint(point, change.value)
+        row = newPoint.row
+        column = newPoint.column
+      }
+    }
+  })
+}
+
 module.exports = {
   assertWithException,
   getLast,
@@ -1201,7 +1242,7 @@ module.exports = {
   getSubwordPatternAtBufferPosition,
   getNonWordCharactersForCursor,
   shrinkRangeEndToBeforeNewLine,
-  collectRangeInBufferRow,
+  collectRangeByScan,
   translatePointAndClip,
   getRangeByTranslatePointAndClip,
   getPackage,
@@ -1245,4 +1286,5 @@ module.exports = {
   atomVersionSatisfies,
   getRowRangeForCommentAtBufferRow,
   getHunkRangeAtBufferRow,
+  replaceTextInRangeViaDiff,
 }

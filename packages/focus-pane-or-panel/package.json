@@ -1,0 +1,69 @@
+{
+  "_args": [
+    [
+      {
+        "raw": "/private/var/folders/dp/vj05cwss7pz9mjl62ccqzysm0000gp/T/d-118019-7063-hwl38f.mjowvfs9k9/package.tgz",
+        "scope": null,
+        "escapedName": null,
+        "name": null,
+        "rawSpec": "/private/var/folders/dp/vj05cwss7pz9mjl62ccqzysm0000gp/T/d-118019-7063-hwl38f.mjowvfs9k9/package.tgz",
+        "spec": "/private/var/folders/dp/vj05cwss7pz9mjl62ccqzysm0000gp/T/d-118019-7063-hwl38f.mjowvfs9k9/package.tgz",
+        "type": "local"
+      },
+      "/private/var/folders/dp/vj05cwss7pz9mjl62ccqzysm0000gp/T/apm-install-dir-118019-7063-itnt6k.pbzdvd9529"
+    ]
+  ],
+  "_from": "../d-118019-7063-hwl38f.mjowvfs9k9/package.tgz",
+  "_id": "focus-pane-or-panel@0.3.0",
+  "_inCache": true,
+  "_location": "/focus-pane-or-panel",
+  "_phantomChildren": {},
+  "_requested": {
+    "raw": "/private/var/folders/dp/vj05cwss7pz9mjl62ccqzysm0000gp/T/d-118019-7063-hwl38f.mjowvfs9k9/package.tgz",
+    "scope": null,
+    "escapedName": null,
+    "name": null,
+    "rawSpec": "/private/var/folders/dp/vj05cwss7pz9mjl62ccqzysm0000gp/T/d-118019-7063-hwl38f.mjowvfs9k9/package.tgz",
+    "spec": "/private/var/folders/dp/vj05cwss7pz9mjl62ccqzysm0000gp/T/d-118019-7063-hwl38f.mjowvfs9k9/package.tgz",
+    "type": "local"
+  },
+  "_requiredBy": [
+    "#USER"
+  ],
+  "_resolved": "file:../d-118019-7063-hwl38f.mjowvfs9k9/package.tgz",
+  "_shasum": "4110eb7fcebba7fd2b11b44207ba9b9cf84952d5",
+  "_shrinkwrap": null,
+  "_spec": "/private/var/folders/dp/vj05cwss7pz9mjl62ccqzysm0000gp/T/d-118019-7063-hwl38f.mjowvfs9k9/package.tgz",
+  "_where": "/private/var/folders/dp/vj05cwss7pz9mjl62ccqzysm0000gp/T/apm-install-dir-118019-7063-itnt6k.pbzdvd9529",
+  "activationCommands": {
+    "atom-workspace": [
+      "focus-pane-or-panel:focus-below",
+      "focus-pane-or-panel:focus-above",
+      "focus-pane-or-panel:focus-on-left",
+      "focus-pane-or-panel:focus-on-right"
+    ]
+  },
+  "bugs": {
+    "url": "https://github.com/t9md/atom-focus-pane-or-panel/issues"
+  },
+  "dependencies": {
+    "underscore-plus": "^1.6.6"
+  },
+  "description": "change focus or pane or panel seamlessly",
+  "devDependencies": {},
+  "engines": {
+    "atom": ">=0.174.0 <2.0.0"
+  },
+  "homepage": "https://github.com/t9md/atom-focus-pane-or-panel#readme",
+  "license": "MIT",
+  "main": "./lib/main",
+  "name": "focus-pane-or-panel",
+  "optionalDependencies": {},
+  "readme": "# focus-pane-or-panel\n\nChange focus of pane or panel seamlessly.\n\n# keymaps example  \n\nNo keymap by default.  \n\n#### very basic\n\n```coffeescript\n'body':\n  'cmd-k cmd-up': 'focus-pane-or-panel:focus-above'\n  'cmd-k cmd-down': 'focus-pane-or-panel:focus-below'\n  'cmd-k cmd-left': 'focus-pane-or-panel:focus-on-left'\n  'cmd-k cmd-right': 'focus-pane-or-panel:focus-on-right'\n```\n\n#### mine(I'm vim-mode-plus user).\n\nwant to change focus by ctrl-hjkl\n\n```coffeescript\n'atom-text-editor.vim-mode-plus.normal-mode':\n  'ctrl-j': 'focus-pane-or-panel:focus-below'\n  'ctrl-k': 'focus-pane-or-panel:focus-above'\n  'ctrl-h': 'focus-pane-or-panel:focus-on-left'\n  'ctrl-l': 'focus-pane-or-panel:focus-on-right'\n\n'.tree-view':\n  'ctrl-h': 'focus-pane-or-panel:focus-on-left'\n  'ctrl-l': 'focus-pane-or-panel:focus-on-right'\n\n# for cmd-f panel\n'.platform-darwin .find-and-replace atom-text-editor':\n  'ctrl-j': 'focus-pane-or-panel:focus-below'\n  'ctrl-k': 'focus-pane-or-panel:focus-above'\n\n# for cmd-shift-f panel\n'.platform-darwin .project-find atom-text-editor':\n  'ctrl-j': 'focus-pane-or-panel:focus-below'\n  'ctrl-k': 'focus-pane-or-panel:focus-above'\n```\n",
+  "readmeFilename": "README.md",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/t9md/atom-focus-pane-or-panel.git"
+  },
+  "version": "0.3.0"
+}

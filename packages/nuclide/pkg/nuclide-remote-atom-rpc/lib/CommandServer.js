@@ -156,10 +156,10 @@ class ServiceAtomCommands {
     }
   }
 
-  addProject(projectPath) {
+  addProject(projectPath, newWindow) {
     const commands = CommandServer.getAtomCommandsByPath(projectPath);
     if (commands != null) {
-      return commands.addProject(projectPath);
+      return commands.addProject(projectPath, newWindow);
     } else {
       throw new Error('No connected Atom windows');
     }

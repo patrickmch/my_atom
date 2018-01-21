@@ -383,9 +383,11 @@ class LspLanguageService {
         childProcess.stdout.pipe((0, (_through || _load_through()).default)(function (data) {
           return accumulate('stdout', data);
         }));
-        childProcess.stderr.pipe((0, (_through || _load_through()).default)(function (data) {
-          return accumulate('stderr', data);
-        }));
+        if (childProcess.stderr != null) {
+          childProcess.stderr.pipe((0, (_through || _load_through()).default)(function (data) {
+            return accumulate('stderr', data);
+          }));
+        }
 
         const jsonRpcConnection = (_vscodeJsonrpc || _load_vscodeJsonrpc()).createMessageConnection(new (_SafeStreamMessageReader || _load_SafeStreamMessageReader()).default(childProcess.stdout), new (_vscodeJsonrpc || _load_vscodeJsonrpc()).StreamMessageWriter(childProcess.stdin), new JsonRpcLogger(_this._logger));
         jsonRpcConnection.trace((_jsonrpc || _load_jsonrpc()).JsonRpcTrace.Verbose, new JsonRpcTraceLogger(_this._logger));

@@ -101,7 +101,8 @@ class NavStackStatusBarTile extends _react.Component {
         tooltip: {
           title: 'Navigate Backwards',
           keyBindingCommand: 'nuclide-navigation-stack:navigate-backwards'
-        }
+        },
+        className: 'nuclide-navigation-stack-button'
       }),
       _react.createElement((_Button || _load_Button()).Button, {
         icon: 'chevron-right',
@@ -110,7 +111,8 @@ class NavStackStatusBarTile extends _react.Component {
         tooltip: {
           title: 'Navigate Forwards',
           keyBindingCommand: 'nuclide-navigation-stack:navigate-forwards'
-        }
+        },
+        className: 'nuclide-navigation-stack-button'
       })
     );
   }

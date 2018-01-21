@@ -1,0 +1,80 @@
+{
+  "_args": [
+    [
+      {
+        "raw": "/private/var/folders/dp/vj05cwss7pz9mjl62ccqzysm0000gp/T/d-118019-16772-uutn9e.sleopqfr/package.tgz",
+        "scope": null,
+        "escapedName": null,
+        "name": null,
+        "rawSpec": "/private/var/folders/dp/vj05cwss7pz9mjl62ccqzysm0000gp/T/d-118019-16772-uutn9e.sleopqfr/package.tgz",
+        "spec": "/private/var/folders/dp/vj05cwss7pz9mjl62ccqzysm0000gp/T/d-118019-16772-uutn9e.sleopqfr/package.tgz",
+        "type": "local"
+      },
+      "/private/var/folders/dp/vj05cwss7pz9mjl62ccqzysm0000gp/T/apm-install-dir-118019-16772-1ghc44s.bkfkpm0a4i"
+    ]
+  ],
+  "_from": "../d-118019-16772-uutn9e.sleopqfr/package.tgz",
+  "_id": "keystroke@0.2.1",
+  "_inCache": true,
+  "_location": "/keystroke",
+  "_phantomChildren": {},
+  "_requested": {
+    "raw": "/private/var/folders/dp/vj05cwss7pz9mjl62ccqzysm0000gp/T/d-118019-16772-uutn9e.sleopqfr/package.tgz",
+    "scope": null,
+    "escapedName": null,
+    "name": null,
+    "rawSpec": "/private/var/folders/dp/vj05cwss7pz9mjl62ccqzysm0000gp/T/d-118019-16772-uutn9e.sleopqfr/package.tgz",
+    "spec": "/private/var/folders/dp/vj05cwss7pz9mjl62ccqzysm0000gp/T/d-118019-16772-uutn9e.sleopqfr/package.tgz",
+    "type": "local"
+  },
+  "_requiredBy": [
+    "#USER"
+  ],
+  "_resolved": "file:../d-118019-16772-uutn9e.sleopqfr/package.tgz",
+  "_shasum": "cabc8026e05ebef69ef43d5e16808b77bcca9e68",
+  "_shrinkwrap": null,
+  "_spec": "/private/var/folders/dp/vj05cwss7pz9mjl62ccqzysm0000gp/T/d-118019-16772-uutn9e.sleopqfr/package.tgz",
+  "_where": "/private/var/folders/dp/vj05cwss7pz9mjl62ccqzysm0000gp/T/apm-install-dir-118019-16772-1ghc44s.bkfkpm0a4i",
+  "bugs": {
+    "url": "https://github.com/t9md/atom-keystroke/issues"
+  },
+  "configSchema": {
+    "commands": {
+      "type": "array",
+      "default": [],
+      "items": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "keystroke": {
+            "type": "string"
+          },
+          "scope": {
+            "type": "string"
+          }
+        }
+      }
+    }
+  },
+  "dependencies": {},
+  "description": "define command from keystroke",
+  "devDependencies": {},
+  "engines": {
+    "atom": "^1.19.0"
+  },
+  "homepage": "https://github.com/t9md/atom-keystroke#readme",
+  "keywords": [],
+  "license": "MIT",
+  "main": "./lib/main",
+  "name": "keystroke",
+  "optionalDependencies": {},
+  "readme": "# keystroke\n\nKeymap from keystroke to keystroke in your `keymap.cson`.\n\n**RULE: Command name must start with `keystroke<space>`**.\n\n```coffeescript\n'atom-text-editor':\n  'ctrl-a': 'keystroke ctrl-e ctrl-p'\n\n'atom-text-editor.vim-mode-plus.normal-mode':\n  'space j': 'keystroke 5 j'\n  'space k': 'keystroke 5 k'\n```\n\n\n# What is happening under the hood.\n\n- When `keymap.cson` was loaded, collect `keystroke ` prefixed commands from loaded keymaps.\n- Register these commands automatically.\n\n# Two way to reigster keystroke command\n\nFor historical reason, there is two way to register keystroke commands.\n\n- [New and auto]: Automatically register keystroke commands from loaded user's keymaps.\n- [Old and manual]: Manually register keystroke commands from `keystroke.commands` configuration( older way ).\n\n## [New and auto] auto register via `keymap.cson`\n\n- `keymap.cson`\n\n```coffeescript\n'atom-text-editor':\n  'ctrl-cmd-c': 'keystroke ctrl-shift-w backspace'\n\n'atom-text-editor.vim-mode-plus.normal-mode':\n  'C': 'keystroke c i w'\n```\n\n## [Old and manual] manual register via `config.cson`\n\n- `config.cson`\n\n```coffeescript\n\"*\":\n  \"keystroke\":\n    commands: [\n      {\n        name: \"delete-current-word\"\n        keystroke: \"ctrl-shift-w backspace\"\n        scope: 'atom-workspace' # atom-workspace is default, just for demo.\n      }\n      {\n        name: \"change-inner-word\"\n        keystroke: \"c i w\" # using vim-mode-plus keymap\n      }\n    ]\n```\n\n- `keymap.cson`\n\n```coffeescript\n'atom-text-editor':\n  'ctrl-cmd-c': 'keystroke:delete-current-word'\n\n'atom-text-editor.vim-mode-plus.normal-mode':\n  'C': 'keystroke:change-inner-word'\n```\n",
+  "readmeFilename": "README.md",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/t9md/atom-keystroke.git"
+  },
+  "version": "0.2.1"
+}

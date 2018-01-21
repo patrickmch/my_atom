@@ -3,6 +3,7 @@
   "main": "./lib/main.js",
   "version": "0.0.0",
   "description": "Client side of command-line interface for communicating with nuclide-server",
+  "author": "NEEDS OWNER",
   "atomTestRunner": "../../lib/test-runner-entry.js",
   "nuclide": {
     "packageType": "Atom",
@@ -19,6 +20,18 @@
         "type": "boolean",
         "default": "false",
         "description": "For example, this makes it possible to talk to your local Atom instance via the command line. Note this adds a small startup cost to Atom."
+      }
+    }
+  },
+  "consumedServices": {
+    "nuclide-deep-link.provider": {
+      "versions": {
+        "0.0.0": "consumeDeepLinkService"
+      }
+    },
+    "nuclide-remote-projects": {
+      "versions": {
+        "0.0.0": "consumeRemoteProjectsService"
       }
     }
   }
