@@ -80,7 +80,7 @@ const getLogger = () => (0, (_log4js || _load_log4js()).getLogger)('nuclide-remo
 
 function openConnectionDialog(dialogOptions) {
   return new Promise(resolve => {
-    (0, (_showModal || _load_showModal()).default)(({ dismiss }) => {
+    (0, (_showModal || _load_showModal()).default)(dismiss => {
       const StatefulModal = (0, (_bindObservableAsProps || _load_bindObservableAsProps()).bindObservableAsProps)(createPropsStream({ dismiss, onConnected: resolve, dialogOptions }), (_RemoteProjectConnectionModal || _load_RemoteProjectConnectionModal()).default);
       return _react.createElement(StatefulModal, null);
     }, { shouldDismissOnClickOutsideModal: () => false });

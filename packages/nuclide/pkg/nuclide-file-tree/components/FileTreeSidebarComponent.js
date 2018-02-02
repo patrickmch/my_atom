@@ -608,9 +608,9 @@ All the changes across your entire stacked diff.
   }
 
   _monitorActiveUri() {
-    const activeEditors = (0, (_event || _load_event()).observableFromSubscribeFunction)(atom.workspace.observeActiveTextEditor.bind(atom.workspace));
+    const activeEditors = (0, (_event || _load_event()).observableFromSubscribeFunction)(atom.workspace.onDidStopChangingActivePaneItem.bind(atom.workspace));
 
-    return new (_UniversalDisposable || _load_UniversalDisposable()).default(activeEditors.debounceTime(100).let((0, (_observable || _load_observable()).toggle)(this._showOpenConfigValues)).subscribe(editor => {
+    return new (_UniversalDisposable || _load_UniversalDisposable()).default(activeEditors.let((0, (_observable || _load_observable()).toggle)(this._showOpenConfigValues)).subscribe(editor => {
       if (editor == null || typeof editor.getPath !== 'function' || editor.getPath() == null) {
         this.setState({ activeUri: null });
         return;

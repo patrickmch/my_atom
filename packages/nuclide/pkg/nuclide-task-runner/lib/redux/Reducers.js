@@ -151,23 +151,26 @@ function consoleService(state = null, action) {
   }
 }
 
-function consolesForTaskRunners(state = (_immutable || _load_immutable()).Map(), action) {
+function consolesForTaskRunners(state = new Map(), action) {
   switch (action.type) {
     case (_Actions || _load_Actions()).SET_CONSOLES_FOR_TASK_RUNNERS:
-      state.forEach(value => value.dispose());
+      state.forEach((value, key) => {
+        value.dispose();
+      });
       return action.payload.consolesForTaskRunners;
+    case (_Actions || _load_Actions()).SET_CONSOLE_SERVICE:
+      return new Map();
     case (_Actions || _load_Actions()).ADD_CONSOLE_FOR_TASK_RUNNER:
       const { consoleApi, taskRunner } = action.payload;
-      return state.set(taskRunner, consoleApi);
+      return new Map(state.entries()).set(taskRunner, consoleApi);
     case (_Actions || _load_Actions()).REMOVE_CONSOLE_FOR_TASK_RUNNER:
       const previous = state.get(action.payload.taskRunner);
+      const newState = new Map(state.entries());
       if (previous) {
         previous.dispose();
+        newState.delete(action.payload.taskRunner);
       }
-      return state.delete(action.payload.taskRunner);
-    case (_Actions || _load_Actions()).SET_CONSOLE_SERVICE:
-      state.forEach(value => value.dispose());
-      return (_immutable || _load_immutable()).Map();
+      return newState;
     default:
       return state;
   }

@@ -571,7 +571,7 @@ function createRemoteDirectoryProvider() {
 
 function createRemoteDirectorySearcher() {
   return new (_RemoteDirectorySearcher || _load_RemoteDirectorySearcher()).default(dir => {
-    return (0, (_nuclideRemoteConnection || _load_nuclideRemoteConnection()).getCodeSearchServiceByNuclideUri)(dir.getPath());
+    return (0, (_nuclideRemoteConnection || _load_nuclideRemoteConnection()).getGrepServiceByNuclideUri)(dir.getPath());
   }, () => workingSetsStore);
 }
 

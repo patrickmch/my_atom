@@ -1,0 +1,67 @@
+{
+  "_args": [
+    [
+      {
+        "raw": "/private/var/folders/dp/vj05cwss7pz9mjl62ccqzysm0000gp/T/d-118021-12787-1t5vvza.jcpplul3di/package.tgz",
+        "scope": null,
+        "escapedName": null,
+        "name": null,
+        "rawSpec": "/private/var/folders/dp/vj05cwss7pz9mjl62ccqzysm0000gp/T/d-118021-12787-1t5vvza.jcpplul3di/package.tgz",
+        "spec": "/private/var/folders/dp/vj05cwss7pz9mjl62ccqzysm0000gp/T/d-118021-12787-1t5vvza.jcpplul3di/package.tgz",
+        "type": "local"
+      },
+      "/private/var/folders/dp/vj05cwss7pz9mjl62ccqzysm0000gp/T/apm-install-dir-118021-12787-1mou1ew.dxkbju4n29"
+    ]
+  ],
+  "_from": "../d-118021-12787-1t5vvza.jcpplul3di/package.tgz",
+  "_id": "autumn-highlighter-syntax@1.13.0",
+  "_inCache": true,
+  "_location": "/autumn-highlighter-syntax",
+  "_phantomChildren": {},
+  "_requested": {
+    "raw": "/private/var/folders/dp/vj05cwss7pz9mjl62ccqzysm0000gp/T/d-118021-12787-1t5vvza.jcpplul3di/package.tgz",
+    "scope": null,
+    "escapedName": null,
+    "name": null,
+    "rawSpec": "/private/var/folders/dp/vj05cwss7pz9mjl62ccqzysm0000gp/T/d-118021-12787-1t5vvza.jcpplul3di/package.tgz",
+    "spec": "/private/var/folders/dp/vj05cwss7pz9mjl62ccqzysm0000gp/T/d-118021-12787-1t5vvza.jcpplul3di/package.tgz",
+    "type": "local"
+  },
+  "_requiredBy": [
+    "#USER"
+  ],
+  "_resolved": "file:../d-118021-12787-1t5vvza.jcpplul3di/package.tgz",
+  "_shasum": "510994f252e7a8ffd34cc569b436faeb2b474855",
+  "_shrinkwrap": null,
+  "_spec": "/private/var/folders/dp/vj05cwss7pz9mjl62ccqzysm0000gp/T/d-118021-12787-1t5vvza.jcpplul3di/package.tgz",
+  "_where": "/private/var/folders/dp/vj05cwss7pz9mjl62ccqzysm0000gp/T/apm-install-dir-118021-12787-1mou1ew.dxkbju4n29",
+  "bugs": {
+    "url": "https://github.com/Lucid-Network/electron-highlighter-syntax/issues"
+  },
+  "dependencies": {},
+  "description": "A fork of the electron-highlighter-syntax with a new autumn-style color scheme",
+  "devDependencies": {},
+  "engines": {
+    "atom": ">=1.13.0 <2.0.0"
+  },
+  "homepage": "https://github.com/Lucid-Network/electron-highlighter-syntax#readme",
+  "keywords": [
+    "syntax",
+    "theme",
+    "elecron",
+    "dark",
+    "spacegray",
+    "autumn"
+  ],
+  "license": "MIT",
+  "name": "autumn-highlighter-syntax",
+  "optionalDependencies": {},
+  "readme": "# autumn-highlighter-syntax theme\n\nA fork of the electron-highlighter-syntax theme based on One Dark with an autumn like color scheme.\n\nPython\n\n![screenshot](https://raw.githubusercontent.com/Lucid-Network/electron-highlighter-syntax/master/python.png)\n\nJavascript\n\n![screenshot](https://raw.githubusercontent.com/Lucid-Network/electron-highlighter-syntax/master/javascript.png)\n\nHTML\n\n![screenshot](https://raw.githubusercontent.com/Lucid-Network/electron-highlighter-syntax/master/html.png)\n",
+  "readmeFilename": "README.md",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Lucid-Network/electron-highlighter-syntax.git"
+  },
+  "theme": "syntax",
+  "version": "1.13.0"
+}

@@ -1,0 +1,65 @@
+{
+  "_args": [
+    [
+      {
+        "raw": "/private/var/folders/dp/vj05cwss7pz9mjl62ccqzysm0000gp/T/d-118024-89710-11u00ab.qbvgqfr/package.tgz",
+        "scope": null,
+        "escapedName": null,
+        "name": null,
+        "rawSpec": "/private/var/folders/dp/vj05cwss7pz9mjl62ccqzysm0000gp/T/d-118024-89710-11u00ab.qbvgqfr/package.tgz",
+        "spec": "/private/var/folders/dp/vj05cwss7pz9mjl62ccqzysm0000gp/T/d-118024-89710-11u00ab.qbvgqfr/package.tgz",
+        "type": "local"
+      },
+      "/private/var/folders/dp/vj05cwss7pz9mjl62ccqzysm0000gp/T/apm-install-dir-118024-89710-7qswa8.hw2buik9"
+    ]
+  ],
+  "_from": "../d-118024-89710-11u00ab.qbvgqfr/package.tgz",
+  "_id": "ubik-gotham-syntax@1.2.0",
+  "_inCache": true,
+  "_location": "/ubik-gotham-syntax",
+  "_phantomChildren": {},
+  "_requested": {
+    "raw": "/private/var/folders/dp/vj05cwss7pz9mjl62ccqzysm0000gp/T/d-118024-89710-11u00ab.qbvgqfr/package.tgz",
+    "scope": null,
+    "escapedName": null,
+    "name": null,
+    "rawSpec": "/private/var/folders/dp/vj05cwss7pz9mjl62ccqzysm0000gp/T/d-118024-89710-11u00ab.qbvgqfr/package.tgz",
+    "spec": "/private/var/folders/dp/vj05cwss7pz9mjl62ccqzysm0000gp/T/d-118024-89710-11u00ab.qbvgqfr/package.tgz",
+    "type": "local"
+  },
+  "_requiredBy": [
+    "#USER"
+  ],
+  "_resolved": "file:../d-118024-89710-11u00ab.qbvgqfr/package.tgz",
+  "_shasum": "2600f4be34759100487faa8edd2ea997de0e6e7b",
+  "_shrinkwrap": null,
+  "_spec": "/private/var/folders/dp/vj05cwss7pz9mjl62ccqzysm0000gp/T/d-118024-89710-11u00ab.qbvgqfr/package.tgz",
+  "_where": "/private/var/folders/dp/vj05cwss7pz9mjl62ccqzysm0000gp/T/apm-install-dir-118024-89710-7qswa8.hw2buik9",
+  "bugs": {
+    "url": "https://github.com/mr-ubik/atom-ubik-gotham-syntax/issues"
+  },
+  "dependencies": {},
+  "description": "Dark syntax theme inspired by vim's gotham colorscheme, extended to better highlight code, with a focus on Python and Jinja2.",
+  "devDependencies": {},
+  "engines": {
+    "atom": ">=1.0.0 <2.0.0"
+  },
+  "homepage": "https://github.com/mr-ubik/atom-ubik-gotham-syntax#readme",
+  "keywords": [
+    "syntax",
+    "theme",
+    "python",
+    "jinja"
+  ],
+  "license": "MIT",
+  "name": "ubik-gotham-syntax",
+  "optionalDependencies": {},
+  "readme": "# ubik-gotham-syntax Atom Theme\n\n![Screenshot](http://i.imgur.com/auTTGgP.png \"Syntax\")\n\nBetter Screenshot: http://imgur.com/auTTGgP\n\n*__Disclaimer:__\nI strongly recommend leaving the dark background unchanged, coupling it with a dark UI-theme.*\n\n## Description\n\nInspired by the [Gotham colorscheme](https://github.com/whatyouhide/vim-gotham), modified and enriched to better highlight code.\nCode highlighting is done by altering / adding new colors to the base gotham scheme\nand by experimenting with font styling; this is by far still a growing pet project\nof mine: as I code more and in more language I will tweak it according to my eyes'\nfatigue and aesthetic sense.\n\nSince I mostly code in Python that is where my customization show itself the most.\n\n__SPECIAL:\n  Custom Jinja code styling is supported if you use atom-jinja2.__\n\n## Installation\n\n> From the command line: `apm install ubik-gotham-syntax`\n\n> From Atom, go to __Settings__ --> __Install__ --> __Themes__ --> type in __ubik-gotham-syntax__\n\nIf you have any suggestions, please don't hesitate to let me know.\n\nHappy Coding!\n\nUbik\n\n_PS: if you like what you see check my [Spyder syntax theme](https://github.com/mr-ubik/spyder-ubik-syntax) and the [gotham-contrib repository](https://github.com/whatyouhide/gotham-contrib)_\n",
+  "readmeFilename": "README.md",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/mr-ubik/atom-ubik-gotham-syntax.git"
+  },
+  "theme": "syntax",
+  "version": "1.2.0"
+}

@@ -480,11 +480,10 @@ class SshHandshake {
           displayTitle: _this3._config.displayTitle
         });
       } else {
+        /* $FlowIssue t9212378 */
         _this3._forwardingServer = _net.default.createServer(function (sock) {
           _this3._forwardSocket(sock);
-        })
-        // $FlowFixMe
-        .listen(0, 'localhost', function () {
+        }).listen(0, 'localhost', function () {
           const localPort = _this3._getLocalPort();
           // flowlint-next-line sketchy-null-number:off
 

@@ -6,6 +6,7 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 
 import Blamer from './Blamer';
+import GitCommander from './GitCommander';
 import RemoteRevision from './RemoteRevision';
 import repositoryForEditorPath from './repositoryForEditorPath';
 import BlameLine from '../components/BlameLine';
@@ -14,6 +15,8 @@ import GutterResize from '../components/GutterResize';
 const GUTTER_ID = 'com.alexcorre.git-blame';
 const GUTTER_STYLE_ID = 'com.alexcorre.git-blame.style';
 const RESIZE_DEBOUNCE_MS = 5;
+
+const GIT_CONFIG_REPO_URL = 'atom-git-blame.repositoryUrlTemplate';
 
 export default class BlameGutter {
 
@@ -98,14 +101,21 @@ export default class BlameGutter {
     return repositoryForEditorPath(filePath)
       .then((repo) => {
         const blamer = new Blamer(repo);
-        return new Promise((resolve, reject) => {
+        const gitCmd = new GitCommander(repo.getWorkingDirectory());
+        const blamePromise = new Promise((resolve, reject) => {
           blamer.blame(filePath, function (err, data) {
             return err ? reject(err) : resolve([repo, data]);
           });
         });
+        const gitConfigPromise = new Promise((resolve, reject) => {
+          gitCmd.config(GIT_CONFIG_REPO_URL, function (err, data) {
+            return err ? reject(err) : resolve(data);
+          });
+        });
+        return Promise.all([blamePromise, gitConfigPromise]);
       })
-      .then(([repo, blameData]) => {
-        const remoteRevision = new RemoteRevision(repo.getOriginURL(filePath));
+      .then(([[repo, blameData], gitConfigData]) => {
+        const remoteRevision = new RemoteRevision(repo.getOriginURL(filePath), gitConfigData);
         const hasUrlTemplate = !!remoteRevision.getTemplate();
         let lastHash = null;
         let className = null;

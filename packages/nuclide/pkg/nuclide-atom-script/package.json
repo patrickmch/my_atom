@@ -2,7 +2,6 @@
   "name": "nuclide-atom-script",
   "version": "0.0.0",
   "description": "Facilitates dumping data from Atom",
-  "author": "NEEDS OWNER",
   "main": "./lib/test-runner-entry.js",
   "atomTestRunner": "./lib/test-runner-entry.js",
   "nuclide": {

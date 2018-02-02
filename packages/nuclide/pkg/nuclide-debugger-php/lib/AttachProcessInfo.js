@@ -63,10 +63,8 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
  */
 
 class AttachProcessInfo extends (_nuclideDebuggerCommon || _load_nuclideDebuggerCommon()).DebuggerProcessInfo {
-
-  constructor(targetUri, debugPort) {
+  constructor(targetUri) {
     super('hhvm', targetUri);
-    this._debugPort = debugPort;
   }
 
   clone() {
@@ -75,7 +73,6 @@ class AttachProcessInfo extends (_nuclideDebuggerCommon || _load_nuclideDebugger
 
   getDebuggerCapabilities() {
     return Object.assign({}, super.getDebuggerCapabilities(), {
-      completionsRequest: true,
       conditionalBreakpoints: true,
       continueToLocation: true,
       setVariable: true,
@@ -113,19 +110,6 @@ class AttachProcessInfo extends (_nuclideDebuggerCommon || _load_nuclideDebugger
         targetUri: (_nuclideUri || _load_nuclideUri()).default.getPath(_this.getTargetUri()),
         action: 'attach'
       };
-
-      let debugPort = _this._debugPort;
-      if (debugPort == null) {
-        try {
-          // $FlowFB
-          const fetch = require('../../commons-node/fb-sitevar').fetchSitevarOnce;
-          debugPort = yield fetch('NUCLIDE_HHVM_DEBUG_PORT');
-        } catch (e) {}
-      }
-
-      if (debugPort != null) {
-        config.debugPort = debugPort;
-      }
 
       (_utils || _load_utils()).default.info(`Connection session config: ${JSON.stringify(config)}`);
       const result = yield hhvmDebuggerService.debug(config);

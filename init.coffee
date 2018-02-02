@@ -40,11 +40,13 @@ atom.commands.add 'atom-text-editor',
     editor.insertText('\u0020')
     editor.setCursorBufferPosition(currentPosition)
 
+
 atom.commands.add 'atom-text-editor',
-  'custom:insert-tab-keep-cursor-place': ->
+  'custom:insert-newline-keep-cursor-place': ->
     editor = atom.workspace.getActiveTextEditor()
     currentPosition = editor.getCursorBufferPosition()
-    editor.insertText('\u0020\u0020\u0020\u0020')
+    editor.moveToEndOfLine()
+    editor.insertText('\n')
     editor.setCursorBufferPosition(currentPosition)
 
 # Better support for indent (from https://github.com/atom/atom/pull/9104)
@@ -65,3 +67,9 @@ atom.commands.add 'atom-text-editor', 'my:move-line-down', ->
     atom.config.set('editor.autoIndent', true)
   else
     editor.moveLineDown()
+
+
+atom.commands.add 'atom-workspace', 'my:dismiss-notifications', ->
+  atom.notifications.getNotifications().forEach (notification) ->
+    notification.dismiss()
+  atom.notifications.clear()

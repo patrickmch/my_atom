@@ -7,18 +7,6 @@ exports.COMPILATION_DATABASE_FILE = undefined;
 
 var _asyncToGenerator = _interopRequireDefault(require('async-to-generator'));
 
-var _fsPromise;
-
-function _load_fsPromise() {
-  return _fsPromise = _interopRequireDefault(require('nuclide-commons/fsPromise'));
-}
-
-var _nuclideUri;
-
-function _load_nuclideUri() {
-  return _nuclideUri = _interopRequireDefault(require('nuclide-commons/nuclideUri'));
-}
-
 var _UniversalDisposable;
 
 function _load_UniversalDisposable() {
@@ -133,11 +121,8 @@ class CqueryLanguageServer extends (_nuclideLanguageServiceRpc || _load_nuclideL
 
       const [, host] = yield Promise.all([_this.hasObservedDiagnostics(), (0, (_nuclideLanguageServiceRpc || _load_nuclideLanguageServiceRpc()).forkHostServices)(_this._host, _this._logger)]);
 
-      const stderrFd = yield (_fsPromise || _load_fsPromise()).default.open((_nuclideUri || _load_nuclideUri()).default.join(initalizationOptions.cacheDirectory, '..', 'stderr'), 'a');
-      const lsp = new (_CqueryLanguageClient || _load_CqueryLanguageClient()).CqueryLanguageClient(_this._logger, _this._fileCache, host, _this._languageId, _this._command, ['--language-server', '--log-file', (_nuclideUri || _load_nuclideUri()).default.join(initalizationOptions.cacheDirectory, '..', 'diagnostics')], // args
-      {
-        stdio: ['pipe', 'pipe', stderrFd]
-      }, // spawnOptions
+      const lsp = new (_CqueryLanguageClient || _load_CqueryLanguageClient()).CqueryLanguageClient(_this._logger, _this._fileCache, host, _this._languageId, _this._command, ['--language-server', '--log-file', `${initalizationOptions.cacheDirectory}/diagnostics`], // args
+      {}, // spawnOptions
       project.projectRoot, ['.cpp', '.h', '.hpp', '.cc', '.m', 'mm'], initalizationOptions, 5 * 60 * 1000);
 
       lsp.start(); // Kick off 'Initializing'...

@@ -1,0 +1,75 @@
+{
+  "_args": [
+    [
+      {
+        "raw": "/private/var/folders/dp/vj05cwss7pz9mjl62ccqzysm0000gp/T/d-118021-11443-127jtev.81h4qgp66r/package.tgz",
+        "scope": null,
+        "escapedName": null,
+        "name": null,
+        "rawSpec": "/private/var/folders/dp/vj05cwss7pz9mjl62ccqzysm0000gp/T/d-118021-11443-127jtev.81h4qgp66r/package.tgz",
+        "spec": "/private/var/folders/dp/vj05cwss7pz9mjl62ccqzysm0000gp/T/d-118021-11443-127jtev.81h4qgp66r/package.tgz",
+        "type": "local"
+      },
+      "/private/var/folders/dp/vj05cwss7pz9mjl62ccqzysm0000gp/T/apm-install-dir-118021-11443-c9spm8.ky4b49529"
+    ]
+  ],
+  "_from": "../d-118021-11443-127jtev.81h4qgp66r/package.tgz",
+  "_id": "vim-mode-clipboard-plus@0.2.0",
+  "_inCache": true,
+  "_location": "/vim-mode-clipboard-plus",
+  "_phantomChildren": {},
+  "_requested": {
+    "raw": "/private/var/folders/dp/vj05cwss7pz9mjl62ccqzysm0000gp/T/d-118021-11443-127jtev.81h4qgp66r/package.tgz",
+    "scope": null,
+    "escapedName": null,
+    "name": null,
+    "rawSpec": "/private/var/folders/dp/vj05cwss7pz9mjl62ccqzysm0000gp/T/d-118021-11443-127jtev.81h4qgp66r/package.tgz",
+    "spec": "/private/var/folders/dp/vj05cwss7pz9mjl62ccqzysm0000gp/T/d-118021-11443-127jtev.81h4qgp66r/package.tgz",
+    "type": "local"
+  },
+  "_requiredBy": [
+    "#USER"
+  ],
+  "_resolved": "file:../d-118021-11443-127jtev.81h4qgp66r/package.tgz",
+  "_shasum": "c826f7ae09471285f8d18dd3a67d0aaf63621775",
+  "_shrinkwrap": null,
+  "_spec": "/private/var/folders/dp/vj05cwss7pz9mjl62ccqzysm0000gp/T/d-118021-11443-127jtev.81h4qgp66r/package.tgz",
+  "_where": "/private/var/folders/dp/vj05cwss7pz9mjl62ccqzysm0000gp/T/apm-install-dir-118021-11443-c9spm8.ky4b49529",
+  "bugs": {
+    "url": "https://github.com/aki77/atom-vim-mode-clipboard-plus/issues"
+  },
+  "consumedServices": {
+    "clipboard-plus": {
+      "versions": {
+        "^0.1.0": "consumeClipboardPlus"
+      }
+    }
+  },
+  "dependencies": {
+    "atom-package-dependencies": "~1.0.3"
+  },
+  "description": "Add clipboard-plus feature to vim-mode",
+  "devDependencies": {},
+  "engines": {
+    "atom": ">=0.174.0 <2.0.0"
+  },
+  "homepage": "https://github.com/aki77/atom-vim-mode-clipboard-plus#readme",
+  "keywords": [
+    "vim",
+    "clipboard"
+  ],
+  "license": "MIT",
+  "main": "./lib/main",
+  "name": "vim-mode-clipboard-plus",
+  "optionalDependencies": {},
+  "package-dependencies": {
+    "clipboard-plus": ">=0.3.0"
+  },
+  "readme": "# vim-mode-clipboard-plus package\n\nAdd clipboard-plus feature to vim-mode.\n\nSee [clipboard-plus](https://atom.io/packages/clipboard-plus) for details.\n\n## Requirement\n\n* [vim-mode](https://atom.io/packages/vim-mode) or [vim-mode-plus](https://atom.io/packages/vim-mode-plus)\n* [clipboard-plus](https://atom.io/packages/clipboard-plus)\n\n## Keymap\n\nNo keymap by default.\n\nedit `~/.atom/keymap.cson`\n\n```coffeescript\n'.platform-darwin atom-text-editor.vim-mode:not(.insert-mode)':\n  'ctrl-p': 'clipboard-plus:toggle'\n\n'.platform-linux atom-text-editor.vim-mode:not(.insert-mode)':\n  'alt-p': 'clipboard-plus:toggle'\n```\n\n## Settings\n\n* `useVimModePlus` (default: false)\n",
+  "readmeFilename": "README.md",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/aki77/atom-vim-mode-clipboard-plus.git"
+  },
+  "version": "0.2.0"
+}

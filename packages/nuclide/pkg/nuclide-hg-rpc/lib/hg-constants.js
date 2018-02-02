@@ -102,13 +102,6 @@ MergeConflictFileStatus;
 const HEAD_REVISION_EXPRESSION = '.';
 const PARENT_REVISION_EXPRESSION = '.^';
 
-const HisteditActions = Object.freeze({
-  PICK: 'pick'
-});
-
-// This is to work around flow's missing support of enums.
-HisteditActions;
-
 // eslint-disable-next-line rulesdir/no-commonjs
 module.exports = {
   AmendMode,
@@ -120,6 +113,5 @@ module.exports = {
   StatusCodeId,
   StatusCodeIdToNumber,
   StatusCodeNumber,
-  SuccessorType,
-  HisteditActions
+  SuccessorType
 };

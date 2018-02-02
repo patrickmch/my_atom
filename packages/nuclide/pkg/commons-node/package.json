@@ -2,7 +2,6 @@
   "name": "commons-node",
   "version": "0.0.0",
   "description": "Provides common utilities for other Nuclide packages",
-  "author": "NEEDS OWNER",
   "nuclide": {
     "packageType": "Node",
     "testRunner": "npm"

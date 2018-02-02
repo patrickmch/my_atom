@@ -50,31 +50,23 @@ function _load_types() {
   return _types = require('./types');
 }
 
-var _fsPromise;
-
-function _load_fsPromise() {
-  return _fsPromise = _interopRequireDefault(require('nuclide-commons/fsPromise'));
-}
-
 function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-/**
- * Copyright (c) 2015-present, Facebook, Inc.
- * All rights reserved.
- *
- * This source code is licensed under the license found in the LICENSE file in
- * the root directory of this source tree.
- *
- * 
- * @format
- */
+const logger = (0, (_log4js || _load_log4js()).getLogger)('nuclide-buck'); /**
+                                                                            * Copyright (c) 2015-present, Facebook, Inc.
+                                                                            * All rights reserved.
+                                                                            *
+                                                                            * This source code is licensed under the license found in the LICENSE file in
+                                                                            * the root directory of this source tree.
+                                                                            *
+                                                                            * 
+                                                                            * @format
+                                                                            */
 
-const logger = (0, (_log4js || _load_log4js()).getLogger)('nuclide-buck');
 const BUCK_TIMEOUT = 10 * 60 * 1000;
 const TARGET_KIND_REGEX = ['apple_binary', 'apple_library', 'apple_test', 'cxx_binary', 'cxx_library', 'cxx_test'].join('|');
-const MAX_DB_SIZE_IN_BYTES_FOR_CACHING = 100000000; // 100 MB
 
 /**
  * Facebook puts all headers in a <target>:__default_headers__ build target by default.
@@ -117,7 +109,7 @@ class BuckClangCompilationDatabaseHandler {
         throw err;
       }).then(function (db) {
         if (db != null) {
-          _this._cacheFilesToCompilationDB(db, buckRoot, src);
+          _this._cacheAllTheFilesInTheSameDB(db, buckRoot);
         }
         return db;
       });
@@ -222,13 +214,10 @@ class BuckClangCompilationDatabaseHandler {
     })();
   }
 
-  _cacheFilesToCompilationDB(db, buckRoot, src) {
+  _cacheAllTheFilesInTheSameDB(db, buckRoot) {
     var _this4 = this;
 
     return (0, _asyncToGenerator.default)(function* () {
-      if (yield _this4._isDbTooBigForFullCaching(db)) {
-        return;
-      }
       const pathToFlags = yield (_nuclideClangRpc || _load_nuclideClangRpc()).loadFlagsFromCompilationDatabaseAndCacheThem({
         compilationDatabase: (0, (_types || _load_types()).convertBuckClangCompilationDatabase)(db),
         projectRoot: buckRoot
@@ -236,12 +225,6 @@ class BuckClangCompilationDatabaseHandler {
       pathToFlags.forEach(function (fullFlags, path) {
         _this4._sourceCache.set(path, Promise.resolve(db));
       });
-    })();
-  }
-
-  _isDbTooBigForFullCaching(db) {
-    return (0, _asyncToGenerator.default)(function* () {
-      return db.file == null ? false : (yield (_fsPromise || _load_fsPromise()).default.stat(db.file)).size > MAX_DB_SIZE_IN_BYTES_FOR_CACHING;
     })();
   }
 }

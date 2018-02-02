@@ -27,14 +27,29 @@ function StateBlock(src, md, env, tokens) {
   this.tShift = [];  // offsets of the first non-space characters (tabs not expanded)
   this.sCount = [];  // indents for each line (tabs expanded)
 
+  // An amount of virtual spaces (tabs expanded) between beginning
+  // of each line (bMarks) and real beginning of that line.
+  //
+  // It exists only as a hack because blockquotes override bMarks
+  // losing information in the process.
+  //
+  // It's used only when expanding tabs, you can think about it as
+  // an initial tab length, e.g. bsCount=21 applied to string `\t123`
+  // means first tab should be expanded to 4-21%4 === 3 spaces.
+  //
+  this.bsCount = [];
+
   // block parser variables
   this.blkIndent  = 0; // required block content indent
                        // (for example, if we are in list)
   this.line       = 0; // line index in src
   this.lineMax    = 0; // lines count
   this.tight      = false;  // loose/tight mode for lists
-  this.parentType = 'root'; // if `list`, block parser stops on two newlines
   this.ddIndent   = -1; // indent of the current dd block (-1 if there isn't any)
+
+  // can be 'blockquote', 'list', 'root', 'paragraph' or 'reference'
+  // used in lists to determine if they interrupt a paragraph
+  this.parentType = 'root';
 
   this.level = 0;
 
@@ -70,6 +85,7 @@ function StateBlock(src, md, env, tokens) {
       this.eMarks.push(pos);
       this.tShift.push(indent);
       this.sCount.push(offset);
+      this.bsCount.push(0);
 
       indent_found = false;
       indent = 0;
@@ -83,6 +99,7 @@ function StateBlock(src, md, env, tokens) {
   this.eMarks.push(s.length);
   this.tShift.push(0);
   this.sCount.push(0);
+  this.bsCount.push(0);
 
   this.lineMax = this.bMarks.length - 1; // don't count last fake line
 }
@@ -180,7 +197,7 @@ StateBlock.prototype.getLines = function getLines(begin, end, indent, keepLastLF
 
       if (isSpace(ch)) {
         if (ch === 0x09) {
-          lineIndent += 4 - lineIndent % 4;
+          lineIndent += 4 - (lineIndent + this.bsCount[line]) % 4;
         } else {
           lineIndent++;
         }
@@ -194,7 +211,13 @@ StateBlock.prototype.getLines = function getLines(begin, end, indent, keepLastLF
       first++;
     }
 
-    queue[i] = this.src.slice(first, last);
+    if (lineIndent > indent) {
+      // partially expanding tabs in code blocks, e.g '\t\tfoobar'
+      // with indent=2 becomes '  \tfoobar'
+      queue[i] = new Array(lineIndent - indent + 1).join(' ') + this.src.slice(first, last);
+    } else {
+      queue[i] = this.src.slice(first, last);
+    }
   }
 
   return queue.join('');

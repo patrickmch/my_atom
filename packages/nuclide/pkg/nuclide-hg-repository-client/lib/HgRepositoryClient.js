@@ -1043,10 +1043,6 @@ class HgRepositoryClient {
     return this._service.rebase(destination, source).refCount();
   }
 
-  reorderWithinStack(orderedRevisions) {
-    return this._service.reorderWithinStack(orderedRevisions).refCount();
-  }
-
   pull(options = []) {
     // TODO(T17463635)
     return this._service.pull(options).refCount();

@@ -1,91 +1,229 @@
-{% load static from staticfiles %}
+"""Forms for staffing applications"""
 
-<form id="payment" action="." method="post" autocomplete="off" class="form-horizontal">
+import datetime
 
-    {# Visa/MC logos #}
-    <p class="normal">
-        <label>&nbsp;<img src="{% static "payment/img/logo_ccVisa.gif" %}" alt="Visa accepted"/>
-            <img src="{% static "payment/img/logo_ccMC.gif" %}" alt="MasterCard accepted"/></label>
-        <span class="subtle">Visa &amp; MasterCard accepted</span>
-    </p>
+from django import forms
+from django.db.models.fields import BLANK_CHOICE_DASH
+from django.utils.safestring import mark_safe, SafeUnicode
 
-    {# Display testmode information if needed, including fake cc data #}
-    {% if testmode %}
-        <div style="color:red;">{{ testmode|safe }}</div>
-    {% endif %}
+from staffing import constants as const
+from staffing.models import Wrap, WrapCourseSelection
+from nols.util.django.forms import utils as formutils
 
-	{% if form.errors or contact_form.errors %}
-    <div data-closable class="row callout alert">
-      <button type="button" class="close-button" data-close data-dismiss="alert" aria-hidden="true">&times</button>
-    	<p class="errorlist">There is an error, please correct the appropriate field(s).<p>
-	    {{ contact_form.non_field_errors }}
-	    {{ form.non_field_errors }}
-        </p>
-    </div>
-	{% endif %}
 
-    {# Cardholder name and card data #}
-    {% if testmode %}
-      <!-- For Sandbox/Testing use -->
-      <script type="text/javascript" src="https://jstest.authorize.net/v1/Accept.js" charset="utf-8"></script>
-      <script type="text/javascript">var forceDelay = false;</script>
-    {% else %}
-      <script type="text/javascript" src="https://js.authorize.net/v1/Accept.js" charset="utf-8"></script>
-      <script type="text/javascript">var forceDelay = true;</script>
-    {% endif %}
-    <script src="{% static 'payment/js/authorize.js' %}"></script>
-    {% include 'payment/credit_card_info.html' %}
+NULL_BOOLEAN_FIELDS = ('is_avail_all_season', 'will_proctor', 'will_work_anywhere', 'will_nolspro',
+                       'applying_for_wild_med_work')
 
-    {# Address form #}
-    {% if include_billing_address_label %}
-        <div class="form-group">
-            <label class="control-label column medium-3">Billing Address</label>
-        </div>
-    {% endif %}
-      {% with "True" as hide_form_level_error_header %}
-    {% with form_template="dataentry/bs_responsive_form_layout.html" label_columns=3 input_columns=4 %}
-      {% if is_anonymous and not address_form %}
-        {% with contact_form as address_form %}
-          {% include "core/fragments/address_form_layout.html" %}
-        {% endwith %}
 
-      {% else %}
-        {% with contact_form as contact_info_form %}
-          {% with input_columns=6 %}
-            {% include "core/fragments/contact_info.html" %}
-          {% endwith %}
-        {% endwith %}
-        {% if address_form %}
-          <div class="address-form">
-            {% with address_form as form %}
-              {% include form_template %}
-            {% endwith %}
-	        </div>
-        {% endif %}
-      {% if include_billing_address_label or address_form %}
-          <div class="subtle-divider"></div>
-      {% endif %}
-    {% endif %}
-    <br/>
-    {% endwith %}
-    {% endwith %}
+class DegreeForm(forms.Form):
+    """Does an instructor have an advanced degree; possibly a short-term thing we will abandon"""
 
-    <div class="subtle-divider"></div>
-    <div class="row bottom-buttons">
-        <div class="column small-12 medium-6">
-          {% if include_db_button %}
-            <a class="button button--hollow" href="{% url 'dashboard:csr_detail' csr_id=csr.pk %}">
-          {% elif back_to_account_button %}
-            <a class="button button--hollow" href="{% url 'account_home' %}">
-          {% else %}
-          <a class="button button--hollow" onclick="window.history.back()">
-            <span>Back</span>
-          {% endif %}
-          </a>
-        </div>
-        <div class="column small-12 medium-6">
-            <input id="payment-submit" class="button small-float-none float-right" type="submit" value="Submit"
-                  onclick="validateAndSendToAuthNet(event, '{{ api_login }}', '{{ client_key }}')"/>
-        </div>
-    </div>
-</form>
+    # These need to be kept in sync with the pick-list constraining personTab.highestLevelCompleted
+    DEGREE_CHOICES = (
+        'High School Diploma',
+        'Associate Degree',
+        'Bachelors Degree',
+        'Masters Degree',
+        'Doctorate Degree',
+        'Other'
+    )
+    education_level = forms.ChoiceField(
+        label='Highest education level achieved', required=True, widget=forms.widgets.RadioSelect,
+        choices=[(x, x) for x in DEGREE_CHOICES])
+
+
+class CertificationForm(forms.Form):
+    """Form to prompt instructor for provisional updated First Aid certification data"""
+    cpr_choices = BLANK_CHOICE_DASH + [
+        ('CPR only', 'CPR only'),
+        ('First Aid only', 'First Aid only'),
+        ('First Aid with CPR', 'First Aid with CPR'),
+    ]
+    update_type = forms.ChoiceField(cpr_choices)
+    cert_choices = sorted([(val, val) for val in const.FIRST_AID_MAP.values()
+                           if val.startswith('First Aid')])
+    first_aid_type = forms.ChoiceField(
+        label='First Aid type', required=False, widget=forms.widgets.RadioSelect,
+        choices=cert_choices)
+    expiration_date = forms.DateField(
+        help_text="MM/DD/YYYY - Actual or anticipated new expiration date")
+    note = forms.CharField(
+        max_length=40, required=False,
+        help_text="Do you already have the certification? Or is this a plan.")
+
+    def clean_expiration_date(self):
+        """Ensure newly provided expiration date is in the future"""
+        data = self.cleaned_data['expiration_date']
+        if data <= datetime.date.today():
+            raise forms.ValidationError('Expiration dates should be in the future.')
+        return data
+
+    def clean(self):
+        """Ensure First Aid type is appropriate for update type"""
+        data = self.cleaned_data
+        update_type = data.get('update_type')
+        if update_type and update_type == 'CPR only' and data.get('first_aid_type'):
+            msg = 'You cannot choose a First Aid type with a CPR only update.'
+            self._errors['first_aid_type'] = self.error_class([msg])
+
+        if update_type and update_type.startswith('First Aid') and not data.get('first_aid_type'):
+            msg = 'You must choose a First Aid type.'
+            self._errors['first_aid_type'] = self.error_class([msg])
+
+        return data
+
+
+class WrapForm(forms.ModelForm):
+    """Form to accept Wrap data from instructors"""
+
+    class Meta:
+        """Meta options for WrapForm"""
+        model = Wrap
+        exclude = ('user', 'season', 'submitted_ts')
+
+    def __init__(self, season, wild_med_instructor, *args, **kwargs):
+        super(WrapForm, self).__init__(*args, **kwargs)
+
+        max_weeks = season.max_workable_weeks + 1
+        weeks_choices = zip(xrange(max_weeks), xrange(max_weeks))
+        weeks_choices = BLANK_CHOICE_DASH + weeks_choices
+        self.fields['minimum_weeks'].widget = forms.widgets.Select(choices=weeks_choices)
+        self.fields['maximum_weeks'].widget = forms.widgets.Select(choices=weeks_choices)
+
+        yesno_choices = BLANK_CHOICE_DASH + [('True', 'Yes'), ('False', 'No')]
+        for key in NULL_BOOLEAN_FIELDS:
+            if not wild_med_instructor and key == 'applying_for_wild_med_work':
+                del self.fields['applying_for_wild_med_work']
+                continue
+            self.fields[key].widget = forms.widgets.Select(choices=yesno_choices)
+            self.fields[key].required = True
+
+        long_attrs = {"class": "answer"}
+        self.fields['priorities'].widget = forms.widgets.Textarea(attrs=long_attrs)
+        self.fields['blackout_date_details'].widget = forms.widgets.Textarea(attrs=long_attrs)
+
+        self.fields['is_avail_all_season'].label = mark_safe(
+            'Available for ENTIRE season (%s to %s)' % (
+                season.operations_start.strftime(const.FMT).replace('-', '&#8209;'),
+                season.operations_end.strftime(const.FMT).replace('-', '&#8209;')))
+
+    def clean(self):
+        """Ensure weeks range has sane data, ensure details fields are populated as needed"""
+
+        # Manipulate _errors directly since we want to highlight the appropriate fields
+
+        data = self.cleaned_data
+        if data.get('maximum_weeks', 0) < data.get('minimum_weeks', 0):
+            weeks_msg = 'Maximum weeks must be same as or more than minimum weeks.'
+            self._errors["maximum_weeks"] = self.error_class([weeks_msg])
+
+        # Careful, we don't want to post an error if is_avail_all_season is None, only False
+        if data.get('is_avail_all_season') is False and not data.get('blackout_date_details'):
+            # TODO: Unclear why we get None if blackout_date_details overflows it's max_length.
+            # But we do, so check for input before displaying no input error.
+            if not self.data.get('blackout_date_details'):
+                dates_msg = 'Details are required if you cannot work entire season.'
+                self._errors['blackout_date_details'] = self.error_class([dates_msg])
+
+        if data.get('will_proctor') and not data.get('proctor_branch_prefs'):
+            proctor_msg = 'You must provide a branch preference for proctoring.'
+            self._errors['proctor_branch_prefs'] = self.error_class([proctor_msg])
+
+        if data.get('will_nolspro') and not data.get('pro_branch_prefs'):
+            proctor_msg = 'You must provide preferences for NOLSPro work.'
+            self._errors['pro_branch_prefs'] = self.error_class([proctor_msg])
+
+        # TODO: DJ1.1 Part of the grand ugliness that is BooleanFields and forms in Django 1.1.x
+        # ideally the model would simply be BooleanField, but that makes putting an empty choice
+        # on the form really hard. We want the user to choose yes or no, not accept a default.
+        required_msg = "This field is required."
+        for field in NULL_BOOLEAN_FIELDS:
+            if data.get(field) is None:
+                self._errors[field] = self.error_class([required_msg])
+
+        return data
+
+
+class CourseSelectionForm(forms.ModelForm):
+    """Course selection form."""
+
+    class Meta:
+        """Meta options for CourseSelectionForm"""
+
+        model = WrapCourseSelection
+        exclude = ('wrap', 'preference')
+
+    def __init__(self, season, *args, **kwargs):
+        from staffing import utils
+
+        self.preference = kwargs.pop('preference', 1)
+        self.preference_desc = const.PREF_DESC_MAP[self.preference]
+        kwargs['prefix'] = str(self.preference)
+        self.optional = kwargs.pop('optional', False)
+        self.session_ns = kwargs.pop('session_ns', '')
+
+        super(CourseSelectionForm, self).__init__(*args, **kwargs)
+
+        self.fields['position'] = forms.ChoiceField(
+            choices=BLANK_CHOICE_DASH + const.POSITION_CHOICES,
+            required=not self.optional)
+
+        self.fields["ops_location_code"] = forms.ChoiceField(
+            label="Sponsor",
+            choices=utils.get_ops_location_choices(season.season),
+            required=not self.optional)
+
+        skills = [(skill, skill) for skill in utils.get_skills_for_branch_season()]
+        self.fields['course_type'] = forms.ChoiceField(
+            choices=BLANK_CHOICE_DASH + skills,
+            required=not self.optional)
+
+        self.fields['notes'] = forms.CharField(
+            help_text='Example: "prefer WST" or "both sections of RAR".',
+            max_length=100,
+            required=False)
+
+    def clean(self):
+        data = self.cleaned_data
+        position = data.get('position')
+        location = data.get('ops_location_code')
+        course_type = data.get('course_type')
+        notes = data.get('notes').strip()
+
+        if course_type == 'Other' and not notes:
+            other_msg = "If you select Other you must also provide a Notes explanation."
+            self._errors['notes'] = self.error_class([other_msg])
+
+        if notes and not all((position, location, course_type)):
+            msg = "Please select position, location and course type or clear Notes."
+            self._errors['notes'] = self.error_class([msg])
+
+        if self.preference != 1 and any((position, location, course_type, notes)):
+            msg = "Position, location and course type must all be selected (or cleared)."
+            if not position:
+                self._errors['position'] = self.error_class([msg])
+            if not location:
+                self._errors['ops_location_code'] = self.error_class([msg])
+            if not course_type:
+                self._errors['course_type'] = self.error_class([msg])
+
+        return data
+
+    def display_data(self):
+        """Build compressed version of this form for display purposes."""
+
+        from staffing import utils
+
+        # TODO: DJ 1.3: Refactor this when ticket 10427 lands
+        position = self.initial.get('position')
+
+        ops_location_code = self.initial.get('ops_location_code')
+        location_name = dict(utils.get_ops_location_choices()).get(ops_location_code, '')
+        course_type = self.initial.get('course_type')
+        notes = self.initial.get('notes')
+
+        label = '%s choice' % const.PREF_DESC_MAP[self.preference]
+        data = "-".join(filter(None, (position, location_name, course_type)))
+        selection = formutils.display_data(label=label, data=data or '&nbsp;')
+        selection_notes = formutils.display_data('Notes', data=notes or '&nbsp;')
+        return SafeUnicode(selection + selection_notes)

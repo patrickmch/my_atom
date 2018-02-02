@@ -295,6 +295,7 @@ class NuclideSocket {
   }
 
   _scheduleReconnect() {
+    // flowlint-next-line sketchy-null-number:off
     if (this._reconnectTimer) {
       return;
     }
@@ -312,6 +313,7 @@ class NuclideSocket {
   }
 
   _clearReconnectTimer() {
+    // flowlint-next-line sketchy-null-number:off
     if (this._reconnectTimer) {
       clearTimeout(this._reconnectTimer);
       this._reconnectTimer = null;

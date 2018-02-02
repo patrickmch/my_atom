@@ -2,39 +2,39 @@
   "_args": [
     [
       {
-        "raw": "/private/var/folders/dp/vj05cwss7pz9mjl62ccqzysm0000gp/T/d-117911-90358-czxgu3.k1s0n6d2t9/package.tgz",
+        "raw": "/private/var/folders/dp/vj05cwss7pz9mjl62ccqzysm0000gp/T/d-118029-4078-qjkgw8.70nq4a38fr/package.tgz",
         "scope": null,
         "escapedName": null,
         "name": null,
-        "rawSpec": "/private/var/folders/dp/vj05cwss7pz9mjl62ccqzysm0000gp/T/d-117911-90358-czxgu3.k1s0n6d2t9/package.tgz",
-        "spec": "/private/var/folders/dp/vj05cwss7pz9mjl62ccqzysm0000gp/T/d-117911-90358-czxgu3.k1s0n6d2t9/package.tgz",
+        "rawSpec": "/private/var/folders/dp/vj05cwss7pz9mjl62ccqzysm0000gp/T/d-118029-4078-qjkgw8.70nq4a38fr/package.tgz",
+        "spec": "/private/var/folders/dp/vj05cwss7pz9mjl62ccqzysm0000gp/T/d-118029-4078-qjkgw8.70nq4a38fr/package.tgz",
         "type": "local"
       },
-      "/private/var/folders/dp/vj05cwss7pz9mjl62ccqzysm0000gp/T/apm-install-dir-117911-90358-y1hn1x.dkrpncow29"
+      "/private/var/folders/dp/vj05cwss7pz9mjl62ccqzysm0000gp/T/apm-install-dir-118029-4078-1uz0bo5.rmabrzfr"
     ]
   ],
-  "_from": "../d-117911-90358-czxgu3.k1s0n6d2t9/package.tgz",
-  "_id": "git-plus@7.10.0",
+  "_from": "../d-118029-4078-qjkgw8.70nq4a38fr/package.tgz",
+  "_id": "git-plus@7.9.3",
   "_inCache": true,
   "_location": "/git-plus",
   "_phantomChildren": {},
   "_requested": {
-    "raw": "/private/var/folders/dp/vj05cwss7pz9mjl62ccqzysm0000gp/T/d-117911-90358-czxgu3.k1s0n6d2t9/package.tgz",
+    "raw": "/private/var/folders/dp/vj05cwss7pz9mjl62ccqzysm0000gp/T/d-118029-4078-qjkgw8.70nq4a38fr/package.tgz",
     "scope": null,
     "escapedName": null,
     "name": null,
-    "rawSpec": "/private/var/folders/dp/vj05cwss7pz9mjl62ccqzysm0000gp/T/d-117911-90358-czxgu3.k1s0n6d2t9/package.tgz",
-    "spec": "/private/var/folders/dp/vj05cwss7pz9mjl62ccqzysm0000gp/T/d-117911-90358-czxgu3.k1s0n6d2t9/package.tgz",
+    "rawSpec": "/private/var/folders/dp/vj05cwss7pz9mjl62ccqzysm0000gp/T/d-118029-4078-qjkgw8.70nq4a38fr/package.tgz",
+    "spec": "/private/var/folders/dp/vj05cwss7pz9mjl62ccqzysm0000gp/T/d-118029-4078-qjkgw8.70nq4a38fr/package.tgz",
     "type": "local"
   },
   "_requiredBy": [
     "#USER"
   ],
-  "_resolved": "file:../d-117911-90358-czxgu3.k1s0n6d2t9/package.tgz",
-  "_shasum": "68e6007e85c606389fe5a364bc5d55172a86f0c1",
+  "_resolved": "file:../d-118029-4078-qjkgw8.70nq4a38fr/package.tgz",
+  "_shasum": "2f3206a523fb6c0a9228c94769b2ae1bcfc59e38",
   "_shrinkwrap": null,
-  "_spec": "/private/var/folders/dp/vj05cwss7pz9mjl62ccqzysm0000gp/T/d-117911-90358-czxgu3.k1s0n6d2t9/package.tgz",
-  "_where": "/private/var/folders/dp/vj05cwss7pz9mjl62ccqzysm0000gp/T/apm-install-dir-117911-90358-y1hn1x.dkrpncow29",
+  "_spec": "/private/var/folders/dp/vj05cwss7pz9mjl62ccqzysm0000gp/T/d-118029-4078-qjkgw8.70nq4a38fr/package.tgz",
+  "_where": "/private/var/folders/dp/vj05cwss7pz9mjl62ccqzysm0000gp/T/apm-install-dir-118029-4078-1uz0bo5.rmabrzfr",
   "bugs": {
     "url": "https://github.com/akonwi/git-plus/issues"
   },
@@ -91,5 +91,5 @@
   "scripts": {
     "test": "eslint --fix \"lib/**/*.js\" \"spec/**/*.js\" && apm test"
   },
-  "version": "7.10.0"
+  "version": "7.9.3"
 }

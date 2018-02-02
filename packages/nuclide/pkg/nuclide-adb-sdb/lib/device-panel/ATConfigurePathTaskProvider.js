@@ -53,7 +53,7 @@ class ATConfigurePathTaskProvider {
   getTask(host) {
     return _rxjsBundlesRxMinJs.Observable.defer(() => this._bridge.getFullConfig(host)).switchMap(fullConfig => {
       return _rxjsBundlesRxMinJs.Observable.create(observer => {
-        const disposable = (0, (_showModal || _load_showModal()).default)(({ dismiss }) => _react.createElement((_ATCustomDBPathModal || _load_ATCustomDBPathModal()).ATCustomDBPathModal, {
+        const disposable = (0, (_showModal || _load_showModal()).default)(dismiss => _react.createElement((_ATCustomDBPathModal || _load_ATCustomDBPathModal()).ATCustomDBPathModal, {
           dismiss: dismiss,
           activePath: fullConfig.active,
           currentCustomPath: this._bridge.getCustomDebugBridgePath(host),

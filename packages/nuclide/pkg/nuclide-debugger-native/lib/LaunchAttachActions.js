@@ -123,7 +123,7 @@ class LaunchAttachActions {
 
   _killAutoRefreshTimer() {
     if (this._refreshTimerId != null) {
-      clearInterval(this._refreshTimerId);
+      clearTimeout(this._refreshTimerId);
       this._refreshTimerId = null;
     }
   }

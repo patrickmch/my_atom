@@ -29,6 +29,5 @@
       }
     }
   },
-  "description": "Provides HHVM debug tasks",
-  "author": "NEEDS OWNER"
+  "description": "Provides HHVM debug tasks"
 }

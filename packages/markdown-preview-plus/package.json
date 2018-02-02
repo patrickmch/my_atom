@@ -2,67 +2,85 @@
   "_args": [
     [
       {
-        "raw": "/private/var/folders/dp/vj05cwss7pz9mjl62ccqzysm0000gp/T/d-11804-17940-1ghkdb5.aoid8zd7vi/package.tgz",
+        "raw": "/private/var/folders/dp/vj05cwss7pz9mjl62ccqzysm0000gp/T/d-118031-40056-yl29rt.axd66zjjor/package.tgz",
         "scope": null,
         "escapedName": null,
         "name": null,
-        "rawSpec": "/private/var/folders/dp/vj05cwss7pz9mjl62ccqzysm0000gp/T/d-11804-17940-1ghkdb5.aoid8zd7vi/package.tgz",
-        "spec": "/private/var/folders/dp/vj05cwss7pz9mjl62ccqzysm0000gp/T/d-11804-17940-1ghkdb5.aoid8zd7vi/package.tgz",
+        "rawSpec": "/private/var/folders/dp/vj05cwss7pz9mjl62ccqzysm0000gp/T/d-118031-40056-yl29rt.axd66zjjor/package.tgz",
+        "spec": "/private/var/folders/dp/vj05cwss7pz9mjl62ccqzysm0000gp/T/d-118031-40056-yl29rt.axd66zjjor/package.tgz",
         "type": "local"
       },
-      "/private/var/folders/dp/vj05cwss7pz9mjl62ccqzysm0000gp/T/apm-install-dir-11804-17940-1wdrn3q.in8rkq33di"
+      "/private/var/folders/dp/vj05cwss7pz9mjl62ccqzysm0000gp/T/apm-install-dir-118031-40056-zyufah.d8lhgds4i"
     ]
   ],
-  "_from": "../d-11804-17940-1ghkdb5.aoid8zd7vi/package.tgz",
-  "_id": "markdown-preview-plus@2.4.16",
+  "_from": "../d-118031-40056-yl29rt.axd66zjjor/package.tgz",
+  "_id": "markdown-preview-plus@2.5.1",
   "_inCache": true,
   "_location": "/markdown-preview-plus",
   "_phantomChildren": {},
   "_requested": {
-    "raw": "/private/var/folders/dp/vj05cwss7pz9mjl62ccqzysm0000gp/T/d-11804-17940-1ghkdb5.aoid8zd7vi/package.tgz",
+    "raw": "/private/var/folders/dp/vj05cwss7pz9mjl62ccqzysm0000gp/T/d-118031-40056-yl29rt.axd66zjjor/package.tgz",
     "scope": null,
     "escapedName": null,
     "name": null,
-    "rawSpec": "/private/var/folders/dp/vj05cwss7pz9mjl62ccqzysm0000gp/T/d-11804-17940-1ghkdb5.aoid8zd7vi/package.tgz",
-    "spec": "/private/var/folders/dp/vj05cwss7pz9mjl62ccqzysm0000gp/T/d-11804-17940-1ghkdb5.aoid8zd7vi/package.tgz",
+    "rawSpec": "/private/var/folders/dp/vj05cwss7pz9mjl62ccqzysm0000gp/T/d-118031-40056-yl29rt.axd66zjjor/package.tgz",
+    "spec": "/private/var/folders/dp/vj05cwss7pz9mjl62ccqzysm0000gp/T/d-118031-40056-yl29rt.axd66zjjor/package.tgz",
     "type": "local"
   },
   "_requiredBy": [
     "#USER"
   ],
-  "_resolved": "file:../d-11804-17940-1ghkdb5.aoid8zd7vi/package.tgz",
-  "_shasum": "f6a357434b8cc8f6574bb070aca1d4831585b25d",
+  "_resolved": "file:../d-118031-40056-yl29rt.axd66zjjor/package.tgz",
+  "_shasum": "e2fab8b9c42e19855f33354afc23469fa5d71145",
   "_shrinkwrap": null,
-  "_spec": "/private/var/folders/dp/vj05cwss7pz9mjl62ccqzysm0000gp/T/d-11804-17940-1ghkdb5.aoid8zd7vi/package.tgz",
-  "_where": "/private/var/folders/dp/vj05cwss7pz9mjl62ccqzysm0000gp/T/apm-install-dir-11804-17940-1wdrn3q.in8rkq33di",
+  "_spec": "/private/var/folders/dp/vj05cwss7pz9mjl62ccqzysm0000gp/T/d-118031-40056-yl29rt.axd66zjjor/package.tgz",
+  "_where": "/private/var/folders/dp/vj05cwss7pz9mjl62ccqzysm0000gp/T/apm-install-dir-118031-40056-zyufah.d8lhgds4i",
+  "atomTestRunner": "./spec/runner.js",
   "bugs": {
     "url": "https://github.com/atom-community/markdown-preview-plus/issues"
   },
   "dependencies": {
     "MathJax": "https://github.com/atom-community/MathJax/tarball/2.4.0-electron.0.2.0",
-    "atom-highlight": "^0.3.0",
-    "atom-space-pen-views": "^2.0.0",
-    "fs-plus": "^2.0.0",
-    "grim": "^1.2.1",
-    "lodash": "^3.10.1",
-    "markdown-it": "^5.1.0",
+    "atom-highlight": "^0.4.1",
+    "lodash": "^4.17.4",
+    "markdown-it": "^8.4.0",
+    "markdown-it-emoji": "^1.4.0",
     "markdown-it-lazy-headers": "^0.1.2",
-    "markdown-it-math": "https://github.com/atom-community/markdown-it-math/tarball/fix-table-pipe-parse-no-ascii",
-    "season": "^5.3",
-    "temp": "^0.8.1",
-    "underscore-plus": "^1.0.0",
-    "wrench": "^1.5.0"
+    "markdown-it-task-lists": "^2.1.0",
+    "season": "^6.0",
+    "twemoji": "^2.5.0"
   },
   "description": "Markdown Preview + Community Features",
   "deserializers": {
-    "MarkdownPreviewView": "createMarkdownPreviewView"
+    "markdown-preview-plus/MarkdownPreviewView": "createMarkdownPreviewView"
   },
   "devDependencies": {
-    "coffeelint": "^1.9.7",
-    "jasmine-tagged": "^1.1.4"
+    "@types/atom": "~1.23.3",
+    "@types/chai": "^4.0.10",
+    "@types/fs-extra": "^5.0.0",
+    "@types/lodash": "^4.14.88",
+    "@types/markdown-it": "0.0.4",
+    "@types/mathjax": "0.0.32",
+    "@types/mocha": "^2.2.45",
+    "@types/node": "^7.0.0",
+    "@types/sinon-chai": "^2.7.29",
+    "@types/temp": "^0.8.31",
+    "atom-haskell-tslint-rules": "^0.1.1",
+    "atom-mocha-test-runner": "^1.2.0",
+    "chai": "^4.1.2",
+    "fs-extra": "^5.0.0",
+    "jasmine-tagged": "^1.1.4",
+    "markdown-it-testgen": "^0.1.4",
+    "prettier": "^1.9.2",
+    "sinon": "^4.1.3",
+    "sinon-chai": "^2.14.0",
+    "temp": "^0.8.1",
+    "ts-node": "^4.1.0",
+    "tslint": "^5.8.0",
+    "typescript": "^2.6.2"
   },
   "engines": {
-    "atom": ">=1.17.0 <2.0.0"
+    "atom": ">=1.23.0 <2.0.0"
   },
   "homepage": "https://github.com/atom-community/markdown-preview-plus#readme",
   "keywords": [
@@ -76,11 +94,19 @@
   "main": "./lib/main",
   "name": "markdown-preview-plus",
   "optionalDependencies": {},
-  "readme": "# Markdown Preview Plus (MPP)\n\n[![appveyor][ab]][a] [![travis][tb]][t] ![apm version][av] ![apm downloads][ad]\n\nMarkdown Preview Plus (MPP) is a fork of\n[Markdown Preview](https://github.com/atom/markdown-preview) that provides a\nreal-time preview of markdown documents.\n\nShould you have any problems while installing or using MPP please open up a\n[new issue][issue].\n\n![MPP][preview]\n\n## Features\n\nWe also have a more detailed description of [features][features].\n\n-   Fastly open a preview of any markdown with `ctrl-shift-m`\n-   Math rendering with persistent macro support, toggled with `ctrl-shift-x`\n-   Optionally use pandoc with citation support\n-   Live reload while editing\n-   On demand synchronization\n-   And many more...\n\n## Installation\n\nLong instructions can be found [here][installation]. In short steps:\n\n1.  Search for and install `markdown-preview-plus` in Atom's Settings view.\n2.  Search for and disable the built-in package `markdown-preview`.\n3.  (Optional) Install and enable [Pandoc][pandoc].\n\n## Usage\n\nPlease see [options][options] for further details on configuring MPP and\n[math][math] for more details on math rendering. For basic usage:\n\n-   Toggle Preview: `ctrl-shift-m`\n-   Toggle Math Rendering: `ctrl-shift-x`\n\n## License\n\nMarkdown Preview Plus (MPP) is released under the [MIT license][license].\n\n[preview]: https://raw.githubusercontent.com/atom-community/markdown-preview-plus/master/imgs/mpp-full-res-invert.png\n[changelog]: https://github.com/atom-community/markdown-preview-plus/blob/master/CHANGELOG.md\n[issue]: https://github.com/atom-community/markdown-preview-plus/issues\n[installation]: docs/installation.md\n[license]: LICENSE.md\n[math]: docs/math.md\n[features]: docs/features.md\n[node-gyp]: https://github.com/TooTallNate/node-gyp#installation\n[options]: docs/options.md\n[pandoc]: https://pandoc.org\n\n[ad]: https://img.shields.io/apm/dm/markdown-preview-plus.svg\n[av]: https://img.shields.io/apm/v/markdown-preview-plus.svg\n[ab]: https://img.shields.io/appveyor/ci/lierdakil/markdown-preview-plus/master.svg?label=appveyor\n[a]: https://ci.appveyor.com/project/lierdakil/markdown-preview-plus/branch/master\n[tb]: https://img.shields.io/travis/atom-community/markdown-preview-plus/master.svg?label=travis\n[t]: https://travis-ci.org/atom-community/markdown-preview-plus\n",
+  "readme": "# Markdown Preview Plus (MPP)\n\n[![appveyor](https://img.shields.io/appveyor/ci/lierdakil/markdown-preview-plus/master.svg?label=appveyor)](https://ci.appveyor.com/project/lierdakil/markdown-preview-plus/branch/master)\n[![travis](https://img.shields.io/travis/atom-community/markdown-preview-plus/master.svg?label=travis)](https://travis-ci.org/atom-community/markdown-preview-plus)\n![apm version](https://img.shields.io/apm/v/markdown-preview-plus.svg)\n![apm\ndownloads](https://img.shields.io/apm/dm/markdown-preview-plus.svg)\n[![dependency status](https://david-dm.org/atom-community/markdown-preview-plus/status.svg)](https://david-dm.org/atom-community/markdown-preview-plus)\n\nMarkdown Preview Plus (MPP) is a fork of [Markdown\nPreview](https://github.com/atom/markdown-preview) that provides a\nreal-time preview of markdown documents.\n\nShould you have any problems while installing or using MPP please open\nup a [new\nissue](https://github.com/atom-community/markdown-preview-plus/issues).\n\n![MPP](https://raw.githubusercontent.com/atom-community/markdown-preview-plus/master/imgs/mpp-full-res-invert.png)\n\n## Features\n\nWe also have a more detailed description of\n[features](docs/features.md).\n\n-   Fastly open a preview of any markdown with `ctrl-shift-m`\n-   Math rendering with persistent macro support, toggled with\n    `ctrl-shift-x`\n-   Optionally use pandoc with citation support\n-   Live reload while editing\n-   On demand synchronization\n-   And many more...\n\n## Installation\n\nLong instructions can be found [here](docs/installation.md). In short\nsteps:\n\n1.  Search for and install `markdown-preview-plus` in Atom's Settings\n    view.\n2.  Search for and disable the built-in package `markdown-preview`.\n3.  (Optional) Install and enable [Pandoc](https://pandoc.org).\n\n## Usage\n\nPlease see [options](docs/options.md) for further details on configuring\nMPP and [math](docs/math.md) for more details on math rendering. For\nbasic usage:\n\n-   Toggle Preview: `ctrl-shift-m`\n-   Toggle Math Rendering: `ctrl-shift-x`\n\n## Contributing\n\nSee [CONTRIBUTING.md](https://github.com/atom-community/markdown-preview-plus/blob/master/CONTRIBUTING.md).\n\nAlso of interest might be [issues marked as \"help wanted\"](https://github.com/atom-community/markdown-preview-plus/labels/help%20wanted)\n\n## License\n\nMarkdown Preview Plus (MPP) is released under the [MIT\nlicense](LICENSE.md).\n",
   "readmeFilename": "README.md",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/atom-community/markdown-preview-plus.git"
   },
-  "version": "2.4.16"
+  "scripts": {
+    "build": "tsc -p .",
+    "lint": "tslint --project . && tslint --project spec",
+    "prettier": "prettier --write 'src/**/*.ts' 'spec/**/*.ts'",
+    "prettier-check": "prettier -l 'src/**/*.ts' 'spec/**/*.ts'",
+    "test": "npm run typecheck && npm run lint && npm run prettier-check",
+    "typecheck": "tsc --noEmit -p . && tsc --noEmit -p spec"
+  },
+  "version": "2.5.1"
 }

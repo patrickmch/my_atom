@@ -1,0 +1,122 @@
+{
+  "_args": [
+    [
+      {
+        "raw": "/private/var/folders/dp/vj05cwss7pz9mjl62ccqzysm0000gp/T/d-118024-92974-1ne6wky.ceikonu3di/package.tgz",
+        "scope": null,
+        "escapedName": null,
+        "name": null,
+        "rawSpec": "/private/var/folders/dp/vj05cwss7pz9mjl62ccqzysm0000gp/T/d-118024-92974-1ne6wky.ceikonu3di/package.tgz",
+        "spec": "/private/var/folders/dp/vj05cwss7pz9mjl62ccqzysm0000gp/T/d-118024-92974-1ne6wky.ceikonu3di/package.tgz",
+        "type": "local"
+      },
+      "/private/var/folders/dp/vj05cwss7pz9mjl62ccqzysm0000gp/T/apm-install-dir-118024-92974-24e28i.rjwl3gcik9"
+    ]
+  ],
+  "_from": "../d-118024-92974-1ne6wky.ceikonu3di/package.tgz",
+  "_id": "linter-shellcheck@1.4.6",
+  "_inCache": true,
+  "_location": "/linter-shellcheck",
+  "_phantomChildren": {},
+  "_requested": {
+    "raw": "/private/var/folders/dp/vj05cwss7pz9mjl62ccqzysm0000gp/T/d-118024-92974-1ne6wky.ceikonu3di/package.tgz",
+    "scope": null,
+    "escapedName": null,
+    "name": null,
+    "rawSpec": "/private/var/folders/dp/vj05cwss7pz9mjl62ccqzysm0000gp/T/d-118024-92974-1ne6wky.ceikonu3di/package.tgz",
+    "spec": "/private/var/folders/dp/vj05cwss7pz9mjl62ccqzysm0000gp/T/d-118024-92974-1ne6wky.ceikonu3di/package.tgz",
+    "type": "local"
+  },
+  "_requiredBy": [
+    "#USER"
+  ],
+  "_resolved": "file:../d-118024-92974-1ne6wky.ceikonu3di/package.tgz",
+  "_shasum": "ab437a2d061aeeebb78a264e5ddaa6bd0a9a8726",
+  "_shrinkwrap": null,
+  "_spec": "/private/var/folders/dp/vj05cwss7pz9mjl62ccqzysm0000gp/T/d-118024-92974-1ne6wky.ceikonu3di/package.tgz",
+  "_where": "/private/var/folders/dp/vj05cwss7pz9mjl62ccqzysm0000gp/T/apm-install-dir-118024-92974-24e28i.rjwl3gcik9",
+  "activationHooks": [
+    "language-shellscript:grammar-used"
+  ],
+  "bugs": {
+    "url": "https://github.com/AtomLinter/linter-shellcheck/issues"
+  },
+  "configSchema": {
+    "shellcheckExecutablePath": {
+      "type": "string",
+      "title": "Shellcheck Executable Path",
+      "default": "shellcheck"
+    },
+    "userParameters": {
+      "type": "string",
+      "title": "Additional Executable Parameters",
+      "description": "Additional shellcheck parameters, for example `-x -e SC1090`.",
+      "default": ""
+    },
+    "enableNotice": {
+      "type": "boolean",
+      "title": "Enable Notice Messages",
+      "default": false
+    }
+  },
+  "dependencies": {
+    "atom-linter": "^10.0.0",
+    "atom-package-deps": "^4.3.1"
+  },
+  "description": "Lint Bash on the fly, using shellcheck",
+  "devDependencies": {
+    "eslint": "^4.3.0",
+    "eslint-config-airbnb-base": "^11.3.1",
+    "eslint-plugin-import": "^2.7.0"
+  },
+  "engines": {
+    "atom": ">=1.4.0 <2.0.0"
+  },
+  "eslintConfig": {
+    "extends": "airbnb-base",
+    "rules": {
+      "global-require": "off",
+      "import/no-unresolved": [
+        "error",
+        {
+          "ignore": [
+            "atom"
+          ]
+        }
+      ]
+    },
+    "env": {
+      "browser": true,
+      "node": true
+    },
+    "globals": {
+      "atom": true
+    }
+  },
+  "homepage": "https://github.com/AtomLinter/linter-shellcheck#readme",
+  "license": "MIT",
+  "main": "./lib/main.js",
+  "name": "linter-shellcheck",
+  "optionalDependencies": {},
+  "package-deps": [
+    "linter"
+  ],
+  "providedServices": {
+    "linter": {
+      "versions": {
+        "1.0.0": "provideLinter"
+      }
+    }
+  },
+  "readme": "# linter-shellcheck\n\nThis linter plugin for [Linter][linter] provides an interface to\n[shellcheck][shellcheck]. It will be used with files that have the \"Shell\"\nsyntax.\n\n## Installation\n\nLinter package must be installed in order to use this plugin. If Linter is not\ninstalled, please follow the instructions [here][linter].\n\n### `shellcheck` installation\n\nBefore using this plugin, you must ensure that `shellcheck` is installed on\nyour system. To install `shellcheck`, follow the guide on\n[shellcheck github][shellcheck]\n\n### Plugin installation\n\n```ShellSession\napm install linter-shellcheck\n```\n\n## Settings\n\nYou can configure linter-shellcheck through Atom's Settings menu. If you\ninstead prefer editing the configuration by hand you can get to that by editing\n`~/.atom/config.cson` (choose Open Your Config in Atom menu). The settings\navailable are:\n\n*   `shellcheckExecutablePath`: The full path to the `shellcheck` executable.\nRun `which shellcheck` to find where it is installed on your system.\n\n*   `userParameters`: Any additional executable parameters to pass to\n`shellcheck` when linting your files.\n\n[linter]: https://github.com/atom-community/linter \"Linter\"\n[shellcheck]: https://github.com/koalaman/shellcheck \"ShellCheck\"\n",
+  "readmeFilename": "README.md",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/AtomLinter/linter-shellcheck.git"
+  },
+  "scripts": {
+    "lint": "eslint .",
+    "test": "apm test"
+  },
+  "version": "1.4.6"
+}

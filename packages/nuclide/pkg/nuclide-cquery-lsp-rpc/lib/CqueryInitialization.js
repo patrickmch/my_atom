@@ -26,7 +26,7 @@ let getInitializationOptionsWithCompilationDb = (() => {
   var _ref2 = (0, _asyncToGenerator.default)(function* (projectRoot, compilationDbDir) {
     return Object.assign({}, staticInitializationOptions(), {
       compilationDatabaseDirectory: compilationDbDir,
-      cacheDirectory: yield createCacheDir(compilationDbDir)
+      cacheDirectory: yield verifyOrCreateFallbackCacheDir(compilationDbDir)
     });
   });
 
@@ -39,7 +39,7 @@ let getInitializationOptionsWithoutCompilationDb = (() => {
   var _ref3 = (0, _asyncToGenerator.default)(function* (projectRoot, defaultFlags) {
     return Object.assign({}, staticInitializationOptions(), {
       extraClangArguments: defaultFlags,
-      cacheDirectory: yield createCacheDir(projectRoot)
+      cacheDirectory: yield verifyOrCreateFallbackCacheDir(projectRoot)
     });
   });
 
@@ -48,14 +48,18 @@ let getInitializationOptionsWithoutCompilationDb = (() => {
   };
 })();
 
-let createCacheDir = (() => {
+let verifyOrCreateFallbackCacheDir = (() => {
   var _ref4 = (0, _asyncToGenerator.default)(function* (rootDir) {
-    const dir = (_nuclideUri || _load_nuclideUri()).default.join(_os.default.tmpdir(), 'cquery', (_nuclideUri || _load_nuclideUri()).default.split(rootDir).join('@'), CQUERY_CACHE_DIR);
-    yield (_fsPromise || _load_fsPromise()).default.mkdirp(dir);
-    return dir;
+    // If the cache directory can't be created, then we fallback to putting it
+    // in the system's tempdir. This makes caching unreliable but otherwise
+    // cquery would crash.
+    if (!(yield (_fsPromise || _load_fsPromise()).default.access(rootDir, _fs.default.W_OK + _fs.default.R_OK))) {
+      return (_nuclideUri || _load_nuclideUri()).default.join(_os.default.tmpdir(), CQUERY_CACHE_DIR);
+    }
+    return (_nuclideUri || _load_nuclideUri()).default.join(rootDir, CQUERY_CACHE_DIR);
   });
 
-  return function createCacheDir(_x6) {
+  return function verifyOrCreateFallbackCacheDir(_x6) {
     return _ref4.apply(this, arguments);
   };
 })();
@@ -74,8 +78,13 @@ function _load_fsPromise() {
   return _fsPromise = _interopRequireDefault(require('nuclide-commons/fsPromise'));
 }
 
+var _fs = _interopRequireDefault(require('fs'));
+
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
+const CQUERY_CACHE_DIR = '.cquery_cache';
+
+// TODO pelmers: expose some of these in the atom config
 /**
  * Copyright (c) 2015-present, Facebook, Inc.
  * All rights reserved.
@@ -87,9 +96,6 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
  * @format
  */
 
-const CQUERY_CACHE_DIR = '.cquery_cache';
-
-// TODO pelmers: expose some of these in the atom config
 function staticInitializationOptions() {
   // Copied from the corresponding vs-code plugin
   return {

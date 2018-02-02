@@ -5,6 +5,37 @@ let Observable;
 module.exports = _client => {
   const remoteModule = {};
 
+  remoteModule.grepSearch = function (arg0, arg1, arg2) {
+    return Observable.fromPromise(_client.marshalArguments(Array.from(arguments), [{
+      name: "directory",
+      type: {
+        kind: "named",
+        name: "NuclideUri"
+      }
+    }, {
+      name: "regex",
+      type: {
+        kind: "named",
+        name: "RegExp"
+      }
+    }, {
+      name: "subdirs",
+      type: {
+        kind: "array",
+        type: {
+          kind: "string"
+        }
+      }
+    }])).switchMap(args => {
+      return _client.callRemoteFunction("GrepService/grepSearch", "observable", args);
+    }).concatMap(value => {
+      return _client.unmarshal(value, {
+        kind: "named",
+        name: "search$FileResult"
+      });
+    }).publish();
+  };
+
   remoteModule.grepReplace = function (arg0, arg1, arg2, arg3) {
     return Observable.fromPromise(_client.marshalArguments(Array.from(arguments), [{
       name: "filePaths",
@@ -110,12 +141,85 @@ Object.defineProperty(module.exports, "defs", {
         type: "builtin"
       }
     },
+    search$Match: {
+      kind: "alias",
+      location: {
+        type: "source",
+        fileName: "GrepService.js",
+        line: 20
+      },
+      name: "search$Match",
+      definition: {
+        kind: "object",
+        fields: [{
+          name: "lineText",
+          type: {
+            kind: "string"
+          },
+          optional: false
+        }, {
+          name: "lineTextOffset",
+          type: {
+            kind: "number"
+          },
+          optional: false
+        }, {
+          name: "matchText",
+          type: {
+            kind: "string"
+          },
+          optional: false
+        }, {
+          name: "range",
+          type: {
+            kind: "array",
+            type: {
+              kind: "array",
+              type: {
+                kind: "number"
+              }
+            }
+          },
+          optional: false
+        }]
+      }
+    },
+    search$FileResult: {
+      kind: "alias",
+      location: {
+        type: "source",
+        fileName: "GrepService.js",
+        line: 27
+      },
+      name: "search$FileResult",
+      definition: {
+        kind: "object",
+        fields: [{
+          name: "filePath",
+          type: {
+            kind: "named",
+            name: "NuclideUri"
+          },
+          optional: false
+        }, {
+          name: "matches",
+          type: {
+            kind: "array",
+            type: {
+              kind: "named",
+              name: "search$Match"
+            }
+          },
+          optional: false
+        }]
+      }
+    },
     search$ReplaceResult: {
       kind: "alias",
       location: {
         type: "source",
         fileName: "GrepService.js",
-        line: 17
+        line: 32
       },
       name: "search$ReplaceResult",
       definition: {
@@ -170,19 +274,64 @@ Object.defineProperty(module.exports, "defs", {
         discriminantField: "type"
       }
     },
+    grepSearch: {
+      kind: "function",
+      name: "grepSearch",
+      location: {
+        type: "source",
+        fileName: "GrepService.js",
+        line: 44
+      },
+      type: {
+        location: {
+          type: "source",
+          fileName: "GrepService.js",
+          line: 44
+        },
+        kind: "function",
+        argumentTypes: [{
+          name: "directory",
+          type: {
+            kind: "named",
+            name: "NuclideUri"
+          }
+        }, {
+          name: "regex",
+          type: {
+            kind: "named",
+            name: "RegExp"
+          }
+        }, {
+          name: "subdirs",
+          type: {
+            kind: "array",
+            type: {
+              kind: "string"
+            }
+          }
+        }],
+        returnType: {
+          kind: "observable",
+          type: {
+            kind: "named",
+            name: "search$FileResult"
+          }
+        }
+      }
+    },
     grepReplace: {
       kind: "function",
       name: "grepReplace",
       location: {
         type: "source",
         fileName: "GrepService.js",
-        line: 29
+        line: 60
       },
       type: {
         location: {
           type: "source",
           fileName: "GrepService.js",
-          line: 29
+          line: 60
         },
         kind: "function",
         argumentTypes: [{

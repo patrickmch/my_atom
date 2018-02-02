@@ -401,71 +401,47 @@ class ClangFlagsManager {
     })();
   }
 
-  _assertCompilationDatabaseEntry(entry) {
-    if (!(typeof entry.file === 'string' && typeof entry.directory === 'string' && (typeof entry.command === 'string' || Array.isArray(entry.arguments)))) {
-      throw new Error('The compilation database entry is invalid and does not comply with the spec.');
-    }
-  }
-
-  _processCompilationDatabaseEntry(entry, dbDir, flagsFile, dbFile) {
+  _loadFlagsFromCompilationDatabase(dbFile, flagsFile, requestSettings) {
     var _this9 = this;
 
     return (0, _asyncToGenerator.default)(function* () {
-      _this9._assertCompilationDatabaseEntry(entry);
-      const directory = yield (_fsPromise || _load_fsPromise()).default.realpath(
-      // Relative directories aren't part of the spec, but resolving them
-      // relative to the compile_commands.json location seems reasonable.
-      (_nuclideUri || _load_nuclideUri()).default.resolve(dbDir, entry.directory), _this9._realpathCache);
-      const filename = (_nuclideUri || _load_nuclideUri()).default.resolve(directory, entry.file);
-      const realpath = yield (_fsPromise || _load_fsPromise()).default.realpath(filename, _this9._realpathCache);
-      const clangFlags = {
-        rawData: {
-          command: entry.command,
-          file: entry.file,
-          directory,
-          arguments: entry.arguments
-        },
-        flagsFile: flagsFile == null ? dbFile : flagsFile
-      };
-      return [realpath, clangFlags];
-    })();
-  }
-
-  _loadFlagsFromCompilationDatabase(dbFile, flagsFile, requestSettings) {
-    var _this10 = this;
-
-    return (0, _asyncToGenerator.default)(function* () {
       const flags = new Map();
-      let contents = null;
       try {
-        contents = yield (_fsPromise || _load_fsPromise()).default.readFile(dbFile, 'utf8');
-      } catch (e) {
-        logger.error(`Error reading the compilation database ${dbFile} before parsing. It might be too big or have corrupted data.`, e);
-        return flags;
-      }
-      let data = null;
-      try {
-        data = JSON.parse(contents);
-      } catch (e) {
-        logger.error(`Error parsing as JSON object the compilation database ${dbFile}`, e);
-        return flags;
-      }
-      const dbDir = (_nuclideUri || _load_nuclideUri()).default.dirname(dbFile);
-      yield Promise.all(data.map((() => {
-        var _ref = (0, _asyncToGenerator.default)(function* (entry) {
-          try {
-            const [realpath, clangFlags] = yield _this10._processCompilationDatabaseEntry(entry, dbDir, flagsFile, dbFile);
-            flags.set(realpath, clangFlags);
-            _this10._pathToFlags.set([realpath, requestSettings], Promise.resolve(clangFlags));
-          } catch (e) {
-            logger.error(`Error processing entry for compilation database ${dbFile}: ${entry}`, e);
-          }
-        });
+        const contents = yield (_fsPromise || _load_fsPromise()).default.readFile(dbFile, 'utf8');
+        const data = JSON.parse(contents);
+        const dbDir = (_nuclideUri || _load_nuclideUri()).default.dirname(dbFile);
+        yield Promise.all(data.map((() => {
+          var _ref = (0, _asyncToGenerator.default)(function* (entry) {
+            const { command, file } = entry;
+            const directory = yield (_fsPromise || _load_fsPromise()).default.realpath(
+            // Relative directories aren't part of the spec, but resolving them
+            // relative to the compile_commands.json location seems reasonable.
+            (_nuclideUri || _load_nuclideUri()).default.resolve(dbDir, entry.directory), _this9._realpathCache);
+            const filename = (_nuclideUri || _load_nuclideUri()).default.resolve(directory, file);
+            if (yield (_fsPromise || _load_fsPromise()).default.exists(filename)) {
+              const realpath = yield (_fsPromise || _load_fsPromise()).default.realpath(filename, _this9._realpathCache);
+              const result = {
+                rawData: {
+                  command,
+                  file,
+                  directory,
+                  arguments: entry.arguments
+                },
+                // flowlint-next-line sketchy-null-string:off
+                flagsFile: flagsFile || dbFile
+              };
+              flags.set(realpath, result);
+              _this9._pathToFlags.set([realpath, requestSettings], Promise.resolve(result));
+            }
+          });
 
-        return function (_x) {
-          return _ref.apply(this, arguments);
-        };
-      })()));
+          return function (_x) {
+            return _ref.apply(this, arguments);
+          };
+        })()));
+      } catch (e) {
+        logger.error(`Error reading compilation flags from ${dbFile}`, e);
+      }
       return flags;
     })();
   }

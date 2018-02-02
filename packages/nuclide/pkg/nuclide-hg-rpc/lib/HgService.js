@@ -875,6 +875,9 @@ class HgService {
     // TODO(T17463635)
     let editMergeConfigs;
     return _rxjsBundlesRxMinJs.Observable.fromPromise((0, _asyncToGenerator.default)(function* () {
+      // prevent user-specified merge tools from attempting to
+      // open interactive editors
+      args.push('--config', 'ui.merge=:merge');
       if (message == null) {
         return args;
       } else {
@@ -946,7 +949,7 @@ class HgService {
   }
 
   restack() {
-    const args = ['rebase', '--restack'];
+    const args = ['rebase', '--restack', '--config', 'ui.merge=:merge'];
     const execOptions = {
       cwd: this._workingDirectory
     };
@@ -1274,9 +1277,12 @@ class HgService {
     return this._hgObserveExecution(args, execOptions).switchMap((_hgUtils || _load_hgUtils()).processExitCodeAndThrow).publish();
   }
 
-  continueOperation(args) {
+  continueOperation(commandWithOptions) {
     // TODO(T17463635)
 
+    // prevent user-specified merge tools from attempting to
+    // open interactive editors
+    const args = [...commandWithOptions, '--config', 'ui.merge=:merge'];
     const execOptions = {
       cwd: this._workingDirectory
     };
@@ -1301,38 +1307,18 @@ class HgService {
   rebase(destination, source) {
     // TODO(T17463635)
 
-    const args = ['rebase', '-d', destination];
+    // prevent user-specified merge tools from attempting to
+    // open interactive editors
+    const args = ['rebase', '-d', destination, '--config', 'ui.merge=:merge'];
     if (source != null) {
       args.push('-s', source);
     }
     const execOptions = {
       cwd: this._workingDirectory
+      // Setting the editor to a non-existent tool to prevent operations that rely
+      // on the user's default editor from attempting to open up when needed.
     };
     return this._hgObserveExecution(args, execOptions).publish();
-  }
-
-  /**
-   *  Given a list of the new order of revisions, use histedit to rearrange
-   *  history to match the input. Note that you must be checked out on the
-   *  stack above where any reordering takes place, and there can be no
-   *  branches off of any revision in the stack except the top one.
-   */
-  reorderWithinStack(orderedRevisions) {
-    const args = ['histedit', '--commands', '-'];
-    const commandsJson = JSON.stringify({
-      histedit: orderedRevisions.map(hash => {
-        return {
-          node: hash,
-          action: (_hgConstants || _load_hgConstants()).HisteditActions.PICK
-        };
-      })
-    });
-
-    const execOptions = {
-      cwd: this._workingDirectory,
-      input: commandsJson
-    };
-    return this._hgRunCommand(args, execOptions).publish();
   }
 
   pull(options) {

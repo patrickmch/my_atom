@@ -25,6 +25,10 @@ module.exports.tokenize = function emphasis(state, silent) {
       //
       marker: marker,
 
+      // Total length of these series of delimiters.
+      //
+      length: scanned.length,
+
       // An amount of characters before this one that's equivalent to
       // current one. In plain English: if this delimiter does not open
       // an emphasis, neither do previous `jump` characters.
@@ -73,7 +77,7 @@ module.exports.postProcess = function emphasis(state) {
       delimiters = state.delimiters,
       max = state.delimiters.length;
 
-  for (i = 0; i < max; i++) {
+  for (i = max - 1; i >= 0; i--) {
     startDelim = delimiters[i];
 
     if (startDelim.marker !== 0x5F/* _ */ && startDelim.marker !== 0x2A/* * */) {
@@ -87,16 +91,16 @@ module.exports.postProcess = function emphasis(state) {
 
     endDelim = delimiters[startDelim.end];
 
-    // If the next delimiter has the same marker and is adjacent to this one,
+    // If the previous delimiter has the same marker and is adjacent to this one,
     // merge those into one strong delimiter.
     //
     // `<em><em>whatever</em></em>` -> `<strong>whatever</strong>`
     //
-    isStrong = i + 1 < max &&
-               delimiters[i + 1].end === startDelim.end - 1 &&
-               delimiters[i + 1].token === startDelim.token + 1 &&
-               delimiters[startDelim.end - 1].token === endDelim.token - 1 &&
-               delimiters[i + 1].marker === startDelim.marker;
+    isStrong = i > 0 &&
+               delimiters[i - 1].end === startDelim.end + 1 &&
+               delimiters[i - 1].token === startDelim.token - 1 &&
+               delimiters[startDelim.end + 1].token === endDelim.token + 1 &&
+               delimiters[i - 1].marker === startDelim.marker;
 
     ch = String.fromCharCode(startDelim.marker);
 
@@ -115,9 +119,9 @@ module.exports.postProcess = function emphasis(state) {
     token.content = '';
 
     if (isStrong) {
-      state.tokens[delimiters[i + 1].token].content = '';
-      state.tokens[delimiters[startDelim.end - 1].token].content = '';
-      i++;
+      state.tokens[delimiters[i - 1].token].content = '';
+      state.tokens[delimiters[startDelim.end + 1].token].content = '';
+      i--;
     }
   }
 };

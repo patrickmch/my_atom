@@ -37,21 +37,12 @@ function _load_fsPromise() {
   return _fsPromise = _interopRequireDefault(require('nuclide-commons/fsPromise'));
 }
 
-var _os = _interopRequireDefault(require('os'));
-
-var _fbPastebin;
-
-function _load_fbPastebin() {
-  return _fbPastebin = require('../../fb-pastebin');
-}
-
-var _process;
-
-function _load_process() {
-  return _process = require('nuclide-commons/process');
-}
-
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+const DEFAULT_HHVM_PATH = '/usr/local/bin/hhvm';
+
+// The default path (relative to Hack Root) to use for the startup document,
+// which is loaded by the dummy request thread in the debugger backend.
 
 // eslint-disable-next-line rulesdir/no-unresolved
 /**
@@ -65,10 +56,6 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
  * @format
  */
 
-const DEFAULT_HHVM_PATH = '/usr/local/bin/hhvm';
-
-// The default path (relative to Hack Root) to use for the startup document,
-// which is loaded by the dummy request thread in the debugger backend.
 const DEFAULT_STARTUP_DOC_PATH = 'scripts/vsdebug_includes.php';
 
 class HhvmDebuggerService extends (_nuclideDebuggerCommon || _load_nuclideDebuggerCommon()).DebuggerRpcServiceBase {
@@ -180,43 +167,24 @@ class HhvmDebuggerService extends (_nuclideDebuggerCommon || _load_nuclideDebugg
 
       const startupDocumentPath = yield _this4._getStartupDocumentPath(config);
 
-      const logFilePath = _this4._getHHVMLogFilePath();
-
       return {
         hhvmPath,
         hhvmArgs,
         startupDocumentPath,
-        logFilePath,
         debugPort,
         cwd: config.launchWrapperCommand != null ? (_nuclideUri || _load_nuclideUri()).default.dirname(config.launchWrapperCommand) : cwd
       };
     })();
   }
 
-  _getHHVMLogFilePath() {
-    return (_nuclideUri || _load_nuclideUri()).default.join(_os.default.tmpdir(), `nuclide-${_os.default.userInfo().username}-logs`, 'hhvm-debugger.log');
-  }
-
-  createLogFilePaste() {
+  _getAttachArgs(config) {
     var _this5 = this;
 
     return (0, _asyncToGenerator.default)(function* () {
-      return (_fsPromise || _load_fsPromise()).default.readFile(_this5._getHHVMLogFilePath(), 'utf8').then(function (contents) {
-        return (0, (_fbPastebin || _load_fbPastebin()).createPasteFromContents)(contents, { title: 'HHVM-Debugger' });
-      });
-    })();
-  }
-
-  _getAttachArgs(config) {
-    var _this6 = this;
-
-    return (0, _asyncToGenerator.default)(function* () {
-      const startupDocumentPath = yield _this6._getStartupDocumentPath(config);
-      const logFilePath = _this6._getHHVMLogFilePath();
+      const startupDocumentPath = yield _this5._getStartupDocumentPath(config);
       return {
         debugPort: config.debugPort,
-        startupDocumentPath,
-        logFilePath
+        startupDocumentPath
       };
     })();
   }
@@ -270,23 +238,6 @@ class HhvmDebuggerService extends (_nuclideDebuggerCommon || _load_nuclideDebugg
       } catch (error) {
         return DEFAULT_HHVM_PATH;
       }
-    })();
-  }
-
-  getAttachTargetList() {
-    return (0, _asyncToGenerator.default)(function* () {
-      const commands = yield (0, (_process || _load_process()).runCommand)('ps', ['-e', '-o', 'pid,args'], {}).toPromise();
-      return commands.toString().split('\n').filter(function (line) {
-        return line.indexOf('vsDebugPort') > 0;
-      }).map(function (line) {
-        const words = line.trim().split(' ');
-        const pid = Number(words[0]);
-        const command = words.slice(1).join(' ');
-        return {
-          pid,
-          command
-        };
-      });
     })();
   }
 

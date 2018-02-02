@@ -37,6 +37,7 @@ function debounce(func, wait, immediate = false) {
     args = args_;
     timestamp = Date.now();
     const callNow = immediate && !timeout;
+    // flowlint-next-line sketchy-null-number:off
     if (!timeout) {
       timeout = setTimeout(later, wait);
     }
@@ -49,6 +50,7 @@ function debounce(func, wait, immediate = false) {
   };
 
   debounced.dispose = () => {
+    // flowlint-next-line sketchy-null-number:off
     if (timeout) {
       clearTimeout(timeout);
       timeout = context = args = null;

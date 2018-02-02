@@ -1,0 +1,36 @@
+.syntax--md {
+    &.syntax--heading-1 {
+        color: @syntax-color-keyword;
+        font-weight: bold;
+    }
+    &.syntax--heading-2 {
+        color: @syntax-color-keyword;
+        font-weight: bold;
+    }
+    &.syntax--heading-3 {
+        color: @syntax-color-keyword;
+        font-weight: bold;
+    }
+    &.syntax--heading-4 {
+        color: @syntax-color-keyword;
+        font-weight: bold;
+    }
+    &.syntax--heading-5 {
+        color: @syntax-color-keyword;
+        font-weight: bold;
+    }
+
+    &.syntax--list {
+        color: @syntax-color-added;
+        &.syntax--unordered {
+            &.syntax--task {
+                color: @orange;
+                &.syntax--completed {
+                    color: @blue;
+                    font-style: italic;
+                    text-decoration: line-through;
+                }
+            }
+        }
+    }
+}

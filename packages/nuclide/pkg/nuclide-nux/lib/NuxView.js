@@ -58,7 +58,7 @@ const ATTACHMENT_ATTEMPT_THRESHOLD = 5;
 const ATTACHMENT_RETRY_TIMEOUT = 500; // milliseconds
 const RESIZE_EVENT_DEBOUNCE_DURATION = 100; // milliseconds
 // The frequency with which to poll the element that the NUX is bound to.
-const POLL_ELEMENT_INTERVAL = 100; // milliseconds
+const POLL_ELEMENT_TIMEOUT = 100; // milliseconds
 
 const logger = (0, (_log4js || _load_log4js()).getLogger)('nuclide-nux');
 
@@ -162,15 +162,15 @@ class NuxView {
         this._handleDisposableClick(false);
       }
     };
-    // The element is polled every `POLL_ELEMENT_INTERVAL` milliseconds instead
+    // The element is polled every `POLL_ELEMENT_TIMEOUT` milliseconds instead
     // of using a MutationObserver. When an element such as a panel is closed,
     // it may not mutate but simply be removed from the DOM - a change which
     // would not be captured by the MutationObserver.
-    const pollElementInterval = setInterval(tryDismissTooltip.bind(this, elem), POLL_ELEMENT_INTERVAL);
+    const pollElementTimeout = setInterval(tryDismissTooltip.bind(this, elem), POLL_ELEMENT_TIMEOUT);
     this._disposables.add(new _atom.Disposable(() => {
       // eslint-disable-next-line eqeqeq
-      if (pollElementInterval !== null) {
-        clearInterval(pollElementInterval);
+      if (pollElementTimeout !== null) {
+        clearTimeout(pollElementTimeout);
       }
     }));
 

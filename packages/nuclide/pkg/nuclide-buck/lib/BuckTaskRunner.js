@@ -215,8 +215,10 @@ class BuckTaskRunner {
   }
 
   setProjectRoot(projectRoot, callback) {
+    const path = projectRoot == null ? null : projectRoot.getPath();
+
     // $FlowFixMe: type symbol-observable
-    const storeReady = _rxjsBundlesRxMinJs.Observable.from(this._getStore()).distinctUntilChanged().filter(state => !state.isLoadingBuckProject && state.projectRoot === projectRoot).share();
+    const storeReady = _rxjsBundlesRxMinJs.Observable.from(this._getStore()).distinctUntilChanged().filter(state => !state.isLoadingBuckProject && state.projectRoot === path).share();
 
     const enabledObservable = storeReady.map(state => state.buckRoot != null).distinctUntilChanged();
 
@@ -245,7 +247,7 @@ class BuckTaskRunner {
 
     const subscription = _rxjsBundlesRxMinJs.Observable.combineLatest(enabledObservable, tasksObservable).subscribe(([enabled, tasks]) => callback(enabled, tasks));
 
-    this._getStore().dispatch((_Actions || _load_Actions()).setProjectRoot(projectRoot));
+    this._getStore().dispatch((_Actions || _load_Actions()).setProjectRoot(path));
 
     return new (_UniversalDisposable || _load_UniversalDisposable()).default(subscription);
   }

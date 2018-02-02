@@ -94,14 +94,13 @@ class OpenFilesListComponent extends _react.PureComponent {
     };
 
     this.state = {
-      hoveredUri: null,
-      selectedUri: null
+      hoveredUri: null
     };
   }
 
   componentDidUpdate(prevProps) {
     const selectedRow = this._selectedRow;
-    if (selectedRow != null && this.state.selectedUri !== this.props.activeUri && prevProps.activeUri !== this.props.activeUri) {
+    if (selectedRow != null && prevProps.activeUri !== this.props.activeUri) {
       // Our lint rule isn't smart enough to recognize that this is a custom method and not the one
       // on HTMLElements, so we just have to squelch the error.
       // eslint-disable-next-line rulesdir/dom-apis
@@ -114,7 +113,6 @@ class OpenFilesListComponent extends _react.PureComponent {
     const rootNode = store.getRootForPath(entry.uri);
     if ((_FileTreeHelpers || _load_FileTreeHelpers()).default.getSelectionMode(event) === 'single-select' && !entry.isSelected && rootNode != null) {
       getActions().setTargetNode(rootNode.rootUri, entry.uri);
-      this.setState({ selectedUri: entry.uri });
     }
   }
 

@@ -42,6 +42,9 @@
     backspaceTriggersAutocomplete: true
   "autocomplete-python":
     showTooltips: true
+  "choose-pane":
+    labelChars: "JKLH;ABCDEFGIMNOPQRSTUVWXYZ"
+  "city-lights-ui": {}
   core:
     audioBeep: false
     customFileTypes:
@@ -65,32 +68,43 @@
       "my-package"
       "my-package"
       "my-package"
+      "language-shellscript"
       "linter"
+      "city-lights-icons"
     ]
     excludeVcsIgnoredPaths: false
     packagesWithKeymapsDisabled: [
       "tool-bar"
       "line-jumper"
       "atom-css-class-checker"
-      "emmet-simplified"
       "ctrl-dir-scroll"
       "jumpy"
+      "emmet-simplified"
     ]
     telemetryConsent: "limited"
     themes: [
-      "atom-material-ui"
+      "pristine-ui"
       "atom-material-syntax"
     ]
+    titleBar: "custom"
   editor:
     fontFamily: "Source Code Pro for Powerline"
-    fontSize: 15
+    fontSize: 11
     nonWordCharacters: "/\\()\"':,.;<>~!@#$%^&*|+=[]{}`?…-"
     preferredLineLength: 100
     showIndentGuide: true
     showInvisibles: true
     softWrap: true
+  "editor-background":
+    image:
+      backgroundSize: "100%"
+      customOverlayColor: true
+    other: {}
+    text:
+      blur: 0
   "exception-reporting":
     userId: "bf1a28f2-4481-4777-b187-9b8e1da674c0"
+  "file-icons": {}
   "find-and-replace":
     closeFindPanelAfterSearch: true
     focusEditorAfterSearch: true
@@ -111,14 +125,14 @@
         all_scopes: true
       mccabe:
         enabled: false
-      pycodestyle:
-        enabled: false
+      pycodestyle: {}
       pyflakes:
         enabled: false
       yapf:
         enabled: false
   jumpy:
     fontSize: 0.9
+    highContrast: true
   "keybinding-cheatsheet": {}
   kite:
     enableCompletions: false
@@ -148,6 +162,11 @@
       "minimap-autohiderDecorationsZIndex": 0
     scrollAnimation: true
   nuclide:
+    "atom-ide-datatip":
+      onlyTopDatatip: true
+    "atom-ide-diagnostics-ui": {}
+    "atom-ide-outline-view":
+      nameOnly: true
     hyperclick:
       darwinTriggerKeys: "altKey,metaKey"
     "nuclide-code-search":
@@ -162,18 +181,57 @@
       showHome: false
     "nuclide-python":
       enableLinting: false
+      includeOptionalArguments: true
       lintOnFly: true
     use:
+      "nuclide-adb-logcat": false
+      "nuclide-adb-sdb": false
+      "nuclide-atom-notifications": false
       "nuclide-blame": false
       "nuclide-blame-provider-hg": false
-      "nuclide-bookshelf": false
       "nuclide-buck": false
       "nuclide-buck-ios": false
       "nuclide-clang": false
+      "nuclide-clipboard-path": false
       "nuclide-console": false
       "nuclide-cquery-lsp": false
+      "nuclide-ctags": false
       "nuclide-debugger-php": false
       "nuclide-debugger-vsp": false
+      "nuclide-deprecation-cop": false
+      "nuclide-device-panel": false
+      "nuclide-device-panel-ios": false
+      "nuclide-distraction-free-mode": false
+      "nuclide-flow": false
+      "nuclide-graphql": false
+      "nuclide-hack": false
+      "nuclide-health": false
+      "nuclide-hg-repository": false
+      "nuclide-hhvm": false
+      "nuclide-home": false
+      "nuclide-infer-al": false
+      "nuclide-ios-simulator-logs": false
+      "nuclide-key-binding-hint-status": false
+      "nuclide-language-hack": false
+      "nuclide-language-infer-al": false
+      "nuclide-language-reason": false
+      "nuclide-metro": false
+      "nuclide-move-item-to-available-pane": false
+      "nuclide-navigation-stack": false
+      "nuclide-navigation-stack-status-bar": false
+      "nuclide-notifications": false
+      "nuclide-objc": false
+      "nuclide-ocaml": false
+      "nuclide-react-inspector": false
+      "nuclide-refactorizer": false
+      "nuclide-remote-atom": false
+      "nuclide-remote-projects": false
+      "nuclide-ssh-tunnel": false
+      "nuclide-swift": false
+      "nuclide-task-runner": false
+      "nuclide-terminal": false
+      "nuclide-test-runner": false
+      "nuclide-type-coverage": false
   "platformio-ide-terminal":
     ansiColors:
       normal:
@@ -208,12 +266,15 @@
     visible: false
   "tool-bar-markdown-writer":
     visibility: "showToolbarOnMarkdown"
+  "vim-mode":
+    useClipboardAsDefaultRegister: true
   "vim-mode-plus":
     automaticallyEscapeInsertModeOnActivePaneItemChange: true
     defaultScrollRowsOnMiniScroll: 2
     keymapCCToChangeInnerSmartWord: true
     keymapYToYankToLastCharacterOfLine: true
     sequentialPaste: true
+    showHoverSearchCounter: true
     smoothScrollOnFullScrollMotion: true
     smoothScrollOnFullScrollMotionDuration: 100
     smoothScrollOnHalfScrollMotion: true
@@ -222,6 +283,10 @@
     smoothScrollOnMiniScrollDuration: 100
     smoothScrollOnRedrawCursorLine: true
     smoothScrollOnRedrawCursorLineDuration: 100
+  "vim-mode-plus-move-selected-text": {}
+".hack.html.text":
+  editor:
+    nonWordCharacters: "/\\()\"':,.;<>~!@#$%^&*|+=[]{}`?…"
 ".reason.source":
   editor:
     preferredLineLength: 110

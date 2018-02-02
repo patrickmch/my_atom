@@ -1,13 +1,9 @@
 # Master TODO List
 
-Finish Giving Page Revisions:
-- [x] Put gift_credit_card on bs_responsive
-- [ ] Should we preserve order.description in the payment template
-- [ ] Test payment stuff
-- [x] Do we need logic in the payment template?
 
 Other:
 - [ ] Figure out what percentage of non-null blackout dates are in the WRAPS
+- [x] Delete abandoned branches from GitHub
 - [ ] Version control api_csv_script (without test passwords)
 
 See [1-15-2018 Notes](./1-15-2018.md)
@@ -30,11 +26,18 @@ Wrap is_applying_for_wild_med_work Addition
   - [x] Make sure I can test WRAPS
   - [x] Add field and update model
     - [ ] Show staffing draft and get the verbage right
-  - [ ] Use API to query the db and see if they are a WildMed instructor
-    - [ ] Add a dependency to NOLS API Client (steve says we stop and think before adding a dependency)
-    - [ ] If we query anything that is not on SPEs or Person talk to Steve
-  - [ ] Show field if they are WildMed instructor
+  - [x] Use API to query the db and see if they are a WildMed instructor
+    - [x] Add a dependency to NOLS API Client (steve says we stop and think before adding a dependency)
+    - [x] If we query anything that is not on SPEs or Person talk to Steve
+  - [x] Show field if they are WildMed instructor
   - [ ] Add field to script that will dump all the WRAP data (it will export the WRAP data to CSV for staffing)
     - [ ] There is a readme in the Staffing module of the website that details how to use the export script. The actual script lives in staffing.utils.export_current_season_wraps_to_file
-Future:
-- [ ] You will be refactoring SPEs so that the they are getting data from the API rather than data access
+  - [ ] Add tests for this?
+- [ ] Add tests for WRAPS in general
+
+- [ ] Refactor SPEs to use API rather than DA
+  - [ ] Only display evals for a type of 'course'
+    - [ ] display when course_id is not null or some such 
+  - [x] Make sure you figure out when an SPE 'is_viewable'
+  - [ ] Take hardcoded id out and replace it with entity_id
+- [ ] Add Facebook Metadata to the Donation page #2718

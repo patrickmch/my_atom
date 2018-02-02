@@ -3,7 +3,6 @@
   "main": "./lib/main.js",
   "version": "0.0.0",
   "description": "Provides a welcome message and other links for first time users.",
-  "author": "NEEDS OWNER",
   "atomTestRunner": "../../lib/test-runner-entry.js",
   "nuclide": {
     "configMetadata": {
@@ -18,6 +17,12 @@
         "type": "boolean",
         "default": true,
         "description": "Show the home pane (by default shown on first startup)."
+      },
+      "showChangelogs": {
+        "title": "Show Changelogs",
+        "type": "boolean",
+        "default": true,
+        "description": "Open the changelog after each update."
       }
     },
     "packageType": "Atom",

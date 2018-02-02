@@ -393,8 +393,9 @@ class FileTreeActions {
       const rootKeys = rootDirectories.map(function (directory) {
         return (_FileTreeHelpers || _load_FileTreeHelpers()).default.dirPathToKey(directory.getPath());
       });
-      // $FlowFixMe
-      const rootRepos = yield Promise.all(rootDirectories.map(function (directory) {
+      const rootRepos = yield Promise.all(
+      // $FlowFixMe(>=0.55.0) Flow suppress
+      rootDirectories.map(function (directory) {
         return (0, (_nuclideVcsBase || _load_nuclideVcsBase()).repositoryForPath)(directory.getPath());
       }));
 

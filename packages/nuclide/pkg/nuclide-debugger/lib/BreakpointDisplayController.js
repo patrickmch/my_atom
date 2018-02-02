@@ -210,9 +210,7 @@ class BreakpointDisplayController {
     for (const [line, breakpoint] of breakpoints) {
       // Remove any breakpoints that are past the end of the file.
       if (line >= fileLength) {
-        process.nextTick(() => {
-          this._debuggerActions.deleteBreakpoint(path, line);
-        });
+        this._debuggerActions.deleteBreakpoint(path, line);
         continue;
       }
 
