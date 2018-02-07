@@ -2,39 +2,39 @@
   "_args": [
     [
       {
-        "raw": "/private/var/folders/dp/vj05cwss7pz9mjl62ccqzysm0000gp/T/d-1171116-55110-lyo9y0.1svqu84cxr/package.tgz",
+        "raw": "/private/var/folders/dp/vj05cwss7pz9mjl62ccqzysm0000gp/T/d-11814-14938-gdujsu.bwusgx2yb9/package.tgz",
         "scope": null,
         "escapedName": null,
         "name": null,
-        "rawSpec": "/private/var/folders/dp/vj05cwss7pz9mjl62ccqzysm0000gp/T/d-1171116-55110-lyo9y0.1svqu84cxr/package.tgz",
-        "spec": "/private/var/folders/dp/vj05cwss7pz9mjl62ccqzysm0000gp/T/d-1171116-55110-lyo9y0.1svqu84cxr/package.tgz",
+        "rawSpec": "/private/var/folders/dp/vj05cwss7pz9mjl62ccqzysm0000gp/T/d-11814-14938-gdujsu.bwusgx2yb9/package.tgz",
+        "spec": "/private/var/folders/dp/vj05cwss7pz9mjl62ccqzysm0000gp/T/d-11814-14938-gdujsu.bwusgx2yb9/package.tgz",
         "type": "local"
       },
-      "/private/var/folders/dp/vj05cwss7pz9mjl62ccqzysm0000gp/T/apm-install-dir-1171116-55110-1t2vium.cavsz41jor"
+      "/private/var/folders/dp/vj05cwss7pz9mjl62ccqzysm0000gp/T/apm-install-dir-11814-14938-1m6qv43.iaa0mgqfr"
     ]
   ],
-  "_from": "../d-1171116-55110-lyo9y0.1svqu84cxr/package.tgz",
-  "_id": "minimap-autohider@1.5.3",
+  "_from": "../d-11814-14938-gdujsu.bwusgx2yb9/package.tgz",
+  "_id": "minimap-autohider@1.5.4",
   "_inCache": true,
   "_location": "/minimap-autohider",
   "_phantomChildren": {},
   "_requested": {
-    "raw": "/private/var/folders/dp/vj05cwss7pz9mjl62ccqzysm0000gp/T/d-1171116-55110-lyo9y0.1svqu84cxr/package.tgz",
+    "raw": "/private/var/folders/dp/vj05cwss7pz9mjl62ccqzysm0000gp/T/d-11814-14938-gdujsu.bwusgx2yb9/package.tgz",
     "scope": null,
     "escapedName": null,
     "name": null,
-    "rawSpec": "/private/var/folders/dp/vj05cwss7pz9mjl62ccqzysm0000gp/T/d-1171116-55110-lyo9y0.1svqu84cxr/package.tgz",
-    "spec": "/private/var/folders/dp/vj05cwss7pz9mjl62ccqzysm0000gp/T/d-1171116-55110-lyo9y0.1svqu84cxr/package.tgz",
+    "rawSpec": "/private/var/folders/dp/vj05cwss7pz9mjl62ccqzysm0000gp/T/d-11814-14938-gdujsu.bwusgx2yb9/package.tgz",
+    "spec": "/private/var/folders/dp/vj05cwss7pz9mjl62ccqzysm0000gp/T/d-11814-14938-gdujsu.bwusgx2yb9/package.tgz",
     "type": "local"
   },
   "_requiredBy": [
     "#USER"
   ],
-  "_resolved": "file:../d-1171116-55110-lyo9y0.1svqu84cxr/package.tgz",
-  "_shasum": "f7f005aa7e208582c8e55b00c5f5529bc83e41f8",
+  "_resolved": "file:../d-11814-14938-gdujsu.bwusgx2yb9/package.tgz",
+  "_shasum": "6d39f80f62677f4a3ac25995be85f22f4182d3b3",
   "_shrinkwrap": null,
-  "_spec": "/private/var/folders/dp/vj05cwss7pz9mjl62ccqzysm0000gp/T/d-1171116-55110-lyo9y0.1svqu84cxr/package.tgz",
-  "_where": "/private/var/folders/dp/vj05cwss7pz9mjl62ccqzysm0000gp/T/apm-install-dir-1171116-55110-1t2vium.cavsz41jor",
+  "_spec": "/private/var/folders/dp/vj05cwss7pz9mjl62ccqzysm0000gp/T/d-11814-14938-gdujsu.bwusgx2yb9/package.tgz",
+  "_where": "/private/var/folders/dp/vj05cwss7pz9mjl62ccqzysm0000gp/T/apm-install-dir-11814-14938-1m6qv43.iaa0mgqfr",
   "author": {
     "name": "Aaron Ballard",
     "email": "ans.ballard@gmail.com",
@@ -80,5 +80,5 @@
     "type": "git",
     "url": "git+https://github.com/ansballard/minimap-autohider.git"
   },
-  "version": "1.5.3"
+  "version": "1.5.4"
 }

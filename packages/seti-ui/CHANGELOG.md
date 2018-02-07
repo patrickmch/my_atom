@@ -1,4 +1,17 @@
 # Changelog
+## 1.10.0
+- New Icons & Extensions:
+  - Ethererum/Solidity
+  - Packaged Web App (Widget)
+  - Haxe
+  - HTML ERB
+  - Clojure
+  - Crystal
+  - Odata
+- Update typescript test color
+- Fix font family variable
+- Typo fix
+
 ## 1.9.0
 - Better support for multiple project folders
 - Improve dock styling

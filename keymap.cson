@@ -36,7 +36,6 @@
   # 'shift': 'autocomplete-plus:cancel'
   'ctrl-cmd-left': 'editor:delete-line'
   'ctrl-cmd-right': 'editor:delete-to-end-of-line'
-  'alt-space': 'choose-pane:start'
   'shift-cmd-v': 'clipboard-plus:toggle'
   # movement
   'alt-down': 'line-jumper:move-down'
@@ -47,6 +46,7 @@
   'ctrl-up':   'multi-cursor:expandup'
 
   # panes
+  'alt-space': 'choose-pane:start'
   'ctrl->': 'pane:move-item-right'
   'ctrl-<': 'pane:move-item-left'
 
@@ -92,7 +92,7 @@
   # custom
   'shift-cmd-space': 'custom:insert-space-keep-cursor-place'
   'ctrl-alt-space': 'custom:insert-tab-keep-cursor-place'
-  'alt-cmd-enter': 'custom:insert-newline-keep-cursor-place'
+  'alt-enter': 'custom:insert-newline-keep-cursor-place'
 
   'ctrl-cmd-up': 'my:move-line-up'
   'ctrl-cmd-down': 'my:move-line-down'
@@ -137,8 +137,6 @@
 'atom-text-editor.vim-mode-plus:not(.insert-mode)':
   'cmd-enter': 'editor:newline-below'
   'space escape': 'vim-mode-plus:undo'
-  'o': 'vim-mode-plus:insert-above-with-newline'
-  'O': 'vim-mode-plus:insert-below-with-newline'
   # pane splitting
   'up': 'window:focus-pane-above'
   'down': 'window:focus-pane-below'
@@ -159,7 +157,7 @@
   'ctrl-right':'pane:split-right-and-copy-active-item'
   'ctrl-up':'pane:split-up-and-copy-active-item'
   'ctrl-down':'pane:split-down-and-copy-active-item'
-  'space k': 'hey-pane:toggle-follow-mode'
+  'space h': 'hey-pane:toggle-follow-mode'
 
   # space keys!
   'space p': 'clipboard-plus:toggle'
@@ -172,6 +170,7 @@
   'space g p': 'git-plus:add-all-commit-and-push'
   'space g o': 'git-plus:checkout'
   'space g s': 'git-plus:status'
+  'space g v': 'git-plus:stash-save'
   'space s': 'settings-view:install-packages-and-themes'
 
   'space d b': 'window:toggle-bottom-dock'
@@ -186,24 +185,24 @@
   'space b v': 'bookmarks:view-all'
   'space b c': 'bookmarks:clear-bookmarks'
 
+  'space 1': 'window:reload'
+  'space 2': 'window:toggle-dev-tools'
+
   'shift-alt-j': 'vim-mode-plus:move-down-to-edge'
   'shift-alt-k': 'vim-mode-plus:move-up-to-edge'
   'ctrl-cmd-k': 'my:move-line-up'
   'ctrl-cmd-j': 'my:move-line-down'
 
-  'e e': 'editor:delete-to-end-of-line'
-  'd d': 'editor:delete-line'
-  'b b': 'editor:delete-to-beginning-of-line'
-  'D D': 'vim-mode-plus:delete-line'
-  'E E': 'vim-mode-plus:delete-to-last-character-of-line'
-
   'shift-l': 'vim-mode-plus:move-to-next-word'
-  'ctrl-l': 'vim-mode-plus:move-to-next-whole-word'
+  'ctrl-l': 'vim-mode-plus:move-to-last-character-of-line'
   'shift-h': 'vim-mode-plus:move-to-previous-word'
-  'ctrl-h': 'vim-mode-plus:move-to-previous-whole-word'
+  'ctrl-h': 'vim-mode-plus:move-to-first-character-of-line'
 
-  '>': 'vim-mode-plus:move-to-last-character-of-line'
-  '<': 'vim-mode-plus:move-to-first-character-of-line'
+  'D': 'vim-mode-plus:delete-line'
+  'd x': 'vim-mode-plus:delete-to-last-character-of-line'
+  'd X': 'keystroke v ctrl-h x'
+  '>': 'editor:delete-to-end-of-line'
+  '<': 'editor:delete-to-beginning-of-line'
   'ctrl-,': 'editor:outdent-selected-rows'
   'ctrl-.': 'editor:indent-selected-rows'
 
@@ -212,19 +211,18 @@
   'd i space w': 'keystroke v i space w cmd-x'
   'y i space w': 'keystroke v i space w cmd-c escape'
 
-  ')': 'unset!'
-  '(': 'unset!'
-  '}': 'unset!'
-  '{': 'unset!'
-  ']': 'unset!'
-  '[': 'unset!'
+  # ')': 'unset!'
+  # '(': 'unset!'
+  # '}': 'unset!'
+  # '{': 'unset!'
+  # ']': 'unset!'
+  # '[': 'unset!'
   'shift-j': 'vim-mode-plus:previous-tab'
   'shift-k': 'vim-mode-plus:next-tab'
 
-  ':': 'vim-mode-plus:repeat-find'
+# ':': 'vim-mode-plus:repeat-find'
 
-  ';': 'vim-mode-plus:set-register-name'
-  'x': 'vim-mode-plus:set-register-name-to-blackhole'
+  # ';': 'vim-mode-plus:set-register-name'
 ###################################-package specific keymaps-##################################
 
 '.tree-view':

@@ -7,6 +7,7 @@ const LoadedLibs = {}
 const __vimStatesByEditor = new Map()
 
 const dasherize = s => (s[0].toLowerCase() + s.slice(1)).replace(/[A-Z]/g, m => '-' + m.toLowerCase())
+const classify = s => s[0].toUpperCase() + s.slice(1).replace(/-(\w)/g, m => m[1].toUpperCase())
 
 module.exports = class VimState {
   // Proxy propperties and methods
@@ -60,11 +61,14 @@ module.exports = class VimState {
   get _ () { return this.constructor._ } // prettier-ignore
   static get _ () { return this.__underscorePlus || (this.__underscorePlus = require('underscore-plus')) } // prettier-ignore
 
-  static getDispatcherDispatchBy (fn) {
+  static getDispatcher (fn) {
     return function (event) {
       event.stopPropagation()
       const vimState = VimState.get(this.getModel()) // vimState possibly be undefined See #85
-      if (vimState) vimState.operationStack.run(fn(event))
+      if (vimState) {
+        const klass = fn ? fn() : classify(event.type.replace('vim-mode-plus:', ''))
+        vimState.operationStack.run(klass)
+      }
     }
   }
 
@@ -85,7 +89,7 @@ module.exports = class VimState {
     const table = {}
     for (const klassName of klassNames) {
       const commandName = spec.prefix + ':' + dasherize(klassName)
-      table[commandName] = this.getDispatcherDispatchBy(() => getClass(klassName))
+      table[commandName] = this.getDispatcher(() => getClass(klassName))
     }
     return atom.commands.add(spec.scope || 'atom-text-editor', table)
   }
@@ -98,6 +102,8 @@ module.exports = class VimState {
 
     this.mode = 'insert' // Bare atom is not modal editor, thus it's `insert` mode.
     this.submode = null
+
+    this.replaceModeDisposable = null
 
     this.previousSelection = {}
     this.ignoreSelectionChange = false
@@ -374,8 +380,8 @@ module.exports = class VimState {
     this.__register && this.register.reset()
     this.__searchHistory && this.searchHistory.reset()
     this.__hover && this.hover.reset()
-    this.__operationStack && this.operationStack.reset()
     this.__mutationManager && this.mutationManager.reset()
+    this.__operationStack && this.operationStack.reset()
   }
 
   isVisible () {
@@ -493,9 +499,6 @@ module.exports = class VimState {
     // Component is not necessary avaiable see #98.
     if (this.editorElement.component) {
       this.editorElement.component.setInputEnabled(false)
-      if (atom.appVersion === '1.24.0-beta0') {
-        this.editor.setReadOnly && this.editor.setReadOnly(false)
-      }
     }
 
     // In visual-mode, cursor can place at EOL. move left if cursor is at EOL

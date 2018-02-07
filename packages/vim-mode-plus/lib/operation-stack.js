@@ -19,6 +19,7 @@ module.exports = class OperationStack {
     this.vimState = vimState
     this.editor = vimState.editor
     this.editorElement = vimState.editorElement
+    this.operationToRunNext = null
 
     this.vimState.onDidDestroy(() => this.destroy())
     this.reset()
@@ -44,6 +45,12 @@ module.exports = class OperationStack {
 
     if (this.operationSubscriptions) this.operationSubscriptions.dispose()
     this.operationSubscriptions = new CompositeDisposable()
+
+    if (this.operationToRunNext) {
+      const args = this.operationToRunNext
+      this.operationToRunNext = null
+      this.run(...args)
+    }
   }
 
   destroy () {
@@ -76,7 +83,9 @@ module.exports = class OperationStack {
         // . repeat case we can execute as-it-is.
         operation = klass
       } else {
-        if (type === 'string') klass = Base.getClass(klass)
+        if (type === 'string') {
+          klass = Base.getClass(klass)
+        }
 
         const stackTop = this.peekTop()
         if (stackTop && stackTop.constructor === klass) {
@@ -104,6 +113,10 @@ module.exports = class OperationStack {
     } catch (error) {
       this.handleError(error)
     }
+  }
+
+  runNext (...args) {
+    this.operationToRunNext = args
   }
 
   runRecorded () {

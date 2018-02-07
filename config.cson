@@ -168,7 +168,7 @@
     "atom-ide-outline-view":
       nameOnly: true
     hyperclick:
-      darwinTriggerKeys: "altKey,metaKey"
+      darwinTriggerKeys: "ctrlKey"
     "nuclide-code-search":
       tool: "ag"
     "nuclide-definition-preview":
@@ -183,6 +183,8 @@
       enableLinting: false
       includeOptionalArguments: true
       lintOnFly: true
+    "nuclide-terminal":
+      cursorBlink: true
     use:
       "nuclide-adb-logcat": false
       "nuclide-adb-sdb": false
@@ -229,7 +231,6 @@
       "nuclide-ssh-tunnel": false
       "nuclide-swift": false
       "nuclide-task-runner": false
-      "nuclide-terminal": false
       "nuclide-test-runner": false
       "nuclide-type-coverage": false
   "platformio-ide-terminal":
@@ -271,8 +272,9 @@
   "vim-mode-plus":
     automaticallyEscapeInsertModeOnActivePaneItemChange: true
     defaultScrollRowsOnMiniScroll: 2
-    keymapCCToChangeInnerSmartWord: true
-    keymapYToYankToLastCharacterOfLine: true
+    keymapBackslashToInnerCommentOrParagraphWhenToggleLineCommentsIsPending: true
+    keymapSemicolonToInnerAnyPairInOperatorPendingMode: true
+    keymapSemicolonToInnerAnyPairInVisualMode: true
     sequentialPaste: true
     showHoverSearchCounter: true
     smoothScrollOnFullScrollMotion: true

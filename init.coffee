@@ -47,7 +47,9 @@ atom.commands.add 'atom-text-editor',
     currentPosition = editor.getCursorBufferPosition()
     editor.moveToEndOfLine()
     editor.insertText('\n')
+    editor.deleteToBeginningOfLine()
     editor.setCursorBufferPosition(currentPosition)
+
 
 # Better support for indent (from https://github.com/atom/atom/pull/9104)
 atom.commands.add 'atom-text-editor', 'my:move-line-up', ->
@@ -73,3 +75,20 @@ atom.commands.add 'atom-workspace', 'my:dismiss-notifications', ->
   atom.notifications.getNotifications().forEach (notification) ->
     notification.dismiss()
   atom.notifications.clear()
+
+# This is a bit nasty... if it breaks look up https://atom.io/docs/api/v1.0.7/File#instance-getPath
+atom.commands.add 'atom-workspace', 'my:get-file-paths', ->
+  filePaths = ''
+  pathRegEx = ///^\/(.+)\/([^\/]+)$///i
+  atom.workspace.getPanes().forEach (pane) ->
+      for own key, value of pane.getElement().children[0].children
+        filePath = value.children[0].dataset.path
+        if filePath isnt undefined && filePath.match(pathRegEx) isnt null
+          filePaths += '"' + filePath + '",\n'
+  fileString = '{\n
+      title:\n
+      paths: [ \n \n' + String(filePaths) + '
+      ]\n
+      icon:\"icon-squirrel\"\n
+    }'
+  atom.clipboard.write(fileString)

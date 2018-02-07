@@ -355,23 +355,8 @@ class TransformStringByExternalCommand extends TransformString {
 
 // -------------------------
 class TransformStringBySelectList extends TransformString {
-  isReady () {
-    // This command is just gate to execute another operator.
-    // So never get ready and never be executed.
-    return false
-  }
-
-  initialize () {
-    if (!selectList) selectList = new (require('./select-list'))()
-    selectList.show({
-      items: this.constructor.getSelectListItems(),
-      onCancel: () => this.cancelOperation(),
-      onConfirm: item => {
-        this.vimState.reset()
-        this.vimState.operationStack.run(item.klass, {target: this.target})
-      }
-    })
-  }
+  target = 'Empty'
+  recordable = false
 
   static getSelectListItems () {
     if (!this.selectListItems) {
@@ -389,17 +374,28 @@ class TransformStringBySelectList extends TransformString {
     return this.selectListItems
   }
 
-  execute () {
-    throw new Error(`${this.name} should not be executed`)
+  selectItems () {
+    if (!selectList) {
+      const SelectList = require('./select-list')
+      selectList = new SelectList()
+    }
+    return selectList.selectFromItems(this.constructor.getSelectListItems())
+  }
+
+  async execute () {
+    const item = await this.selectItems()
+    if (item) {
+      this.vimState.operationStack.runNext(item.klass, {target: this.nextTarget})
+    }
   }
 }
 
 class TransformWordBySelectList extends TransformStringBySelectList {
-  target = 'InnerWord'
+  nextTarget = 'InnerWord'
 }
 
 class TransformSmartWordBySelectList extends TransformStringBySelectList {
-  target = 'InnerSmartWord'
+  nextTarget = 'InnerSmartWord'
 }
 
 // -------------------------
@@ -732,10 +728,21 @@ class SplitArgumentsOfInnerAnyPair extends SplitArguments {
 
 class ChangeOrder extends TransformString {
   static command = false
+  action = null
+  sortBy = null
+
   getNewText (text) {
     return this.target.isLinewise()
       ? this.getNewList(this.utils.splitTextByNewLine(text)).join('\n') + '\n'
       : this.sortArgumentsInTextBy(text, args => this.getNewList(args))
+  }
+
+  getNewList (rows) {
+    if (rows.length === 1) {
+      return [this.utils.changeCharOrder(rows[0], this.action, this.sortBy)]
+    } else {
+      return this.utils.changeArrayOrder(rows, this.action, this.sortBy)
+    }
   }
 
   sortArgumentsInTextBy (text, fn) {
@@ -758,9 +765,7 @@ class ChangeOrder extends TransformString {
 }
 
 class Reverse extends ChangeOrder {
-  getNewList (rows) {
-    return rows.reverse()
-  }
+  action = 'reverse'
 }
 
 class ReverseInnerAnyPair extends Reverse {
@@ -768,42 +773,31 @@ class ReverseInnerAnyPair extends Reverse {
 }
 
 class Rotate extends ChangeOrder {
-  backwards = false
-  getNewList (rows) {
-    if (this.backwards) rows.push(rows.shift())
-    else rows.unshift(rows.pop())
-    return rows
-  }
+  action = 'rotate-left'
 }
 
 class RotateBackwards extends ChangeOrder {
-  backwards = true
+  action = 'rotate-right'
 }
 
 class RotateArgumentsOfInnerPair extends Rotate {
   target = 'InnerAnyPair'
 }
 
-class RotateArgumentsBackwardsOfInnerPair extends RotateArgumentsOfInnerPair {
-  backwards = true
+class RotateArgumentsBackwardsOfInnerPair extends RotateBackwards {
+  target = 'InnerAnyPair'
 }
 
 class Sort extends ChangeOrder {
-  getNewList (rows) {
-    return rows.sort()
-  }
+  action = 'sort'
 }
 
-class SortCaseInsensitively extends ChangeOrder {
-  getNewList (rows) {
-    return rows.sort((rowA, rowB) => rowA.localeCompare(rowB, {sensitivity: 'base'}))
-  }
+class SortCaseInsensitively extends Sort {
+  sortBy = (rowA, rowB) => rowA.localeCompare(rowB, {sensitivity: 'base'})
 }
 
-class SortByNumber extends ChangeOrder {
-  getNewList (rows) {
-    return this._.sortBy(rows, row => Number.parseInt(row) || Infinity)
-  }
+class SortByNumber extends Sort {
+  sortBy = (rowA, rowB) => (Number.parseInt(rowA) || Infinity) - (Number.parseInt(rowB) || Infinity)
 }
 
 class NumberingLines extends TransformString {

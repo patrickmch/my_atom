@@ -29,4 +29,12 @@
     ]
     icon: "icon-hubot"
   }
+  {
+    title: "Tes"
+    paths: [
+      "/Users/mchey/code/website/nols_website/core/admin.py",
+      "/Users/mchey/code/website/forms.py"
+    ]
+    icon: "icon-squirrel"
+  }
 ]

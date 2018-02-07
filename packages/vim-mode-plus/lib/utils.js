@@ -698,7 +698,7 @@ function splitTextByNewLine (text) {
   return text.endsWith('\n') ? text.trimRight().split(/\r?\n/g) : text.split(/\r?\n/g)
 }
 
-function replaceDecorationClassBy (fn, decoration) {
+function replaceDecorationClassBy (decoration, fn) {
   const props = decoration.getProperties()
   decoration.setProperties(Object.assign(props, {class: fn(props.class)}))
 }
@@ -763,7 +763,7 @@ function expandRangeToWhiteSpaces (editor, range) {
 // type should be "separator" or "argument"
 function splitArguments (text, joinSpaceSeparatedToken = true) {
   const separatorChars = '\t, \r\n'
-  const quoteChars = "\"'`"
+  const quoteChars = '"\'`'
   const closeCharToOpenChar = {
     ')': '(',
     '}': '{',
@@ -1190,6 +1190,27 @@ function replaceTextInRangeViaDiff (editor, range, newText) {
   })
 }
 
+function changeArrayOrder (array, action, sortBy) {
+  if (array.length < 2) {
+    return array
+  }
+
+  switch (action) {
+    case 'reverse':
+      return array.slice().reverse()
+    case 'sort':
+      return array.slice().sort(sortBy)
+    case 'rotate-right':
+      return array.slice(1).concat(array[0])
+    case 'rotate-left':
+      return array.slice(-1).concat(array.slice(0, -1))
+  }
+}
+
+function changeCharOrder (text, action) {
+  return changeArrayOrder(text.split(''), action).join('')
+}
+
 module.exports = {
   assertWithException,
   getLast,
@@ -1288,5 +1309,7 @@ module.exports = {
   atomVersionSatisfies,
   getRowRangeForCommentAtBufferRow,
   getHunkRangeAtBufferRow,
-  replaceTextInRangeViaDiff
+  replaceTextInRangeViaDiff,
+  changeCharOrder,
+  changeArrayOrder
 }
