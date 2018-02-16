@@ -5,12 +5,6 @@ Object.defineProperty(exports, "__esModule", {
 });
 exports.WatchExpressionComponent = undefined;
 
-var _WatchExpressionStore;
-
-function _load_WatchExpressionStore() {
-  return _WatchExpressionStore = require('./WatchExpressionStore');
-}
-
 var _react = _interopRequireWildcard(require('react'));
 
 var _classnames;
@@ -40,13 +34,13 @@ function _load_nullthrows() {
 var _LazyNestedValueComponent;
 
 function _load_LazyNestedValueComponent() {
-  return _LazyNestedValueComponent = require('../../nuclide-ui/LazyNestedValueComponent');
+  return _LazyNestedValueComponent = require('nuclide-commons-ui/LazyNestedValueComponent');
 }
 
 var _SimpleValueComponent;
 
 function _load_SimpleValueComponent() {
-  return _SimpleValueComponent = _interopRequireDefault(require('../../nuclide-ui/SimpleValueComponent'));
+  return _SimpleValueComponent = _interopRequireDefault(require('nuclide-commons-ui/SimpleValueComponent'));
 }
 
 var _Icon;
@@ -185,9 +179,8 @@ class WatchExpressionComponent extends _react.PureComponent {
   }
 
   render() {
-    const { watchExpressions, watchExpressionStore } = this.props;
-    const fetchChildren = watchExpressionStore.getProperties.bind(watchExpressionStore);
-    const expressions = watchExpressions.map(this._renderExpression.bind(this, fetchChildren));
+    const { watchExpressions, getProperties } = this.props;
+    const expressions = watchExpressions.map(this._renderExpression.bind(this, getProperties));
     const addNewExpressionInput = _react.createElement((_AtomInput || _load_AtomInput()).AtomInput, {
       className: (0, (_classnames || _load_classnames()).default)('nuclide-debugger-watch-expression-input', 'nuclide-debugger-watch-expression-add-new-input'),
       onConfirm: this._onConfirmNewExpression,

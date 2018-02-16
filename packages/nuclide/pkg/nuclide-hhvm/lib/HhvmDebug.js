@@ -46,7 +46,7 @@ let debug = exports.debug = (() => {
 
     // Use commands here to trigger package activation.
     atom.commands.dispatch(atom.views.getView(atom.workspace), 'nuclide-debugger:show');
-    const debuggerService = yield (0, (_consumeFirstProvider || _load_consumeFirstProvider()).default)('nuclide-debugger.remote');
+    const debuggerService = yield (0, (_debugger || _load_debugger()).getDebuggerService)();
     yield debuggerService.startDebugging(processInfo);
   });
 
@@ -57,10 +57,10 @@ let debug = exports.debug = (() => {
 // eslint-disable-next-line rulesdir/no-cross-atom-imports
 
 
-var _consumeFirstProvider;
+var _debugger;
 
-function _load_consumeFirstProvider() {
-  return _consumeFirstProvider = _interopRequireDefault(require('../../commons-atom/consumeFirstProvider'));
+function _load_debugger() {
+  return _debugger = require('../../commons-atom/debugger');
 }
 
 var _LaunchProcessInfo;

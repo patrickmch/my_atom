@@ -12,9 +12,21 @@ var _rxjsBundlesRxMinJs = require('rxjs/bundles/Rx.min.js');
  * client to launch a remote process and communication with its stdin, stdout,
  * and stderr.
  */
+/**
+ * Copyright (c) 2017-present, Facebook, Inc.
+ * All rights reserved.
+ *
+ * This source code is licensed under the BSD-style license found in the
+ * LICENSE file in the root directory of this source tree. An additional grant
+ * of patent rights can be found in the PATENTS file in the same directory.
+ *
+ * 
+ * @format
+ */
+
 class BigDigClient {
 
-  constructor(webSocketTransport) {
+  constructor(webSocketTransport, heartbeat) {
     this._webSocketTransport = webSocketTransport;
     this._tagToSubject = new Map();
 
@@ -42,6 +54,12 @@ class BigDigClient {
         console.error('ConnectionWrapper completed()?');
       }
     });
+
+    this._heartbeat = heartbeat;
+    this._heartbeat.onConnectionRestored(() => {
+      // eslint-disable-next-line no-console
+      console.warn('TODO(T25533063): Implement reconnect logic');
+    });
   }
 
   isClosed() {
@@ -50,6 +68,10 @@ class BigDigClient {
 
   onClose(callback) {
     return this._webSocketTransport.onClose(callback);
+  }
+
+  close() {
+    this._webSocketTransport.close();
   }
 
   sendMessage(tag, body) {
@@ -65,6 +87,10 @@ class BigDigClient {
     return subject.asObservable();
   }
 
+  getHeartbeat() {
+    return this._heartbeat;
+  }
+
   getAddress() {
     return this._webSocketTransport.getAddress();
   }
@@ -73,14 +99,4 @@ class BigDigClient {
     // TODO(mbolin)
   }
 }
-exports.BigDigClient = BigDigClient; /**
-                                      * Copyright (c) 2017-present, Facebook, Inc.
-                                      * All rights reserved.
-                                      *
-                                      * This source code is licensed under the BSD-style license found in the
-                                      * LICENSE file in the root directory of this source tree. An additional grant
-                                      * of patent rights can be found in the PATENTS file in the same directory.
-                                      *
-                                      * 
-                                      * @format
-                                      */
+exports.BigDigClient = BigDigClient;

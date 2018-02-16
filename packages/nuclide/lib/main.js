@@ -146,8 +146,8 @@ _fs.default.readdirSync(FEATURES_DIR).forEach(item => {
   if (item.indexOf('.') !== -1) {
     return;
   }
-  const dirname = _path.default.join(FEATURES_DIR, item);
-  const filename = _path.default.join(dirname, 'package.json');
+  const featurePath = _path.default.join(FEATURES_DIR, item);
+  const filename = _path.default.join(featurePath, 'package.json');
   try {
     const stat = _fs.default.statSync(filename);
 
@@ -155,7 +155,7 @@ _fs.default.readdirSync(FEATURES_DIR).forEach(item => {
       throw new Error('Invariant violation: "stat.isFile()"');
     }
   } catch (err) {
-    if (err && err.code === 'ENOENT') {
+    if (err && (err.code === 'ENOENT' || err.code === 'ENOTDIR')) {
       return;
     }
   }
@@ -172,7 +172,7 @@ _fs.default.readdirSync(FEATURES_DIR).forEach(item => {
 
     features.push({
       pkg,
-      dirname
+      path: featurePath
     });
   }
 });
@@ -180,8 +180,8 @@ _fs.default.readdirSync(FEATURES_DIR).forEach(item => {
 // atom-ide-ui packages are a lot more consistent.
 const ATOM_IDE_DIR = _path.default.join(__dirname, '../modules/atom-ide-ui/pkg');
 _fs.default.readdirSync(ATOM_IDE_DIR).forEach(item => {
-  const dirname = _path.default.join(ATOM_IDE_DIR, item);
-  const filename = _path.default.join(dirname, 'package.json');
+  const featurePath = _path.default.join(ATOM_IDE_DIR, item);
+  const filename = _path.default.join(featurePath, 'package.json');
   try {
     const src = _fs.default.readFileSync(filename, 'utf8');
     const pkg = JSON.parse(src);
@@ -192,10 +192,10 @@ _fs.default.readdirSync(ATOM_IDE_DIR).forEach(item => {
 
     features.push({
       pkg,
-      dirname
+      path: featurePath
     });
   } catch (err) {
-    if (err.code !== 'ENOENT') {
+    if (err.code !== 'ENOENT' && err.code !== 'ENOTDIR') {
       throw err;
     }
   }
@@ -207,8 +207,8 @@ let featureLoader;
 
 if (shouldInitialize) {
   featureLoader = new (_FeatureLoader || _load_FeatureLoader()).default({
-    features,
-    pkgName: 'nuclide'
+    path: _path.default.resolve(__dirname, '..'),
+    features
   });
   featureLoader.load();
 }

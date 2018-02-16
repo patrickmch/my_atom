@@ -300,6 +300,10 @@ class HackSingleFileLanguageService {
   }
 
   findReferences(filePath, buffer, position) {
+    return _rxjsBundlesRxMinJs.Observable.fromPromise(this._findReferences(filePath, buffer, position));
+  }
+
+  _findReferences(filePath, buffer, position) {
     return (0, _asyncToGenerator.default)(function* () {
       const contents = buffer.getText();
 

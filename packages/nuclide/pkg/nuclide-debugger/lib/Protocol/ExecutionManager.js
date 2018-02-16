@@ -20,9 +20,22 @@ function _load_EventReporter() {
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
+const LOCAL_PATH_URI_PREFIX = 'file://';
+
 /**
  * Bridge between Nuclide IPC and RPC execution control protocols.
  */
+/**
+ * Copyright (c) 2015-present, Facebook, Inc.
+ * All rights reserved.
+ *
+ * This source code is licensed under the license found in the LICENSE file in
+ * the root directory of this source tree.
+ *
+ * 
+ * @format
+ */
+
 class ExecutionManager {
 
   constructor(debuggerDispatcher, getIsReadonlyTarget) {
@@ -70,8 +83,9 @@ class ExecutionManager {
       // Chrome's continueToLocation implementation incorrect
       // uses source uri instead of scriptId as the location ScriptId
       // field, we mirror the same behavior for compatibility reason.
-      const sourceUri = this._debuggerDispatcher.getSourceUriFromUri(fileUri);
-      if (sourceUri != null) {
+      const sourceUriOrFileUri = this._debuggerDispatcher.getSourceUriFromUri(fileUri);
+      if (sourceUriOrFileUri != null) {
+        const sourceUri = sourceUriOrFileUri.indexOf(LOCAL_PATH_URI_PREFIX) === 0 ? sourceUriOrFileUri.substr(LOCAL_PATH_URI_PREFIX.length) : sourceUriOrFileUri;
         const scriptId = (_nuclideUri || _load_nuclideUri()).default.getPath(sourceUri);
         this._debuggerDispatcher.continueToLocation({
           scriptId,
@@ -126,13 +140,4 @@ class ExecutionManager {
     this._executionEvent$.next(args);
   }
 }
-exports.default = ExecutionManager; /**
-                                     * Copyright (c) 2015-present, Facebook, Inc.
-                                     * All rights reserved.
-                                     *
-                                     * This source code is licensed under the license found in the LICENSE file in
-                                     * the root directory of this source tree.
-                                     *
-                                     * 
-                                     * @format
-                                     */
+exports.default = ExecutionManager;

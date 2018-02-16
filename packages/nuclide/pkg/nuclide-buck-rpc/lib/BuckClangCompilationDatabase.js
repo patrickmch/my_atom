@@ -14,6 +14,12 @@ function _load_nuclideClangRpc() {
   return _nuclideClangRpc = _interopRequireWildcard(require('../../nuclide-clang-rpc'));
 }
 
+var _finders;
+
+function _load_finders() {
+  return _finders = require('../../nuclide-clang-rpc/lib/related-file/finders');
+}
+
 var _BuckServiceImpl;
 
 function _load_BuckServiceImpl() {
@@ -50,6 +56,12 @@ function _load_types() {
   return _types = require('./types');
 }
 
+var _fsPromise;
+
+function _load_fsPromise() {
+  return _fsPromise = _interopRequireDefault(require('nuclide-commons/fsPromise'));
+}
+
 function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
@@ -67,6 +79,7 @@ const logger = (0, (_log4js || _load_log4js()).getLogger)('nuclide-buck'); /**
 
 const BUCK_TIMEOUT = 10 * 60 * 1000;
 const TARGET_KIND_REGEX = ['apple_binary', 'apple_library', 'apple_test', 'cxx_binary', 'cxx_library', 'cxx_test'].join('|');
+const MAX_DB_SIZE_IN_BYTES_FOR_CACHING = 100000000; // 100 MB
 
 /**
  * Facebook puts all headers in a <target>:__default_headers__ build target by default.
@@ -99,25 +112,49 @@ class BuckClangCompilationDatabaseHandler {
     this._sourceToTargetKey.clear();
   }
 
-  getCompilationDatabase(src) {
+  getCompilationDatabase(file) {
     var _this = this;
 
-    return this._sourceCache.getOrCreate(src, (0, _asyncToGenerator.default)(function* () {
-      const buckRoot = yield (_BuckServiceImpl || _load_BuckServiceImpl()).getRootForPath(src);
-      return _this._loadCompilationDatabaseFromBuck(src, buckRoot).catch(function (err) {
-        logger.error('Error getting flags from Buck', err);
-        throw err;
-      }).then(function (db) {
-        if (db != null) {
-          _this._cacheAllTheFilesInTheSameDB(db, buckRoot);
+    return this._sourceCache.getOrCreate(file, (0, _asyncToGenerator.default)(function* () {
+      if ((0, (_utils || _load_utils()).isHeaderFile)(file)) {
+        const source = yield new (_finders || _load_finders()).RelatedFileFinder().getRelatedSourceForHeader(file);
+        if (source != null) {
+          logger.info(`${file} is a header, thus using ${source} for getting the compilation flags.`);
+          return _this.getCompilationDatabase(source);
+        } else {
+          logger.error(`Couldn't find a corresponding source file for ${file}, thus there are no compilation flags available.`);
+          return {
+            file: null,
+            flagsFile: yield (0, (_utils || _load_utils()).guessBuildFile)(file),
+            libclangPath: null,
+            warnings: [`I could not find a corresponding source file for ${file}.`]
+          };
         }
-        return db;
-      });
+      } else {
+        return _this._getCompilationDatabase(file);
+      }
     }));
   }
 
-  _loadCompilationDatabaseFromBuck(src, buckRoot) {
+  _getCompilationDatabase(file) {
     var _this2 = this;
+
+    return (0, _asyncToGenerator.default)(function* () {
+      const buckRoot = yield (_BuckServiceImpl || _load_BuckServiceImpl()).getRootForPath(file);
+      return _this2._loadCompilationDatabaseFromBuck(file, buckRoot).catch(function (err) {
+        logger.error('Error getting flags from Buck for file ', file, err);
+        throw err;
+      }).then(function (db) {
+        if (db != null) {
+          _this2._cacheFilesToCompilationDB(db, buckRoot, file);
+        }
+        return db;
+      });
+    })();
+  }
+
+  _loadCompilationDatabaseFromBuck(src, buckRoot) {
+    var _this3 = this;
 
     return (0, _asyncToGenerator.default)(function* () {
       if (buckRoot == null) {
@@ -126,7 +163,7 @@ class BuckClangCompilationDatabaseHandler {
 
       let queryTarget = null;
       try {
-        queryTarget = (yield (_BuckServiceImpl || _load_BuckServiceImpl()).getOwners(buckRoot, src, TARGET_KIND_REGEX)).find(function (x) {
+        queryTarget = (yield (_BuckServiceImpl || _load_BuckServiceImpl()).getOwners(buckRoot, src, [], TARGET_KIND_REGEX)).find(function (x) {
           return x.indexOf(DEFAULT_HEADERS_TARGET) === -1;
         });
       } catch (err) {
@@ -148,10 +185,10 @@ class BuckClangCompilationDatabaseHandler {
       }
       const target = queryTarget;
 
-      _this2._sourceToTargetKey.set(src, _this2._targetCache.keyForArgs([buckRoot, target]));
+      _this3._sourceToTargetKey.set(src, _this3._targetCache.keyForArgs([buckRoot, target]));
 
-      return _this2._targetCache.getOrCreate([buckRoot, target], function () {
-        return _this2._loadCompilationDatabaseForBuckTarget(buckRoot, target);
+      return _this3._targetCache.getOrCreate([buckRoot, target], function () {
+        return _this3._loadCompilationDatabaseForBuckTarget(buckRoot, target);
       });
     })();
   }
@@ -169,13 +206,13 @@ class BuckClangCompilationDatabaseHandler {
   }
 
   _loadCompilationDatabaseForBuckTarget(buckProjectRoot, target) {
-    var _this3 = this;
+    var _this4 = this;
 
     return (0, _asyncToGenerator.default)(function* () {
       // TODO(t12973165): Allow configuring a custom flavor.
       // For now, this seems to use cxx.default_platform, which tends to be correct.
-      const allFlavors = ['compilation-database', ..._this3._params.flavorsForTarget];
-      const allArgs = _this3._params.args.length === 0 ? yield _this3._getExtraArguments(buckProjectRoot, target) : _this3._params.args;
+      const allFlavors = ['compilation-database', ..._this4._params.flavorsForTarget];
+      const allArgs = _this4._params.args.length === 0 ? yield _this4._getExtraArguments(buckProjectRoot, target) : _this4._params.args;
       const buildTarget = target + '#' + allFlavors.join(',');
       const buildReport = yield (_BuckServiceImpl || _load_BuckServiceImpl()).build(buckProjectRoot, [
       // Small builds, like those used for a compilation database, can degrade overall
@@ -199,7 +236,7 @@ class BuckClangCompilationDatabaseHandler {
         libclangPath: null,
         warnings: []
       };
-      return _this3._processCompilationDb(compilationDB, buckProjectRoot, allArgs);
+      return _this4._processCompilationDb(compilationDB, buckProjectRoot, allArgs);
     })();
   }
 
@@ -214,17 +251,26 @@ class BuckClangCompilationDatabaseHandler {
     })();
   }
 
-  _cacheAllTheFilesInTheSameDB(db, buckRoot) {
-    var _this4 = this;
+  _cacheFilesToCompilationDB(db, buckRoot, src) {
+    var _this5 = this;
 
     return (0, _asyncToGenerator.default)(function* () {
+      if (yield _this5._isDbTooBigForFullCaching(db)) {
+        return;
+      }
       const pathToFlags = yield (_nuclideClangRpc || _load_nuclideClangRpc()).loadFlagsFromCompilationDatabaseAndCacheThem({
         compilationDatabase: (0, (_types || _load_types()).convertBuckClangCompilationDatabase)(db),
         projectRoot: buckRoot
       });
-      pathToFlags.forEach(function (fullFlags, path) {
-        _this4._sourceCache.set(path, Promise.resolve(db));
+      pathToFlags.forEach(function (_, path) {
+        _this5._sourceCache.set(path, Promise.resolve(db));
       });
+    })();
+  }
+
+  _isDbTooBigForFullCaching(db) {
+    return (0, _asyncToGenerator.default)(function* () {
+      return db.file == null ? false : (yield (_fsPromise || _load_fsPromise()).default.stat(db.file)).size > MAX_DB_SIZE_IN_BYTES_FOR_CACHING;
     })();
   }
 }

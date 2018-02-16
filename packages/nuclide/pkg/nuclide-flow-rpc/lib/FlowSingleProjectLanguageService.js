@@ -63,12 +63,6 @@ function _load_FlowProcess() {
   return _FlowProcess = require('./FlowProcess');
 }
 
-var _FlowVersion;
-
-function _load_FlowVersion() {
-  return _FlowVersion = require('./FlowVersion');
-}
-
 var _prettyPrintTypes;
 
 function _load_prettyPrintTypes() {
@@ -102,20 +96,14 @@ const logger = (0, (_log4js || _load_log4js()).getLogger)('nuclide-flow-rpc'); /
 
 /** Encapsulates all of the state information we need about a specific Flow root */
 class FlowSingleProjectLanguageService {
-  // The path to the directory where the .flowconfig is -- i.e. the root of the Flow project.
+
   constructor(root, execInfoContainer, fileCache) {
     this._root = root;
     this._execInfoContainer = execInfoContainer;
     this._process = new (_FlowProcess || _load_FlowProcess()).FlowProcess(root, execInfoContainer, fileCache);
-    this._version = new (_FlowVersion || _load_FlowVersion()).FlowVersion((0, _asyncToGenerator.default)(function* () {
-      const execInfo = yield execInfoContainer.getFlowExecInfo(root);
-      if (!execInfo) {
-        return null;
-      }
-      return execInfo.flowVersion;
-    }));
-    this._process.getServerStatusUpdates().filter(state => state === 'not running').subscribe(() => this._version.invalidateVersion());
   }
+  // The path to the directory where the .flowconfig is -- i.e. the root of the Flow project.
+
 
   dispose() {
     this._process.dispose();
@@ -192,7 +180,7 @@ class FlowSingleProjectLanguageService {
 
     return (0, _asyncToGenerator.default)(function* () {
       // `flow find-refs` did not work well until version v0.55.0
-      const isSupported = yield _this2._version.satisfies('>=0.55.0');
+      const isSupported = yield _this2._process.getVersion().satisfies('>=0.55.0');
       if (!isSupported) {
         return null;
       }
@@ -224,7 +212,10 @@ class FlowSingleProjectLanguageService {
         return convertFindRefsOutput(json, _this3._root);
       } catch (e) {
         logger.error(`flowFindRefs error: ${String(e)}`);
-        return null;
+        return {
+          type: 'error',
+          message: String(e)
+        };
       }
     })();
   }
@@ -242,7 +233,9 @@ class FlowSingleProjectLanguageService {
 
       const options = {};
 
-      const args = ['status', '--json', filePath];
+      const supportsFriendlyStatusError = yield _this4._process.getVersion().satisfies('>=0.66.0');
+      const jsonFlag = supportsFriendlyStatusError ? ['--json', '--json-version', '2'] : ['--json'];
+      const args = ['status', ...jsonFlag, filePath];
 
       let result;
 
@@ -338,7 +331,7 @@ class FlowSingleProjectLanguageService {
       try {
         let json;
         const ideConnection = _this5._process.getCurrentIDEConnection();
-        if (ideConnection != null && (yield _this5._version.satisfies('>=0.48.0'))) {
+        if (ideConnection != null && (yield _this5._process.getVersion().satisfies('>=0.48.0'))) {
           json = yield ideConnection.getAutocompleteSuggestions(filePath, line, column, contents);
         } else {
           const args = ['autocomplete', '--json', filePath, line, column];
@@ -548,7 +541,7 @@ class FlowSingleProjectLanguageService {
 
   findReferences(filePath, buffer, position) {
     // TODO check flow version
-    return this._findRefs(filePath, buffer, position, true);
+    return _rxjsBundlesRxMinJs.Observable.fromPromise(this._findRefs(filePath, buffer, position, true));
   }
 
   getEvaluationExpression(filePath, buffer, position) {
@@ -801,7 +794,10 @@ function convertFindRefsOutput(output, root) {
     };
   } else {
     if (output.kind === 'no-symbol-found') {
-      return null;
+      return {
+        type: 'error',
+        message: 'No symbol found at the current location by Flow.'
+      };
     } else {
       return {
         type: 'data',

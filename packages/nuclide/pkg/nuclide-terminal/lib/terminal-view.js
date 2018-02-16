@@ -11,12 +11,6 @@ var _atom = require('atom');
 
 var _electron = require('electron');
 
-var _observable;
-
-function _load_observable() {
-  return _observable = require('nuclide-commons/observable');
-}
-
 var _rxjsBundlesRxMinJs = require('rxjs/bundles/Rx.min.js');
 
 var _url = _interopRequireDefault(require('url'));
@@ -24,7 +18,13 @@ var _url = _interopRequireDefault(require('url'));
 var _xterm;
 
 function _load_xterm() {
-  return _xterm = _interopRequireDefault(require('xterm'));
+  return _xterm = require('xterm');
+}
+
+var _fit;
+
+function _load_fit() {
+  return _fit = _interopRequireWildcard(require('xterm/lib/addons/fit/fit'));
 }
 
 var _nuclideRemoteConnection;
@@ -93,20 +93,21 @@ function _load_sink() {
   return _sink = require('./sink');
 }
 
+function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
+
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-const RESIZE_EVENT_DEBOUNCE_MS = 100; /**
-                                       * Copyright (c) 2015-present, Facebook, Inc.
-                                       * All rights reserved.
-                                       *
-                                       * This source code is licensed under the license found in the LICENSE file in
-                                       * the root directory of this source tree.
-                                       *
-                                       * 
-                                       * @format
-                                       */
+const PRESERVED_COMMANDS_CONFIG = 'nuclide-terminal.preservedCommands'; /**
+                                                                         * Copyright (c) 2015-present, Facebook, Inc.
+                                                                         * All rights reserved.
+                                                                         *
+                                                                         * This source code is licensed under the license found in the LICENSE file in
+                                                                         * the root directory of this source tree.
+                                                                         *
+                                                                         * 
+                                                                         * @format
+                                                                         */
 
-const PRESERVED_COMMANDS_CONFIG = 'nuclide-terminal.preservedCommands';
 const SCROLLBACK_CONFIG = 'nuclide-terminal.scrollback';
 const CURSOR_STYLE_CONFIG = 'nuclide-terminal.cursorStyle';
 const CURSOR_BLINK_CONFIG = 'nuclide-terminal.cursorBlink';
@@ -117,6 +118,13 @@ const URI_PREFIX = exports.URI_PREFIX = 'atom://nuclide-terminal-view';
 class TerminalView {
 
   constructor(paneUri) {
+    if ((_xterm || _load_xterm()).Terminal.fit == null) {
+      // The 'fit' add-on resizes the terminal based on the container size
+      // and the font size such that the terminal fills the container.
+      // Load the addon on-demand the first time we create a terminal.
+      (_xterm || _load_xterm()).Terminal.applyAddon(_fit || _load_fit());
+    }
+
     this._paneUri = paneUri;
     const info = (0, (_nuclideTerminalUri || _load_nuclideTerminalUri()).infoFromUri)(paneUri);
     this._terminalInfo = info;
@@ -143,20 +151,22 @@ class TerminalView {
 
     subscriptions.add((_featureConfig || _load_featureConfig()).default.observeAsStream(PRESERVED_COMMANDS_CONFIG).subscribe(preserved => {
       this._preservedCommands = new Set([...(preserved || []), ...(info.preservedCommands || [])]);
-    }), atom.config.onDidChange('editor.fontSize', this._syncAtomStyle.bind(this)), atom.config.onDidChange('editor.fontFamily', this._syncAtomStyle.bind(this)), atom.config.onDidChange('editor.lineHeight', this._syncAtomStyle.bind(this)));
+    }), atom.config.onDidChange('editor.fontSize', this._syncAtomStyle.bind(this)), atom.config.onDidChange('editor.fontFamily', this._syncAtomStyle.bind(this)), atom.config.onDidChange('editor.lineHeight', this._syncAtomStyle.bind(this)), atom.config.onDidChange('core.themes', this._syncAtomTheme.bind(this)), atom.themes.onDidChangeActiveThemes(this._syncAtomTheme.bind(this)));
 
     const div = this._div = document.createElement('div');
     div.classList.add('terminal-pane');
     subscriptions.add(() => div.remove());
 
-    const terminal = this._terminal = new (_xterm || _load_xterm()).default({
+    const terminal = this._terminal = new (_xterm || _load_xterm()).Terminal({
       cols: 512,
       rows: 512,
       cursorBlink: (_featureConfig || _load_featureConfig()).default.get(CURSOR_BLINK_CONFIG),
       cursorStyle: (_featureConfig || _load_featureConfig()).default.get(CURSOR_STYLE_CONFIG),
       scrollback: (_featureConfig || _load_featureConfig()).default.get(SCROLLBACK_CONFIG)
     });
-    terminal.open(this._div, false);
+    terminal.open(this._div);
+    terminal.setHypertextLinkHandler(openLink);
+    this._syncAtomStyle();
     terminal.attachCustomKeyEventHandler(this._checkIfKeyBoundOrDivertToXTerm.bind(this));
     this._subscriptions.add(() => terminal.destroy());
     registerLinkHandlers(terminal);
@@ -165,7 +175,7 @@ class TerminalView {
       document.execCommand('copy');
     }), atom.commands.add(div, 'core:paste', () => {
       document.execCommand('paste');
-    }), atom.commands.add(div, ADD_ESCAPE_COMMAND, this._addEscapePrefix.bind(this)), atom.commands.add(div, 'nuclide-terminal:clear', this._clear.bind(this)), (_featureConfig || _load_featureConfig()).default.observeAsStream(CURSOR_STYLE_CONFIG).skip(1).subscribe(cursorStyle => terminal.setOption('cursorStyle', cursorStyle)), (_featureConfig || _load_featureConfig()).default.observeAsStream(CURSOR_BLINK_CONFIG).skip(1).subscribe(cursorBlink => terminal.setOption('cursorBlink', cursorBlink)), (_featureConfig || _load_featureConfig()).default.observeAsStream(SCROLLBACK_CONFIG).skip(1).subscribe(scrollback => terminal.setOption('scrollback', scrollback)));
+    }), atom.commands.add(div, ADD_ESCAPE_COMMAND, this._addEscapePrefix.bind(this)), atom.commands.add(div, 'nuclide-terminal:clear', this._clear.bind(this)), (_featureConfig || _load_featureConfig()).default.observeAsStream(CURSOR_STYLE_CONFIG).skip(1).subscribe(cursorStyle => terminal.setOption('cursorStyle', cursorStyle)), (_featureConfig || _load_featureConfig()).default.observeAsStream(CURSOR_BLINK_CONFIG).skip(1).subscribe(cursorBlink => terminal.setOption('cursorBlink', cursorBlink)), (_featureConfig || _load_featureConfig()).default.observeAsStream(SCROLLBACK_CONFIG).skip(1).subscribe(scrollback => terminal.setOption('scrollback', scrollback)), _rxjsBundlesRxMinJs.Observable.merge(_rxjsBundlesRxMinJs.Observable.fromEvent(this._terminal, 'focus'), _rxjsBundlesRxMinJs.Observable.fromEvent(window, 'resize'), new (_observableDom || _load_observableDom()).ResizeObservable(this._div)).subscribe(this._fitAndResize.bind(this)));
 
     if (process.platform === 'win32') {
       // On Windows, add Putty-style highlight and right click to copy, right click to paste.
@@ -197,12 +207,6 @@ class TerminalView {
     this._div.blur = () => terminal.blur();
 
     this._spawn(cwd);
-    this._setUseTitleAsPath(cwd);
-  }
-
-  _setUseTitleAsPath(cwd) {
-    const promise = cwd == null ? (0, (_nuclidePtyRpc || _load_nuclidePtyRpc()).useTitleAsPath)(this) : (0, (_nuclideRemoteConnection || _load_nuclideRemoteConnection()).getPtyServiceByNuclideUri)(cwd).useTitleAsPath(this);
-    promise.then(value => this._useTitleAsPath = value);
   }
 
   _spawn(cwd) {
@@ -212,6 +216,7 @@ class TerminalView {
       environment: this._terminalInfo.environmentVariables
     }, command == null ? {} : { command });
     if (cwd == null || (_nuclideUri || _load_nuclideUri()).default.isLocal(cwd) || (_nuclideRemoteConnection || _load_nuclideRemoteConnection()).RemoteConnection.getByHostname((_nuclideUri || _load_nuclideUri()).default.getHostname(cwd)).length > 0) {
+      this._setUseTitleAsPath(cwd);
       const promise = cwd == null ? (0, (_nuclidePtyRpc || _load_nuclidePtyRpc()).spawn)(info, this) : (0, (_nuclideRemoteConnection || _load_nuclideRemoteConnection()).getPtyServiceByNuclideUri)(cwd).spawn(Object.assign({}, info, { cwd: (_nuclideUri || _load_nuclideUri()).default.getPath(cwd) }), this);
       promise.then(pty => this._onPtyFulfill(pty)).catch(error => this._onPtyFail(error));
     } else {
@@ -225,6 +230,11 @@ class TerminalView {
       });
       this._subscriptions.add(subscription);
     }
+  }
+
+  _setUseTitleAsPath(cwd) {
+    const promise = cwd == null ? (0, (_nuclidePtyRpc || _load_nuclidePtyRpc()).useTitleAsPath)(this) : (0, (_nuclideRemoteConnection || _load_nuclideRemoteConnection()).getPtyServiceByNuclideUri)(cwd).useTitleAsPath(this);
+    promise.then(value => this._useTitleAsPath = value);
   }
 
   _onPtyFulfill(pty) {
@@ -242,7 +252,7 @@ class TerminalView {
       startDelay: Math.round(now - this._startTime)
     });
 
-    this._subscriptions.add(this.dispose.bind(this), _rxjsBundlesRxMinJs.Observable.merge(_rxjsBundlesRxMinJs.Observable.fromEvent(this._terminal, 'focus'), _rxjsBundlesRxMinJs.Observable.fromEvent(window, 'resize'), new (_observableDom || _load_observableDom()).ResizeObservable(this._div)).let((0, (_observable || _load_observable()).fastDebounce)(RESIZE_EVENT_DEBOUNCE_MS)).subscribe(() => this._fitAndResize()), _rxjsBundlesRxMinJs.Observable.fromEvent(this._terminal, 'data').subscribe(this._onInput.bind(this)), _rxjsBundlesRxMinJs.Observable.fromEvent(this._terminal, 'title').subscribe(title => {
+    this._subscriptions.add(this.dispose.bind(this), _rxjsBundlesRxMinJs.Observable.fromEvent(this._terminal, 'data').subscribe(this._onInput.bind(this)), _rxjsBundlesRxMinJs.Observable.fromEvent(this._terminal, 'title').subscribe(title => {
       this._setTitle(title);
       if (this._useTitleAsPath) {
         this._setPath(title);
@@ -254,6 +264,7 @@ class TerminalView {
 
       return (0, (_event || _load_event()).observableFromSubscribeFunction)(pane.onDidChangeFlexScale.bind(pane));
     }).subscribe(this._syncAtomStyle.bind(this)), _rxjsBundlesRxMinJs.Observable.interval(60 * 60 * 1000).subscribe(() => (0, (_nuclideAnalytics || _load_nuclideAnalytics()).track)('nuclide-terminal.hourly', this._statistics())), _rxjsBundlesRxMinJs.Observable.fromEvent(this._terminal, 'focus').subscribe(this._focused.bind(this)), _rxjsBundlesRxMinJs.Observable.fromEvent(this._terminal, 'blur').subscribe(this._blurred.bind(this)));
+    this._fitAndResize();
   }
 
   _focused() {
@@ -305,17 +316,33 @@ class TerminalView {
   // before we measure and resize, so we setTimeout to run on the tick after config
   // notifications go out.
   _syncAtomStyle() {
-    setTimeout(this._fitAndResize.bind(this), 0);
+    for (const attr of ['fontFamily', 'fontSize', 'lineHeight']) {
+      this._syncAtomStyleItem(attr);
+    }
+    this._fitAndResize();
+  }
+
+  _syncAtomStyleItem(name) {
+    const item = atom.config.get(`editor.${name}`);
+    if (item != null && item !== '') {
+      this._terminal.setOption(name, item);
+    }
   }
 
   _fitAndResize() {
-    // The 'fit' add-on resizes the terminal based on the container size
-    // and the font size such that the terminal fills the container.
-    (_xterm || _load_xterm()).default.loadAddon('fit');
+    // Force character measure before 'fit' runs.
+    this._terminal.resize(this._terminal.cols, this._terminal.rows);
     this._terminal.fit();
     if (this._pty != null) {
       this._pty.resize(this._terminal.cols, this._terminal.rows);
     }
+    this._syncAtomTheme();
+  }
+
+  _syncAtomTheme() {
+    const terminal = this._terminal;
+    const div = this._div;
+    terminal.setOption('theme', getTerminalTheme(div));
   }
 
   _clear() {
@@ -528,7 +555,7 @@ class TerminalView {
 exports.TerminalView = TerminalView;
 function deserializeTerminalView(state) {
   // Convert from/to uri to generate a new unique id.
-  const info = (0, (_nuclideTerminalUri || _load_nuclideTerminalUri()).infoFromUri)(state.paneUri);
+  const info = (0, (_nuclideTerminalUri || _load_nuclideTerminalUri()).infoFromUri)(state.paneUri, true);
   const paneUri = (0, (_nuclideTerminalUri || _load_nuclideTerminalUri()).uriFromInfo)(info);
   return new TerminalView(paneUri);
 }
@@ -566,6 +593,14 @@ function registerLinkHandlers(terminal) {
   }
 }
 
+function openLink(event, link) {
+  _electron.shell.openExternal(trimTrailingDot(link));
+}
+
+function trimTrailingDot(s) {
+  return s.endsWith('.') ? s.substring(0, s.length - 1) : s;
+}
+
 // As a precaution, we should not let any undisplayable or potentially unsafe characters through
 function getSafeInitialInput(initialInput) {
   for (let i = 0; i < initialInput.length; i++) {
@@ -581,4 +616,26 @@ function getSafeInitialInput(initialInput) {
     }
   }
   return initialInput;
+}
+
+function getTerminalTheme(div) {
+  const style = window.getComputedStyle(div);
+  const foreground = convertRgbToHash(style.getPropertyValue('color'));
+  const background = convertRgbToHash(style.getPropertyValue('background-color'));
+  return {
+    foreground,
+    background,
+    cursor: foreground
+  };
+}
+
+// Terminal only allows colors of the form '#rrggbb' or '#rgb' and falls back
+// to black otherwise. https://git.io/vNE8a  :-(
+const rgbRegex = / *rgb *\( *([0-9]+) *, *([0-9]+) *, *([0-9]+) *\) */;
+function convertRgbToHash(rgb) {
+  const matches = rgb.match(rgbRegex);
+  if (matches == null) {
+    return rgb;
+  }
+  return '#' + matches.slice(1, 4).map(Number).map(n => (n < 0x10 ? '0' : '') + n.toString(16)).join('');
 }

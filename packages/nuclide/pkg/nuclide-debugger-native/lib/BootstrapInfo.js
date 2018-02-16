@@ -13,10 +13,10 @@ function _load_nuclideDebuggerCommon() {
   return _nuclideDebuggerCommon = require('nuclide-debugger-common');
 }
 
-var _nuclideDebugger;
+var _AtomServiceContainer;
 
-function _load_nuclideDebugger() {
-  return _nuclideDebugger = require('../../nuclide-debugger');
+function _load_AtomServiceContainer() {
+  return _AtomServiceContainer = require('../../nuclide-debugger/lib/AtomServiceContainer');
 }
 
 var _nuclideRemoteConnection;
@@ -63,7 +63,6 @@ class BootstrapInfo extends (_nuclideDebuggerCommon || _load_nuclideDebuggerComm
 
   getDebuggerCapabilities() {
     return Object.assign({}, super.getDebuggerCapabilities(), {
-      singleThreadStepping: true,
       threads: true
     });
   }
@@ -78,7 +77,7 @@ class BootstrapInfo extends (_nuclideDebuggerCommon || _load_nuclideDebuggerComm
     return (0, _asyncToGenerator.default)(function* () {
       const rpcService = _this._getRpcService();
       let debugSession = null;
-      let outputDisposable = (0, (_nuclideDebugger || _load_nuclideDebugger()).registerConsoleLogging)('LLDB', rpcService.getOutputWindowObservable().refCount());
+      let outputDisposable = (0, (_AtomServiceContainer || _load_AtomServiceContainer()).registerConsoleLogging)('LLDB', rpcService.getOutputWindowObservable().refCount());
       try {
         yield rpcService.bootstrap(_this._bootstrapInfo).refCount().toPromise();
         // Start websocket server with Chrome after launch completed.

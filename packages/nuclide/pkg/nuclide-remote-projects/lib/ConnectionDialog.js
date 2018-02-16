@@ -4,6 +4,14 @@ Object.defineProperty(exports, "__esModule", {
   value: true
 });
 
+var _rxjsBundlesRxMinJs = require('rxjs/bundles/Rx.min.js');
+
+var _passesGK;
+
+function _load_passesGK() {
+  return _passesGK = _interopRequireDefault(require('../../commons-node/passesGK'));
+}
+
 var _AuthenticationPrompt;
 
 function _load_AuthenticationPrompt() {
@@ -20,6 +28,12 @@ var _ButtonGroup;
 
 function _load_ButtonGroup() {
   return _ButtonGroup = require('nuclide-commons-ui/ButtonGroup');
+}
+
+var _connectBigDigSshHandshake;
+
+function _load_connectBigDigSshHandshake() {
+  return _connectBigDigSshHandshake = _interopRequireDefault(require('./connectBigDigSshHandshake'));
 }
 
 var _ConnectionDetailsPrompt;
@@ -139,17 +153,17 @@ class ConnectionDialog extends _react.Component {
     this.cancel = () => {
       const mode = this.state.mode;
 
-      // It is safe to call cancel even if no connection is started
-      this.state.sshHandshake.cancel();
+      if (this._pendingHandshake != null) {
+        this._pendingHandshake.unsubscribe();
+        this._pendingHandshake = null;
+      }
 
       if (mode === WAITING_FOR_CONNECTION) {
-        // TODO(mikeo): Tell delegate to cancel the connection request.
         this.setState({
           isDirty: false,
           mode: REQUEST_CONNECTION_DETAILS
         });
       } else {
-        // TODO(mikeo): Also cancel connection request, as appropriate for mode?
         this.props.onCancel();
         this.close();
       }
@@ -188,7 +202,7 @@ class ConnectionDialog extends _react.Component {
             isDirty: false,
             mode: WAITING_FOR_CONNECTION
           });
-          this.state.sshHandshake.connect({
+          this._pendingHandshake = this._connect({
             host: server,
             sshPort: parseInt(sshPort, 10),
             username,
@@ -225,7 +239,7 @@ class ConnectionDialog extends _react.Component {
       this.props.onProfileSelected(selectedProfileIndex);
     };
 
-    const sshHandshake = new (_nuclideRemoteConnection || _load_nuclideRemoteConnection()).SshHandshake((0, (_nuclideRemoteConnection || _load_nuclideRemoteConnection()).decorateSshConnectionDelegateWithTracking)({
+    this._delegate = (0, (_nuclideRemoteConnection || _load_nuclideRemoteConnection()).decorateSshConnectionDelegateWithTracking)({
       onKeyboardInteractive: (name, instructions, instructionsLang, prompts, finish) => {
         // TODO: Display all prompts, not just the first one.
         this.requestAuthentication(prompts[0], finish);
@@ -244,14 +258,13 @@ class ConnectionDialog extends _react.Component {
         this.props.onError(error, config);
         logger.debug(error);
       }
-    }));
+    });
 
     this.state = {
       finish: answers => {},
       instructions: '',
       isDirty: false,
-      mode: REQUEST_CONNECTION_DETAILS,
-      sshHandshake
+      mode: REQUEST_CONNECTION_DETAILS
     };
   }
 
@@ -382,6 +395,11 @@ class ConnectionDialog extends _react.Component {
   }
 
   close() {
+    if (this._pendingHandshake != null) {
+      this._pendingHandshake.unsubscribe();
+      this._pendingHandshake = null;
+    }
+
     if (this.props.onClosed) {
       this.props.onClosed();
     }
@@ -428,5 +446,24 @@ class ConnectionDialog extends _react.Component {
     };
   }
 
+  _connect(connectionConfig) {
+    return _rxjsBundlesRxMinJs.Observable.defer(() => Promise.all([(0, (_passesGK || _load_passesGK()).default)('nuclide_big_dig'), (_nuclideRemoteConnection || _load_nuclideRemoteConnection()).RemoteConnection.reconnect(connectionConfig.host, connectionConfig.cwd, connectionConfig.displayTitle)])).switchMap(([useBigDig, existingConnection]) => {
+      if (existingConnection != null) {
+        this._delegate.onWillConnect(connectionConfig); // required for the API
+        this._delegate.onDidConnect(existingConnection, connectionConfig);
+        return _rxjsBundlesRxMinJs.Observable.empty();
+      }
+      let sshHandshake;
+      if (useBigDig) {
+        sshHandshake = (0, (_connectBigDigSshHandshake || _load_connectBigDigSshHandshake()).default)(connectionConfig, this._delegate);
+      } else {
+        sshHandshake = new (_nuclideRemoteConnection || _load_nuclideRemoteConnection()).SshHandshake(this._delegate);
+        sshHandshake.connect(connectionConfig);
+      }
+      return _rxjsBundlesRxMinJs.Observable.create(() => {
+        return () => sshHandshake.cancel();
+      });
+    }).subscribe();
+  }
 }
 exports.default = ConnectionDialog;

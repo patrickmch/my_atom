@@ -44,8 +44,8 @@ let getAutocompleteSuggestions = exports.getAutocompleteSuggestions = (() => {
 
 let getCompletions = exports.getCompletions = (() => {
   var _ref2 = (0, _asyncToGenerator.default)(function* (serverManager, src, contents, line, column) {
-    const service = yield serverManager.getJediService(src);
-    return service.get_completions(src, contents, line, column);
+    const service = yield serverManager.getJediService();
+    return service.get_completions(src, contents, serverManager.getSysPath(src), line, column);
   });
 
   return function getCompletions(_x8, _x9, _x10, _x11, _x12) {

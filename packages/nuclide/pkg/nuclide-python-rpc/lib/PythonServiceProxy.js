@@ -17,7 +17,7 @@ module.exports = _client => {
         location: {
           type: "source",
           fileName: "rpc-types.js",
-          line: 60
+          line: 62
         },
         name: "FileNotifier"
       })]).then(([args, id]) => _client.callRemoteMethod(id, "onFileEvent", "promise", args)).then(value => {
@@ -42,7 +42,7 @@ module.exports = _client => {
         location: {
           type: "source",
           fileName: "rpc-types.js",
-          line: 60
+          line: 62
         },
         name: "FileNotifier"
       })]).then(([args, id]) => _client.callRemoteMethod(id, "onDirectoriesChanged", "promise", args)).then(value => {
@@ -58,7 +58,7 @@ module.exports = _client => {
         location: {
           type: "source",
           fileName: "rpc-types.js",
-          line: 60
+          line: 62
         },
         name: "FileNotifier"
       })]).then(([args, id]) => _client.callRemoteMethod(id, "getTotalBufferSize", "promise", args)).then(value => {
@@ -226,7 +226,7 @@ module.exports = _client => {
     }
 
     findReferences(arg0, arg1) {
-      return Promise.all([_client.marshalArguments(Array.from(arguments), [{
+      return Observable.fromPromise(Promise.all([_client.marshalArguments(Array.from(arguments), [{
         name: "fileVersion",
         type: {
           kind: "named",
@@ -246,7 +246,7 @@ module.exports = _client => {
           line: 113
         },
         name: "LanguageService"
-      })]).then(([args, id]) => _client.callRemoteMethod(id, "findReferences", "promise", args)).then(value => {
+      })])).switchMap(([args, id]) => _client.callRemoteMethod(id, "findReferences", "observable", args)).concatMap(value => {
         return _client.unmarshal(value, {
           kind: "nullable",
           type: {
@@ -254,7 +254,7 @@ module.exports = _client => {
             name: "FindReferencesReturn"
           }
         });
-      });
+      }).publish();
     }
 
     getCoverage(arg0) {
@@ -821,44 +821,6 @@ module.exports = _client => {
     });
   };
 
-  remoteModule.getReferences = function (arg0, arg1, arg2, arg3) {
-    return _client.marshalArguments(Array.from(arguments), [{
-      name: "src",
-      type: {
-        kind: "named",
-        name: "NuclideUri"
-      }
-    }, {
-      name: "contents",
-      type: {
-        kind: "string"
-      }
-    }, {
-      name: "line",
-      type: {
-        kind: "number"
-      }
-    }, {
-      name: "column",
-      type: {
-        kind: "number"
-      }
-    }]).then(args => {
-      return _client.callRemoteFunction("PythonService/getReferences", "promise", args);
-    }).then(value => {
-      return _client.unmarshal(value, {
-        kind: "nullable",
-        type: {
-          kind: "array",
-          type: {
-            kind: "named",
-            name: "PythonReference"
-          }
-        }
-      });
-    });
-  };
-
   remoteModule.getDiagnostics = function (arg0, arg1) {
     return _client.marshalArguments(Array.from(arguments), [{
       name: "src",
@@ -881,6 +843,31 @@ module.exports = _client => {
           name: "PythonDiagnostic"
         }
       });
+    });
+  };
+
+  remoteModule.getBuildableTargets = function (arg0) {
+    return _client.marshalArguments(Array.from(arguments), [{
+      name: "src",
+      type: {
+        kind: "named",
+        name: "NuclideUri"
+      }
+    }]).then(args => {
+      return _client.callRemoteFunction("PythonService/getBuildableTargets", "promise", args);
+    }).then(value => {
+      return _client.unmarshal(value, {
+        kind: "array",
+        type: {
+          kind: "string"
+        }
+      });
+    });
+  };
+
+  remoteModule.reset = function () {
+    return _client.marshalArguments(Array.from(arguments), []).then(args => {
+      return _client.callRemoteFunction("PythonService/reset", "void", args);
     });
   };
 
@@ -955,7 +942,7 @@ Object.defineProperty(module.exports, "defs", {
       location: {
         type: "source",
         fileName: "PythonService.js",
-        line: 48
+        line: 52
       },
       name: "PythonCompletion",
       definition: {
@@ -998,7 +985,7 @@ Object.defineProperty(module.exports, "defs", {
       location: {
         type: "source",
         fileName: "PythonService.js",
-        line: 55
+        line: 59
       },
       name: "PythonDefinition",
       definition: {
@@ -1042,7 +1029,7 @@ Object.defineProperty(module.exports, "defs", {
       location: {
         type: "source",
         fileName: "PythonService.js",
-        line: 63
+        line: 67
       },
       name: "PythonReference",
       definition: {
@@ -1092,7 +1079,7 @@ Object.defineProperty(module.exports, "defs", {
       location: {
         type: "source",
         fileName: "PythonService.js",
-        line: 72
+        line: 76
       },
       name: "Position",
       definition: {
@@ -1117,7 +1104,7 @@ Object.defineProperty(module.exports, "defs", {
       location: {
         type: "source",
         fileName: "PythonService.js",
-        line: 87
+        line: 91
       },
       name: "PythonClassItem",
       definition: {
@@ -1182,7 +1169,7 @@ Object.defineProperty(module.exports, "defs", {
       location: {
         type: "source",
         fileName: "PythonService.js",
-        line: 98
+        line: 102
       },
       name: "PythonStatementItem",
       definition: {
@@ -1228,7 +1215,7 @@ Object.defineProperty(module.exports, "defs", {
       location: {
         type: "source",
         fileName: "PythonService.js",
-        line: 106
+        line: 110
       },
       name: "PythonOutlineItem",
       definition: {
@@ -1388,7 +1375,7 @@ Object.defineProperty(module.exports, "defs", {
       location: {
         type: "source",
         fileName: "PythonService.js",
-        line: 77
+        line: 81
       },
       name: "PythonFunctionItem",
       definition: {
@@ -1478,7 +1465,7 @@ Object.defineProperty(module.exports, "defs", {
       location: {
         type: "source",
         fileName: "PythonService.js",
-        line: 111
+        line: 115
       },
       name: "PythonDiagnostic",
       definition: {
@@ -1529,7 +1516,7 @@ Object.defineProperty(module.exports, "defs", {
       location: {
         type: "source",
         fileName: "PythonService.js",
-        line: 120
+        line: 124
       },
       name: "PythonServiceConfig",
       definition: {
@@ -1862,6 +1849,12 @@ Object.defineProperty(module.exports, "defs", {
             kind: "string"
           },
           optional: false
+        }, {
+          name: "languageId",
+          type: {
+            kind: "string"
+          },
+          optional: false
         }]
       }
     },
@@ -1870,7 +1863,7 @@ Object.defineProperty(module.exports, "defs", {
       location: {
         type: "source",
         fileName: "rpc-types.js",
-        line: 27
+        line: 29
       },
       name: "FileCloseEvent",
       definition: {
@@ -1897,7 +1890,7 @@ Object.defineProperty(module.exports, "defs", {
       location: {
         type: "source",
         fileName: "rpc-types.js",
-        line: 32
+        line: 34
       },
       name: "FileEditEvent",
       definition: {
@@ -1950,7 +1943,7 @@ Object.defineProperty(module.exports, "defs", {
       location: {
         type: "source",
         fileName: "rpc-types.js",
-        line: 41
+        line: 43
       },
       name: "FileSaveEvent",
       definition: {
@@ -1977,7 +1970,7 @@ Object.defineProperty(module.exports, "defs", {
       location: {
         type: "source",
         fileName: "rpc-types.js",
-        line: 21
+        line: 22
       },
       name: "FileSyncEvent",
       definition: {
@@ -2002,6 +1995,12 @@ Object.defineProperty(module.exports, "defs", {
             kind: "string"
           },
           optional: false
+        }, {
+          name: "languageId",
+          type: {
+            kind: "string"
+          },
+          optional: false
         }]
       }
     },
@@ -2010,7 +2009,7 @@ Object.defineProperty(module.exports, "defs", {
       location: {
         type: "source",
         fileName: "rpc-types.js",
-        line: 47
+        line: 49
       },
       name: "FileEvent",
       definition: {
@@ -2033,6 +2032,12 @@ Object.defineProperty(module.exports, "defs", {
             optional: false
           }, {
             name: "contents",
+            type: {
+              kind: "string"
+            },
+            optional: false
+          }, {
+            name: "languageId",
             type: {
               kind: "string"
             },
@@ -2137,6 +2142,12 @@ Object.defineProperty(module.exports, "defs", {
               kind: "string"
             },
             optional: false
+          }, {
+            name: "languageId",
+            type: {
+              kind: "string"
+            },
+            optional: false
           }]
         }],
         discriminantField: "kind"
@@ -2148,7 +2159,7 @@ Object.defineProperty(module.exports, "defs", {
       location: {
         type: "source",
         fileName: "rpc-types.js",
-        line: 60
+        line: 62
       },
       constructorArgs: null,
       staticMethods: {},
@@ -2157,7 +2168,7 @@ Object.defineProperty(module.exports, "defs", {
           location: {
             type: "source",
             fileName: "rpc-types.js",
-            line: 61
+            line: 63
           },
           kind: "function",
           argumentTypes: [{
@@ -2178,7 +2189,7 @@ Object.defineProperty(module.exports, "defs", {
           location: {
             type: "source",
             fileName: "rpc-types.js",
-            line: 62
+            line: 64
           },
           kind: "function",
           argumentTypes: [{
@@ -2202,7 +2213,7 @@ Object.defineProperty(module.exports, "defs", {
           location: {
             type: "source",
             fileName: "rpc-types.js",
-            line: 63
+            line: 65
           },
           kind: "function",
           argumentTypes: [],
@@ -2217,7 +2228,7 @@ Object.defineProperty(module.exports, "defs", {
           location: {
             type: "source",
             fileName: "rpc-types.js",
-            line: 64
+            line: 66
           },
           kind: "function",
           argumentTypes: [],
@@ -2232,7 +2243,7 @@ Object.defineProperty(module.exports, "defs", {
       location: {
         type: "source",
         fileName: "rpc-types.js",
-        line: 67
+        line: 69
       },
       name: "FileVersion",
       definition: {
@@ -3212,7 +3223,7 @@ Object.defineProperty(module.exports, "defs", {
       location: {
         type: "source",
         fileName: "types.js",
-        line: 53
+        line: 56
       },
       name: "NuclideEvaluationExpression",
       definition: {
@@ -3446,7 +3457,7 @@ Object.defineProperty(module.exports, "defs", {
             }
           }],
           returnType: {
-            kind: "promise",
+            kind: "observable",
             type: {
               kind: "nullable",
               type: {
@@ -3995,13 +4006,13 @@ Object.defineProperty(module.exports, "defs", {
       location: {
         type: "source",
         fileName: "PythonService.js",
-        line: 128
+        line: 132
       },
       type: {
         location: {
           type: "source",
           fileName: "PythonService.js",
-          line: 128
+          line: 132
         },
         kind: "function",
         argumentTypes: [{
@@ -4026,71 +4037,19 @@ Object.defineProperty(module.exports, "defs", {
         }
       }
     },
-    getReferences: {
-      kind: "function",
-      name: "getReferences",
-      location: {
-        type: "source",
-        fileName: "PythonService.js",
-        line: 379
-      },
-      type: {
-        location: {
-          type: "source",
-          fileName: "PythonService.js",
-          line: 379
-        },
-        kind: "function",
-        argumentTypes: [{
-          name: "src",
-          type: {
-            kind: "named",
-            name: "NuclideUri"
-          }
-        }, {
-          name: "contents",
-          type: {
-            kind: "string"
-          }
-        }, {
-          name: "line",
-          type: {
-            kind: "number"
-          }
-        }, {
-          name: "column",
-          type: {
-            kind: "number"
-          }
-        }],
-        returnType: {
-          kind: "promise",
-          type: {
-            kind: "nullable",
-            type: {
-              kind: "array",
-              type: {
-                kind: "named",
-                name: "PythonReference"
-              }
-            }
-          }
-        }
-      }
-    },
     getDiagnostics: {
       kind: "function",
       name: "getDiagnostics",
       location: {
         type: "source",
         fileName: "PythonService.js",
-        line: 392
+        line: 439
       },
       type: {
         location: {
           type: "source",
           fileName: "PythonService.js",
-          line: 392
+          line: 439
         },
         kind: "function",
         argumentTypes: [{
@@ -4114,6 +4073,60 @@ Object.defineProperty(module.exports, "defs", {
               name: "PythonDiagnostic"
             }
           }
+        }
+      }
+    },
+    getBuildableTargets: {
+      kind: "function",
+      name: "getBuildableTargets",
+      location: {
+        type: "source",
+        fileName: "PythonService.js",
+        line: 518
+      },
+      type: {
+        location: {
+          type: "source",
+          fileName: "PythonService.js",
+          line: 518
+        },
+        kind: "function",
+        argumentTypes: [{
+          name: "src",
+          type: {
+            kind: "named",
+            name: "NuclideUri"
+          }
+        }],
+        returnType: {
+          kind: "promise",
+          type: {
+            kind: "array",
+            type: {
+              kind: "string"
+            }
+          }
+        }
+      }
+    },
+    reset: {
+      kind: "function",
+      name: "reset",
+      location: {
+        type: "source",
+        fileName: "PythonService.js",
+        line: 538
+      },
+      type: {
+        location: {
+          type: "source",
+          fileName: "PythonService.js",
+          line: 538
+        },
+        kind: "function",
+        argumentTypes: [],
+        returnType: {
+          kind: "void"
         }
       }
     }

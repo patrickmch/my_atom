@@ -174,14 +174,13 @@ const actionTrackers = new Map();
  * dispatcher is a mechanism through which FileTreeActions interfaces with FileTreeStore.
  */
 class FileTreeStore {
-
+  // The configuration for the file-tree. Avoid direct writing.
   static getInstance() {
     if (!instance) {
       instance = new FileTreeStore();
     }
     return instance;
-  } // The configuration for the file-tree. Avoid direct writing.
-
+  }
 
   static dispose() {
     if (instance != null) {
@@ -215,6 +214,8 @@ class FileTreeStore {
     this._selectionRange = null;
     this._targetNodeKeys = null;
     this._isCalculatingChanges = false;
+
+    this._maxComponentWidth = -1;
   }
 
   /**
@@ -2035,6 +2036,16 @@ class FileTreeStore {
 
   subscribe(listener) {
     return this._emitter.on('change', listener);
+  }
+
+  getMaxComponentWidth() {
+    return this._maxComponentWidth;
+  }
+
+  updateMaxComponentWidth(width) {
+    if (width != null) {
+      this._maxComponentWidth = Math.max(this._maxComponentWidth, width);
+    }
   }
 }
 

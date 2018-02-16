@@ -67,7 +67,7 @@ function _load_log4js() {
 var _nuclideWatchmanHelpers;
 
 function _load_nuclideWatchmanHelpers() {
-  return _nuclideWatchmanHelpers = require('../../nuclide-watchman-helpers');
+  return _nuclideWatchmanHelpers = require('nuclide-watchman-helpers');
 }
 
 var _debounceDeletes;
@@ -80,6 +80,10 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
 
 // Cache an observable for each watched entity (file or directory).
 // Multiple watches for the same entity can share the same observable.
+const entityWatches = new (_SharedObservableCache || _load_SharedObservableCache()).default(registerWatch);
+
+// In addition, expose the observer behind each observable so we can
+// dispatch events from the root subscription.
 /**
  * Copyright (c) 2015-present, Facebook, Inc.
  * All rights reserved.
@@ -91,10 +95,6 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
  * @format
  */
 
-const entityWatches = new (_SharedObservableCache || _load_SharedObservableCache()).default(registerWatch);
-
-// In addition, expose the observer behind each observable so we can
-// dispatch events from the root subscription.
 const entityObserver = new Map();
 
 let watchmanClient = null;

@@ -7,6 +7,12 @@ exports.RemoteFile = undefined;
 
 var _asyncToGenerator = _interopRequireDefault(require('async-to-generator'));
 
+var _UniversalDisposable;
+
+function _load_UniversalDisposable() {
+  return _UniversalDisposable = _interopRequireDefault(require('nuclide-commons/UniversalDisposable'));
+}
+
 var _passesGK;
 
 function _load_passesGK() {
@@ -33,6 +39,9 @@ var _stream = _interopRequireDefault(require('stream'));
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
+const logger = (0, (_log4js || _load_log4js()).getLogger)('nuclide-remote-connection');
+
+/* Mostly implements https://atom.io/docs/api/latest/File */
 /**
  * Copyright (c) 2015-present, Facebook, Inc.
  * All rights reserved.
@@ -44,9 +53,6 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
  * @format
  */
 
-const logger = (0, (_log4js || _load_log4js()).getLogger)('nuclide-remote-connection');
-
-/* Mostly implements https://atom.io/docs/api/latest/File */
 class RemoteFile {
 
   constructor(server, remotePath, symlink = false) {
@@ -70,7 +76,7 @@ class RemoteFile {
 
   onDidRename(callback) {
     // TODO: this is not supported by the Watchman API.
-    return new _atom.Disposable();
+    return new (_UniversalDisposable || _load_UniversalDisposable()).default();
   }
 
   onDidDelete(callback) {
@@ -154,7 +160,7 @@ class RemoteFile {
    * When the number of subscriptions reach 0, the file is unwatched.
    */
   _trackUnsubscription(subscription) {
-    return new _atom.Disposable(() => {
+    return new (_UniversalDisposable || _load_UniversalDisposable()).default(() => {
       subscription.dispose();
       this._didRemoveSubscription();
     });

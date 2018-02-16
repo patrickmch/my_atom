@@ -16,11 +16,15 @@ function _load_nuclideRemoteConnection() {
   return _nuclideRemoteConnection = require('../../nuclide-remote-connection');
 }
 
+var _NuclideSocket;
+
+function _load_NuclideSocket() {
+  return _NuclideSocket = require('../../nuclide-server/lib/NuclideSocket');
+}
+
 var _react = _interopRequireWildcard(require('react'));
 
 var _reactDom = _interopRequireDefault(require('react-dom'));
-
-var _atom = require('atom');
 
 var _StatusBarTile;
 
@@ -109,11 +113,14 @@ class RemoteProjectsController {
       return;
     }
 
-    const socket = connection.getSocket();
-    updateStatus(socket.isConnected());
+    const socket = connection.getClient().getTransport();
+    updateStatus(!socket.isClosed());
 
-    this._statusSubscription = socket.onStatus(updateStatus);
-    this._disposables.add(this._statusSubscription);
+    // TODO: implement for big-dig
+    if (socket instanceof (_NuclideSocket || _load_NuclideSocket()).NuclideSocket) {
+      this._statusSubscription = socket.onStatus(updateStatus);
+      this._disposables.add(this._statusSubscription);
+    }
   }
 
   consumeStatusBar(statusBar) {
@@ -133,7 +140,7 @@ class RemoteProjectsController {
       priority: -99
     });
 
-    this._disposables.add(new _atom.Disposable(() => {
+    this._disposables.add(new (_UniversalDisposable || _load_UniversalDisposable()).default(() => {
       if (!this._statusBarDiv) {
         throw new Error('Invariant violation: "this._statusBarDiv"');
       }

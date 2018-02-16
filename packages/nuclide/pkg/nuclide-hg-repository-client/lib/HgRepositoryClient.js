@@ -393,6 +393,10 @@ class HgRepositoryClient {
     return this._emitter.on('did-change-interactive-mode', callback);
   }
 
+  observeLockFiles() {
+    return this._service.observeLockFilesDidChange().refCount();
+  }
+
   /**
    *
    * Section: Repository Details
@@ -1041,6 +1045,10 @@ class HgRepositoryClient {
   rebase(destination, source) {
     // TODO(T17463635)
     return this._service.rebase(destination, source).refCount();
+  }
+
+  reorderWithinStack(orderedRevisions) {
+    return this._service.reorderWithinStack(orderedRevisions).refCount();
   }
 
   pull(options = []) {

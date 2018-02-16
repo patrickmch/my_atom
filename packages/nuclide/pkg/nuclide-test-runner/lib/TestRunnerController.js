@@ -7,6 +7,12 @@ exports.TestRunnerController = exports.WORKSPACE_VIEW_URI = undefined;
 
 var _asyncToGenerator = _interopRequireDefault(require('async-to-generator'));
 
+var _debugger;
+
+function _load_debugger() {
+  return _debugger = require('../../commons-atom/debugger');
+}
+
 var _Ansi;
 
 function _load_Ansi() {
@@ -43,12 +49,6 @@ var _nuclideAnalytics;
 
 function _load_nuclideAnalytics() {
   return _nuclideAnalytics = require('../../nuclide-analytics');
-}
-
-var _consumeFirstProvider;
-
-function _load_consumeFirstProvider() {
-  return _consumeFirstProvider = _interopRequireDefault(require('../../commons-atom/consumeFirstProvider'));
 }
 
 var _log4js;
@@ -218,8 +218,8 @@ class TestRunnerController {
 
   _isDebuggerAttached(debuggerProviderName) {
     return (0, _asyncToGenerator.default)(function* () {
-      const debuggerService = yield (0, (_consumeFirstProvider || _load_consumeFirstProvider()).default)('nuclide-debugger.remote');
-      return debuggerService.isInDebuggingMode(debuggerProviderName);
+      const debuggerService = yield (0, (_debugger || _load_debugger()).getDebuggerService)();
+      return debuggerService.getCurrentDebuggerName() === debuggerProviderName;
     })();
   }
 

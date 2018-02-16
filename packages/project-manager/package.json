@@ -2,39 +2,39 @@
   "_args": [
     [
       {
-        "raw": "/private/var/folders/dp/vj05cwss7pz9mjl62ccqzysm0000gp/T/d-117923-43505-qxi7pg.4qgkd6xbt9/package.tgz",
+        "raw": "/private/var/folders/dp/vj05cwss7pz9mjl62ccqzysm0000gp/T/d-11817-2847-10za4h9.h353yxpqfr/package.tgz",
         "scope": null,
         "escapedName": null,
         "name": null,
-        "rawSpec": "/private/var/folders/dp/vj05cwss7pz9mjl62ccqzysm0000gp/T/d-117923-43505-qxi7pg.4qgkd6xbt9/package.tgz",
-        "spec": "/private/var/folders/dp/vj05cwss7pz9mjl62ccqzysm0000gp/T/d-117923-43505-qxi7pg.4qgkd6xbt9/package.tgz",
+        "rawSpec": "/private/var/folders/dp/vj05cwss7pz9mjl62ccqzysm0000gp/T/d-11817-2847-10za4h9.h353yxpqfr/package.tgz",
+        "spec": "/private/var/folders/dp/vj05cwss7pz9mjl62ccqzysm0000gp/T/d-11817-2847-10za4h9.h353yxpqfr/package.tgz",
         "type": "local"
       },
-      "/private/var/folders/dp/vj05cwss7pz9mjl62ccqzysm0000gp/T/apm-install-dir-117923-43505-us83rg.iqqa9ssjor"
+      "/private/var/folders/dp/vj05cwss7pz9mjl62ccqzysm0000gp/T/apm-install-dir-11817-2847-am5riz.x0tdq5b3xr"
     ]
   ],
-  "_from": "../d-117923-43505-qxi7pg.4qgkd6xbt9/package.tgz",
+  "_from": "../d-11817-2847-10za4h9.h353yxpqfr/package.tgz",
   "_id": "project-manager@3.3.5",
   "_inCache": true,
   "_location": "/project-manager",
   "_phantomChildren": {},
   "_requested": {
-    "raw": "/private/var/folders/dp/vj05cwss7pz9mjl62ccqzysm0000gp/T/d-117923-43505-qxi7pg.4qgkd6xbt9/package.tgz",
+    "raw": "/private/var/folders/dp/vj05cwss7pz9mjl62ccqzysm0000gp/T/d-11817-2847-10za4h9.h353yxpqfr/package.tgz",
     "scope": null,
     "escapedName": null,
     "name": null,
-    "rawSpec": "/private/var/folders/dp/vj05cwss7pz9mjl62ccqzysm0000gp/T/d-117923-43505-qxi7pg.4qgkd6xbt9/package.tgz",
-    "spec": "/private/var/folders/dp/vj05cwss7pz9mjl62ccqzysm0000gp/T/d-117923-43505-qxi7pg.4qgkd6xbt9/package.tgz",
+    "rawSpec": "/private/var/folders/dp/vj05cwss7pz9mjl62ccqzysm0000gp/T/d-11817-2847-10za4h9.h353yxpqfr/package.tgz",
+    "spec": "/private/var/folders/dp/vj05cwss7pz9mjl62ccqzysm0000gp/T/d-11817-2847-10za4h9.h353yxpqfr/package.tgz",
     "type": "local"
   },
   "_requiredBy": [
     "#USER"
   ],
-  "_resolved": "file:../d-117923-43505-qxi7pg.4qgkd6xbt9/package.tgz",
+  "_resolved": "file:../d-11817-2847-10za4h9.h353yxpqfr/package.tgz",
   "_shasum": "145fbdfcb6c24d31e073e974c839bae9f2b44ff9",
   "_shrinkwrap": null,
-  "_spec": "/private/var/folders/dp/vj05cwss7pz9mjl62ccqzysm0000gp/T/d-117923-43505-qxi7pg.4qgkd6xbt9/package.tgz",
-  "_where": "/private/var/folders/dp/vj05cwss7pz9mjl62ccqzysm0000gp/T/apm-install-dir-117923-43505-us83rg.iqqa9ssjor",
+  "_spec": "/private/var/folders/dp/vj05cwss7pz9mjl62ccqzysm0000gp/T/d-11817-2847-10za4h9.h353yxpqfr/package.tgz",
+  "_where": "/private/var/folders/dp/vj05cwss7pz9mjl62ccqzysm0000gp/T/apm-install-dir-11817-2847-am5riz.x0tdq5b3xr",
   "bugs": {
     "url": "https://github.com/danielbrodin/atom-project-manager/issues"
   },

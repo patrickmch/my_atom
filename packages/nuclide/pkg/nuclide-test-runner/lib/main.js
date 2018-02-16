@@ -6,8 +6,6 @@ function _load_UniversalDisposable() {
   return _UniversalDisposable = _interopRequireDefault(require('nuclide-commons/UniversalDisposable'));
 }
 
-var _atom = require('atom');
-
 var _createPackage;
 
 function _load_createPackage() {
@@ -35,21 +33,23 @@ function _load_log4js() {
 var _ToolbarUtils;
 
 function _load_ToolbarUtils() {
-  return _ToolbarUtils = require('../../nuclide-ui/ToolbarUtils');
+  return _ToolbarUtils = require('nuclide-commons-ui/ToolbarUtils');
 }
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-const logger = (0, (_log4js || _load_log4js()).getLogger)('nuclide-test-runner'); /**
-                                                                                   * Copyright (c) 2015-present, Facebook, Inc.
-                                                                                   * All rights reserved.
-                                                                                   *
-                                                                                   * This source code is licensed under the license found in the LICENSE file in
-                                                                                   * the root directory of this source tree.
-                                                                                   *
-                                                                                   * 
-                                                                                   * @format
-                                                                                   */
+/**
+ * Copyright (c) 2015-present, Facebook, Inc.
+ * All rights reserved.
+ *
+ * This source code is licensed under the license found in the LICENSE file in
+ * the root directory of this source tree.
+ *
+ * 
+ * @format
+ */
+
+const logger = (0, (_log4js || _load_log4js()).getLogger)('nuclide-test-runner');
 
 const FILE_TREE_CONTEXT_MENU_PRIORITY = 200;
 
@@ -133,7 +133,7 @@ class Activation {
     menuItemSubscriptions.add(contextMenu.addItemToTestSection(fileItem, FILE_TREE_CONTEXT_MENU_PRIORITY), contextMenu.addItemToTestSection(directoryItem, FILE_TREE_CONTEXT_MENU_PRIORITY + 1), contextMenu.addItemToTestSection(separator, FILE_TREE_CONTEXT_MENU_PRIORITY + 2));
     this._disposables.add(menuItemSubscriptions);
 
-    return new _atom.Disposable(() => this._disposables.remove(menuItemSubscriptions));
+    return new (_UniversalDisposable || _load_UniversalDisposable()).default(() => this._disposables.remove(menuItemSubscriptions));
   }
 
   consumeTestRunner(testRunner) {
@@ -152,7 +152,7 @@ class Activation {
       this.getController().didUpdateTestRunners();
     }
 
-    return new _atom.Disposable(() => {
+    return new (_UniversalDisposable || _load_UniversalDisposable()).default(() => {
       this._testRunners.delete(testRunner);
       // Tell the controller to re-render only if it exists so test runner services won't force
       // construction if the panel is still invisible.
@@ -171,7 +171,7 @@ class Activation {
       tooltip: 'Toggle Test Runner',
       priority: 600
     }));
-    const disposable = new _atom.Disposable(() => {
+    const disposable = new (_UniversalDisposable || _load_UniversalDisposable()).default(() => {
       toolBar.removeItems();
     });
     this._disposables.add(disposable);

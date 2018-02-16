@@ -97,6 +97,8 @@ const OMNISEARCH_PROVIDER = {
 };
 const UPDATE_DIRECTORIES_DEBOUNCE_DELAY = 100;
 const GLOBAL_KEY = 'global';
+// Quick-open generates a *ton* of queries - sample the tracking.
+const TRACK_SOURCE_RATE = 10;
 
 function getQueryDebounceDelay(provider) {
   return provider.debounceDelay != null ? provider.debounceDelay : DEFAULT_QUERY_DEBOUNCE_DELAY;
@@ -353,7 +355,7 @@ class SearchResultManager {
         this._emitter.emit('results-changed');
       };
       (0, (_promise || _load_promise()).triggerAfterWait)(globalProvider.executeQuery(query, this._directories), LOADING_EVENT_DELAY, loadingFn).then(result => {
-        (0, (_nuclideAnalytics || _load_nuclideAnalytics()).track)('quickopen-query-source-provider', {
+        (0, (_nuclideAnalytics || _load_nuclideAnalytics()).trackSampled)('quickopen-query-source-provider', TRACK_SOURCE_RATE, {
           'quickopen-source-provider': globalProvider.name,
           'quickopen-query-duration': (performance.now() - startTime).toString(),
           'quickopen-result-count': result.length.toString()
@@ -371,7 +373,7 @@ class SearchResultManager {
       this._emitter.emit('results-changed');
     };
     (0, (_promise || _load_promise()).triggerAfterWait)(provider.executeQuery(query, directory), LOADING_EVENT_DELAY, loadingFn).then(result => {
-      (0, (_nuclideAnalytics || _load_nuclideAnalytics()).track)('quickopen-query-source-provider', {
+      (0, (_nuclideAnalytics || _load_nuclideAnalytics()).trackSampled)('quickopen-query-source-provider', TRACK_SOURCE_RATE, {
         'quickopen-source-provider': provider.name,
         'quickopen-query-duration': (performance.now() - startTime).toString(),
         'quickopen-result-count': result.length.toString()

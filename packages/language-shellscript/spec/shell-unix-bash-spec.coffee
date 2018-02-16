@@ -223,6 +223,17 @@ describe "Shell script grammar", ->
       expect(tokens[1][0]).toEqual value: 'stuff', scopes: ['source.shell', 'string.unquoted.heredoc.shell']
       expect(tokens[2][0]).toEqual value: delim, scopes: ['source.shell', 'string.unquoted.heredoc.shell', 'keyword.control.heredoc-token.shell']
 
+    for delim in delims
+      tokens = grammar.tokenizeLines """
+        << '#{delim}'
+        stuff
+        #{delim}
+      """
+      expect(tokens[0][0]).toEqual value: '<<', scopes: ['source.shell', 'string.unquoted.heredoc.shell', 'keyword.operator.heredoc.shell']
+      expect(tokens[0][2]).toEqual value: delim, scopes: ['source.shell', 'string.unquoted.heredoc.shell', 'keyword.control.heredoc-token.shell']
+      expect(tokens[1][0]).toEqual value: 'stuff', scopes: ['source.shell', 'string.unquoted.heredoc.shell']
+      expect(tokens[2][0]).toEqual value: delim, scopes: ['source.shell', 'string.unquoted.heredoc.shell', 'keyword.control.heredoc-token.shell']
+
   it "tokenizes shebangs", ->
     {tokens} = grammar.tokenizeLine('#!/bin/sh')
     expect(tokens[0]).toEqual value: '#!', scopes: ['source.shell', 'comment.line.number-sign.shebang.shell', 'punctuation.definition.comment.shebang.shell']
@@ -237,6 +248,10 @@ describe "Shell script grammar", ->
     {tokens} = grammar.tokenizeLine('`#comment`')
     expect(tokens[1]).toEqual value: '#', scopes: ['source.shell', 'string.interpolated.backtick.shell', 'comment.line.number-sign.shell', 'punctuation.definition.comment.shell']
     expect(tokens[3]).toEqual value: '`', scopes: ['source.shell', 'string.interpolated.backtick.shell', 'punctuation.definition.string.end.shell']
+
+  it "does not tokenize -# in argument lists as a comment", ->
+    {tokens} = grammar.tokenizeLine('curl -#')
+    expect(tokens[0]).toEqual value: 'curl -#', scopes: ['source.shell']
 
   it "tokenizes nested variable expansions", ->
     {tokens} = grammar.tokenizeLine('${${C}}')

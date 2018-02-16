@@ -26,9 +26,9 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
 
 class BreakpointManager {
 
-  constructor(store, debuggerActions) {
-    this._breakpointStore = store;
+  constructor(debuggerActions, model) {
     this._debuggerActions = debuggerActions;
+    this._model = model;
     this._displayControllers = new Map();
     this._disposables = new (_UniversalDisposable || _load_UniversalDisposable()).default((0, (_textEditor || _load_textEditor()).observeTextEditors)(this._handleTextEditor.bind(this)));
   }
@@ -56,7 +56,7 @@ class BreakpointManager {
 
   _handleTextEditor(editor) {
     if (!this._displayControllers.has(editor)) {
-      const controller = new (_BreakpointDisplayController || _load_BreakpointDisplayController()).default(this, this._breakpointStore, editor, this._debuggerActions);
+      const controller = new (_BreakpointDisplayController || _load_BreakpointDisplayController()).default(this, this._model, editor, this._debuggerActions);
       this._displayControllers.set(editor, controller);
     }
   }

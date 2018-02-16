@@ -42,7 +42,7 @@ let startCommands = exports.startCommands = (() => {
     } catch (e) {
       // This is usually ECONNREFUSED ...
       // ... indicating that there was a nuclide-server but it is now shutdown.
-      (0, (_errors || _load_errors()).reportConnectionErrorAndExit)('Could not find a nuclide-server with a connected Atom ("Nuclide/Kill Nuclide Server and Restart" will likely help)');
+      (0, (_errors || _load_errors()).reportConnectionErrorAndExit)('Could not find a nuclide-server with a connected Atom ' + '("Nuclide/Kill Nuclide Server and Restart" will likely help)');
     }
     const connection = (_nuclideRpc || _load_nuclideRpc()).RpcConnection.createLocal(transport, [(_nuclideMarshalersCommon || _load_nuclideMarshalersCommon()).localNuclideUriMarshalers], services, (_ConfigDirectory || _load_ConfigDirectory()).RPC_PROTOCOL);
 

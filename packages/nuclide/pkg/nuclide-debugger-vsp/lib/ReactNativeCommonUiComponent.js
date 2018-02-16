@@ -114,10 +114,10 @@ class ReactNativeCommonUiComponent extends _react.Component {
       _react.createElement(
         'label',
         null,
-        'Workspace path (should contain package.json): '
+        'Workspace absolute path (should contain package.json): '
       ),
       _react.createElement((_AtomInput || _load_AtomInput()).AtomInput, {
-        placeholderText: 'Path containing package.json',
+        placeholderText: 'Absolute path containing package.json',
         value: this.state.workspacePath,
         onDidChange: value => this.setState({ workspacePath: value }),
         autofocus: true

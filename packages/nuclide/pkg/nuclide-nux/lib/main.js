@@ -9,8 +9,6 @@ exports.provideRegisterNuxService = provideRegisterNuxService;
 exports.provideTriggerNuxService = provideTriggerNuxService;
 exports.consumeSyncCompletedNuxService = consumeSyncCompletedNuxService;
 
-var _atom = require('atom');
-
 var _UniversalDisposable;
 
 function _load_UniversalDisposable() {

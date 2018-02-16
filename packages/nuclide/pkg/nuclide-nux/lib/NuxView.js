@@ -5,8 +5,6 @@ Object.defineProperty(exports, "__esModule", {
 });
 exports.NuxView = undefined;
 
-var _atom = require('atom');
-
 var _debounce;
 
 function _load_debounce() {
@@ -39,8 +37,6 @@ function _load_UniversalDisposable() {
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-const VALID_NUX_POSITIONS = new Set(['top', 'bottom', 'left', 'right', 'auto']);
-// The maximum number of times the NuxView will attempt to attach to the DOM.
 /**
  * Copyright (c) 2015-present, Facebook, Inc.
  * All rights reserved.
@@ -54,11 +50,13 @@ const VALID_NUX_POSITIONS = new Set(['top', 'bottom', 'left', 'right', 'auto']);
 
 /* global getComputedStyle */
 
+const VALID_NUX_POSITIONS = new Set(['top', 'bottom', 'left', 'right', 'auto']);
+// The maximum number of times the NuxView will attempt to attach to the DOM.
 const ATTACHMENT_ATTEMPT_THRESHOLD = 5;
 const ATTACHMENT_RETRY_TIMEOUT = 500; // milliseconds
 const RESIZE_EVENT_DEBOUNCE_DURATION = 100; // milliseconds
 // The frequency with which to poll the element that the NUX is bound to.
-const POLL_ELEMENT_TIMEOUT = 100; // milliseconds
+const POLL_ELEMENT_INTERVAL = 100; // milliseconds
 
 const logger = (0, (_log4js || _load_log4js()).getLogger)('nuclide-nux');
 
@@ -119,7 +117,7 @@ class NuxView {
     const elem = this._selector();
     if (elem == null) {
       const attachmentTimeout = setTimeout(this._createNux.bind(this, creationAttempt + 1), ATTACHMENT_RETRY_TIMEOUT);
-      this._disposables.add(new _atom.Disposable(() => {
+      this._disposables.add(new (_UniversalDisposable || _load_UniversalDisposable()).default(() => {
         // eslint-disable-next-line eqeqeq
         if (attachmentTimeout !== null) {
           clearTimeout(attachmentTimeout);
@@ -162,22 +160,22 @@ class NuxView {
         this._handleDisposableClick(false);
       }
     };
-    // The element is polled every `POLL_ELEMENT_TIMEOUT` milliseconds instead
+    // The element is polled every `POLL_ELEMENT_INTERVAL` milliseconds instead
     // of using a MutationObserver. When an element such as a panel is closed,
     // it may not mutate but simply be removed from the DOM - a change which
     // would not be captured by the MutationObserver.
-    const pollElementTimeout = setInterval(tryDismissTooltip.bind(this, elem), POLL_ELEMENT_TIMEOUT);
-    this._disposables.add(new _atom.Disposable(() => {
+    const pollElementInterval = setInterval(tryDismissTooltip.bind(this, elem), POLL_ELEMENT_INTERVAL);
+    this._disposables.add(new (_UniversalDisposable || _load_UniversalDisposable()).default(() => {
       // eslint-disable-next-line eqeqeq
-      if (pollElementTimeout !== null) {
-        clearTimeout(pollElementTimeout);
+      if (pollElementInterval !== null) {
+        clearInterval(pollElementInterval);
       }
     }));
 
     const boundClickListener = this._handleDisposableClick.bind(this, true /* continue to the next NUX in the NuxTour */
     );
     this._modifiedElem.addEventListener('click', boundClickListener);
-    this._disposables.add(new _atom.Disposable(() => {
+    this._disposables.add(new (_UniversalDisposable || _load_UniversalDisposable()).default(() => {
       this._modifiedElem.removeEventListener('click', boundClickListener);
       window.removeEventListener('resize', debouncedWindowResizeListener);
     }));
@@ -247,7 +245,7 @@ class NuxView {
       }
 
       nextElement.addEventListener('click', nextElementClickListener);
-      this._disposables.add(new _atom.Disposable(() => nextElement.removeEventListener('click', nextElementClickListener)));
+      this._disposables.add(new (_UniversalDisposable || _load_UniversalDisposable()).default(() => nextElement.removeEventListener('click', nextElementClickListener)));
     }
 
     // Record the NUX as dismissed iff it is not the last NUX in the tour.
@@ -263,7 +261,7 @@ class NuxView {
 
     dismissElement.addEventListener('click', dismissElementClickListener);
 
-    this._disposables.add(new _atom.Disposable(() => dismissElement.removeEventListener('click', dismissElementClickListener)));
+    this._disposables.add(new (_UniversalDisposable || _load_UniversalDisposable()).default(() => dismissElement.removeEventListener('click', dismissElementClickListener)));
   }
 
   _handleDisposableClick(success = true) {

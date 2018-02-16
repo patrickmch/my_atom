@@ -39,7 +39,9 @@ function _objectWithoutProperties(obj, keys) { var target = {}; for (var i in ob
  */
 class ListViewItem extends _react.Component {
   _select(value, index, event) {
-    this.props.onSelect(value, index);
+    if (this.props.onSelect != null) {
+      this.props.onSelect(value, index);
+    }
   }
 
   render() {

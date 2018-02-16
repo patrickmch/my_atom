@@ -7,12 +7,6 @@ exports.RegisterView = undefined;
 
 var _react = _interopRequireWildcard(require('react'));
 
-var _CallstackStore;
-
-function _load_CallstackStore() {
-  return _CallstackStore = _interopRequireDefault(require('./CallstackStore'));
-}
-
 var _DebuggerModel;
 
 function _load_DebuggerModel() {
@@ -41,6 +35,17 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
 
 function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
 
+/**
+ * Copyright (c) 2015-present, Facebook, Inc.
+ * All rights reserved.
+ *
+ * This source code is licensed under the license found in the LICENSE file in
+ * the root directory of this source tree.
+ *
+ * 
+ * @format
+ */
+
 class RegisterView extends _react.Component {
 
   constructor(props) {
@@ -49,7 +54,6 @@ class RegisterView extends _react.Component {
     this._callStackUpdated = this._callStackUpdated.bind(this);
 
     this._disposables = new (_UniversalDisposable || _load_UniversalDisposable()).default();
-    this._callstackStore = this.props.model.getCallstackStore();
     this.state = {
       registerInfo: null,
       filter: ''
@@ -57,7 +61,7 @@ class RegisterView extends _react.Component {
   }
 
   componentDidMount() {
-    this._disposables.add(this._callstackStore.onChange(() => {
+    this._disposables.add(this.props.model.onCallstackChange(() => {
       this._callStackUpdated();
     }));
 
@@ -69,13 +73,13 @@ class RegisterView extends _react.Component {
   }
 
   _callStackUpdated() {
-    const callstack = this._callstackStore.getCallstack();
+    const callstack = this.props.model.getCallstack();
     if (callstack == null || callstack.length === 0) {
       this.setState({
         registerInfo: null
       });
     } else {
-      const selectedFrame = this._callstackStore.getSelectedCallFrameIndex();
+      const selectedFrame = this.props.model.getSelectedCallFrameIndex();
       const selectedFrameInfo = callstack[selectedFrame];
       this.setState({
         registerInfo: selectedFrameInfo != null ? selectedFrameInfo.registers : null
@@ -184,13 +188,4 @@ class RegisterView extends _react.Component {
     );
   }
 }
-exports.RegisterView = RegisterView; /**
-                                      * Copyright (c) 2015-present, Facebook, Inc.
-                                      * All rights reserved.
-                                      *
-                                      * This source code is licensed under the license found in the LICENSE file in
-                                      * the root directory of this source tree.
-                                      *
-                                      * 
-                                      * @format
-                                      */
+exports.RegisterView = RegisterView;

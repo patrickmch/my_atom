@@ -20,10 +20,10 @@ function _load_HackLanguage() {
   return _HackLanguage = require('./HackLanguage');
 }
 
-var _Omni2ProjectSymbolProvider;
+var _DashProjectSymbolProvider;
 
-function _load_Omni2ProjectSymbolProvider() {
-  return _Omni2ProjectSymbolProvider = _interopRequireDefault(require('./Omni2ProjectSymbolProvider'));
+function _load_DashProjectSymbolProvider() {
+  return _DashProjectSymbolProvider = _interopRequireDefault(require('./DashProjectSymbolProvider'));
 }
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
@@ -51,5 +51,5 @@ function registerQuickOpenProvider() {
 }
 
 function registerProjectSymbolSearchProvider() {
-  return (_Omni2ProjectSymbolProvider || _load_Omni2ProjectSymbolProvider()).default;
+  return (_DashProjectSymbolProvider || _load_DashProjectSymbolProvider()).default;
 }

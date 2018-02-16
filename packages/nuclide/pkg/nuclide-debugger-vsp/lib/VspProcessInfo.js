@@ -3,7 +3,6 @@
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.VSP_DEBUGGER_SERVICE_NAME = undefined;
 
 var _asyncToGenerator = _interopRequireDefault(require('async-to-generator'));
 
@@ -13,10 +12,10 @@ function _load_nuclideDebuggerCommon() {
   return _nuclideDebuggerCommon = require('nuclide-debugger-common');
 }
 
-var _nuclideDebugger;
+var _AtomServiceContainer;
 
-function _load_nuclideDebugger() {
-  return _nuclideDebugger = require('../../nuclide-debugger');
+function _load_AtomServiceContainer() {
+  return _AtomServiceContainer = require('../../nuclide-debugger/lib/AtomServiceContainer');
 }
 
 var _nuclideRemoteConnection;
@@ -51,7 +50,7 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
  * @format
  */
 
-const VSP_DEBUGGER_SERVICE_NAME = exports.VSP_DEBUGGER_SERVICE_NAME = 'vscode-adapter';
+const VSP_DEBUGGER_SERVICE_NAME = 'vscode-adapter';
 
 class VspProcessInfo extends (_nuclideDebuggerCommon || _load_nuclideDebuggerCommon()).DebuggerProcessInfo {
 
@@ -86,7 +85,7 @@ class VspProcessInfo extends (_nuclideDebuggerCommon || _load_nuclideDebuggerCom
 
     return (0, _asyncToGenerator.default)(function* () {
       const rpcService = _this._getRpcService();
-      const outputDisposable = (0, (_nuclideDebugger || _load_nuclideDebugger()).registerConsoleLogging)(_this._adapterType, rpcService.getOutputWindowObservable().refCount());
+      const outputDisposable = (0, (_AtomServiceContainer || _load_AtomServiceContainer()).registerConsoleLogging)(_this._adapterType, rpcService.getOutputWindowObservable().refCount());
       (0, (_nuclideAnalytics || _load_nuclideAnalytics()).track)('fb-vscode-debugger-launch', {
         type: _this._adapterType,
         mode: _this._debugMode

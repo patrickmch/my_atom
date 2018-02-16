@@ -3,7 +3,7 @@
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.SET_DEVICE_TYPE_TASKS = exports.TOGGLE_PROCESS_POLLING = exports.TOGGLE_DEVICE_POLLING = exports.SET_PROCESS_TASKS = exports.SET_PROCESSES = exports.SET_APP_INFO_TABLES = exports.SET_INFO_TABLES = exports.SET_HOST = exports.SET_HOSTS = exports.SET_DEVICE_TASKS = exports.SET_DEVICE = exports.SET_DEVICES = exports.SET_DEVICE_TYPE = exports.SET_DEVICE_TYPES = undefined;
+exports.SET_DEVICE_TYPE_COMPONENTS = exports.SET_DEVICE_TYPE_TASKS = exports.TOGGLE_PROCESS_POLLING = exports.TOGGLE_DEVICE_POLLING = exports.SET_PROCESS_TASKS = exports.SET_PROCESSES = exports.SET_APP_INFO_TABLES = exports.SET_INFO_TABLES = exports.SET_HOST = exports.SET_HOSTS = exports.SET_DEVICE_TASKS = exports.SET_DEVICE = exports.SET_DEVICES = exports.SET_DEVICE_TYPE = exports.SET_DEVICE_TYPES = undefined;
 exports.toggleDevicePolling = toggleDevicePolling;
 exports.toggleProcessPolling = toggleProcessPolling;
 exports.setInfoTables = setInfoTables;
@@ -18,6 +18,7 @@ exports.setDeviceTypes = setDeviceTypes;
 exports.setDevice = setDevice;
 exports.setDeviceTasks = setDeviceTasks;
 exports.setDeviceTypeTasks = setDeviceTypeTasks;
+exports.setDeviceTypeComponents = setDeviceTypeComponents;
 
 var _DeviceTask;
 
@@ -50,6 +51,7 @@ const SET_PROCESS_TASKS = exports.SET_PROCESS_TASKS = 'SET_PROCESS_TASKS';
 const TOGGLE_DEVICE_POLLING = exports.TOGGLE_DEVICE_POLLING = 'TOGGLE_DEVICE_POLLING';
 const TOGGLE_PROCESS_POLLING = exports.TOGGLE_PROCESS_POLLING = 'TOGGLE_PROCESS_POLLING';
 const SET_DEVICE_TYPE_TASKS = exports.SET_DEVICE_TYPE_TASKS = 'SET_DEVICE_TYPE_TASKS';
+const SET_DEVICE_TYPE_COMPONENTS = exports.SET_DEVICE_TYPE_COMPONENTS = 'SET_DEVICE_TYPE_COMPONENTS';
 
 function toggleDevicePolling(isActive) {
   return {
@@ -147,4 +149,8 @@ function setDeviceTypeTasks(deviceTypeTasks) {
     type: SET_DEVICE_TYPE_TASKS,
     payload: { deviceTypeTasks }
   };
+}
+
+function setDeviceTypeComponents(components) {
+  return { type: SET_DEVICE_TYPE_COMPONENTS, payload: { components } };
 }

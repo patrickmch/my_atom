@@ -5,10 +5,10 @@ Object.defineProperty(exports, "__esModule", {
 });
 exports.ObservableManager = undefined;
 
-var _nuclideDebugger;
+var _AtomServiceContainer;
 
-function _load_nuclideDebugger() {
-  return _nuclideDebugger = require('../../nuclide-debugger');
+function _load_AtomServiceContainer() {
+  return _AtomServiceContainer = require('../../nuclide-debugger/lib/AtomServiceContainer');
 }
 
 var _utils;
@@ -67,7 +67,7 @@ class ObservableManager {
   }
 
   _registerConsoleLogging(outputMessages) {
-    const outputDisposable = (0, (_nuclideDebugger || _load_nuclideDebugger()).registerConsoleLogging)('PHP Debugger', outputMessages);
+    const outputDisposable = (0, (_AtomServiceContainer || _load_AtomServiceContainer()).registerConsoleLogging)('PHP Debugger', outputMessages);
     if (outputDisposable != null) {
       this._disposables.add(outputDisposable);
     }

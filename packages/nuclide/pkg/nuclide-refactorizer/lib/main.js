@@ -2,8 +2,6 @@
 
 var _asyncToGenerator = _interopRequireDefault(require('async-to-generator'));
 
-var _atom = require('atom');
-
 var _ProviderRegistry;
 
 function _load_ProviderRegistry() {
@@ -62,22 +60,20 @@ function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj;
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-/**
- * Copyright (c) 2015-present, Facebook, Inc.
- * All rights reserved.
- *
- * This source code is licensed under the license found in the LICENSE file in
- * the root directory of this source tree.
- *
- * 
- * @format
- */
+const CONTEXT_MENU_CLASS = 'enable-nuclide-refactorizer'; /**
+                                                           * Copyright (c) 2015-present, Facebook, Inc.
+                                                           * All rights reserved.
+                                                           *
+                                                           * This source code is licensed under the license found in the LICENSE file in
+                                                           * the root directory of this source tree.
+                                                           *
+                                                           * 
+                                                           * @format
+                                                           */
 
 /*
  * WARNING: This package is still experimental and in early development. Use it at your own risk.
  */
-
-const CONTEXT_MENU_CLASS = 'enable-nuclide-refactorizer';
 
 class Activation {
 
@@ -143,7 +139,7 @@ class Activation {
   consumeRefactorProvider(provider) {
     this._providerRegistry.addProvider(provider);
     this._checkAllEditorContextMenus();
-    return new _atom.Disposable(() => {
+    return new (_UniversalDisposable || _load_UniversalDisposable()).default(() => {
       this._providerRegistry.removeProvider(provider);
       this._checkAllEditorContextMenus();
     });

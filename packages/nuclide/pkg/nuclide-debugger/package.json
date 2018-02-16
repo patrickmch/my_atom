@@ -3,6 +3,7 @@
   "main": "./lib/main.js",
   "version": "0.0.0",
   "description": "Allows debugging of various types of process from within Nuclide",
+  "author": "Nuclide : Debugging",
   "atomTestRunner": "../../lib/test-runner-entry.js",
   "nuclide": {
     "packageType": "Atom",
@@ -35,11 +36,8 @@
       }
     }
   },
-  "viewProviders": [
-    "createDebuggerView"
-  ],
   "consumedServices": {
-    "nuclide.registerExecutor": {
+    "DEPRECATED-nuclide.registerExecutor": {
       "versions": {
         "0.0.0": "consumeRegisterExecutor"
       }
@@ -74,10 +72,13 @@
         "0.0.0": "consumeCurrentWorkingDirectory"
       }
     },
-    "nuclide-output": {
+    "DEPRECATED-nuclide-output": {
       "versions": {
         "0.0.0": "consumeOutputService"
       }
     }
-  }
+  },
+  "activationHooks": [
+    "!nuclide_vsp_debugger_core:gk:nuclide"
+  ]
 }

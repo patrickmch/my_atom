@@ -26,10 +26,10 @@ function _load_username() {
   return _username = require('big-dig/src/common/username');
 }
 
-var _SshHandshake;
+var _client;
 
-function _load_SshHandshake() {
-  return _SshHandshake = require('big-dig/src/client/SshHandshake');
+function _load_client() {
+  return _client = require('big-dig/src/client');
 }
 
 var _logging;
@@ -72,7 +72,7 @@ function parseArgsAndRunMain() {
   const { host, privateKey, remoteServerCommand } = argv;
 
   return new Promise((resolve, reject) => {
-    const sshHandshake = new (_SshHandshake || _load_SshHandshake()).SshHandshake({
+    const sshHandshake = new (_client || _load_client()).SshHandshake({
       onKeyboardInteractive(name, instructions, instructionsLang, prompts) {
         return (0, _asyncToGenerator.default)(function* () {
           if (!(prompts.length > 0)) {
@@ -89,23 +89,24 @@ function parseArgsAndRunMain() {
         (0, (_log4js || _load_log4js()).getLogger)().info('Connecting...');
       },
 
-      onDidConnect(connection, config) {
-        return (0, _asyncToGenerator.default)(function* () {
+      onDidConnect(connectionConfig, config) {
+        (0, (_client || _load_client()).createBigDigClient)(connectionConfig).then(connection => {
           (0, (_log4js || _load_log4js()).getLogger)().info(`Connected to server at: ${connection.getAddress()}`);
           // TODO(mbolin): Do this in a better way that does not interleave
           // with logging output. Maybe a simpler send/response would be a better
           // first sample and there could be a more complex example that uses more
           // of the Observable API.
-          connection.onMessage('raw-data').subscribe(function (x) {
-            return (0, (_log4js || _load_log4js()).getLogger)().info(x);
-          });
+          connection.onMessage('raw-data').subscribe(x => (0, (_log4js || _load_log4js()).getLogger)().info(x));
 
           // Once the connection is established, the common pattern is to pass
           // the WebSocketTransport to the business logic that needs to
           // communicate with the server.
           const client = new QuestionClient(connection, resolve);
           client.run();
-        })();
+        }, err => {
+          (0, (_log4js || _load_log4js()).getLogger)().error('Error connecting to server', err);
+          reject(err);
+        });
       },
 
       onError(errorType, error, config) {

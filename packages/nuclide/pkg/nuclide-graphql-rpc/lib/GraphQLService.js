@@ -17,7 +17,8 @@ let initializeLsp = exports.initializeLsp = (() => {
       host,
       spawnOptions,
       projectFileNames,
-      fileExtensions
+      fileExtensions,
+      additionalLogFilesRetentionPeriod: 5 * 60 * 1000 // 5 minutes
     });
   });
 

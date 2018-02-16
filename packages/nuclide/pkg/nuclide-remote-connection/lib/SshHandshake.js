@@ -71,10 +71,10 @@ function _load_RemoteCommand() {
   return _RemoteCommand = require('./RemoteCommand');
 }
 
-var _nuclideVersion;
+var _systemInfo;
 
-function _load_nuclideVersion() {
-  return _nuclideVersion = require('../../nuclide-version');
+function _load_systemInfo() {
+  return _systemInfo = require('../../commons-node/system-info');
 }
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
@@ -198,13 +198,6 @@ class SshHandshake {
       _this._cancelled = false;
       _this._willConnect();
 
-      const existingConnection = (_RemoteConnection || _load_RemoteConnection()).RemoteConnection.getByHostnameAndPath(_this._config.host, _this._config.cwd);
-
-      if (existingConnection) {
-        _this._didConnect(existingConnection);
-        return;
-      }
-
       let lookup;
       try {
         lookup = yield (0, (_lookupPreferIpV || _load_lookupPreferIpV()).default)(config.host);
@@ -214,16 +207,6 @@ class SshHandshake {
 
       const { address, family } = lookup;
       _this._config.family = family;
-
-      const connection = (yield (_RemoteConnection || _load_RemoteConnection()).RemoteConnection.createConnectionBySavedConfig(_this._config.host, _this._config.cwd, _this._config.displayTitle)) || (
-      // We save connections by their IP address as well, in case a different hostname
-      // was used for the same server.
-      yield (_RemoteConnection || _load_RemoteConnection()).RemoteConnection.createConnectionBySavedConfig(address, _this._config.cwd, _this._config.displayTitle));
-
-      if (connection) {
-        _this._didConnect(connection);
-        return;
-      }
 
       if (config.authMethod === SupportedMethods.SSL_AGENT) {
         // Point to ssh-agent's socket for ssh-agent-based authentication.
@@ -347,7 +330,7 @@ class SshHandshake {
       const flags = [`--workspace=${this._config.cwd}`, `--common-name=${this._config.host}`, `--json-output-file=${remoteTempFile}`, '--timeout=60'];
       // Append the client version if not already provided.
       if (!command.includes('--version=')) {
-        flags.push(`--version=${(0, (_nuclideVersion || _load_nuclideVersion()).getVersion)()}`);
+        flags.push(`--version=${(0, (_systemInfo || _load_systemInfo()).getNuclideVersion)()}`);
       }
       // We'll take the user-provided command literally.
       const cmd = command + ' ' + (0, (_string || _load_string()).shellQuote)(flags);
@@ -480,10 +463,11 @@ class SshHandshake {
           displayTitle: _this3._config.displayTitle
         });
       } else {
-        /* $FlowIssue t9212378 */
         _this3._forwardingServer = _net.default.createServer(function (sock) {
           _this3._forwardSocket(sock);
-        }).listen(0, 'localhost', function () {
+        })
+        // $FlowFixMe
+        .listen(0, 'localhost', function () {
           const localPort = _this3._getLocalPort();
           // flowlint-next-line sketchy-null-number:off
 

@@ -32,6 +32,12 @@ function _load_nuclideDebuggerCommon() {
   return _nuclideDebuggerCommon = require('nuclide-debugger-common');
 }
 
+var _debugger;
+
+function _load_debugger() {
+  return _debugger = require('../../commons-atom/debugger');
+}
+
 var _nuclideAnalytics;
 
 function _load_nuclideAnalytics() {
@@ -54,17 +60,6 @@ function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj;
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-/**
- * Copyright (c) 2015-present, Facebook, Inc.
- * All rights reserved.
- *
- * This source code is licensed under the license found in the LICENSE file in
- * the root directory of this source tree.
- *
- * 
- * @format
- */
-
 class NodeScriptAttachUiComponent extends _react.Component {
 
   constructor(props) {
@@ -76,7 +71,7 @@ class NodeScriptAttachUiComponent extends _react.Component {
       const port = Number((0, (_nullthrows || _load_nullthrows()).default)(_this._port).getText().trim());
       const attachInfo = yield (0, (_utils || _load_utils()).getNodeAttachProcessInfo)(_this.props.targetUri, port);
 
-      const debuggerService = yield (0, (_utils || _load_utils()).getDebuggerService)();
+      const debuggerService = yield (0, (_debugger || _load_debugger()).getDebuggerService)();
       debuggerService.startDebugging(attachInfo);
 
       (0, (_nuclideDebuggerCommon || _load_nuclideDebuggerCommon()).serializeDebuggerConfig)(..._this._getSerializationArgs(), {
@@ -155,4 +150,13 @@ class NodeScriptAttachUiComponent extends _react.Component {
   }
 
 }
-exports.default = NodeScriptAttachUiComponent;
+exports.default = NodeScriptAttachUiComponent; /**
+                                                * Copyright (c) 2015-present, Facebook, Inc.
+                                                * All rights reserved.
+                                                *
+                                                * This source code is licensed under the license found in the LICENSE file in
+                                                * the root directory of this source tree.
+                                                *
+                                                * 
+                                                * @format
+                                                */

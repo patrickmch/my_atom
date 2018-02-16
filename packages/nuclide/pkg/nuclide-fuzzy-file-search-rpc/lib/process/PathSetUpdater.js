@@ -41,25 +41,24 @@ function _load_hgUtils() {
 var _nuclideWatchmanHelpers;
 
 function _load_nuclideWatchmanHelpers() {
-  return _nuclideWatchmanHelpers = require('../../../nuclide-watchman-helpers');
+  return _nuclideWatchmanHelpers = require('nuclide-watchman-helpers');
 }
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 // TODO: This probably won't work on Windows, but we'll worry about that
 // when Watchman officially supports Windows.
-/**
- * Copyright (c) 2015-present, Facebook, Inc.
- * All rights reserved.
- *
- * This source code is licensed under the license found in the LICENSE file in
- * the root directory of this source tree.
- *
- * 
- * @format
- */
+const S_IFDIR = 16384; /**
+                        * Copyright (c) 2015-present, Facebook, Inc.
+                        * All rights reserved.
+                        *
+                        * This source code is licensed under the license found in the LICENSE file in
+                        * the root directory of this source tree.
+                        *
+                        * 
+                        * @format
+                        */
 
-const S_IFDIR = 16384;
 const WATCHMAN_SUBSCRIPTION_BUFFER_TIME = 3000;
 const CONCURRENT_HG_STATUS = 2;
 const HG_STATUS_TIMEOUT = 10000;

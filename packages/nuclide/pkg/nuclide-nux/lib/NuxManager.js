@@ -118,7 +118,7 @@ class NuxManager {
   // Triggered NUXes that are waiting to be displayed
   addNewNux(nux) {
     this._nuxStore.addNewNux(nux);
-    return new _atom.Disposable(() => {
+    return new (_UniversalDisposable || _load_UniversalDisposable()).default(() => {
       this._removeNux(nux.id);
     });
   }
@@ -272,7 +272,7 @@ class NuxManager {
    */
   _canTriggerNux(gkID) {
     return new Promise((resolve, reject) => {
-      const cleanupDisposable = new _atom.Disposable(() => {
+      const cleanupDisposable = new (_UniversalDisposable || _load_UniversalDisposable()).default(() => {
         gkDisposable.dispose();
         reject(new Error('NuxManager was disposed while waiting on GKs.'));
       });

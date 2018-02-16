@@ -50,22 +50,20 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
 function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
 
 // & 'isSelected';
-/**
- * Copyright (c) 2015-present, Facebook, Inc.
- * All rights reserved.
- *
- * This source code is licensed under the license found in the LICENSE file in
- * the root directory of this source tree.
- *
- * 
- * @format
- */
-
 const activeThreadIndicatorComponent = props => _react.createElement(
   'div',
   { className: 'nuclide-debugger-thread-list-item-current-indicator' },
   props.cellData ? _react.createElement((_Icon || _load_Icon()).Icon, { icon: 'arrow-right', title: 'Selected Thread' }) : null
-);
+); /**
+    * Copyright (c) 2015-present, Facebook, Inc.
+    * All rights reserved.
+    *
+    * This source code is licensed under the license found in the LICENSE file in
+    * the root directory of this source tree.
+    *
+    * 
+    * @format
+    */
 
 class DebuggerThreadsComponent extends _react.Component {
 
@@ -73,7 +71,7 @@ class DebuggerThreadsComponent extends _react.Component {
     super(props);
 
     this._handleSelectThread = data => {
-      this.props.bridge.selectThread(data.id);
+      this.props.selectThread(data.id);
     };
 
     this._handleSort = (sortedColumn, sortDescending) => {
@@ -100,12 +98,12 @@ class DebuggerThreadsComponent extends _react.Component {
       });
     };
 
-    this._handleThreadStoreChanged = (0, (_debounce || _load_debounce()).default)(this._handleThreadStoreChanged, 150);
+    this._handleThreadsChanged = (0, (_debounce || _load_debounce()).default)(this._handleThreadsChanged, 150);
 
     this._disposables = new (_UniversalDisposable || _load_UniversalDisposable()).default();
     this.state = {
-      threadList: props.threadStore.getThreadList(),
-      selectedThreadId: props.threadStore.getSelectedThreadId(),
+      threadList: props.model.getThreadList(),
+      selectedThreadId: props.model.getSelectedThreadId(),
       sortedColumn: null,
       sortDescending: false,
       threadsLoading: false
@@ -113,8 +111,7 @@ class DebuggerThreadsComponent extends _react.Component {
   }
 
   componentDidMount() {
-    const { threadStore } = this.props;
-    this._disposables.add(threadStore.onChange(() => this._handleThreadStoreChanged()));
+    this._disposables.add(this.props.model.onThreadsChanged(() => this._handleThreadsChanged()));
   }
 
   componentWillUnmount() {
@@ -139,11 +136,11 @@ class DebuggerThreadsComponent extends _react.Component {
     }
   }
 
-  _handleThreadStoreChanged() {
+  _handleThreadsChanged() {
     this.setState({
-      threadList: this.props.threadStore.getThreadList(),
-      selectedThreadId: this.props.threadStore.getSelectedThreadId(),
-      threadsLoading: this.props.threadStore.getThreadsReloading()
+      threadList: this.props.model.getThreadList(),
+      selectedThreadId: this.props.model.getSelectedThreadId(),
+      threadsLoading: this.props.model.getThreadsReloading()
     });
   }
 
@@ -171,7 +168,7 @@ class DebuggerThreadsComponent extends _react.Component {
     }];
 
     // Individual debuggers can override the displayed columns.
-    const columns = this.props.customThreadColumns.length === 0 ? defaultColumns : [activeThreadCol, ...this.props.customThreadColumns];
+    const columns = defaultColumns;
     const threadName = this.props.threadName.toLowerCase();
     const emptyComponent = () => _react.createElement(
       'div',

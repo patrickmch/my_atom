@@ -122,7 +122,7 @@ class BuckToolbarTargetSelector extends _react.Component {
       return this._cachedOwners;
     }
     const buckService = (0, (_nuclideBuckBase || _load_nuclideBuckBase()).getBuckService)(buckRoot);
-    this._cachedOwners = buckService == null ? Promise.resolve([]) : buckService.getOwners(buckRoot, path).then(
+    this._cachedOwners = buckService == null ? Promise.resolve([]) : buckService.getOwners(buckRoot, path, []).then(
     // Strip off the optional leading "//" to match typical user input.
     owners => owners.map(owner => owner.startsWith('//') ? owner.substring(2) : owner)).catch(err => {
       (0, (_log4js || _load_log4js()).getLogger)('nuclide-buck').error(`Error getting Buck owners for ${path}`, err);

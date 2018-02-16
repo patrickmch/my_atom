@@ -63,7 +63,7 @@ function _load_event() {
 var _humanizeKeystroke;
 
 function _load_humanizeKeystroke() {
-  return _humanizeKeystroke = _interopRequireDefault(require('../../commons-node/humanizeKeystroke'));
+  return _humanizeKeystroke = _interopRequireDefault(require('nuclide-commons/humanizeKeystroke'));
 }
 
 var _observable;
@@ -178,7 +178,7 @@ class QuickSelectionComponent extends _react.Component {
       if (event.target !== this._modal && !(0, (_nullthrows || _load_nullthrows()).default)(this._modal).contains(event.target)) {
         this.props.onCancellation();
       } else {
-        process.nextTick(() => this._getInputTextEditor().focus());
+        process.nextTick(() => this.focus());
       }
     };
 
@@ -244,7 +244,10 @@ class QuickSelectionComponent extends _react.Component {
    * Public API
    */
   focus() {
-    this._getInputTextEditor().focus();
+    const element = this._getInputTextEditor();
+    if (element != null) {
+      element.focus();
+    }
   }
 
   selectAllText() {
@@ -515,8 +518,10 @@ class QuickSelectionComponent extends _react.Component {
   }
 
   _getInputTextEditor() {
-    // $FlowFixMe
-    return _reactDom.default.findDOMNode(this._queryInput);
+    if (this._queryInput != null) {
+      return this._queryInput.getTextEditor().getElement();
+    }
+    return null;
   }
 
   _getTextEditor() {

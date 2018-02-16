@@ -30,8 +30,6 @@ var _react = _interopRequireWildcard(require('react'));
 
 var _reactDom = _interopRequireDefault(require('react-dom'));
 
-var _atom = require('atom');
-
 var _rxjsBundlesRxMinJs = require('rxjs/bundles/Rx.min.js');
 
 var _analytics;
@@ -68,18 +66,16 @@ function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj;
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-/**
- * Copyright (c) 2015-present, Facebook, Inc.
- * All rights reserved.
- *
- * This source code is licensed under the license found in the LICENSE file in
- * the root directory of this source tree.
- *
- * 
- * @format
- */
-
-const STATUS_BAR_PRIORITY = 1000;
+const STATUS_BAR_PRIORITY = 1000; /**
+                                   * Copyright (c) 2015-present, Facebook, Inc.
+                                   * All rights reserved.
+                                   *
+                                   * This source code is licensed under the license found in the LICENSE file in
+                                   * the root directory of this source tree.
+                                   *
+                                   * 
+                                   * @format
+                                   */
 
 class Activation {
 
@@ -115,7 +111,7 @@ class Activation {
       isActive: this._shouldRenderDiagnostics,
       onClick: () => this._toggleEvents.next()
     }), item);
-    const disposable = new _atom.Disposable(() => {
+    const disposable = new (_UniversalDisposable || _load_UniversalDisposable()).default(() => {
       _reactDom.default.unmountComponentAtNode(item);
       statusBarTile.destroy();
     });

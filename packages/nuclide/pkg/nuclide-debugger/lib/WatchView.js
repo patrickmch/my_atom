@@ -35,11 +35,22 @@ function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj;
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
+/**
+ * Copyright (c) 2015-present, Facebook, Inc.
+ * All rights reserved.
+ *
+ * This source code is licensed under the license found in the LICENSE file in
+ * the root directory of this source tree.
+ *
+ * 
+ * @format
+ */
+
 class WatchView extends _react.PureComponent {
 
   constructor(props) {
     super(props);
-    this._watchExpressionComponentWrapped = (0, (_bindObservableAsProps || _load_bindObservableAsProps()).bindObservableAsProps)(props.model.getWatchExpressionListStore().getWatchExpressions().map(watchExpressions => ({ watchExpressions })), (_WatchExpressionComponent || _load_WatchExpressionComponent()).WatchExpressionComponent);
+    this._watchExpressionComponentWrapped = (0, (_bindObservableAsProps || _load_bindObservableAsProps()).bindObservableAsProps)(props.model.getWatchExpressions().map(watchExpressions => ({ watchExpressions })), (_WatchExpressionComponent || _load_WatchExpressionComponent()).WatchExpressionComponent);
   }
 
   render() {
@@ -57,19 +68,10 @@ class WatchView extends _react.PureComponent {
           onAddWatchExpression: actions.addWatchExpression.bind(model),
           onRemoveWatchExpression: actions.removeWatchExpression.bind(model),
           onUpdateWatchExpression: actions.updateWatchExpression.bind(model),
-          watchExpressionStore: model.getWatchExpressionStore()
+          getProperties: model.getProperties.bind(model)
         })
       )
     );
   }
 }
-exports.WatchView = WatchView; /**
-                                * Copyright (c) 2015-present, Facebook, Inc.
-                                * All rights reserved.
-                                *
-                                * This source code is licensed under the license found in the LICENSE file in
-                                * the root directory of this source tree.
-                                *
-                                * 
-                                * @format
-                                */
+exports.WatchView = WatchView;

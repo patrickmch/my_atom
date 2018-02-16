@@ -6,8 +6,6 @@ Object.defineProperty(exports, "__esModule", {
 
 var _asyncToGenerator = _interopRequireDefault(require('async-to-generator'));
 
-var _atom = require('atom');
-
 var _nuclideRemoteConnection;
 
 function _load_nuclideRemoteConnection() {
@@ -24,6 +22,12 @@ var _promise;
 
 function _load_promise() {
   return _promise = require('nuclide-commons/promise');
+}
+
+var _UniversalDisposable;
+
+function _load_UniversalDisposable() {
+  return _UniversalDisposable = _interopRequireDefault(require('nuclide-commons/UniversalDisposable'));
 }
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
@@ -53,11 +57,11 @@ const relatedFilesProviders = new Set();
 class RelatedFileFinder {
   static registerRelatedFilesProvider(provider) {
     relatedFilesProviders.add(provider);
-    return new _atom.Disposable(() => relatedFilesProviders.delete(provider));
+    return new (_UniversalDisposable || _load_UniversalDisposable()).default(() => relatedFilesProviders.delete(provider));
   }
 
   static getRelatedFilesProvidersDisposable() {
-    return new _atom.Disposable(() => relatedFilesProviders.clear());
+    return new (_UniversalDisposable || _load_UniversalDisposable()).default(() => relatedFilesProviders.clear());
   }
 
   static _findRelatedFilesFromProviders(path) {

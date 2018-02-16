@@ -15,7 +15,7 @@ module.exports = _client => {
         location: {
           type: "source",
           fileName: "main.js",
-          line: 51
+          line: 36
         },
         name: "HhvmDebuggerService"
       })])).switchMap(([args, id]) => _client.callRemoteMethod(id, "getOutputWindowObservable", "observable", args)).concatMap(value => {
@@ -31,7 +31,7 @@ module.exports = _client => {
         location: {
           type: "source",
           fileName: "main.js",
-          line: 51
+          line: 36
         },
         name: "HhvmDebuggerService"
       })])).switchMap(([args, id]) => _client.callRemoteMethod(id, "getAtomNotificationObservable", "observable", args)).concatMap(value => {
@@ -48,7 +48,7 @@ module.exports = _client => {
         location: {
           type: "source",
           fileName: "main.js",
-          line: 51
+          line: 36
         },
         name: "HhvmDebuggerService"
       })])).switchMap(([args, id]) => _client.callRemoteMethod(id, "getNotificationObservable", "observable", args)).concatMap(value => {
@@ -65,7 +65,7 @@ module.exports = _client => {
         location: {
           type: "source",
           fileName: "main.js",
-          line: 51
+          line: 36
         },
         name: "HhvmDebuggerService"
       })])).switchMap(([args, id]) => _client.callRemoteMethod(id, "getServerMessageObservable", "observable", args)).concatMap(value => {
@@ -174,6 +174,12 @@ module.exports = _client => {
                 kind: "string"
               },
               optional: true
+            }, {
+              name: "cwd",
+              type: {
+                kind: "string"
+              },
+              optional: true
             }]
           }],
           discriminantField: "action"
@@ -183,7 +189,7 @@ module.exports = _client => {
         location: {
           type: "source",
           fileName: "main.js",
-          line: 51
+          line: 36
         },
         name: "HhvmDebuggerService"
       })]).then(([args, id]) => _client.callRemoteMethod(id, "debug", "promise", args)).then(value => {
@@ -204,7 +210,7 @@ module.exports = _client => {
         location: {
           type: "source",
           fileName: "main.js",
-          line: 51
+          line: 36
         },
         name: "HhvmDebuggerService"
       })]).then(([args, id]) => _client.callRemoteMethod(id, "sendCommand", "promise", args)).then(value => {
@@ -226,13 +232,61 @@ module.exports = _client => {
         location: {
           type: "source",
           fileName: "main.js",
-          line: 51
+          line: 36
         },
         name: "HhvmDebuggerService"
       })]).then(([args, id]) => _client.callRemoteMethod(id, "getLaunchArgs", "promise", args)).then(value => {
         return _client.unmarshal(value, {
           kind: "named",
           name: "Object"
+        });
+      });
+    }
+
+    createLogFilePaste() {
+      return Promise.all([_client.marshalArguments(Array.from(arguments), []), _client.marshal(this, {
+        kind: "named",
+        location: {
+          type: "source",
+          fileName: "main.js",
+          line: 36
+        },
+        name: "HhvmDebuggerService"
+      })]).then(([args, id]) => _client.callRemoteMethod(id, "createLogFilePaste", "promise", args)).then(value => {
+        return _client.unmarshal(value, {
+          kind: "string"
+        });
+      });
+    }
+
+    getAttachTargetList() {
+      return Promise.all([_client.marshalArguments(Array.from(arguments), []), _client.marshal(this, {
+        kind: "named",
+        location: {
+          type: "source",
+          fileName: "main.js",
+          line: 36
+        },
+        name: "HhvmDebuggerService"
+      })]).then(([args, id]) => _client.callRemoteMethod(id, "getAttachTargetList", "promise", args)).then(value => {
+        return _client.unmarshal(value, {
+          kind: "array",
+          type: {
+            kind: "object",
+            fields: [{
+              name: "pid",
+              type: {
+                kind: "number"
+              },
+              optional: false
+            }, {
+              name: "command",
+              type: {
+                kind: "string"
+              },
+              optional: false
+            }]
+          }
         });
       });
     }
@@ -308,12 +362,51 @@ Object.defineProperty(module.exports, "defs", {
         type: "builtin"
       }
     },
+    HHVMAttachConfig: {
+      kind: "alias",
+      location: {
+        type: "source",
+        fileName: "types.js",
+        line: 27
+      },
+      name: "HHVMAttachConfig",
+      definition: {
+        kind: "object",
+        fields: [{
+          name: "action",
+          type: {
+            kind: "string-literal",
+            value: "attach"
+          },
+          optional: false
+        }, {
+          name: "targetUri",
+          type: {
+            kind: "named",
+            name: "NuclideUri"
+          },
+          optional: false
+        }, {
+          name: "startupDocumentPath",
+          type: {
+            kind: "string"
+          },
+          optional: true
+        }, {
+          name: "debugPort",
+          type: {
+            kind: "number"
+          },
+          optional: true
+        }]
+      }
+    },
     HHVMLaunchConfig: {
       kind: "alias",
       location: {
         type: "source",
-        fileName: "main.js",
-        line: 26
+        fileName: "types.js",
+        line: 14
       },
       name: "HHVMLaunchConfig",
       definition: {
@@ -381,43 +474,10 @@ Object.defineProperty(module.exports, "defs", {
             kind: "string"
           },
           optional: true
-        }]
-      }
-    },
-    HHVMAttachConfig: {
-      kind: "alias",
-      location: {
-        type: "source",
-        fileName: "main.js",
-        line: 38
-      },
-      name: "HHVMAttachConfig",
-      definition: {
-        kind: "object",
-        fields: [{
-          name: "action",
-          type: {
-            kind: "string-literal",
-            value: "attach"
-          },
-          optional: false
         }, {
-          name: "targetUri",
-          type: {
-            kind: "named",
-            name: "NuclideUri"
-          },
-          optional: false
-        }, {
-          name: "startupDocumentPath",
+          name: "cwd",
           type: {
             kind: "string"
-          },
-          optional: true
-        }, {
-          name: "debugPort",
-          type: {
-            kind: "number"
           },
           optional: true
         }]
@@ -428,7 +488,7 @@ Object.defineProperty(module.exports, "defs", {
       location: {
         type: "source",
         fileName: "types.js",
-        line: 18
+        line: 20
       },
       name: "AtomNotificationType",
       definition: {
@@ -453,7 +513,7 @@ Object.defineProperty(module.exports, "defs", {
       location: {
         type: "source",
         fileName: "types.js",
-        line: 19
+        line: 21
       },
       name: "AtomNotification",
       definition: {
@@ -480,7 +540,7 @@ Object.defineProperty(module.exports, "defs", {
       location: {
         type: "source",
         fileName: "main.js",
-        line: 51
+        line: 36
       },
       constructorArgs: [],
       staticMethods: {},
@@ -489,7 +549,7 @@ Object.defineProperty(module.exports, "defs", {
           location: {
             type: "source",
             fileName: "main.js",
-            line: 58
+            line: 43
           },
           kind: "function",
           argumentTypes: [],
@@ -504,7 +564,7 @@ Object.defineProperty(module.exports, "defs", {
           location: {
             type: "source",
             fileName: "main.js",
-            line: 62
+            line: 47
           },
           kind: "function",
           argumentTypes: [],
@@ -520,7 +580,7 @@ Object.defineProperty(module.exports, "defs", {
           location: {
             type: "source",
             fileName: "main.js",
-            line: 69
+            line: 54
           },
           kind: "function",
           argumentTypes: [],
@@ -536,7 +596,7 @@ Object.defineProperty(module.exports, "defs", {
           location: {
             type: "source",
             fileName: "main.js",
-            line: 73
+            line: 58
           },
           kind: "function",
           argumentTypes: [],
@@ -551,7 +611,7 @@ Object.defineProperty(module.exports, "defs", {
           location: {
             type: "source",
             fileName: "main.js",
-            line: 77
+            line: 62
           },
           kind: "function",
           argumentTypes: [{
@@ -652,6 +712,12 @@ Object.defineProperty(module.exports, "defs", {
                     kind: "string"
                   },
                   optional: true
+                }, {
+                  name: "cwd",
+                  type: {
+                    kind: "string"
+                  },
+                  optional: true
                 }]
               }],
               discriminantField: "action"
@@ -668,7 +734,7 @@ Object.defineProperty(module.exports, "defs", {
           location: {
             type: "source",
             fileName: "main.js",
-            line: 103
+            line: 88
           },
           kind: "function",
           argumentTypes: [{
@@ -688,7 +754,7 @@ Object.defineProperty(module.exports, "defs", {
           location: {
             type: "source",
             fileName: "main.js",
-            line: 135
+            line: 120
           },
           kind: "function",
           argumentTypes: [{
@@ -706,11 +772,57 @@ Object.defineProperty(module.exports, "defs", {
             }
           }
         },
+        createLogFilePaste: {
+          location: {
+            type: "source",
+            fileName: "main.js",
+            line: 202
+          },
+          kind: "function",
+          argumentTypes: [],
+          returnType: {
+            kind: "promise",
+            type: {
+              kind: "string"
+            }
+          }
+        },
+        getAttachTargetList: {
+          location: {
+            type: "source",
+            fileName: "main.js",
+            line: 283
+          },
+          kind: "function",
+          argumentTypes: [],
+          returnType: {
+            kind: "promise",
+            type: {
+              kind: "array",
+              type: {
+                kind: "object",
+                fields: [{
+                  name: "pid",
+                  type: {
+                    kind: "number"
+                  },
+                  optional: false
+                }, {
+                  name: "command",
+                  type: {
+                    kind: "string"
+                  },
+                  optional: false
+                }]
+              }
+            }
+          }
+        },
         dispose: {
           location: {
             type: "source",
             fileName: "main.js",
-            line: 257
+            line: 304
           },
           kind: "function",
           argumentTypes: [],

@@ -17,7 +17,7 @@ module.exports = _client => {
         location: {
           type: "source",
           fileName: "rpc-types.js",
-          line: 60
+          line: 62
         },
         name: "FileNotifier"
       })]).then(([args, id]) => _client.callRemoteMethod(id, "onFileEvent", "promise", args)).then(value => {
@@ -42,7 +42,7 @@ module.exports = _client => {
         location: {
           type: "source",
           fileName: "rpc-types.js",
-          line: 60
+          line: 62
         },
         name: "FileNotifier"
       })]).then(([args, id]) => _client.callRemoteMethod(id, "onDirectoriesChanged", "promise", args)).then(value => {
@@ -58,7 +58,7 @@ module.exports = _client => {
         location: {
           type: "source",
           fileName: "rpc-types.js",
-          line: 60
+          line: 62
         },
         name: "FileNotifier"
       })]).then(([args, id]) => _client.callRemoteMethod(id, "getTotalBufferSize", "promise", args)).then(value => {
@@ -226,7 +226,7 @@ module.exports = _client => {
     }
 
     findReferences(arg0, arg1) {
-      return Promise.all([_client.marshalArguments(Array.from(arguments), [{
+      return Observable.fromPromise(Promise.all([_client.marshalArguments(Array.from(arguments), [{
         name: "fileVersion",
         type: {
           kind: "named",
@@ -246,7 +246,7 @@ module.exports = _client => {
           line: 113
         },
         name: "LanguageService"
-      })]).then(([args, id]) => _client.callRemoteMethod(id, "findReferences", "promise", args)).then(value => {
+      })])).switchMap(([args, id]) => _client.callRemoteMethod(id, "findReferences", "observable", args)).concatMap(value => {
         return _client.unmarshal(value, {
           kind: "nullable",
           type: {
@@ -254,7 +254,7 @@ module.exports = _client => {
             name: "FindReferencesReturn"
           }
         });
-      });
+      }).publish();
     }
 
     getCoverage(arg0) {
@@ -1503,6 +1503,12 @@ Object.defineProperty(module.exports, "defs", {
             kind: "string"
           },
           optional: false
+        }, {
+          name: "languageId",
+          type: {
+            kind: "string"
+          },
+          optional: false
         }]
       }
     },
@@ -1511,7 +1517,7 @@ Object.defineProperty(module.exports, "defs", {
       location: {
         type: "source",
         fileName: "rpc-types.js",
-        line: 27
+        line: 29
       },
       name: "FileCloseEvent",
       definition: {
@@ -1538,7 +1544,7 @@ Object.defineProperty(module.exports, "defs", {
       location: {
         type: "source",
         fileName: "rpc-types.js",
-        line: 32
+        line: 34
       },
       name: "FileEditEvent",
       definition: {
@@ -1591,7 +1597,7 @@ Object.defineProperty(module.exports, "defs", {
       location: {
         type: "source",
         fileName: "rpc-types.js",
-        line: 41
+        line: 43
       },
       name: "FileSaveEvent",
       definition: {
@@ -1618,7 +1624,7 @@ Object.defineProperty(module.exports, "defs", {
       location: {
         type: "source",
         fileName: "rpc-types.js",
-        line: 21
+        line: 22
       },
       name: "FileSyncEvent",
       definition: {
@@ -1643,6 +1649,12 @@ Object.defineProperty(module.exports, "defs", {
             kind: "string"
           },
           optional: false
+        }, {
+          name: "languageId",
+          type: {
+            kind: "string"
+          },
+          optional: false
         }]
       }
     },
@@ -1651,7 +1663,7 @@ Object.defineProperty(module.exports, "defs", {
       location: {
         type: "source",
         fileName: "rpc-types.js",
-        line: 47
+        line: 49
       },
       name: "FileEvent",
       definition: {
@@ -1674,6 +1686,12 @@ Object.defineProperty(module.exports, "defs", {
             optional: false
           }, {
             name: "contents",
+            type: {
+              kind: "string"
+            },
+            optional: false
+          }, {
+            name: "languageId",
             type: {
               kind: "string"
             },
@@ -1778,6 +1796,12 @@ Object.defineProperty(module.exports, "defs", {
               kind: "string"
             },
             optional: false
+          }, {
+            name: "languageId",
+            type: {
+              kind: "string"
+            },
+            optional: false
           }]
         }],
         discriminantField: "kind"
@@ -1789,7 +1813,7 @@ Object.defineProperty(module.exports, "defs", {
       location: {
         type: "source",
         fileName: "rpc-types.js",
-        line: 60
+        line: 62
       },
       constructorArgs: null,
       staticMethods: {},
@@ -1798,7 +1822,7 @@ Object.defineProperty(module.exports, "defs", {
           location: {
             type: "source",
             fileName: "rpc-types.js",
-            line: 61
+            line: 63
           },
           kind: "function",
           argumentTypes: [{
@@ -1819,7 +1843,7 @@ Object.defineProperty(module.exports, "defs", {
           location: {
             type: "source",
             fileName: "rpc-types.js",
-            line: 62
+            line: 64
           },
           kind: "function",
           argumentTypes: [{
@@ -1843,7 +1867,7 @@ Object.defineProperty(module.exports, "defs", {
           location: {
             type: "source",
             fileName: "rpc-types.js",
-            line: 63
+            line: 65
           },
           kind: "function",
           argumentTypes: [],
@@ -1858,7 +1882,7 @@ Object.defineProperty(module.exports, "defs", {
           location: {
             type: "source",
             fileName: "rpc-types.js",
-            line: 64
+            line: 66
           },
           kind: "function",
           argumentTypes: [],
@@ -1873,7 +1897,7 @@ Object.defineProperty(module.exports, "defs", {
       location: {
         type: "source",
         fileName: "rpc-types.js",
-        line: 67
+        line: 69
       },
       name: "FileVersion",
       definition: {
@@ -2853,7 +2877,7 @@ Object.defineProperty(module.exports, "defs", {
       location: {
         type: "source",
         fileName: "types.js",
-        line: 53
+        line: 56
       },
       name: "NuclideEvaluationExpression",
       definition: {
@@ -3087,7 +3111,7 @@ Object.defineProperty(module.exports, "defs", {
             }
           }],
           returnType: {
-            kind: "promise",
+            kind: "observable",
             type: {
               kind: "nullable",
               type: {

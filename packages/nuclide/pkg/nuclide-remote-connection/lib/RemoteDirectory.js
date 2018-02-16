@@ -7,6 +7,12 @@ exports.RemoteDirectory = undefined;
 
 var _asyncToGenerator = _interopRequireDefault(require('async-to-generator'));
 
+var _UniversalDisposable;
+
+function _load_UniversalDisposable() {
+  return _UniversalDisposable = _interopRequireDefault(require('nuclide-commons/UniversalDisposable'));
+}
+
 var _nuclideUri;
 
 function _load_nuclideUri() {
@@ -92,7 +98,7 @@ class RemoteDirectory {
    * However, for the time being, we don't get any benefits from doing so.
    */
   onDidChangeFiles(callback) {
-    return new _atom.Disposable();
+    return new (_UniversalDisposable || _load_UniversalDisposable()).default();
   }
 
   _willAddSubscription() {
@@ -140,7 +146,7 @@ class RemoteDirectory {
   }
 
   _trackUnsubscription(subscription) {
-    return new _atom.Disposable(() => {
+    return new (_UniversalDisposable || _load_UniversalDisposable()).default(() => {
       subscription.dispose();
       this._didRemoveSubscription();
     });

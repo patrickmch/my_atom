@@ -63,8 +63,10 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
  */
 
 class AttachProcessInfo extends (_nuclideDebuggerCommon || _load_nuclideDebuggerCommon()).DebuggerProcessInfo {
-  constructor(targetUri) {
+
+  constructor(targetUri, debugPort) {
     super('hhvm', targetUri);
+    this._debugPort = debugPort;
   }
 
   clone() {
@@ -73,6 +75,7 @@ class AttachProcessInfo extends (_nuclideDebuggerCommon || _load_nuclideDebugger
 
   getDebuggerCapabilities() {
     return Object.assign({}, super.getDebuggerCapabilities(), {
+      completionsRequest: true,
       conditionalBreakpoints: true,
       continueToLocation: true,
       setVariable: true,
@@ -83,7 +86,6 @@ class AttachProcessInfo extends (_nuclideDebuggerCommon || _load_nuclideDebugger
   getDebuggerProps() {
     return Object.assign({}, super.getDebuggerProps(), {
       customControlButtons: this._getCustomControlButtons(),
-      threadColumns: this._getThreadColumns(),
       threadsComponentTitle: 'Requests'
     });
   }
@@ -110,6 +112,19 @@ class AttachProcessInfo extends (_nuclideDebuggerCommon || _load_nuclideDebugger
         targetUri: (_nuclideUri || _load_nuclideUri()).default.getPath(_this.getTargetUri()),
         action: 'attach'
       };
+
+      let debugPort = _this._debugPort;
+      if (debugPort == null) {
+        try {
+          // $FlowFB
+          const fetch = require('../../commons-node/fb-sitevar').fetchSitevarOnce;
+          debugPort = yield fetch('NUCLIDE_HHVM_DEBUG_PORT');
+        } catch (e) {}
+      }
+
+      if (debugPort != null) {
+        config.debugPort = debugPort;
+      }
 
       (_utils || _load_utils()).default.info(`Connection session config: ${JSON.stringify(config)}`);
       const result = yield hhvmDebuggerService.debug(config);
@@ -146,22 +161,6 @@ class AttachProcessInfo extends (_nuclideDebuggerCommon || _load_nuclideDebugger
   _getRpcService() {
     const service = (0, (_nuclideRemoteConnection || _load_nuclideRemoteConnection()).getPhpDebuggerServiceByNuclideUri)(this.getTargetUri());
     return new service.PhpDebuggerService();
-  }
-
-  _getThreadColumns() {
-    return [{
-      key: 'id',
-      title: 'ID',
-      width: 0.15
-    }, {
-      key: 'address',
-      title: 'Location',
-      width: 0.55
-    }, {
-      key: 'stopReason',
-      title: 'Stop Reason',
-      width: 0.25
-    }];
   }
 
   _getCustomControlButtons() {

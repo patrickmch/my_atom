@@ -38,10 +38,10 @@ function _load_UniversalDisposable() {
   return _UniversalDisposable = _interopRequireDefault(require('nuclide-commons/UniversalDisposable'));
 }
 
-var _TerminalOmni2Provider;
+var _TerminalDashProvider;
 
-function _load_TerminalOmni2Provider() {
-  return _TerminalOmni2Provider = _interopRequireDefault(require('./TerminalOmni2Provider'));
+function _load_TerminalDashProvider() {
+  return _TerminalDashProvider = _interopRequireDefault(require('./TerminalDashProvider'));
 }
 
 var _terminalView;
@@ -142,10 +142,12 @@ class Activation {
     });
   }
 
-  consumeOmni2(registerProvider) {
-    return registerProvider(new (_TerminalOmni2Provider || _load_TerminalOmni2Provider()).default({
+  consumeDash(registerProvider) {
+    const subscription = registerProvider(new (_TerminalDashProvider || _load_TerminalDashProvider()).default({
       getCwdApi: () => this._cwd
     }));
+    this._subscriptions.add(subscription);
+    return subscription;
   }
 
   _getPathOrCwd(event) {

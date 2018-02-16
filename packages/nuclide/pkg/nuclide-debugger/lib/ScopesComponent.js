@@ -5,30 +5,18 @@ Object.defineProperty(exports, "__esModule", {
 });
 exports.ScopesComponent = undefined;
 
-var _ScopesStore;
-
-function _load_ScopesStore() {
-  return _ScopesStore = _interopRequireDefault(require('./ScopesStore'));
-}
-
-var _WatchExpressionStore;
-
-function _load_WatchExpressionStore() {
-  return _WatchExpressionStore = require('./WatchExpressionStore');
-}
-
 var _react = _interopRequireWildcard(require('react'));
 
 var _LazyNestedValueComponent;
 
 function _load_LazyNestedValueComponent() {
-  return _LazyNestedValueComponent = require('../../nuclide-ui/LazyNestedValueComponent');
+  return _LazyNestedValueComponent = require('nuclide-commons-ui/LazyNestedValueComponent');
 }
 
 var _SimpleValueComponent;
 
 function _load_SimpleValueComponent() {
-  return _SimpleValueComponent = _interopRequireDefault(require('../../nuclide-ui/SimpleValueComponent'));
+  return _SimpleValueComponent = _interopRequireDefault(require('nuclide-commons-ui/SimpleValueComponent'));
 }
 
 var _Section;
@@ -37,9 +25,9 @@ function _load_Section() {
   return _Section = require('../../nuclide-ui/Section');
 }
 
-function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
-
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
 
 /**
  * Copyright (c) 2015-present, Facebook, Inc.
@@ -87,7 +75,7 @@ class ScopesComponent extends _react.Component {
           throw new Error('Invariant violation: "newValue != null"');
         }
 
-        this.props.scopesStore.sendSetVariableRequest(scopeObjectId, scopeName, expression, newValue);
+        this.props.model.sendSetVariableRequest(scopeObjectId, scopeName, expression, newValue);
       }
     };
 
@@ -131,11 +119,10 @@ class ScopesComponent extends _react.Component {
   }
 
   _renderScopeSection(fetchChildren, scope) {
-    const { scopesStore } = this.props;
     const { loaded, expanded, name, scopeObjectId, scopeVariables } = scope;
     // Non-local scopes should be collapsed by default since users typically care less about them.
 
-    const setVariableHandler = scopesStore.supportsSetVariable() ? this._setVariable.bind(this, scopeObjectId, name) : null;
+    const setVariableHandler = this.props.model.supportsSetVariable() ? this._setVariable.bind(this, scopeObjectId, name) : null;
 
     return (
       // $FlowFixMe(>=0.53.0) Flow suppress
@@ -144,7 +131,7 @@ class ScopesComponent extends _react.Component {
         {
           collapsable: true,
           collapsed: !expanded,
-          onChange: isCollapsed => scopesStore.setExpanded(name, !isCollapsed),
+          onChange: isCollapsed => this.props.model.setExpanded(name, !isCollapsed),
           headline: name,
           size: 'small' },
         !expanded ? null : !loaded ? LOADING : scopeVariables.length > 0 ? scopeVariables.map(this._renderExpression.bind(this, fetchChildren, setVariableHandler)) : NO_VARIABLES
@@ -153,7 +140,7 @@ class ScopesComponent extends _react.Component {
   }
 
   render() {
-    const { watchExpressionStore, scopes } = this.props;
+    const { model, scopes } = this.props;
     if (scopes == null || scopes.size === 0) {
       return _react.createElement(
         'span',
@@ -161,7 +148,7 @@ class ScopesComponent extends _react.Component {
         '(no variables)'
       );
     }
-    const fetchChildren = watchExpressionStore.getProperties.bind(watchExpressionStore);
+    const fetchChildren = model.getProperties.bind(model);
     const scopeSections = Array.from(scopes.values()).map(this._renderScopeSection.bind(this, fetchChildren));
     return _react.createElement(
       'div',

@@ -55,16 +55,10 @@ function _load_Checkbox() {
   return _Checkbox = require('nuclide-commons-ui/Checkbox');
 }
 
-var _BreakpointStore;
-
-function _load_BreakpointStore() {
-  return _BreakpointStore = _interopRequireDefault(require('./BreakpointStore'));
-}
-
 var _Modal;
 
 function _load_Modal() {
-  return _Modal = require('../../nuclide-ui/Modal');
+  return _Modal = require('nuclide-commons-ui/Modal');
 }
 
 var _nuclideAnalytics;
@@ -99,8 +93,8 @@ class BreakpointConfigComponent extends _react.Component {
       breakpoint: this.props.breakpoint
     };
 
-    this._disposables.add(this.props.breakpointStore.onNeedUIUpdate(() => {
-      const breakpoint = this.props.breakpointStore.getBreakpointAtLine(this.state.breakpoint.path, this.state.breakpoint.line);
+    this._disposables.add(this.props.model.onNeedUIUpdate(() => {
+      const breakpoint = this.props.model.getBreakpointAtLine(this.state.breakpoint.path, this.state.breakpoint.line);
       if (breakpoint == null) {
         // Breakpoint no longer exists.
         this.props.onDismiss();

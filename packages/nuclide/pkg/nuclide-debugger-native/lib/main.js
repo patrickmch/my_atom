@@ -2,6 +2,12 @@
 
 var _asyncToGenerator = _interopRequireDefault(require('async-to-generator'));
 
+var _debugger;
+
+function _load_debugger() {
+  return _debugger = require('../../commons-atom/debugger');
+}
+
 var _createPackage;
 
 function _load_createPackage() {
@@ -32,12 +38,6 @@ var _UniversalDisposable;
 
 function _load_UniversalDisposable() {
   return _UniversalDisposable = _interopRequireDefault(require('nuclide-commons/UniversalDisposable'));
-}
-
-var _consumeFirstProvider;
-
-function _load_consumeFirstProvider() {
-  return _consumeFirstProvider = _interopRequireDefault(require('../../commons-atom/consumeFirstProvider'));
 }
 
 var _AttachProcessInfo;
@@ -229,12 +229,6 @@ class Activation {
     });
   }
 
-  _getDebuggerService() {
-    return (0, _asyncToGenerator.default)(function* () {
-      return (0, (_consumeFirstProvider || _load_consumeFirstProvider()).default)('nuclide-debugger.remote');
-    })();
-  }
-
   _debugPidWithLLDB(pid, buckRoot) {
     var _this = this;
 
@@ -245,7 +239,7 @@ class Activation {
         throw new Error('Invariant violation: "attachInfo"');
       }
 
-      const debuggerService = yield _this._getDebuggerService();
+      const debuggerService = yield (0, (_debugger || _load_debugger()).getDebuggerService)();
       debuggerService.startDebugging(attachInfo);
     })();
   }
@@ -269,8 +263,6 @@ class Activation {
   }
 
   _debugBuckTarget(buckService, buckRoot, buildTarget, runArguments) {
-    var _this2 = this;
-
     return (0, _asyncToGenerator.default)(function* () {
       const output = yield buckService.showOutput(buckRoot, buildTarget);
       if (output.length === 0) {
@@ -308,7 +300,7 @@ class Activation {
         lldbPythonPath: null
       });
 
-      const debuggerService = yield _this2._getDebuggerService();
+      const debuggerService = yield (0, (_debugger || _load_debugger()).getDebuggerService)();
       yield debuggerService.startDebugging(info);
       return remoteOutputPath;
     })();

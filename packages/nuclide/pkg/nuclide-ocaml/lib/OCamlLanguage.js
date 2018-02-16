@@ -20,12 +20,16 @@ let createOCamlLanguageService = (() => {
       projectFileSearchStrategy: 'priority',
       useOriginalEnvironment: true,
       fileExtensions: ['.ml', '.mli', '.re', '.rei'],
+      additionalLogFilesRetentionPeriod: 5 * 60 * 1000, // 5 minutes
       initializationOptions: {
         codelens: {
           unicode: true
         },
         debounce: {
           linter: 10 * 1000 // 10s
+        },
+        format: {
+          width: 80
         },
         diagnostics: {
           merlinPerfLogging: true,

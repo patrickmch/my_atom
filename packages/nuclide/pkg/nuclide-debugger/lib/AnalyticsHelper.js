@@ -29,16 +29,14 @@ function beginTimerTracking(eventName) {
 }
 
 function failTimerTracking(err) {
-  // eslint-disable-next-line eqeqeq
-  if (timer !== null) {
+  if (timer != null) {
     timer.onError(err);
     timer = null;
   }
 }
 
 function endTimerTracking() {
-  // eslint-disable-next-line eqeqeq
-  if (timer !== null) {
+  if (timer != null) {
     timer.onSuccess();
     timer = null;
   }

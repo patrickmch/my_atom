@@ -81,15 +81,15 @@ let _build = exports._build = (() => {
 })();
 
 let getOwners = exports.getOwners = (() => {
-  var _ref3 = (0, _asyncToGenerator.default)(function* (rootPath, filePath, kindFilter) {
+  var _ref3 = (0, _asyncToGenerator.default)(function* (rootPath, filePath, extraArguments, kindFilter) {
     let queryString = `owner("${(0, (_string || _load_string()).shellQuote)([filePath])}")`;
     if (kindFilter != null) {
       queryString = `kind(${JSON.stringify(kindFilter)}, ${queryString})`;
     }
-    return query(rootPath, queryString);
+    return query(rootPath, queryString, extraArguments);
   });
 
-  return function getOwners(_x5, _x6, _x7) {
+  return function getOwners(_x5, _x6, _x7, _x8) {
     return _ref3.apply(this, arguments);
   };
 })();
@@ -116,7 +116,7 @@ let runBuckCommandFromProjectRoot = exports.runBuckCommandFromProjectRoot = (() 
     });
   });
 
-  return function runBuckCommandFromProjectRoot(_x8, _x9, _x10) {
+  return function runBuckCommandFromProjectRoot(_x9, _x10, _x11) {
     return _ref4.apply(this, arguments);
   };
 })();
@@ -125,14 +125,14 @@ let runBuckCommandFromProjectRoot = exports.runBuckCommandFromProjectRoot = (() 
 
 
 let query = exports.query = (() => {
-  var _ref5 = (0, _asyncToGenerator.default)(function* (rootPath, queryString) {
-    const args = ['query', '--json', queryString];
+  var _ref5 = (0, _asyncToGenerator.default)(function* (rootPath, queryString, extraArguments) {
+    const args = ['query', ...extraArguments, '--json', queryString];
     const result = yield runBuckCommandFromProjectRoot(rootPath, args);
     const json = JSON.parse(result);
     return json;
   });
 
-  return function query(_x11, _x12) {
+  return function query(_x12, _x13, _x14) {
     return _ref5.apply(this, arguments);
   };
 })();
@@ -140,7 +140,7 @@ let query = exports.query = (() => {
 let getBuildFile = exports.getBuildFile = (() => {
   var _ref6 = (0, _asyncToGenerator.default)(function* (rootPath, targetName) {
     try {
-      const result = yield query(rootPath, `buildfile(${targetName})`);
+      const result = yield query(rootPath, `buildfile(${targetName})`, []);
       if (result.length === 0) {
         return null;
       }
@@ -151,7 +151,7 @@ let getBuildFile = exports.getBuildFile = (() => {
     }
   });
 
-  return function getBuildFile(_x13, _x14) {
+  return function getBuildFile(_x15, _x16) {
     return _ref6.apply(this, arguments);
   };
 })();

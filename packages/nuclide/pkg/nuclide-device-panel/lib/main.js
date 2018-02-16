@@ -18,8 +18,6 @@ function _load_DevicePanelWorkspaceView() {
   return _DevicePanelWorkspaceView = require('./DevicePanelWorkspaceView');
 }
 
-var _atom = require('atom');
-
 var _ServerConnection;
 
 function _load_ServerConnection() {
@@ -78,16 +76,18 @@ function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj;
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-let activation = null; /**
-                        * Copyright (c) 2015-present, Facebook, Inc.
-                        * All rights reserved.
-                        *
-                        * This source code is licensed under the license found in the LICENSE file in
-                        * the root directory of this source tree.
-                        *
-                        * 
-                        * @format
-                        */
+/**
+ * Copyright (c) 2015-present, Facebook, Inc.
+ * All rights reserved.
+ *
+ * This source code is licensed under the license found in the LICENSE file in
+ * the root directory of this source tree.
+ *
+ * 
+ * @format
+ */
+
+let activation = null;
 
 class Activation {
 
@@ -132,7 +132,7 @@ class Activation {
       if (onDispose != null) {
         onDispose();
       }
-      return new _atom.Disposable(() => {
+      return new (_UniversalDisposable || _load_UniversalDisposable()).default(() => {
         if (activation != null) {
           providers.delete(provider);
         }
@@ -154,7 +154,8 @@ class Activation {
       registerProcessTaskProvider: this._createProviderRegistration(providers.processTask),
       registerDeviceTypeTaskProvider: this._createProviderRegistration(providers.deviceTypeTask, () => this._refreshDeviceTypes()),
       registerDeviceActionProvider: this._createProviderRegistration(providers.deviceAction),
-      registerAppInfoProvider: this._createProviderRegistration(providers.appInfo)
+      registerAppInfoProvider: this._createProviderRegistration(providers.appInfo),
+      registerDeviceTypeComponentProvider: this._createProviderRegistration(providers.deviceTypeComponent)
     };
   }
 }

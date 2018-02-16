@@ -57,8 +57,6 @@ function _load_registerGrammar() {
   return _registerGrammar = _interopRequireDefault(require('../../commons-atom/register-grammar'));
 }
 
-var _atom = require('atom');
-
 var _nuclideVcsBase;
 
 function _load_nuclideVcsBase() {
@@ -73,17 +71,18 @@ function _load_HgRepositoryProvider() {
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-const HG_ADD_TREE_CONTEXT_MENU_PRIORITY = 400; /**
-                                                * Copyright (c) 2015-present, Facebook, Inc.
-                                                * All rights reserved.
-                                                *
-                                                * This source code is licensed under the license found in the LICENSE file in
-                                                * the root directory of this source tree.
-                                                *
-                                                * 
-                                                * @format
-                                                */
+/**
+ * Copyright (c) 2015-present, Facebook, Inc.
+ * All rights reserved.
+ *
+ * This source code is licensed under the license found in the LICENSE file in
+ * the root directory of this source tree.
+ *
+ * 
+ * @format
+ */
 
+const HG_ADD_TREE_CONTEXT_MENU_PRIORITY = 400;
 const HG_REVERT_FILE_TREE_CONTEXT_MENU_PRIORITY = 1050;
 
 let subscriptions = null;
@@ -219,7 +218,7 @@ function addItemsToFileTreeContextMenu(contextMenu) {
   }, HG_ADD_TREE_CONTEXT_MENU_PRIORITY);
   subscriptions.add(addContextDisposable);
 
-  return new _atom.Disposable(() => {
+  return new (_UniversalDisposable || _load_UniversalDisposable()).default(() => {
     if (subscriptions != null) {
       subscriptions.remove(revertContextDisposable);
       subscriptions.remove(addContextDisposable);

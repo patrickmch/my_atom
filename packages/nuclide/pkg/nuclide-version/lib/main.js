@@ -5,22 +5,11 @@ Object.defineProperty(exports, "__esModule", {
 });
 exports.getVersion = getVersion;
 
-var _fs = _interopRequireDefault(require('fs'));
+var _package;
 
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-// Use a regex and not the "semver" module so the result here is the same
-// as from python code.
-const SEMVERISH_RE = /^(\d+)\.(\d+)\.(\d+)(?:-([a-z0-9.-]+))?$/; /**
-                                                                  * Copyright (c) 2015-present, Facebook, Inc.
-                                                                  * All rights reserved.
-                                                                  *
-                                                                  * This source code is licensed under the license found in the LICENSE file in
-                                                                  * the root directory of this source tree.
-                                                                  *
-                                                                  * 
-                                                                  * @format
-                                                                  */
+function _load_package() {
+  return _package = require('nuclide-commons/package');
+}
 
 let version;
 
@@ -40,24 +29,23 @@ let version;
  * (new feature or whatever) that do not work with the older servers.
  * It also includes server changes that break older clients.
  */
+/**
+ * Copyright (c) 2015-present, Facebook, Inc.
+ * All rights reserved.
+ *
+ * This source code is licensed under the license found in the LICENSE file in
+ * the root directory of this source tree.
+ *
+ * 
+ * @format
+ */
+
 function getVersion() {
   if (!version) {
     // Don't use require() because it may be reading from the module cache.
     // Do use require.resolve so the paths can be codemoded in the future.
-    const pkgFilename = require.resolve('../../../package.json');
-    const pkgJson = JSON.parse(_fs.default.readFileSync(pkgFilename, 'utf8'));
-    const match = SEMVERISH_RE.exec(pkgJson.version);
-
-    if (!match) {
-      throw new Error('Invariant violation: "match"');
-    }
-    // const majorVersion = match[1];
-
-
-    const minorVersion = match[2];
-    // const patchVersion = match[3];
-    // const prereleaseVersion = match[4];
-    version = minorVersion;
+    const packageJsonPath = require.resolve('../../../package.json');
+    version = (0, (_package || _load_package()).getPackageMinorVersion)(packageJsonPath);
   }
   return version;
 }

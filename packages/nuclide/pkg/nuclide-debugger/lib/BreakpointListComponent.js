@@ -3,7 +3,6 @@
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.BreakpointListComponent = undefined;
 
 var _UniversalDisposable;
 
@@ -89,19 +88,19 @@ class BreakpointListComponent extends _react.Component {
     };
 
     this._debuggerSupportsConditionalBp = breakpoint => {
-      return this.props.breakpointStore.breakpointSupportsConditions(breakpoint);
+      return this.props.model.breakpointSupportsConditions(breakpoint);
     };
 
     this.state = {
-      breakpoints: this.props.breakpointStore.getAllBreakpoints()
+      breakpoints: this.props.model.getAllBreakpoints()
     };
   }
 
   componentDidMount() {
-    const { breakpointStore } = this.props;
-    this._disposables = new (_UniversalDisposable || _load_UniversalDisposable()).default(breakpointStore.onNeedUIUpdate(() => {
+    const { model } = this.props;
+    this._disposables = new (_UniversalDisposable || _load_UniversalDisposable()).default(model.onNeedUIUpdate(() => {
       this.setState({
-        breakpoints: breakpointStore.getAllBreakpoints()
+        breakpoints: model.getAllBreakpoints()
       });
     }));
   }
@@ -188,6 +187,16 @@ class BreakpointListComponent extends _react.Component {
                   (0, (_nuclideAnalytics || _load_nuclideAnalytics()).track)((_constants || _load_constants()).AnalyticsEvents.DEBUGGER_EDIT_BREAKPOINT_FROM_ICON);
                   atom.commands.dispatch(event.target, 'nuclide-debugger:edit-breakpoint');
                 }
+              }),
+              _react.createElement((_Icon || _load_Icon()).Icon, {
+                icon: 'x',
+                className: 'nuclide-debugger-breakpoint-condition-control',
+                'data-path': path,
+                'data-line': line,
+                onClick: event => {
+                  (0, (_nuclideAnalytics || _load_nuclideAnalytics()).track)((_constants || _load_constants()).AnalyticsEvents.DEBUGGER_DELETE_BREAKPOINT_FROM_ICON);
+                  atom.commands.dispatch(event.target, 'nuclide-debugger:remove-breakpoint');
+                }
               })
             ),
             label
@@ -196,32 +205,27 @@ class BreakpointListComponent extends _react.Component {
         ),
         hitCountElement
       );
-      return (
-        // $FlowFixMe(>=0.53.0) Flow suppress
-        _react.createElement(
-          (_ListView || _load_ListView()).ListViewItem,
-          {
-            key: label,
-            value: breakpoint,
-            'data-path': path,
-            'data-line': line,
-            title: title,
-            className: 'nuclide-debugger-breakpoint' },
-          content
-        )
+      return _react.createElement(
+        (_ListView || _load_ListView()).ListViewItem,
+        {
+          key: label,
+          index: i,
+          value: breakpoint,
+          'data-path': path,
+          'data-line': line,
+          title: title,
+          className: 'nuclide-debugger-breakpoint' },
+        content
       );
     });
-    return (
-      // $FlowFixMe(>=0.53.0) Flow suppress
-      _react.createElement(
-        (_ListView || _load_ListView()).ListView,
-        {
-          alternateBackground: true,
-          onSelect: this._handleBreakpointClick,
-          selectable: true },
-        items
-      )
+    return _react.createElement(
+      (_ListView || _load_ListView()).ListView,
+      {
+        alternateBackground: true,
+        onSelect: this._handleBreakpointClick,
+        selectable: true },
+      items
     );
   }
 }
-exports.BreakpointListComponent = BreakpointListComponent;
+exports.default = BreakpointListComponent;

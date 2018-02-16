@@ -9,8 +9,6 @@ exports.serialize = serialize;
 exports.consumeDistractionFreeModeProvider = consumeDistractionFreeModeProvider;
 exports.consumeToolBar = consumeToolBar;
 
-var _atom = require('atom');
-
 var _analytics;
 
 function _load_analytics() {
@@ -38,7 +36,7 @@ function _load_BuiltinProviders() {
 var _ToolbarUtils;
 
 function _load_ToolbarUtils() {
-  return _ToolbarUtils = require('../../nuclide-ui/ToolbarUtils');
+  return _ToolbarUtils = require('nuclide-commons-ui/ToolbarUtils');
 }
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
@@ -89,7 +87,7 @@ class Activation {
       tooltip: 'Toggle Distraction-Free Mode',
       priority: 901
     }));
-    const disposable = new _atom.Disposable(() => {
+    const disposable = new (_UniversalDisposable || _load_UniversalDisposable()).default(() => {
       toolBar.removeItems();
     });
     this._disposables.add(disposable);

@@ -27,22 +27,16 @@ function _load_LspLanguageService() {
   return _LspLanguageService = require('../../nuclide-vscode-language-service-rpc/lib/LspLanguageService');
 }
 
+var _CqueryOutlineParser;
+
+function _load_CqueryOutlineParser() {
+  return _CqueryOutlineParser = require('./outline/CqueryOutlineParser');
+}
+
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 // FIXME pelmers: tracking cquery/issues/30
 // https://github.com/jacobdufault/cquery/issues/30#issuecomment-345536318
-/**
- * Copyright (c) 2015-present, Facebook, Inc.
- * All rights reserved.
- *
- * This source code is licensed under the license found in the LICENSE file in
- * the root directory of this source tree.
- *
- * 
- * @format
- */
-
-// Provides some extra commands on top of base Lsp.
 function shortenByOneCharacter({ newText, range }) {
   return {
     newText,
@@ -51,8 +45,18 @@ function shortenByOneCharacter({ newText, range }) {
       end: { line: range.end.line, character: range.end.character - 1 }
     }
   };
-}
+} /**
+   * Copyright (c) 2015-present, Facebook, Inc.
+   * All rights reserved.
+   *
+   * This source code is licensed under the license found in the LICENSE file in
+   * the root directory of this source tree.
+   *
+   * 
+   * @format
+   */
 
+// Provides some extra commands on top of base Lsp.
 class CqueryLanguageClient extends (_LspLanguageService || _load_LspLanguageService()).LspLanguageService {
   start() {
     // Workaround for https://github.com/babel/babel/issues/3930
@@ -105,6 +109,10 @@ class CqueryLanguageClient extends (_LspLanguageService || _load_LspLanguageServ
     })();
   }
 
+  _createOutlineTreeHierarchy(list) {
+    return (0, (_CqueryOutlineParser || _load_CqueryOutlineParser()).parseOutlineTree)(list);
+  }
+
   _executeCommand(command, args) {
     const cqueryEditCommands = new Set(['cquery._applyFixIt']);
     if (cqueryEditCommands.has(command) && args != null && args.length === 2) {
@@ -154,7 +162,8 @@ class CqueryLanguageClient extends (_LspLanguageService || _load_LspLanguageServ
     })();
   }
 
-  // TODO pelmers: remove this when cquery implements workspace/applyEdit
+  // TODO pelmers(T25418348): remove when cquery implements workspace/applyEdit
+  // track https://github.com/jacobdufault/cquery/issues/283
   _applyEdit(file, edits) {
     var _this3 = this;
 
@@ -168,7 +177,7 @@ class CqueryLanguageClient extends (_LspLanguageService || _load_LspLanguageServ
 
     return (0, _asyncToGenerator.default)(function* () {
       // identical to vscode extension, https://git.io/vbUbQ
-      _this4._lspConnection._jsonRpcConnection.sendNotification('$cquery/freshenIndex');
+      _this4._lspConnection._jsonRpcConnection.sendNotification('$cquery/freshenIndex', {});
     })();
   }
 

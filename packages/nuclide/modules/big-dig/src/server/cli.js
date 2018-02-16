@@ -15,7 +15,8 @@ var _asyncToGenerator = _interopRequireDefault(require('async-to-generator'));
  */
 let parseArgsAndRunMain = exports.parseArgsAndRunMain = (() => {
   var _ref = (0, _asyncToGenerator.default)(function* (absolutePathToServerMain) {
-    const params = JSON.parse(process.argv[2]);
+    // All arguments expect for the last one are ignored.
+    const params = JSON.parse(process.argv[process.argv.length - 1]);
     const { cname, expiration, jsonOutputFile } = params;
     let { port } = params;
     if (typeof cname !== 'string') {

@@ -11,8 +11,6 @@ exports.deactivate = deactivate;
 exports.consumeBlameProvider = consumeBlameProvider;
 exports.addItemsToFileTreeContextMenu = addItemsToFileTreeContextMenu;
 
-var _atom = require('atom');
-
 var _BlameGutter;
 
 function _load_BlameGutter() {
@@ -248,7 +246,7 @@ class Activation {
 
   consumeBlameProvider(provider) {
     this._registeredProviders.add(provider);
-    return new _atom.Disposable(() => {
+    return new (_UniversalDisposable || _load_UniversalDisposable()).default(() => {
       if (this._registeredProviders) {
         this._registeredProviders.delete(provider);
       }
@@ -279,7 +277,7 @@ class Activation {
     // We don't need to dispose of the contextDisposable when the provider is disabled -
     // it needs to be handled by the provider itself. We only should remove it from the list
     // of the disposables we maintain.
-    return new _atom.Disposable(() => this._packageDisposables.remove(contextDisposable));
+    return new (_UniversalDisposable || _load_UniversalDisposable()).default(() => this._packageDisposables.remove(contextDisposable));
   }
 }
 

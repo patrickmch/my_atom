@@ -8,8 +8,6 @@ exports.activate = activate;
 exports.deactivate = deactivate;
 exports.addItemsToFileTreeContextMenu = addItemsToFileTreeContextMenu;
 
-var _atom = require('atom');
-
 var _featureConfig;
 
 function _load_featureConfig() {
@@ -88,20 +86,19 @@ function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj;
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-/**
- * Copyright (c) 2015-present, Facebook, Inc.
- * All rights reserved.
- *
- * This source code is licensed under the license found in the LICENSE file in
- * the root directory of this source tree.
- *
- * 
- * @format
- */
+const SHOW_LOG_FILE_TREE_CONTEXT_MENU_PRIORITY = 500; /**
+                                                       * Copyright (c) 2015-present, Facebook, Inc.
+                                                       * All rights reserved.
+                                                       *
+                                                       * This source code is licensed under the license found in the LICENSE file in
+                                                       * the root directory of this source tree.
+                                                       *
+                                                       * 
+                                                       * @format
+                                                       */
 
 // TODO: Make it possible to move or split a pane with a VcsLogPaneItem.
 
-const SHOW_LOG_FILE_TREE_CONTEXT_MENU_PRIORITY = 500;
 const NUM_LOG_RESULTS = 100;
 
 const CONTEXT_MENU_LABEL = 'Show history';
@@ -193,7 +190,7 @@ class Activation {
     // We don't need to dispose of the contextDisposable when the provider is disabled -
     // it needs to be handled by the provider itself. We only should remove it from the list
     // of the disposables we maintain.
-    return new _atom.Disposable(() => this._subscriptions.remove(contextDisposable));
+    return new (_UniversalDisposable || _load_UniversalDisposable()).default(() => this._subscriptions.remove(contextDisposable));
   }
 
   dispose() {

@@ -18,10 +18,10 @@ function _load_UniversalDisposable() {
   return _UniversalDisposable = _interopRequireDefault(require('nuclide-commons/UniversalDisposable'));
 }
 
-var _DebuggerStore;
+var _constants;
 
-function _load_DebuggerStore() {
-  return _DebuggerStore = require('./DebuggerStore');
+function _load_constants() {
+  return _constants = require('./constants');
 }
 
 var _CommandDispatcher;
@@ -135,15 +135,15 @@ class Bridge {
 
     this._debuggerModel = debuggerModel;
     this._suppressBreakpointSync = false;
-    this._commandDispatcher = new (_CommandDispatcher || _load_CommandDispatcher()).default(() => debuggerModel.getStore().getIsReadonlyTarget(), pausedEvent => {
-      const info = debuggerModel.getStore().getDebugProcessInfo();
+    this._commandDispatcher = new (_CommandDispatcher || _load_CommandDispatcher()).default(() => debuggerModel.getIsReadonlyTarget(), pausedEvent => {
+      const info = debuggerModel.getDebugProcessInfo();
       if (info != null) {
         return info.shouldFilterBreak(pausedEvent);
       }
       return false;
     });
     this._consoleEvent$ = new _rxjsBundlesRxMinJs.Subject();
-    this._disposables = new (_UniversalDisposable || _load_UniversalDisposable()).default(debuggerModel.getBreakpointStore().onUserChange(this._handleUserBreakpointChange.bind(this)));
+    this._disposables = new (_UniversalDisposable || _load_UniversalDisposable()).default(debuggerModel.onUserChange(this._handleUserBreakpointChange.bind(this)));
     const subscription = (0, (_AtomServiceContainer || _load_AtomServiceContainer()).registerConsoleLogging)('Debugger', this._consoleEvent$);
     if (subscription != null) {
       this._disposables.add(subscription);
@@ -194,7 +194,7 @@ class Bridge {
   }
 
   runToLocation(filePath, line) {
-    const stopThreadId = this._debuggerModel.getThreadStore().getStopThread();
+    const stopThreadId = this._debuggerModel.getStopThread();
     const threadId = stopThreadId == null ? -1 : stopThreadId;
     this._clearInterfaceDelayed();
     this._commandDispatcher.send('RunToLocation', filePath, line, threadId);
@@ -231,10 +231,6 @@ class Bridge {
 
   setPauseOnCaughtException(pauseOnCaughtExceptionEnabled) {
     this._commandDispatcher.send('setPauseOnCaughtException', pauseOnCaughtExceptionEnabled);
-  }
-
-  setSingleThreadStepping(singleThreadStepping) {
-    this._commandDispatcher.send('setSingleThreadStepping', singleThreadStepping);
   }
 
   setShowDisassembly(disassembly) {
@@ -299,15 +295,14 @@ class Bridge {
   }
 
   _syncDebuggerState() {
-    const store = this._debuggerModel.getStore();
+    const store = this._debuggerModel;
     this.setPauseOnException(store.getTogglePauseOnException());
     this.setPauseOnCaughtException(store.getTogglePauseOnCaughtException());
-    this.setSingleThreadStepping(store.getEnableSingleThreadStepping());
     this.setShowDisassembly(store.getShowDisassembly());
   }
 
   _handleDebuggerPaused(options) {
-    this._debuggerModel.getActions().setDebuggerMode((_DebuggerStore || _load_DebuggerStore()).DebuggerMode.PAUSED);
+    this._debuggerModel.getActions().setDebuggerMode((_constants || _load_constants()).DebuggerMode.PAUSED);
     if (options != null) {
       if (options.stopThreadId != null) {
         this._handleStopThreadUpdate(options.stopThreadId);
@@ -318,11 +313,11 @@ class Bridge {
 
   _handleDebuggerResumed() {
     this._clearInterface();
-    this._debuggerModel.getActions().setDebuggerMode((_DebuggerStore || _load_DebuggerStore()).DebuggerMode.RUNNING);
+    this._debuggerModel.getActions().setDebuggerMode((_constants || _load_constants()).DebuggerMode.RUNNING);
   }
 
   _handleLoaderBreakpointResumed() {
-    this._debuggerModel.getStore().loaderBreakpointResumed();
+    this._debuggerModel.loaderBreakpointResumed();
   }
 
   _clearInterfaceDelayed() {
@@ -424,7 +419,7 @@ class Bridge {
     // Send an array of file/line objects.
     if (!this._suppressBreakpointSync) {
       const results = [];
-      this._debuggerModel.getBreakpointStore().getAllBreakpoints().forEach(breakpoint => {
+      this._debuggerModel.getAllBreakpoints().forEach(breakpoint => {
         results.push({
           sourceURL: (_nuclideUri || _load_nuclideUri()).default.nuclideUriToUri(breakpoint.path),
           lineNumber: breakpoint.line,

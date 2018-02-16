@@ -84,6 +84,12 @@ function _load_removeProjectPath() {
   return _removeProjectPath = _interopRequireDefault(require('../../commons-atom/removeProjectPath'));
 }
 
+var _systemInfo;
+
+function _load_systemInfo() {
+  return _systemInfo = require('../../commons-node/system-info');
+}
+
 var _UniversalDisposable;
 
 function _load_UniversalDisposable() {
@@ -96,7 +102,11 @@ function _load_Constants() {
   return _Constants = require('./Constants');
 }
 
-var _atom = require('atom');
+var _log4js;
+
+function _load_log4js() {
+  return _log4js = require('log4js');
+}
 
 var _os = _interopRequireDefault(require('os'));
 
@@ -106,20 +116,19 @@ function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj;
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-/**
- * Copyright (c) 2015-present, Facebook, Inc.
- * All rights reserved.
- *
- * This source code is licensed under the license found in the LICENSE file in
- * the root directory of this source tree.
- *
- * 
- * @format
- */
+// $FlowFixMe(>=0.53.0) Flow suppress
+const logger = (0, (_log4js || _load_log4js()).getLogger)('nuclide-file-tree'); /**
+                                                                                 * Copyright (c) 2015-present, Facebook, Inc.
+                                                                                 * All rights reserved.
+                                                                                 *
+                                                                                 * This source code is licensed under the license found in the LICENSE file in
+                                                                                 * the root directory of this source tree.
+                                                                                 *
+                                                                                 * 
+                                                                                 * @format
+                                                                                 */
 
 const VALID_FILTER_CHARS = '!#./0123456789-:;?@ABCDEFGHIJKLMNOPQRSTUVWXYZ' + '_abcdefghijklmnopqrstuvwxyz~';
-// $FlowFixMe(>=0.53.0) Flow suppress
-
 
 class ProjectSelectionManager {
 
@@ -130,7 +139,7 @@ class ProjectSelectionManager {
 
   addExtraContent(content) {
     this._actions.addExtraProjectSelectionContent(content);
-    return new _atom.Disposable(() => this._actions.removeExtraProjectSelectionContent(content));
+    return new (_UniversalDisposable || _load_UniversalDisposable()).default(() => this._actions.removeExtraProjectSelectionContent(content));
   }
 
   getExtraContent() {
@@ -484,7 +493,8 @@ class FileTreeController {
         const nodePath = (_FileTreeHelpers || _load_FileTreeHelpers()).default.keyToPath(node.uri);
         const parentOfRoot = (_nuclideUri || _load_nuclideUri()).default.dirname(node.rootUri);
 
-        return (_nuclideUri || _load_nuclideUri()).default.relative(parentOfRoot, nodePath);
+        // Fix Windows paths to avoid end of filename truncation
+        return (0, (_systemInfo || _load_systemInfo()).isRunningInWindows)() ? (_nuclideUri || _load_nuclideUri()).default.relative(parentOfRoot, nodePath).replace(/\//g, '\\') : (_nuclideUri || _load_nuclideUri()).default.relative(parentOfRoot, nodePath);
       });
       const message = 'Are you sure you want to delete the following ' + (nodes.size > 1 ? 'items?' : 'item?');
       atom.confirm({
@@ -591,6 +601,7 @@ class FileTreeController {
     return (0, _asyncToGenerator.default)(function* () {
       const rootNode = _this._store.getSingleSelectedNode();
       if (rootNode != null && rootNode.isRoot) {
+        logger.info('Removing project path via file tree', rootNode);
         yield (0, (_removeProjectPath || _load_removeProjectPath()).default)(rootNode.uri);
       }
     })();

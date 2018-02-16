@@ -28,7 +28,7 @@ function _load_Checkbox() {
 var _MultiSelectList;
 
 function _load_MultiSelectList() {
-  return _MultiSelectList = require('./MultiSelectList');
+  return _MultiSelectList = require('nuclide-commons-ui/MultiSelectList');
 }
 
 function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }

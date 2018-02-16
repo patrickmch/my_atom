@@ -44,6 +44,12 @@ function _load_util() {
   return _util = require('../utils/util');
 }
 
+var _lspUtils;
+
+function _load_lspUtils() {
+  return _lspUtils = require('../../../nuclide-lsp-implementation-common/lsp-utils');
+}
+
 var _simpleTextBuffer;
 
 function _load_simpleTextBuffer() {
@@ -60,19 +66,21 @@ function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj;
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
+/**
+ * Copyright (c) 2015-present, Facebook, Inc.
+ * All rights reserved.
+ *
+ * This source code is licensed under the license found in the LICENSE file in
+ * the root directory of this source tree.
+ *
+ * 
+ * @format
+ */
+
 const babylonOptions = exports.babylonOptions = {
   sourceType: 'module',
   plugins: ['jsx', 'flow', 'exportExtensions', 'objectRestSpread', 'classProperties']
-}; /**
-    * Copyright (c) 2015-present, Facebook, Inc.
-    * All rights reserved.
-    *
-    * This source code is licensed under the license found in the LICENSE file in
-    * the root directory of this source tree.
-    *
-    * 
-    * @format
-    */
+};
 
 const logger = (0, (_log4js || _load_log4js()).getLogger)();
 
@@ -157,7 +165,7 @@ class AutoImportsManager {
     return suggestedImports.filter(suggestedImport => {
       // We use intersectsWith instead of containsRange to be compatible with clients
       // like VSCode which may request small ranges (the range of the current word).
-      return (_simpleTextBuffer || _load_simpleTextBuffer()).Range.fromObject((0, (_util || _load_util()).lspRangeToAtomRange)(range)).intersectsWith((0, (_util || _load_util()).babelLocationToAtomRange)(suggestedImport.symbol.location), true);
+      return (_simpleTextBuffer || _load_simpleTextBuffer()).Range.fromObject((0, (_lspUtils || _load_lspUtils()).lspRangeToAtomRange)(range)).intersectsWith((0, (_util || _load_util()).babelLocationToAtomRange)(suggestedImport.symbol.location), true);
     });
   }
 }

@@ -42,6 +42,7 @@ let findNearestBuildFile = exports.findNearestBuildFile = (() => {
 })();
 
 exports.getBuildFileName = getBuildFileName;
+exports.getCellLocation = getCellLocation;
 
 var _nuclideUri;
 
@@ -109,4 +110,23 @@ function getBuildFileName(buckRoot) {
   .then(result => result || DEFAULT_BUILD_FILE_NAME);
   buildFileNameCache.set(buckRoot, buildFileName);
   return buildFileName;
+}
+
+const cellLocationCache = new Map();
+/**
+ * @return path of the provided cell from .buckconfig.
+ */
+function getCellLocation(buckRoot, cellName) {
+  const cacheKey = buckRoot + '->' + cellName;
+  const cachedLocation = cellLocationCache.get(cacheKey);
+  if (cachedLocation != null) {
+    return cachedLocation;
+  }
+  const buckService = (0, (_nuclideRemoteConnection || _load_nuclideRemoteConnection()).getBuckServiceByNuclideUri)(buckRoot);
+  const cellLocation = buckService.getBuckConfig(buckRoot, 'repositories', cellName).catch(error => {
+    (0, (_log4js || _load_log4js()).getLogger)('nuclide-buck').error(`Error trying to find the location of '${cellName}' for Buck project '${buckRoot}'`, error);
+    return '';
+  }).then(result => result == null ? '' : result);
+  cellLocationCache.set(cacheKey, cellLocation);
+  return cellLocation;
 }

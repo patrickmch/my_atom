@@ -7,6 +7,24 @@ exports.COMPILATION_DATABASE_FILE = undefined;
 
 var _asyncToGenerator = _interopRequireDefault(require('async-to-generator'));
 
+var _fsPromise;
+
+function _load_fsPromise() {
+  return _fsPromise = _interopRequireDefault(require('nuclide-commons/fsPromise'));
+}
+
+var _nuclideUri;
+
+function _load_nuclideUri() {
+  return _nuclideUri = _interopRequireDefault(require('nuclide-commons/nuclideUri'));
+}
+
+var _process;
+
+function _load_process() {
+  return _process = require('nuclide-commons/process');
+}
+
 var _UniversalDisposable;
 
 function _load_UniversalDisposable() {
@@ -57,22 +75,20 @@ function _load_CqueryProjectManager() {
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-/**
- * Copyright (c) 2015-present, Facebook, Inc.
- * All rights reserved.
- *
- * This source code is licensed under the license found in the LICENSE file in
- * the root directory of this source tree.
- *
- * 
- * @format
- */
-
-const COMPILATION_DATABASE_FILE = exports.COMPILATION_DATABASE_FILE = 'compile_commands.json';
+const COMPILATION_DATABASE_FILE = exports.COMPILATION_DATABASE_FILE = 'compile_commands.json'; /**
+                                                                                                * Copyright (c) 2015-present, Facebook, Inc.
+                                                                                                * All rights reserved.
+                                                                                                *
+                                                                                                * This source code is licensed under the license found in the LICENSE file in
+                                                                                                * the root directory of this source tree.
+                                                                                                *
+                                                                                                * 
+                                                                                                * @format
+                                                                                                */
 
 class CqueryLanguageServer extends (_nuclideLanguageServiceRpc || _load_nuclideLanguageServiceRpc()).MultiProjectLanguageService {
   // Maps clang settings => settings metadata with same key as _processes field.
-  constructor(languageId, command, logger, fileCache, host) {
+  constructor(languageId, command, logger, fileCache, host, enableLibclangLogs) {
     super();
 
     this._disposables = new (_UniversalDisposable || _load_UniversalDisposable()).default();
@@ -83,7 +99,7 @@ class CqueryLanguageServer extends (_nuclideLanguageServiceRpc || _load_nuclideL
     this._logger = logger;
     this._projectManager = new (_CqueryProjectManager || _load_CqueryProjectManager()).CqueryProjectManager(logger);
 
-    this._processes = new (_cache || _load_cache()).Cache(projectKey => this._createCqueryLanguageClient(projectKey), value => {
+    this._processes = new (_cache || _load_cache()).Cache(projectKey => this._createCqueryLanguageClient(projectKey, enableLibclangLogs), value => {
       value.then(service => {
         if (service != null) {
           service.dispose();
@@ -103,7 +119,7 @@ class CqueryLanguageServer extends (_nuclideLanguageServiceRpc || _load_nuclideL
     super.dispose();
   }
 
-  _createCqueryLanguageClient(projectKey) {
+  _createCqueryLanguageClient(projectKey, enableLibclangLogs) {
     var _this = this;
 
     return (0, _asyncToGenerator.default)(function* () {
@@ -121,9 +137,15 @@ class CqueryLanguageServer extends (_nuclideLanguageServiceRpc || _load_nuclideL
 
       const [, host] = yield Promise.all([_this.hasObservedDiagnostics(), (0, (_nuclideLanguageServiceRpc || _load_nuclideLanguageServiceRpc()).forkHostServices)(_this._host, _this._logger)]);
 
-      const lsp = new (_CqueryLanguageClient || _load_CqueryLanguageClient()).CqueryLanguageClient(_this._logger, _this._fileCache, host, _this._languageId, _this._command, ['--language-server', '--log-file', `${initalizationOptions.cacheDirectory}/diagnostics`], // args
-      {}, // spawnOptions
-      project.projectRoot, ['.cpp', '.h', '.hpp', '.cc', '.m', 'mm'], initalizationOptions, 5 * 60 * 1000);
+      const stderrFd = yield (_fsPromise || _load_fsPromise()).default.open((_nuclideUri || _load_nuclideUri()).default.join(initalizationOptions.cacheDirectory, '..', 'stderr'), 'a');
+      const spawnOptions = {
+        stdio: ['pipe', 'pipe', stderrFd],
+        env: Object.assign({}, (yield (0, (_process || _load_process()).getOriginalEnvironment)()))
+      };
+      if (enableLibclangLogs) {
+        spawnOptions.env.LIBCLANG_LOGGING = 1;
+      }
+      const lsp = new (_CqueryLanguageClient || _load_CqueryLanguageClient()).CqueryLanguageClient(_this._logger, _this._fileCache, host, _this._languageId, _this._command, ['--language-server', '--log-file', (_nuclideUri || _load_nuclideUri()).default.join(initalizationOptions.cacheDirectory, '..', 'diagnostics')], spawnOptions, project.projectRoot, ['.cpp', '.h', '.hpp', '.cc', '.m', 'mm'], initalizationOptions, 5 * 60 * 1000);
 
       lsp.start(); // Kick off 'Initializing'...
       return lsp;

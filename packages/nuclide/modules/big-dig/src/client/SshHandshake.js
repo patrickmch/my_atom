@@ -53,12 +53,6 @@ function _load_lookupPreferIpV() {
   return _lookupPreferIpV = _interopRequireDefault(require('./lookup-prefer-ip-v6'));
 }
 
-var _createBigDigClient;
-
-function _load_createBigDigClient() {
-  return _createBigDigClient = _interopRequireDefault(require('./createBigDigClient'));
-}
-
 var _events;
 
 function _load_events() {
@@ -73,21 +67,19 @@ function _load_RemotePackage() {
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-// TODO
-function restoreBigDigClient(address) {} /**
-                                          * Copyright (c) 2017-present, Facebook, Inc.
-                                          * All rights reserved.
-                                          *
-                                          * This source code is licensed under the BSD-style license found in the
-                                          * LICENSE file in the root directory of this source tree. An additional grant
-                                          * of patent rights can be found in the PATENTS file in the same directory.
-                                          *
-                                          * 
-                                          * @format
-                                          */
-
 // Sync word and regex pattern for parsing command stdout.
-const READY_TIMEOUT_MS = 120 * 1000;
+const READY_TIMEOUT_MS = 120 * 1000; /**
+                                      * Copyright (c) 2017-present, Facebook, Inc.
+                                      * All rights reserved.
+                                      *
+                                      * This source code is licensed under the BSD-style license found in the
+                                      * LICENSE file in the root directory of this source tree. An additional grant
+                                      * of patent rights can be found in the PATENTS file in the same directory.
+                                      *
+                                      * 
+                                      * @format
+                                      */
+
 const SFTP_TIMEOUT_MS = 20 * 1000;
 
 // Automatically retry with a password prompt if existing authentication methods fail.
@@ -108,7 +100,6 @@ const ErrorType = Object.freeze({
   SSH_AUTHENTICATION: 'SSH_AUTHENTICATION',
   DIRECTORY_NOT_FOUND: 'DIRECTORY_NOT_FOUND',
   SERVER_START_FAILED: 'SERVER_START_FAILED',
-  SERVER_CANNOT_CONNECT: 'SERVER_CANNOT_CONNECT',
   SFTP_TIMEOUT: 'SFTP_TIMEOUT',
   UNSUPPORTED_AUTH_METHOD: 'UNSUPPORTED_AUTH_METHOD',
   USER_CANCELLED: 'USER_CANCELLED',
@@ -193,8 +184,9 @@ class SshHandshake {
     this._delegate.onWillConnect(this._config);
   }
 
-  _didConnect(connection) {
-    this._delegate.onDidConnect(connection, this._config);
+  _didConnect(config) {
+    this._delegate.onDidConnect(config, this._config);
+    return config;
   }
 
   _userPromptSingle(prompt) {
@@ -391,16 +383,6 @@ class SshHandshake {
           address = yield (0, (_lookupPreferIpV || _load_lookupPreferIpV()).default)(config.host);
         } catch (error) {
           throw new SshHandshakeError('Failed to resolve DNS.', SshHandshake.ErrorType.HOST_NOT_FOUND, error);
-        }
-
-        const connection = (yield restoreBigDigClient(config.host)) || (
-        // We save connections by their IP address as well, in case a different hostname
-        // was used for the same server.
-        yield restoreBigDigClient(address));
-
-        if (connection) {
-          _this4._didConnect(connection);
-          return [connection, _this4._config];
         }
 
         const connectConfig = yield _this4._getConnectConfig(address, config);
@@ -674,7 +656,7 @@ class SshHandshake {
           throw new Error('Invariant violation: "this._remoteHost"');
         }
 
-        return _this11._establishBigDigClient({
+        return _this11._didConnect({
           host: _this11._remoteHost,
           port: _this11._remotePort,
           certificateAuthorityCertificate: _this11._certificateAuthorityCertificate,
@@ -695,36 +677,11 @@ class SshHandshake {
           throw new Error('Invariant violation: "localPort"');
         }
 
-        return _this11._establishBigDigClient({
+        return _this11._didConnect({
           host: 'localhost',
           port: localPort
         });
       }
-    })();
-  }
-
-  /**
-   * Now that the remote server has been started, create the BigDigClient to talk to it and
-   * pass it to the _didConnect() callback.
-   */
-  _establishBigDigClient(config) {
-    var _this12 = this;
-
-    return (0, _asyncToGenerator.default)(function* () {
-      let bigDigClient = null;
-      try {
-        bigDigClient = yield (0, (_createBigDigClient || _load_createBigDigClient()).default)(config);
-      } catch (error) {
-        throw new SshHandshakeError('Connection check failed', SshHandshake.ErrorType.SERVER_CANNOT_CONNECT, error);
-      }
-
-      _this12._didConnect(bigDigClient);
-      // If we are secure then we don't need the ssh tunnel.
-      if (_this12._isSecure()) {
-        yield _this12._connection.end();
-      }
-
-      return bigDigClient;
     })();
   }
 
@@ -765,13 +722,13 @@ function decorateSshConnectionDelegateWithTracking(delegate) {
       connectionTracker = new (_ConnectionTracker || _load_ConnectionTracker()).default(config);
       delegate.onWillConnect(config);
     },
-    onDidConnect: (connection, config) => {
+    onDidConnect: (remoteConnectionConfig, config) => {
       if (!connectionTracker) {
         throw new Error('Invariant violation: "connectionTracker"');
       }
 
       connectionTracker.trackSuccess();
-      delegate.onDidConnect(connection, config);
+      delegate.onDidConnect(remoteConnectionConfig, config);
     },
     onError: (errorType, error, config) => {
       if (!connectionTracker) {

@@ -1,6 +1,6 @@
 [
   {
-    title: "CMS"
+    title: "2792-search-string-details-page"
     group: "NOLS CMS"
     paths: [
       "/Users/mchey/code/cms"
@@ -8,12 +8,12 @@
     icon: "icon-heart"
   }
   {
-    title: "Website"
-    group: "NOLS Website"
+    title: "styleguide"
+    group: "CMS"
     paths: [
-      "/Users/mchey/code/website"
+      "/Users/mchey/code/cms/client"
     ]
-    icon: "icon-zap"
+    icon: "icon-ruby"
   }
   {
     title: "Atom Mgmt"
@@ -30,11 +30,41 @@
     icon: "icon-hubot"
   }
   {
-    title: "Tes"
+    title: "staffing-wrap-tests"
+    group: "NOLS Website"
     paths: [
-      "/Users/mchey/code/website/nols_website/core/admin.py",
-      "/Users/mchey/code/website/forms.py"
+      "/Users/mchey/code/website/nols_website/staffing/views.py"
+      "/Users/mchey/code/website/nols_website/staffing/tests.py"
+      "/Users/mchey/code/website/nols_website/alumni/tests.py"
+      "/Users/mchey/code/website/nols_website/admissions/tests/test_open_app.py"
+      "/Users/mchey/code/website/nols_website/website/gui_tests/page_objects/test_tools.py"
+      "/Users/mchey/code/website/nols_website/admissions/dashboard/tests.py"
+      "/Users/mchey/code/website/nols_website/staffing/models.py"
+      "/Users/mchey/code/website/nols_website/website/tests.py"
+      "/Users/mchey/code/website_core/nols_model_core/src/nols/model/core/entity/entity_classification.py"
+      "/Users/mchey/code/website_core/nols_model_core/src/nols/model/core/entity/person.py"
+      "/Users/mchey/code/website_core/nols_model_core/src/nols/model/core/entity/entity.py"
+      "/Users/mchey/code/website_core/nols_model_core/src/nols/model/core/data_access.py"
+      "/Users/mchey/code/website_core/nols_model_core/src/nols/model/core/manager_base.py"
+      "/Users/mchey/code/website_core/nols_model_core/src/nols/model/core/entity/entity_manager.py"
+      "/Users/mchey/code/website/nols_website/core/models.py"
+      "/Users/mchey/code/website/nols_website/staffing/utils.py"
     ]
-    icon: "icon-squirrel"
+    icon: "icon-calendar"
+  }
+  {
+    title: "styleguide"
+    group: "styleguide"
+    paths: [
+      "/Users/mchey/code/website/client"
+    ]
+    icon: "icon-book"
+  }
+  {
+    title: "Staffing Tests"
+    group: "Website"
+    paths: [
+      "/Users/mchey/code/website"
+    ]
   }
 ]

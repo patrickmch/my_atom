@@ -29,161 +29,145 @@ let getPythonScriptLaunchProcessInfo = exports.getPythonScriptLaunchProcessInfo 
   };
 })();
 
-let getNodeBinaryPath = (() => {
-  var _ref3 = (0, _asyncToGenerator.default)(function* (path) {
-    try {
-      // $FlowFB
-      return require('./fb-config').getNodeBinaryPath(path);
-    } catch (error) {
-      return 'node';
-    }
-  });
-
-  return function getNodeBinaryPath(_x8) {
-    return _ref3.apply(this, arguments);
-  };
-})();
-
 let getAdapterExecutableWithProperNode = (() => {
-  var _ref4 = (0, _asyncToGenerator.default)(function* (adapterType, path) {
+  var _ref3 = (0, _asyncToGenerator.default)(function* (adapterType, path) {
     const service = (0, (_nuclideRemoteConnection || _load_nuclideRemoteConnection()).getRemoteDebuggerCommandServiceByNuclideUri)(path);
     const adapterInfo = yield service.getAdapterExecutableInfo(adapterType);
 
     if (adapterInfo.command === 'node') {
-      adapterInfo.command = yield getNodeBinaryPath(path);
+      adapterInfo.command = yield (0, (_nodeInfo || _load_nodeInfo()).getNodeBinaryPath)(path);
     }
 
     return adapterInfo;
   });
 
-  return function getAdapterExecutableWithProperNode(_x9, _x10) {
-    return _ref4.apply(this, arguments);
+  return function getAdapterExecutableWithProperNode(_x8, _x9) {
+    return _ref3.apply(this, arguments);
   };
 })();
 
 let getPythonAdapterInfo = (() => {
-  var _ref5 = (0, _asyncToGenerator.default)(function* (path) {
+  var _ref4 = (0, _asyncToGenerator.default)(function* (path) {
     return getAdapterExecutableWithProperNode('python', path);
   });
 
-  return function getPythonAdapterInfo(_x11) {
-    return _ref5.apply(this, arguments);
+  return function getPythonAdapterInfo(_x10) {
+    return _ref4.apply(this, arguments);
   };
 })();
 
 let getPythonAttachTargetProcessInfo = (() => {
-  var _ref6 = (0, _asyncToGenerator.default)(function* (targetRootUri, target) {
+  var _ref5 = (0, _asyncToGenerator.default)(function* (targetRootUri, target) {
     return new (_VspProcessInfo || _load_VspProcessInfo()).default(targetRootUri, 'attach', (_main || _load_main()).VsAdapterTypes.PYTHON, (yield getPythonAdapterInfo(targetRootUri)), true, // showThreads
     getPythonAttachTargetConfig(target));
   });
 
-  return function getPythonAttachTargetProcessInfo(_x12, _x13) {
-    return _ref6.apply(this, arguments);
+  return function getPythonAttachTargetProcessInfo(_x11, _x12) {
+    return _ref5.apply(this, arguments);
   };
 })();
 
 let getPrepackLaunchProcessInfo = exports.getPrepackLaunchProcessInfo = (() => {
-  var _ref7 = (0, _asyncToGenerator.default)(function* (scriptPath, prepackPath, args) {
+  var _ref6 = (0, _asyncToGenerator.default)(function* (scriptPath, prepackPath, args) {
     const adapterInfo = yield getPrepackAdapterInfo(scriptPath);
     return new (_VspProcessInfo || _load_VspProcessInfo()).default(scriptPath, 'launch', (_main || _load_main()).VsAdapterTypes.PREPACK, adapterInfo, false, getPrepackScriptConfig(scriptPath, prepackPath, args));
   });
 
-  return function getPrepackLaunchProcessInfo(_x14, _x15, _x16) {
-    return _ref7.apply(this, arguments);
+  return function getPrepackLaunchProcessInfo(_x13, _x14, _x15) {
+    return _ref6.apply(this, arguments);
   };
 })();
 
 let getPrepackAdapterInfo = (() => {
-  var _ref8 = (0, _asyncToGenerator.default)(function* (path) {
+  var _ref7 = (0, _asyncToGenerator.default)(function* (path) {
     return getAdapterExecutableWithProperNode('prepack', path);
   });
 
-  return function getPrepackAdapterInfo(_x17) {
-    return _ref8.apply(this, arguments);
+  return function getPrepackAdapterInfo(_x16) {
+    return _ref7.apply(this, arguments);
   };
 })();
 
 let getNodeLaunchProcessInfo = exports.getNodeLaunchProcessInfo = (() => {
-  var _ref9 = (0, _asyncToGenerator.default)(function* (scriptPath, nodePath, args, cwd, env, outFiles) {
+  var _ref8 = (0, _asyncToGenerator.default)(function* (scriptPath, nodePath, args, cwd, env, outFiles) {
     const adapterInfo = yield getNodeAdapterInfo(scriptPath);
     return new (_VspProcessInfo || _load_VspProcessInfo()).default(scriptPath, 'launch', (_main || _load_main()).VsAdapterTypes.NODE, adapterInfo, false, // showThreads
     getNodeScriptConfig(scriptPath, nodePath.length > 0 ? nodePath : adapterInfo.command, cwd, args, env, outFiles));
   });
 
-  return function getNodeLaunchProcessInfo(_x18, _x19, _x20, _x21, _x22, _x23) {
-    return _ref9.apply(this, arguments);
+  return function getNodeLaunchProcessInfo(_x17, _x18, _x19, _x20, _x21, _x22) {
+    return _ref8.apply(this, arguments);
   };
 })();
 
 let getOCamlLaunchProcessInfo = exports.getOCamlLaunchProcessInfo = (() => {
-  var _ref10 = (0, _asyncToGenerator.default)(function* (targetUri, launchTarget) {
+  var _ref9 = (0, _asyncToGenerator.default)(function* (targetUri, launchTarget) {
     const adapterInfo = yield getAdapterExecutableWithProperNode('ocaml', targetUri);
     return new (_VspProcessInfo || _load_VspProcessInfo()).default(targetUri, 'launch', (_main || _load_main()).VsAdapterTypes.OCAML, adapterInfo, false, // showThreads
     { config: launchTarget });
   });
 
-  return function getOCamlLaunchProcessInfo(_x24, _x25) {
-    return _ref10.apply(this, arguments);
+  return function getOCamlLaunchProcessInfo(_x23, _x24) {
+    return _ref9.apply(this, arguments);
   };
 })();
 
 let getNodeAttachProcessInfo = exports.getNodeAttachProcessInfo = (() => {
-  var _ref11 = (0, _asyncToGenerator.default)(function* (targetUri, port) {
+  var _ref10 = (0, _asyncToGenerator.default)(function* (targetUri, port) {
     const adapterInfo = yield getNodeAdapterInfo(targetUri);
     return new (_VspProcessInfo || _load_VspProcessInfo()).default(targetUri, 'attach', (_main || _load_main()).VsAdapterTypes.NODE, adapterInfo, false, // showThreads
     getAttachNodeConfig(port));
   });
 
-  return function getNodeAttachProcessInfo(_x26, _x27) {
-    return _ref11.apply(this, arguments);
+  return function getNodeAttachProcessInfo(_x25, _x26) {
+    return _ref10.apply(this, arguments);
   };
 })();
 
 let getNodeAdapterInfo = (() => {
-  var _ref12 = (0, _asyncToGenerator.default)(function* (path) {
+  var _ref11 = (0, _asyncToGenerator.default)(function* (path) {
     return getAdapterExecutableWithProperNode('node', path);
   });
 
-  return function getNodeAdapterInfo(_x28) {
-    return _ref12.apply(this, arguments);
+  return function getNodeAdapterInfo(_x27) {
+    return _ref11.apply(this, arguments);
   };
 })();
 
 let getReactNativeAttachProcessInfo = exports.getReactNativeAttachProcessInfo = (() => {
-  var _ref13 = (0, _asyncToGenerator.default)(function* (args) {
+  var _ref12 = (0, _asyncToGenerator.default)(function* (args) {
     const adapterInfo = yield getReactNativeAdapterInfo(args.program);
     return new (_VspProcessInfo || _load_VspProcessInfo()).default(args.program, 'attach', (_main || _load_main()).VsAdapterTypes.REACT_NATIVE, adapterInfo, false, // showThreads
     args);
   });
 
-  return function getReactNativeAttachProcessInfo(_x29) {
-    return _ref13.apply(this, arguments);
+  return function getReactNativeAttachProcessInfo(_x28) {
+    return _ref12.apply(this, arguments);
   };
 })();
 
 let getReactNativeLaunchProcessInfo = exports.getReactNativeLaunchProcessInfo = (() => {
-  var _ref14 = (0, _asyncToGenerator.default)(function* (args) {
+  var _ref13 = (0, _asyncToGenerator.default)(function* (args) {
     const adapterInfo = yield getReactNativeAdapterInfo(args.program);
     return new (_VspProcessInfo || _load_VspProcessInfo()).default(args.program, 'launch', (_main || _load_main()).VsAdapterTypes.REACT_NATIVE, adapterInfo, false, // showThreads
     args);
   });
 
-  return function getReactNativeLaunchProcessInfo(_x30) {
-    return _ref14.apply(this, arguments);
+  return function getReactNativeLaunchProcessInfo(_x29) {
+    return _ref13.apply(this, arguments);
   };
 })();
 
 let getReactNativeAdapterInfo = (() => {
-  var _ref15 = (0, _asyncToGenerator.default)(function* (path) {
+  var _ref14 = (0, _asyncToGenerator.default)(function* (path) {
     return getAdapterExecutableWithProperNode('react-native', path);
   });
 
-  return function getReactNativeAdapterInfo(_x31) {
-    return _ref15.apply(this, arguments);
+  return function getReactNativeAdapterInfo(_x30) {
+    return _ref14.apply(this, arguments);
   };
 })();
 
-exports.getDebuggerService = getDebuggerService;
 exports.listenToRemoteDebugCommands = listenToRemoteDebugCommands;
 
 var _observable;
@@ -198,16 +182,16 @@ function _load_UniversalDisposable() {
   return _UniversalDisposable = _interopRequireDefault(require('nuclide-commons/UniversalDisposable'));
 }
 
+var _debugger;
+
+function _load_debugger() {
+  return _debugger = require('../../commons-atom/debugger');
+}
+
 var _VspProcessInfo;
 
 function _load_VspProcessInfo() {
   return _VspProcessInfo = _interopRequireDefault(require('./VspProcessInfo'));
-}
-
-var _VspProcessInfo2;
-
-function _load_VspProcessInfo2() {
-  return _VspProcessInfo2 = require('./VspProcessInfo');
 }
 
 var _nuclideUri;
@@ -226,12 +210,6 @@ var _nuclideRemoteConnection;
 
 function _load_nuclideRemoteConnection() {
   return _nuclideRemoteConnection = require('../../nuclide-remote-connection');
-}
-
-var _consumeFirstProvider;
-
-function _load_consumeFirstProvider() {
-  return _consumeFirstProvider = _interopRequireDefault(require('../../commons-atom/consumeFirstProvider'));
 }
 
 var _log4js;
@@ -254,20 +232,27 @@ function _load_systemInfo() {
   return _systemInfo = require('../../commons-node/system-info');
 }
 
+var _nodeInfo;
+
+function _load_nodeInfo() {
+  return _nodeInfo = require('../../commons-node/node-info');
+}
+
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-// eslint-disable-next-line rulesdir/no-unresolved
-const DEFAULT_DEBUG_OPTIONS = new Set(['WaitOnAbnormalExit', 'WaitOnNormalExit', 'RedirectOutput']); /**
-                                                                                                      * Copyright (c) 2015-present, Facebook, Inc.
-                                                                                                      * All rights reserved.
-                                                                                                      *
-                                                                                                      * This source code is licensed under the license found in the LICENSE file in
-                                                                                                      * the root directory of this source tree.
-                                                                                                      *
-                                                                                                      * 
-                                                                                                      * @format
-                                                                                                      */
+/**
+ * Copyright (c) 2015-present, Facebook, Inc.
+ * All rights reserved.
+ *
+ * This source code is licensed under the license found in the LICENSE file in
+ * the root directory of this source tree.
+ *
+ * 
+ * @format
+ */
 
+const DEFAULT_DEBUG_OPTIONS = new Set(['WaitOnAbnormalExit', 'WaitOnNormalExit', 'RedirectOutput']);
+// eslint-disable-next-line rulesdir/no-unresolved
 const REACT_NATIVE_PACKAGER_DEFAULT_PORT = exports.REACT_NATIVE_PACKAGER_DEFAULT_PORT = 8081;
 
 // Delay starting the remote debug server to avoid affecting Nuclide's startup.
@@ -311,10 +296,6 @@ function getPythonAttachTargetConfig(target) {
     port: target.port,
     host: '127.0.0.1'
   };
-}
-
-function getDebuggerService() {
-  return (0, (_consumeFirstProvider || _load_consumeFirstProvider()).default)('nuclide-debugger.remote');
 }
 
 function rootUriOfConnection(connection) {
@@ -377,27 +358,23 @@ function listenToRemoteDebugCommands() {
       return _rxjsBundlesRxMinJs.Observable.empty();
     }).map(command => ({ rootUri, command }));
   }).let((0, (_observable || _load_observable()).fastDebounce)(500)).subscribe((() => {
-    var _ref16 = (0, _asyncToGenerator.default)(function* ({ rootUri, command }) {
+    var _ref15 = (0, _asyncToGenerator.default)(function* ({ rootUri, command }) {
       const attachProcessInfo = yield getPythonAttachTargetProcessInfo(rootUri, command.target);
-      const debuggerService = yield getDebuggerService();
-      const instance = debuggerService.getDebuggerInstance();
-      if (instance == null) {
+      const debuggerService = yield (0, (_debugger || _load_debugger()).getDebuggerService)();
+      const debuggerName = debuggerService.getCurrentDebuggerName();
+      if (debuggerName == null) {
         (0, (_nuclideAnalytics || _load_nuclideAnalytics()).track)('fb-python-debugger-auto-attach');
         debuggerService.startDebugging(attachProcessInfo);
         return;
-      } else if (instance.getProviderName() !== (_VspProcessInfo2 || _load_VspProcessInfo2()).VSP_DEBUGGER_SERVICE_NAME) {
+      } else {
         notifyOpenDebugSession();
         return;
-      }
-      const vspInfo = instance.getDebuggerProcessInfo();
-      if (vspInfo.getDebugMode() !== 'attach' || vspInfo.getAdapterType() !== (_main || _load_main()).VsAdapterTypes.PYTHON || vspInfo.getConfig().port !== command.target.port) {
-        notifyOpenDebugSession();
       }
       // Otherwise, we're already debugging that target.
     });
 
-    return function (_x32) {
-      return _ref16.apply(this, arguments);
+    return function (_x31) {
+      return _ref15.apply(this, arguments);
     };
   })()));
 }

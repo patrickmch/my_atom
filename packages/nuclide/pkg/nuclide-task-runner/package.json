@@ -3,6 +3,7 @@
   "main": "./lib/main.js",
   "version": "0.0.0",
   "description": "Run tasks from Nuclide.",
+  "author": "NEEDS OWNER",
   "atomTestRunner": "../../lib/test-runner-entry.js",
   "nuclide": {
     "packageType": "Atom",
@@ -32,9 +33,9 @@
         "0.0.0": "consumeCurrentWorkingDirectory"
       }
     },
-    "nuclide-console": {
+    "console": {
       "versions": {
-        "0.0.0": "consumeConsole"
+        "0.1.0": "consumeConsole"
       }
     }
   },

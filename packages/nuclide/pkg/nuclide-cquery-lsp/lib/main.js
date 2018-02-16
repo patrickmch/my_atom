@@ -9,7 +9,8 @@ let getConnection = (() => {
       fileNotifier,
       host,
       logCategory: 'cquery-language-server',
-      logLevel: 'WARN'
+      logLevel: 'WARN',
+      enableLibclangLogs: (_featureConfig || _load_featureConfig()).default.get('nuclide-cquery-lsp.enable-libclang-logs') === true
     });
     return cqueryService != null ? new CqueryLSPClient(cqueryService) : new (_nuclideLanguageServiceRpc || _load_nuclideLanguageServiceRpc()).NullLanguageService();
   });
@@ -42,6 +43,8 @@ var _UniversalDisposable;
 function _load_UniversalDisposable() {
   return _UniversalDisposable = _interopRequireDefault(require('nuclide-commons/UniversalDisposable'));
 }
+
+var _rxjsBundlesRxMinJs = require('rxjs/bundles/Rx.min.js');
 
 var _libclang;
 
@@ -87,12 +90,6 @@ function _load_utils() {
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-let _referencesViewService;
-
-// Wrapper that queries for clang settings when new files seen.
-
-// TODO pelmers: maybe don't import from libclang
-// eslint-disable-next-line rulesdir/no-cross-atom-imports
 /**
  * Copyright (c) 2015-present, Facebook, Inc.
  * All rights reserved.
@@ -104,6 +101,12 @@ let _referencesViewService;
  * @format
  */
 
+let _referencesViewService;
+
+// Wrapper that queries for clang settings when new files seen.
+
+// TODO pelmers: maybe don't import from libclang
+// eslint-disable-next-line rulesdir/no-cross-atom-imports
 class CqueryLSPClient {
 
   constructor(service) {
@@ -220,100 +223,97 @@ class CqueryLSPClient {
   }
 
   findReferences(fileVersion, position) {
-    var _this6 = this;
-
-    return (0, _asyncToGenerator.default)(function* () {
-      const project = yield _this6.ensureProject(fileVersion.filePath);
-      return project == null ? null : _this6._service.findReferences(fileVersion, position);
-    })();
+    return _rxjsBundlesRxMinJs.Observable.fromPromise(this.ensureProject(fileVersion.filePath)).concatMap(project => {
+      return project == null ? _rxjsBundlesRxMinJs.Observable.of(null) : this._service.findReferences(fileVersion, position).refCount();
+    }).publish();
   }
 
   getCoverage(filePath) {
-    var _this7 = this;
+    var _this6 = this;
 
     return (0, _asyncToGenerator.default)(function* () {
-      const project = yield _this7.ensureProject(filePath);
-      return project == null ? null : _this7._service.getCoverage(filePath);
+      const project = yield _this6.ensureProject(filePath);
+      return project == null ? null : _this6._service.getCoverage(filePath);
     })();
   }
 
   getOutline(fileVersion) {
-    var _this8 = this;
+    var _this7 = this;
 
     return (0, _asyncToGenerator.default)(function* () {
-      const project = yield _this8.ensureProject(fileVersion.filePath);
-      return project == null ? null : _this8._service.getOutline(fileVersion);
+      const project = yield _this7.ensureProject(fileVersion.filePath);
+      return project == null ? null : _this7._service.getOutline(fileVersion);
     })();
   }
 
   getCodeActions(fileVersion, range, diagnostics) {
-    var _this9 = this;
+    var _this8 = this;
 
     return (0, _asyncToGenerator.default)(function* () {
-      const project = yield _this9.ensureProject(fileVersion.filePath);
-      return project == null ? [] : _this9._service.getCodeActions(fileVersion, range, diagnostics);
+      const project = yield _this8.ensureProject(fileVersion.filePath);
+      return project == null ? [] : _this8._service.getCodeActions(fileVersion, range, diagnostics);
     })();
   }
 
   highlight(fileVersion, position) {
-    var _this10 = this;
+    var _this9 = this;
 
     return (0, _asyncToGenerator.default)(function* () {
-      const project = yield _this10.ensureProject(fileVersion.filePath);
-      return project == null ? null : _this10._service.highlight(fileVersion, position);
+      const project = yield _this9.ensureProject(fileVersion.filePath);
+      return project == null ? null : _this9._service.highlight(fileVersion, position);
     })();
   }
 
   formatSource(fileVersion, range, options) {
-    var _this11 = this;
+    var _this10 = this;
 
     return (0, _asyncToGenerator.default)(function* () {
-      const project = yield _this11.ensureProject(fileVersion.filePath);
-      return project == null ? null : _this11._service.formatSource(fileVersion, range, options);
+      const project = yield _this10.ensureProject(fileVersion.filePath);
+      return project == null ? null : _this10._service.formatSource(fileVersion, range, options);
     })();
   }
 
   formatAtPosition(fileVersion, position, triggerCharacter, options) {
-    var _this12 = this;
+    var _this11 = this;
 
     return (0, _asyncToGenerator.default)(function* () {
-      const project = yield _this12.ensureProject(fileVersion.filePath);
-      return project == null ? null : _this12._service.formatAtPosition(fileVersion, position, triggerCharacter, options);
+      const project = yield _this11.ensureProject(fileVersion.filePath);
+      return project == null ? null : _this11._service.formatAtPosition(fileVersion, position, triggerCharacter, options);
     })();
   }
 
   formatEntireFile(fileVersion, range, options) {
-    var _this13 = this;
+    var _this12 = this;
 
     return (0, _asyncToGenerator.default)(function* () {
-      const project = yield _this13.ensureProject(fileVersion.filePath);
-      return project == null ? null : _this13._service.formatEntireFile(fileVersion, range, options);
+      const project = yield _this12.ensureProject(fileVersion.filePath);
+      return project == null ? null : _this12._service.formatEntireFile(fileVersion, range, options);
     })();
   }
 
   getEvaluationExpression(fileVersion, position) {
-    var _this14 = this;
+    var _this13 = this;
 
     return (0, _asyncToGenerator.default)(function* () {
-      const project = yield _this14.ensureProject(fileVersion.filePath);
-      return project == null ? null : _this14._service.getEvaluationExpression(fileVersion, position);
+      const project = yield _this13.ensureProject(fileVersion.filePath);
+      return project == null ? null : _this13._service.getEvaluationExpression(fileVersion, position);
     })();
   }
 
   getProjectRoot(filePath) {
-    var _this15 = this;
+    var _this14 = this;
 
     return (0, _asyncToGenerator.default)(function* () {
-      const project = yield _this15.ensureProject(filePath);
-      return project == null ? null : _this15._service.getProjectRoot(filePath);
+      const project = yield _this14.ensureProject(filePath);
+      return project == null ? null : _this14._service.getProjectRoot(filePath);
     })();
   }
 
   isFileInProject(filePath) {
-    var _this16 = this;
+    var _this15 = this;
 
     return (0, _asyncToGenerator.default)(function* () {
-      const project = yield _this16.ensureProject(filePath);
+      const project = yield _this15.ensureProject(filePath);
       return project != null;
     })();
   }
@@ -323,44 +323,44 @@ class CqueryLSPClient {
   }
 
   typeHint(fileVersion, position) {
-    var _this17 = this;
+    var _this16 = this;
 
     return (0, _asyncToGenerator.default)(function* () {
-      const project = yield _this17.ensureProject(fileVersion.filePath);
-      return project == null ? null : _this17._service.typeHint(fileVersion, position);
+      const project = yield _this16.ensureProject(fileVersion.filePath);
+      return project == null ? null : _this16._service.typeHint(fileVersion, position);
     })();
   }
 
   supportsSymbolSearch(directories) {
-    var _this18 = this;
+    var _this17 = this;
 
     return (0, _asyncToGenerator.default)(function* () {
       // TODO pelmers: wrap with ensure server
-      return _this18._service.supportsSymbolSearch(directories);
+      return _this17._service.supportsSymbolSearch(directories);
     })();
   }
 
   symbolSearch(query, directories) {
-    var _this19 = this;
+    var _this18 = this;
 
     return (0, _asyncToGenerator.default)(function* () {
-      return _this19._service.symbolSearch(query, directories);
+      return _this18._service.symbolSearch(query, directories);
     })();
   }
 
   getExpandedSelectionRange(fileVersion, currentSelection) {
-    var _this20 = this;
+    var _this19 = this;
 
     return (0, _asyncToGenerator.default)(function* () {
-      return _this20._service.getExpandedSelectionRange(fileVersion, currentSelection);
+      return _this19._service.getExpandedSelectionRange(fileVersion, currentSelection);
     })();
   }
 
   getCollapsedSelectionRange(fileVersion, currentSelection, originalCursorPosition) {
-    var _this21 = this;
+    var _this20 = this;
 
     return (0, _asyncToGenerator.default)(function* () {
-      return _this21._service.getCollapsedSelectionRange(fileVersion, currentSelection, originalCursorPosition);
+      return _this20._service.getCollapsedSelectionRange(fileVersion, currentSelection, originalCursorPosition);
     })();
   }
 }
@@ -393,16 +393,13 @@ class Activation {
   initializeLsp() {
     const atomConfig = {
       name: 'cquery',
-      grammars: ['source.cpp', 'source.c', 'source.objc'],
+      grammars: ['source.cpp', 'source.c', 'source.objc', 'source.objcpp'],
       autocomplete: {
         inclusionPriority: 1,
         suggestionPriority: 3,
         disableForSelector: null,
         excludeLowerPriority: false,
-        autocompleteCacherConfig: {
-          updateResults: (_nuclideLanguageService || _load_nuclideLanguageService()).updateAutocompleteResults,
-          updateFirstResults: (_nuclideLanguageService || _load_nuclideLanguageService()).updateAutocompleteFirstResults
-        },
+        autocompleteCacherConfig: null,
         analytics: {
           eventName: 'nuclide-cquery-lsp',
           shouldLogInsertedSuggestion: false
@@ -428,6 +425,18 @@ class Activation {
         analyticsEventName: 'cquery.outline',
         updateOnEdit: true,
         priority: 1
+      },
+      codeFormat: {
+        version: '0.1.0',
+        priority: 1,
+        analyticsEventName: 'cquery.codeFormat',
+        canFormatAtPosition: false,
+        canFormatRanges: true
+      },
+      typeHint: {
+        version: '0.0.0',
+        priority: 1,
+        analyticsEventName: 'cquery.typeHint'
       },
       findReferences: {
         version: '0.1.0',

@@ -42,6 +42,11 @@
     backspaceTriggersAutocomplete: true
   "autocomplete-python":
     showTooltips: true
+  autosave: {}
+  "block-cursor":
+    global:
+      blinkOn:
+        backgroundColor: "#43b1e9"
   "choose-pane":
     labelChars: "JKLH;ABCDEFGIMNOPQRSTUVWXYZ"
   "city-lights-ui": {}
@@ -73,6 +78,7 @@
       "city-lights-icons"
     ]
     excludeVcsIgnoredPaths: false
+    openEmptyEditorOnStart: false
     packagesWithKeymapsDisabled: [
       "tool-bar"
       "line-jumper"
@@ -80,10 +86,11 @@
       "ctrl-dir-scroll"
       "jumpy"
       "emmet-simplified"
+      "highlight-line"
     ]
     telemetryConsent: "limited"
     themes: [
-      "pristine-ui"
+      "atom-material-ui"
       "atom-material-syntax"
     ]
     titleBar: "custom"
@@ -92,6 +99,7 @@
     fontSize: 11
     nonWordCharacters: "/\\()\"':,.;<>~!@#$%^&*|+=[]{}`?…-"
     preferredLineLength: 100
+    scrollPastEnd: true
     showIndentGuide: true
     showInvisibles: true
     softWrap: true
@@ -114,6 +122,8 @@
     columnWidth: 412
   "hey-pane":
     expandedWidth: 97
+  "highlight-line":
+    enableBackgroundColor: false
   "ide-css":
     lessSupport: false
   "ide-python":
@@ -143,7 +153,9 @@
     ]
     maxLineLength: 100
     pycodestyleErrorsToWarnings: true
-  "linter-jshint": {}
+  "linter-jshint":
+    executablePath: "/usr/local/bin/jshint"
+    lintInlineJavaScript: true
   "linter-ui-default": {}
   minimap:
     absoluteMode: true
@@ -224,15 +236,21 @@
       "nuclide-notifications": false
       "nuclide-objc": false
       "nuclide-ocaml": false
+      "nuclide-project": false
       "nuclide-react-inspector": false
+      "nuclide-recent-files-provider": false
+      "nuclide-recent-files-service": false
       "nuclide-refactorizer": false
+      "nuclide-related-files": false
       "nuclide-remote-atom": false
       "nuclide-remote-projects": false
       "nuclide-ssh-tunnel": false
       "nuclide-swift": false
       "nuclide-task-runner": false
+      "nuclide-terminal": false
       "nuclide-test-runner": false
       "nuclide-type-coverage": false
+      "nuclide-working-sets": false
   "platformio-ide-terminal":
     ansiColors:
       normal:
@@ -252,6 +270,115 @@
     linting:
       pylintArgs: [
         "--disable=R,C"
+      ]
+  "save-workspace-Workspaces":
+    "2835-check-if-applying-for-wild-med-work-WRAP":
+      panes: [
+        {
+          type: "paneAxis"
+          data: [
+            {
+              type: "pane"
+              data:
+                tabs: [
+                  "/Users/mchey/code/website/nols_website/staffing/tests.py"
+                  "/Users/mchey/code/website/nols_website/staffing/views.py"
+                  "/Users/mchey/code/website/nols_website/alumni/tests.py"
+                  "/Users/mchey/code/website/nols_website/website/gui_tests/page_objects/test_tools.py"
+                  "/Users/mchey/code/website/nols_website/admissions/tests/test_open_app.py"
+                  "/Users/mchey/code/website/nols_website/admissions/dashboard/tests.py"
+                  "/Users/mchey/code/website/nols_website/staffing/models.py"
+                  "/Users/mchey/code/website_core/nols_model_core/src/nols/model/core/entity/person.py"
+                  "/Users/mchey/code/website/nols_website/core/models.py"
+                  "/Users/mchey/code/website_core/nols_model_core/src/nols/model/core/entity/entity.py"
+                  "/Users/mchey/code/website_core/nols_model_core/src/nols/model/core/data_access.py"
+                  "/Users/mchey/code/website_core/nols_model_core/src/nols/model/core/manager_base.py"
+                  "/Users/mchey/.atom/projects.cson"
+                  "/Users/mchey/code/website_core/nols_model_core/src/nols/model/core/entity/entity_manager.py"
+                  "/Users/mchey/dotfiles/.atom/init.coffee"
+                ]
+                orientation: "vertical"
+            }
+            {
+              type: "pane"
+              data:
+                tabs: [
+                  "/Users/mchey/code/website/nols_website/website/tests.py"
+                ]
+                orientation: "vertical"
+            }
+          ]
+          orientation: "vertical"
+        }
+        {
+          type: "pane"
+          data:
+            tabs: [
+              "/Users/mchey/code/website/nols_website/core/decorators.py"
+            ]
+            orientation: "horizontal"
+        }
+        {
+          type: "pane"
+          data:
+            tabs: [
+              "/Users/mchey/code/website_core/nols_model_core/src/nols/model/core/entity/entity_classification.py"
+            ]
+            orientation: "horizontal"
+        }
+      ]
+      projectPaths: [
+        "/Users/mchey/code/website"
+        "/Users/mchey/Documents"
+      ]
+    "foundation-upgrade":
+      panes: [
+        {
+          type: "paneAxis"
+          data: [
+            {
+              type: "pane"
+              data:
+                tabs: [
+                  "/Users/mchey/code/website/nols_website/admissions/dashboard/gui_tests/__init__.py"
+                  "/Users/mchey/code/website/nols_website/admissions/dashboard/gui_tests/academic_credit_tests.py"
+                ]
+                orientation: "vertical"
+            }
+            {
+              type: "pane"
+              data:
+                tabs: [
+                  "/Users/mchey/code/website/nols_website/website/gui_tests/page_objects/page_elements.py"
+                ]
+                orientation: "vertical"
+            }
+          ]
+          orientation: "vertical"
+        }
+        {
+          type: "pane"
+          data:
+            tabs: [
+              "/Users/mchey/code/website/nols_website/admissions/dashboard/gui_tests/emt_prerequisites_tests.py"
+              "/Users/mchey/code/website/nols_website/admissions/dashboard/gui_tests/academic_credit_tests.py"
+              "/Users/mchey/code/website/nols_website/admissions/dashboard/gui_tests/page_objects/student_form_pages.py"
+              "/Users/mchey/code/website/nols_website/admissions/dashboard/gui_tests/page_objects/dashboard_pages.py"
+              "/Users/mchey/code/website/nols_website/website/gui_tests/page_objects/base_page.py"
+            ]
+            orientation: "horizontal"
+        }
+        {
+          type: "pane"
+          data:
+            tabs: [
+              "/Users/mchey/code/website/nols_website/admissions/dashboard/gui_tests/letters_of_recommendation_tests.py"
+            ]
+            orientation: "horizontal"
+        }
+      ]
+      projectPaths: [
+        "/Users/mchey/code/website"
       ]
   "split-diff":
     colors:

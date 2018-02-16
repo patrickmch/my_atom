@@ -3,6 +3,7 @@
   "main": "./lib/main.js",
   "version": "0.0.0",
   "description": "A terminal integrated into nuclide.",
+  "author": "NEEDS OWNER",
   "private": true,
   "atomTestRunner": "../../lib/test-runner-entry.js",
   "deserializers": {
@@ -79,9 +80,9 @@
         "0.0.0": "initializeCwdApi"
       }
     },
-    "nuclide-omni2-register-provider": {
+    "nuclide-dash-register-provider": {
       "versions": {
-        "0.0.0": "consumeOmni2"
+        "0.0.0": "consumeDash"
       }
     }
   }

@@ -9,8 +9,6 @@ var _react = _interopRequireWildcard(require('react'));
 
 var _rxjsBundlesRxMinJs = require('rxjs/bundles/Rx.min.js');
 
-var _atom = require('atom');
-
 var _renderReactRoot;
 
 function _load_renderReactRoot() {
@@ -39,6 +37,12 @@ var _event;
 
 function _load_event() {
   return _event = require('nuclide-commons/event');
+}
+
+var _UniversalDisposable;
+
+function _load_UniversalDisposable() {
+  return _UniversalDisposable = _interopRequireDefault(require('nuclide-commons/UniversalDisposable'));
 }
 
 var _shallowequal;
@@ -84,7 +88,7 @@ function consumeStatusBar(statusBar, navigationStack) {
     priority: STATUS_BAR_PRIORITY
   });
 
-  return new _atom.Disposable(() => {
+  return new (_UniversalDisposable || _load_UniversalDisposable()).default(() => {
     statusBarTile.destroy();
   });
 }
@@ -101,7 +105,8 @@ class NavStackStatusBarTile extends _react.Component {
         tooltip: {
           title: 'Navigate Backwards',
           keyBindingCommand: 'nuclide-navigation-stack:navigate-backwards'
-        }
+        },
+        className: 'nuclide-navigation-stack-button'
       }),
       _react.createElement((_Button || _load_Button()).Button, {
         icon: 'chevron-right',
@@ -110,7 +115,8 @@ class NavStackStatusBarTile extends _react.Component {
         tooltip: {
           title: 'Navigate Forwards',
           keyBindingCommand: 'nuclide-navigation-stack:navigate-forwards'
-        }
+        },
+        className: 'nuclide-navigation-stack-button'
       })
     );
   }

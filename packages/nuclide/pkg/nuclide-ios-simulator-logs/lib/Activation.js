@@ -19,7 +19,7 @@ function _load_formatEnoentNotification() {
 var _LogTailer;
 
 function _load_LogTailer() {
-  return _LogTailer = require('../../nuclide-console/lib/LogTailer');
+  return _LogTailer = require('../../nuclide-console-base/lib/LogTailer');
 }
 
 var _createMessageStream;
@@ -38,7 +38,6 @@ var _rxjsBundlesRxMinJs = require('rxjs/bundles/Rx.min.js');
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-// eslint-disable-next-line rulesdir/no-cross-atom-imports
 class Activation {
 
   constructor(state) {

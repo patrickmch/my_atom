@@ -3,8 +3,11 @@
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
+exports.HEARTBEAT_CHANNEL = undefined;
 
 var _asyncToGenerator = _interopRequireDefault(require('async-to-generator'));
+
+var _os = _interopRequireDefault(require('os'));
 
 var _log4js;
 
@@ -34,12 +37,6 @@ var _blocked;
 
 function _load_blocked() {
   return _blocked = _interopRequireDefault(require('./blocked'));
-}
-
-var _config;
-
-function _load_config() {
-  return _config = require('./config');
 }
 
 var _QueuedAckTransport;
@@ -78,12 +75,6 @@ function _load_nuclideRpc() {
   return _nuclideRpc = require('../../nuclide-rpc');
 }
 
-var _QueuedTransport;
-
-function _load_QueuedTransport() {
-  return _QueuedTransport = require('./QueuedTransport');
-}
-
 var _WebSocketTransport;
 
 function _load_WebSocketTransport() {
@@ -98,7 +89,6 @@ function _load_nuclideMarshalersCommon() {
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-// eslint-disable-next-line rulesdir/no-commonjs
 /**
  * Copyright (c) 2015-present, Facebook, Inc.
  * All rights reserved.
@@ -110,6 +100,9 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
  * @format
  */
 
+const HEARTBEAT_CHANNEL = exports.HEARTBEAT_CHANNEL = 'heartbeat';
+
+// eslint-disable-next-line rulesdir/no-commonjs
 const connect = require('connect');
 // eslint-disable-next-line rulesdir/no-commonjs
 const http = require('http');
@@ -140,7 +133,8 @@ class NuclideServer {
     this._version = (0, (_nuclideVersion || _load_nuclideVersion()).getVersion)().toString();
     this._app = connect();
     this._attachUtilHandlers();
-    if (serverKey && serverCertificate && certificateAuthorityCertificate) {
+    const isHttps = Boolean(serverKey && serverCertificate && certificateAuthorityCertificate);
+    if (isHttps) {
       const webServerOptions = {
         key: serverKey,
         cert: serverCertificate,
@@ -171,6 +165,8 @@ class NuclideServer {
     }
 
     this._rpcServiceRegistry = new (_nuclideRpc || _load_nuclideRpc()).ServiceRegistry((_nuclideMarshalersCommon || _load_nuclideMarshalersCommon()).getServerSideMarshalers, services);
+
+    (0, (_nuclideAnalytics || _load_nuclideAnalytics()).track)('server-created', { port, isHttps, host: _os.default.hostname() });
   }
 
   _attachUtilHandlers() {
@@ -219,7 +215,7 @@ class NuclideServer {
   _setupHeartbeatHandler() {
     var _this = this;
 
-    this._registerService('/' + (_config || _load_config()).HEARTBEAT_CHANNEL, (0, _asyncToGenerator.default)(function* () {
+    this._registerService('/' + HEARTBEAT_CHANNEL, (0, _asyncToGenerator.default)(function* () {
       return _this._version;
     }), 'post', true);
   }
@@ -324,10 +320,9 @@ class NuclideServer {
     socket.once('message', clientId => {
       errorSubscription.dispose();
       client = this._clients.get(clientId);
-      const useAck = clientId.startsWith('ACK');
       const transport = new (_WebSocketTransport || _load_WebSocketTransport()).WebSocketTransport(clientId, socket);
       if (client == null) {
-        client = (_nuclideRpc || _load_nuclideRpc()).RpcConnection.createServer(this._rpcServiceRegistry, useAck ? new (_QueuedAckTransport || _load_QueuedAckTransport()).QueuedAckTransport(clientId, transport) : new (_QueuedTransport || _load_QueuedTransport()).QueuedTransport(clientId, transport), {}, clientId, useAck ? (_utils || _load_utils()).protocolLogger : null);
+        client = (_nuclideRpc || _load_nuclideRpc()).RpcConnection.createServer(this._rpcServiceRegistry, new (_QueuedAckTransport || _load_QueuedAckTransport()).QueuedAckTransport(clientId, transport, (_utils || _load_utils()).protocolLogger), {}, clientId, (_utils || _load_utils()).protocolLogger);
         this._clients.set(clientId, client);
       } else {
         if (!(clientId === client.getTransport().id)) {

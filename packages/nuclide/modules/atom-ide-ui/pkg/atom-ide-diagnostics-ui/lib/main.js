@@ -266,8 +266,9 @@ class Activation {
 
       const uiConfigStream = updaters.switchMap(updater => updater == null ? _rxjsBundlesRxMinJs.Observable.of([]) : (0, (_event || _load_event()).observableFromSubscribeFunction)(updater.observeUiConfig.bind(updater)));
 
-      // $FlowFixMe: exceeds number of args defined in flow-typed definition
-      this._globalViewStates = _rxjsBundlesRxMinJs.Observable.combineLatest(diagnosticsStream, filterByActiveTextEditorStream, pathToActiveTextEditorStream, showTracesStream, showDirectoryColumnStream, autoVisibilityStream, supportedMessageKindsStream, uiConfigStream, (diagnostics, filterByActiveTextEditor, pathToActiveTextEditor, showTraces, showDirectoryColumn, autoVisibility, supportedMessageKinds, uiConfig) => ({
+      this._globalViewStates = _rxjsBundlesRxMinJs.Observable.combineLatest(diagnosticsStream, filterByActiveTextEditorStream, pathToActiveTextEditorStream, showTracesStream, showDirectoryColumnStream, autoVisibilityStream, supportedMessageKindsStream, uiConfigStream,
+      // $FlowFixMe
+      (diagnostics, filterByActiveTextEditor, pathToActiveTextEditor, showTraces, showDirectoryColumn, autoVisibility, supportedMessageKinds, uiConfig) => ({
         diagnostics,
         filterByActiveTextEditor,
         pathToActiveTextEditor,

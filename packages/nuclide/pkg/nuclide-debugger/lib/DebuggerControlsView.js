@@ -25,10 +25,10 @@ function _load_DebuggerSteppingComponent() {
   return _DebuggerSteppingComponent = require('./DebuggerSteppingComponent');
 }
 
-var _DebuggerStore;
+var _constants;
 
-function _load_DebuggerStore() {
-  return _DebuggerStore = require('./DebuggerStore');
+function _load_constants() {
+  return _constants = require('./constants');
 }
 
 var _DebuggerControllerView;
@@ -71,17 +71,16 @@ class DebuggerControlsView extends _react.PureComponent {
     };
 
     this._disposables = new (_UniversalDisposable || _load_UniversalDisposable()).default();
-    const debuggerStore = props.model.getStore();
     this.state = {
-      mode: debuggerStore.getDebuggerMode()
+      mode: props.model.getDebuggerMode()
     };
   }
 
   componentDidMount() {
-    const debuggerStore = this.props.model.getStore();
-    this._disposables.add(debuggerStore.onChange(() => {
+    const { model } = this.props;
+    this._disposables.add(model.onChange(() => {
       this.setState({
-        mode: debuggerStore.getDebuggerMode()
+        mode: model.getDebuggerMode()
       });
     }));
   }
@@ -98,7 +97,7 @@ class DebuggerControlsView extends _react.PureComponent {
     const { model } = this.props;
     const actions = model.getActions();
     const { mode } = this.state;
-    const debuggerStoppedNotice = mode !== (_DebuggerStore || _load_DebuggerStore()).DebuggerMode.STOPPED ? null : _react.createElement(
+    const debuggerStoppedNotice = mode !== (_constants || _load_constants()).DebuggerMode.STOPPED ? null : _react.createElement(
       'div',
       { className: 'nuclide-debugger-pane-content' },
       _react.createElement(
@@ -131,10 +130,10 @@ class DebuggerControlsView extends _react.PureComponent {
       )
     );
 
-    const targetInfo = model.getStore().getDebugProcessInfo();
+    const targetInfo = model.getDebugProcessInfo();
     const targetDescription = targetInfo == null ? null : targetInfo.getDebuggerProps().targetDescription();
 
-    const debugeeRunningNotice = mode !== (_DebuggerStore || _load_DebuggerStore()).DebuggerMode.RUNNING ? null : _react.createElement(
+    const debugeeRunningNotice = mode !== (_constants || _load_constants()).DebuggerMode.RUNNING ? null : _react.createElement(
       'div',
       { className: 'nuclide-debugger-pane-content' },
       _react.createElement(
@@ -155,20 +154,12 @@ class DebuggerControlsView extends _react.PureComponent {
       _react.createElement(
         'div',
         { className: 'nuclide-debugger-section-header' },
-        _react.createElement((_DebuggerControllerView || _load_DebuggerControllerView()).default, {
-          store: model.getStore(),
-          bridge: model.getBridge(),
-          breakpointStore: model.getBreakpointStore(),
-          stopDebugging: this._stopDebugging
-        })
+        _react.createElement((_DebuggerControllerView || _load_DebuggerControllerView()).default, { model: model })
       ),
       _react.createElement(
         'div',
         { className: 'nuclide-debugger-section-header nuclide-debugger-controls-section' },
-        _react.createElement((_DebuggerSteppingComponent || _load_DebuggerSteppingComponent()).DebuggerSteppingComponent, {
-          actions: actions,
-          debuggerStore: model.getStore()
-        })
+        _react.createElement((_DebuggerSteppingComponent || _load_DebuggerSteppingComponent()).DebuggerSteppingComponent, { actions: actions, model: model })
       ),
       debugeeRunningNotice,
       debuggerStoppedNotice

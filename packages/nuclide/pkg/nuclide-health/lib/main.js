@@ -1,10 +1,16 @@
 'use strict';
 
-var _atom = require('atom');
+var _asyncToGenerator = _interopRequireDefault(require('async-to-generator'));
 
 var _react = _interopRequireWildcard(require('react'));
 
 var _rxjsBundlesRxMinJs = require('rxjs/bundles/Rx.min.js');
+
+var _log4js;
+
+function _load_log4js() {
+  return _log4js = require('log4js');
+}
 
 var _nuclideAnalytics;
 
@@ -54,10 +60,10 @@ function _load_HealthPaneItem2() {
   return _HealthPaneItem2 = require('./HealthPaneItem');
 }
 
-var _getChildProcessesTree;
+var _getChildProcesses;
 
-function _load_getChildProcessesTree() {
-  return _getChildProcessesTree = _interopRequireDefault(require('./getChildProcessesTree'));
+function _load_getChildProcesses() {
+  return _getChildProcesses = require('./getChildProcesses');
 }
 
 var _getStats;
@@ -81,17 +87,28 @@ function _load_trackStalls() {
 var _ToolbarUtils;
 
 function _load_ToolbarUtils() {
-  return _ToolbarUtils = require('../../nuclide-ui/ToolbarUtils');
+  return _ToolbarUtils = require('nuclide-commons-ui/ToolbarUtils');
 }
 
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
 function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 // Imports from within this Nuclide package.
 
 
 // Imports from other Nuclide packages.
+/**
+ * Copyright (c) 2015-present, Facebook, Inc.
+ * All rights reserved.
+ *
+ * This source code is licensed under the license found in the LICENSE file in
+ * the root directory of this source tree.
+ *
+ * 
+ * @format
+ */
+
 class Activation {
 
   constructor(state) {
@@ -105,24 +122,32 @@ class Activation {
     // Update the stats immediately, and then periodically based on the config.
     const statsStream = _rxjsBundlesRxMinJs.Observable.of(null).concat(viewTimeouts.switchMap(_rxjsBundlesRxMinJs.Observable.interval)).map((_getStats || _load_getStats()).default).publishReplay(1).refCount();
 
-    const childProcessesTreeStream = _rxjsBundlesRxMinJs.Observable.of(null).concat(viewTimeouts.switchMap(_rxjsBundlesRxMinJs.Observable.interval)).switchMap((_getChildProcessesTree || _load_getChildProcessesTree()).default).share();
+    const processTreeStream = _rxjsBundlesRxMinJs.Observable.of(null).concat(viewTimeouts.switchMap(_rxjsBundlesRxMinJs.Observable.interval)).switchMap(() => (0, (_getChildProcesses || _load_getChildProcesses()).queryPs)('command')).map((_getChildProcesses || _load_getChildProcesses()).childProcessTree).share();
+
+    // Sample analytics streams at about the same time by sharing
+    // the timer stream.
+    const analyticsInterval = analyticsTimeouts.switchMap(_rxjsBundlesRxMinJs.Observable.interval).share();
 
     // These aren't really aggregated because they're too expensive to fetch.
     // We'll just fetch these once per analytics upload cycle.
     // (Which means the first analytics upload won't have DOM counters).
     const domCounterStream = _rxjsBundlesRxMinJs.Observable.of(null).concat(analyticsTimeouts.switchMap(_rxjsBundlesRxMinJs.Observable.interval)).switchMap(() => (0, (_getDOMCounters || _load_getDOMCounters()).default)()).publishReplay(1).refCount();
 
-    this._paneItemStates = _rxjsBundlesRxMinJs.Observable.combineLatest(statsStream, domCounterStream, _rxjsBundlesRxMinJs.Observable.of(null).concat(childProcessesTreeStream), (stats, domCounters, childProcessesTree) => ({
+    this._paneItemStates = _rxjsBundlesRxMinJs.Observable.combineLatest(statsStream, domCounterStream, _rxjsBundlesRxMinJs.Observable.of(null).concat(processTreeStream), (stats, domCounters, childProcessesTree) => ({
       stats,
       domCounters,
       childProcessesTree
     }));
 
-    this._subscriptions = new (_UniversalDisposable || _load_UniversalDisposable()).default(
-    // Buffer the stats and send analytics periodically.
-    statsStream.buffer(analyticsTimeouts.switchMap(_rxjsBundlesRxMinJs.Observable.interval)).withLatestFrom(domCounterStream).subscribe(([buffer, domCounters]) => {
-      this._updateAnalytics(buffer, domCounters);
-    }), (0, (_trackStalls || _load_trackStalls()).default)(), this._registerCommandAndOpener());
+    this._subscriptions = new (_UniversalDisposable || _load_UniversalDisposable()).default(this._registerCommandAndOpener());
+
+    if ((0, (_nuclideAnalytics || _load_nuclideAnalytics()).isTrackSupported)()) {
+      this._subscriptions.add(_rxjsBundlesRxMinJs.Observable.zip(statsStream.buffer(analyticsInterval), analyticsInterval.switchMap((_getDOMCounters || _load_getDOMCounters()).default), analyticsInterval.switchMap(() => (0, (_getChildProcesses || _load_getChildProcesses()).queryPs)('comm').map((_getChildProcesses || _load_getChildProcesses()).childProcessSummary))).subscribe(([buffer, domCounters, processes]) => {
+        this._updateAnalytics(buffer, domCounters, processes);
+      }, error => {
+        (0, (_log4js || _load_log4js()).getLogger)().error('Failed to gather nuclide-health analytics.', error.stack);
+      }), (0, (_trackStalls || _load_trackStalls()).default)());
+    }
   }
 
   dispose() {
@@ -134,11 +159,11 @@ class Activation {
     this._healthButton = toolBar.addButton((0, (_ToolbarUtils || _load_ToolbarUtils()).makeToolbarButtonSpec)({
       icon: 'dashboard',
       callback: 'nuclide-health:toggle',
-      tooltip: 'Toggle Nuclide health stats',
+      tooltip: 'Toggle Nuclide Health Stats',
       priority: -400
     })).element;
     this._healthButton.classList.add('nuclide-health-jewel');
-    const disposable = new _atom.Disposable(() => {
+    const disposable = new (_UniversalDisposable || _load_UniversalDisposable()).default(() => {
       this._healthButton = null;
       toolBar.removeItems();
     });
@@ -156,54 +181,53 @@ class Activation {
     }));
   }
 
-  _updateAnalytics(analyticsBuffer, domCounters) {
-    if (analyticsBuffer.length === 0) {
-      return;
-    }
-
-    // Aggregates the buffered stats up by suffixing avg, min, max to their names.
-    const aggregateStats = {};
-
-    // We don't have aggregates for these - these are just the most recent numbers.
-    if (domCounters != null) {
-      aggregateStats.attachedDomNodes = domCounters.attachedNodes;
-      aggregateStats.domNodes = domCounters.nodes;
-      aggregateStats.domListeners = domCounters.jsEventListeners;
-    }
-
-    // All analyticsBuffer entries have the same keys; we use the first entry to know what they
-    // are.
-    Object.keys(analyticsBuffer[0]).forEach(statsKey => {
-      // These values are not to be aggregated or sent.
-      if (statsKey === 'activeHandlesByType') {
+  _updateAnalytics(analyticsBuffer, domCounters, subProcesses) {
+    return (0, _asyncToGenerator.default)(function* () {
+      if (analyticsBuffer.length === 0) {
         return;
       }
 
-      const aggregates = aggregate(analyticsBuffer.map(stats => typeof stats[statsKey] === 'number' ? stats[statsKey] : 0));
-      Object.keys(aggregates).forEach(aggregatesKey => {
-        const value = aggregates[aggregatesKey];
-        if (value != null) {
-          aggregateStats[`${statsKey}_${aggregatesKey}`] = value.toFixed(2);
+      // Aggregates the buffered stats up by suffixing avg, min, max to their names.
+      const state = {};
+
+      // We don't have aggregates for these - these are just the most recent numbers.
+      if (domCounters != null) {
+        state.attachedDomNodes = domCounters.attachedNodes;
+        state.domNodes = domCounters.nodes;
+        state.domListeners = domCounters.jsEventListeners;
+      }
+
+      if (subProcesses != null) {
+        state.subProcesses = subProcesses;
+      }
+
+      // All analyticsBuffer entries have the same keys; we use the first entry to know what they
+      // are.
+      Object.keys(analyticsBuffer[0]).forEach(function (statsKey) {
+        // These values are not to be aggregated or sent.
+        if (statsKey === 'activeHandlesByType') {
+          return;
         }
+
+        const aggregates = aggregateHealth(analyticsBuffer.map(function (stats) {
+          return typeof stats[statsKey] === 'number' ? stats[statsKey] : 0;
+        }));
+        Object.keys(aggregates).forEach(function (aggregatesKey) {
+          const value = aggregates[aggregatesKey];
+          if (value != null) {
+            state[`${statsKey}_${aggregatesKey}`] = value.toFixed(2);
+          }
+        });
       });
-    });
-    (0, (_nuclideAnalytics || _load_nuclideAnalytics()).track)('nuclide-health', aggregateStats);
+      (0, (_nuclideAnalytics || _load_nuclideAnalytics()).track)('nuclide-health', state);
+    })();
   }
 }
 
 // Imports from non-Nuclide modules.
-/**
- * Copyright (c) 2015-present, Facebook, Inc.
- * All rights reserved.
- *
- * This source code is licensed under the license found in the LICENSE file in
- * the root directory of this source tree.
- *
- * 
- * @format
- */
 
-function aggregate(values) {
+
+function aggregateHealth(values) {
   const sum = values.reduce((acc, value) => acc + value, 0);
   const avg = values.length > 0 ? sum / values.length : 0;
   const min = Math.min(...values);

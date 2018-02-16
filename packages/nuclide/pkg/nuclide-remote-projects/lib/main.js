@@ -45,6 +45,7 @@ let createEditorForNuclide = (() => {
       // Add a custom serializer that deserializes to a placeholder TextEditor
       // that we have total control over. The usual Atom deserialization flow for editors
       // typically involves attempting to load the file from disk, which tends to throw.
+      // $FlowIgnore
       textEditor.serialize = function () {
         return {
           deserializer: 'RemoteTextEditorPlaceholder',
@@ -118,18 +119,7 @@ let reloadRemoteProjects = (() => {
 
         (_nuclideRemoteConnection || _load_nuclideRemoteConnection()).ServerConnection.cancelConnection(config.host);
       } else {
-        // It's fine the user connected to a different project on the same host:
-        // we should still be able to restore this using the new connection.
-        const { cwd, host, displayTitle } = config;
-        if (connection.getPathForInitialWorkingDirectory() !== cwd && connection.getRemoteHostname() === host) {
-          // eslint-disable-next-line no-await-in-loop
-          const subConnection = yield (_nuclideRemoteConnection || _load_nuclideRemoteConnection()).RemoteConnection.createConnectionBySavedConfig(host, cwd, displayTitle);
-          if (subConnection != null) {
-            reloadedProjects.push(subConnection.getUriForInitialWorkingDirectory());
-          }
-        } else {
-          reloadedProjects.push(connection.getUriForInitialWorkingDirectory());
-        }
+        reloadedProjects.push(connection.getUriForInitialWorkingDirectory());
       }
     }
     if (remoteProjectsService != null) {
@@ -312,6 +302,7 @@ function addRemoteFolderToProject(connection) {
     }
 
     // The project was removed from the tree.
+    (_constants || _load_constants()).logger.info(`Project ${workingDirectoryUri} removed from the tree`);
     subscription.dispose();
     if (connection.isOnlyConnection()) {
       closeOpenFilesForRemoteProject(connection);
@@ -330,9 +321,11 @@ function addRemoteFolderToProject(connection) {
 
   function closeRemoteConnection() {
     const closeConnection = shutdownIfLast => {
+      (_constants || _load_constants()).logger.info('Closing remote connection.', { shutdownIfLast });
       connection.close(shutdownIfLast);
     };
 
+    (_constants || _load_constants()).logger.info('Closing connection to remote project.');
     if (!connection.isOnlyConnection()) {
       (_constants || _load_constants()).logger.info('Remaining remote projects using Nuclide Server - no prompt to shutdown');
       const shutdownIfLast = false;
@@ -351,6 +344,7 @@ function addRemoteFolderToProject(connection) {
       throw new Error('Invariant violation: "typeof shutdownServerAfterDisconnection === \'boolean\'"');
     }
 
+    (_constants || _load_constants()).logger.info({ shutdownServerAfterDisconnection });
     closeConnection(shutdownServerAfterDisconnection);
   }
 
@@ -571,7 +565,7 @@ function createRemoteDirectoryProvider() {
 
 function createRemoteDirectorySearcher() {
   return new (_RemoteDirectorySearcher || _load_RemoteDirectorySearcher()).default(dir => {
-    return (0, (_nuclideRemoteConnection || _load_nuclideRemoteConnection()).getGrepServiceByNuclideUri)(dir.getPath());
+    return (0, (_nuclideRemoteConnection || _load_nuclideRemoteConnection()).getCodeSearchServiceByNuclideUri)(dir.getPath());
   }, () => workingSetsStore);
 }
 

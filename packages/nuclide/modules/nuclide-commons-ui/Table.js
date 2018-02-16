@@ -328,6 +328,7 @@ class Table extends _react.Component {
     const {
       alternateBackground,
       columns,
+      headerElement,
       headerTitle,
       maxBodyHeight,
       rows,
@@ -340,10 +341,10 @@ class Table extends _react.Component {
 
     const columnWidths = this._calculateColumnWidths();
 
-    const header = headerTitle != null ? _react.createElement(
+    const header = headerElement != null || headerTitle != null ? _react.createElement(
       'div',
       { className: 'nuclide-ui-table-header-cell nuclide-ui-table-full-header' },
-      headerTitle
+      headerElement != null ? headerElement : headerTitle
     ) : columns.map((column, i) => {
       const { title, key, shouldRightAlign, cellClassName } = column;
       let resizer;

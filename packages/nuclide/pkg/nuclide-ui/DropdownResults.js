@@ -28,13 +28,9 @@ function _load_observable() {
   return _observable = require('nuclide-commons/observable');
 }
 
-var _Portal;
-
-function _load_Portal() {
-  return _Portal = require('./Portal');
-}
-
 var _react = _interopRequireWildcard(require('react'));
+
+var _reactDom = _interopRequireDefault(require('react-dom'));
 
 var _rxjsBundlesRxMinJs = require('rxjs/bundles/Rx.min.js');
 
@@ -253,25 +249,21 @@ class DropdownResults extends _react.Component {
       ));
     }
 
-    return _react.createElement(
-      (_Portal || _load_Portal()).Portal,
-      { container: this._optionsElement },
+    return _reactDom.default.createPortal(_react.createElement(
+      'div',
+      {
+        className: 'nuclide-combobox-options nuclide-dropdown-results',
+        style: this.state.optionsRect },
       _react.createElement(
         'div',
-        {
-          className: 'nuclide-combobox-options nuclide-dropdown-results',
-          style: this.state.optionsRect },
+        { className: 'select-list' },
         _react.createElement(
-          'div',
-          { className: 'select-list' },
-          _react.createElement(
-            'ol',
-            { className: 'nuclide-combobox-list-group list-group' },
-            options
-          )
+          'ol',
+          { className: 'nuclide-combobox-list-group list-group' },
+          options
         )
       )
-    );
+    ), this._optionsElement);
   }
 
 }

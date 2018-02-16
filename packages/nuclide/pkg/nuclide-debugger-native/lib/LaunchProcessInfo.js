@@ -7,16 +7,22 @@ exports.LaunchProcessInfo = undefined;
 
 var _asyncToGenerator = _interopRequireDefault(require('async-to-generator'));
 
+var _debugger;
+
+function _load_debugger() {
+  return _debugger = require('../../commons-atom/debugger');
+}
+
 var _nuclideDebuggerCommon;
 
 function _load_nuclideDebuggerCommon() {
   return _nuclideDebuggerCommon = require('nuclide-debugger-common');
 }
 
-var _nuclideDebugger;
+var _AtomServiceContainer;
 
-function _load_nuclideDebugger() {
-  return _nuclideDebugger = require('../../nuclide-debugger');
+function _load_AtomServiceContainer() {
+  return _AtomServiceContainer = require('../../nuclide-debugger/lib/AtomServiceContainer');
 }
 
 var _nuclideRemoteConnection;
@@ -37,18 +43,6 @@ function _load_UniversalDisposable() {
   return _UniversalDisposable = _interopRequireDefault(require('nuclide-commons/UniversalDisposable'));
 }
 
-var _consumeFirstProvider;
-
-function _load_consumeFirstProvider() {
-  return _consumeFirstProvider = _interopRequireDefault(require('../../commons-atom/consumeFirstProvider'));
-}
-
-var _nullthrows;
-
-function _load_nullthrows() {
-  return _nullthrows = _interopRequireDefault(require('nullthrows'));
-}
-
 var _passesGK;
 
 function _load_passesGK() {
@@ -58,6 +52,17 @@ function _load_passesGK() {
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 // eslint-disable-next-line rulesdir/no-cross-atom-imports
+/**
+ * Copyright (c) 2015-present, Facebook, Inc.
+ * All rights reserved.
+ *
+ * This source code is licensed under the license found in the LICENSE file in
+ * the root directory of this source tree.
+ *
+ * 
+ * @format
+ */
+
 class LaunchProcessInfo extends (_nuclideDebuggerCommon || _load_nuclideDebuggerCommon()).DebuggerProcessInfo {
 
   constructor(targetUri, launchTargetInfo) {
@@ -77,7 +82,6 @@ class LaunchProcessInfo extends (_nuclideDebuggerCommon || _load_nuclideDebugger
       disassembly: true,
       readOnlyTarget: this._launchTargetInfo.coreDump != null && this._launchTargetInfo.coreDump !== '',
       registers: true,
-      singleThreadStepping: true,
       threads: true
     });
   }
@@ -143,19 +147,20 @@ class LaunchProcessInfo extends (_nuclideDebuggerCommon || _load_nuclideDebugger
 
     return (0, _asyncToGenerator.default)(function* () {
       const rpcService = _this2._getRpcService();
-      const remoteService = (0, (_nullthrows || _load_nullthrows()).default)((yield (0, (_consumeFirstProvider || _load_consumeFirstProvider()).default)('nuclide-debugger.remote')));
+      const remoteService = yield (0, (_debugger || _load_debugger()).getDebuggerService)();
 
       if (typeof _this2.basepath === 'string') {
         _this2._launchTargetInfo.basepath = _this2.basepath;
       }
 
       let debugSession = null;
-      let outputDisposable = (0, (_nuclideDebugger || _load_nuclideDebugger()).registerConsoleLogging)('LLDB', rpcService.getOutputWindowObservable().refCount());
+      let outputDisposable = (0, (_AtomServiceContainer || _load_AtomServiceContainer()).registerConsoleLogging)('LLDB', rpcService.getOutputWindowObservable().refCount());
       try {
         // Attempt to launch into a terminal if it is supported.
         let launched = false;
         if (remoteService.canLaunchDebugTargetInTerminal(_this2._targetUri) && (0, (_utils || _load_utils()).getConfig)().useTerminal && (yield (0, (_passesGK || _load_passesGK()).default)('nuclide_debugger_launch_in_terminal'))) {
-          launched = yield _this2._launchInTerminal(rpcService, remoteService);
+          yield _this2._launchInTerminal(rpcService, remoteService);
+          launched = true;
         }
 
         // Otherwise, fall back to launching without a terminal.
@@ -203,13 +208,4 @@ class LaunchProcessInfo extends (_nuclideDebuggerCommon || _load_nuclideDebugger
     return new service.NativeDebuggerService(debuggerConfig);
   }
 }
-exports.LaunchProcessInfo = LaunchProcessInfo; /**
-                                                * Copyright (c) 2015-present, Facebook, Inc.
-                                                * All rights reserved.
-                                                *
-                                                * This source code is licensed under the license found in the LICENSE file in
-                                                * the root directory of this source tree.
-                                                *
-                                                * 
-                                                * @format
-                                                */
+exports.LaunchProcessInfo = LaunchProcessInfo;

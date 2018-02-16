@@ -21,7 +21,7 @@ function _load_OutlineViewPanel() {
 var _ToolbarUtils;
 
 function _load_ToolbarUtils() {
-  return _ToolbarUtils = require('../../nuclide-ui/ToolbarUtils');
+  return _ToolbarUtils = require('nuclide-commons-ui/ToolbarUtils');
 }
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }

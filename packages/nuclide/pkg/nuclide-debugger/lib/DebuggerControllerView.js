@@ -6,12 +6,6 @@ Object.defineProperty(exports, "__esModule", {
 
 var _react = _interopRequireWildcard(require('react'));
 
-var _DebuggerStore;
-
-function _load_DebuggerStore() {
-  return _DebuggerStore = require('./DebuggerStore');
-}
-
 var _LoadingSpinner;
 
 function _load_LoadingSpinner() {
@@ -20,7 +14,7 @@ function _load_LoadingSpinner() {
 
 function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
 
-function getStateFromStore(store) {
+function getStateFromModel(model) {
   return {};
 } /**
    * Copyright (c) 2015-present, Facebook, Inc.
@@ -37,44 +31,44 @@ class DebuggerControllerView extends _react.Component {
   constructor(props) {
     super(props);
 
-    this._updateStateFromStore = store => {
-      if (store != null) {
-        this.setState(getStateFromStore(store));
+    this._updateStateFromModel = model => {
+      if (model != null) {
+        this.setState(getStateFromModel(model));
       } else {
-        this.setState(getStateFromStore(this.props.store));
+        this.setState(getStateFromModel(this.props.model));
       }
     };
 
-    this.state = getStateFromStore(props.store);
+    this.state = getStateFromModel(props.model);
   }
 
   componentWillMount() {
     this.setState({
-      debuggerStoreChangeListener: this.props.store.onChange(this._updateStateFromStore)
+      debuggerModelChangeListener: this.props.model.onChange(this._updateStateFromModel)
     });
-    this._updateStateFromStore();
+    this._updateStateFromModel();
   }
 
   componentWillUnmount() {
-    const listener = this.state.debuggerStoreChangeListener;
+    const listener = this.state.debuggerModelChangeListener;
     if (listener != null) {
       listener.dispose();
     }
   }
 
   componentWillReceiveProps(nextProps) {
-    const listener = this.state.debuggerStoreChangeListener;
+    const listener = this.state.debuggerModelChangeListener;
     if (listener != null) {
       listener.dispose();
     }
     this.setState({
-      debuggerStoreChangeListener: nextProps.store.onChange(this._updateStateFromStore)
+      debuggerModelChangeListener: nextProps.model.onChange(this._updateStateFromModel)
     });
-    this._updateStateFromStore(nextProps.store);
+    this._updateStateFromModel(nextProps.model);
   }
 
   render() {
-    if (this.props.store.getDebuggerMode() === 'starting') {
+    if (this.props.model.getDebuggerMode() === 'starting') {
       return _react.createElement(
         'div',
         { className: 'nuclide-debugger-starting-message' },

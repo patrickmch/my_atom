@@ -32,6 +32,9 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
  * Note that if options.port=0 is specified to choose an ephemeral port, then the caller should
  * check server.address().port to see what the actual port is.
  */
+
+
+// The absolutePathToServerMain must export a single function of this type.
 function launchServer(options) {
   const webServer = _https.default.createServer(options.webServer);
 
@@ -57,6 +60,7 @@ function launchServer(options) {
       });
       webSocketServer.on('error', onError);
 
+      // $FlowIgnore
       const launcher = require(options.absolutePathToServerMain);
 
       const bigDigServer = new (_BigDigServer || _load_BigDigServer()).default(webServer, webSocketServer);

@@ -46,7 +46,7 @@ let createCqueryService = exports.createCqueryService = (() => {
 
     return new (_CqueryLanguageServer || _load_CqueryLanguageServer()).default(languageId, // id
     command, // command
-    logger, fileCache, params.host);
+    logger, fileCache, params.host, params.enableLibclangLogs);
   });
 
   return function createCqueryService(_x5) {

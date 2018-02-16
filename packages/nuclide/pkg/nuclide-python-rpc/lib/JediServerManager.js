@@ -6,11 +6,22 @@ Object.defineProperty(exports, "__esModule", {
 
 var _asyncToGenerator = _interopRequireDefault(require('async-to-generator'));
 
-var _lruCache;
+let getCustomSysPath = (() => {
+  var _ref = (0, _asyncToGenerator.default)(function* (src) {
+    try {
+      // $FlowFB
+      const fbCustomSysPath = require('./fb/custom-sys-path').default;
+      return yield fbCustomSysPath(src);
+    } catch (err) {
+      // Ignore.
+    }
+    return [];
+  });
 
-function _load_lruCache() {
-  return _lruCache = _interopRequireDefault(require('lru-cache'));
-}
+  return function getCustomSysPath(_x) {
+    return _ref.apply(this, arguments);
+  };
+})();
 
 var _fsPromise;
 
@@ -38,111 +49,67 @@ function _load_LinkTreeManager() {
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-/**
- * Copyright (c) 2015-present, Facebook, Inc.
- * All rights reserved.
- *
- * This source code is licensed under the license found in the LICENSE file in
- * the root directory of this source tree.
- *
- * 
- * @format
- */
-
 class JediServerManager {
-  // Cache the promises of additional paths to ensure that we never trigger two
-  // calls for the same file name from external calls to getLinkTreePaths and
-  // getTopLevelModulePath.
+
   constructor() {
-    this._cachedTopLevelModulePaths = new Map();
-    this._cachedLinkTreePaths = new Map();
-
     this._linkTreeManager = new (_LinkTreeManager || _load_LinkTreeManager()).default();
-    this._servers = new (_lruCache || _load_lruCache()).default({
-      max: 20,
-      dispose(key, val) {
-        val.dispose();
-      }
-    });
+    this._sysPathMap = new Map();
   }
 
-  getJediService(src) {
-    let server = this._servers.get(src);
-    if (server == null) {
-      server = new (_JediServer || _load_JediServer()).default(src);
-      this._servers.set(src, server);
-
-      // Add link tree and top-level module paths without awaiting,
-      // so we don't block the service from returning.
-      this._addLinkTreePaths(src, server);
-      this._addTopLevelModulePath(src, server);
+  getJediService() {
+    if (this._server == null) {
+      this._server = new (_JediServer || _load_JediServer()).default();
     }
-
-    return server.getService();
+    return this._server.getService();
   }
 
-  getLinkTreePaths(src) {
-    let linkTreePathsPromise = this._cachedLinkTreePaths.get(src);
-    if (linkTreePathsPromise == null) {
-      linkTreePathsPromise = this._linkTreeManager.getLinkTreePaths(src);
-      this._cachedLinkTreePaths.set(src, linkTreePathsPromise);
+  /**
+   * It's fine if the syspath changes over time.
+   * We'll return partial results while we fetch the actual values.
+   */
+  getSysPath(src) {
+    const cachedSysPath = this._sysPathMap.get(src);
+    if (cachedSysPath == null) {
+      const sysPath = [];
+      this._sysPathMap.set(src, sysPath);
+      getTopLevelModulePath(src).then(result => {
+        if (result != null) {
+          sysPath.push(result);
+        }
+      });
+      this._linkTreeManager.getLinkTreePaths(src).then(result => {
+        sysPath.push(...result);
+      });
+      getCustomSysPath(src).then(result => {
+        sysPath.push(...result);
+      });
+      return sysPath;
     }
-
-    return Promise.resolve(linkTreePathsPromise);
+    return cachedSysPath;
   }
 
-  getTopLevelModulePath(src) {
-    let topLevelModulePathPromise = this._cachedTopLevelModulePaths.get(src);
-    // We don't need to explicitly check undefined since the cached promise
-    // itself is not nullable, though its content is.
-    if (topLevelModulePathPromise == null) {
-      // Find the furthest directory while an __init__.py is present, stopping
-      // search once a directory does not contain an __init__.py.
-      topLevelModulePathPromise = (_fsPromise || _load_fsPromise()).default.findFurthestFile('__init__.py', (_nuclideUri || _load_nuclideUri()).default.dirname(src), true /* stopOnMissing */
-      );
-      this._cachedTopLevelModulePaths.set(src, topLevelModulePathPromise);
+  reset() {
+    if (this._server != null) {
+      this._server.dispose();
+      this._server = null;
     }
-
-    return Promise.resolve(topLevelModulePathPromise);
-  }
-
-  _addLinkTreePaths(src, server) {
-    var _this = this;
-
-    return (0, _asyncToGenerator.default)(function* () {
-      const linkTreePaths = yield _this.getLinkTreePaths(src);
-      if (server.isDisposed() || linkTreePaths.length === 0) {
-        return;
-      }
-      const service = yield server.getService();
-      yield service.add_paths(linkTreePaths);
-    })();
-  }
-
-  _addTopLevelModulePath(src, server) {
-    var _this2 = this;
-
-    return (0, _asyncToGenerator.default)(function* () {
-      const topLevelModulePath = yield _this2.getTopLevelModulePath(src);
-      // flowlint-next-line sketchy-null-string:off
-      if (server.isDisposed() || !topLevelModulePath) {
-        return;
-      }
-      const service = yield server.getService();
-      // Add the parent dir of the top level module path, i.e. the closest
-      // directory that does NOT contain __init__.py.
-      yield service.add_paths([(_nuclideUri || _load_nuclideUri()).default.dirname(topLevelModulePath)]);
-    })();
-  }
-
-  reset(src) {
-    this._servers.del(src);
-    this._linkTreeManager.reset(src);
-  }
-
-  dispose() {
-    this._servers.reset();
-    this._linkTreeManager.dispose();
+    this._sysPathMap.clear();
+    this._linkTreeManager = new (_LinkTreeManager || _load_LinkTreeManager()).default();
   }
 }
-exports.default = JediServerManager;
+
+exports.default = JediServerManager; /**
+                                      * Copyright (c) 2015-present, Facebook, Inc.
+                                      * All rights reserved.
+                                      *
+                                      * This source code is licensed under the license found in the LICENSE file in
+                                      * the root directory of this source tree.
+                                      *
+                                      * 
+                                      * @format
+                                      */
+
+function getTopLevelModulePath(src) {
+  return (_fsPromise || _load_fsPromise()).default.findFurthestFile('__init__.py', (_nuclideUri || _load_nuclideUri()).default.dirname(src), true /* stopOnMissing */
+  );
+}

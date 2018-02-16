@@ -25,12 +25,6 @@ function _load_AtomInput() {
   return _AtomInput = require('nuclide-commons-ui/AtomInput');
 }
 
-var _Portal;
-
-function _load_Portal() {
-  return _Portal = require('./Portal');
-}
-
 var _react = _interopRequireWildcard(require('react'));
 
 var _reactDom = _interopRequireDefault(require('react-dom'));
@@ -53,6 +47,17 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
  * TODO use generic search provider
  * TODO move combobox to separate package.
  */
+/**
+ * Copyright (c) 2015-present, Facebook, Inc.
+ * All rights reserved.
+ *
+ * This source code is licensed under the license found in the LICENSE file in
+ * the root directory of this source tree.
+ *
+ * 
+ * @format
+ */
+
 class Combobox extends _react.Component {
 
   constructor(props) {
@@ -371,23 +376,19 @@ class Combobox extends _react.Component {
 
       const rect = this.state.optionsRect || { left: 0, top: 0, width: 300 };
 
-      optionsContainer = _react.createElement(
-        (_Portal || _load_Portal()).Portal,
-        { container: this._getOptionsElement() },
+      optionsContainer = _reactDom.default.createPortal(_react.createElement(
+        'div',
+        { className: 'nuclide-combobox-options', style: rect },
         _react.createElement(
           'div',
-          { className: 'nuclide-combobox-options', style: rect },
+          { className: 'select-list' },
           _react.createElement(
-            'div',
-            { className: 'select-list' },
-            _react.createElement(
-              'ol',
-              { className: 'nuclide-combobox-list-group list-group' },
-              options
-            )
+            'ol',
+            { className: 'nuclide-combobox-list-group list-group' },
+            options
           )
         )
-      );
+      ), this._getOptionsElement());
     }
 
     const { initialTextInput, placeholderText, size, width } = this.props;
@@ -419,17 +420,7 @@ class Combobox extends _react.Component {
     );
   }
 }
-exports.Combobox = Combobox; /**
-                              * Copyright (c) 2015-present, Facebook, Inc.
-                              * All rights reserved.
-                              *
-                              * This source code is licensed under the license found in the LICENSE file in
-                              * the root directory of this source tree.
-                              *
-                              * 
-                              * @format
-                              */
-
+exports.Combobox = Combobox;
 Combobox.defaultProps = {
   className: '',
   maxOptionCount: 10,

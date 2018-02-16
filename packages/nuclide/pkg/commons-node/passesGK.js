@@ -17,10 +17,10 @@ function _load_once() {
   return _once = _interopRequireDefault(require('./once'));
 }
 
-var _eventKit;
+var _UniversalDisposable;
 
-function _load_eventKit() {
-  return _eventKit = require('event-kit');
+function _load_UniversalDisposable() {
+  return _UniversalDisposable = _interopRequireDefault(require('nuclide-commons/UniversalDisposable'));
 }
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
@@ -59,7 +59,7 @@ const getGatekeeper = (0, (_once || _load_once()).default)(() => {
         process.nextTick(() => {
           callback();
         });
-        return new (_eventKit || _load_eventKit()).Disposable();
+        return new (_UniversalDisposable || _load_UniversalDisposable()).default();
       }
 
       getCacheEntries() {

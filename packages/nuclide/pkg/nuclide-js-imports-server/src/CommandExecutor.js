@@ -48,18 +48,13 @@ function _load_util() {
   return _util = require('./utils/util');
 }
 
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+var _lspUtils;
 
-/**
- * Copyright (c) 2015-present, Facebook, Inc.
- * All rights reserved.
- *
- * This source code is licensed under the license found in the LICENSE file in
- * the root directory of this source tree.
- *
- * 
- * @format
- */
+function _load_lspUtils() {
+  return _lspUtils = require('../../nuclide-lsp-implementation-common/lsp-utils');
+}
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 class CommandExecutor {
 
@@ -130,7 +125,17 @@ class CommandExecutor {
   }
 }
 
-exports.CommandExecutor = CommandExecutor;
+exports.CommandExecutor = CommandExecutor; /**
+                                            * Copyright (c) 2015-present, Facebook, Inc.
+                                            * All rights reserved.
+                                            *
+                                            * This source code is licensed under the license found in the LICENSE file in
+                                            * the root directory of this source tree.
+                                            *
+                                            * 
+                                            * @format
+                                            */
+
 CommandExecutor.COMMANDS = {
   addImport: true
 };
@@ -145,7 +150,7 @@ function getEditsForImport(importFormatter, fileMissingImport, missingImport, pr
 
 function createEdit(insertText, { row, column, indent, newLinesAfter, newLinesBefore }) {
   return {
-    range: (0, (_util || _load_util()).atomRangeToLSPRange)(new (_simpleTextBuffer || _load_simpleTextBuffer()).Range([row, column], [row, column])),
+    range: (0, (_lspUtils || _load_lspUtils()).atomRangeToLSPRange)(new (_simpleTextBuffer || _load_simpleTextBuffer()).Range([row, column], [row, column])),
     newText:
     // We're always going to insert before any trailing commas, so it's safe to always add one.
     (column === 0 ? '' : ',') + '\n'.repeat(newLinesBefore) + ' '.repeat(indent || 0) + insertText + '\n'.repeat(newLinesAfter)
@@ -289,7 +294,7 @@ function insertBefore(node, spacing = 0) {
 // Signal across RPC that the import had no available exports, via empty newText
 function undecidableImportEdits() {
   return [{
-    range: (0, (_util || _load_util()).atomRangeToLSPRange)(new (_simpleTextBuffer || _load_simpleTextBuffer()).Range([0, 0], [0, 0])),
+    range: (0, (_lspUtils || _load_lspUtils()).atomRangeToLSPRange)(new (_simpleTextBuffer || _load_simpleTextBuffer()).Range([0, 0], [0, 0])),
     newText: ''
   }];
 }

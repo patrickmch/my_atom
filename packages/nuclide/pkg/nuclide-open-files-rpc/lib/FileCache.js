@@ -42,6 +42,10 @@ function _load_constants() {
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 /**
+ * NB: although it is possible to change the language ID after the file has
+ * already been opened, the file cache will not update to reflect that.
+ */
+/**
  * Copyright (c) 2015-present, Facebook, Inc.
  * All rights reserved.
  *
@@ -86,14 +90,15 @@ class FileCache {
   onFileEvent(event) {
     const filePath = event.fileVersion.filePath;
     const changeCount = event.fileVersion.version;
-    const buffer = this._buffers.get(filePath);
+    const fileInfo = this._buffers.get(filePath);
+    const buffer = fileInfo != null ? fileInfo.buffer : null;
     switch (event.kind) {
       case (_constants || _load_constants()).FileEventKind.OPEN:
         if (!(buffer == null)) {
           throw new Error('Invariant violation: "buffer == null"');
         }
 
-        this._open(filePath, event.contents, changeCount);
+        this._open(filePath, event.contents, changeCount, event.languageId);
         break;
       case (_constants || _load_constants()).FileEventKind.CLOSE:
         if (buffer != null) {
@@ -128,7 +133,7 @@ class FileCache {
         break;
       case (_constants || _load_constants()).FileEventKind.SYNC:
         if (buffer == null) {
-          this._open(filePath, event.contents, changeCount);
+          this._open(filePath, event.contents, changeCount, event.languageId);
         } else {
           this._syncEdit(filePath, buffer, event.contents, changeCount);
         }
@@ -144,7 +149,7 @@ class FileCache {
     var _this = this;
 
     return (0, _asyncToGenerator.default)(function* () {
-      const addLength = function (acc, buffer) {
+      const addLength = function (acc, { buffer }) {
         return acc + buffer.getText().length;
       };
       return [..._this._buffers.values()].reduce(addLength, 0);
@@ -175,14 +180,14 @@ class FileCache {
     });
   }
 
-  _open(filePath, contents, changeCount) {
+  _open(filePath, contents, changeCount, languageId) {
     // We never call setPath on these TextBuffers as that will
     // start the TextBuffer attempting to sync with the file system.
     const newBuffer = new (_simpleTextBuffer || _load_simpleTextBuffer()).default(contents);
     newBuffer.changeCount = changeCount;
     this.update(() => {
-      this._buffers.set(filePath, newBuffer);
-      return createOpenEvent(this.createFileVersion(filePath, changeCount), contents);
+      this._buffers.set(filePath, { buffer: newBuffer, languageId });
+      return createOpenEvent(this.createFileVersion(filePath, changeCount), contents, languageId);
     });
   }
 
@@ -202,7 +207,7 @@ class FileCache {
 
   dispose() {
     // The _close routine will delete elements from the _buffers map.
-    for (const [filePath, buffer] of this._buffers.entries()) {
+    for (const [filePath, { buffer }] of this._buffers.entries()) {
       this._close(filePath, buffer);
     }
 
@@ -220,7 +225,8 @@ class FileCache {
     // TODO: change this to return a string, to ensure that no caller will ever mutate
     // the buffer contents (and hence its changeCount). The only modifications allowed
     // are those that come from the editor inside this.onFileEvent.
-    return this._buffers.get(filePath);
+    const fileInfo = this._buffers.get(filePath);
+    return fileInfo != null ? fileInfo.buffer : null;
   }
 
   // getBufferAtVersion(version): if the stream of onFileEvent gets up to this particular
@@ -284,12 +290,16 @@ class FileCache {
   }
 
   observeFileEvents() {
-    return _rxjsBundlesRxMinJs.Observable.from(Array.from(this._buffers.entries()).map(([filePath, buffer]) => {
+    return _rxjsBundlesRxMinJs.Observable.from(Array.from(this._buffers.entries()).map(([filePath, { buffer, languageId }]) => {
       if (!(buffer != null)) {
         throw new Error('Invariant violation: "buffer != null"');
       }
 
-      return createOpenEvent(this.createFileVersion(filePath, buffer.changeCount), buffer.getText());
+      if (!(languageId != null)) {
+        throw new Error('Invariant violation: "languageId != null"');
+      }
+
+      return createOpenEvent(this.createFileVersion(filePath, buffer.changeCount), buffer.getText(), languageId);
     })).concat(this._fileEvents);
   }
 
@@ -307,11 +317,12 @@ class FileCache {
 }
 
 exports.FileCache = FileCache;
-function createOpenEvent(fileVersion, contents) {
+function createOpenEvent(fileVersion, contents, languageId) {
   return {
     kind: (_constants || _load_constants()).FileEventKind.OPEN,
     fileVersion,
-    contents
+    contents,
+    languageId
   };
 }
 

@@ -49,7 +49,7 @@ function _load_split() {
 var _nuclideWatchmanHelpers;
 
 function _load_nuclideWatchmanHelpers() {
-  return _nuclideWatchmanHelpers = require('../../../nuclide-watchman-helpers');
+  return _nuclideWatchmanHelpers = require('nuclide-watchman-helpers');
 }
 
 var _fsPromise;

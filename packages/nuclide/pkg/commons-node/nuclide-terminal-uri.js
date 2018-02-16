@@ -81,8 +81,9 @@ function uriFromInfo(info) {
   return uri;
 }
 
-function infoFromUri(paneUri) {
+function infoFromUri(paneUri, uriFromTrustedSource = false) {
   const { query } = _url.default.parse(paneUri, true);
+
   if (query == null) {
     return TERMINAL_DEFAULT_INFO;
   } else {
@@ -117,7 +118,7 @@ function infoFromUri(paneUri) {
       key
     });
 
-    const isTrusted = query.trustToken === trustToken;
+    const isTrusted = uriFromTrustedSource || query.trustToken === trustToken;
     return Object.assign({}, untrustedFields, isTrusted ? trustedFields : {});
   }
 }

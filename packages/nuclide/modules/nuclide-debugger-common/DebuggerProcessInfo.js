@@ -32,7 +32,6 @@ class DebuggerProcessInfo {
       readOnlyTarget: false,
       registers: false,
       setVariable: false,
-      singleThreadStepping: false,
       threads: false,
       completionsRequest: false
     };
@@ -42,7 +41,6 @@ class DebuggerProcessInfo {
     return {
       customControlButtons: [],
       targetDescription: () => null,
-      threadColumns: [],
       threadsComponentTitle: 'Threads'
     };
   }

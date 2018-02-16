@@ -110,6 +110,7 @@ const getActions = (_FileTreeActions || _load_FileTreeActions()).default.getInst
 const SUBSEQUENT_FETCH_SPINNER_DELAY = 500;
 const INITIAL_FETCH_SPINNER_DELAY = 25;
 const INDENT_LEVEL = 17;
+const CHAR_EM_SCALE_FACTOR = 0.9;
 
 class FileTreeEntryComponent extends _react.Component {
 
@@ -429,21 +430,40 @@ class FileTreeEntryComponent extends _react.Component {
       }
     }
 
+    let min_width = 'max-content';
+    if (store != null) {
+      const size = store.getMaxComponentWidth();
+      if (size != null && typeof size === 'number' && size > 0) {
+        min_width = size * CHAR_EM_SCALE_FACTOR + 'em';
+      }
+    }
+
     return _react.createElement(
       'li',
       {
-        className: `${outerClassName} ${statusClass} ${generatedClass}`,
-        style: { paddingLeft: this.props.node.getDepth() * INDENT_LEVEL },
+        className: (0, (_classnames || _load_classnames()).default)(outerClassName, statusClass, generatedClass, {
+          // `atom/find-and-replace` looks for this class to determine if a
+          // data-path is a directory or not:
+          directory: node.isContainer
+        }),
+        style: {
+          paddingLeft: this.props.node.getDepth() * INDENT_LEVEL,
+          minWidth: min_width,
+          marginLeft: 0
+        },
         draggable: true,
         onMouseDown: this._onMouseDown,
         onClick: this._onClick,
-        onDoubleClick: this._onDoubleClick },
+        onDoubleClick: this._onDoubleClick,
+        'data-name': node.name,
+        'data-path': node.uri },
       _react.createElement(
         'div',
         {
           className: listItemClassName,
           ref: el => {
             this._arrowContainer = el;
+            store.updateMaxComponentWidth(this.props.node.name.length);
           } },
         _react.createElement(
           (_PathWithFileIcon || _load_PathWithFileIcon()).default,

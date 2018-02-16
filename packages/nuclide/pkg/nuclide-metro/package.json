@@ -3,6 +3,7 @@
   "main": "./lib/main.js",
   "version": "0.0.0",
   "description": "Metro (JavaScript bundler) Atom-side package",
+  "author": "NEEDS OWNER",
   "atomTestRunner": "../../lib/test-runner-entry.js",
   "nuclide": {
     "configMetadata": {
@@ -15,7 +16,7 @@
     "testRunner": "apm"
   },
   "consumedServices": {
-    "nuclide-output": {
+    "DEPRECATED-nuclide-output": {
       "versions": {
         "0.0.0": "consumeOutputService"
       }

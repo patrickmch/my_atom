@@ -15,6 +15,12 @@ function _load_systemInfo() {
 
 var _os = _interopRequireDefault(require('os'));
 
+var _process;
+
+function _load_process() {
+  return _process = require('nuclide-commons/process');
+}
+
 var _nuclideUri;
 
 function _load_nuclideUri() {
@@ -23,17 +29,18 @@ function _load_nuclideUri() {
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-const LOG_DIRECTORY = (_nuclideUri || _load_nuclideUri()).default.join(_os.default.tmpdir(), `/nuclide-${_os.default.userInfo().username}-logs`); /**
-                                                                                                                                                   * Copyright (c) 2015-present, Facebook, Inc.
-                                                                                                                                                   * All rights reserved.
-                                                                                                                                                   *
-                                                                                                                                                   * This source code is licensed under the license found in the LICENSE file in
-                                                                                                                                                   * the root directory of this source tree.
-                                                                                                                                                   *
-                                                                                                                                                   * 
-                                                                                                                                                   * @format
-                                                                                                                                                   */
+/**
+ * Copyright (c) 2015-present, Facebook, Inc.
+ * All rights reserved.
+ *
+ * This source code is licensed under the license found in the LICENSE file in
+ * the root directory of this source tree.
+ *
+ * 
+ * @format
+ */
 
+const LOG_DIRECTORY = (_nuclideUri || _load_nuclideUri()).default.join(_os.default.tmpdir(), `/nuclide-${_os.default.userInfo().username}-logs`);
 const LOG_FILE_PATH = exports.LOG_FILE_PATH = (_nuclideUri || _load_nuclideUri()).default.join(LOG_DIRECTORY, 'nuclide.log');
 
 const MAX_LOG_SIZE = 1024 * 1024;
@@ -74,6 +81,10 @@ function getDefaultConfig() {
     });
   }
   if (!(0, (_systemInfo || _load_systemInfo()).isRunningInTest)()) {
+    appenders.push({
+      type: require.resolve('./processTrackingAppender'),
+      category: (_process || _load_process()).LOG_CATEGORY
+    });
     try {
       const scribeAppenderPath = require.resolve('../fb/scribeAppender');
       appenders.push({

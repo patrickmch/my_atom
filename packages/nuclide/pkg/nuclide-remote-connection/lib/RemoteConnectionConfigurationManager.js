@@ -107,7 +107,8 @@ let encryptConfig = (() => {
       family: remoteProjectConfig.family,
       certificateAuthorityCertificate: certificateAuthorityCertificate.toString(),
       clientCertificate: clientCertificate.toString(),
-      clientKey: clientKeyWithSalt
+      clientKey: clientKeyWithSalt,
+      version: remoteProjectConfig.version
     };
   });
 
@@ -177,7 +178,8 @@ let decryptConfig = (() => {
       family: remoteProjectConfig.family,
       certificateAuthorityCertificate: new Buffer(certificateAuthorityCertificate),
       clientCertificate: new Buffer(clientCertificate),
-      clientKey: new Buffer(restoredClientKey)
+      clientKey: new Buffer(restoredClientKey),
+      version: remoteProjectConfig.version
     };
   });
 

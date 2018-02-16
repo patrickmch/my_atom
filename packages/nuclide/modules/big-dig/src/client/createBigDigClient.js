@@ -14,6 +14,12 @@ function _load_ws() {
 
 var _https = _interopRequireDefault(require('https'));
 
+var _BigDigServer;
+
+function _load_BigDigServer() {
+  return _BigDigServer = require('../server/BigDigServer');
+}
+
 var _WebSocketTransport;
 
 function _load_WebSocketTransport() {
@@ -24,6 +30,12 @@ var _BigDigClient;
 
 function _load_BigDigClient() {
   return _BigDigClient = require('./BigDigClient');
+}
+
+var _XhrConnectionHeartbeat;
+
+function _load_XhrConnectionHeartbeat() {
+  return _XhrConnectionHeartbeat = require('./XhrConnectionHeartbeat');
 }
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
@@ -57,7 +69,8 @@ exports.default = (() => {
     });
     const agent = new _https.default.Agent(options);
     const webSocketTransport = new (_WebSocketTransport || _load_WebSocketTransport()).WebSocketTransport('test', agent, socket);
-    return new (_BigDigClient || _load_BigDigClient()).BigDigClient(webSocketTransport);
+    const heartbeat = new (_XhrConnectionHeartbeat || _load_XhrConnectionHeartbeat()).XhrConnectionHeartbeat(`https://${config.host}:${config.port}`, (_BigDigServer || _load_BigDigServer()).HEARTBEAT_CHANNEL, options);
+    return new (_BigDigClient || _load_BigDigClient()).BigDigClient(webSocketTransport, heartbeat);
   });
 
   function createBigDigClient(_x) {

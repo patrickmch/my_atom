@@ -3,7 +3,7 @@
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.resetCompilationDatabase = exports.resetCompilationDatabaseForSource = exports.getLastCommandInfo = exports.queryWithArgs = exports.getHTTPServerPort = exports._buildRuleTypeFor = exports.buildRuleTypeFor = exports.showOutput = exports.listFlavors = exports.listAliases = exports.getBuckConfig = exports.MULTIPLE_TARGET_RULE_TYPE = undefined;
+exports.resetCompilationDatabase = exports.resetCompilationDatabaseForSource = exports.getLastCommandInfo = exports.queryWithAttributes = exports.queryWithArgs = exports.getHTTPServerPort = exports._buildRuleTypeFor = exports.buildRuleTypeFor = exports.showOutput = exports.listFlavors = exports.listAliases = exports.getBuckConfig = exports.MULTIPLE_TARGET_RULE_TYPE = undefined;
 
 var _asyncToGenerator = _interopRequireDefault(require('async-to-generator'));
 
@@ -255,12 +255,37 @@ let queryWithArgs = exports.queryWithArgs = (() => {
   };
 })();
 
+/**
+ * Executes a query with additional attributes.
+ * Example output:
+ *   queryWithAttributes(rootPath, 'owner(foo.py)', ['buck.type', 'deps']) =>
+ *   {
+ *      "//foo:foo": {
+ *        "buck.type": "python_library",
+ *        "deps": [],
+ *      }
+ *   }
+ */
+
+
+let queryWithAttributes = exports.queryWithAttributes = (() => {
+  var _ref10 = (0, _asyncToGenerator.default)(function* (rootPath, queryString, attributes) {
+    const completeArgs = ['query', '--json', queryString, '--output-attributes', ...attributes];
+    const result = yield (_BuckServiceImpl || _load_BuckServiceImpl()).runBuckCommandFromProjectRoot(rootPath, completeArgs);
+    return JSON.parse(result);
+  });
+
+  return function queryWithAttributes(_x18, _x19, _x20) {
+    return _ref10.apply(this, arguments);
+  };
+})();
+
 // TODO: Nuclide's RPC framework won't allow BuckWebSocketMessage here unless we cover
 // all possible message types. For now, we'll manually typecast at the callsite.
 
 
 let getLastCommandInfo = exports.getLastCommandInfo = (() => {
-  var _ref10 = (0, _asyncToGenerator.default)(function* (rootPath, maxArgs) {
+  var _ref11 = (0, _asyncToGenerator.default)(function* (rootPath, maxArgs) {
     const logFile = (_nuclideUri || _load_nuclideUri()).default.join(rootPath, LOG_PATH);
     if (yield (_fsPromise || _load_fsPromise()).default.exists(logFile)) {
       let line;
@@ -289,28 +314,28 @@ let getLastCommandInfo = exports.getLastCommandInfo = (() => {
     return null;
   });
 
-  return function getLastCommandInfo(_x18, _x19) {
-    return _ref10.apply(this, arguments);
-  };
-})();
-
-let resetCompilationDatabaseForSource = exports.resetCompilationDatabaseForSource = (() => {
-  var _ref11 = (0, _asyncToGenerator.default)(function* (src, params) {
-    (0, (_BuckClangCompilationDatabase || _load_BuckClangCompilationDatabase()).getCompilationDatabaseHandler)(params).resetForSource(src);
-  });
-
-  return function resetCompilationDatabaseForSource(_x20, _x21) {
+  return function getLastCommandInfo(_x21, _x22) {
     return _ref11.apply(this, arguments);
   };
 })();
 
+let resetCompilationDatabaseForSource = exports.resetCompilationDatabaseForSource = (() => {
+  var _ref12 = (0, _asyncToGenerator.default)(function* (src, params) {
+    (0, (_BuckClangCompilationDatabase || _load_BuckClangCompilationDatabase()).getCompilationDatabaseHandler)(params).resetForSource(src);
+  });
+
+  return function resetCompilationDatabaseForSource(_x23, _x24) {
+    return _ref12.apply(this, arguments);
+  };
+})();
+
 let resetCompilationDatabase = exports.resetCompilationDatabase = (() => {
-  var _ref12 = (0, _asyncToGenerator.default)(function* (params) {
+  var _ref13 = (0, _asyncToGenerator.default)(function* (params) {
     (0, (_BuckClangCompilationDatabase || _load_BuckClangCompilationDatabase()).getCompilationDatabaseHandler)(params).reset();
   });
 
-  return function resetCompilationDatabase(_x22) {
-    return _ref12.apply(this, arguments);
+  return function resetCompilationDatabase(_x25) {
+    return _ref13.apply(this, arguments);
   };
 })();
 
@@ -418,10 +443,11 @@ function getBuildFile(rootPath, targetName) {
  *
  * @param filePath absolute path or a local or a remote file.
  * @param kindFilter filter for specific build target kinds.
+ * @param extraArguments passed on the command line to buck query
  * @return Promise that resolves to an array of build targets.
  */
-function getOwners(rootPath, filePath, kindFilter) {
-  return (_BuckServiceImpl || _load_BuckServiceImpl()).getOwners(rootPath, filePath, kindFilter);
+function getOwners(rootPath, filePath, extraArguments, kindFilter) {
+  return (_BuckServiceImpl || _load_BuckServiceImpl()).getOwners(rootPath, filePath, extraArguments, kindFilter);
 }function build(rootPath, buildTargets, options) {
   return (_BuckServiceImpl || _load_BuckServiceImpl()).build(rootPath, buildTargets, options);
 }
@@ -554,8 +580,8 @@ function _normalizeNameForBuckQuery(aliasOrTarget) {
 
 const _cachedPorts = new Map();
 
-function query(rootPath, queryString) {
-  return (_BuckServiceImpl || _load_BuckServiceImpl()).query(rootPath, queryString);
+function query(rootPath, queryString, extraArguments) {
+  return (_BuckServiceImpl || _load_BuckServiceImpl()).query(rootPath, queryString, extraArguments);
 }function getWebSocketStream(rootPath, httpPort) {
   return (0, (_createBuckWebSocket || _load_createBuckWebSocket()).default)(httpPort).publish();
 }

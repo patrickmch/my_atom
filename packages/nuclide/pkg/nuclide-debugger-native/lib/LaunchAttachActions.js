@@ -7,6 +7,12 @@ exports.LaunchAttachActions = undefined;
 
 var _asyncToGenerator = _interopRequireDefault(require('async-to-generator'));
 
+var _debugger;
+
+function _load_debugger() {
+  return _debugger = require('../../commons-atom/debugger');
+}
+
 var _AttachProcessInfo;
 
 function _load_AttachProcessInfo() {
@@ -23,12 +29,6 @@ var _nuclideRemoteConnection;
 
 function _load_nuclideRemoteConnection() {
   return _nuclideRemoteConnection = require('../../nuclide-remote-connection');
-}
-
-var _consumeFirstProvider;
-
-function _load_consumeFirstProvider() {
-  return _consumeFirstProvider = _interopRequireDefault(require('../../commons-atom/consumeFirstProvider'));
 }
 
 var _LaunchAttachDispatcher;
@@ -75,7 +75,7 @@ class LaunchAttachActions {
 
   _startDebugging(processInfo) {
     return (0, _asyncToGenerator.default)(function* () {
-      const debuggerService = yield (0, (_consumeFirstProvider || _load_consumeFirstProvider()).default)('nuclide-debugger.remote');
+      const debuggerService = yield (0, (_debugger || _load_debugger()).getDebuggerService)();
       yield debuggerService.startDebugging(processInfo);
     })();
   }
@@ -123,7 +123,7 @@ class LaunchAttachActions {
 
   _killAutoRefreshTimer() {
     if (this._refreshTimerId != null) {
-      clearTimeout(this._refreshTimerId);
+      clearInterval(this._refreshTimerId);
       this._refreshTimerId = null;
     }
   }

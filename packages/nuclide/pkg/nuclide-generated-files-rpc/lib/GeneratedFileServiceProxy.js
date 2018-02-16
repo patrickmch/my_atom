@@ -30,6 +30,22 @@ module.exports = _client => {
     });
   };
 
+  remoteModule.invalidateFileTypeCache = function (arg0) {
+    return _client.marshalArguments(Array.from(arguments), [{
+      name: "filePath",
+      type: {
+        kind: "named",
+        name: "NuclideUri"
+      }
+    }]).then(args => {
+      return _client.callRemoteFunction("GeneratedFileService/invalidateFileTypeCache", "promise", args);
+    }).then(value => {
+      return _client.unmarshal(value, {
+        kind: "void"
+      });
+    });
+  };
+
   remoteModule.getGeneratedFileTypes = function (arg0) {
     return _client.marshalArguments(Array.from(arguments), [{
       name: "dirPath",
@@ -181,9 +197,9 @@ Object.defineProperty(module.exports, "defs", {
         }
       }
     },
-    getGeneratedFileTypes: {
+    invalidateFileTypeCache: {
       kind: "function",
-      name: "getGeneratedFileTypes",
+      name: "invalidateFileTypeCache",
       location: {
         type: "source",
         fileName: "GeneratedFileService.js",
@@ -194,6 +210,36 @@ Object.defineProperty(module.exports, "defs", {
           type: "source",
           fileName: "GeneratedFileService.js",
           line: 56
+        },
+        kind: "function",
+        argumentTypes: [{
+          name: "filePath",
+          type: {
+            kind: "named",
+            name: "NuclideUri"
+          }
+        }],
+        returnType: {
+          kind: "promise",
+          type: {
+            kind: "void"
+          }
+        }
+      }
+    },
+    getGeneratedFileTypes: {
+      kind: "function",
+      name: "getGeneratedFileTypes",
+      location: {
+        type: "source",
+        fileName: "GeneratedFileService.js",
+        line: 62
+      },
+      type: {
+        location: {
+          type: "source",
+          fileName: "GeneratedFileService.js",
+          line: 62
         },
         kind: "function",
         argumentTypes: [{

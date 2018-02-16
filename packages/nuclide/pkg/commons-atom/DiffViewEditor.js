@@ -16,6 +16,18 @@ function _load_collection() {
   return _collection = require('nuclide-commons/collection');
 }
 
+var _semver;
+
+function _load_semver() {
+  return _semver = _interopRequireDefault(require('semver'));
+}
+
+var _systemInfo;
+
+function _load_systemInfo() {
+  return _systemInfo = require('../commons-node/system-info');
+}
+
 var _blockDecorations;
 
 function _load_blockDecorations() {
@@ -36,6 +48,8 @@ function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj;
  * 
  * @format
  */
+
+const ATOM_VERSION_CHECK_FOR_SET_GRAMMAR = '1.24.0-beta0';
 
 function renderLineOffset(lineCount, lineHeight) {
   return _react.createElement('div', {
@@ -125,7 +139,12 @@ class DiffViewEditor {
       buffer.setText(contents);
     }
     const grammar = atom.grammars.selectGrammar(filePath, contents);
-    this._editor.setGrammar(grammar);
+    const version = (0, (_systemInfo || _load_systemInfo()).getAtomVersion)();
+    if ((_semver || _load_semver()).default.lt(version, ATOM_VERSION_CHECK_FOR_SET_GRAMMAR)) {
+      this._editor.setGrammar(grammar);
+    } else {
+      atom.grammars.assignLanguageMode(buffer, grammar.scopeName);
+    }
   }
 
   getModel() {

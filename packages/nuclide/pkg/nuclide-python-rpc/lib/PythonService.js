@@ -3,7 +3,7 @@
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.getDiagnostics = exports.getReferences = exports.initialize = undefined;
+exports.getBuildableTargets = exports.getDiagnostics = exports._getReferences = exports.initialize = undefined;
 
 var _asyncToGenerator = _interopRequireDefault(require('async-to-generator'));
 
@@ -17,13 +17,14 @@ let initialize = exports.initialize = (() => {
   };
 })();
 
-let getReferences = exports.getReferences = (() => {
-  var _ref2 = (0, _asyncToGenerator.default)(function* (src, contents, line, column) {
-    const service = yield serverManager.getJediService(src);
-    return service.get_references(src, contents, line, column);
+// Exported for testing.
+let _getReferences = exports._getReferences = (() => {
+  var _ref2 = (0, _asyncToGenerator.default)(function* (manager, src, contents, line, column) {
+    const service = yield manager.getJediService();
+    return service.get_references(src, contents, manager.getSysPath(src), line, column);
   });
 
-  return function getReferences(_x3, _x4, _x5, _x6) {
+  return function _getReferences(_x3, _x4, _x5, _x6, _x7) {
     return _ref2.apply(this, arguments);
   };
 })();
@@ -57,7 +58,7 @@ let getDiagnostics = exports.getDiagnostics = (() => {
     return (0, (_flake || _load_flake()).parseFlake8Output)(src, result);
   });
 
-  return function getDiagnostics(_x7, _x8) {
+  return function getDiagnostics(_x8, _x9) {
     return _ref3.apply(this, arguments);
   };
 })();
@@ -111,15 +112,61 @@ let runLinterCommand = (() => {
     }).toPromise();
   });
 
-  return function runLinterCommand(_x9, _x10) {
+  return function runLinterCommand(_x10, _x11) {
     return _ref4.apply(this, arguments);
   };
 })();
+
+/**
+ * Retrieves a list of buildable targets to obtain link trees for a given file.
+ * (This won't return anything if a link tree is already available.)
+ */
+
+
+let getBuildableTargets = exports.getBuildableTargets = (() => {
+  var _ref5 = (0, _asyncToGenerator.default)(function* (src) {
+    const linkTreeManager = serverManager._linkTreeManager;
+    const linkTrees = yield linkTreeManager.getLinkTreePaths(src);
+    if (linkTrees.length === 0) {
+      return [];
+    }
+    if (yield (0, (_promise || _load_promise()).asyncSome)(linkTrees, (_fsPromise || _load_fsPromise()).default.exists)) {
+      return [];
+    }
+    const buckRoot = yield linkTreeManager.getBuckRoot(src);
+    const owner = yield linkTreeManager.getOwner(src);
+    if (buckRoot == null || owner == null) {
+      return [];
+    }
+    const dependents = yield linkTreeManager.getDependents(buckRoot, owner);
+    return Array.from(dependents.keys());
+  });
+
+  return function getBuildableTargets(_x12) {
+    return _ref5.apply(this, arguments);
+  };
+})();
+
+exports.reset = reset;
+
+var _rxjsBundlesRxMinJs = require('rxjs/bundles/Rx.min.js');
 
 var _process;
 
 function _load_process() {
   return _process = require('nuclide-commons/process');
+}
+
+var _promise;
+
+function _load_promise() {
+  return _promise = require('nuclide-commons/promise');
+}
+
+var _range;
+
+function _load_range() {
+  return _range = require('nuclide-commons/range');
 }
 
 var _string;
@@ -144,6 +191,12 @@ var _once;
 
 function _load_once() {
   return _once = _interopRequireDefault(require('../../commons-node/once'));
+}
+
+var _constants;
+
+function _load_constants() {
+  return _constants = require('./constants');
 }
 
 var _JediServerManager;
@@ -243,10 +296,14 @@ class PythonSingleFileLanguageService {
   }
 
   findReferences(filePath, buffer, position) {
+    return _rxjsBundlesRxMinJs.Observable.fromPromise(this._findReferences(filePath, buffer, position));
+  }
+
+  _findReferences(filePath, buffer, position) {
     var _this = this;
 
     return (0, _asyncToGenerator.default)(function* () {
-      const result = yield getReferences(filePath, buffer.getText(), position.row, position.column);
+      const result = yield _getReferences(serverManager, filePath, buffer.getText(), position.row, position.column);
 
       if (!result || result.length === 0) {
         return { type: 'error', message: 'No usages were found.' };
@@ -284,7 +341,7 @@ class PythonSingleFileLanguageService {
     var _this2 = this;
 
     return (0, _asyncToGenerator.default)(function* () {
-      const service = yield serverManager.getJediService(filePath);
+      const service = yield serverManager.getJediService();
       const items = yield service.get_outline(filePath, buffer.getText());
 
       if (items == null) {
@@ -299,7 +356,24 @@ class PythonSingleFileLanguageService {
   }
 
   typeHint(filePath, buffer, position) {
-    throw new Error('Not Yet Implemented');
+    return (0, _asyncToGenerator.default)(function* () {
+      const word = (0, (_range || _load_range()).wordAtPositionFromBuffer)(buffer, position, (_constants || _load_constants()).IDENTIFIER_REGEXP);
+      if (word == null) {
+        return null;
+      }
+      const service = yield serverManager.getJediService();
+      const result = yield service.get_hover(filePath, buffer.getText(), serverManager.getSysPath(filePath), word.wordMatch[0], position.row, position.column);
+      if (result == null) {
+        return null;
+      }
+      return {
+        hint: [{
+          type: 'markdown',
+          value: result
+        }],
+        range: word.range
+      };
+    })();
   }
 
   highlight(filePath, buffer, position) {
@@ -381,6 +455,8 @@ const getFormatterCommandImpl = (0, (_once || _load_once()).default)(() => {
       args: ['--lines', `${range.start.row + 1}-${range.end.row + 1}`]
     });
   }
-});
+});let shouldRunFlake8 = true;
 
-let shouldRunFlake8 = true;
+function reset() {
+  serverManager.reset();
+}

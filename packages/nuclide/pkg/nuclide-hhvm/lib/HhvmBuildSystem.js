@@ -94,11 +94,9 @@ class HhvmBuildSystem {
   }
 
   setProjectRoot(projectRoot, callback) {
-    const path = projectRoot == null ? null : projectRoot.getPath();
-
-    const enabledObservable = (0, (_event || _load_event()).observableFromSubscribeFunction)(this._projectStore.onChange.bind(this._projectStore)).map(() => this._projectStore).filter(store =>
+    const enabledObservable = (0, (_event || _load_event()).observableFromSubscribeFunction)(this._projectStore.onChange.bind(this._projectStore)).map(() => this._projectStore).filter(store => store.getProjectRoot() === projectRoot &&
     // eslint-disable-next-line eqeqeq
-    store.getProjectRoot() === path && store.isHHVMProject() !== null).map(store => store.isHHVMProject() === true).distinctUntilChanged();
+    store.isHHVMProject() !== null).map(store => store.isHHVMProject() === true).distinctUntilChanged();
 
     const tasksObservable = _rxjsBundlesRxMinJs.Observable.of([{
       type: 'debug',
@@ -110,7 +108,7 @@ class HhvmBuildSystem {
 
     const subscription = _rxjsBundlesRxMinJs.Observable.combineLatest(enabledObservable, tasksObservable).subscribe(([enabled, tasks]) => callback(enabled, tasks));
 
-    this._projectStore.setProjectRoot(path);
+    this._projectStore.setProjectRoot(projectRoot);
 
     return new (_UniversalDisposable || _load_UniversalDisposable()).default(subscription);
   }

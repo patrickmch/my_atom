@@ -5,7 +5,13 @@ Object.defineProperty(exports, "__esModule", {
 });
 exports.DistractionFreeMode = undefined;
 
-var _atom = require('atom');
+var _UniversalDisposable;
+
+function _load_UniversalDisposable() {
+  return _UniversalDisposable = _interopRequireDefault(require('nuclide-commons/UniversalDisposable'));
+}
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 class DistractionFreeMode {
   // Non-null iff we have entered distraction-free mode without explicitly exiting it. See
@@ -37,7 +43,7 @@ class DistractionFreeMode {
     if (this._deserializationState != null && this._deserializationState.has(provider.name)) {
       this._addToRestoreState(provider);
     }
-    return new _atom.Disposable(() => {
+    return new (_UniversalDisposable || _load_UniversalDisposable()).default(() => {
       this._providers.delete(provider);
     });
   }

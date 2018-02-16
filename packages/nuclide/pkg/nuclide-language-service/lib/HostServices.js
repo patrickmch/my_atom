@@ -7,6 +7,12 @@ exports.getHostServices = undefined;
 
 var _asyncToGenerator = _interopRequireDefault(require('async-to-generator'));
 
+var _memoize2;
+
+function _load_memoize() {
+  return _memoize2 = _interopRequireDefault(require('lodash/memoize'));
+}
+
 let getHostServices = exports.getHostServices = (() => {
   var _ref = (0, _asyncToGenerator.default)(function* () {
     // This method doesn't need to be async. But out of laziness we're
@@ -26,6 +32,12 @@ let getHostServices = exports.getHostServices = (() => {
 
 // Following type implements the HostServicesForLanguage interface
 
+
+var _consumeFirstProvider;
+
+function _load_consumeFirstProvider() {
+  return _consumeFirstProvider = _interopRequireDefault(require('../../commons-atom/consumeFirstProvider'));
+}
 
 var _log4js;
 
@@ -55,17 +67,18 @@ function _load_textEdit() {
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-let rootAggregatorPromise; /**
-                            * Copyright (c) 2015-present, Facebook, Inc.
-                            * All rights reserved.
-                            *
-                            * This source code is licensed under the license found in the LICENSE file in
-                            * the root directory of this source tree.
-                            *
-                            * 
-                            * @format
-                            */
+/**
+ * Copyright (c) 2015-present, Facebook, Inc.
+ * All rights reserved.
+ *
+ * This source code is licensed under the license found in the LICENSE file in
+ * the root directory of this source tree.
+ *
+ * 
+ * @format
+ */
 
+let rootAggregatorPromise;
 const logger = (0, (_log4js || _load_log4js()).getLogger)('HostServices');
 
 null;
@@ -76,33 +89,19 @@ class RootHostServices {
       setTitle: s => {},
       dispose: () => {}
     };
-    this._consoleSubjects = new Map();
+    this._getConsoleService = (0, (_memoize2 || _load_memoize()).default)(() => (0, (_consumeFirstProvider || _load_consumeFirstProvider()).default)('console', '0.1.0'));
+    this._getConsoleApi = (0, (_memoize2 || _load_memoize()).default)(source => this._getConsoleService().then(createApi => createApi({ id: source, name: source })));
   }
 
-  // lazily created map from source, to how we'll push messages from that source
+  // This method creates registers sources with the atom-ide-console service, but never disposes
+  // those registrations; there's not much point. The now-defunct sources will be visible in the
+  // Sources UI.
 
 
   consoleNotification(source, level, text) {
-    let subjectPromise = this._consoleSubjects.get(source);
-    if (subjectPromise == null) {
-      subjectPromise = new Promise((resolve, reject) => {
-        const subject = new _rxjsBundlesRxMinJs.Subject();
-        const consumer = service => {
-          service.registerOutputProvider({
-            messages: subject,
-            id: source
-          });
-          resolve(subject);
-        };
-        atom.packages.serviceHub.consume('nuclide-output', '0.0.0', consumer);
-      });
-      this._consoleSubjects.set(source, subjectPromise);
-    }
-    subjectPromise.then(subject => subject.next({ level, text }));
-
-    // This method creates registrations to the nuclide-output service,
-    // but never disposes those registrations; there's not much point. The
-    // now-defunct sources will be visible in the Sources UI.
+    this._getConsoleApi(source).then(api => {
+      api.append({ text, level });
+    });
   }
 
   dialogNotification(level, text) {

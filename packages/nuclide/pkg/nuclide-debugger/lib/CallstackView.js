@@ -25,10 +25,10 @@ function _load_DebuggerCallstackComponent() {
   return _DebuggerCallstackComponent = require('./DebuggerCallstackComponent');
 }
 
-var _DebuggerStore;
+var _constants;
 
-function _load_DebuggerStore() {
-  return _DebuggerStore = require('./DebuggerStore');
+function _load_constants() {
+  return _constants = require('./constants');
 }
 
 function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
@@ -40,17 +40,15 @@ class CallstackView extends _react.PureComponent {
   constructor(props) {
     super(props);
     this._disposables = new (_UniversalDisposable || _load_UniversalDisposable()).default();
-    const debuggerStore = props.model.getStore();
     this.state = {
-      mode: debuggerStore.getDebuggerMode()
+      mode: props.model.getDebuggerMode()
     };
   }
 
   componentDidMount() {
-    const debuggerStore = this.props.model.getStore();
-    this._disposables.add(debuggerStore.onChange(() => {
+    this._disposables.add(this.props.model.onChange(() => {
       this.setState({
-        mode: debuggerStore.getDebuggerMode()
+        mode: this.props.model.getDebuggerMode()
       });
     }));
   }
@@ -67,7 +65,7 @@ class CallstackView extends _react.PureComponent {
     const { model } = this.props;
     const actions = model.getActions();
     const { mode } = this.state;
-    const disabledClass = mode !== (_DebuggerStore || _load_DebuggerStore()).DebuggerMode.RUNNING ? '' : ' nuclide-debugger-container-new-disabled';
+    const disabledClass = mode !== (_constants || _load_constants()).DebuggerMode.RUNNING ? '' : ' nuclide-debugger-container-new-disabled';
 
     return _react.createElement(
       'div',
@@ -76,11 +74,7 @@ class CallstackView extends _react.PureComponent {
       _react.createElement(
         'div',
         { className: 'nuclide-debugger-pane-content' },
-        _react.createElement((_DebuggerCallstackComponent || _load_DebuggerCallstackComponent()).DebuggerCallstackComponent, {
-          actions: actions,
-          bridge: model.getBridge(),
-          callstackStore: model.getCallstackStore()
-        })
+        _react.createElement((_DebuggerCallstackComponent || _load_DebuggerCallstackComponent()).DebuggerCallstackComponent, { actions: actions, model: model })
       )
     );
   }

@@ -49,22 +49,26 @@ function _load_Checkbox() {
   return _Checkbox = require('nuclide-commons-ui/Checkbox');
 }
 
+var _nuclideAnalytics;
+
+function _load_nuclideAnalytics() {
+  return _nuclideAnalytics = require('../../nuclide-analytics');
+}
+
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
 
-/**
- * Copyright (c) 2015-present, Facebook, Inc.
- * All rights reserved.
- *
- * This source code is licensed under the license found in the LICENSE file in
- * the root directory of this source tree.
- *
- * 
- * @format
- */
-
-const WORKSPACE_VIEW_URI = exports.WORKSPACE_VIEW_URI = 'atom://nuclide/home';
+const WORKSPACE_VIEW_URI = exports.WORKSPACE_VIEW_URI = 'atom://nuclide/home'; /**
+                                                                                * Copyright (c) 2015-present, Facebook, Inc.
+                                                                                * All rights reserved.
+                                                                                *
+                                                                                * This source code is licensed under the license found in the LICENSE file in
+                                                                                * the root directory of this source tree.
+                                                                                *
+                                                                                * 
+                                                                                * @format
+                                                                                */
 
 const NUCLIDE_DOCS_URL = (0, (_createUtmUrl || _load_createUtmUrl()).default)('http://nuclide.io', 'welcome');
 const DEFAULT_WELCOME = _react.createElement(
@@ -165,7 +169,7 @@ class HomePaneItem extends _react.Component {
       ),
       _react.createElement(
         'section',
-        { className: 'text-center' },
+        { className: 'text-center', onClick: trackAnchorClicks },
         welcomes.length > 0 ? welcomes : DEFAULT_WELCOME
       ),
       _react.createElement(
@@ -224,4 +228,15 @@ class HomePaneItem extends _react.Component {
     }
   }
 }
+
 exports.default = HomePaneItem;
+function trackAnchorClicks(e) {
+  const { target } = e;
+  if (target.tagName !== 'A' || target.href == null) {
+    return;
+  }
+
+  // $FlowFixMe
+  const { href, innerText } = target;
+  (0, (_nuclideAnalytics || _load_nuclideAnalytics()).track)('home-link-clicked', { href, text: innerText });
+}

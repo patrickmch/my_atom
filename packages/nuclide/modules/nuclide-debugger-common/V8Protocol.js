@@ -12,11 +12,6 @@ function _load_vscodeDebugprotocol() {
 
 function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
 
-const TWO_CRLF = '\r\n\r\n';
-
-/**
- * JSON-RPC protocol implementation over a read and write buffers.
- */
 /**
  * Copyright (c) 2017-present, Facebook, Inc.
  * All rights reserved.
@@ -29,11 +24,18 @@ const TWO_CRLF = '\r\n\r\n';
  * @format
  */
 
+const TWO_CRLF = '\r\n\r\n';
+
+/**
+ * JSON-RPC protocol implementation over a read and write buffers.
+ */
 class V8Protocol {
 
-  constructor(id, logger) {
+  constructor(id, logger, sendPreprocessors, receivePreprocessors) {
     this._id = id;
     this._logger = logger;
+    this._sendPreprocessors = sendPreprocessors;
+    this._receivePreprocessors = receivePreprocessors;
     this._sequence = 1;
     this._contentLength = -1;
     this._pendingRequests = new Map();
@@ -56,13 +58,8 @@ class V8Protocol {
     throw new Error('No implementation found!');
   }
 
-  connect(readable, writable) {
-    this._outputStream = writable;
-
-    readable.on('data', data => {
-      this._rawData = Buffer.concat([this._rawData, data]);
-      this._handleData();
-    });
+  setOutput(output) {
+    this._output = output;
   }
 
   send(command, args) {
@@ -105,14 +102,15 @@ class V8Protocol {
     message.type = typ;
     message.seq = this._sequence++;
 
+    this._sendPreprocessors.forEach(processor => processor(message));
     const json = JSON.stringify(message);
     const length = Buffer.byteLength(json, 'utf8');
 
-    this._outputStream.write('Content-Length: ' + length.toString() + TWO_CRLF, 'utf8');
-    this._outputStream.write(json, 'utf8');
+    this._output('Content-Length: ' + length.toString() + TWO_CRLF + json);
   }
 
-  _handleData() {
+  handleData(data) {
+    this._rawData = Buffer.concat([this._rawData, data]);
     while (true) {
       if (this._contentLength >= 0) {
         if (this._rawData.length >= this._contentLength) {
@@ -143,6 +141,8 @@ class V8Protocol {
   _dispatch(body) {
     try {
       const rawData = JSON.parse(body);
+      this._receivePreprocessors.forEach(processor => processor(rawData));
+
       switch (rawData.type) {
         case 'event':
           this.onEvent(rawData);

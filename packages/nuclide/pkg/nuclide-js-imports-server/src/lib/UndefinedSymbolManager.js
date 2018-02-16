@@ -36,6 +36,8 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
 (_babelTraverse || _load_babelTraverse()).default.Scope.prototype.warnOnFlowBinding = x => x;
 
 const BUILT_INS = ['Iterator', '__DEV__'];
+const REACT_MODULE_NAME = 'React';
+const JSX_CSX_PRAGMA_REGEX = /\*?\s*@csx/;
 
 class UndefinedSymbolManager {
 
@@ -65,6 +67,7 @@ function traverseTreeForUndefined(ast, globals) {
   const undefinedSymbols = [];
   const definedTypes = new Set();
   const definedValues = new Set();
+  let csx = false;
   (0, (_babelTraverse || _load_babelTraverse()).default)(ast, {
     ImportDeclaration: path => {
       saveImports(path, definedTypes);
@@ -102,6 +105,14 @@ function traverseTreeForUndefined(ast, globals) {
         definedValues.add(path.node.name);
       }
     },
+    Program(path) {
+      csx = csx || path.parent.comments.some(({ value }) => JSX_CSX_PRAGMA_REGEX.test(value));
+    },
+    JSXIdentifier(path) {
+      if (!csx) {
+        findUndefinedReact(path, undefinedSymbols, globals);
+      }
+    },
     LabeledStatement(path) {
       // Create a fake binding for the label.
       if (path.node.label && path.node.label.name) {
@@ -126,6 +137,23 @@ function findUndefinedValues(path, undefinedSymbols, globals) {
 
   undefinedSymbols.push({
     id: node.name,
+    type: 'value',
+    location: {
+      start: { line: node.loc.start.line, col: node.loc.start.column },
+      end: { line: node.loc.end.line, col: node.loc.end.column }
+    }
+  });
+}
+
+function findUndefinedReact(path, undefinedSymbols, globals) {
+  const { node, scope } = path;
+
+  if (scope.hasBinding(REACT_MODULE_NAME)) {
+    return;
+  }
+
+  undefinedSymbols.push({
+    id: REACT_MODULE_NAME,
     type: 'value',
     location: {
       start: { line: node.loc.start.line, col: node.loc.start.column },

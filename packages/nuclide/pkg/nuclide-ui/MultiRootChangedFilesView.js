@@ -249,7 +249,6 @@ class MultiRootChangedFilesView extends _react.PureComponent {
       commandPrefix,
       enableFileExpansion,
       enableInlineActions,
-      fileChanges: fileChangesByRoot,
       fileStatuses: fileStatusesByRoot,
       hideEmptyFolders,
       onFileChecked,
@@ -276,7 +275,6 @@ class MultiRootChangedFilesView extends _react.PureComponent {
       'div',
       { className: 'nuclide-ui-multi-root-file-tree-container' },
       Array.from(fileStatusesByRoot.entries()).map(([root, fileStatuses]) => {
-        const fileChanges = fileChangesByRoot == null ? null : fileChangesByRoot.get(root);
         const checkedFiles = checkedFilesByRoot == null ? null : checkedFilesByRoot.get(root);
         return (
           // $FlowFixMe(>=0.53.0) Flow suppress
@@ -285,7 +283,6 @@ class MultiRootChangedFilesView extends _react.PureComponent {
             commandPrefix: commandPrefix,
             enableFileExpansion: enableFileExpansion === true,
             enableInlineActions: enableInlineActions === true,
-            fileChanges: fileChanges,
             fileStatuses: fileStatuses,
             hideEmptyFolders: hideEmptyFolders,
             key: root,

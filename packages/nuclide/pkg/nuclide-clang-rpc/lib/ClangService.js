@@ -3,7 +3,7 @@
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.formatCode = exports.getLocalReferences = exports.getOutline = exports.getRelatedSourceOrHeader = exports.getDeclarationInfo = exports.getDeclaration = exports.getCompletions = exports.ClangCursorTypes = exports.ClangCursorToDeclarationTypes = undefined;
+exports.loadFlagsFromCompilationDatabaseAndCacheThem = exports.formatCode = exports.getLocalReferences = exports.getOutline = exports.getRelatedSourceOrHeader = exports.getDeclarationInfo = exports.getDeclaration = exports.getCompletions = exports.ClangCursorTypes = exports.ClangCursorToDeclarationTypes = undefined;
 
 var _asyncToGenerator = _interopRequireDefault(require('async-to-generator'));
 
@@ -168,11 +168,36 @@ let getArcanistClangFormatBinary = (() => {
   };
 })();
 
+let loadFlagsFromCompilationDatabaseAndCacheThem = exports.loadFlagsFromCompilationDatabaseAndCacheThem = (() => {
+  var _ref11 = (0, _asyncToGenerator.default)(function* (requestSettings) {
+    const flagsManager = serverManager.getClangFlagsManager();
+    const compilationHandles = yield flagsManager.loadFlagsFromCompilationDatabase(requestSettings);
+    const compilationFlags = new Map();
+    for (const [src, handle] of compilationHandles) {
+      const flags = flagsManager.getFlags(handle);
+      if (flags != null) {
+        compilationFlags.set(src, flags);
+      }
+    }
+    return compilationFlags;
+  });
+
+  return function loadFlagsFromCompilationDatabaseAndCacheThem(_x44) {
+    return _ref11.apply(this, arguments);
+  };
+})();
+
+/**
+ * Kill the Clang server for a particular source file,
+ * as well as all the cached compilation flags.
+ */
+
+
 exports.compile = compile;
-exports.loadFlagsFromCompilationDatabaseAndCacheThem = loadFlagsFromCompilationDatabaseAndCacheThem;
 exports.resetForSource = resetForSource;
 exports.reset = reset;
 exports.dispose = dispose;
+exports.setMemoryLimit = setMemoryLimit;
 
 var _collection;
 
@@ -289,14 +314,6 @@ function compile(src, contents, requestSettings, defaultFlags) {
   return _rxjsBundlesRxMinJs.Observable.fromPromise(doCompile()).publish();
 }
 
-function loadFlagsFromCompilationDatabaseAndCacheThem(requestSettings) {
-  return serverManager.getClangFlagsManager().loadFlagsFromCompilationDatabase(requestSettings).then(fullFlags => (0, (_collection || _load_collection()).mapCompact)((0, (_collection || _load_collection()).mapTransform)(fullFlags, flags => flags.rawData)));
-}
-
-/**
- * Kill the Clang server for a particular source file,
- * as well as all the cached compilation flags.
- */
 function resetForSource(src) {
   serverManager.reset(src);
 }
@@ -310,4 +327,8 @@ function reset() {
 
 function dispose() {
   serverManager.dispose();
+}
+
+function setMemoryLimit(percent) {
+  serverManager.setMemoryLimit(percent);
 }

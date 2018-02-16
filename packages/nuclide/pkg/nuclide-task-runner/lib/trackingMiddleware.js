@@ -51,8 +51,8 @@ function trackingMiddleware(store) {
 function trackTaskAction(type, store, action) {
   const { activeTaskRunner, projectRoot } = store.getState();
 
-  if (!projectRoot) {
-    throw new Error('Invariant violation: "projectRoot"');
+  if (!(projectRoot != null)) {
+    throw new Error('Invariant violation: "projectRoot != null"');
   }
 
   if (!activeTaskRunner) {
@@ -67,7 +67,7 @@ function trackTaskAction(type, store, action) {
   (0, (_nuclideAnalytics || _load_nuclideAnalytics()).trackEvent)({
     type,
     data: Object.assign({}, taskTrackingData, {
-      projectRoot: projectRoot.getPath(),
+      projectRoot,
       taskRunnerId: activeTaskRunner.id,
       taskType: taskStatus.metadata.type,
       errorMessage: error != null ? error.message : null,

@@ -31,16 +31,10 @@ function _load_DebuggerModel() {
   return _DebuggerModel = _interopRequireDefault(require('./DebuggerModel'));
 }
 
-var _DebuggerStore;
+var _constants;
 
-function _load_DebuggerStore() {
-  return _DebuggerStore = require('./DebuggerStore');
-}
-
-var _runtimeInfo;
-
-function _load_runtimeInfo() {
-  return _runtimeInfo = require('../../commons-node/runtime-info');
+function _load_constants() {
+  return _constants = require('./constants');
 }
 
 var _createPaneContainer;
@@ -112,12 +106,24 @@ function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj;
 
 
 // Debugger views
+/**
+ * Copyright (c) 2015-present, Facebook, Inc.
+ * All rights reserved.
+ *
+ * This source code is licensed under the license found in the LICENSE file in
+ * the root directory of this source tree.
+ *
+ * 
+ * @format
+ */
+/* global localStorage */
+
 class DebuggerLayoutManager {
 
   constructor(model, state) {
     this._disposables = new (_UniversalDisposable || _load_UniversalDisposable()).default();
     this._model = model;
-    this._previousDebuggerMode = (_DebuggerStore || _load_DebuggerStore()).DebuggerMode.STOPPED;
+    this._previousDebuggerMode = (_constants || _load_constants()).DebuggerMode.STOPPED;
     this._paneHiddenWarningShown = false;
     this._leftPaneContainerModel = null;
     this._rightPaneContainerModel = null;
@@ -205,16 +211,6 @@ class DebuggerLayoutManager {
       isEnabled: () => true,
       createView: () => _react.createElement((_DebuggerControlsView || _load_DebuggerControlsView()).DebuggerControlsView, { model: this._model }),
       onPaneResize: (dockPane, newFlexScale) => {
-        // If the debugger is stopped, let the controls pane keep its default
-        // layout to make room for the buttons and additional content. Otherwise,
-        // override the layout to shrink the pane and remove extra vertical whitespace.
-        const debuggerMode = this._model.getStore().getDebuggerMode();
-        if (debuggerMode !== (_DebuggerStore || _load_DebuggerStore()).DebuggerMode.STOPPED) {
-          // If __DEV__, leave some extra space for the chrome devtools gear
-          // TODO: Remove this when chrome is gone
-          this._overridePaneInitialHeight(dockPane, newFlexScale, (_runtimeInfo || _load_runtimeInfo()).__DEV__ ? 155 : 130);
-        }
-
         // If newFlexScale !== 1, that means the user must have resized this pane.
         // Return true to unhook this callback and let the pane resize per Atom's
         // default behavior. The user is now responsible for the pane's height.
@@ -227,7 +223,7 @@ class DebuggerLayoutManager {
       title: () => 'Call Stack',
       isEnabled: () => true,
       createView: () => _react.createElement((_CallstackView || _load_CallstackView()).CallstackView, { model: this._model }),
-      debuggerModeFilter: mode => mode !== (_DebuggerStore || _load_DebuggerStore()).DebuggerMode.STOPPED
+      debuggerModeFilter: mode => mode !== (_constants || _load_constants()).DebuggerMode.STOPPED
     }, {
       uri: debuggerUriBase + 'breakpoints',
       isLifetimeView: false,
@@ -242,7 +238,7 @@ class DebuggerLayoutManager {
       title: () => 'Scopes',
       isEnabled: () => true,
       createView: () => _react.createElement((_ScopesView || _load_ScopesView()).ScopesView, { model: this._model }),
-      debuggerModeFilter: mode => mode !== (_DebuggerStore || _load_DebuggerStore()).DebuggerMode.STOPPED
+      debuggerModeFilter: mode => mode !== (_constants || _load_constants()).DebuggerMode.STOPPED
     }, {
       uri: debuggerUriBase + 'watch-expressions',
       isLifetimeView: false,
@@ -254,10 +250,10 @@ class DebuggerLayoutManager {
       uri: debuggerUriBase + 'threads',
       isLifetimeView: false,
       defaultLocation: 'right',
-      title: () => this._model.getStore().getSettings().threadsComponentTitle,
-      isEnabled: () => this._model.getStore().getSettings().supportThreadsWindow,
+      title: () => this._model.getSettings().threadsComponentTitle,
+      isEnabled: () => this._model.getSettings().supportThreadsWindow,
       createView: () => _react.createElement((_ThreadsView || _load_ThreadsView()).ThreadsView, { model: this._model }),
-      debuggerModeFilter: mode => mode !== (_DebuggerStore || _load_DebuggerStore()).DebuggerMode.STOPPED
+      debuggerModeFilter: mode => mode !== (_constants || _load_constants()).DebuggerMode.STOPPED
     }, {
       uri: debuggerUriBase + 'disassembly',
       isLifetimeView: false,
@@ -268,10 +264,10 @@ class DebuggerLayoutManager {
       isEnabled: () => true,
       createView: () => _react.createElement((_DisassemblyView || _load_DisassemblyView()).DisassemblyView, { model: this._model }),
       debuggerModeFilter: mode => {
-        if (mode === (_DebuggerStore || _load_DebuggerStore()).DebuggerMode.STOPPED) {
+        if (mode === (_constants || _load_constants()).DebuggerMode.STOPPED) {
           return false;
         }
-        const info = this._model.getStore().getDebugProcessInfo();
+        const info = this._model.getDebugProcessInfo();
         return info != null && info.getDebuggerCapabilities().disassembly;
       }
     }, {
@@ -284,10 +280,10 @@ class DebuggerLayoutManager {
       isEnabled: () => true,
       createView: () => _react.createElement((_RegisterView || _load_RegisterView()).RegisterView, { model: this._model }),
       debuggerModeFilter: mode => {
-        if (mode === (_DebuggerStore || _load_DebuggerStore()).DebuggerMode.STOPPED) {
+        if (mode === (_constants || _load_constants()).DebuggerMode.STOPPED) {
           return false;
         }
-        const info = this._model.getStore().getDebugProcessInfo();
+        const info = this._model.getDebugProcessInfo();
         return info != null && info.getDebuggerCapabilities().registers;
       }
     }];
@@ -585,13 +581,13 @@ class DebuggerLayoutManager {
   }
 
   debuggerModeChanged() {
-    const mode = this._model.getStore().getDebuggerMode();
+    const mode = this._model.getDebuggerMode();
 
     // Most panes disappear when the debugger is stopped, only keep
     // the ones that should still be shown.
-    if (mode === (_DebuggerStore || _load_DebuggerStore()).DebuggerMode.STOPPING && this._previousDebuggerMode !== (_DebuggerStore || _load_DebuggerStore()).DebuggerMode.STOPPED) {
+    if (mode === (_constants || _load_constants()).DebuggerMode.STOPPING && this._previousDebuggerMode !== (_constants || _load_constants()).DebuggerMode.STOPPED) {
       this._saveDebuggerPaneLocations();
-    } else if (mode === (_DebuggerStore || _load_DebuggerStore()).DebuggerMode.STOPPED) {
+    } else if (mode === (_constants || _load_constants()).DebuggerMode.STOPPED) {
       (0, (_destroyItemWhere || _load_destroyItemWhere()).destroyItemWhere)(item => {
         if (item instanceof (_DebuggerPaneContainerViewModel || _load_DebuggerPaneContainerViewModel()).DebuggerPaneContainerViewModel) {
           // Forward the destruction logic to the contianer.
@@ -609,7 +605,7 @@ class DebuggerLayoutManager {
   }
 
   _countPanesForTargetDock(dockName, defaultDockName) {
-    const mode = this._model.getStore().getDebuggerMode();
+    const mode = this._model.getDebuggerMode();
     return this._debuggerPanes.filter(
     // Filter out any panes that the user has hidden or that aren't visible
     // in the current debug mode.
@@ -680,7 +676,7 @@ class DebuggerLayoutManager {
     // Sort the debugger panes by the index at which they appeared the last
     // time they were positioned, so we maintain the relative ordering of
     // debugger panes within the same dock.
-    const mode = this._model.getStore().getDebuggerMode();
+    const mode = this._model.getDebuggerMode();
     this._debuggerPanes.slice().sort((a, b) => {
       const aPos = a.previousLocation == null ? 0 : a.previousLocation.layoutIndex;
       const bPos = b.previousLocation == null ? 0 : b.previousLocation.layoutIndex;
@@ -730,8 +726,8 @@ class DebuggerLayoutManager {
       // This view being destroyed means the debugger is exiting completely, and
       // this view is never remembered as "hidden by the user" because it's reqiured
       // for running the debugger.
-      const mode = this._model.getStore().getDebuggerMode();
-      if (mode === (_DebuggerStore || _load_DebuggerStore()).DebuggerMode.RUNNING || mode === (_DebuggerStore || _load_DebuggerStore()).DebuggerMode.PAUSED) {
+      const mode = this._model.getDebuggerMode();
+      if (mode === (_constants || _load_constants()).DebuggerMode.RUNNING || mode === (_constants || _load_constants()).DebuggerMode.PAUSED) {
         this._saveDebuggerPaneLocations();
       }
 
@@ -757,7 +753,7 @@ class DebuggerLayoutManager {
     }
 
     if (config.isEnabled == null || config.isEnabled()) {
-      const mode = this._model.getStore().getDebuggerMode();
+      const mode = this._model.getDebuggerMode();
       if (config.debuggerModeFilter == null || config.debuggerModeFilter(mode)) {
         if (!(config.previousLocation != null)) {
           throw new Error('Invariant violation: "config.previousLocation != null"');
@@ -859,14 +855,4 @@ class DebuggerLayoutManager {
     });
   }
 }
-exports.DebuggerLayoutManager = DebuggerLayoutManager; /**
-                                                        * Copyright (c) 2015-present, Facebook, Inc.
-                                                        * All rights reserved.
-                                                        *
-                                                        * This source code is licensed under the license found in the LICENSE file in
-                                                        * the root directory of this source tree.
-                                                        *
-                                                        * 
-                                                        * @format
-                                                        */
-/* global localStorage */
+exports.DebuggerLayoutManager = DebuggerLayoutManager;

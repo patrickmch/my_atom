@@ -31,7 +31,7 @@
 #       else
 #         panel.item.openSelectedEntry(pending: true, activatePane: false)
 #         return
-
+fs = require('fs')
 # Adds space chars without moving the cursor
 atom.commands.add 'atom-text-editor',
   'custom:insert-space-keep-cursor-place': ->
@@ -76,19 +76,20 @@ atom.commands.add 'atom-workspace', 'my:dismiss-notifications', ->
     notification.dismiss()
   atom.notifications.clear()
 
-# This is a bit nasty... if it breaks look up https://atom.io/docs/api/v1.0.7/File#instance-getPath
-atom.commands.add 'atom-workspace', 'my:get-file-paths', ->
-  filePaths = ''
+atom.commands.add 'atom-workspace', 'my:get-file-paths-improved', ->
+  filePaths = []
   pathRegEx = ///^\/(.+)\/([^\/]+)$///i
-  atom.workspace.getPanes().forEach (pane) ->
-      for own key, value of pane.getElement().children[0].children
-        filePath = value.children[0].dataset.path
-        if filePath isnt undefined && filePath.match(pathRegEx) isnt null
-          filePaths += '"' + filePath + '",\n'
-  fileString = '{\n
-      title:\n
-      paths: [ \n \n' + String(filePaths) + '
-      ]\n
-      icon:\"icon-squirrel\"\n
-    }'
-  atom.clipboard.write(fileString)
+  atom.project.buffers.forEach (editorWindow) ->
+    filePath = editorWindow.file.path
+    if filePath isnt undefined && filePath.match(pathRegEx) isnt null
+      filePaths.push(filePath)
+  projectTitle = atom.project.repositories[0].branch.split('/')[2]
+  fileString = JSON.stringify({
+      title: projectTitle
+      paths: filePaths
+      icon: 'icon-squirrel'
+    }, null, '\t')
+  fs.appendFile '/Users/mchey/projects.json', fileString
+
+
+# atom.commands.add 'atom-workspace', 'my:open-my-project', ->

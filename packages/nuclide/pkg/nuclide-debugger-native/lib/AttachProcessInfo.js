@@ -13,10 +13,10 @@ function _load_nuclideDebuggerCommon() {
   return _nuclideDebuggerCommon = require('nuclide-debugger-common');
 }
 
-var _nuclideDebugger;
+var _AtomServiceContainer;
 
-function _load_nuclideDebugger() {
-  return _nuclideDebugger = require('../../nuclide-debugger');
+function _load_AtomServiceContainer() {
+  return _AtomServiceContainer = require('../../nuclide-debugger/lib/AtomServiceContainer');
 }
 
 var _utils;
@@ -56,7 +56,6 @@ class AttachProcessInfo extends (_nuclideDebuggerCommon || _load_nuclideDebugger
       continueToLocation: true,
       disassembly: true,
       registers: true,
-      singleThreadStepping: true,
       threads: true
     });
   }
@@ -71,7 +70,7 @@ class AttachProcessInfo extends (_nuclideDebuggerCommon || _load_nuclideDebugger
     return (0, _asyncToGenerator.default)(function* () {
       const rpcService = _this._getRpcService();
       let debugSession = null;
-      let outputDisposable = (0, (_nuclideDebugger || _load_nuclideDebugger()).registerConsoleLogging)('LLDB', rpcService.getOutputWindowObservable().refCount());
+      let outputDisposable = (0, (_AtomServiceContainer || _load_AtomServiceContainer()).registerConsoleLogging)('LLDB', rpcService.getOutputWindowObservable().refCount());
       try {
         yield rpcService.attach(_this._targetInfo).refCount().toPromise();
         // Start websocket server with Chrome after attach completed.

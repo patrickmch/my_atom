@@ -13,6 +13,12 @@ function _load_nuclideRemoteConnection() {
   return _nuclideRemoteConnection = require('../../nuclide-remote-connection');
 }
 
+var _UniversalDisposable;
+
+function _load_UniversalDisposable() {
+  return _UniversalDisposable = _interopRequireDefault(require('nuclide-commons/UniversalDisposable'));
+}
+
 var _nuclideOpenFilesRpc;
 
 function _load_nuclideOpenFilesRpc() {
@@ -40,8 +46,6 @@ var _event;
 function _load_event() {
   return _event = require('nuclide-commons/event');
 }
-
-var _atom = require('atom');
 
 var _collection;
 
@@ -110,7 +114,7 @@ class NotifiersByConnection {
           notifier.onDirectoriesChanged(dirs);
         });
       });
-      return Promise.resolve(new _atom.Disposable(() => subscription.unsubscribe()));
+      return Promise.resolve(new (_UniversalDisposable || _load_UniversalDisposable()).default(() => subscription.unsubscribe()));
     });
     const user = _os.default.userInfo().username;
     this._bufferTracking = _rxjsBundlesRxMinJs.Observable.timer(TEN_MINUTES, TWO_HOURS).switchMap(() => this._notifiers.observeEntries()).subscribe(([sc, notifier]) => {

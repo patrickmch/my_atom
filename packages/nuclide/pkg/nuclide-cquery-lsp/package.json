@@ -3,6 +3,7 @@
   "main": "./lib/main.js",
   "version": "0.0.0",
   "description": "Client for the cquery LSP",
+  "author": "NEEDS OWNER",
   "private": true,
   "atomTestRunner": "../../lib/test-runner-entry.js",
   "nuclide": {
@@ -16,10 +17,16 @@
     },
     "config": {
       "use-cquery": {
-        "title": "Use cquery instead of libclang (experimental)",
+        "title": "Use cquery instead of libclang",
         "type": "boolean",
         "default": "false",
-        "description": "Still in early development. You need cquery in your PATH and a restart is required"
+        "description": "You need cquery in your PATH and a restart is required"
+      },
+      "enable-libclang-logs": {
+        "title": "Enable libclang logs (for developers)",
+        "type": "boolean",
+        "default": "false",
+        "description": "Enable libclang logs to be printed to the cquery's stderr file"
       }
     }
   },

@@ -3,7 +3,7 @@
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.getGeneratedFileTypes = exports.getGeneratedFileType = undefined;
+exports.getGeneratedFileTypes = exports.invalidateFileTypeCache = exports.getGeneratedFileType = undefined;
 
 var _asyncToGenerator = _interopRequireDefault(require('async-to-generator'));
 
@@ -40,8 +40,18 @@ let getGeneratedFileType = exports.getGeneratedFileType = (() => {
   };
 })();
 
+let invalidateFileTypeCache = exports.invalidateFileTypeCache = (() => {
+  var _ref2 = (0, _asyncToGenerator.default)(function* (filePath) {
+    cache.del(filePath);
+  });
+
+  return function invalidateFileTypeCache(_x2) {
+    return _ref2.apply(this, arguments);
+  };
+})();
+
 let getGeneratedFileTypes = exports.getGeneratedFileTypes = (() => {
-  var _ref2 = (0, _asyncToGenerator.default)(function* (dirPath) {
+  var _ref3 = (0, _asyncToGenerator.default)(function* (dirPath) {
     const fileTypes = new Map();
     const uncheckedFiles = [];
     if (!(_nuclideUri || _load_nuclideUri()).default.isInArchive(dirPath) && !(_nuclideUri || _load_nuclideUri()).default.hasKnownArchiveExtension(dirPath)) {
@@ -84,8 +94,8 @@ let getGeneratedFileTypes = exports.getGeneratedFileTypes = (() => {
     return fileTypes;
   });
 
-  return function getGeneratedFileTypes(_x2) {
-    return _ref2.apply(this, arguments);
+  return function getGeneratedFileTypes(_x3) {
+    return _ref3.apply(this, arguments);
   };
 })();
 

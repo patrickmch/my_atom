@@ -58,7 +58,7 @@ class FindReferencesProvider {
         return null;
       }
 
-      return (yield languageService).findReferences(fileVersion, position);
+      return (yield languageService).findReferences(fileVersion, position).refCount().toPromise();
     }));
   }
 }

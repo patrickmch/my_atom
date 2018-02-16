@@ -115,7 +115,7 @@ class Activation {
     var _this = this;
 
     return (0, _asyncToGenerator.default)(function* () {
-      const isOpenSource = !(yield (_fsPromise || _load_fsPromise()).default.exists(_path.default.join(__dirname, 'fb-config.js')));
+      const isOpenSource = !(yield (_fsPromise || _load_fsPromise()).default.exists(_path.default.join(__dirname, 'fb-marker')));
       if ((yield (0, (_passesGK || _load_passesGK()).default)('nuclide_debugger_reactnative')) || isOpenSource) {
         _this._registerDebugProvider({
           name: 'React Native',
@@ -131,7 +131,7 @@ class Activation {
     var _this2 = this;
 
     return (0, _asyncToGenerator.default)(function* () {
-      const isOpenSource = !(yield (_fsPromise || _load_fsPromise()).default.exists(_path.default.join(__dirname, 'fb-config.js')));
+      const isOpenSource = !(yield (_fsPromise || _load_fsPromise()).default.exists(_path.default.join(__dirname, 'fb-marker')));
       if ((yield (0, (_passesGK || _load_passesGK()).default)('nuclide_debugger_prepack')) || isOpenSource) {
         _this2._registerDebugProvider({
           name: 'Prepack',

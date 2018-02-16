@@ -16,13 +16,13 @@ var _react = _interopRequireWildcard(require('react'));
 var _LazyNestedValueComponent;
 
 function _load_LazyNestedValueComponent() {
-  return _LazyNestedValueComponent = require('../../nuclide-ui/LazyNestedValueComponent');
+  return _LazyNestedValueComponent = require('nuclide-commons-ui/LazyNestedValueComponent');
 }
 
 var _SimpleValueComponent;
 
 function _load_SimpleValueComponent() {
-  return _SimpleValueComponent = _interopRequireDefault(require('../../nuclide-ui/SimpleValueComponent'));
+  return _SimpleValueComponent = _interopRequireDefault(require('nuclide-commons-ui/SimpleValueComponent'));
 }
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
@@ -42,8 +42,8 @@ function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj;
 
 class DebuggerDatatipComponent extends _react.Component {
   render() {
-    const { expression, evaluationResult, watchExpressionStore } = this.props;
-    const fetchChildren = watchExpressionStore.getProperties.bind(watchExpressionStore);
+    const { expression, evaluationResult, model } = this.props;
+    const fetchChildren = model.getProperties.bind(model);
     let datatipElement;
     if (evaluationResult == null) {
       datatipElement = _react.createElement((_LoadingSpinner || _load_LoadingSpinner()).LoadingSpinner, { delay: 100, size: 'EXTRA_SMALL' });

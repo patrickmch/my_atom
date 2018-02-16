@@ -99,7 +99,7 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
  */
 
 function openTunnelEpic(actions, store) {
-  return actions.ofType((_Actions || _load_Actions()).OPEN_TUNNEL).switchMap((() => {
+  return actions.ofType((_Actions || _load_Actions()).OPEN_TUNNEL).mergeMap((() => {
     var _ref = (0, _asyncToGenerator.default)(function* (action) {
       if (!(action.type === (_Actions || _load_Actions()).OPEN_TUNNEL)) {
         throw new Error('Invariant violation: "action.type === Actions.OPEN_TUNNEL"');
@@ -135,6 +135,10 @@ function openTunnelEpic(actions, store) {
       const subscription = events.refCount().subscribe({
         next: function (event) {
           if (event.type === 'server_started') {
+            store.getState().consoleOutput.next({
+              text: `Opened tunnel: ${friendlyString}`,
+              level: 'info'
+            });
             store.dispatch((_Actions || _load_Actions()).setTunnelState(tunnel, 'ready'));
             onOpen();
           } else if (event.type === 'client_connected') {
@@ -146,12 +150,10 @@ function openTunnelEpic(actions, store) {
               store.dispatch((_Actions || _load_Actions()).setTunnelState(tunnel, 'ready'));
             }
           }
+        },
+        error: function (error) {
+          return store.dispatch((_Actions || _load_Actions()).closeTunnel(tunnel, error));
         }
-      });
-
-      store.getState().consoleOutput.next({
-        text: `Opened tunnel: ${friendlyString}`,
-        level: 'info'
       });
 
       return (_Actions || _load_Actions()).addOpenTunnel(tunnel, function (error) {

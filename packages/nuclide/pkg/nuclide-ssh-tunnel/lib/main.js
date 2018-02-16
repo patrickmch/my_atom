@@ -14,11 +14,25 @@ function _load_destroyItemWhere() {
   return _destroyItemWhere = require('nuclide-commons-atom/destroyItemWhere');
 }
 
+var _immutable;
+
+function _load_immutable() {
+  return _immutable = _interopRequireWildcard(require('immutable'));
+}
+
+var _collection;
+
+function _load_collection() {
+  return _collection = require('nuclide-commons/collection');
+}
+
 var _UniversalDisposable;
 
 function _load_UniversalDisposable() {
   return _UniversalDisposable = _interopRequireDefault(require('nuclide-commons/UniversalDisposable'));
 }
+
+var _rxjsBundlesRxMinJs = require('rxjs/bundles/Rx.min.js');
 
 var _nuclideRemoteConnection;
 
@@ -66,6 +80,17 @@ function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj;
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
+/**
+ * Copyright (c) 2015-present, Facebook, Inc.
+ * All rights reserved.
+ *
+ * This source code is licensed under the license found in the LICENSE file in
+ * the root directory of this source tree.
+ *
+ * 
+ * @format
+ */
+
 class Activation {
 
   constructor(rawState) {
@@ -90,6 +115,14 @@ class Activation {
   }
 
   provideSshTunnelService() {
+    if (this._tunnels == null) {
+      // $FlowFixMe: Teach flow about Symbol.observable
+      const states = _rxjsBundlesRxMinJs.Observable.from(this._store);
+      this._tunnels = states.map(state => state.openTunnels)
+      // $FlowFixMe teach mapEqual to accept Immutable.Map
+      .distinctUntilChanged((_collection || _load_collection()).mapEqual).map(tunnelMap => tunnelMap.map(openTunnel => openTunnel.state)).publishReplay(1).refCount();
+    }
+
     return {
       openTunnel: (tunnel, onOpen, onClose) => {
         this._store.dispatch((_Actions || _load_Actions()).openTunnel(tunnel, onOpen, onClose));
@@ -97,6 +130,9 @@ class Activation {
       },
       getOpenTunnels: () => {
         return new Set(this._store.getState().openTunnels.keys());
+      },
+      observeTunnels: callback => {
+        return new (_UniversalDisposable || _load_UniversalDisposable()).default(this._tunnels.subscribe(tunnels => callback(tunnels)));
       },
       getAvailableServerPort: (() => {
         var _ref = (0, _asyncToGenerator.default)(function* (nuclideUri) {
@@ -131,15 +167,6 @@ class Activation {
       messages: this._store.getState().consoleOutput
     }));
   }
-} /**
-   * Copyright (c) 2015-present, Facebook, Inc.
-   * All rights reserved.
-   *
-   * This source code is licensed under the license found in the LICENSE file in
-   * the root directory of this source tree.
-   *
-   * 
-   * @format
-   */
+}
 
 (0, (_createPackage || _load_createPackage()).default)(module.exports, Activation);

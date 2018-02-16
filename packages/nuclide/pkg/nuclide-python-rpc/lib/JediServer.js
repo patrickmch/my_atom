@@ -7,14 +7,14 @@ Object.defineProperty(exports, "__esModule", {
 var _asyncToGenerator = _interopRequireDefault(require('async-to-generator'));
 
 let getServerArgs = (() => {
-  var _ref = (0, _asyncToGenerator.default)(function* (src) {
+  var _ref = (0, _asyncToGenerator.default)(function* () {
     let overrides = {};
     try {
       // Override the python path and additional sys paths
       // if override script is present.
       // $FlowFB
       const findJediServerArgs = require('./fb/find-jedi-server-args').default;
-      overrides = yield findJediServerArgs(src);
+      overrides = yield findJediServerArgs();
     } catch (e) {}
     // Ignore.
 
@@ -42,7 +42,7 @@ let getServerArgs = (() => {
     }, overrides);
   });
 
-  return function getServerArgs(_x) {
+  return function getServerArgs() {
     return _ref.apply(this, arguments);
   };
 })();
@@ -112,18 +112,16 @@ function getServiceRegistry() {
 
 class JediServer {
 
-  constructor(src) {
-    // Generate a name for this server using the src file name, used to namespace logs
-    const name = `JediServer-${(_nuclideUri || _load_nuclideUri()).default.basename(src)}`;
-    const processStream = _rxjsBundlesRxMinJs.Observable.fromPromise(getServerArgs(src)).switchMap(({ pythonPath, paths }) => {
-      let args = [PROCESS_PATH, '-s', src];
+  constructor() {
+    const processStream = _rxjsBundlesRxMinJs.Observable.fromPromise(getServerArgs()).switchMap(({ pythonPath, paths }) => {
+      let args = [PROCESS_PATH];
       if (paths.length > 0) {
         args.push('-p');
         args = args.concat(paths);
       }
       return (0, (_process || _load_process()).spawn)(pythonPath, args, OPTS);
     });
-    this._process = new (_nuclideRpc || _load_nuclideRpc()).RpcProcess(name, getServiceRegistry(), processStream);
+    this._process = new (_nuclideRpc || _load_nuclideRpc()).RpcProcess('JediServer', getServiceRegistry(), processStream);
     this._isDisposed = false;
   }
 

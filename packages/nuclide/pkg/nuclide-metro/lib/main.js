@@ -19,7 +19,7 @@ var _rxjsBundlesRxMinJs = require('rxjs/bundles/Rx.min.js');
 var _LogTailer;
 
 function _load_LogTailer() {
-  return _LogTailer = require('../../nuclide-console/lib/LogTailer');
+  return _LogTailer = require('../../nuclide-console-base/lib/LogTailer');
 }
 
 var _UniversalDisposable;
@@ -68,8 +68,6 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
  */
 
 const GLOBAL_RELOAD_HOTKEY = 'CmdOrCtrl+Alt+R';
-// eslint-disable-next-line rulesdir/no-cross-atom-imports
-
 const logger = (0, (_log4js || _load_log4js()).getLogger)('Metro');
 
 class Activation {
@@ -204,7 +202,9 @@ class Activation {
 
   provideMetroAtomService() {
     return {
-      start: tunnelBehavior => this.start(tunnelBehavior)
+      start: tunnelBehavior => this.start(tunnelBehavior),
+      stop: () => this.stop(),
+      observeStatus: callback => this._logTailer.observeStatus(callback)
     };
   }
 

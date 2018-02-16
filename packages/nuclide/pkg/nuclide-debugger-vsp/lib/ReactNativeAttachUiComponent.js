@@ -12,6 +12,12 @@ function _load_nuclideDebuggerCommon() {
   return _nuclideDebuggerCommon = require('nuclide-debugger-common');
 }
 
+var _debugger;
+
+function _load_debugger() {
+  return _debugger = require('../../commons-atom/debugger');
+}
+
 var _ReactNativeCommonUiComponent;
 
 function _load_ReactNativeCommonUiComponent() {
@@ -26,17 +32,6 @@ function _load_utils() {
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-/**
- * Copyright (c) 2015-present, Facebook, Inc.
- * All rights reserved.
- *
- * This source code is licensed under the license found in the LICENSE file in
- * the root directory of this source tree.
- *
- * 
- * @format
- */
-
 class ReactNativeAttachUiComponent extends (_ReactNativeCommonUiComponent || _load_ReactNativeCommonUiComponent()).default {
   constructor(props) {
     var _this;
@@ -45,7 +40,7 @@ class ReactNativeAttachUiComponent extends (_ReactNativeCommonUiComponent || _lo
     this.handleLaunchClick = (0, _asyncToGenerator.default)(function* () {
       const launchInfo = yield (0, (_utils || _load_utils()).getReactNativeAttachProcessInfo)(_this.stateToArgs());
 
-      const debuggerService = yield (0, (_utils || _load_utils()).getDebuggerService)();
+      const debuggerService = yield (0, (_debugger || _load_debugger()).getDebuggerService)();
       debuggerService.startDebugging(launchInfo);
 
       (0, (_nuclideDebuggerCommon || _load_nuclideDebuggerCommon()).serializeDebuggerConfig)(..._this._getSerializationArgs(), {
@@ -82,4 +77,13 @@ class ReactNativeAttachUiComponent extends (_ReactNativeCommonUiComponent || _lo
   }
 
 }
-exports.default = ReactNativeAttachUiComponent;
+exports.default = ReactNativeAttachUiComponent; /**
+                                                 * Copyright (c) 2015-present, Facebook, Inc.
+                                                 * All rights reserved.
+                                                 *
+                                                 * This source code is licensed under the license found in the LICENSE file in
+                                                 * the root directory of this source tree.
+                                                 *
+                                                 * 
+                                                 * @format
+                                                 */

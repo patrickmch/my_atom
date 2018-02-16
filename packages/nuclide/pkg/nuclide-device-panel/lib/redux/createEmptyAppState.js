@@ -38,6 +38,7 @@ function createEmptyAppState() {
     isDeviceConnected: false,
     supportedPidsPerTask: new Map(),
     deviceTypeTasks: [],
-    isPollingDevices: false
+    isPollingDevices: false,
+    deviceTypeComponents: []
   };
 }

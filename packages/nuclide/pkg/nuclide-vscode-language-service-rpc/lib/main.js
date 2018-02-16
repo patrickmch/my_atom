@@ -14,14 +14,14 @@ var _asyncToGenerator = _interopRequireDefault(require('async-to-generator'));
  * TODO: Document all of the fields below.
  */
 let createMultiLspLanguageService = exports.createMultiLspLanguageService = (() => {
-  var _ref = (0, _asyncToGenerator.default)(function* (languageId, command, args, params) {
+  var _ref = (0, _asyncToGenerator.default)(function* (languageServerName, command, args, params) {
     const logger = (0, (_log4js || _load_log4js()).getLogger)(params.logCategory);
     logger.setLevel(params.logLevel);
 
     if ((yield (0, (_which || _load_which()).default)(command)) == null) {
-      const message = `Command "${command}" could not be found: ${languageId} language features will be disabled.`;
+      const message = `Command "${command}" could not be found: ${languageServerName} language features will be disabled.`;
       logger.warn(message);
-      params.host.consoleNotification(languageId, 'warning', message);
+      params.host.consoleNotification(languageServerName, 'warning', message);
       return null;
     }
 
@@ -51,7 +51,7 @@ let createMultiLspLanguageService = exports.createMultiLspLanguageService = (() 
         // We're awaiting until AtomLanguageService has observed diagnostics (to
         // prevent race condition: see below).
 
-        const lsp = new (_LspLanguageService || _load_LspLanguageService()).LspLanguageService(logger, fileCache, (yield (0, (_nuclideLanguageServiceRpc || _load_nuclideLanguageServiceRpc()).forkHostServices)(params.host, logger)), languageId, command, args, params.spawnOptions, projectDir, params.fileExtensions, params.initializationOptions || {}, Number(params.additionalLogFilesRetentionPeriod), params.useOriginalEnvironment || false);
+        const lsp = new (_LspLanguageService || _load_LspLanguageService()).LspLanguageService(logger, fileCache, (yield (0, (_nuclideLanguageServiceRpc || _load_nuclideLanguageServiceRpc()).forkHostServices)(params.host, logger)), languageServerName, command, args, params.spawnOptions, projectDir, params.fileExtensions, params.initializationOptions || {}, Number(params.additionalLogFilesRetentionPeriod), params.useOriginalEnvironment || false);
 
         lsp.start(); // Kick off 'Initializing'...
         return lsp;

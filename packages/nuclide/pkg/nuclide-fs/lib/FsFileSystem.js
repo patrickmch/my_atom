@@ -133,7 +133,6 @@ class FsFileSystem {
 
   readdir(path) {
     return (0, _asyncToGenerator.default)(function* () {
-      // $FlowFixMe(>=0.55.0) Flow suppress
       const files = yield (_fsPromise || _load_fsPromise()).default.readdir(path);
       const entries = yield Promise.all(files.map((() => {
         var _ref = (0, _asyncToGenerator.default)(function* (file) {
@@ -156,6 +155,7 @@ class FsFileSystem {
         };
       })()));
       // TODO: Return entries directly and change client to handle error.
+      // $FlowFixMe
       return (0, (_collection || _load_collection()).arrayCompact)(entries).map(function (entry) {
         return [entry.file, entry.stats.isFile(), entry.isSymbolicLink];
       });

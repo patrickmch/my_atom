@@ -53,27 +53,30 @@ function _load_ATConfigurePathTaskProvider() {
   return _ATConfigurePathTaskProvider = require('./ATConfigurePathTaskProvider');
 }
 
+var _AvdComponentProvider;
+
+function _load_AvdComponentProvider() {
+  return _AvdComponentProvider = require('./AvdComponentProvider');
+}
+
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
+/**
+ * Copyright (c) 2015-present, Facebook, Inc.
+ * All rights reserved.
+ *
+ * This source code is licensed under the license found in the LICENSE file in
+ * the root directory of this source tree.
+ *
+ * 
+ * @format
+ */
+
 function registerDevicePanelProviders(api, android, tizen) {
-  return new (_UniversalDisposable || _load_UniversalDisposable()).default(
-  // list
-  api.registerListProvider(new (_ATDeviceListProvider || _load_ATDeviceListProvider()).ATDeviceListProvider(android)), api.registerListProvider(new (_ATDeviceListProvider || _load_ATDeviceListProvider()).ATDeviceListProvider(tizen)),
-  // info
-  api.registerInfoProvider(new (_ATDeviceInfoProvider || _load_ATDeviceInfoProvider()).ATDeviceInfoProvider(android)), api.registerInfoProvider(new (_ATDeviceInfoProvider || _load_ATDeviceInfoProvider()).ATDeviceInfoProvider(tizen)),
-  // processes
-  api.registerProcessesProvider(new (_ATDeviceProcessesProvider || _load_ATDeviceProcessesProvider()).ATDeviceProcessesProvider(android)), api.registerProcessesProvider(new (_ATDeviceProcessesProvider || _load_ATDeviceProcessesProvider()).ATDeviceProcessesProvider(tizen)),
-  // process tasks
-  api.registerProcessTaskProvider(new (_ATDeviceStopProcessProvider || _load_ATDeviceStopProcessProvider()).ATDeviceStopProcessProvider(android)), api.registerProcessTaskProvider(new (_ATDeviceStopProcessProvider || _load_ATDeviceStopProcessProvider()).ATDeviceStopProcessProvider(tizen)),
-  // device type tasks
-  api.registerDeviceTypeTaskProvider(new (_ATConfigurePathTaskProvider || _load_ATConfigurePathTaskProvider()).ATConfigurePathTaskProvider(android)), api.registerDeviceTypeTaskProvider(new (_ATConfigurePathTaskProvider || _load_ATConfigurePathTaskProvider()).ATConfigurePathTaskProvider(tizen)));
-} /**
-   * Copyright (c) 2015-present, Facebook, Inc.
-   * All rights reserved.
-   *
-   * This source code is licensed under the license found in the LICENSE file in
-   * the root directory of this source tree.
-   *
-   * 
-   * @format
-   */
+  const disposable = new (_UniversalDisposable || _load_UniversalDisposable()).default(api.registerListProvider(new (_ATDeviceListProvider || _load_ATDeviceListProvider()).ATDeviceListProvider(android)), api.registerInfoProvider(new (_ATDeviceInfoProvider || _load_ATDeviceInfoProvider()).ATDeviceInfoProvider(android)), api.registerProcessesProvider(new (_ATDeviceProcessesProvider || _load_ATDeviceProcessesProvider()).ATDeviceProcessesProvider(android)), api.registerProcessTaskProvider(new (_ATDeviceStopProcessProvider || _load_ATDeviceStopProcessProvider()).ATDeviceStopProcessProvider(android)), api.registerDeviceTypeTaskProvider(new (_ATConfigurePathTaskProvider || _load_ATConfigurePathTaskProvider()).ATConfigurePathTaskProvider(android)), api.registerDeviceTypeComponentProvider(new (_AvdComponentProvider || _load_AvdComponentProvider()).AvdComponentProvider()));
+
+  if (atom.config.get('nuclide.nuclide-adb-sdb.tizen')) {
+    disposable.add(api.registerListProvider(new (_ATDeviceListProvider || _load_ATDeviceListProvider()).ATDeviceListProvider(tizen)), api.registerInfoProvider(new (_ATDeviceInfoProvider || _load_ATDeviceInfoProvider()).ATDeviceInfoProvider(tizen)), api.registerProcessesProvider(new (_ATDeviceProcessesProvider || _load_ATDeviceProcessesProvider()).ATDeviceProcessesProvider(tizen)), api.registerProcessTaskProvider(new (_ATDeviceStopProcessProvider || _load_ATDeviceStopProcessProvider()).ATDeviceStopProcessProvider(tizen)), api.registerDeviceTypeTaskProvider(new (_ATConfigurePathTaskProvider || _load_ATConfigurePathTaskProvider()).ATConfigurePathTaskProvider(tizen)));
+  }
+  return disposable;
+}

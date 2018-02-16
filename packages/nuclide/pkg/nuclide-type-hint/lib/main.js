@@ -8,8 +8,6 @@ exports.consumeTypehintProvider = consumeTypehintProvider;
 exports.consumeDatatipService = consumeDatatipService;
 exports.deactivate = deactivate;
 
-var _atom = require('atom');
-
 var _UniversalDisposable;
 
 function _load_UniversalDisposable() {
@@ -24,16 +22,18 @@ function _load_TypeHintManager() {
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-const PACKAGE_NAME = 'nuclide-type-hint'; /**
-                                           * Copyright (c) 2015-present, Facebook, Inc.
-                                           * All rights reserved.
-                                           *
-                                           * This source code is licensed under the license found in the LICENSE file in
-                                           * the root directory of this source tree.
-                                           *
-                                           * 
-                                           * @format
-                                           */
+/**
+ * Copyright (c) 2015-present, Facebook, Inc.
+ * All rights reserved.
+ *
+ * This source code is licensed under the license found in the LICENSE file in
+ * the root directory of this source tree.
+ *
+ * 
+ * @format
+ */
+
+const PACKAGE_NAME = 'nuclide-type-hint';
 
 class Activation {
 
@@ -50,7 +50,7 @@ class Activation {
     }
 
     this.typeHintManager.addProvider(provider);
-    return new _atom.Disposable(() => {
+    return new (_UniversalDisposable || _load_UniversalDisposable()).default(() => {
       if (this.typeHintManager != null) {
         this.typeHintManager.removeProvider(provider);
       }

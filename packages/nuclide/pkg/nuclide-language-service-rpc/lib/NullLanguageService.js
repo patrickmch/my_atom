@@ -38,7 +38,7 @@ class NullLanguageService {
   }
 
   findReferences(fileVersion, position) {
-    return Promise.resolve(null);
+    return _rxjsBundlesRxMinJs.Observable.of(null).publish();
   }
 
   getCoverage(filePath) {

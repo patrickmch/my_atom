@@ -1,3 +1,12 @@
+### 2.83.4
+  - Remove PR #473 which causes Atom to ignore the grammar at startup.
+  
+### 2.83.3
+  - Parse <T>( as flowtype. Before, the paren had to be terminated by a new line. Relax this condition. [#480](https://github.com/gandm/language-babel/issues/480)
+    
+### 2.83.2
+  - Change grammar to correctly support function braces in the Allman style. [#478](https://github.com/gandm/language-babel/issues/478)
+
 ### 2.83.1
   - Mistakenly removed the line added by the PR in 2.83.0!
 

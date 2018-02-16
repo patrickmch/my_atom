@@ -51,6 +51,18 @@ class MemoryLogger {
     return this._logs.toArray().map(entry => `${entry.text}\n`).join('');
   }
 
+  tail(count) {
+    if (!(count > 0)) {
+      throw new Error('Invariant violation: "count > 0"');
+    }
+
+    if (count >= this._logs.length) {
+      return this.dump();
+    } else {
+      return this._logs.toArray().slice(this._logs.length - count, this._logs.length).map(entry => `${entry.text}\n`).join('');
+    }
+  }
+
   getUnderlyingLogger() {
     return this._underlyingLogger;
   }

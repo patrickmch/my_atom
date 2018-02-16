@@ -89,13 +89,13 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
 const SERVER_LIMIT = 20;
 
 // Limit the total memory usage of all Clang servers.
-const MEMORY_LIMIT = Math.round(_os.default.totalmem() * 15 / 100);
+const DEFAULT_MEMORY_LIMIT = Math.round(_os.default.totalmem() * 15 / 100);
 
 let _getDefaultFlags;
 class ClangServerManager {
 
   constructor() {
-    this._memoryLimit = MEMORY_LIMIT;
+    this._memoryLimit = DEFAULT_MEMORY_LIMIT;
 
     this._flagsManager = new (_ClangFlagsManager || _load_ClangFlagsManager()).default();
     this._servers = new (_lruCache || _load_lruCache()).default({
@@ -110,6 +110,11 @@ class ClangServerManager {
 
   getClangFlagsManager() {
     return this._flagsManager;
+  }
+
+  setMemoryLimit(percent) {
+    this._memoryLimit = Math.round(Math.abs(_os.default.totalmem() * percent / 100));
+    this._checkMemoryUsage();
   }
 
   /**
@@ -151,7 +156,9 @@ class ClangServerManager {
         (0, (_log4js || _load_log4js()).getLogger)('nuclide-clang-rpc').error(`Error getting flags for ${src}:`, e);
         return null;
       });
-      if (flagsData != null && flagsData.flags != null) {
+      if (flagsData != null && flagsData.flags.length > 0) {
+        // Flags length could be 0 if the clang provider wants us to watch the
+        // flags file but doesn't have accurate flags (e.g. header-only libs).
         return {
           flags: flagsData.flags,
           usesDefaultFlags: false,
@@ -232,10 +239,6 @@ class ClangServerManager {
 
       return total;
     })();
-  }
-
-  setMemoryLimit(limit) {
-    this._memoryLimit = limit;
   }
 }
 exports.default = ClangServerManager;

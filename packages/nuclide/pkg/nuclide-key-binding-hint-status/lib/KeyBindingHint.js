@@ -27,7 +27,7 @@ function _load_UniversalDisposable() {
 var _humanizeKeystroke;
 
 function _load_humanizeKeystroke() {
-  return _humanizeKeystroke = _interopRequireDefault(require('../../commons-node/humanizeKeystroke'));
+  return _humanizeKeystroke = _interopRequireDefault(require('nuclide-commons/humanizeKeystroke'));
 }
 
 var _humanizeEventName;

@@ -31,6 +31,12 @@ function _load_tasks() {
   return _tasks = require('../../commons-node/tasks');
 }
 
+var _nuclideArtillery;
+
+function _load_nuclideArtillery() {
+  return _nuclideArtillery = require('../../nuclide-artillery');
+}
+
 var _BuckBuildSystem;
 
 function _load_BuckBuildSystem() {
@@ -115,6 +121,17 @@ function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj;
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
+/**
+ * Copyright (c) 2015-present, Facebook, Inc.
+ * All rights reserved.
+ *
+ * This source code is licensed under the license found in the LICENSE file in
+ * the root directory of this source tree.
+ *
+ * 
+ * @format
+ */
+
 const TASKS = [{
   type: 'build',
   label: 'Build',
@@ -138,17 +155,6 @@ const TASKS = [{
 }];
 
 // This must match URI defined in ../../nuclide-console/lib/ui/ConsoleContainer
-/**
- * Copyright (c) 2015-present, Facebook, Inc.
- * All rights reserved.
- *
- * This source code is licensed under the license found in the LICENSE file in
- * the root directory of this source tree.
- *
- * 
- * @format
- */
-
 const CONSOLE_VIEW_URI = exports.CONSOLE_VIEW_URI = 'atom://nuclide/console';
 
 function shouldEnableTask(taskType, ruleType) {
@@ -215,10 +221,8 @@ class BuckTaskRunner {
   }
 
   setProjectRoot(projectRoot, callback) {
-    const path = projectRoot == null ? null : projectRoot.getPath();
-
     // $FlowFixMe: type symbol-observable
-    const storeReady = _rxjsBundlesRxMinJs.Observable.from(this._getStore()).distinctUntilChanged().filter(state => !state.isLoadingBuckProject && state.projectRoot === path).share();
+    const storeReady = _rxjsBundlesRxMinJs.Observable.from(this._getStore()).distinctUntilChanged().filter(state => !state.isLoadingBuckProject && state.projectRoot === projectRoot).share();
 
     const enabledObservable = storeReady.map(state => state.buckRoot != null).distinctUntilChanged();
 
@@ -247,7 +251,7 @@ class BuckTaskRunner {
 
     const subscription = _rxjsBundlesRxMinJs.Observable.combineLatest(enabledObservable, tasksObservable).subscribe(([enabled, tasks]) => callback(enabled, tasks));
 
-    this._getStore().dispatch((_Actions || _load_Actions()).setProjectRoot(path));
+    this._getStore().dispatch((_Actions || _load_Actions()).setProjectRoot(projectRoot));
 
     return new (_UniversalDisposable || _load_UniversalDisposable()).default(subscription);
   }
@@ -334,12 +338,27 @@ class BuckTaskRunner {
     const deploymentString = deploymentTargetString === '' ? '' : ` on "${deploymentTargetString}"`;
 
     const task = (0, (_tasks || _load_tasks()).taskFromObservable)(_rxjsBundlesRxMinJs.Observable.concat((0, (_tasks || _load_tasks()).createMessage)(`Resolving ${taskType} command for "${buildTarget}"${deploymentString}`, 'log'), _rxjsBundlesRxMinJs.Observable.defer(() => {
+      const trace = (_nuclideArtillery || _load_nuclideArtillery()).NuclideArtilleryTrace.begin('nuclide_buck', taskType);
       if (selectedDeploymentTarget) {
         const { platform, device } = selectedDeploymentTarget;
-        return platform.runTask(this._buildSystem, taskType, buildRuleType.buildTarget, taskSettings, device);
+        return platform.runTask(this._buildSystem, taskType, buildRuleType.buildTarget, taskSettings, device).do({
+          error() {
+            trace.end();
+          },
+          complete() {
+            trace.end();
+          }
+        });
       } else {
         const subcommand = taskType === 'debug' ? 'build' : taskType;
-        return this._buildSystem.runSubcommand(buckRoot, subcommand, buildRuleType.buildTarget, taskSettings, taskType === 'debug', null);
+        return this._buildSystem.runSubcommand(buckRoot, subcommand, buildRuleType.buildTarget, taskSettings, taskType === 'debug', null).do({
+          error() {
+            trace.end();
+          },
+          complete() {
+            trace.end();
+          }
+        });
       }
     })));
 

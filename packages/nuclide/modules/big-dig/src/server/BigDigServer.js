@@ -3,6 +3,7 @@
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
+exports.HEARTBEAT_CHANNEL = undefined;
 
 var _log4js;
 
@@ -14,31 +15,31 @@ var _url = _interopRequireDefault(require('url'));
 
 var _rxjsBundlesRxMinJs = require('rxjs/bundles/Rx.min.js');
 
+var _getVersion;
+
+function _load_getVersion() {
+  return _getVersion = require('../common/getVersion');
+}
+
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-/**
- * Copyright (c) 2017-present, Facebook, Inc.
- * All rights reserved.
- *
- * This source code is licensed under the BSD-style license found in the
- * LICENSE file in the root directory of this source tree. An additional grant
- * of patent rights can be found in the PATENTS file in the same directory.
- *
- * 
- * @format
- */
+const HEARTBEAT_CHANNEL = exports.HEARTBEAT_CHANNEL = 'big-dig-heartbeat'; /**
+                                                                            * Copyright (c) 2017-present, Facebook, Inc.
+                                                                            * All rights reserved.
+                                                                            *
+                                                                            * This source code is licensed under the BSD-style license found in the
+                                                                            * LICENSE file in the root directory of this source tree. An additional grant
+                                                                            * of patent rights can be found in the PATENTS file in the same directory.
+                                                                            *
+                                                                            * 
+                                                                            * @format
+                                                                            */
 
 class BigDigServer {
 
   /**
    * Note: The webSocketServer must be running on top of the httpsServer.
    * Note: This BigDigServer is responsible for closing httpServer and wss.
-   */
-
-
-  /**
-   * Currently, this is unused, though we will likely use it once we port the
-   * logic for XhrConnectionHeartbeat over.
    */
   constructor(httpsServer, webSocketServer) {
     this._logger = (0, (_log4js || _load_log4js()).getLogger)();
@@ -63,6 +64,12 @@ class BigDigServer {
   }
 
   _onHttpsRequest(request, response) {
+    const { pathname } = _url.default.parse(request.url);
+    if (pathname === `/${HEARTBEAT_CHANNEL}`) {
+      response.write((0, (_getVersion || _load_getVersion()).getVersion)());
+      response.end();
+      return;
+    }
     this._logger.info(`Ignored HTTPS request for ${request.url}`);
   }
 

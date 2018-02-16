@@ -13,17 +13,6 @@ function _load_Dispatcher() {
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-/**
- * Copyright (c) 2015-present, Facebook, Inc.
- * All rights reserved.
- *
- * This source code is licensed under the license found in the LICENSE file in
- * the root directory of this source tree.
- *
- * 
- * @format
- */
-
 const ActionTypes = exports.ActionTypes = Object.freeze({
   SET_DEBUGGER_INSTANCE: 'SET_DEBUGGER_INSTANCE',
   SET_ERROR: 'SET_ERROR',
@@ -66,7 +55,6 @@ const ActionTypes = exports.ActionTypes = Object.freeze({
   UPDATE_STOP_THREAD: 'UPDATE_STOP_THREAD',
   UPDATE_SELECTED_THREAD: 'UPDATE_SELECTED_THREAD',
   NOTIFY_THREAD_SWITCH: 'NOTIFY_THREAD_SWITCH',
-  TOGGLE_SINGLE_THREAD_STEPPING: 'TOGGLE_SINGLE_THREAD_STEPPING',
   RECEIVED_EXPRESSION_EVALUATION_RESPONSE: 'RECEIVED_EXPRESSION_EVALUATION_RESPONSE',
   RECEIVED_GET_PROPERTIES_RESPONSE: 'RECEIVED_GET_PROPERTIES_RESPONSE',
   UPDATE_CUSTOM_CONTROL_BUTTONS: 'UPDATE_CUSTOM_CONTROL_BUTTONS',
@@ -77,6 +65,17 @@ const ActionTypes = exports.ActionTypes = Object.freeze({
 
 // Flow hack: Every DebuggerAction actionType must be in ActionTypes.
 // $FlowFixMe(>=0.55.0) Flow suppress
+/**
+ * Copyright (c) 2015-present, Facebook, Inc.
+ * All rights reserved.
+ *
+ * This source code is licensed under the license found in the LICENSE file in
+ * the root directory of this source tree.
+ *
+ * 
+ * @format
+ */
+
 '';
 
 class DebuggerDispatcher extends (_Dispatcher || _load_Dispatcher()).default {}

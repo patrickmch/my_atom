@@ -39,7 +39,7 @@ function _load_AutoImportsManager() {
 var _TextDocuments;
 
 function _load_TextDocuments() {
-  return _TextDocuments = _interopRequireDefault(require('./TextDocuments'));
+  return _TextDocuments = _interopRequireDefault(require('../../nuclide-lsp-implementation-common/TextDocuments'));
 }
 
 var _ImportFormatter;
@@ -185,10 +185,10 @@ documents.onDidOpenTextDocument(params => {
 
 documents.onDidChangeContent(params => {
   try {
-    const uri = (_nuclideUri || _load_nuclideUri()).default.uriToNuclideUri(params.document.uri);
+    const uri = (_nuclideUri || _load_nuclideUri()).default.uriToNuclideUri(params.textDocument.uri);
     if (uri != null) {
-      autoImportsManager.workerIndexFile(uri, params.document.getText());
-      findAndSendDiagnostics(params.document.getText(), uri);
+      autoImportsManager.workerIndexFile(uri, params.textDocument.getText());
+      findAndSendDiagnostics(params.textDocument.getText(), uri);
     }
   } catch (e) {
     logger.error(e);

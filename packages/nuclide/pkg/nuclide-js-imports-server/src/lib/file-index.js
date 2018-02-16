@@ -9,7 +9,7 @@ var _asyncToGenerator = _interopRequireDefault(require('async-to-generator'));
 
 let getFileIndex = exports.getFileIndex = (() => {
   var _ref = (0, _asyncToGenerator.default)(function* (root, configFromFlow) {
-    const client = new (_main || _load_main()).WatchmanClient();
+    const client = new (_nuclideWatchmanHelpers || _load_nuclideWatchmanHelpers()).WatchmanClient();
     const exportCache = new (_ExportCache || _load_ExportCache()).default({ root, configFromFlow });
     const loadPromise = exportCache.load().then(function (success) {
       const logger = (0, (_log4js || _load_log4js()).getLogger)('js-imports-server');
@@ -140,10 +140,10 @@ var _os = _interopRequireDefault(require('os'));
 
 var _rxjsBundlesRxMinJs = require('rxjs/bundles/Rx.min.js');
 
-var _main;
+var _nuclideWatchmanHelpers;
 
-function _load_main() {
-  return _main = require('../../../nuclide-watchman-helpers/lib/main');
+function _load_nuclideWatchmanHelpers() {
+  return _nuclideWatchmanHelpers = require('nuclide-watchman-helpers');
 }
 
 var _ExportCache;
@@ -207,7 +207,7 @@ function filesWithoutHash(files) {
 // TODO: watch node_modules and package.json files for changes.
 function watchDirectory(root) {
   return _rxjsBundlesRxMinJs.Observable.defer(() => {
-    const watchmanClient = new (_main || _load_main()).WatchmanClient();
+    const watchmanClient = new (_nuclideWatchmanHelpers || _load_nuclideWatchmanHelpers()).WatchmanClient();
     return _rxjsBundlesRxMinJs.Observable.using(() => new (_UniversalDisposable || _load_UniversalDisposable()).default(watchmanClient), () => _rxjsBundlesRxMinJs.Observable.fromPromise(watchmanClient.watchDirectoryRecursive(root, 'js-imports-subscription', getWatchmanExpression(root, '*.js'))).switchMap(watchmanSubscription => {
       return _rxjsBundlesRxMinJs.Observable.fromEvent(watchmanSubscription, 'change').switchMap(changes => _rxjsBundlesRxMinJs.Observable.from(changes.map(change => {
         const name = (_nuclideUri || _load_nuclideUri()).default.join(watchmanSubscription.root, change.name);

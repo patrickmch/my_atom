@@ -17,8 +17,18 @@ let getUseFfpAutocomplete = (() => {
   };
 })();
 
+let getUseEnhancedHover = (() => {
+  var _ref2 = (0, _asyncToGenerator.default)(function* () {
+    return (0, (_passesGK || _load_passesGK()).default)('nuclide_hack_use_enhanced_hover');
+  });
+
+  return function getUseEnhancedHover() {
+    return _ref2.apply(this, arguments);
+  };
+})();
+
 let connectionToHackService = (() => {
-  var _ref2 = (0, _asyncToGenerator.default)(function* (connection) {
+  var _ref3 = (0, _asyncToGenerator.default)(function* (connection) {
     const hackService = (0, (_nuclideRemoteConnection || _load_nuclideRemoteConnection()).getServiceByConnection)(HACK_SERVICE_NAME, connection);
     const config = (0, (_config || _load_config()).getConfig)();
     const fileNotifier = yield (0, (_nuclideOpenFiles || _load_nuclideOpenFiles()).getNotifierByConnection)(connection);
@@ -28,8 +38,9 @@ let connectionToHackService = (() => {
     } else {
       const host = yield (0, (_nuclideLanguageService || _load_nuclideLanguageService()).getHostServices)();
       const autocompleteArg = (yield getUseFfpAutocomplete()) ? ['--ffp-autocomplete'] : [];
+      const enhancedHoverArg = (yield getUseEnhancedHover()) ? ['--enhanced-hover'] : [];
       const lspService = yield hackService.initializeLsp(config.hhClientPath, // command
-      ['lsp', '--from', 'nuclide', ...autocompleteArg], // arguments
+      ['lsp', '--from', 'nuclide', ...autocompleteArg, ...enhancedHoverArg], // arguments
       [(_constants || _load_constants()).HACK_CONFIG_FILE_NAME], // project file
       (_constants || _load_constants()).HACK_FILE_EXTENSIONS, // which file-notifications should be sent to LSP
       config.logLevel, fileNotifier, host);
@@ -38,12 +49,12 @@ let connectionToHackService = (() => {
   });
 
   return function connectionToHackService(_x) {
-    return _ref2.apply(this, arguments);
+    return _ref3.apply(this, arguments);
   };
 })();
 
 let createLanguageService = (() => {
-  var _ref3 = (0, _asyncToGenerator.default)(function* () {
+  var _ref4 = (0, _asyncToGenerator.default)(function* () {
     const usingLsp = !(0, (_config || _load_config()).getConfig)().legacyHackIde;
     const atomConfig = {
       name: 'Hack',
@@ -117,7 +128,7 @@ let createLanguageService = (() => {
   });
 
   return function createLanguageService() {
-    return _ref3.apply(this, arguments);
+    return _ref4.apply(this, arguments);
   };
 })();
 
@@ -125,24 +136,24 @@ let createLanguageService = (() => {
 
 
 let getHackLanguageForUri = exports.getHackLanguageForUri = (() => {
-  var _ref4 = (0, _asyncToGenerator.default)(function* (uri) {
+  var _ref5 = (0, _asyncToGenerator.default)(function* (uri) {
     return (yield hackLanguageService).getLanguageServiceForUri(uri);
   });
 
   return function getHackLanguageForUri(_x2) {
-    return _ref4.apply(this, arguments);
+    return _ref5.apply(this, arguments);
   };
 })();
 
 let isFileInHackProject = exports.isFileInHackProject = (() => {
-  var _ref5 = (0, _asyncToGenerator.default)(function* (fileUri) {
+  var _ref6 = (0, _asyncToGenerator.default)(function* (fileUri) {
     const fileSystemService = (0, (_nuclideRemoteConnection || _load_nuclideRemoteConnection()).getFileSystemServiceByNuclideUri)(fileUri);
     const foundDir = yield fileSystemService.findNearestAncestorNamed('.hhconfig', fileUri);
     return foundDir != null;
   });
 
   return function isFileInHackProject(_x3) {
-    return _ref5.apply(this, arguments);
+    return _ref6.apply(this, arguments);
   };
 })();
 

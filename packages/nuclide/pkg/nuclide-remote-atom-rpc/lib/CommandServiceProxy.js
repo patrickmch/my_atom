@@ -80,12 +80,17 @@ module.exports = _client => {
       }).publish();
     }
 
-    addProject(arg0) {
+    addProject(arg0, arg1) {
       return Promise.all([_client.marshalArguments(Array.from(arguments), [{
         name: "projectPath",
         type: {
           kind: "named",
           name: "NuclideUri"
+        }
+      }, {
+        name: "newWindow",
+        type: {
+          kind: "boolean"
         }
       }]), _client.marshal(this, {
         kind: "named",
@@ -273,7 +278,7 @@ Object.defineProperty(module.exports, "defs", {
           location: {
             type: "source",
             fileName: "rpc-types.js",
-            line: 23
+            line: 24
           },
           kind: "function",
           argumentTypes: [{
@@ -309,7 +314,7 @@ Object.defineProperty(module.exports, "defs", {
           location: {
             type: "source",
             fileName: "rpc-types.js",
-            line: 29
+            line: 37
           },
           kind: "function",
           argumentTypes: [{
@@ -317,6 +322,11 @@ Object.defineProperty(module.exports, "defs", {
             type: {
               kind: "named",
               name: "NuclideUri"
+            }
+          }, {
+            name: "newWindow",
+            type: {
+              kind: "boolean"
             }
           }],
           returnType: {
@@ -330,7 +340,7 @@ Object.defineProperty(module.exports, "defs", {
           location: {
             type: "source",
             fileName: "rpc-types.js",
-            line: 30
+            line: 38
           },
           kind: "function",
           argumentTypes: [],
@@ -373,7 +383,7 @@ Object.defineProperty(module.exports, "defs", {
       location: {
         type: "source",
         fileName: "rpc-types.js",
-        line: 33
+        line: 41
       },
       name: "ConnectionDetails",
       definition: {

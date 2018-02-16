@@ -51,6 +51,12 @@ function _load_nuclideDebuggerCommon() {
   return _nuclideDebuggerCommon = require('nuclide-debugger-common');
 }
 
+var _debugger;
+
+function _load_debugger() {
+  return _debugger = require('../../commons-atom/debugger');
+}
+
 var _utils;
 
 function _load_utils() {
@@ -58,17 +64,6 @@ function _load_utils() {
 }
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-/**
- * Copyright (c) 2015-present, Facebook, Inc.
- * All rights reserved.
- *
- * This source code is licensed under the license found in the LICENSE file in
- * the root directory of this source tree.
- *
- * 
- * @format
- */
 
 class OCamlLaunchUIComponent extends _react.default.Component {
 
@@ -227,7 +222,7 @@ class OCamlLaunchUIComponent extends _react.default.Component {
         logLevel: (_vscodeDebugadapter || _load_vscodeDebugadapter()).Logger.LogLevel.Verbose // TODO: read from configuration
       };
 
-      const debuggerService = yield (0, (_utils || _load_utils()).getDebuggerService)();
+      const debuggerService = yield (0, (_debugger || _load_debugger()).getDebuggerService)();
       const launchProcessInfo = yield (0, (_utils || _load_utils()).getOCamlLaunchProcessInfo)(_this.props.targetUri, launchTarget);
       debuggerService.startDebugging(launchProcessInfo);
       (0, (_nuclideDebuggerCommon || _load_nuclideDebuggerCommon()).serializeDebuggerConfig)(..._this._getSerializationArgs(), _this.state);
@@ -243,4 +238,13 @@ class OCamlLaunchUIComponent extends _react.default.Component {
     return (_nuclideUri || _load_nuclideUri()).default.expandHomeDir(path);
   }
 }
-exports.OCamlLaunchUIComponent = OCamlLaunchUIComponent;
+exports.OCamlLaunchUIComponent = OCamlLaunchUIComponent; /**
+                                                          * Copyright (c) 2015-present, Facebook, Inc.
+                                                          * All rights reserved.
+                                                          *
+                                                          * This source code is licensed under the license found in the LICENSE file in
+                                                          * the root directory of this source tree.
+                                                          *
+                                                          * 
+                                                          * @format
+                                                          */

@@ -83,16 +83,13 @@ class ServerLanguageService {
   }
 
   findReferences(fileVersion, position) {
-    var _this4 = this;
-
-    return (0, _asyncToGenerator.default)(function* () {
-      const filePath = fileVersion.filePath;
-      const buffer = yield (0, (_nuclideOpenFilesRpc || _load_nuclideOpenFilesRpc()).getBufferAtVersion)(fileVersion);
+    const filePath = fileVersion.filePath;
+    return _rxjsBundlesRxMinJs.Observable.fromPromise((0, (_nuclideOpenFilesRpc || _load_nuclideOpenFilesRpc()).getBufferAtVersion)(fileVersion)).concatMap(buffer => {
       if (buffer == null) {
-        return null;
+        return _rxjsBundlesRxMinJs.Observable.of(null);
       }
-      return _this4._service.findReferences(filePath, buffer, position);
-    })();
+      return this._service.findReferences(filePath, buffer, position);
+    }).publish();
   }
 
   getCoverage(filePath) {
@@ -107,15 +104,28 @@ class ServerLanguageService {
   }
 
   getCodeActions(fileVersion, range, diagnostics) {
-    var _this5 = this;
+    var _this4 = this;
 
     return (0, _asyncToGenerator.default)(function* () {
       const { filePath } = fileVersion;
-      return _this5._service.getCodeActions(filePath, range, diagnostics);
+      return _this4._service.getCodeActions(filePath, range, diagnostics);
     })();
   }
 
   getOutline(fileVersion) {
+    var _this5 = this;
+
+    return (0, _asyncToGenerator.default)(function* () {
+      const filePath = fileVersion.filePath;
+      const buffer = yield (0, (_nuclideOpenFilesRpc || _load_nuclideOpenFilesRpc()).getBufferAtVersion)(fileVersion);
+      if (buffer == null) {
+        return null;
+      }
+      return _this5._service.getOutline(filePath, buffer);
+    })();
+  }
+
+  typeHint(fileVersion, position) {
     var _this6 = this;
 
     return (0, _asyncToGenerator.default)(function* () {
@@ -124,25 +134,12 @@ class ServerLanguageService {
       if (buffer == null) {
         return null;
       }
-      return _this6._service.getOutline(filePath, buffer);
-    })();
-  }
-
-  typeHint(fileVersion, position) {
-    var _this7 = this;
-
-    return (0, _asyncToGenerator.default)(function* () {
-      const filePath = fileVersion.filePath;
-      const buffer = yield (0, (_nuclideOpenFilesRpc || _load_nuclideOpenFilesRpc()).getBufferAtVersion)(fileVersion);
-      if (buffer == null) {
-        return null;
-      }
-      return _this7._service.typeHint(filePath, buffer, position);
+      return _this6._service.typeHint(filePath, buffer, position);
     })();
   }
 
   highlight(fileVersion, position) {
-    var _this8 = this;
+    var _this7 = this;
 
     return (0, _asyncToGenerator.default)(function* () {
       const filePath = fileVersion.filePath;
@@ -150,11 +147,24 @@ class ServerLanguageService {
       if (buffer == null) {
         return [];
       }
-      return _this8._service.highlight(filePath, buffer, position);
+      return _this7._service.highlight(filePath, buffer, position);
     })();
   }
 
   formatSource(fileVersion, range, options) {
+    var _this8 = this;
+
+    return (0, _asyncToGenerator.default)(function* () {
+      const filePath = fileVersion.filePath;
+      const buffer = yield (0, (_nuclideOpenFilesRpc || _load_nuclideOpenFilesRpc()).getBufferAtVersion)(fileVersion);
+      if (buffer == null) {
+        return null;
+      }
+      return _this8._service.formatSource(filePath, buffer, range, options);
+    })();
+  }
+
+  formatEntireFile(fileVersion, range, options) {
     var _this9 = this;
 
     return (0, _asyncToGenerator.default)(function* () {
@@ -163,11 +173,11 @@ class ServerLanguageService {
       if (buffer == null) {
         return null;
       }
-      return _this9._service.formatSource(filePath, buffer, range, options);
+      return _this9._service.formatEntireFile(filePath, buffer, range, options);
     })();
   }
 
-  formatEntireFile(fileVersion, range, options) {
+  formatAtPosition(fileVersion, position, triggerCharacter, options) {
     var _this10 = this;
 
     return (0, _asyncToGenerator.default)(function* () {
@@ -176,11 +186,11 @@ class ServerLanguageService {
       if (buffer == null) {
         return null;
       }
-      return _this10._service.formatEntireFile(filePath, buffer, range, options);
+      return _this10._service.formatAtPosition(filePath, buffer, position, triggerCharacter, options);
     })();
   }
 
-  formatAtPosition(fileVersion, position, triggerCharacter, options) {
+  getEvaluationExpression(fileVersion, position) {
     var _this11 = this;
 
     return (0, _asyncToGenerator.default)(function* () {
@@ -189,20 +199,7 @@ class ServerLanguageService {
       if (buffer == null) {
         return null;
       }
-      return _this11._service.formatAtPosition(filePath, buffer, position, triggerCharacter, options);
-    })();
-  }
-
-  getEvaluationExpression(fileVersion, position) {
-    var _this12 = this;
-
-    return (0, _asyncToGenerator.default)(function* () {
-      const filePath = fileVersion.filePath;
-      const buffer = yield (0, (_nuclideOpenFilesRpc || _load_nuclideOpenFilesRpc()).getBufferAtVersion)(fileVersion);
-      if (buffer == null) {
-        return null;
-      }
-      return _this12._service.getEvaluationExpression(filePath, buffer, position);
+      return _this11._service.getEvaluationExpression(filePath, buffer, position);
     })();
   }
 
@@ -222,14 +219,28 @@ class ServerLanguageService {
   }
 
   isFileInProject(fileUri) {
-    var _this13 = this;
+    var _this12 = this;
 
     return (0, _asyncToGenerator.default)(function* () {
-      return _this13._service.isFileInProject(fileUri);
+      return _this12._service.isFileInProject(fileUri);
     })();
   }
 
   getExpandedSelectionRange(fileVersion, currentSelection) {
+    var _this13 = this;
+
+    return (0, _asyncToGenerator.default)(function* () {
+      const filePath = fileVersion.filePath;
+      const buffer = yield (0, (_nuclideOpenFilesRpc || _load_nuclideOpenFilesRpc()).getBufferAtVersion)(fileVersion);
+      if (buffer == null) {
+        return null;
+      }
+
+      return _this13._service.getExpandedSelectionRange(filePath, buffer, currentSelection);
+    })();
+  }
+
+  getCollapsedSelectionRange(fileVersion, currentSelection, originalCursorPosition) {
     var _this14 = this;
 
     return (0, _asyncToGenerator.default)(function* () {
@@ -239,21 +250,7 @@ class ServerLanguageService {
         return null;
       }
 
-      return _this14._service.getExpandedSelectionRange(filePath, buffer, currentSelection);
-    })();
-  }
-
-  getCollapsedSelectionRange(fileVersion, currentSelection, originalCursorPosition) {
-    var _this15 = this;
-
-    return (0, _asyncToGenerator.default)(function* () {
-      const filePath = fileVersion.filePath;
-      const buffer = yield (0, (_nuclideOpenFilesRpc || _load_nuclideOpenFilesRpc()).getBufferAtVersion)(fileVersion);
-      if (buffer == null) {
-        return null;
-      }
-
-      return _this15._service.getCollapsedSelectionRange(filePath, buffer, currentSelection, originalCursorPosition);
+      return _this14._service.getCollapsedSelectionRange(filePath, buffer, currentSelection, originalCursorPosition);
     })();
   }
 

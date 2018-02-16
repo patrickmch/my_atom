@@ -197,4 +197,17 @@ Object.defineProperty(exports, 'serializeDebuggerConfig', {
   }
 });
 
+var _VsAdapterSpawner;
+
+function _load_VsAdapterSpawner() {
+  return _VsAdapterSpawner = require('./VsAdapterSpawner');
+}
+
+Object.defineProperty(exports, 'VsAdapterSpawner', {
+  enumerable: true,
+  get: function () {
+    return _interopRequireDefault(_VsAdapterSpawner || _load_VsAdapterSpawner()).default;
+  }
+});
+
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }

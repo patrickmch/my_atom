@@ -35,13 +35,13 @@ function app(state, action) {
     case (_Actions || _load_Actions()).SET_HOST:
       const { host } = action.payload;
       return Object.assign({}, state, {
-        deviceType: null,
         device: null,
         devices: (_expected || _load_expected()).Expect.pendingValue([]),
         infoTables: (_expected || _load_expected()).Expect.pendingValue(new Map()),
         processes: (_expected || _load_expected()).Expect.pendingValue([]),
         actions: [],
         processTasks: [],
+        deviceTypeComponents: [],
         isDeviceConnected: false,
         host
       });
@@ -59,6 +59,7 @@ function app(state, action) {
         processes: (_expected || _load_expected()).Expect.pendingValue([]),
         actions: [],
         processTasks: [],
+        deviceTypeComponents: [],
         isDeviceConnected: false
       });
 
@@ -122,6 +123,12 @@ function app(state, action) {
       const { deviceTypeTasks } = action.payload;
       return Object.assign({}, state, {
         deviceTypeTasks
+      });
+
+    case (_Actions || _load_Actions()).SET_DEVICE_TYPE_COMPONENTS:
+      const deviceTypeComponents = action.payload.components;
+      return Object.assign({}, state, {
+        deviceTypeComponents
       });
 
     case (_Actions || _load_Actions()).TOGGLE_DEVICE_POLLING:

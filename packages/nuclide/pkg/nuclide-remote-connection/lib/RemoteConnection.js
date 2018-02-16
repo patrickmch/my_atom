@@ -13,6 +13,12 @@ function _load_UniversalDisposable() {
   return _UniversalDisposable = _interopRequireDefault(require('nuclide-commons/UniversalDisposable'));
 }
 
+var _lookupPreferIpV;
+
+function _load_lookupPreferIpV() {
+  return _lookupPreferIpV = _interopRequireDefault(require('./lookup-prefer-ip-v6'));
+}
+
 var _ServerConnection;
 
 function _load_ServerConnection() {
@@ -41,18 +47,16 @@ function _load_log4js() {
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-/**
- * Copyright (c) 2015-present, Facebook, Inc.
- * All rights reserved.
- *
- * This source code is licensed under the license found in the LICENSE file in
- * the root directory of this source tree.
- *
- * 
- * @format
- */
-
-const logger = (0, (_log4js || _load_log4js()).getLogger)('nuclide-remote-connection');
+const logger = (0, (_log4js || _load_log4js()).getLogger)('nuclide-remote-connection'); /**
+                                                                                         * Copyright (c) 2015-present, Facebook, Inc.
+                                                                                         * All rights reserved.
+                                                                                         *
+                                                                                         * This source code is licensed under the license found in the LICENSE file in
+                                                                                         * the root directory of this source tree.
+                                                                                         *
+                                                                                         * 
+                                                                                         * @format
+                                                                                         */
 
 const FILE_WATCHER_SERVICE = 'FileWatcherService';
 const FILE_SYSTEM_SERVICE = 'FileSystemService';
@@ -105,9 +109,19 @@ class RemoteConnection {
    * connection, null (resolved by promise) is returned.
    * Configurations may also be retrieved by IP address.
    */
-  static createConnectionBySavedConfig(hostOrIp, cwd, displayTitle, promptReconnectOnFailure = true) {
+  static _createConnectionBySavedConfig(host, cwd, displayTitle, promptReconnectOnFailure = true) {
     return (0, _asyncToGenerator.default)(function* () {
-      const connectionConfig = yield (0, (_RemoteConnectionConfigurationManager || _load_RemoteConnectionConfigurationManager()).getConnectionConfig)(hostOrIp);
+      let connectionConfig = yield (0, (_RemoteConnectionConfigurationManager || _load_RemoteConnectionConfigurationManager()).getConnectionConfig)(host);
+      if (!connectionConfig) {
+        return null;
+      }
+      try {
+        // Connection configs are also stored by IP address to share between hostnames.
+        const { address } = yield (0, (_lookupPreferIpV || _load_lookupPreferIpV()).default)(host);
+        connectionConfig = yield (0, (_RemoteConnectionConfigurationManager || _load_RemoteConnectionConfigurationManager()).getConnectionConfig)(address);
+      } catch (err) {
+        // It's OK if the backup IP check fails.
+      }
       if (!connectionConfig) {
         return null;
       }
@@ -120,9 +134,28 @@ class RemoteConnection {
         return yield RemoteConnection.findOrCreate(config);
       } catch (e) {
         const log = e.name === 'VersionMismatchError' ? logger.warn.bind(logger) : logger.error.bind(logger);
-        log(`Failed to reuse connectionConfiguration for ${hostOrIp}`, e);
+        log(`Failed to reuse connectionConfiguration for ${host}`, e);
         return null;
       }
+    })();
+  }
+
+  /**
+   * Attempts to connect to an open or previously open remote connection.
+   */
+  static reconnect(host, cwd, displayTitle, promptReconnectOnFailure = true) {
+    return (0, _asyncToGenerator.default)(function* () {
+      logger.info('Attempting to reconnect', {
+        host,
+        cwd,
+        displayTitle,
+        promptReconnectOnFailure
+      });
+      const connection = RemoteConnection.getByHostnameAndPath(host, cwd);
+      if (connection != null) {
+        return connection;
+      }
+      return RemoteConnection._createConnectionBySavedConfig(host, cwd, displayTitle, promptReconnectOnFailure);
     })();
   }
 
@@ -265,6 +298,7 @@ class RemoteConnection {
     var _this4 = this;
 
     return (0, _asyncToGenerator.default)(function* () {
+      logger.info('Received close command!', { shutdownIfLast });
       _this4._subscriptions.dispose();
       yield _this4._connection.removeConnection(_this4, shutdownIfLast);
       RemoteConnection._emitter.emit('did-close', _this4);

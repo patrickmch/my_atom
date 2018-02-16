@@ -28,18 +28,6 @@ function _load_eventKit() {
   return _eventKit = require('event-kit');
 }
 
-var _nuclideAnalytics;
-
-function _load_nuclideAnalytics() {
-  return _nuclideAnalytics = require('../../nuclide-analytics');
-}
-
-var _utils;
-
-function _load_utils() {
-  return _utils = require('./utils');
-}
-
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 const logger = (0, (_log4js || _load_log4js()).getLogger)('nuclide-server'); /**
@@ -73,7 +61,7 @@ const ACK = exports.ACK = 'ACK';
 // Once closed, reconnect may not be called and no other events will be emitted.
 class QueuedAckTransport {
 
-  constructor(clientId, transport) {
+  constructor(clientId, transport, protocolLogger) {
     this._lastSendId = 0;
     this._lastProcessedId = 0;
 
@@ -84,6 +72,7 @@ class QueuedAckTransport {
     this._pendingReceives = new Map();
     this._messageProcessor = new _rxjsBundlesRxMinJs.Subject();
     this._emitter = new (_eventKit || _load_eventKit()).Emitter();
+    this._protocolLogger = protocolLogger;
 
     if (transport != null) {
       this._connect(transport);
@@ -104,7 +93,7 @@ class QueuedAckTransport {
   }
 
   _connect(transport) {
-    logInfo(`${this.id} connect`);
+    this._logInfo(`${this.id} connect`);
 
     if (!!transport.isClosed()) {
       throw new Error('connect with closed transport');
@@ -127,12 +116,12 @@ class QueuedAckTransport {
 
     if (this._isClosed) {
       // This happens when close() is called and we have an open transport.
-      logInfo(`${this.id} handleTransportClose (but already closed)`);
+      this._logInfo(`${this.id} handleTransportClose (but already closed)`);
     } else if (transport !== this._transport) {
       // This should not happen, but we don't care enough to track.
-      logError(`${this.id} handleTransportClose (but unexpected transport)`);
+      this._logError(`${this.id} handleTransportClose (but unexpected transport)`);
     } else {
-      logInfo(`${this.id} handleTransportClose`);
+      this._logInfo(`${this.id} handleTransportClose`);
       this._transport = null;
       this._cancelPendingMessageTimer();
       this._cancelAckTimer();
@@ -143,7 +132,7 @@ class QueuedAckTransport {
 
   reconnect(transport) {
     if (this._isClosed) {
-      logInfo(`${this.id} reconnect (but already closed)`);
+      this._logInfo(`${this.id} reconnect (but already closed)`);
       this._checkLeaks();
       return;
     }
@@ -152,7 +141,7 @@ class QueuedAckTransport {
       throw new Error('reconnect with closed transport');
     }
 
-    logInfo(`${this.id} reconnect (${this._pendingSends.length} sends, ${this._pendingReceives.size} receives)`);
+    this._logInfo(`${this.id} reconnect (${this._pendingSends.length} sends, ${this._pendingReceives.size} receives)`);
 
     if (this._transport != null) {
       this._transport.close();
@@ -163,7 +152,7 @@ class QueuedAckTransport {
   }
 
   disconnect(caller = 'external') {
-    (_utils || _load_utils()).protocolLogger.trace(`${this.id} disconnect (caller=${caller}, state=${this.getState()}))`);
+    this._logTrace(`${this.id} disconnect (caller=${caller}, state=${this.getState()}))`);
     const transport = this._transport;
     if (transport != null) {
       if (!!this._isClosed) {
@@ -182,7 +171,7 @@ class QueuedAckTransport {
 
   send(message) {
     if (this._isClosed) {
-      (_utils || _load_utils()).protocolLogger.trace(`${this.id} send (but already closed) '${message}'`);
+      this._logTrace(`${this.id} send (but already closed) '${message}'`);
       this._checkLeaks();
       return;
     }
@@ -196,7 +185,7 @@ class QueuedAckTransport {
   }
 
   _resendQueue() {
-    logInfo(`${this.id} resendQueue`);
+    this._logInfo(`${this.id} resendQueue`);
     this._sendAck();
     this._pendingSends.toArray().forEach(x => this._transportSend(x.wireMessage), this);
     this._maybeStartPendingMessageTimer();
@@ -204,7 +193,7 @@ class QueuedAckTransport {
 
   _handleMessage(wireMessage) {
     if (this._isClosed) {
-      (_utils || _load_utils()).protocolLogger.trace(`${this.id} receive (but already closed) '${wireMessage}'`);
+      this._logTrace(`${this.id} receive (but already closed) '${wireMessage}'`);
       this._checkLeaks();
       return;
     }
@@ -215,7 +204,7 @@ class QueuedAckTransport {
     switch (parsed.type) {
       case CONTENT:
         {
-          (_utils || _load_utils()).protocolLogger.trace(`${this.id} received ${_forLogging(wireMessage)}`);
+          this._logTrace(`${this.id} received ${_forLogging(wireMessage)}`);
           const pending = this._pendingReceives;
           // If this is a repeat of an old message, don't add it, since we
           // only remove messages when we process them.
@@ -234,7 +223,7 @@ class QueuedAckTransport {
             progress++;
           }
           if (progress !== 1) {
-            (_utils || _load_utils()).protocolLogger.trace(`${this.id} processed ${progress} messages`);
+            this._logTrace(`${this.id} processed ${progress} messages`);
           }
           this._ensureAckTimer();
           break;
@@ -244,21 +233,16 @@ class QueuedAckTransport {
         {
           const pending = this._pendingSends;
           const id = parsed.id;
+
           if (id > this._lastSendId) {
-            // This happens if the client tells the server to close while
-            // racing to reconnect.  In this case the client really does
-            // think we are done, even if all async work hasn't figured that
-            // out yet.  Unfortunately, we don't have enough state to
-            // proceed, so just disconnect.
-            logError(`${this.id} amnesia receiving ack=${id}`);
-            (0, (_nuclideAnalytics || _load_nuclideAnalytics()).track)('queued-ack-transport:amnesia-ack', {
-              clientId: this.id,
-              ackedId: id,
-              lastSendId: this._lastSendId,
-              lastProcessedId: this._lastProcessedId,
-              sendQueue: pending.toArray().map(send => send.id),
-              receiveQueue: [...this._pendingReceives.keys()]
-            });
+            // The id needs to be smaller than or equal to the _lastSendId unless
+            // the client is reconnecting after a close (which can happen in a
+            // specific client-side race condition). The invariant here makes
+            // sure this is the case.
+            if (!(this._lastSendId === 0 && this._lastProcessedId === 0)) {
+              throw new Error('Invariant violation: "this._lastSendId === 0 && this._lastProcessedId === 0"');
+            }
+
             this.close();
             break;
           } else {
@@ -270,7 +254,7 @@ class QueuedAckTransport {
               pending.dequeue();
               progress++;
             }
-            (_utils || _load_utils()).protocolLogger.trace(`${this.id} received ack ${wireMessage} (cleared ${progress} messages, last sent ${this._lastSendId})`);
+            this._logTrace(`${this.id} received ack ${wireMessage} (cleared ${progress} messages, last sent ${this._lastSendId})`);
           }
           break;
         }
@@ -289,13 +273,13 @@ class QueuedAckTransport {
 
   close() {
     if (!this._isClosed) {
-      (_utils || _load_utils()).protocolLogger.trace(`${this.id} close`);
+      this._logTrace(`${this.id} close`);
       this.disconnect('close');
       this._pendingSends.clear();
       this._pendingReceives.clear();
       this._isClosed = true;
     } else {
-      (_utils || _load_utils()).protocolLogger.trace(`${this.id} close (but already closed)`);
+      this._logTrace(`${this.id} close (but already closed)`);
     }
     this._checkLeaks();
   }
@@ -369,10 +353,10 @@ class QueuedAckTransport {
     const transport = this._transport;
     const summary = _forLogging(wireMessage);
     if (transport != null) {
-      (_utils || _load_utils()).protocolLogger.trace(`${this.id} transport send ${summary}`);
+      this._logTrace(`${this.id} transport send ${summary}`);
       transport.send(wireMessage);
     } else {
-      (_utils || _load_utils()).protocolLogger.trace(`${this.id} transport send (but disconnected) ${summary}`);
+      this._logTrace(`${this.id} transport send (but disconnected) ${summary}`);
     }
   }
 
@@ -398,6 +382,28 @@ class QueuedAckTransport {
       if (!(this._pendingMessageTimer == null)) {
         throw new Error('pendingMessageTimer');
       }
+    }
+  }
+
+  // Helper functions to log sufficiently interesting logs to both
+  // logger (disk) and protocolLogger (circular in-memory).
+  _logError(format, ...args) {
+    logger.error(format, ...args);
+    if (this._protocolLogger != null) {
+      this._protocolLogger.error(format, ...args);
+    }
+  }
+
+  _logInfo(format, ...args) {
+    logger.info(format, ...args);
+    if (this._protocolLogger != null) {
+      this._protocolLogger.info(format, ...args);
+    }
+  }
+
+  _logTrace(format, ...args) {
+    if (this._protocolLogger != null) {
+      this._protocolLogger.trace(format, ...args);
     }
   }
 }
@@ -459,16 +465,4 @@ function removeUserInput(message) {
   }
 
   return message.substring(0, argsIndex + WRITE_INPUT_DATA_PREFIX.length) + '<omitted user input>..';
-}
-
-// Helper functions to log sufficiently interesting logs to both
-// logger (disk) and protocolLogger (circular in-memory).
-function logError(format, ...args) {
-  logger.error(format, ...args);
-  (_utils || _load_utils()).protocolLogger.error(format, ...args);
-}
-
-function logInfo(format, ...args) {
-  logger.info(format, ...args);
-  (_utils || _load_utils()).protocolLogger.info(format, ...args);
 }

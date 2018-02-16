@@ -1,7 +1,5 @@
 'use strict';
 
-var _atom = require('atom');
-
 var _createPackage;
 
 function _load_createPackage() {
@@ -72,6 +70,17 @@ function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj;
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
+/**
+ * Copyright (c) 2015-present, Facebook, Inc.
+ * All rights reserved.
+ *
+ * This source code is licensed under the license found in the LICENSE file in
+ * the root directory of this source tree.
+ *
+ * 
+ * @format
+ */
+
 class Activation {
 
   constructor() {
@@ -123,7 +132,7 @@ class Activation {
       visible: false
     });
     _reactDom.default.render(_react.createElement(BoundEditDialog, { actionCreators: this._actionCreators }), container);
-    this._disposables.add(new _atom.Disposable(() => {
+    this._disposables.add(new (_UniversalDisposable || _load_UniversalDisposable()).default(() => {
       requestEditDialog.destroy();
       this._requestEditDialog = null;
       _reactDom.default.unmountComponentAtNode(container);
@@ -141,15 +150,6 @@ class Activation {
   dispose() {
     this._disposables.dispose();
   }
-} /**
-   * Copyright (c) 2015-present, Facebook, Inc.
-   * All rights reserved.
-   *
-   * This source code is licensed under the license found in the LICENSE file in
-   * the root directory of this source tree.
-   *
-   * 
-   * @format
-   */
+}
 
 (0, (_createPackage || _load_createPackage()).default)(module.exports, Activation);

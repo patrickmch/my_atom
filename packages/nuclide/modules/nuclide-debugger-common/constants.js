@@ -10,7 +10,8 @@ const VsAdapterTypes = exports.VsAdapterTypes = Object.freeze({
   NODE: 'node',
   JAVA: 'java',
   PREPACK: 'prepack',
-  OCAML: 'ocaml'
+  OCAML: 'ocaml',
+  MOBILEJS: 'mobilejs'
 });
 
 // This is to work around flow's missing support of enums.

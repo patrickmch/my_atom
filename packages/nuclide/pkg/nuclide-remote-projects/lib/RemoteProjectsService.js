@@ -55,12 +55,7 @@ class RemoteProjectsService {
         displayTitle,
         promptReconnectOnFailure = true
       } = remoteProjectConfig;
-      let connection = (_nuclideRemoteConnection || _load_nuclideRemoteConnection()).RemoteConnection.getByHostnameAndPath(host, cwd);
-      if (connection != null) {
-        return connection;
-      }
-
-      connection = yield (_nuclideRemoteConnection || _load_nuclideRemoteConnection()).RemoteConnection.createConnectionBySavedConfig(host, cwd, displayTitle, promptReconnectOnFailure);
+      const connection = yield (_nuclideRemoteConnection || _load_nuclideRemoteConnection()).RemoteConnection.reconnect(host, cwd, displayTitle, promptReconnectOnFailure);
       if (connection != null) {
         return connection;
       }

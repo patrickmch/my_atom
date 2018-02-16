@@ -41,17 +41,24 @@ function _load_util() {
   return _util = require('./utils/util');
 }
 
-const CODE_ACTIONS_LIMIT = 10; /**
-                                * Copyright (c) 2015-present, Facebook, Inc.
-                                * All rights reserved.
-                                *
-                                * This source code is licensed under the license found in the LICENSE file in
-                                * the root directory of this source tree.
-                                *
-                                * 
-                                * @format
-                                */
+var _lspUtils;
 
+function _load_lspUtils() {
+  return _lspUtils = require('../../nuclide-lsp-implementation-common/lsp-utils');
+}
+
+/**
+ * Copyright (c) 2015-present, Facebook, Inc.
+ * All rights reserved.
+ *
+ * This source code is licensed under the license found in the LICENSE file in
+ * the root directory of this source tree.
+ *
+ * 
+ * @format
+ */
+
+const CODE_ACTIONS_LIMIT = 10;
 const FLOW_DIAGNOSTIC_SOURCE = 'Flow';
 
 class CodeActions {
@@ -76,7 +83,7 @@ function diagnosticToCommands(autoImportsManager, importFormatter, diagnostic, f
           return false;
         }
         const range = (0, (_util || _load_util()).babelLocationToAtomRange)(suggestedImport.symbol.location);
-        const diagnosticRange = (0, (_util || _load_util()).lspRangeToAtomRange)(diagnostic.range);
+        const diagnosticRange = (0, (_lspUtils || _load_lspUtils()).lspRangeToAtomRange)(diagnostic.range);
         return range.isEqual(diagnosticRange);
       }
       // Otherwise this has to be a value import.

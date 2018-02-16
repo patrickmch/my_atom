@@ -3,7 +3,7 @@
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.VSCodeDebuggerAdapterService = undefined;
+exports.VsRawAdapterSpawnerService = exports.VSCodeDebuggerAdapterService = undefined;
 
 var _asyncToGenerator = _interopRequireDefault(require('async-to-generator'));
 
@@ -14,17 +14,6 @@ function _load_nuclideDebuggerCommon() {
 }
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-/**
- * Copyright (c) 2015-present, Facebook, Inc.
- * All rights reserved.
- *
- * This source code is licensed under the license found in the LICENSE file in
- * the root directory of this source tree.
- *
- * 
- * @format
- */
 
 class VSCodeDebuggerAdapterService extends (_nuclideDebuggerCommon || _load_nuclideDebuggerCommon()).DebuggerRpcServiceBase {
 
@@ -77,6 +66,32 @@ class VSCodeDebuggerAdapterService extends (_nuclideDebuggerCommon || _load_nucl
     return super.dispose();
   }
 }
+
 exports.VSCodeDebuggerAdapterService = VSCodeDebuggerAdapterService;
 
 // eslint-disable-next-line rulesdir/no-unresolved
+/**
+ * Copyright (c) 2015-present, Facebook, Inc.
+ * All rights reserved.
+ *
+ * This source code is licensed under the license found in the LICENSE file in
+ * the root directory of this source tree.
+ *
+ * 
+ * @format
+ */
+
+class VsRawAdapterSpawnerService extends (_nuclideDebuggerCommon || _load_nuclideDebuggerCommon()).VsAdapterSpawner {
+  spawnAdapter(adapter) {
+    return super.spawnAdapter(adapter);
+  }
+
+  write(input) {
+    return super.write(input);
+  }
+
+  dispose() {
+    return super.dispose();
+  }
+}
+exports.VsRawAdapterSpawnerService = VsRawAdapterSpawnerService;

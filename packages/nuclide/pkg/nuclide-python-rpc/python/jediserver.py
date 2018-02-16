@@ -16,7 +16,7 @@ import traceback
 from logging import FileHandler
 from argparse import ArgumentParser
 import jedi
-from parso.python.tree import Function, ImportFrom
+from parso.python.tree import ImportFrom
 import outline
 
 LOGGING_DIR = 'nuclide-%s-logs/python' % getpass.getuser()
@@ -26,9 +26,8 @@ WORKING_DIR = os.getcwd()
 
 class JediServer:
 
-    def __init__(self, src, paths):
-        self.src = src
-        self.sys_path = self.get_filtered_sys_path() + paths
+    def __init__(self, paths):
+        self.additional_paths = paths
         self.logger = logging.getLogger()
         self.input_stream = sys.stdin
         self.output_stream = sys.stdout
@@ -43,13 +42,13 @@ class JediServer:
             self.output_stream.write('\n')
             self.output_stream.flush()
 
-    def get_filtered_sys_path(self):
+    def get_filtered_sys_path(self, src):
         # Retrieves the sys.path with VendorLib filtered out, so symbols from
         # jedi don't appear in user's autocompletions or hyperclicks.
         # Don't filter out VendorLib if we're working in the jediserver's dir. :)
         return [path for path in sys.path
                 if (path != LIB_DIR and path != WORKING_DIR) or
-                self.src.startswith(WORKING_DIR)]
+                src.startswith(WORKING_DIR)]
 
     def generate_log_name(self, value):
         hash = hashlib.md5(value.encode('utf-8')).hexdigest()[:10]
@@ -57,16 +56,13 @@ class JediServer:
 
     def init_logging(self):
         # Be consistent with the main Nuclide logs.
-        log_dir = os.path.join(tempfile.gettempdir(), LOGGING_DIR)
-        if not os.path.exists(log_dir):
-            os.makedirs(log_dir)
-        handler = FileHandler(os.path.join(log_dir, self.generate_log_name(self.src)))
+        log_path = os.path.join(tempfile.gettempdir(), 'nuclide-jedi.log')
+        handler = FileHandler(log_path)
         handler.setFormatter(logging.Formatter(
             'nuclide-jedi-py %(asctime)s: [%(name)s] %(message)s'
         ))
         self.logger.addHandler(handler)
         self.logger.setLevel(logging.INFO)
-        self.logger.info('starting for ' + self.src)
 
     def process_request(self, line):
         start_time = time.time()
@@ -84,11 +80,9 @@ class JediServer:
             elif method == 'get_references':
                 res['result'] = self.get_references(self.make_script(data))
             elif method == 'get_outline':
-                res['result'] = outline.get_outline(self.src, data['contents'])
-            # Allow deferred injection of additional paths
-            elif method == 'add_paths':
-                self.sys_path = self.sys_path + data['paths']
-                res['result'] = self.sys_path
+                res['result'] = outline.get_outline(data['src'], data['contents'])
+            elif method == 'get_hover':
+                res['result'] = self.get_hover(self.make_script(data), data['word'])
             else:
                 res['type'] = 'error-response'
                 res['error'] = 'Unknown method to jediserver.py: %s.' % method
@@ -96,19 +90,28 @@ class JediServer:
         # See https://github.com/davidhalter/jedi/issues/590
         except KeyError:
             res['result'] = []
-        except:
+        except Exception:
             res['type'] = 'error-response'
             res['error'] = traceback.format_exc()
 
-        self.logger.info('Finished %s request in %.2lf seconds.',
-                         method, time.time() - start_time)
+        self.logger.info('Finished %s request for %s in %.2lf seconds.',
+                         method, data.get('src'), time.time() - start_time)
         return res
 
     def make_script(self, req_data):
+        src = req_data['src']
+        sys_path = (
+            self.get_filtered_sys_path(src) +
+            self.additional_paths +
+            # While non-existent paths don't cause any harm,
+            # paths may sometimes not exist but then be built after.
+            # Doing so should invalidate Jedi's cache.
+            list(filter(os.path.exists, req_data['sysPath']))
+        )
         return jedi.api.Script(
             source=req_data['contents'], line=req_data['line'] + 1,
-            column=req_data['column'], path=self.src,
-            sys_path=self.sys_path)
+            column=req_data['column'], path=src,
+            sys_path=sys_path)
 
     def is_func_or_class(self, completion):
         return completion.type == 'function' or completion.type == 'class'
@@ -154,7 +157,9 @@ class JediServer:
                 lambda x: x != '...' and x != 'args' and x != 'kwargs',
                 names,
             ))
-        except AttributeError:
+        except Exception:
+            # ".params" appears to be quite flaky.
+            # e.g: https://github.com/davidhalter/jedi/issues/1031
             return None
 
     def get_definitions(self, script):
@@ -182,6 +187,22 @@ class JediServer:
             results.append(result)
         return results
 
+    # It'd be nice if this could return the actual types.
+    # As the next best thing, displaying method/class docblocks is pretty useful.
+    def get_hover(self, script, word):
+        # Jedi is loose with definitions when > 1 is possible (e.g: os.path).
+        # For the purposes of hovering, only allow exact matches.
+        definitions = [d for d in script.goto_definitions() if d.name == word]
+        if not definitions:
+            return None
+
+        docstring = definitions[0].docstring()
+        # The return value will be interpreted as Markdown.
+        # Make some adjustments for better Markdown formatting.
+        docstring = docstring.replace('\t', ' ' * 4)
+        docstring = docstring.replace('*', '\\*')
+        return docstring
+
     def serialize_definition(self, definition):
         return {
             'text': definition.name,
@@ -204,8 +225,14 @@ class JediServer:
 
 if __name__ == '__main__':
     parser = ArgumentParser()
-    parser.add_argument('-s', '--source', dest='src', default='', type=str)
-    parser.add_argument('-p', '--paths', dest='paths', default=[], type=str, nargs='+')
+    parser.add_argument('-p', '--paths', dest='paths', default=[], type=str, nargs='+',
+                        help='Additional Python module resolution paths.')
     args = parser.parse_args()
 
-    JediServer(args.src, args.paths).run()
+    # By default, Jedi uses ~/.cache or similar.
+    # Let's use a temporary directory instead so it doesn't grow forever.
+    jedi.settings.cache_directory = os.path.join(
+        tempfile.gettempdir(),
+        'jedi-cache',
+    )
+    JediServer(args.paths).run()

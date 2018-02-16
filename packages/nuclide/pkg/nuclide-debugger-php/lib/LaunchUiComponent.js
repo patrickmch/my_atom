@@ -13,6 +13,12 @@ function _load_AtomInput() {
   return _AtomInput = require('nuclide-commons-ui/AtomInput');
 }
 
+var _debugger;
+
+function _load_debugger() {
+  return _debugger = require('../../commons-atom/debugger');
+}
+
 var _LaunchProcessInfo;
 
 function _load_LaunchProcessInfo() {
@@ -41,12 +47,6 @@ var _nuclideRemoteConnection;
 
 function _load_nuclideRemoteConnection() {
   return _nuclideRemoteConnection = require('../../nuclide-remote-connection');
-}
-
-var _consumeFirstProvider;
-
-function _load_consumeFirstProvider() {
-  return _consumeFirstProvider = _interopRequireDefault(require('../../commons-atom/consumeFirstProvider'));
 }
 
 var _UniversalDisposable;
@@ -91,20 +91,27 @@ class LaunchUiComponent extends _react.Component {
     return _temp = super(...args), this._disposables = new (_UniversalDisposable || _load_UniversalDisposable()).default(), this.state = {
       recentlyLaunchedScripts: this._getRecentlyLaunchedScripts(),
       recentlyLaunchedScript: null,
-      runInTerminal: false
+      runInTerminal: false,
+      scriptArgs: null,
+      cwd: this._getLastCwd()
     }, this._handleRecentSelectionChange = newValue => {
       this.setState({
         recentlyLaunchedScript: newValue
       });
     }, this._handleLaunchButtonClick = () => {
       const scriptPath = (0, (_nullthrows || _load_nullthrows()).default)(this._scriptPath).getText().trim();
-      this._setRecentlyLaunchedScript(scriptPath, this.state.recentlyLaunchedScripts);
+      const cwdPath = (0, (_nullthrows || _load_nullthrows()).default)(this._cwdPath).getText().trim();
+      const scriptArgs = (0, (_nullthrows || _load_nullthrows()).default)(this._scriptArgs).getText().trim();
 
-      const processInfo = new (_LaunchProcessInfo || _load_LaunchProcessInfo()).LaunchProcessInfo(this.props.targetUri, scriptPath, null, this.state.runInTerminal);
-      (0, (_consumeFirstProvider || _load_consumeFirstProvider()).default)('nuclide-debugger.remote').then(debuggerService => debuggerService.startDebugging(processInfo));
+      this._setRecentlyLaunchedScript(scriptPath, this.state.recentlyLaunchedScripts, cwdPath);
+
+      const processInfo = new (_LaunchProcessInfo || _load_LaunchProcessInfo()).LaunchProcessInfo(this.props.targetUri, scriptPath, null, this.state.runInTerminal, scriptArgs, cwdPath);
+      (0, (_debugger || _load_debugger()).getDebuggerService)().then(debuggerService => debuggerService.startDebugging(processInfo));
 
       (0, (_nuclideDebuggerCommon || _load_nuclideDebuggerCommon()).serializeDebuggerConfig)(...this._getSerializationArgs(), {
-        scriptPath
+        scriptPath,
+        scriptArgs,
+        cwdPath
       });
     }, this._getActiveFilePath = () => {
       const editor = atom.workspace.getActiveTextEditor();
@@ -125,7 +132,9 @@ class LaunchUiComponent extends _react.Component {
   componentDidMount() {
     (0, (_nuclideDebuggerCommon || _load_nuclideDebuggerCommon()).deserializeDebuggerConfig)(...this._getSerializationArgs(), (transientSettings, savedSettings) => {
       this.setState({
-        recentlyLaunchedScript: savedSettings.scriptPath || ''
+        recentlyLaunchedScript: savedSettings.scriptPath || '',
+        cwd: savedSettings.cwdPath || '',
+        scriptArgs: savedSettings.scriptArgs || ''
       });
     });
     this.props.configIsValidChanged(this._debugButtonShouldEnable());
@@ -169,7 +178,7 @@ class LaunchUiComponent extends _react.Component {
       _react.createElement(
         'label',
         null,
-        'Command: '
+        'Script path: '
       ),
       _react.createElement((_AtomInput || _load_AtomInput()).AtomInput, {
         ref: input => {
@@ -180,6 +189,34 @@ class LaunchUiComponent extends _react.Component {
         initialValue: this._getActiveFilePath(),
         value: this.state.recentlyLaunchedScript || '',
         onDidChange: value => this.setState({ recentlyLaunchedScript: value })
+      }),
+      _react.createElement(
+        'label',
+        null,
+        'Script arguments: '
+      ),
+      _react.createElement((_AtomInput || _load_AtomInput()).AtomInput, {
+        ref: input => {
+          this._scriptArgs = input;
+        },
+        tabIndex: '12',
+        value: this.state.scriptArgs || '',
+        onDidChange: value => this.setState({ scriptArgs: value })
+      }),
+      _react.createElement(
+        'label',
+        null,
+        'Current Working Directory: '
+      ),
+      _react.createElement((_AtomInput || _load_AtomInput()).AtomInput, {
+        tabIndex: '13',
+        ref: input => {
+          this._cwdPath = input;
+        },
+        placeholderText: 'Optional. Working directory to launch script in.',
+        initialValue: '',
+        value: this.state.cwd || '',
+        onDidChange: value => this.setState({ cwd: value })
       }),
       _react.createElement((_Checkbox || _load_Checkbox()).Checkbox, {
         checked: this.state.runInTerminal,
@@ -193,6 +230,16 @@ class LaunchUiComponent extends _react.Component {
   _getRecentlyLaunchedKey() {
     const hostname = (_nuclideUri || _load_nuclideUri()).default.getHostname(this.props.targetUri);
     return 'nuclide-debugger-php.recentlyLaunchedScripts:' + hostname;
+  }
+
+  _getCwdKey() {
+    const hostname = (_nuclideUri || _load_nuclideUri()).default.getHostname(this.props.targetUri);
+    return 'nuclide-debugger-php.Cwd:' + hostname;
+  }
+
+  _getLastCwd() {
+    const lastCwd = localStorage.getItem(this._getCwdKey());
+    return lastCwd;
   }
 
   _getRecentlyLaunchedScripts() {
@@ -210,7 +257,7 @@ class LaunchUiComponent extends _react.Component {
     });
   }
 
-  _setRecentlyLaunchedScript(script, recentlyLaunched) {
+  _setRecentlyLaunchedScript(script, recentlyLaunched, cwd) {
     // Act like a simple MRU cache, move the script being launched to the front.
     // NOTE: this array is expected to be really tiny.
     const scriptNames = [script];
@@ -221,6 +268,7 @@ class LaunchUiComponent extends _react.Component {
     });
 
     localStorage.setItem(this._getRecentlyLaunchedKey(), JSON.stringify(scriptNames));
+    localStorage.setItem(this._getCwdKey(), cwd);
     this.setState({
       recentlyLaunchedScripts: this._getRecentlyLaunchedScripts(),
       recentlyLaunchedScript: script

@@ -2,44 +2,44 @@
   "_args": [
     [
       {
-        "raw": "/private/var/folders/dp/vj05cwss7pz9mjl62ccqzysm0000gp/T/d-11808-49091-98tuvi.ptozrdlsor/package.tgz",
+        "raw": "/private/var/folders/dp/vj05cwss7pz9mjl62ccqzysm0000gp/T/d-118113-55335-1e2uo9n.5k7wo03sor/package.tgz",
         "scope": null,
         "escapedName": null,
         "name": null,
-        "rawSpec": "/private/var/folders/dp/vj05cwss7pz9mjl62ccqzysm0000gp/T/d-11808-49091-98tuvi.ptozrdlsor/package.tgz",
-        "spec": "/private/var/folders/dp/vj05cwss7pz9mjl62ccqzysm0000gp/T/d-11808-49091-98tuvi.ptozrdlsor/package.tgz",
+        "rawSpec": "/private/var/folders/dp/vj05cwss7pz9mjl62ccqzysm0000gp/T/d-118113-55335-1e2uo9n.5k7wo03sor/package.tgz",
+        "spec": "/private/var/folders/dp/vj05cwss7pz9mjl62ccqzysm0000gp/T/d-118113-55335-1e2uo9n.5k7wo03sor/package.tgz",
         "type": "local"
       },
-      "/private/var/folders/dp/vj05cwss7pz9mjl62ccqzysm0000gp/T/apm-install-dir-11808-49091-glykg8.8493zt1emi"
+      "/private/var/folders/dp/vj05cwss7pz9mjl62ccqzysm0000gp/T/apm-install-dir-118113-55335-1npzqaw.0olvyxecdi"
     ]
   ],
-  "_from": "../d-11808-49091-98tuvi.ptozrdlsor/package.tgz",
-  "_id": "language-shellscript@0.26.0",
+  "_from": "../d-118113-55335-1e2uo9n.5k7wo03sor/package.tgz",
+  "_id": "language-shellscript@0.26.1",
   "_inCache": true,
   "_location": "/language-shellscript",
   "_phantomChildren": {},
   "_requested": {
-    "raw": "/private/var/folders/dp/vj05cwss7pz9mjl62ccqzysm0000gp/T/d-11808-49091-98tuvi.ptozrdlsor/package.tgz",
+    "raw": "/private/var/folders/dp/vj05cwss7pz9mjl62ccqzysm0000gp/T/d-118113-55335-1e2uo9n.5k7wo03sor/package.tgz",
     "scope": null,
     "escapedName": null,
     "name": null,
-    "rawSpec": "/private/var/folders/dp/vj05cwss7pz9mjl62ccqzysm0000gp/T/d-11808-49091-98tuvi.ptozrdlsor/package.tgz",
-    "spec": "/private/var/folders/dp/vj05cwss7pz9mjl62ccqzysm0000gp/T/d-11808-49091-98tuvi.ptozrdlsor/package.tgz",
+    "rawSpec": "/private/var/folders/dp/vj05cwss7pz9mjl62ccqzysm0000gp/T/d-118113-55335-1e2uo9n.5k7wo03sor/package.tgz",
+    "spec": "/private/var/folders/dp/vj05cwss7pz9mjl62ccqzysm0000gp/T/d-118113-55335-1e2uo9n.5k7wo03sor/package.tgz",
     "type": "local"
   },
   "_requiredBy": [
     "#USER"
   ],
-  "_resolved": "file:../d-11808-49091-98tuvi.ptozrdlsor/package.tgz",
-  "_shasum": "df45b32cfb826a513d420b31859c80d52a65e994",
+  "_resolved": "file:../d-118113-55335-1e2uo9n.5k7wo03sor/package.tgz",
+  "_shasum": "91764512054dac3dcd0b13da58ab4cd2faa615d8",
   "_shrinkwrap": null,
-  "_spec": "/private/var/folders/dp/vj05cwss7pz9mjl62ccqzysm0000gp/T/d-11808-49091-98tuvi.ptozrdlsor/package.tgz",
-  "_where": "/private/var/folders/dp/vj05cwss7pz9mjl62ccqzysm0000gp/T/apm-install-dir-11808-49091-glykg8.8493zt1emi",
+  "_spec": "/private/var/folders/dp/vj05cwss7pz9mjl62ccqzysm0000gp/T/d-118113-55335-1e2uo9n.5k7wo03sor/package.tgz",
+  "_where": "/private/var/folders/dp/vj05cwss7pz9mjl62ccqzysm0000gp/T/apm-install-dir-118113-55335-1npzqaw.0olvyxecdi",
   "bugs": {
     "url": "https://github.com/atom/language-shellscript/issues"
   },
   "dependencies": {
-    "tree-sitter-bash": "^0.4.0"
+    "tree-sitter-bash": "^0.5.0"
   },
   "description": "ShellScript language support in Atom",
   "devDependencies": {
@@ -59,5 +59,5 @@
     "type": "git",
     "url": "git+https://github.com/atom/language-shellscript.git"
   },
-  "version": "0.26.0"
+  "version": "0.26.1"
 }

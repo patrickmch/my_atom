@@ -34,11 +34,22 @@ function _load_LoadingSpinner() {
 function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
 
 class DeviceTable extends _react.Component {
+  constructor(...args) {
+    var _temp;
 
-  constructor(props) {
-    super(props);
-
-    this._handleDeviceWillSelect = (item, selectedIndex, event) => {
+    return _temp = super(...args), this._pendingComponent = () => {
+      return _react.createElement(
+        'div',
+        { className: 'padded' },
+        _react.createElement((_LoadingSpinner || _load_LoadingSpinner()).LoadingSpinner, { size: 'EXTRA_SMALL' })
+      );
+    }, this._noDevicesComponent = () => {
+      return _react.createElement(
+        'div',
+        { className: 'padded' },
+        'No devices connected'
+      );
+    }, this._handleDeviceWillSelect = (item, selectedIndex, event) => {
       if (event != null) {
         let element = event.target;
         while (element != null) {
@@ -52,28 +63,11 @@ class DeviceTable extends _react.Component {
         return false;
       }
       return true;
-    };
-
-    this._handleDeviceTableSelection = (item, selectedDeviceIndex) => {
+    }, this._handleDeviceTableSelection = (item, selectedDeviceIndex) => {
       if (!this.props.devices.isError) {
         this.props.setDevice(this.props.devices.value[selectedDeviceIndex]);
       }
-    };
-
-    this._emptyComponent = () => {
-      if (this.props.devices.isError) {
-        return _react.createElement(
-          'div',
-          { className: 'padded nuclide-device-panel-device-list-error' },
-          this.props.devices.error.message
-        );
-      }
-      return _react.createElement(
-        'div',
-        { className: 'padded' },
-        this.props.devices.isPending ? _react.createElement((_LoadingSpinner || _load_LoadingSpinner()).LoadingSpinner, { size: 'EXTRA_SMALL' }) : 'No devices connected'
-      );
-    };
+    }, _temp;
   }
 
   _getActionsForDevice(device, actionProviders) {
@@ -125,12 +119,35 @@ class DeviceTable extends _react.Component {
       columns: columns,
       fixedHeader: true,
       maxBodyHeight: '99999px',
-      emptyComponent: this._emptyComponent,
+      emptyComponent: this._getEmptyComponent(),
       selectable: true,
       onSelect: this._handleDeviceTableSelection,
       onWillSelect: this._handleDeviceWillSelect,
       rows: rows
     });
+  }
+
+  // Passes down identical stateless components so === for them works as expected
+  _getEmptyComponent() {
+    if (this.props.devices.isError) {
+      return this._getErrorComponent(this.props.devices.error.message);
+    } else if (this.props.devices.isPending) {
+      return this._pendingComponent;
+    } else {
+      return this._noDevicesComponent;
+    }
+  }
+
+  _getErrorComponent(message) {
+    if (this._lastErrorMessage !== message) {
+      this._lastErrorMessage = message;
+      this._lastErrorComponent = () => _react.createElement(
+        'div',
+        { className: 'padded nuclide-device-panel-device-list-error' },
+        message
+      );
+    }
+    return this._lastErrorComponent;
   }
 
 }

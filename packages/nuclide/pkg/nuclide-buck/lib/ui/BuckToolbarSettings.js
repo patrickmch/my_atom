@@ -39,7 +39,7 @@ function _load_LoadingSpinner() {
 var _Modal;
 
 function _load_Modal() {
-  return _Modal = require('../../../nuclide-ui/Modal');
+  return _Modal = require('nuclide-commons-ui/Modal');
 }
 
 var _Icon;

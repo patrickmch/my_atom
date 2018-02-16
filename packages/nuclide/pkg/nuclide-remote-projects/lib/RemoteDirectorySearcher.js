@@ -4,20 +4,6 @@ Object.defineProperty(exports, "__esModule", {
   value: true
 });
 
-var _rxjsBundlesRxMinJs = require('rxjs/bundles/Rx.min.js');
-
-var _collection;
-
-function _load_collection() {
-  return _collection = require('nuclide-commons/collection');
-}
-
-var _nuclideUri;
-
-function _load_nuclideUri() {
-  return _nuclideUri = _interopRequireDefault(require('nuclide-commons/nuclideUri'));
-}
-
 var _nuclideRemoteConnection;
 
 function _load_nuclideRemoteConnection() {
@@ -36,23 +22,32 @@ function _load_constants2() {
   return _constants2 = require('./constants');
 }
 
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+var _collection;
 
-/**
- * Copyright (c) 2015-present, Facebook, Inc.
- * All rights reserved.
- *
- * This source code is licensed under the license found in the LICENSE file in
- * the root directory of this source tree.
- *
- * 
- * @format
- */
+function _load_collection() {
+  return _collection = require('nuclide-commons/collection');
+}
+
+var _nuclideUri;
+
+function _load_nuclideUri() {
+  return _nuclideUri = _interopRequireDefault(require('nuclide-commons/nuclideUri'));
+}
+
+var _featureConfig;
+
+function _load_featureConfig() {
+  return _featureConfig = _interopRequireDefault(require('nuclide-commons-atom/feature-config'));
+}
+
+var _rxjsBundlesRxMinJs = require('rxjs/bundles/Rx.min.js');
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 class RemoteDirectorySearcher {
 
   // When constructed, RemoteDirectorySearcher must be passed a function that
-  // it can use to get a 'GrepService' for a given remote path.
+  // it can use to get a 'CodeSearchService' for a given remote path.
   constructor(serviceProvider, getWorkingSetsStore) {
     this._serviceProvider = serviceProvider;
     this._getWorkingSetsStore = getWorkingSetsStore;
@@ -63,6 +58,7 @@ class RemoteDirectorySearcher {
   }
 
   search(directories, regex, options) {
+    const config = (_featureConfig || _load_featureConfig()).default.get('nuclide-code-search');
     // Track the files that we have seen updates for.
     const seenFiles = new Set();
 
@@ -75,7 +71,7 @@ class RemoteDirectorySearcher {
     // processPaths returns null if the inclusions are too strict for the
     // given directory, so we don't even want to start the search. This can
     // happen if we're searching in a working set that excludes the directory.
-    inclusion ? services[index].grepSearch(directories[index].getPath(), regex, inclusion).refCount() : _rxjsBundlesRxMinJs.Observable.empty());
+    inclusion ? services[index].remoteAtomSearch(directories[index].getPath(), regex, inclusion, config.remoteUseVcsSearch, config.remoteTool.length === 0 ? null : config.remoteTool).refCount() : _rxjsBundlesRxMinJs.Observable.empty());
 
     // Start the search in each directory, and merge the resulting streams.
     const searchStream = _rxjsBundlesRxMinJs.Observable.merge(...searchStreams);
@@ -171,4 +167,13 @@ class RemoteDirectorySearcher {
     return results;
   }
 }
-exports.default = RemoteDirectorySearcher;
+exports.default = RemoteDirectorySearcher; /**
+                                            * Copyright (c) 2015-present, Facebook, Inc.
+                                            * All rights reserved.
+                                            *
+                                            * This source code is licensed under the license found in the LICENSE file in
+                                            * the root directory of this source tree.
+                                            *
+                                            * 
+                                            * @format
+                                            */

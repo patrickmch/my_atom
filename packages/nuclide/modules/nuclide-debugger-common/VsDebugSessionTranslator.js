@@ -1197,6 +1197,10 @@ class VsDebugSessionTranslator {
     return this._session.observeTerminateDebugeeEvents().delay(1000);
   }
 
+  getSession() {
+    return this._session;
+  }
+
   dispose() {
     this._disposables.dispose();
   }

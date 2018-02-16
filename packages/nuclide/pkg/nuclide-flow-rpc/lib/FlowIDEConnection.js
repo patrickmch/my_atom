@@ -5,12 +5,6 @@ Object.defineProperty(exports, "__esModule", {
 });
 exports.FlowIDEConnection = undefined;
 
-var _eventKit;
-
-function _load_eventKit() {
-  return _eventKit = require('event-kit');
-}
-
 var _rxjsBundlesRxMinJs = require('rxjs/bundles/Rx.min.js');
 
 var _vscodeJsonrpc;
@@ -61,16 +55,18 @@ function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj;
 
 // TODO put these in flow-typed when they are fleshed out better
 
-const SUBSCRIBE_METHOD_NAME = 'subscribeToDiagnostics'; /**
-                                                         * Copyright (c) 2015-present, Facebook, Inc.
-                                                         * All rights reserved.
-                                                         *
-                                                         * This source code is licensed under the license found in the LICENSE file in
-                                                         * the root directory of this source tree.
-                                                         *
-                                                         * 
-                                                         * @format
-                                                         */
+/**
+ * Copyright (c) 2015-present, Facebook, Inc.
+ * All rights reserved.
+ *
+ * This source code is licensed under the license found in the LICENSE file in
+ * the root directory of this source tree.
+ *
+ * 
+ * @format
+ */
+
+const SUBSCRIBE_METHOD_NAME = 'subscribeToDiagnostics';
 
 const NOTIFICATION_METHOD_NAME = 'diagnosticsNotification';
 
@@ -175,7 +171,7 @@ class FlowIDEConnection {
 
   onWillDispose(callback) {
     this._disposables.add(callback);
-    return new (_eventKit || _load_eventKit()).Disposable(() => {
+    return new (_UniversalDisposable || _load_UniversalDisposable()).default(() => {
       this._disposables.remove(callback);
     });
   }

@@ -5,8 +5,6 @@ Object.defineProperty(exports, "__esModule", {
 });
 exports.Webview = undefined;
 
-var _atom = require('atom');
-
 var _UniversalDisposable;
 
 function _load_UniversalDisposable() {
@@ -20,17 +18,6 @@ var _reactDom = _interopRequireDefault(require('react-dom'));
 function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-/**
- * Copyright (c) 2015-present, Facebook, Inc.
- * All rights reserved.
- *
- * This source code is licensed under the license found in the LICENSE file in
- * the root directory of this source tree.
- *
- * 
- * @format
- */
 
 class Webview extends _react.Component {
 
@@ -55,7 +42,7 @@ class Webview extends _react.Component {
     // it at this time.
     // $FlowFixMe
     element.addEventListener('did-finish-load', this._handleDidFinishLoad);
-    this._disposables.add(new _atom.Disposable(() =>
+    this._disposables.add(new (_UniversalDisposable || _load_UniversalDisposable()).default(() =>
     // $FlowFixMe
     element.removeEventListener('did-finish-load', this._handleDidFinishLoad)));
 
@@ -96,4 +83,13 @@ class Webview extends _react.Component {
   }
 
 }
-exports.Webview = Webview;
+exports.Webview = Webview; /**
+                            * Copyright (c) 2015-present, Facebook, Inc.
+                            * All rights reserved.
+                            *
+                            * This source code is licensed under the license found in the LICENSE file in
+                            * the root directory of this source tree.
+                            *
+                            * 
+                            * @format
+                            */

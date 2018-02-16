@@ -12,18 +12,16 @@ function _load_vscodeDebugprotocol() {
   return _vscodeDebugprotocol = _interopRequireWildcard(require('vscode-debugprotocol'));
 }
 
-var _child_process = _interopRequireDefault(require('child_process'));
+var _VsAdapterSpawner;
+
+function _load_VsAdapterSpawner() {
+  return _VsAdapterSpawner = _interopRequireDefault(require('./VsAdapterSpawner'));
+}
 
 var _V8Protocol;
 
 function _load_V8Protocol() {
   return _V8Protocol = _interopRequireDefault(require('./V8Protocol'));
-}
-
-var _process;
-
-function _load_process() {
-  return _process = require('nuclide-commons/process');
 }
 
 var _rxjsBundlesRxMinJs = require('rxjs/bundles/Rx.min.js');
@@ -65,11 +63,12 @@ function raiseAdapterExitedEvent(exitCode) {
 
 class VsDebugSession extends (_V8Protocol || _load_V8Protocol()).default {
 
-  constructor(id, logger, adapterExecutable) {
-    super(id, logger);
+  constructor(id, logger, adapterExecutable, spawner, sendPreprocessors = [], receivePreprocessors = []) {
+    super(id, logger, sendPreprocessors, receivePreprocessors);
     this._adapterExecutable = adapterExecutable;
     this._logger = logger;
     this._readyForBreakpoints = false;
+    this._spawner = spawner == null ? new (_VsAdapterSpawner || _load_VsAdapterSpawner()).default() : spawner;
 
     this._onDidInitialize = new _rxjsBundlesRxMinJs.Subject();
     this._onDidStop = new _rxjsBundlesRxMinJs.Subject();
@@ -82,6 +81,7 @@ class VsDebugSession extends (_V8Protocol || _load_V8Protocol()).default {
     this._onDidBreakpoint = new _rxjsBundlesRxMinJs.Subject();
     this._onDidModule = new _rxjsBundlesRxMinJs.Subject();
     this._onDidLoadSource = new _rxjsBundlesRxMinJs.Subject();
+    this._onDidCustom = new _rxjsBundlesRxMinJs.Subject();
     this._onDidEvent = new _rxjsBundlesRxMinJs.Subject();
   }
 
@@ -129,24 +129,21 @@ class VsDebugSession extends (_V8Protocol || _load_V8Protocol()).default {
     return this._onDidLoadSource.asObservable();
   }
 
+  observeCustomEvents() {
+    return this._onDidCustom.asObservable();
+  }
+
   observeAllEvents() {
     return this._onDidEvent.asObservable();
   }
 
   _initServer() {
-    if (this._cachedInitServer) {
-      return this._cachedInitServer;
+    if (this._adapterProcessSubscription != null) {
+      return;
     }
 
-    const serverPromise = this._startServer();
-    this._cachedInitServer = serverPromise.then(() => {
-      this._startTime = new Date().getTime();
-    }, err => {
-      this._cachedInitServer = null;
-      return Promise.reject(err);
-    });
-
-    return this._cachedInitServer;
+    this._startServer();
+    this._startTime = new Date().getTime();
   }
 
   custom(request, args) {
@@ -155,22 +152,22 @@ class VsDebugSession extends (_V8Protocol || _load_V8Protocol()).default {
 
   send(command, args) {
     this._logger.info('Send request:', command, args);
-    return this._initServer().then(() =>
+    this._initServer();
     // Babel Bug: `super` isn't working with `async`.
-    super.send(command, args).then(response => {
+    return super.send(command, args).then(response => {
       this._logger.info('Received response:', response);
       return response;
     }, errorResponse => {
-      var _ref, _ref2, _ref3;
+      var _ref, _ref2, _ref3, _ref4;
 
-      let formattedError = (_ref = errorResponse) != null ? (_ref2 = _ref.body) != null ? (_ref3 = _ref2.error) != null ? _ref3.format : _ref3 : _ref2 : _ref;
+      let formattedError = ((_ref = errorResponse) != null ? (_ref2 = _ref.body) != null ? (_ref3 = _ref2.error) != null ? _ref3.format : _ref3 : _ref2 : _ref) || ((_ref4 = errorResponse) != null ? _ref4.message : _ref4);
       if (formattedError === '{_stack}') {
         formattedError = JSON.stringify(errorResponse.body.error);
       } else if (formattedError == null) {
         formattedError = [`command: ${command}`, `args: ${JSON.stringify(args)}`, `response: ${JSON.stringify(errorResponse)}`, `adapterExecutable: , ${JSON.stringify(this._adapterExecutable)}`].join(', ');
       }
       throw new Error(formattedError);
-    }));
+    });
   }
 
   onEvent(event) {
@@ -220,13 +217,14 @@ class VsDebugSession extends (_V8Protocol || _load_V8Protocol()).default {
         this._onDidLoadSource.next(event);
         break;
       default:
-        this._logger.error('Unknonwn event type:', event);
+        this._onDidCustom.next(event);
+        this._logger.info('Custom event type:', event);
         break;
     }
   }
 
   getCapabilities() {
-    return this._capabilities || {};
+    return this.capabilities || {};
   }
 
   initialize(args) {
@@ -240,7 +238,7 @@ class VsDebugSession extends (_V8Protocol || _load_V8Protocol()).default {
 
   _readCapabilities(response) {
     if (response) {
-      this._capabilities = Object.assign({}, this._capabilities, response.body);
+      this.capabilities = Object.assign({}, this.capabilities, response.body);
     }
     return response;
   }
@@ -309,7 +307,7 @@ class VsDebugSession extends (_V8Protocol || _load_V8Protocol()).default {
         return;
       }
 
-      if (_this4._serverProcess && !_this4._disconnected) {
+      if (_this4._adapterProcessSubscription != null && !_this4._disconnected) {
         // point of no return: from now on don't report any errors
         _this4._disconnected = true;
         yield _this4.send('disconnect', { restart });
@@ -408,55 +406,44 @@ class VsDebugSession extends (_V8Protocol || _load_V8Protocol()).default {
   }
 
   _startServer() {
-    var _this5 = this;
-
-    return (0, _asyncToGenerator.default)(function* () {
-      const { command, args } = _this5._adapterExecutable;
-      const options = {
-        stdio: ['pipe', // stdin
-        'pipe', // stdout
-        'pipe'],
-        env: yield (0, (_process || _load_process()).getOriginalEnvironment)()
-      };
-      const serverProcess = _this5._serverProcess = _child_process.default.spawn(command, args, options);
-      // Process and stream errors shouldn't crash the server.
-      (0, (_process || _load_process()).preventStreamsFromThrowing)(serverProcess);
-      (0, (_process || _load_process()).logStreamErrors)(serverProcess, command, args, options);
-
-      serverProcess.on('error', function (err) {
-        return _this5.onServerError(err);
-      });
-      serverProcess.on('exit', function (code, signal) {
-        return _this5.onServerExit(code);
-      });
-
-      serverProcess.stderr.on('data', function (data) {
+    this._adapterProcessSubscription = this._spawner.spawnAdapter(this._adapterExecutable).refCount().subscribe(message => {
+      if (message.kind === 'stdout') {
+        this.handleData(new Buffer(message.data));
+      } else if (message.kind === 'stderr') {
         const event = {
           type: 'event',
           event: 'output',
           body: {
             category: 'stderr',
-            output: data.toString()
+            output: message.data
           },
           seq: 0
         };
-        _this5._onDidOutput.next(event);
-        _this5._onDidEvent.next(event);
-        _this5._logger.error(`adapter stderr: ${data.toString()}`);
-      });
+        this._onDidOutput.next(event);
+        this._onDidEvent.next(event);
+        this._logger.error(`adapter stderr: ${message.data}`);
+      } else {
+        if (!(message.kind === 'exit')) {
+          throw new Error('Invariant violation: "message.kind === \'exit\'"');
+        }
 
-      _this5.connect(serverProcess.stdout, serverProcess.stdin);
-    })();
+        this.onServerExit(message.exitCode || 0);
+      }
+    }, err => {
+      this.onServerError(err);
+    });
+
+    this.setOutput(this._spawner.write.bind(this._spawner));
   }
 
   _stopServer() {
     this.onEvent(raiseAdapterExitedEvent(0));
-    if (this._serverProcess == null) {
+    if (this._adapterProcessSubscription == null) {
       return;
     }
 
     this._disconnected = true;
-    (0, (_process || _load_process()).killProcess)(this._serverProcess, /* killTree */true);
+    this._adapterProcessSubscription.unsubscribe();
   }
 
   onServerError(error) {
@@ -465,8 +452,10 @@ class VsDebugSession extends (_V8Protocol || _load_V8Protocol()).default {
   }
 
   onServerExit(code) {
-    this._serverProcess = null;
-    this._cachedInitServer = null;
+    if (this._adapterProcessSubscription != null) {
+      this._adapterProcessSubscription.unsubscribe();
+      this._adapterProcessSubscription = null;
+    }
     if (!this._disconnected) {
       this._logger.error(`Debug adapter process has terminated unexpectedly ${code}`);
     }
@@ -475,6 +464,10 @@ class VsDebugSession extends (_V8Protocol || _load_V8Protocol()).default {
 
   isReadyForBreakpoints() {
     return this._readyForBreakpoints;
+  }
+
+  isDisconnected() {
+    return this._disconnected;
   }
 
   dispose() {

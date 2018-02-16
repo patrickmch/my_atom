@@ -83,10 +83,10 @@ function _load_JSSymbolSearchProvider() {
   return _JSSymbolSearchProvider = _interopRequireDefault(require('./JSSymbolSearchProvider'));
 }
 
-var _Omni2ProjectSymbolProvider;
+var _DashProjectSymbolProvider;
 
-function _load_Omni2ProjectSymbolProvider() {
-  return _Omni2ProjectSymbolProvider = _interopRequireDefault(require('./Omni2ProjectSymbolProvider'));
+function _load_DashProjectSymbolProvider() {
+  return _DashProjectSymbolProvider = _interopRequireDefault(require('./DashProjectSymbolProvider'));
 }
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
@@ -162,7 +162,7 @@ class Activation {
   }
 
   provideProjectSymbolSearch() {
-    return new (_Omni2ProjectSymbolProvider || _load_Omni2ProjectSymbolProvider()).default(this._languageService);
+    return new (_DashProjectSymbolProvider || _load_DashProjectSymbolProvider()).default(this._languageService);
   }
 
   provideJSSymbolSearchService() {

@@ -5,7 +5,7 @@ let Observable;
 module.exports = _client => {
   const remoteModule = {};
 
-  remoteModule.get_completions = function (arg0, arg1, arg2, arg3) {
+  remoteModule.get_completions = function (arg0, arg1, arg2, arg3, arg4) {
     return _client.marshalArguments(Array.from(arguments), [{
       name: "src",
       type: {
@@ -16,6 +16,14 @@ module.exports = _client => {
       name: "contents",
       type: {
         kind: "string"
+      }
+    }, {
+      name: "sysPath",
+      type: {
+        kind: "array",
+        type: {
+          kind: "string"
+        }
       }
     }, {
       name: "line",
@@ -43,7 +51,7 @@ module.exports = _client => {
     });
   };
 
-  remoteModule.get_definitions = function (arg0, arg1, arg2, arg3) {
+  remoteModule.get_definitions = function (arg0, arg1, arg2, arg3, arg4) {
     return _client.marshalArguments(Array.from(arguments), [{
       name: "src",
       type: {
@@ -54,6 +62,14 @@ module.exports = _client => {
       name: "contents",
       type: {
         kind: "string"
+      }
+    }, {
+      name: "sysPath",
+      type: {
+        kind: "array",
+        type: {
+          kind: "string"
+        }
       }
     }, {
       name: "line",
@@ -81,7 +97,7 @@ module.exports = _client => {
     });
   };
 
-  remoteModule.get_references = function (arg0, arg1, arg2, arg3) {
+  remoteModule.get_references = function (arg0, arg1, arg2, arg3, arg4) {
     return _client.marshalArguments(Array.from(arguments), [{
       name: "src",
       type: {
@@ -92,6 +108,14 @@ module.exports = _client => {
       name: "contents",
       type: {
         kind: "string"
+      }
+    }, {
+      name: "sysPath",
+      type: {
+        kind: "array",
+        type: {
+          kind: "string"
+        }
       }
     }, {
       name: "line",
@@ -119,6 +143,53 @@ module.exports = _client => {
     });
   };
 
+  remoteModule.get_hover = function (arg0, arg1, arg2, arg3, arg4, arg5) {
+    return _client.marshalArguments(Array.from(arguments), [{
+      name: "src",
+      type: {
+        kind: "named",
+        name: "NuclideUri"
+      }
+    }, {
+      name: "contents",
+      type: {
+        kind: "string"
+      }
+    }, {
+      name: "sysPath",
+      type: {
+        kind: "array",
+        type: {
+          kind: "string"
+        }
+      }
+    }, {
+      name: "word",
+      type: {
+        kind: "string"
+      }
+    }, {
+      name: "line",
+      type: {
+        kind: "number"
+      }
+    }, {
+      name: "column",
+      type: {
+        kind: "number"
+      }
+    }]).then(args => {
+      return _client.callRemoteFunction("get_hover", "promise", args);
+    }).then(value => {
+      return _client.unmarshal(value, {
+        kind: "nullable",
+        type: {
+          kind: "string"
+        }
+      });
+    });
+  };
+
   remoteModule.get_outline = function (arg0, arg1) {
     return _client.marshalArguments(Array.from(arguments), [{
       name: "src",
@@ -141,30 +212,6 @@ module.exports = _client => {
           type: {
             kind: "named",
             name: "JediOutlineItem"
-          }
-        }
-      });
-    });
-  };
-
-  remoteModule.add_paths = function (arg0) {
-    return _client.marshalArguments(Array.from(arguments), [{
-      name: "paths",
-      type: {
-        kind: "array",
-        type: {
-          kind: "string"
-        }
-      }
-    }]).then(args => {
-      return _client.callRemoteFunction("add_paths", "promise", args);
-    }).then(value => {
-      return _client.unmarshal(value, {
-        kind: "nullable",
-        type: {
-          kind: "array",
-          type: {
-            kind: "string"
           }
         }
       });
@@ -762,6 +809,14 @@ Object.defineProperty(module.exports, "defs", {
             kind: "string"
           }
         }, {
+          name: "sysPath",
+          type: {
+            kind: "array",
+            type: {
+              kind: "string"
+            }
+          }
+        }, {
           name: "line",
           type: {
             kind: "number"
@@ -793,13 +848,13 @@ Object.defineProperty(module.exports, "defs", {
       location: {
         type: "source",
         fileName: "JediService.js",
-        line: 88
+        line: 89
       },
       type: {
         location: {
           type: "source",
           fileName: "JediService.js",
-          line: 88
+          line: 89
         },
         kind: "function",
         argumentTypes: [{
@@ -812,6 +867,14 @@ Object.defineProperty(module.exports, "defs", {
           name: "contents",
           type: {
             kind: "string"
+          }
+        }, {
+          name: "sysPath",
+          type: {
+            kind: "array",
+            type: {
+              kind: "string"
+            }
           }
         }, {
           name: "line",
@@ -845,13 +908,13 @@ Object.defineProperty(module.exports, "defs", {
       location: {
         type: "source",
         fileName: "JediService.js",
-        line: 97
+        line: 99
       },
       type: {
         location: {
           type: "source",
           fileName: "JediService.js",
-          line: 97
+          line: 99
         },
         kind: "function",
         argumentTypes: [{
@@ -864,6 +927,14 @@ Object.defineProperty(module.exports, "defs", {
           name: "contents",
           type: {
             kind: "string"
+          }
+        }, {
+          name: "sysPath",
+          type: {
+            kind: "array",
+            type: {
+              kind: "string"
+            }
           }
         }, {
           name: "line",
@@ -891,19 +962,80 @@ Object.defineProperty(module.exports, "defs", {
         }
       }
     },
+    get_hover: {
+      kind: "function",
+      name: "get_hover",
+      location: {
+        type: "source",
+        fileName: "JediService.js",
+        line: 109
+      },
+      type: {
+        location: {
+          type: "source",
+          fileName: "JediService.js",
+          line: 109
+        },
+        kind: "function",
+        argumentTypes: [{
+          name: "src",
+          type: {
+            kind: "named",
+            name: "NuclideUri"
+          }
+        }, {
+          name: "contents",
+          type: {
+            kind: "string"
+          }
+        }, {
+          name: "sysPath",
+          type: {
+            kind: "array",
+            type: {
+              kind: "string"
+            }
+          }
+        }, {
+          name: "word",
+          type: {
+            kind: "string"
+          }
+        }, {
+          name: "line",
+          type: {
+            kind: "number"
+          }
+        }, {
+          name: "column",
+          type: {
+            kind: "number"
+          }
+        }],
+        returnType: {
+          kind: "promise",
+          type: {
+            kind: "nullable",
+            type: {
+              kind: "string"
+            }
+          }
+        }
+      }
+    },
     get_outline: {
       kind: "function",
       name: "get_outline",
       location: {
         type: "source",
         fileName: "JediService.js",
-        line: 106
+        line: 121
       },
       type: {
         location: {
           type: "source",
           fileName: "JediService.js",
-          line: 106
+          line: 121
         },
         kind: "function",
         argumentTypes: [{
@@ -927,44 +1059,6 @@ Object.defineProperty(module.exports, "defs", {
               type: {
                 kind: "named",
                 name: "JediOutlineItem"
-              }
-            }
-          }
-        }
-      }
-    },
-    add_paths: {
-      kind: "function",
-      name: "add_paths",
-      location: {
-        type: "source",
-        fileName: "JediService.js",
-        line: 113
-      },
-      type: {
-        location: {
-          type: "source",
-          fileName: "JediService.js",
-          line: 113
-        },
-        kind: "function",
-        argumentTypes: [{
-          name: "paths",
-          type: {
-            kind: "array",
-            type: {
-              kind: "string"
-            }
-          }
-        }],
-        returnType: {
-          kind: "promise",
-          type: {
-            kind: "nullable",
-            type: {
-              kind: "array",
-              type: {
-                kind: "string"
               }
             }
           }

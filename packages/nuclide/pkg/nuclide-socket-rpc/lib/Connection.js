@@ -21,6 +21,18 @@ function _load_log4js() {
 
 var _net = _interopRequireDefault(require('net'));
 
+var _utils;
+
+function _load_utils() {
+  return _utils = require('../../nuclide-server/lib/utils');
+}
+
+var _nuclideAnalytics;
+
+function _load_nuclideAnalytics() {
+  return _nuclideAnalytics = require('../../nuclide-analytics');
+}
+
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 /**
@@ -34,11 +46,16 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
  * @format
  */
 
+const PROTOCOL_LOGGER_COUNT = 20;
+
 class Connection {
 
   constructor(tunnelHost, remoteSocket) {
     trace('Connection: creating connection: ' + JSON.stringify(tunnelHost));
+    this._closed = false;
+    this._disposeCalled = false;
     this._remoteSocket = remoteSocket;
+    this._error = null;
 
     this._socket = _net.default.createConnection({ port: tunnelHost.port, family: tunnelHost.family }, socket => {
       trace('Connection: connection created and ready to write data.');
@@ -49,7 +66,9 @@ class Connection {
     this._socket.on('error', err => {
       // TODO: we should find a way to send the error back
       //       to the remote socket
-      trace('Connection error: ' + JSON.stringify(err));
+      this._error = err;
+      (0, (_log4js || _load_log4js()).getLogger)('SocketService').error('Connection error', err);
+      this._closed = true;
       this._socket.end();
     });
 
@@ -58,12 +77,14 @@ class Connection {
     });
 
     this._socket.on('data', data => {
-      // There seems to be a situation where
-      // this event is fired and data isn't a Buffer.
-      // It causes the nuclide server to crash when
-      // attempting to marshal the data
-      if (data instanceof Buffer) {
+      if (!this._closed) {
         this._remoteSocket.write(data);
+      } else {
+        (0, (_nuclideAnalytics || _load_nuclideAnalytics()).track)('socket-service:attempting-to-write-data-after-close', {
+          disposeCalled: this._disposeCalled,
+          lastError: this._error,
+          protocolLog: (_utils || _load_utils()).protocolLogger.tail(PROTOCOL_LOGGER_COUNT)
+        });
       }
     });
   }
@@ -74,6 +95,8 @@ class Connection {
 
   dispose() {
     trace('Connection: disposing connection');
+    this._disposeCalled = true;
+    this._closed = true;
     this._disposables.dispose();
   }
 }

@@ -16,18 +16,25 @@ var _react = _interopRequireWildcard(require('react'));
 var _BreakpointListComponent;
 
 function _load_BreakpointListComponent() {
-  return _BreakpointListComponent = require('./BreakpointListComponent');
+  return _BreakpointListComponent = _interopRequireDefault(require('./BreakpointListComponent'));
 }
 
 function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-class BreakpointsView extends _react.PureComponent {
-  constructor(props) {
-    super(props);
-  }
+/**
+ * Copyright (c) 2015-present, Facebook, Inc.
+ * All rights reserved.
+ *
+ * This source code is licensed under the license found in the LICENSE file in
+ * the root directory of this source tree.
+ *
+ * 
+ * @format
+ */
 
+class BreakpointsView extends _react.PureComponent {
   render() {
     const { model } = this.props;
     const actions = model.getActions();
@@ -39,21 +46,9 @@ class BreakpointsView extends _react.PureComponent {
       _react.createElement(
         'div',
         { className: 'nuclide-debugger-pane-content ' },
-        _react.createElement((_BreakpointListComponent || _load_BreakpointListComponent()).BreakpointListComponent, {
-          actions: actions,
-          breakpointStore: model.getBreakpointStore()
-        })
+        _react.createElement((_BreakpointListComponent || _load_BreakpointListComponent()).default, { actions: actions, model: model })
       )
     );
   }
 }
-exports.BreakpointsView = BreakpointsView; /**
-                                            * Copyright (c) 2015-present, Facebook, Inc.
-                                            * All rights reserved.
-                                            *
-                                            * This source code is licensed under the license found in the LICENSE file in
-                                            * the root directory of this source tree.
-                                            *
-                                            * 
-                                            * @format
-                                            */
+exports.BreakpointsView = BreakpointsView;

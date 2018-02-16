@@ -24,10 +24,10 @@ function _load_nuclideUri() {
   return _nuclideUri = _interopRequireDefault(require('nuclide-commons/nuclideUri'));
 }
 
-var _DebuggerStore;
+var _constants;
 
-function _load_DebuggerStore() {
-  return _DebuggerStore = require('./DebuggerStore');
+function _load_constants() {
+  return _constants = require('./constants');
 }
 
 var _nullthrows;
@@ -36,18 +36,15 @@ function _load_nullthrows() {
   return _nullthrows = _interopRequireDefault(require('nullthrows'));
 }
 
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+var _nuclideTerminalUri;
 
-/**
- * Copyright (c) 2015-present, Facebook, Inc.
- * All rights reserved.
- *
- * This source code is licensed under the license found in the LICENSE file in
- * the root directory of this source tree.
- *
- * 
- * @format
- */
+function _load_nuclideTerminalUri() {
+  return _nuclideTerminalUri = _interopRequireWildcard(require('../../commons-node/nuclide-terminal-uri'));
+}
+
+function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 class RemoteControlService {
 
@@ -75,40 +72,20 @@ class RemoteControlService {
     })();
   }
 
-  toggleBreakpoint(filePath, line) {
+  getCurrentDebuggerName() {
     const model = this._getModel();
     if (model == null) {
       throw new Error('Package is not activated.');
     }
-    model.getActions().toggleBreakpoint(filePath, line);
-  }
-
-  addBreakpoint(filePath, line) {
-    const model = this._getModel();
-    if (model == null) {
-      throw new Error('Package is not activated.');
+    const instance = model.getDebuggerInstance();
+    if (instance == null) {
+      return null;
     }
-    model.getActions().addBreakpoint(filePath, line);
+    const processInfo = instance.getDebuggerProcessInfo();
+    return processInfo.getServiceName();
   }
 
-  isInDebuggingMode(providerName) {
-    const model = this._getModel();
-    if (model == null) {
-      throw new Error('Package is not activated.');
-    }
-    const session = model.getStore().getDebuggerInstance();
-    return session != null && session.getProviderName() === providerName;
-  }
-
-  getDebuggerInstance() {
-    const model = this._getModel();
-    if (model == null) {
-      throw new Error('Package is not activated.');
-    }
-    return model.getStore().getDebuggerInstance();
-  }
-
-  killDebugger() {
+  _killDebugger() {
     const model = this._getModel();
     if (model == null) {
       throw new Error('Package is not activated.');
@@ -116,30 +93,15 @@ class RemoteControlService {
     model.getActions().stopDebugging();
   }
 
-  getTerminal() {
-    try {
-      // $FlowFB
-      const terminalUri = require('../../commons-node/nuclide-terminal-uri');
-      return terminalUri;
-    } catch (_) {
-      return null;
-    }
-  }
-
   canLaunchDebugTargetInTerminal(targetUri) {
     // The terminal is not supported on Windows.
-    return ((_nuclideUri || _load_nuclideUri()).default.isRemote(targetUri) || process.platform !== 'win32') && this.getTerminal() != null;
+    return (_nuclideUri || _load_nuclideUri()).default.isRemote(targetUri) || process.platform !== 'win32';
   }
 
   launchDebugTargetInTerminal(targetUri, command, args, cwd, environmentVariables) {
     var _this2 = this;
 
     return (0, _asyncToGenerator.default)(function* () {
-      const terminalUri = _this2.getTerminal();
-      if (terminalUri == null) {
-        return false;
-      }
-
       const key = `targetUri=${targetUri}&command=${command}`;
       const info = {
         cwd,
@@ -156,20 +118,20 @@ class RemoteControlService {
         preservedCommands: ['nuclide-debugger:continue-debugging', 'nuclide-debugger:stop-debugging', 'nuclide-debugger:restart-debugging', 'nuclide-debugger:step-over', 'nuclide-debugger:step-into', 'nuclide-debugger:step-out']
       };
 
-      const infoUri = terminalUri.uriFromInfo(info);
+      const infoUri = (_nuclideTerminalUri || _load_nuclideTerminalUri()).uriFromInfo(info);
 
       // Ensure any previous instances of this same target are closed before
       // opening a new terminal tab. We don't want them to pile up if the
       // user keeps running the same app over and over.
       (0, (_destroyItemWhere || _load_destroyItemWhere()).destroyItemWhere)(function (item) {
-        if (item.getURI == null) {
+        if (item.getURI == null || item.getURI() == null) {
           return false;
         }
 
-        const uri = item.getURI();
+        const uri = (0, (_nullthrows || _load_nullthrows()).default)(item.getURI());
         try {
           // Only close terminal tabs with the same title and target binary.
-          const otherInfo = terminalUri.infoFromUri(uri);
+          const otherInfo = (_nuclideTerminalUri || _load_nuclideTerminalUri()).infoFromUri(uri);
           return otherInfo.key === key;
         } catch (e) {}
         return false;
@@ -187,15 +149,15 @@ class RemoteControlService {
         throw new Error('Package is not activated.');
       }
 
-      const disposable = model.getStore().onDebuggerModeChange(function () {
+      const disposable = model.onDebuggerModeChange(function () {
         const debuggerModel = _this2._getModel();
 
         if (!(debuggerModel != null)) {
           throw new Error('Invariant violation: "debuggerModel != null"');
         }
 
-        const debuggerMode = debuggerModel.getStore().getDebuggerMode();
-        if (debuggerMode === (_DebuggerStore || _load_DebuggerStore()).DebuggerMode.STOPPED) {
+        const debuggerMode = debuggerModel.getDebuggerMode();
+        if (debuggerMode === (_constants || _load_constants()).DebuggerMode.STOPPED) {
           // This termination path is invoked if the debugger dies first, ensuring
           // we terminate the target process. This can happen if the user hits stop,
           // or if the debugger crashes.
@@ -209,11 +171,18 @@ class RemoteControlService {
         // This callback is invoked if the target process dies first, ensuring
         // we tear down the debugger.
         disposable.dispose();
-        _this2.killDebugger();
+        _this2._killDebugger();
       });
-
-      return true;
     })();
   }
 }
-exports.default = RemoteControlService;
+exports.default = RemoteControlService; /**
+                                         * Copyright (c) 2015-present, Facebook, Inc.
+                                         * All rights reserved.
+                                         *
+                                         * This source code is licensed under the license found in the LICENSE file in
+                                         * the root directory of this source tree.
+                                         *
+                                         * 
+                                         * @format
+                                         */

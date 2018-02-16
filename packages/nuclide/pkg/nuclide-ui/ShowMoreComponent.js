@@ -10,7 +10,7 @@ var _react = _interopRequireWildcard(require('react'));
 var _MeasuredComponent;
 
 function _load_MeasuredComponent() {
-  return _MeasuredComponent = require('./MeasuredComponent');
+  return _MeasuredComponent = require('nuclide-commons-ui/MeasuredComponent');
 }
 
 var _Button;

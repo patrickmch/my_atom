@@ -99,10 +99,29 @@ class RootPanel extends _react.Component {
       const StreamedTaskButton = (0, (_bindObservableAsProps || _load_bindObservableAsProps()).bindObservableAsProps)(task.getTaskEvents().distinctUntilChanged().map(taskEvent => this._taskEventsToProps(task, taskEvent)), (_TaskButton || _load_TaskButton()).TaskButton);
       return _react.createElement(StreamedTaskButton, { key: task.getName() });
     });
+    if (tasks.length < 1) {
+      return null;
+    }
     return _react.createElement(
       'div',
       { className: 'block nuclide-device-panel-tasks-container' },
       tasks
+    );
+  }
+
+  _getDeviceTypeComponents() {
+    const components = this.props.deviceTypeComponents.map(component => {
+      const Type = component.type;
+      return _react.createElement(Type, { key: component.key, devices: this.props.devices });
+    });
+    if (components.length < 1) {
+      return null;
+    }
+
+    return _react.createElement(
+      'div',
+      { className: 'block nuclide-device-panel-additional-components' },
+      components
     );
   }
 
@@ -144,7 +163,8 @@ class RootPanel extends _react.Component {
         { className: 'block' },
         this._createDeviceTable()
       ),
-      this._getTasks()
+      this._getTasks(),
+      this._getDeviceTypeComponents()
     );
   }
 

@@ -9,7 +9,7 @@ var _asyncToGenerator = _interopRequireDefault(require('async-to-generator'));
 
 let getCompilationDbAndFlagsFile = (() => {
   var _ref = (0, _asyncToGenerator.default)(function* (settings, file) {
-    const compilationDbDir = yield (0, (_utils || _load_utils()).secondIfFirstIsNull)(getCompilationDbDirFromSettings(settings), (0, _asyncToGenerator.default)(function* () {
+    const compilationDbDir = yield (0, (_utils2 || _load_utils2()).secondIfFirstIsNull)(getCompilationDbDirFromSettings(settings), (0, _asyncToGenerator.default)(function* () {
       return findNearestCompilationDbDir(file);
     }));
     if (compilationDbDir == null) {
@@ -18,7 +18,7 @@ let getCompilationDbAndFlagsFile = (() => {
     return {
       hasCompilationDb: true,
       compilationDbDir,
-      flagsFile: yield (0, (_utils || _load_utils()).secondIfFirstIsNull)(getFlagsFileFromSettings(settings), (0, _asyncToGenerator.default)(function* () {
+      flagsFile: yield (0, (_utils2 || _load_utils2()).secondIfFirstIsNull)(getFlagsFileFromSettings(settings), (0, _asyncToGenerator.default)(function* () {
         return getCompilationDbFile(compilationDbDir);
       }))
     };
@@ -29,8 +29,28 @@ let getCompilationDbAndFlagsFile = (() => {
   };
 })();
 
-let determineCqueryProject = exports.determineCqueryProject = (() => {
+let findSourcePath = (() => {
   var _ref4 = (0, _asyncToGenerator.default)(function* (path) {
+    if ((0, (_utils || _load_utils()).isHeaderFile)(path)) {
+      const service = (0, (_nuclideRemoteConnection || _load_nuclideRemoteConnection()).getClangServiceByNuclideUri)(path);
+      if (service != null) {
+        const source = yield service.getRelatedSourceOrHeader(path);
+        if (source != null) {
+          return source;
+        }
+      }
+    }
+    return path;
+  });
+
+  return function findSourcePath(_x3) {
+    return _ref4.apply(this, arguments);
+  };
+})();
+
+let determineCqueryProject = exports.determineCqueryProject = (() => {
+  var _ref5 = (0, _asyncToGenerator.default)(function* (_path) {
+    const path = yield findSourcePath(_path);
     const settings = yield (0, (_libclang || _load_libclang()).getClangRequestSettings)(path);
     const compilationDbAndFlags = yield getCompilationDbAndFlagsFile(settings, path);
     const projectRoot = getProjectRootFromClangRequestSettingsOrAtom(settings, path);
@@ -39,8 +59,8 @@ let determineCqueryProject = exports.determineCqueryProject = (() => {
     return compilationDbAndFlags.hasCompilationDb ? Object.assign({}, compilationDbAndFlags, { projectRoot }) : Object.assign({}, compilationDbAndFlags, { projectRoot });
   });
 
-  return function determineCqueryProject(_x3) {
-    return _ref4.apply(this, arguments);
+  return function determineCqueryProject(_x4) {
+    return _ref5.apply(this, arguments);
   };
 })();
 
@@ -48,6 +68,12 @@ var _nuclideUri;
 
 function _load_nuclideUri() {
   return _nuclideUri = _interopRequireDefault(require('nuclide-commons/nuclideUri'));
+}
+
+var _utils;
+
+function _load_utils() {
+  return _utils = require('../../nuclide-clang-rpc/lib/utils');
 }
 
 var _libclang;
@@ -68,10 +94,10 @@ function _load_nuclideRemoteConnection() {
   return _nuclideRemoteConnection = require('../../nuclide-remote-connection');
 }
 
-var _utils;
+var _utils2;
 
-function _load_utils() {
-  return _utils = require('./utils');
+function _load_utils2() {
+  return _utils2 = require('./utils');
 }
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }

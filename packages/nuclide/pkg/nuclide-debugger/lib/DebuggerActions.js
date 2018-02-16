@@ -36,12 +36,6 @@ function _load_AnalyticsHelper() {
   return _AnalyticsHelper = require('./AnalyticsHelper');
 }
 
-var _DebuggerStore;
-
-function _load_DebuggerStore() {
-  return _DebuggerStore = require('./DebuggerStore');
-}
-
 var _nuclideAnalytics;
 
 function _load_nuclideAnalytics() {
@@ -84,10 +78,10 @@ const CONSOLE_VIEW_URI = 'atom://nuclide/console';
  */
 class DebuggerActions {
 
-  constructor(dispatcher, store) {
+  constructor(dispatcher, model) {
     this._disposables = new (_UniversalDisposable || _load_UniversalDisposable()).default();
     this._dispatcher = dispatcher;
-    this._store = store;
+    this._model = model;
   }
 
   startDebugging(processInfo) {
@@ -102,21 +96,17 @@ class DebuggerActions {
       _this.stopDebugging(); // stop existing session.
       _this.setError(null);
       _this._handleDebugModeStart();
-      _this.setDebuggerMode((_DebuggerStore || _load_DebuggerStore()).DebuggerMode.STARTING);
+      _this.setDebuggerMode((_constants || _load_constants()).DebuggerMode.STARTING);
       _this.setDebugProcessInfo(processInfo);
 
       try {
         const debuggerCapabilities = processInfo.getDebuggerCapabilities();
         const debuggerProps = processInfo.getDebuggerProps();
         const supportThreadsWindow = debuggerCapabilities.threads;
-        _this._store.getSettings().supportThreadsWindow = supportThreadsWindow;
+        _this._model.getSettings().supportThreadsWindow = supportThreadsWindow;
         if (supportThreadsWindow) {
-          _this._store.getSettings().customThreadColumns = debuggerProps.threadColumns;
-          _this._store.getSettings().threadsComponentTitle = debuggerProps.threadsComponentTitle;
+          _this._model.getSettings().threadsComponentTitle = debuggerProps.threadsComponentTitle;
         }
-        const singleThreadStepping = debuggerCapabilities.singleThreadStepping;
-        _this._store.getSettings().singleThreadStepping = singleThreadStepping;
-        _this.toggleSingleThreadStepping(singleThreadStepping);
 
         const customControlButtons = debuggerProps.customControlButtons;
         if (customControlButtons.length > 0) {
@@ -134,7 +124,7 @@ class DebuggerActions {
         atom.commands.dispatch(atom.views.getView(atom.workspace), 'nuclide-debugger:show');
 
         const debuggerInstance = yield processInfo.debug();
-        yield _this._store.getBridge().setupNuclideChannel(debuggerInstance);
+        yield _this._model.getBridge().setupNuclideChannel(debuggerInstance);
         _this._registerConsole();
 
         yield _this._waitForChromeConnection(debuggerInstance);
@@ -178,10 +168,10 @@ class DebuggerActions {
         data: ''
       });
       // Debugger finished initializing and entered debug mode.
-      _this2.setDebuggerMode((_DebuggerStore || _load_DebuggerStore()).DebuggerMode.RUNNING);
+      _this2.setDebuggerMode((_constants || _load_constants()).DebuggerMode.RUNNING);
 
       // Wait for 'resume' event from Bridge.js to guarantee we've passed the loader breakpoint.
-      yield _this2._store.loaderBreakpointResumePromise;
+      yield _this2._model.loaderBreakpointResumePromise;
     })();
   }
 
@@ -193,7 +183,7 @@ class DebuggerActions {
   }
 
   _handleSessionEnd(debuggerInstance) {
-    if (this._store.getDebuggerInstance() === debuggerInstance) {
+    if (this._model.getDebuggerInstance() === debuggerInstance) {
       this.stopDebugging();
     } else {
       // Do nothing, because either:
@@ -203,12 +193,12 @@ class DebuggerActions {
   }
 
   stopDebugging() {
-    if (this._store.getDebuggerMode() === (_DebuggerStore || _load_DebuggerStore()).DebuggerMode.STOPPING) {
+    if (this._model.getDebuggerMode() === (_constants || _load_constants()).DebuggerMode.STOPPING) {
       return;
     }
-    this.setDebuggerMode((_DebuggerStore || _load_DebuggerStore()).DebuggerMode.STOPPING);
+    this.setDebuggerMode((_constants || _load_constants()).DebuggerMode.STOPPING);
     this._unregisterConsole();
-    const debuggerInstance = this._store.getDebuggerInstance();
+    const debuggerInstance = this._model.getDebuggerInstance();
     if (debuggerInstance != null) {
       debuggerInstance.dispose();
       this._setDebuggerInstance(null);
@@ -220,20 +210,20 @@ class DebuggerActions {
 
     this.clearInterface();
     this.updateControlButtons([]);
-    this.setDebuggerMode((_DebuggerStore || _load_DebuggerStore()).DebuggerMode.STOPPED);
+    this.setDebuggerMode((_constants || _load_constants()).DebuggerMode.STOPPED);
     this.setDebugProcessInfo(null);
     this.updateConfigureSourcePathsCallback(null);
     (0, (_nuclideAnalytics || _load_nuclideAnalytics()).track)((_constants || _load_constants()).AnalyticsEvents.DEBUGGER_STOP);
     (0, (_AnalyticsHelper || _load_AnalyticsHelper()).endTimerTracking)();
 
-    if (!(this._store.getDebuggerInstance() == null)) {
-      throw new Error('Invariant violation: "this._store.getDebuggerInstance() == null"');
+    if (!(this._model.getDebuggerInstance() == null)) {
+      throw new Error('Invariant violation: "this._model.getDebuggerInstance() == null"');
     }
   }
 
   restartDebugger() {
-    const currentDebuggerInfo = this._store.getDebugProcessInfo();
-    if (currentDebuggerInfo == null || this._store.getDebuggerMode() === (_DebuggerStore || _load_DebuggerStore()).DebuggerMode.STOPPED) {
+    const currentDebuggerInfo = this._model.getDebugProcessInfo();
+    if (currentDebuggerInfo == null || this._model.getDebuggerMode() === (_constants || _load_constants()).DebuggerMode.STOPPED) {
       atom.notifications.addWarning('Cannot restart the debugger: the debugger is not currently running!');
       return;
     }
@@ -596,16 +586,6 @@ class DebuggerActions {
     this._dispatcher.dispatch({
       actionType: (_DebuggerDispatcher || _load_DebuggerDispatcher()).ActionTypes.TOGGLE_PAUSE_ON_CAUGHT_EXCEPTION,
       data: pauseOnCaughtException
-    });
-  }
-
-  toggleSingleThreadStepping(singleThreadStepping) {
-    (0, (_nuclideAnalytics || _load_nuclideAnalytics()).track)((_constants || _load_constants()).AnalyticsEvents.DEBUGGER_TOGGLE_SINGLE_THREAD_STEPPING, {
-      singleThreadStepping
-    });
-    this._dispatcher.dispatch({
-      actionType: (_DebuggerDispatcher || _load_DebuggerDispatcher()).ActionTypes.TOGGLE_SINGLE_THREAD_STEPPING,
-      data: singleThreadStepping
     });
   }
 

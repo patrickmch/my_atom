@@ -65,6 +65,7 @@ exports.getPhpDebuggerServiceByNuclideUri = getPhpDebuggerServiceByNuclideUri;
 exports.getHhvmDebuggerServiceByNuclideUri = getHhvmDebuggerServiceByNuclideUri;
 exports.getPtyServiceByNuclideUri = getPtyServiceByNuclideUri;
 exports.getPythonServiceByNuclideUri = getPythonServiceByNuclideUri;
+exports.getPythonServiceByConnection = getPythonServiceByConnection;
 exports.getReasonServiceByNuclideUri = getReasonServiceByNuclideUri;
 exports.getRemoteCommandServiceByNuclideUri = getRemoteCommandServiceByNuclideUri;
 exports.getSdbServiceByNuclideUri = getSdbServiceByNuclideUri;
@@ -239,6 +240,10 @@ function getPtyServiceByNuclideUri(uri) {
 
 function getPythonServiceByNuclideUri(uri) {
   return (0, (_nullthrows || _load_nullthrows()).default)((0, (_serviceManager || _load_serviceManager()).getServiceByNuclideUri)('PythonService', uri));
+}
+
+function getPythonServiceByConnection(connection) {
+  return (0, (_serviceManager || _load_serviceManager()).getServiceByConnection)('PythonService', connection);
 }
 
 function getReasonServiceByNuclideUri(uri) {

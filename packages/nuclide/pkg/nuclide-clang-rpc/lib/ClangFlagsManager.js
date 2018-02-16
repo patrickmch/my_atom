@@ -6,7 +6,11 @@ Object.defineProperty(exports, "__esModule", {
 
 var _asyncToGenerator = _interopRequireDefault(require('async-to-generator'));
 
-var _rxjsBundlesRxMinJs = require('rxjs/bundles/Rx.min.js');
+var _nullthrows;
+
+function _load_nullthrows() {
+  return _nullthrows = _interopRequireDefault(require('nullthrows'));
+}
 
 var _nuclideUri;
 
@@ -44,10 +48,28 @@ function _load_log4js() {
   return _log4js = require('log4js');
 }
 
+var _clangFlagsReader;
+
+function _load_clangFlagsReader() {
+  return _clangFlagsReader = require('./clang-flags-reader');
+}
+
 var _clangFlagsParser;
 
 function _load_clangFlagsParser() {
   return _clangFlagsParser = require('./clang-flags-parser');
+}
+
+var _ClangFlagsPool;
+
+function _load_ClangFlagsPool() {
+  return _ClangFlagsPool = _interopRequireDefault(require('./ClangFlagsPool'));
+}
+
+var _finders;
+
+function _load_finders() {
+  return _finders = require('./related-file/finders');
 }
 
 var _utils;
@@ -56,26 +78,21 @@ function _load_utils() {
   return _utils = require('./utils');
 }
 
-var _RelatedFileFinder;
-
-function _load_RelatedFileFinder() {
-  return _RelatedFileFinder = require('./RelatedFileFinder');
-}
-
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-const logger = (0, (_log4js || _load_log4js()).getLogger)('nuclide-clang-rpc'); /**
-                                                                                 * Copyright (c) 2015-present, Facebook, Inc.
-                                                                                 * All rights reserved.
-                                                                                 *
-                                                                                 * This source code is licensed under the license found in the LICENSE file in
-                                                                                 * the root directory of this source tree.
-                                                                                 *
-                                                                                 * 
-                                                                                 * @format
-                                                                                 */
+/**
+ * Copyright (c) 2015-present, Facebook, Inc.
+ * All rights reserved.
+ *
+ * This source code is licensed under the license found in the LICENSE file in
+ * the root directory of this source tree.
+ *
+ * 
+ * @format
+ */
 
-const INCLUDE_SEARCH_TIMEOUT = 15000;
+const logger = (0, (_log4js || _load_log4js()).getLogger)('nuclide-clang-rpc');
+
 const COMPILATION_DATABASE_FILE = 'compile_commands.json';
 const PROJECT_CLANG_FLAGS_FILE = '.nuclide_clang_config.json';
 
@@ -112,23 +129,28 @@ class ClangFlagsManager {
     this._compilationDatabases = new (_cache || _load_cache()).Cache({
       keyFactory: db => getCacheKeyForDb(db)
     });
-    this._pathToFlags = new (_cache || _load_cache()).Cache({
-      keyFactory: ([src, requestSettings]) => JSON.stringify([src, getCacheKeyForDb(requestSettings.compilationDatabase)])
+    this._uriResolveCache = new (_cache || _load_cache()).Cache({
+      keyFactory: ([parent, relative]) => relative + parent
     });
 
     this._realpathCache = {};
     this._clangProjectFlags = new Map();
+    this._flagPool = new (_ClangFlagsPool || _load_ClangFlagsPool()).default();
   }
 
   reset() {
-    this._pathToFlags.clear();
     this._compilationDatabases.clear();
     this._realpathCache = {};
     this._clangProjectFlags.clear();
+    this._flagPool.reset();
+  }
+
+  getFlags(handle) {
+    return this._flagPool.getFlags(handle);
   }
 
   /**
-   * @return a space-delimited string of flags or null if nothing is known
+   * @return a the normalized compilation flags or null if nothing is known
    *     about the src file. For example, null will be returned if src is not
    *     under the project root.
    */
@@ -137,28 +159,36 @@ class ClangFlagsManager {
 
     return (0, _asyncToGenerator.default)(function* () {
       const data = yield _this._getFlagsForSrcCached(src, requestSettings);
-      if (data == null) {
-        return null;
+      if (data != null) {
+        const modifiedFlags = yield _this._getModifiedFlags(src, data);
+        return {
+          flags: modifiedFlags,
+          directory: data.directory,
+          flagsFile: data.flagsFile
+        };
       }
-      if (data.flags === undefined) {
-        const { rawData } = data;
-        if (rawData == null) {
-          data.flags = null;
-        } else {
-          const flags = yield _this._getModifiedFlags(src, rawData);
-          data.flags = ClangFlagsManager.sanitizeCommand(rawData.file, flags, rawData.directory);
-        }
-      }
-      return data;
+      return null;
     })();
   }
 
   _getFlagsForSrcCached(src, requestSettings) {
-    return this._pathToFlags.getOrCreate([src, requestSettings], () => this._getFlagsForSrcImpl(src, requestSettings));
-  }
+    var _this2 = this;
 
-  _getFlagsForSrcImpl(src, requestSettings) {
-    return (0, (_nuclideAnalytics || _load_nuclideAnalytics()).trackTiming)('nuclide-clang.get-flags', () => this.__getFlagsForSrcImpl(src, requestSettings));
+    return (0, _asyncToGenerator.default)(function* () {
+      const { compilationDatabase } = requestSettings;
+      if (compilationDatabase != null) {
+        const flagMap = yield _this2._compilationDatabases.get(compilationDatabase);
+        if (flagMap != null) {
+          const flagsHandle = flagMap.get(src);
+          if (flagsHandle != null) {
+            return _this2._flagPool.getFlags(flagsHandle);
+          }
+        }
+      }
+      return (0, (_nuclideAnalytics || _load_nuclideAnalytics()).trackTiming)('nuclide-clang.get-flags', function () {
+        return _this2._getFlagsForSrcImpl(src, requestSettings);
+      });
+    })();
   }
 
   _findSourceFileForHeaderFromCompilationDatabase(header, dbFlags) {
@@ -188,49 +218,11 @@ class ClangFlagsManager {
     return null;
   }
 
-  _getXFlagForSourceFile(sourceFile) {
-    const ext = (_nuclideUri || _load_nuclideUri()).default.extname(sourceFile);
-    if (ext === '.mm') {
-      return 'objective-c++';
-    } else if (ext === '.m') {
-      return 'objective-c';
-    } else if (ext === '.c') {
-      return 'c';
-    } else {
-      return 'c++';
-    }
-  }
-
-  _getFlagsFromSourceFileForHeader(sourceFile, requestSettings) {
-    var _this2 = this;
-
-    return (0, _asyncToGenerator.default)(function* () {
-      const data = yield _this2._getFlagsForSrcCached(sourceFile, requestSettings);
-      if (data != null) {
-        const { rawData } = data;
-        if (rawData != null) {
-          const xFlag = _this2._getXFlagForSourceFile(sourceFile);
-          let { command } = rawData;
-          if (!command.includes('-x ')) {
-            command += ` -x ${xFlag}`;
-            rawData.command = command;
-          }
-          if (rawData.arguments != null && !rawData.arguments.find(function (arg) {
-            return arg === '-x';
-          })) {
-            rawData.arguments.push('-x', xFlag);
-          }
-        }
-      }
-      return data;
-    })();
-  }
-
-  _getModifiedFlags(src, rawData) {
+  _getModifiedFlags(src, clangFlags) {
     var _this3 = this;
 
     return (0, _asyncToGenerator.default)(function* () {
-      const originalFlags = rawData.arguments !== undefined ? rawData.arguments : (0, (_string || _load_string()).shellParse)(rawData.command);
+      const originalFlags = clangFlags.flags;
       // Look for the project-wide flags
       const projectFlagsDir = yield (_fsPromise || _load_fsPromise()).default.findNearestFile(PROJECT_CLANG_FLAGS_FILE, (_nuclideUri || _load_nuclideUri()).default.dirname(src));
       if (projectFlagsDir == null) {
@@ -241,7 +233,6 @@ class ClangFlagsManager {
       if (projectFlags == null) {
         return originalFlags;
       }
-
       return originalFlags.filter(function (flag) {
         return projectFlags.ignoredCompilerFlags.indexOf(flag) === -1;
       }).concat(projectFlags.extraCompilerFlags);
@@ -283,7 +274,7 @@ class ClangFlagsManager {
     var _this5 = this;
 
     return (0, _asyncToGenerator.default)(function* () {
-      const source = yield (0, (_RelatedFileFinder || _load_RelatedFileFinder()).getRelatedSourceForHeader)(header);
+      const source = yield new (_finders || _load_finders()).RelatedFileFinder().getRelatedSourceForHeader(header);
       if (source != null) {
         return source;
       }
@@ -293,14 +284,7 @@ class ClangFlagsManager {
           return sourceFile;
         }
       }
-      if (projectRoot != null) {
-        // Try searching all subdirectories for source files that include this header.
-        // Give up after INCLUDE_SEARCH_TIMEOUT.
-        return (0, (_RelatedFileFinder || _load_RelatedFileFinder()).findIncludingSourceFile)(header, projectRoot).timeout(INCLUDE_SEARCH_TIMEOUT).catch(function () {
-          return _rxjsBundlesRxMinJs.Observable.of(null);
-        }).toPromise();
-      }
-      return null;
+      return projectRoot != null ? new (_finders || _load_finders()).RelatedFileFinder().getRelatedSourceForHeader(header, projectRoot) : null;
     })();
   }
 
@@ -315,19 +299,19 @@ class ClangFlagsManager {
         // flowlint-next-line sketchy-null-string:off
         projectRoot || dbDir);
       }
-      return (0, (_RelatedFileFinder || _load_RelatedFileFinder()).getRelatedHeaderForSource)(src);
+      return new (_finders || _load_finders()).RelatedFileFinder().getRelatedHeaderForSource(src);
     })();
   }
 
-  __getFlagsForSrcImpl(src, requestSettings) {
+  _getFlagsForSrcImpl(src, requestSettings) {
     var _this7 = this;
 
     return (0, _asyncToGenerator.default)(function* () {
       const { dbFlags, dbDir } = yield _this7._getDBFlagsAndDirForSrc(src, requestSettings);
       if (dbFlags != null) {
-        const flags = dbFlags.get(src);
-        if (flags != null) {
-          return flags;
+        const flagsHandle = dbFlags.get(src);
+        if (flagsHandle != null) {
+          return _this7._flagPool.getFlags(flagsHandle);
         }
       }
 
@@ -336,7 +320,7 @@ class ClangFlagsManager {
         // flowlint-next-line sketchy-null-string:off
         requestSettings.projectRoot || dbDir);
         if (sourceFile != null) {
-          return _this7._getFlagsFromSourceFileForHeader(sourceFile, requestSettings);
+          return _this7._getFlagsForSrcCached(sourceFile, requestSettings);
         }
       }
 
@@ -345,8 +329,9 @@ class ClangFlagsManager {
       const buildFile = compilationDB != null && compilationDB.flagsFile != null ? compilationDB.flagsFile : yield (0, (_utils || _load_utils()).guessBuildFile)(src);
       if (buildFile != null) {
         return {
-          rawData: null,
-          flagsFile: buildFile
+          flags: [],
+          flagsFile: buildFile,
+          directory: (_nuclideUri || _load_nuclideUri()).default.dirname(src)
         };
       }
 
@@ -401,47 +386,55 @@ class ClangFlagsManager {
     })();
   }
 
-  _loadFlagsFromCompilationDatabase(dbFile, flagsFile, requestSettings) {
+  _assertCompilationDatabaseEntry(entry) {
+    if (!(typeof entry.file === 'string' && typeof entry.directory === 'string' && (typeof entry.command === 'string' || Array.isArray(entry.arguments)))) {
+      throw new Error('The compilation database entry is invalid and does not comply with the spec.');
+    }
+  }
+
+  _processCompilationDatabaseEntry(entry, dbDir, flagsFile, dbFile) {
     var _this9 = this;
 
     return (0, _asyncToGenerator.default)(function* () {
-      const flags = new Map();
-      try {
-        const contents = yield (_fsPromise || _load_fsPromise()).default.readFile(dbFile, 'utf8');
-        const data = JSON.parse(contents);
-        const dbDir = (_nuclideUri || _load_nuclideUri()).default.dirname(dbFile);
-        yield Promise.all(data.map((() => {
-          var _ref = (0, _asyncToGenerator.default)(function* (entry) {
-            const { command, file } = entry;
-            const directory = yield (_fsPromise || _load_fsPromise()).default.realpath(
-            // Relative directories aren't part of the spec, but resolving them
-            // relative to the compile_commands.json location seems reasonable.
-            (_nuclideUri || _load_nuclideUri()).default.resolve(dbDir, entry.directory), _this9._realpathCache);
-            const filename = (_nuclideUri || _load_nuclideUri()).default.resolve(directory, file);
-            if (yield (_fsPromise || _load_fsPromise()).default.exists(filename)) {
-              const realpath = yield (_fsPromise || _load_fsPromise()).default.realpath(filename, _this9._realpathCache);
-              const result = {
-                rawData: {
-                  command,
-                  file,
-                  directory,
-                  arguments: entry.arguments
-                },
-                // flowlint-next-line sketchy-null-string:off
-                flagsFile: flagsFile || dbFile
-              };
-              flags.set(realpath, result);
-              _this9._pathToFlags.set([realpath, requestSettings], Promise.resolve(result));
-            }
-          });
+      _this9._assertCompilationDatabaseEntry(entry);
+      const directory = yield (_fsPromise || _load_fsPromise()).default.realpath(
+      // Relative directories aren't part of the spec, but resolving them
+      // relative to the compile_commands.json location seems reasonable.
+      _this9._uriResolveCached(dbDir, entry.directory), _this9._realpathCache);
+      const filename = _this9._uriResolveCached(directory, entry.file);
+      const realpath = yield (_fsPromise || _load_fsPromise()).default.realpath(filename, _this9._realpathCache);
+      const clangFlags = _this9.sanitizeEntry(entry, flagsFile == null ? dbFile : flagsFile);
+      return [realpath, _this9._flagPool.getHandle(clangFlags)];
+    })();
+  }
 
-          return function (_x) {
-            return _ref.apply(this, arguments);
-          };
-        })()));
-      } catch (e) {
-        logger.error(`Error reading compilation flags from ${dbFile}`, e);
+  _loadFlagsFromCompilationDatabase(dbFile, flagsFile, requestSettings) {
+    var _this10 = this;
+
+    return (0, _asyncToGenerator.default)(function* () {
+      const flags = new Map();
+      const dbDir = (_nuclideUri || _load_nuclideUri()).default.dirname(dbFile);
+      // Factor out the common arguments to _processCompilationDatabaseEntry.
+      const processEntry = function (entry) {
+        return _this10._processCompilationDatabaseEntry(entry, dbDir, flagsFile, dbFile);
+      };
+
+      const processedEntries = yield (0, (_clangFlagsReader || _load_clangFlagsReader()).readCompilationFlags)(dbFile).flatMap(processEntry).toArray().toPromise().catch(function (error) {
+        logger.error(`Saw error loading ${dbFile}, falling back to JSON.parse.`, error);
+        return (0, (_clangFlagsReader || _load_clangFlagsReader()).fallbackReadCompilationFlags)(dbFile).then(function (entries) {
+          return Promise.all(entries.map(function (entry) {
+            return processEntry(entry);
+          }));
+        });
+      }).catch(function (error) {
+        logger.error(`Fallback parser for ${dbFile} encountered error too`, error);
+        return [];
+      });
+      for (const [realpath, clangFlagsHandle] of processedEntries) {
+        flags.set(realpath, clangFlagsHandle);
       }
+      _this10._flagPool.trackStats();
+      _this10._uriResolveCache.clear();
       return flags;
     })();
   }
@@ -458,31 +451,56 @@ class ClangFlagsManager {
     return this._compilationDatabases.getOrCreate(db, () => this._loadFlagsFromCompilationDatabase(dbFile, db.flagsFile, requestSettings) || Promise.resolve(new Map()));
   }
 
-  static sanitizeCommand(sourceFile, args_, basePath) {
-    // Make a mutable copy.
-    let args = [...args_];
-    // For safety, create a new copy of the array. We exclude the path to the file to compile from
-    // compilation database generated by Buck. It must be removed from the list of command-line
-    // arguments passed to libclang.
-    const normalizedSourceFile = (_nuclideUri || _load_nuclideUri()).default.normalize(sourceFile);
-    args = args.filter(arg => normalizedSourceFile !== arg && normalizedSourceFile !== (_nuclideUri || _load_nuclideUri()).default.resolve(basePath, arg));
+  _uriResolveCached(parent, relative) {
+    return this._uriResolveCache.getOrCreate([parent, relative], () => (_nuclideUri || _load_nuclideUri()).default.resolve(parent, relative));
+  }
 
+  sanitizeEntry(entry, flagsFile) {
+    const { directory, file } = entry;
+    const ext = (_nuclideUri || _load_nuclideUri()).default.extname(file);
+    // Nullthrows is safe because of _assertCompilationDatabaseEntry.
+    let args = entry.arguments !== undefined ? entry.arguments : (0, (_string || _load_string()).shellParse)((0, (_nullthrows || _load_nullthrows()).default)(entry.command));
+    // We exclude the path to the file to compile from the compilation database
+    // generated by Buck. It must be removed from the list of command-line
+    // arguments passed to libclang.
+    const normalizedSourceFile = (_nuclideUri || _load_nuclideUri()).default.normalize(file);
+    args = args.filter(arg => normalizedSourceFile !== arg && (!arg.endsWith(ext) || normalizedSourceFile !== this._uriResolveCached(directory, arg)));
+    // Add the -x flag if it does not exist.
+    if (!args.find(arg => arg === '-x')) {
+      const xFlag = ClangFlagsManager._getXFlagForSourceFile(file);
+      args.push('-x', xFlag);
+    }
     // Resolve relative path arguments against the Buck project root.
     args = (0, (_clangFlagsParser || _load_clangFlagsParser()).mapPathsInFlags)(args, path_ => {
       let path = overrideIncludePath(path_);
       if (!(_nuclideUri || _load_nuclideUri()).default.isAbsolute(path)) {
-        path = (_nuclideUri || _load_nuclideUri()).default.join(basePath, path);
+        path = (_nuclideUri || _load_nuclideUri()).default.join(directory, path);
       }
       return path;
     });
 
+    const skipArgs = ['-o', '-MF'];
     // If an output file is specified, remove that argument.
-    const index = args.indexOf('-o');
-    if (index !== -1) {
-      args.splice(index, 2);
-    }
+    skipArgs.forEach(arg => {
+      const index = args.indexOf(arg);
+      if (index !== -1) {
+        args.splice(index, 2);
+      }
+    });
+    return { directory, flagsFile, flags: args };
+  }
 
-    return args;
+  static _getXFlagForSourceFile(sourceFile) {
+    const ext = (_nuclideUri || _load_nuclideUri()).default.extname(sourceFile);
+    if (ext === '.mm') {
+      return 'objective-c++';
+    } else if (ext === '.m') {
+      return 'objective-c';
+    } else if (ext === '.c') {
+      return 'c';
+    } else {
+      return 'c++';
+    }
   }
 }
 exports.default = ClangFlagsManager;

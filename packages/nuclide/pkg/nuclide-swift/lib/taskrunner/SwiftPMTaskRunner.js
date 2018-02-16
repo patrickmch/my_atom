@@ -220,9 +220,7 @@ class SwiftPMTaskRunner {
   }
 
   setProjectRoot(projectRoot, callback) {
-    const path = projectRoot == null ? null : projectRoot.getPath();
-
-    const storeReady = (0, (_event || _load_event()).observableFromSubscribeFunction)(this._getFlux().store.subscribe.bind(this._getFlux().store)).map(() => this._getFlux().store).startWith(this._getFlux().store).filter(store => store.getProjectRoot() === path).share();
+    const storeReady = (0, (_event || _load_event()).observableFromSubscribeFunction)(this._getFlux().store.subscribe.bind(this._getFlux().store)).map(() => this._getFlux().store).startWith(this._getFlux().store).filter(store => store.getProjectRoot() === projectRoot).share();
 
     const enabledObservable = storeReady.map(store => store.getProjectRoot()).distinctUntilChanged().switchMap(root => {
       // flowlint-next-line sketchy-null-string:off
@@ -236,7 +234,7 @@ class SwiftPMTaskRunner {
 
     const subscription = _rxjsBundlesRxMinJs.Observable.combineLatest(enabledObservable, tasksObservable).subscribe(([enabled, tasks]) => callback(enabled, tasks));
 
-    this._projectRoot.next(path);
+    this._projectRoot.next(projectRoot);
 
     return new (_UniversalDisposable || _load_UniversalDisposable()).default(subscription);
   }

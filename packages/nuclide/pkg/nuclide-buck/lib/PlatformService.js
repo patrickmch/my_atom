@@ -5,7 +5,11 @@ Object.defineProperty(exports, "__esModule", {
 });
 exports.PlatformService = undefined;
 
-var _atom = require('atom');
+var _UniversalDisposable;
+
+function _load_UniversalDisposable() {
+  return _UniversalDisposable = _interopRequireDefault(require('nuclide-commons/UniversalDisposable'));
+}
 
 var _rxjsBundlesRxMinJs = require('rxjs/bundles/Rx.min.js');
 
@@ -14,6 +18,8 @@ var _log4js;
 function _load_log4js() {
   return _log4js = require('log4js');
 }
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 /**
  * Copyright (c) 2015-present, Facebook, Inc.
@@ -35,7 +41,7 @@ class PlatformService {
   register(platformProvider) {
     this._registeredProviders.push(platformProvider);
     this._providersChanged.next();
-    return new _atom.Disposable(() => {
+    return new (_UniversalDisposable || _load_UniversalDisposable()).default(() => {
       const index = this._registeredProviders.indexOf(platformProvider);
       this._registeredProviders.splice(index, 1);
       this._providersChanged.next();

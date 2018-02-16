@@ -19,6 +19,12 @@ function _load_nuclideDebuggerCommon() {
   return _nuclideDebuggerCommon = require('nuclide-debugger-common');
 }
 
+var _debugger;
+
+function _load_debugger() {
+  return _debugger = require('../../commons-atom/debugger');
+}
+
 var _PhpDebuggerInstance;
 
 function _load_PhpDebuggerInstance() {
@@ -35,12 +41,6 @@ var _nuclideUri;
 
 function _load_nuclideUri() {
   return _nuclideUri = _interopRequireDefault(require('nuclide-commons/nuclideUri'));
-}
-
-var _consumeFirstProvider;
-
-function _load_consumeFirstProvider() {
-  return _consumeFirstProvider = _interopRequireDefault(require('../../commons-atom/consumeFirstProvider'));
 }
 
 var _utils;
@@ -82,20 +82,22 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
 
 class LaunchProcessInfo extends (_nuclideDebuggerCommon || _load_nuclideDebuggerCommon()).DebuggerProcessInfo {
 
-  constructor(targetUri, launchTarget, launchWrapperCommand, useTerminal, scriptArguments) {
+  constructor(targetUri, launchTarget, launchWrapperCommand, useTerminal, scriptArguments, cwd) {
     super('hhvm', targetUri);
     this._launchTarget = launchTarget;
     this._launchWrapperCommand = launchWrapperCommand;
     this._useTerminal = useTerminal;
     this._scriptArguments = scriptArguments != null ? scriptArguments : '';
+    this._cwd = cwd;
   }
 
   clone() {
-    return new LaunchProcessInfo(this._targetUri, this._launchTarget, this._launchWrapperCommand, this._useTerminal);
+    return new LaunchProcessInfo(this._targetUri, this._launchTarget, this._launchWrapperCommand, this._useTerminal, this._cwd);
   }
 
   getDebuggerCapabilities() {
     return Object.assign({}, super.getDebuggerCapabilities(), {
+      completionsRequest: true,
       conditionalBreakpoints: true,
       continueToLocation: true,
       setVariable: true,
@@ -113,8 +115,8 @@ class LaunchProcessInfo extends (_nuclideDebuggerCommon || _load_nuclideDebugger
     return (0, _asyncToGenerator.default)(function* () {
       const service = (0, (_nuclideRemoteConnection || _load_nuclideRemoteConnection()).getHhvmDebuggerServiceByNuclideUri)(_this.getTargetUri());
       const hhvmDebuggerService = new service.HhvmDebuggerService();
-      const remoteService = yield (0, (_consumeFirstProvider || _load_consumeFirstProvider()).default)('nuclide-debugger.remote');
-      const deferLaunch = _this._useTerminal && remoteService.getTerminal() != null;
+      const remoteService = yield (0, (_debugger || _load_debugger()).getDebuggerService)();
+      const deferLaunch = _this._useTerminal;
 
       // Honor any PHP configuration the user has in Nuclide settings.
       const userConfig = (_featureConfig || _load_featureConfig()).default.get('nuclide-debugger-php');
@@ -129,6 +131,10 @@ class LaunchProcessInfo extends (_nuclideDebuggerCommon || _load_nuclideDebugger
         hhvmRuntimeArgs,
         deferLaunch
       };
+
+      if (_this._cwd != null && _this._cwd !== '') {
+        config.cwd = _this._cwd;
+      }
 
       if (phpRuntimePath != null) {
         config.hhvmRuntimePath = phpRuntimePath;
@@ -206,8 +212,8 @@ class LaunchProcessInfo extends (_nuclideDebuggerCommon || _load_nuclideDebugger
         sessionConfig.launchWrapperCommand = _this2._launchWrapperCommand;
       }
 
-      const remoteService = yield (0, (_consumeFirstProvider || _load_consumeFirstProvider()).default)('nuclide-debugger.remote');
-      const deferLaunch = sessionConfig.deferLaunch = _this2._useTerminal && remoteService.getTerminal() != null;
+      const remoteService = yield (0, (_debugger || _load_debugger()).getDebuggerService)();
+      const deferLaunch = sessionConfig.deferLaunch = _this2._useTerminal;
 
       (_utils || _load_utils()).default.info(`Connection session config: ${JSON.stringify(sessionConfig)}`);
 

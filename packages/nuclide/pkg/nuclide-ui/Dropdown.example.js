@@ -13,16 +13,16 @@ function _load_Dropdown() {
   return _Dropdown = require('./Dropdown');
 }
 
-var _ModalMultiSelect;
-
-function _load_ModalMultiSelect() {
-  return _ModalMultiSelect = require('./ModalMultiSelect');
-}
-
 var _SplitButtonDropdown;
 
 function _load_SplitButtonDropdown() {
   return _SplitButtonDropdown = require('./SplitButtonDropdown');
+}
+
+var _ModalMultiSelect;
+
+function _load_ModalMultiSelect() {
+  return _ModalMultiSelect = require('nuclide-commons-ui/ModalMultiSelect');
 }
 
 function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }

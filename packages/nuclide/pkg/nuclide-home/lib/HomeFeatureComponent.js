@@ -12,31 +12,29 @@ function _load_Button() {
   return _Button = require('nuclide-commons-ui/Button');
 }
 
-function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
+var _nuclideAnalytics;
 
-/**
- * Copyright (c) 2015-present, Facebook, Inc.
- * All rights reserved.
- *
- * This source code is licensed under the license found in the LICENSE file in
- * the root directory of this source tree.
- *
- * 
- * @format
- */
+function _load_nuclideAnalytics() {
+  return _nuclideAnalytics = require('../../nuclide-analytics');
+}
+
+function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
 
 class HomeFeatureComponent extends _react.Component {
   constructor(...args) {
     var _temp;
 
     return _temp = super(...args), this._tryIt = () => {
-      const { command } = this.props;
+      const { command, title } = this.props;
       if (command == null) {
         return;
       }
+      (0, (_nuclideAnalytics || _load_nuclideAnalytics()).track)('home-feature-tried', { title });
       switch (typeof command) {
         case 'string':
-          atom.commands.dispatch(atom.views.getView(atom.workspace), command);
+          atom.commands.dispatch(atom.views.getView(atom.workspace), command, {
+            _source: 'nuclide-home'
+          });
           return;
         case 'function':
           command();
@@ -75,4 +73,13 @@ class HomeFeatureComponent extends _react.Component {
     );
   }
 }
-exports.default = HomeFeatureComponent;
+exports.default = HomeFeatureComponent; /**
+                                         * Copyright (c) 2015-present, Facebook, Inc.
+                                         * All rights reserved.
+                                         *
+                                         * This source code is licensed under the license found in the LICENSE file in
+                                         * the root directory of this source tree.
+                                         *
+                                         * 
+                                         * @format
+                                         */

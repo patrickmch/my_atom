@@ -327,7 +327,7 @@ Object.defineProperty(module.exports, "defs", {
       location: {
         type: "source",
         fileName: "types.js",
-        line: 18
+        line: 20
       },
       name: "AtomNotificationType",
       definition: {
@@ -352,7 +352,7 @@ Object.defineProperty(module.exports, "defs", {
       location: {
         type: "source",
         fileName: "types.js",
-        line: 19
+        line: 21
       },
       name: "AtomNotification",
       definition: {

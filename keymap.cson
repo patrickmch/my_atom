@@ -14,6 +14,11 @@
   'ctrl-j': 'core:move-down'
   'ctrl-h': 'core:move-left'
   'ctrl-l': 'core:move-right'
+  'alt-cmd-o': 'advanced-open-file:toggle'
+  'alt-space': 'choose-pane:start'
+  'ctrl-alt-cmd-f': 'jumpy:toggle'
+  'alt-cmd-j': 'pane:show-previous-item'
+  'alt-cmd-k': 'pane:show-next-item'
 
 'atom-text-editor':
   'ctrl-k': 'unset!'
@@ -24,7 +29,6 @@
   'cmd-shift-e': 'platformio-ide-terminal:fullscreen'
   'alt-/': 'advanced-open-file:delete-path-component'
   'cmd-q cmd-q': 'application:quit'
-  'alt-cmd-o': 'advanced-open-file:toggle'
   'ctrl-cmd-o': 'nuclide-open-filenames-provider:toggle-provider'
   'shift-cmd-j': 'atom-notes:toggle'
   'shift-cmd-alt-t': 'markdown-writer:toggle-task'
@@ -43,10 +47,9 @@
   'alt-up': 'line-jumper:move-up'
   'alt-shift-up': 'line-jumper:select-up'
   'ctrl-down': 'multi-cursor:expanddown'
-  'ctrl-up':   'multi-cursor:expandup'
+  'ctrl-up': 'multi-cursor:expandup'
 
   # panes
-  'alt-space': 'choose-pane:start'
   'ctrl->': 'pane:move-item-right'
   'ctrl-<': 'pane:move-item-left'
 
@@ -67,13 +70,13 @@
   'alt-.': 'last-cursor-position:next'
 
   # key bindings for multi-cursor-plus
-  'alt-x':           'multi-cursor-plus:mark'
-  'ctrl-alt-up':          'multi-cursor-plus:move-up'
-  'ctrl-alt-down':        'multi-cursor-plus:move-down'
-  'ctrl-alt-left':        'multi-cursor-plus:move-left'
-  'ctrl-alt-right':       'multi-cursor-plus:move-right'
-  'ctrl-alt-cmd-left':    'multi-cursor-plus:move-to-beginning-of-word'
-  'ctrl-alt-cmd-right':   'multi-cursor-plus:move-to-end-of-word'
+  'alt-x': 'multi-cursor-plus:mark'
+  'ctrl-alt-up': 'multi-cursor-plus:move-up'
+  'ctrl-alt-down': 'multi-cursor-plus:move-down'
+  'ctrl-alt-left': 'multi-cursor-plus:move-left'
+  'ctrl-alt-right': 'multi-cursor-plus:move-right'
+  'ctrl-alt-cmd-left': 'multi-cursor-plus:move-to-beginning-of-word'
+  'ctrl-alt-cmd-right': 'multi-cursor-plus:move-to-end-of-word'
 
   # select inside various things
   'cmd-alt-up': 'expand-region:expand'
@@ -106,13 +109,13 @@
   'ctrl-j': 'keystroke 1 0 j'
   'ctrl-k': 'keystroke 1 0 k'
   # key bindings for multi-cursor-plus
-  'alt-x':          'multi-cursor-plus:mark'
-  'ctrl-alt-k':         'multi-cursor-plus:move-up'
-  'ctrl-alt-j':       'multi-cursor-plus:move-down'
-  'ctrl-alt-h':       'multi-cursor-plus:move-left'
-  'ctrl-alt-l':      'multi-cursor-plus:move-right'
-  'ctrl-alt-cmd-h':   'multi-cursor-plus:move-to-beginning-of-word'
-  'ctrl-alt-cmd-l':  'multi-cursor-plus:move-to-end-of-word'
+  'alt-x': 'multi-cursor-plus:mark'
+  'ctrl-alt-k': 'multi-cursor-plus:move-up'
+  'ctrl-alt-j': 'multi-cursor-plus:move-down'
+  'ctrl-alt-h': 'multi-cursor-plus:move-left'
+  'ctrl-alt-l': 'multi-cursor-plus:move-right'
+  'ctrl-alt-cmd-h': 'multi-cursor-plus:move-to-beginning-of-word'
+  'ctrl-alt-cmd-l': 'multi-cursor-plus:move-to-end-of-word'
 
   'alt-k': 'multi-cursor:expandUp'
   'alt-j': 'multi-cursor:expandDown'
@@ -134,7 +137,15 @@
 'atom-text-editor:not(.mini).vim-mode-plus:not(.insert-mode):not(.jumpy-jump-mode), .tree-view':
   'cmd-f': 'jumpy:toggle'
 
+'atom-text-editor.vim-mode-plus.normal-mode':
+  'm m': 'bookmarks:toggle-bookmark'
+  '\'': 'bookmarks:jump-to-next-bookmark'
+  'm p': 'bookmarks:jump-to-previous-bookmark'
+  'm v': 'bookmarks:view-all'
+  'm c': 'bookmarks:clear-bookmarks'
+
 'atom-text-editor.vim-mode-plus:not(.insert-mode)':
+  # 'cmd-j': 'vim-mode-plus:join'
   'cmd-enter': 'editor:newline-below'
   'space escape': 'vim-mode-plus:undo'
   # pane splitting
@@ -162,15 +173,18 @@
   # space keys!
   'space p': 'clipboard-plus:toggle'
   'space t f': 'nuclide-fuzzy-filename-provider:toggle-provider'
-  'space t c': 'nuclide-code-search:toggle-provider'
+  'shift-space': 'nuclide-quick-open:find-anything-via-omni-search'
   'space m': 'application:open-your-keymap'
 
   'space g g': 'git-plus:menu'
   'space g c': 'git-plus:add-all-and-commit'
-  'space g p': 'git-plus:add-all-commit-and-push'
+  'space g p': 'git-plus:push'
   'space g o': 'git-plus:checkout'
   'space g s': 'git-plus:status'
+  'space g l': 'git-plus:log'
   'space g v': 'git-plus:stash-save'
+  'space g a': 'git-plus:add-all'
+
   'space s': 'settings-view:install-packages-and-themes'
 
   'space d b': 'window:toggle-bottom-dock'
@@ -178,12 +192,6 @@
   'space d h': 'window:toggle-left-dock'
   'space d d': 'my:dismiss-notifications'
   'space D D': 'quick-file-actions:delete'
-
-  'space b b': 'bookmarks:toggle-bookmark'
-  'space b n': 'bookmarks:jump-to-next-bookmark'
-  'space b p': 'bookmarks:jump-to-previous-bookmark'
-  'space b v': 'bookmarks:view-all'
-  'space b c': 'bookmarks:clear-bookmarks'
 
   'space 1': 'window:reload'
   'space 2': 'window:toggle-dev-tools'
@@ -201,10 +209,13 @@
   'D': 'vim-mode-plus:delete-line'
   'd x': 'vim-mode-plus:delete-to-last-character-of-line'
   'd X': 'keystroke v ctrl-h x'
-  '>': 'editor:delete-to-end-of-line'
-  '<': 'editor:delete-to-beginning-of-line'
+  '>': 'editor:delete-to-end-of-word'
+  '<': 'editor:delete-to-beginning-of-word'
   'ctrl-,': 'editor:outdent-selected-rows'
   'ctrl-.': 'editor:indent-selected-rows'
+  '_': 'vim-mode-plus:replace-with-register'
+  'g -':   'vim-mode-plus:dash-case'
+  'g _': 'vim-mode-plus:snake-case'
 
   'v i space w': 'expand-region:select-word-include-dash'
   'c i space w': 'keystroke v i space w cmd-x i'
@@ -217,12 +228,15 @@
   # '{': 'unset!'
   # ']': 'unset!'
   # '[': 'unset!'
-  'shift-j': 'vim-mode-plus:previous-tab'
-  'shift-k': 'vim-mode-plus:next-tab'
+  # 'shift-j': 'vim-mode-plus:previous-tab'
+  # 'shift-k': 'vim-mode-plus:next-tab'
 
 # ':': 'vim-mode-plus:repeat-find'
 
   # ';': 'vim-mode-plus:set-register-name'
+'atom-text-editor.vim-mode-plus.operator-pending-mode':
+  'c': 'vim-mode-plus:inner-word'
+  'C': 'vim-mode-plus:inner-smart-word'
 ###################################-package specific keymaps-##################################
 
 '.tree-view':

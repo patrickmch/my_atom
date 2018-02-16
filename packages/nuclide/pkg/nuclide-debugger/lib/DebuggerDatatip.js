@@ -9,7 +9,7 @@ var _asyncToGenerator = _interopRequireDefault(require('async-to-generator'));
 
 let debuggerDatatip = exports.debuggerDatatip = (() => {
   var _ref = (0, _asyncToGenerator.default)(function* (model, editor, position) {
-    if (model.getStore().getDebuggerMode() !== (_DebuggerStore || _load_DebuggerStore()).DebuggerMode.PAUSED) {
+    if (model.getDebuggerMode() !== (_constants || _load_constants()).DebuggerMode.PAUSED) {
       return null;
     }
     const activeEditor = atom.workspace.getActiveTextEditor();
@@ -24,13 +24,12 @@ let debuggerDatatip = exports.debuggerDatatip = (() => {
     if (expression == null) {
       return null;
     }
-    const watchExpressionStore = model.getWatchExpressionStore();
-    const evaluation = watchExpressionStore.evaluateWatchExpression(expression);
+    const evaluation = model.evaluateWatchExpression(expression);
     const propStream = evaluation.map(function (result) {
       return {
         expression,
         evaluationResult: result,
-        watchExpressionStore
+        model
       };
     });
     return {
@@ -57,10 +56,10 @@ function _load_nuclideDebuggerCommon() {
   return _nuclideDebuggerCommon = require('nuclide-debugger-common');
 }
 
-var _DebuggerStore;
+var _constants;
 
-function _load_DebuggerStore() {
-  return _DebuggerStore = require('./DebuggerStore');
+function _load_constants() {
+  return _constants = require('./constants');
 }
 
 var _DebuggerDatatipComponent;
@@ -73,7 +72,7 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
 
 function getEvaluationExpression(model, editor, position) {
   const { scopeName } = editor.getGrammar();
-  const allProviders = model.getStore().getEvaluationExpressionProviders();
+  const allProviders = model.getEvaluationExpressionProviders();
   let matchingProvider = null;
   for (const provider of allProviders) {
     const providerGrammars = provider.selector.split(/, ?/);
@@ -82,8 +81,7 @@ function getEvaluationExpression(model, editor, position) {
       break;
     }
   }
-  // eslint-disable-next-line eqeqeq
-  return matchingProvider === null ? Promise.resolve((0, (_nuclideDebuggerCommon || _load_nuclideDebuggerCommon()).getDefaultEvaluationExpression)(editor, position)) : matchingProvider.getEvaluationExpression(editor, position);
+  return matchingProvider == null ? Promise.resolve((0, (_nuclideDebuggerCommon || _load_nuclideDebuggerCommon()).getDefaultEvaluationExpression)(editor, position)) : matchingProvider.getEvaluationExpression(editor, position);
 } /**
    * Copyright (c) 2015-present, Facebook, Inc.
    * All rights reserved.

@@ -82,6 +82,12 @@ var _react = _interopRequireWildcard(require('react'));
 
 var _rxjsBundlesRxMinJs = require('rxjs/bundles/Rx.min.js');
 
+var _passesGK;
+
+function _load_passesGK() {
+  return _passesGK = _interopRequireDefault(require('../../commons-node/passesGK'));
+}
+
 function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
@@ -90,18 +96,16 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
  * Minimum interval (in ms) between onChangeActivePaneItem events before revealing the active pane
  * item in the file tree.
  */
-/**
- * Copyright (c) 2015-present, Facebook, Inc.
- * All rights reserved.
- *
- * This source code is licensed under the license found in the LICENSE file in
- * the root directory of this source tree.
- *
- * 
- * @format
- */
-
-const OPEN_FILES_UPDATE_DEBOUNCE_INTERVAL_MS = 150;
+const OPEN_FILES_UPDATE_DEBOUNCE_INTERVAL_MS = 150; /**
+                                                     * Copyright (c) 2015-present, Facebook, Inc.
+                                                     * All rights reserved.
+                                                     *
+                                                     * This source code is licensed under the license found in the LICENSE file in
+                                                     * the root directory of this source tree.
+                                                     *
+                                                     * 
+                                                     * @format
+                                                     */
 
 const DESERIALIZER_VERSION = atom.workspace.getLeftDock == null ? 1 : 2;
 
@@ -354,10 +358,12 @@ class Activation {
     }), () => (0, (_destroyItemWhere || _load_destroyItemWhere()).destroyItemWhere)(item => item instanceof (_FileTreeSidebarComponent || _load_FileTreeSidebarComponent()).default), atom.commands.add('atom-workspace', 'nuclide-file-tree:toggle', () => {
       atom.workspace.toggle((_Constants || _load_Constants()).WORKSPACE_VIEW_URI);
     }));
-    if (!this._restored) {
-      // eslint-disable-next-line rulesdir/atom-apis
-      atom.workspace.open((_Constants || _load_Constants()).WORKSPACE_VIEW_URI, { searchAllPanes: true });
-    }
+    (0, (_passesGK || _load_passesGK()).default)('nuclide_open_connect_menu_on_clean_startup').then(openConnectMenu => {
+      if (!this._restored && !openConnectMenu) {
+        // eslint-disable-next-line rulesdir/atom-apis
+        atom.workspace.open((_Constants || _load_Constants()).WORKSPACE_VIEW_URI, { searchAllPanes: true });
+      }
+    });
     return disposable;
   }
 

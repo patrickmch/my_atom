@@ -38,6 +38,12 @@ function _load_nuclideDebuggerCommon() {
   return _nuclideDebuggerCommon = require('nuclide-debugger-common');
 }
 
+var _debugger;
+
+function _load_debugger() {
+  return _debugger = require('../../commons-atom/debugger');
+}
+
 var _nuclideAnalytics;
 
 function _load_nuclideAnalytics() {
@@ -60,6 +66,17 @@ function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj;
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
+/**
+ * Copyright (c) 2015-present, Facebook, Inc.
+ * All rights reserved.
+ *
+ * This source code is licensed under the license found in the LICENSE file in
+ * the root directory of this source tree.
+ *
+ * 
+ * @format
+ */
+
 function getActiveScriptPath() {
   const center = atom.workspace.getCenter ? atom.workspace.getCenter() : atom.workspace;
   const activeEditor = center.getActiveTextEditor();
@@ -67,16 +84,7 @@ function getActiveScriptPath() {
     return '';
   }
   return (_nuclideUri || _load_nuclideUri()).default.getPath((0, (_nullthrows || _load_nullthrows()).default)(activeEditor.getPath()));
-} /**
-   * Copyright (c) 2015-present, Facebook, Inc.
-   * All rights reserved.
-   *
-   * This source code is licensed under the license found in the LICENSE file in
-   * the root directory of this source tree.
-   *
-   * 
-   * @format
-   */
+}
 
 class NodeScriptLaunchUiComponent extends _react.Component {
 
@@ -102,7 +110,7 @@ class NodeScriptLaunchUiComponent extends _react.Component {
 
       const launchInfo = yield (0, (_utils || _load_utils()).getNodeLaunchProcessInfo)(scriptUri, nodePath, args, workingDirectory, environmentVariables, outFiles);
 
-      const debuggerService = yield (0, (_utils || _load_utils()).getDebuggerService)();
+      const debuggerService = yield (0, (_debugger || _load_debugger()).getDebuggerService)();
       debuggerService.startDebugging(launchInfo);
 
       (0, (_nuclideDebuggerCommon || _load_nuclideDebuggerCommon()).serializeDebuggerConfig)(..._this._getSerializationArgs(), {

@@ -37,10 +37,10 @@ function _load_ChromeActionRegistryActions() {
   return _ChromeActionRegistryActions = _interopRequireDefault(require('./ChromeActionRegistryActions'));
 }
 
-var _DebuggerStore;
+var _constants;
 
-function _load_DebuggerStore() {
-  return _DebuggerStore = require('./DebuggerStore');
+function _load_constants() {
+  return _constants = require('./constants');
 }
 
 var _UniversalDisposable;
@@ -122,41 +122,37 @@ class DebuggerSteppingComponent extends _react.Component {
     };
 
     this._togglePauseState = () => {
-      if (this.state.debuggerMode === (_DebuggerStore || _load_DebuggerStore()).DebuggerMode.RUNNING) {
+      if (this.state.debuggerMode === (_constants || _load_constants()).DebuggerMode.RUNNING) {
         this._setWaitingForPause(true);
       }
 
       // ChromeActionRegistryActions.PAUSE actually toggles paused state.
-      const actionId = this.state.debuggerMode === (_DebuggerStore || _load_DebuggerStore()).DebuggerMode.RUNNING ? (_ChromeActionRegistryActions || _load_ChromeActionRegistryActions()).default.PAUSE : (_ChromeActionRegistryActions || _load_ChromeActionRegistryActions()).default.RUN;
+      const actionId = this.state.debuggerMode === (_constants || _load_constants()).DebuggerMode.RUNNING ? (_ChromeActionRegistryActions || _load_ChromeActionRegistryActions()).default.PAUSE : (_ChromeActionRegistryActions || _load_ChromeActionRegistryActions()).default.RUN;
       this.props.actions.triggerDebuggerAction(actionId);
     };
 
     this._disposables = new (_UniversalDisposable || _load_UniversalDisposable()).default();
-    const { debuggerStore } = props;
+    const { model } = props;
     this.state = {
-      allowSingleThreadStepping: Boolean(debuggerStore.getSettings().singleThreadStepping),
-      debuggerMode: debuggerStore.getDebuggerMode(),
-      pauseOnException: debuggerStore.getTogglePauseOnException(),
-      pauseOnCaughtException: debuggerStore.getTogglePauseOnCaughtException(),
-      enableSingleThreadStepping: debuggerStore.getEnableSingleThreadStepping(),
-      customControlButtons: debuggerStore.getCustomControlButtons(),
+      debuggerMode: model.getDebuggerMode(),
+      pauseOnException: model.getTogglePauseOnException(),
+      pauseOnCaughtException: model.getTogglePauseOnCaughtException(),
+      customControlButtons: model.getCustomControlButtons(),
       waitingForPause: false
     };
   }
 
   componentDidMount() {
-    const { debuggerStore } = this.props;
-    this._disposables.add(debuggerStore.onChange(() => {
+    const { model } = this.props;
+    this._disposables.add(model.onChange(() => {
       this.setState({
-        allowSingleThreadStepping: debuggerStore.getSettings().singleThreadStepping,
-        debuggerMode: debuggerStore.getDebuggerMode(),
-        pauseOnException: debuggerStore.getTogglePauseOnException(),
-        pauseOnCaughtException: debuggerStore.getTogglePauseOnCaughtException(),
-        enableSingleThreadStepping: debuggerStore.getEnableSingleThreadStepping(),
-        customControlButtons: debuggerStore.getCustomControlButtons()
+        debuggerMode: model.getDebuggerMode(),
+        pauseOnException: model.getTogglePauseOnException(),
+        pauseOnCaughtException: model.getTogglePauseOnCaughtException(),
+        customControlButtons: model.getCustomControlButtons()
       });
 
-      if (this.state.waitingForPause && debuggerStore.getDebuggerMode() !== (_DebuggerStore || _load_DebuggerStore()).DebuggerMode.RUNNING) {
+      if (this.state.waitingForPause && model.getDebuggerMode() !== (_constants || _load_constants()).DebuggerMode.RUNNING) {
         this._setWaitingForPause(false);
       }
     }));
@@ -171,16 +167,14 @@ class DebuggerSteppingComponent extends _react.Component {
       debuggerMode,
       pauseOnException,
       pauseOnCaughtException,
-      allowSingleThreadStepping,
-      enableSingleThreadStepping,
       customControlButtons,
       waitingForPause
     } = this.state;
-    const { actions, debuggerStore } = this.props;
-    const isReadonlyTarget = debuggerStore.getIsReadonlyTarget();
-    const isPaused = debuggerMode === (_DebuggerStore || _load_DebuggerStore()).DebuggerMode.PAUSED;
-    const isStopped = debuggerMode === (_DebuggerStore || _load_DebuggerStore()).DebuggerMode.STOPPED;
-    const isPausing = debuggerMode === (_DebuggerStore || _load_DebuggerStore()).DebuggerMode.RUNNING && waitingForPause;
+    const { actions, model } = this.props;
+    const isReadonlyTarget = model.getIsReadonlyTarget();
+    const isPaused = debuggerMode === (_constants || _load_constants()).DebuggerMode.PAUSED;
+    const isStopped = debuggerMode === (_constants || _load_constants()).DebuggerMode.STOPPED;
+    const isPausing = debuggerMode === (_constants || _load_constants()).DebuggerMode.RUNNING && waitingForPause;
     const playPauseIcon = isPausing ? null : _react.createElement('span', {
       className: isPaused ? 'icon-playback-play' : 'icon-playback-pause'
     });
@@ -192,14 +186,14 @@ class DebuggerSteppingComponent extends _react.Component {
 
     // "Set Source Paths" is only available if the current debugger provides
     // this functionality.
-    const setSourcePathsButton = !this.props.debuggerStore.getCanSetSourcePaths() ? null : _react.createElement((_Button || _load_Button()).Button, {
+    const setSourcePathsButton = !this.props.model.getCanSetSourcePaths() ? null : _react.createElement((_Button || _load_Button()).Button, {
       className: 'nuclide-debugger-set-source-path-button',
       icon: 'file-code',
       title: 'Configure source file paths',
       onClick: () => actions.configureSourcePaths()
     });
 
-    const restartDebuggerButton = !this.props.debuggerStore.getCanRestartDebugger() ? null : _react.createElement((_Button || _load_Button()).Button, {
+    const restartDebuggerButton = !this.props.model.getCanRestartDebugger() ? null : _react.createElement((_Button || _load_Button()).Button, {
       icon: 'sync',
       className: 'nuclide-debugger-stepping-button-separated',
       disabled: isStopped,
@@ -319,14 +313,7 @@ class DebuggerSteppingComponent extends _react.Component {
           key: 'second',
           className: 'nuclide-debugger-exception-fragment' },
         ' exception'
-      )] : null,
-      allowSingleThreadStepping ? _react.createElement((_Checkbox || _load_Checkbox()).Checkbox, {
-        disabled: isStopped || isReadonlyTarget,
-        className: 'nuclide-debugger-exception-checkbox',
-        onChange: () => actions.toggleSingleThreadStepping(!enableSingleThreadStepping),
-        checked: enableSingleThreadStepping,
-        label: 'Single Thread Stepping'
-      }) : null
+      )] : null
     );
   }
 }

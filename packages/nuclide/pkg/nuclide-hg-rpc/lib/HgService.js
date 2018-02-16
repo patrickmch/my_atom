@@ -69,7 +69,7 @@ function _load_string() {
 var _nuclideWatchmanHelpers;
 
 function _load_nuclideWatchmanHelpers() {
-  return _nuclideWatchmanHelpers = require('../../nuclide-watchman-helpers');
+  return _nuclideWatchmanHelpers = require('nuclide-watchman-helpers');
 }
 
 var _fs = _interopRequireDefault(require('fs'));
@@ -130,19 +130,26 @@ function _load_log4js() {
   return _log4js = require('log4js');
 }
 
+var _watchFileCreationAndDeletion;
+
+function _load_watchFileCreationAndDeletion() {
+  return _watchFileCreationAndDeletion = require('./watchFileCreationAndDeletion');
+}
+
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-const logger = (0, (_log4js || _load_log4js()).getLogger)('nuclide-hg-rpc'); /**
-                                                                              * Copyright (c) 2015-present, Facebook, Inc.
-                                                                              * All rights reserved.
-                                                                              *
-                                                                              * This source code is licensed under the license found in the LICENSE file in
-                                                                              * the root directory of this source tree.
-                                                                              *
-                                                                              * 
-                                                                              * @format
-                                                                              */
+/**
+ * Copyright (c) 2015-present, Facebook, Inc.
+ * All rights reserved.
+ *
+ * This source code is licensed under the license found in the LICENSE file in
+ * the root directory of this source tree.
+ *
+ * 
+ * @format
+ */
 
+const logger = (0, (_log4js || _load_log4js()).getLogger)('nuclide-hg-rpc');
 const DEFAULT_ARC_PROJECT_FORK_BASE = 'remote/master';
 const DEFAULT_FORK_BASE_NAME = 'default';
 
@@ -152,6 +159,7 @@ const WATCHMAN_SUBSCRIPTION_NAME_HGBOOKMARKS = 'hg-repository-watchman-subscript
 const WATCHMAN_HG_DIR_STATE = 'hg-repository-watchman-subscription-dirstate';
 const WATCHMAN_SUBSCRIPTION_NAME_CONFLICTS = 'hg-repository-watchman-subscription-conflicts';
 const WATCHMAN_SUBSCRIPTION_NAME_PROGRESS = 'hg-repository-watchman-subscription-progress';
+const WATCHMAN_SUBSCRIPTION_NAME_LOCK_FILES = 'hg-repository-watchman-subscription-lock-files';
 
 const CHECK_CONFLICT_DELAY_MS = 2000;
 const COMMIT_CHANGE_DEBOUNCE_MS = 1000;
@@ -207,11 +215,13 @@ function resolvePathForPlatform(path) {
 }
 
 class HgService {
+  // used to limit lifespan of other observables
 
   constructor(workingDirectory) {
     this._workingDirectory = workingDirectory;
     this._filesDidChangeObserver = new _rxjsBundlesRxMinJs.Subject();
     this._hgActiveBookmarkDidChangeObserver = new _rxjsBundlesRxMinJs.Subject();
+    this._lockFilesDidChange = _rxjsBundlesRxMinJs.Observable.empty();
     this._hgBookmarksDidChangeObserver = new _rxjsBundlesRxMinJs.Subject();
     this._hgRepoStateDidChangeObserver = new _rxjsBundlesRxMinJs.Subject();
     this._hgConflictStateDidChangeObserver = new _rxjsBundlesRxMinJs.Subject();
@@ -221,6 +231,7 @@ class HgService {
     this._debouncedCheckConflictChange = (0, (_debounce || _load_debounce()).default)(() => {
       this._checkConflictChange();
     }, CHECK_CONFLICT_DELAY_MS);
+    this._disposeObserver = new _rxjsBundlesRxMinJs.ReplaySubject();
     this._watchmanSubscriptionPromise = this._subscribeToWatchman();
   }
 
@@ -232,6 +243,8 @@ class HgService {
     var _this = this;
 
     return (0, _asyncToGenerator.default)(function* () {
+      _this._disposeObserver.next();
+      _this._disposeObserver.complete();
       _this._filesDidChangeObserver.complete();
       _this._hgRepoStateDidChangeObserver.complete();
       _this._hgActiveBookmarkDidChangeObserver.complete();
@@ -465,6 +478,8 @@ class HgService {
         defer_vcs: false
       });
       logWhenSubscriptionEstablished(progressSubscriptionPromise, WATCHMAN_SUBSCRIPTION_NAME_PROGRESS);
+
+      _this3._lockFilesDidChange = (0, (_watchFileCreationAndDeletion || _load_watchFileCreationAndDeletion()).subscribeToFilesCreateAndDelete)(watchmanClient, workingDirectory, (_hgConstants || _load_hgConstants()).LockFilesList, WATCHMAN_SUBSCRIPTION_NAME_LOCK_FILES).publish().refCount();
 
       // Those files' changes indicate a commit-changing action has been applied to the repository,
       // Watchman currently (v4.7) ignores `.hg/store` file updates.
@@ -702,6 +717,13 @@ class HgService {
   }
 
   /**
+   * Observes that the Mercurial working directory lock has changed.
+   */
+  observeLockFilesDidChange() {
+    return this._lockFilesDidChange.takeUntil(this._disposeObserver).publish();
+  }
+
+  /**
    * Observes that Mercurial bookmarks have changed.
    */
   observeBookmarksDidChange() {
@@ -875,9 +897,6 @@ class HgService {
     // TODO(T17463635)
     let editMergeConfigs;
     return _rxjsBundlesRxMinJs.Observable.fromPromise((0, _asyncToGenerator.default)(function* () {
-      // prevent user-specified merge tools from attempting to
-      // open interactive editors
-      args.push('--config', 'ui.merge=:merge');
       if (message == null) {
         return args;
       } else {
@@ -949,7 +968,7 @@ class HgService {
   }
 
   restack() {
-    const args = ['rebase', '--restack', '--config', 'ui.merge=:merge'];
+    const args = ['rebase', '--restack'];
     const execOptions = {
       cwd: this._workingDirectory
     };
@@ -1277,12 +1296,9 @@ class HgService {
     return this._hgObserveExecution(args, execOptions).switchMap((_hgUtils || _load_hgUtils()).processExitCodeAndThrow).publish();
   }
 
-  continueOperation(commandWithOptions) {
+  continueOperation(args) {
     // TODO(T17463635)
 
-    // prevent user-specified merge tools from attempting to
-    // open interactive editors
-    const args = [...commandWithOptions, '--config', 'ui.merge=:merge'];
     const execOptions = {
       cwd: this._workingDirectory
     };
@@ -1307,18 +1323,38 @@ class HgService {
   rebase(destination, source) {
     // TODO(T17463635)
 
-    // prevent user-specified merge tools from attempting to
-    // open interactive editors
-    const args = ['rebase', '-d', destination, '--config', 'ui.merge=:merge'];
+    const args = ['rebase', '-d', destination];
     if (source != null) {
       args.push('-s', source);
     }
     const execOptions = {
       cwd: this._workingDirectory
-      // Setting the editor to a non-existent tool to prevent operations that rely
-      // on the user's default editor from attempting to open up when needed.
     };
     return this._hgObserveExecution(args, execOptions).publish();
+  }
+
+  /**
+   *  Given a list of the new order of revisions, use histedit to rearrange
+   *  history to match the input. Note that you must be checked out on the
+   *  stack above where any reordering takes place, and there can be no
+   *  branches off of any revision in the stack except the top one.
+   */
+  reorderWithinStack(orderedRevisions) {
+    const args = ['histedit', '--commands', '-'];
+    const commandsJson = JSON.stringify({
+      histedit: orderedRevisions.map(hash => {
+        return {
+          node: hash,
+          action: (_hgConstants || _load_hgConstants()).HisteditActions.PICK
+        };
+      })
+    });
+
+    const execOptions = {
+      cwd: this._workingDirectory,
+      input: commandsJson
+    };
+    return this._hgRunCommand(args, execOptions).publish();
   }
 
   pull(options) {

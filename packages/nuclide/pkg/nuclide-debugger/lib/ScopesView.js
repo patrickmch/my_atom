@@ -31,10 +31,10 @@ function _load_ScopesComponent() {
   return _ScopesComponent = require('./ScopesComponent');
 }
 
-var _DebuggerStore;
+var _constants;
 
-function _load_DebuggerStore() {
-  return _DebuggerStore = require('./DebuggerStore');
+function _load_constants() {
+  return _constants = require('./constants');
 }
 
 function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
@@ -56,19 +56,18 @@ class ScopesView extends _react.PureComponent {
 
   constructor(props) {
     super(props);
-    this._scopesComponentWrapped = (0, (_bindObservableAsProps || _load_bindObservableAsProps()).bindObservableAsProps)(props.model.getScopesStore().getScopes().map(scopes => ({ scopes })), (_ScopesComponent || _load_ScopesComponent()).ScopesComponent);
+    this._scopesComponentWrapped = (0, (_bindObservableAsProps || _load_bindObservableAsProps()).bindObservableAsProps)(props.model.getScopes().map(scopes => ({ scopes })), (_ScopesComponent || _load_ScopesComponent()).ScopesComponent);
     this._disposables = new (_UniversalDisposable || _load_UniversalDisposable()).default();
-    const debuggerStore = props.model.getStore();
     this.state = {
-      mode: debuggerStore.getDebuggerMode()
+      mode: props.model.getDebuggerMode()
     };
   }
 
   componentDidMount() {
-    const debuggerStore = this.props.model.getStore();
-    this._disposables.add(debuggerStore.onChange(() => {
+    const { model } = this.props;
+    this._disposables.add(model.onChange(() => {
       this.setState({
-        mode: debuggerStore.getDebuggerMode()
+        mode: model.getDebuggerMode()
       });
     }));
   }
@@ -85,7 +84,7 @@ class ScopesView extends _react.PureComponent {
     const { model } = this.props;
     const { mode } = this.state;
     const ScopesComponentWrapped = this._scopesComponentWrapped;
-    const disabledClass = mode !== (_DebuggerStore || _load_DebuggerStore()).DebuggerMode.RUNNING ? '' : ' nuclide-debugger-container-new-disabled';
+    const disabledClass = mode !== (_constants || _load_constants()).DebuggerMode.RUNNING ? '' : ' nuclide-debugger-container-new-disabled';
 
     return _react.createElement(
       'div',
@@ -94,10 +93,7 @@ class ScopesView extends _react.PureComponent {
       _react.createElement(
         'div',
         { className: 'nuclide-debugger-pane-content' },
-        _react.createElement(ScopesComponentWrapped, {
-          watchExpressionStore: model.getWatchExpressionStore(),
-          scopesStore: model.getScopesStore()
-        })
+        _react.createElement(ScopesComponentWrapped, { model: model })
       )
     );
   }

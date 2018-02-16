@@ -37,6 +37,14 @@ function _load_fsPromise() {
   return _fsPromise = _interopRequireDefault(require('nuclide-commons/fsPromise'));
 }
 
+var _os = _interopRequireDefault(require('os'));
+
+var _process;
+
+function _load_process() {
+  return _process = require('nuclide-commons/process');
+}
+
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 const DEFAULT_HHVM_PATH = '/usr/local/bin/hhvm';
@@ -139,7 +147,13 @@ class HhvmDebuggerService extends (_nuclideDebuggerCommon || _load_nuclideDebugg
     var _this4 = this;
 
     return (0, _asyncToGenerator.default)(function* () {
-      const cwd = (_nuclideUri || _load_nuclideUri()).default.dirname(config.targetUri);
+      const launchWrapperCommand = config.launchWrapperCommand != null && config.launchWrapperCommand.trim() !== '' ? _this4._expandPath(config.launchWrapperCommand, (_nuclideUri || _load_nuclideUri()).default.dirname(config.targetUri)) : null;
+
+      // Launch the script with cwd set to the directory the launch wrapper
+      // command is in, if a wrapper is specified. Otherwise try to use the
+      // cwd provided by the front-end, and finally fall back to the directory
+      // of the target uri.
+      const cwd = launchWrapperCommand != null ? (_nuclideUri || _load_nuclideUri()).default.dirname(launchWrapperCommand) : config.cwd != null && config.cwd.trim() !== '' ? config.cwd : (_nuclideUri || _load_nuclideUri()).default.dirname(config.targetUri);
 
       // Expand paths in the launch config from the front end.
       if (config.hhvmRuntimePath != null) {
@@ -147,10 +161,6 @@ class HhvmDebuggerService extends (_nuclideDebuggerCommon || _load_nuclideDebugg
       }
 
       config.launchScriptPath = _this4._expandPath(config.launchScriptPath, cwd);
-
-      if (config.launchWrapperCommand != null) {
-        config.launchWrapperCommand = _this4._expandPath(config.launchWrapperCommand, cwd);
-      }
 
       const deferArgs = [];
       let debugPort = null;
@@ -161,30 +171,62 @@ class HhvmDebuggerService extends (_nuclideDebuggerCommon || _load_nuclideDebugg
       }
 
       const hhvmPath = yield _this4._getHhvmPath(config);
-      const launchArgs = config.launchWrapperCommand != null && config.launchWrapperCommand.trim() !== '' ? [config.launchWrapperCommand, config.launchScriptPath] : [config.launchScriptPath];
+      const launchArgs = launchWrapperCommand != null ? [launchWrapperCommand, config.launchScriptPath] : [config.launchScriptPath];
 
-      const hhvmArgs = [...config.hhvmRuntimeArgs, '--mode', 'vsdebug', ...deferArgs, ...launchArgs, ...config.scriptArgs];
+      let hhvmRuntimeArgs = config.hhvmRuntimeArgs;
+      try {
+        // $FlowFB
+        const fbConfig = require('./fbConfig');
+        hhvmRuntimeArgs = fbConfig.getHHVMRuntimeArgs(config);
+      } catch (_) {}
+
+      const hhvmArgs = [...hhvmRuntimeArgs, '--mode', 'vsdebug', ...deferArgs, ...launchArgs, ...config.scriptArgs];
 
       const startupDocumentPath = yield _this4._getStartupDocumentPath(config);
+
+      const logFilePath = _this4._getHHVMLogFilePath();
 
       return {
         hhvmPath,
         hhvmArgs,
         startupDocumentPath,
+        logFilePath,
         debugPort,
-        cwd: config.launchWrapperCommand != null ? (_nuclideUri || _load_nuclideUri()).default.dirname(config.launchWrapperCommand) : cwd
+        cwd
       };
     })();
   }
 
-  _getAttachArgs(config) {
+  _getHHVMLogFilePath() {
+    return (_nuclideUri || _load_nuclideUri()).default.join(_os.default.tmpdir(), `nuclide-${_os.default.userInfo().username}-logs`, 'hhvm-debugger.log');
+  }
+
+  createLogFilePaste() {
     var _this5 = this;
 
     return (0, _asyncToGenerator.default)(function* () {
-      const startupDocumentPath = yield _this5._getStartupDocumentPath(config);
+      try {
+        // $FlowFB
+        const fbPaste = require('../../fb-pastebin');
+        return (_fsPromise || _load_fsPromise()).default.readFile(_this5._getHHVMLogFilePath(), 'utf8').then(function (contents) {
+          return fbPaste.createPasteFromContents(contents, { title: 'HHVM-Debugger' });
+        });
+      } catch (error) {
+        return '';
+      }
+    })();
+  }
+
+  _getAttachArgs(config) {
+    var _this6 = this;
+
+    return (0, _asyncToGenerator.default)(function* () {
+      const startupDocumentPath = yield _this6._getStartupDocumentPath(config);
+      const logFilePath = _this6._getHHVMLogFilePath();
       return {
         debugPort: config.debugPort,
-        startupDocumentPath
+        startupDocumentPath,
+        logFilePath
       };
     })();
   }
@@ -238,6 +280,23 @@ class HhvmDebuggerService extends (_nuclideDebuggerCommon || _load_nuclideDebugg
       } catch (error) {
         return DEFAULT_HHVM_PATH;
       }
+    })();
+  }
+
+  getAttachTargetList() {
+    return (0, _asyncToGenerator.default)(function* () {
+      const commands = yield (0, (_process || _load_process()).runCommand)('ps', ['-e', '-o', 'pid,args'], {}).toPromise();
+      return commands.toString().split('\n').filter(function (line) {
+        return line.indexOf('vsDebugPort') > 0;
+      }).map(function (line) {
+        const words = line.trim().split(' ');
+        const pid = Number(words[0]);
+        const command = words.slice(1).join(' ');
+        return {
+          pid,
+          command
+        };
+      });
     })();
   }
 

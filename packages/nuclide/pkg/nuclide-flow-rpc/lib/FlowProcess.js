@@ -8,7 +8,7 @@ exports.FlowProcess = exports.FLOW_RETURN_CODES = undefined;
 var _asyncToGenerator = _interopRequireDefault(require('async-to-generator'));
 
 let getAllExecInfo = (() => {
-  var _ref = (0, _asyncToGenerator.default)(function* (args, root, execInfoContainer, options = {}) {
+  var _ref2 = (0, _asyncToGenerator.default)(function* (args, root, execInfoContainer, options = {}) {
     const execInfo = yield execInfoContainer.getFlowExecInfo(root);
     if (execInfo == null) {
       return null;
@@ -21,7 +21,7 @@ let getAllExecInfo = (() => {
   });
 
   return function getAllExecInfo(_x, _x2, _x3) {
-    return _ref.apply(this, arguments);
+    return _ref2.apply(this, arguments);
   };
 })();
 
@@ -95,6 +95,12 @@ function _load_FlowIDEConnectionWatcher() {
   return _FlowIDEConnectionWatcher = require('./FlowIDEConnectionWatcher');
 }
 
+var _FlowVersion;
+
+function _load_FlowVersion() {
+  return _FlowVersion = require('./FlowVersion');
+}
+
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 const logger = (0, (_log4js || _load_log4js()).getLogger)('nuclide-flow-rpc'); /**
@@ -134,7 +140,9 @@ class FlowProcess {
   // If someone subscribes to _ideConnections, we will also publish them here. But subscribing to
   // this does not actually cause a connection to be created or maintained.
 
-  // The current state of the Flow server in this directory
+  // The path to the directory where the .flowconfig is -- i.e. the root of the Flow project.
+
+  // If we had to start a Flow server, store the process here so we can kill it when we shut down.
   constructor(root, execInfoContainer, fileCache) {
     this._subscriptions = new (_UniversalDisposable || _load_UniversalDisposable()).default();
     this._execInfoContainer = execInfoContainer;
@@ -168,10 +176,17 @@ class FlowProcess {
     this._serverStatus.filter(status => status === (_FlowConstants || _load_FlowConstants()).ServerStatus.FAILED).subscribe(() => {
       (0, (_nuclideAnalytics || _load_nuclideAnalytics()).track)('flow-server-failed');
     });
-  }
-  // The path to the directory where the .flowconfig is -- i.e. the root of the Flow project.
 
-  // If we had to start a Flow server, store the process here so we can kill it when we shut down.
+    this._version = new (_FlowVersion || _load_FlowVersion()).FlowVersion((0, _asyncToGenerator.default)(function* () {
+      const execInfo = yield execInfoContainer.getFlowExecInfo(root);
+      if (!execInfo) {
+        return null;
+      }
+      return execInfo.flowVersion;
+    }));
+    this._serverStatus.filter(state => state === 'not running').subscribe(() => this._version.invalidateVersion());
+  }
+  // The current state of the Flow server in this directory
 
 
   dispose() {
@@ -182,6 +197,10 @@ class FlowProcess {
       this._startedServer.kill('SIGKILL');
     }
     this._subscriptions.dispose();
+  }
+
+  getVersion() {
+    return this._version;
   }
 
   /**
@@ -284,7 +303,10 @@ class FlowProcess {
       if (!serverIsReady) {
         return _rxjsBundlesRxMinJs.Observable.of(null);
       }
-      return getAllExecInfo(['ide', '--protocol', 'very-unstable', ...NO_RETRY_ARGS], this._root, this._execInfoContainer);
+      return this.getVersion().satisfies('>=0.66.0').then(supportsFriendlyStatusError => {
+        const jsonFlag = supportsFriendlyStatusError ? ['--json-version', '2'] : [];
+        return getAllExecInfo(['ide', '--protocol', 'very-unstable', ...jsonFlag, ...NO_RETRY_ARGS], this._root, this._execInfoContainer);
+      });
     }).switchMap(allExecInfo => {
       if (allExecInfo == null) {
         return _rxjsBundlesRxMinJs.Observable.of(null);

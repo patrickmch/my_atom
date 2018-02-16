@@ -43,6 +43,8 @@ exports.count = count;
 exports.isIterable = isIterable;
 exports.insideOut = insideOut;
 exports.mapFromObject = mapFromObject;
+exports.lastFromArray = lastFromArray;
+exports.distinct = distinct;
 /**
  * Copyright (c) 2017-present, Facebook, Inc.
  * All rights reserved.
@@ -532,4 +534,24 @@ function* insideOut(arr, startingIndex) {
 
 function mapFromObject(obj) {
   return new Map(objectEntries(obj));
+}
+
+function lastFromArray(arr) {
+  return arr[arr.length - 1];
+}
+
+function distinct(array, keyFn) {
+  if (keyFn == null) {
+    return Array.from(new Set(array));
+  }
+
+  const seenKeys = new Set();
+  return array.filter(elem => {
+    const key = keyFn(elem);
+    if (seenKeys.has(key)) {
+      return false;
+    }
+    seenKeys.add(key);
+    return true;
+  });
 }

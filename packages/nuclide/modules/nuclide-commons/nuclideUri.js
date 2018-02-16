@@ -310,7 +310,7 @@ function uriToNuclideUri(uri) {
   }
 
   const lspUri = (_vscodeUri || _load_vscodeUri()).default.parse(uri);
-  // flowlint-next-line sketchy-null-string:off
+
   if (lspUri.scheme === 'file' && lspUri.path) {
     // only handle real files for now.
     return lspUri.path;

@@ -10,6 +10,13 @@ exports.setDeviceTypesEpic = setDeviceTypesEpic;
 exports.setDeviceTypeEpic = setDeviceTypeEpic;
 exports.setProcessesEpic = setProcessesEpic;
 exports.setAppInfoEpic = setAppInfoEpic;
+exports.setDeviceTypeComponentsEpic = setDeviceTypeComponentsEpic;
+
+var _log4js;
+
+function _load_log4js() {
+  return _log4js = _interopRequireDefault(require('log4js'));
+}
 
 var _collection;
 
@@ -61,9 +68,20 @@ function _load_shallowequal() {
   return _shallowequal = _interopRequireDefault(require('shallowequal'));
 }
 
+function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
+
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
+/**
+ * Copyright (c) 2015-present, Facebook, Inc.
+ * All rights reserved.
+ *
+ * This source code is licensed under the license found in the LICENSE file in
+ * the root directory of this source tree.
+ *
+ * 
+ * @format
+ */
 
 function pollDevicesEpic(actions, store) {
   return actions.ofType((_Actions || _load_Actions()).TOGGLE_DEVICE_POLLING).map(action => {
@@ -83,16 +101,7 @@ function pollDevicesEpic(actions, store) {
     }
     return _rxjsBundlesRxMinJs.Observable.empty();
   });
-} /**
-   * Copyright (c) 2015-present, Facebook, Inc.
-   * All rights reserved.
-   *
-   * This source code is licensed under the license found in the LICENSE file in
-   * the root directory of this source tree.
-   *
-   * 
-   * @format
-   */
+}
 
 function pollProcessesEpic(actions, store) {
   return actions.ofType((_Actions || _load_Actions()).TOGGLE_PROCESS_POLLING).switchMap(action => {
@@ -164,6 +173,49 @@ function setAppInfoEpic(actions, store) {
     const providers = Array.from((0, (_providers || _load_providers()).getProviders)().appInfo);
     return observeAppInfoTables(processNames, providers, host, device);
   }).map(appInfoTables => (_Actions || _load_Actions()).setAppInfoTables(appInfoTables));
+}
+
+function setDeviceTypeComponentsEpic(actions, store) {
+  return actions.ofType((_Actions || _load_Actions()).SET_DEVICE_TYPE).switchMap(action => {
+    if (!(action.type === (_Actions || _load_Actions()).SET_DEVICE_TYPE)) {
+      throw new Error('Invariant violation: "action.type === Actions.SET_DEVICE_TYPE"');
+    }
+
+    const { deviceType } = action.payload;
+    const { host } = store.getState();
+    if (deviceType == null) {
+      return _rxjsBundlesRxMinJs.Observable.empty();
+    }
+
+    const providers = Array.from((0, (_providers || _load_providers()).getProviders)().deviceTypeComponent).filter(provider => provider.getType() === deviceType);
+    if (providers.length === 0) {
+      return _rxjsBundlesRxMinJs.Observable.empty();
+    }
+
+    const gatheredComponents = _rxjsBundlesRxMinJs.Observable.from(providers.map(provider => _rxjsBundlesRxMinJs.Observable.create(observer => {
+      const disposable = provider.observe(host, component => {
+        observer.next(component);
+      });
+      return () => {
+        disposable.dispose();
+      };
+    }).startWith(null).catch(e => {
+      (_log4js || _load_log4js()).default.getLogger().error(e);
+      return _rxjsBundlesRxMinJs.Observable.of(null);
+    }).map(ordered => ordered == null ? null : { ordered, key: provider.getName() }))
+    // $FlowFixMe add combineAll to flow
+    ).combineAll();
+
+    const components = gatheredComponents.map(array => array.filter(value => value != null).map(value => {
+      if (!(value != null)) {
+        throw new Error('Invariant violation: "value != null"');
+      }
+
+      return value;
+    }).sort((a, b) => a.ordered.order - a.ordered.order).map(value => ({ type: value.ordered.component, key: value.key })));
+
+    return components.map(value => (_Actions || _load_Actions()).setDeviceTypeComponents(value));
+  });
 }
 
 function uniqueArray(array) {

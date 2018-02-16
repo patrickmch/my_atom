@@ -53,6 +53,12 @@ let main = (() => {
         const isDirectory = yield getIsDirectory(realpath);
         try {
           if ((_nuclideUri || _load_nuclideUri()).default.isRemote(realpath)) {
+            if (argv.newWindow) {
+              // TODO(mbolin): Support --new-window for nuclide:// arguments.
+              process.stderr.write('--new-window is not currently supported for remote NuclideUris.\n');
+              return (_errors || _load_errors()).EXIT_CODE_INVALID_ARGUMENTS;
+            }
+
             const result = commands.openRemoteFile(realpath, line, column, Boolean(argv.wait)).refCount();
             if (argv.wait) {
               // eslint-disable-next-line no-await-in-loop
@@ -64,8 +70,20 @@ let main = (() => {
           } else if (isDirectory) {
             // file/line/wait are ignored on directories
             // eslint-disable-next-line no-await-in-loop
-            yield commands.addProject(realpath);
+            yield commands.addProject(realpath, Boolean(argv.newWindow));
           } else {
+            if (argv.newWindow) {
+              // TODO(mbolin): Support --new-window for files. This is tricky to
+              // implement because we create a new window by opening an
+              // atom:// URI on the user's machine. It is challenging to add code
+              // that can recognize when this successfully opens the URI, so that
+              // makes it difficult to implement a faithful
+              // ConnectableObservable<AtomFileEvent> (particularly if --wait is
+              // specified).
+              process.stderr.write('--new-window is not currently supported for files.\n');
+              return (_errors || _load_errors()).EXIT_CODE_INVALID_ARGUMENTS;
+            }
+
             const result = commands.openFile(realpath, line, column, Boolean(argv.wait)).refCount();
             if (argv.wait) {
               // eslint-disable-next-line no-await-in-loop
@@ -93,6 +111,10 @@ let run = (() => {
     const { argv } = (_yargs || _load_yargs()).default.usage('Usage: atom <file>').help('h').alias('h', 'help').demand(1, 'At least one file name is required.').option('a', {
       alias: 'add',
       describe: 'Ignored, as --add as always implied. ' + 'Included for compatibility with atom CLI.',
+      type: 'boolean'
+    }).option('n', {
+      alias: 'new-window',
+      describe: 'Open a new window.',
       type: 'boolean'
     }).option('w', {
       alias: 'wait',

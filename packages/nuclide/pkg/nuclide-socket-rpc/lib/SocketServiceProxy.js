@@ -57,7 +57,7 @@ module.exports = _client => {
         location: {
           type: "source",
           fileName: "Connection.js",
-          line: 17
+          line: 21
         },
         name: "Connection"
       })]).then(([args, id]) => _client.callRemoteMethod(id, "write", "void", args));
@@ -91,7 +91,7 @@ module.exports = _client => {
         location: {
           type: "source",
           fileName: "Connection.js",
-          line: 70
+          line: 86
         },
         name: "ConnectionFactory"
       })]).then(([args, id]) => _client.callRemoteMethod(id, "createConnection", "promise", args)).then(value => {
@@ -305,7 +305,7 @@ Object.defineProperty(module.exports, "defs", {
       location: {
         type: "source",
         fileName: "Connection.js",
-        line: 17
+        line: 21
       },
       constructorArgs: [{
         name: "tunnelHost",
@@ -326,7 +326,7 @@ Object.defineProperty(module.exports, "defs", {
           location: {
             type: "source",
             fileName: "Connection.js",
-            line: 60
+            line: 74
           },
           kind: "function",
           argumentTypes: [{
@@ -344,7 +344,7 @@ Object.defineProperty(module.exports, "defs", {
           location: {
             type: "source",
             fileName: "Connection.js",
-            line: 64
+            line: 78
           },
           kind: "function",
           argumentTypes: [],
@@ -360,7 +360,7 @@ Object.defineProperty(module.exports, "defs", {
       location: {
         type: "source",
         fileName: "Connection.js",
-        line: 70
+        line: 86
       },
       constructorArgs: [],
       staticMethods: {},
@@ -369,7 +369,7 @@ Object.defineProperty(module.exports, "defs", {
           location: {
             type: "source",
             fileName: "Connection.js",
-            line: 73
+            line: 89
           },
           kind: "function",
           argumentTypes: [{
@@ -397,7 +397,7 @@ Object.defineProperty(module.exports, "defs", {
           location: {
             type: "source",
             fileName: "Connection.js",
-            line: 80
+            line: 96
           },
           kind: "function",
           argumentTypes: [],

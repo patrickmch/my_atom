@@ -64,6 +64,8 @@ function addPanel(location, options) {
       return atom.workspace.addBottomPanel(options);
     case 'left':
       return atom.workspace.addLeftPanel(options);
+    case 'header':
+      return atom.workspace.addHeaderPanel(options);
     default:
       throw new Error(`Invalid location: ${location}`);
   }

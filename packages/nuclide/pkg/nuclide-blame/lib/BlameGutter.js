@@ -320,7 +320,7 @@ class GutterElement extends _react.Component {
           className: 'nuclide-blame-row nuclide-blame-content',
           ref: (0, (_addTooltip || _load_addTooltip()).default)(tooltip) },
         !isLastLine ? _react.createElement('div', { className: 'nuclide-blame-vertical-bar nuclide-blame-vertical-bar-first' }) : null,
-        Avatar ? _react.createElement(Avatar, { size: 16, unixname: unixname }) : unixname + ': ',
+        Avatar ? _react.createElement(Avatar, { size: 16, employeeIdentifier: unixname }) : unixname + ': ',
         _react.createElement(
           'span',
           null,
