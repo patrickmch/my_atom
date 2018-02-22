@@ -118,17 +118,10 @@ function overrideIncludePath(src) {
   return src;
 }
 
-function getCacheKeyForDb(compilationDatabase) {
-  // only requestSettings.compilationDatabase.file is meaningful
-  return compilationDatabase == null ? null : compilationDatabase.file;
-}
-
 class ClangFlagsManager {
 
   constructor() {
-    this._compilationDatabases = new (_cache || _load_cache()).Cache({
-      keyFactory: db => getCacheKeyForDb(db)
-    });
+    this._compilationDatabases = new (_cache || _load_cache()).Cache();
     this._uriResolveCache = new (_cache || _load_cache()).Cache({
       keyFactory: ([parent, relative]) => relative + parent
     });
@@ -137,6 +130,8 @@ class ClangFlagsManager {
     this._clangProjectFlags = new Map();
     this._flagPool = new (_ClangFlagsPool || _load_ClangFlagsPool()).default();
   }
+  // Map from the database file to its files -> flags mappings.
+
 
   reset() {
     this._compilationDatabases.clear();
@@ -177,11 +172,14 @@ class ClangFlagsManager {
     return (0, _asyncToGenerator.default)(function* () {
       const { compilationDatabase } = requestSettings;
       if (compilationDatabase != null) {
-        const flagMap = yield _this2._compilationDatabases.get(compilationDatabase);
-        if (flagMap != null) {
-          const flagsHandle = flagMap.get(src);
-          if (flagsHandle != null) {
-            return _this2._flagPool.getFlags(flagsHandle);
+        const { file } = compilationDatabase;
+        if (file != null) {
+          const flagMap = yield _this2._compilationDatabases.get(file);
+          if (flagMap != null) {
+            const flagsHandle = flagMap.get(src);
+            if (flagsHandle != null) {
+              return _this2._flagPool.getFlags(flagsHandle);
+            }
           }
         }
       }
@@ -247,23 +245,16 @@ class ClangFlagsManager {
       let dbDir = null;
       const compilationDB = requestSettings.compilationDatabase;
       if (compilationDB != null && compilationDB.file != null) {
+        const { file, flagsFile } = compilationDB;
         // Look for a compilation database provided by the client.
-        dbDir = (_nuclideUri || _load_nuclideUri()).default.dirname(compilationDB.file);
-        dbFlags = yield _this4.loadFlagsFromCompilationDatabase(requestSettings);
+        dbDir = (_nuclideUri || _load_nuclideUri()).default.dirname(file);
+        dbFlags = yield _this4.loadFlagsFromCompilationDatabase(file, flagsFile);
       } else {
         // Look for a manually provided compilation database.
         dbDir = yield (_fsPromise || _load_fsPromise()).default.findNearestFile(COMPILATION_DATABASE_FILE, (_nuclideUri || _load_nuclideUri()).default.dirname(src));
         if (dbDir != null) {
           const dbFile = (_nuclideUri || _load_nuclideUri()).default.join(dbDir, COMPILATION_DATABASE_FILE);
-          const compilationDatabase = {
-            file: dbFile,
-            flagsFile: null,
-            libclangPath: null
-          };
-          dbFlags = yield _this4.loadFlagsFromCompilationDatabase({
-            compilationDatabase,
-            projectRoot: requestSettings.projectRoot
-          });
+          dbFlags = yield _this4.loadFlagsFromCompilationDatabase(dbFile, null);
         }
       }
       return { dbFlags, dbDir };
@@ -408,7 +399,7 @@ class ClangFlagsManager {
     })();
   }
 
-  _loadFlagsFromCompilationDatabase(dbFile, flagsFile, requestSettings) {
+  _loadFlagsFromCompilationDatabase(dbFile, flagsFile) {
     var _this10 = this;
 
     return (0, _asyncToGenerator.default)(function* () {
@@ -439,16 +430,8 @@ class ClangFlagsManager {
     })();
   }
 
-  loadFlagsFromCompilationDatabase(requestSettings) {
-    const db = requestSettings.compilationDatabase;
-    if (db == null) {
-      return Promise.resolve(new Map());
-    }
-    const dbFile = db.file;
-    if (dbFile == null) {
-      return Promise.resolve(new Map());
-    }
-    return this._compilationDatabases.getOrCreate(db, () => this._loadFlagsFromCompilationDatabase(dbFile, db.flagsFile, requestSettings) || Promise.resolve(new Map()));
+  loadFlagsFromCompilationDatabase(dbFile, flagsFile) {
+    return this._compilationDatabases.getOrCreate(dbFile, () => this._loadFlagsFromCompilationDatabase(dbFile, flagsFile) || Promise.resolve(new Map()));
   }
 
   _uriResolveCached(parent, relative) {

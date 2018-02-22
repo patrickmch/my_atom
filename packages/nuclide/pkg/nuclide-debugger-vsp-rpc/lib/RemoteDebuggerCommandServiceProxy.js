@@ -311,6 +311,9 @@ Object.defineProperty(module.exports, "defs", {
         }, {
           kind: "string-literal",
           value: "ocaml"
+        }, {
+          kind: "string-literal",
+          value: "native"
         }]
       }
     },

@@ -3,7 +3,6 @@
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.COMPILATION_DATABASE_FILE = undefined;
 
 var _asyncToGenerator = _interopRequireDefault(require('async-to-generator'));
 
@@ -29,6 +28,12 @@ var _UniversalDisposable;
 
 function _load_UniversalDisposable() {
   return _UniversalDisposable = _interopRequireDefault(require('nuclide-commons/UniversalDisposable'));
+}
+
+var _utils;
+
+function _load_utils() {
+  return _utils = require('../../nuclide-clang-rpc/lib/utils');
 }
 
 var _nuclideLanguageServiceRpc;
@@ -75,16 +80,16 @@ function _load_CqueryProjectManager() {
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-const COMPILATION_DATABASE_FILE = exports.COMPILATION_DATABASE_FILE = 'compile_commands.json'; /**
-                                                                                                * Copyright (c) 2015-present, Facebook, Inc.
-                                                                                                * All rights reserved.
-                                                                                                *
-                                                                                                * This source code is licensed under the license found in the LICENSE file in
-                                                                                                * the root directory of this source tree.
-                                                                                                *
-                                                                                                * 
-                                                                                                * @format
-                                                                                                */
+/**
+ * Copyright (c) 2015-present, Facebook, Inc.
+ * All rights reserved.
+ *
+ * This source code is licensed under the license found in the LICENSE file in
+ * the root directory of this source tree.
+ *
+ * 
+ * @format
+ */
 
 class CqueryLanguageServer extends (_nuclideLanguageServiceRpc || _load_nuclideLanguageServiceRpc()).MultiProjectLanguageService {
   // Maps clang settings => settings metadata with same key as _processes field.
@@ -145,8 +150,15 @@ class CqueryLanguageServer extends (_nuclideLanguageServiceRpc || _load_nuclideL
       if (enableLibclangLogs) {
         spawnOptions.env.LIBCLANG_LOGGING = 1;
       }
-      const lsp = new (_CqueryLanguageClient || _load_CqueryLanguageClient()).CqueryLanguageClient(_this._logger, _this._fileCache, host, _this._languageId, _this._command, ['--language-server', '--log-file', (_nuclideUri || _load_nuclideUri()).default.join(initalizationOptions.cacheDirectory, '..', 'diagnostics')], spawnOptions, project.projectRoot, ['.cpp', '.h', '.hpp', '.cc', '.m', 'mm'], initalizationOptions, 5 * 60 * 1000);
+      const lsp = new (_CqueryLanguageClient || _load_CqueryLanguageClient()).CqueryLanguageClient(_this._logger, _this._fileCache, host, _this._languageId, _this._command, ['--language-server', '--log-file', (_nuclideUri || _load_nuclideUri()).default.join(initalizationOptions.cacheDirectory, '..', 'diagnostics')], spawnOptions, project.hasCompilationDb ? (_nuclideUri || _load_nuclideUri()).default.dirname(project.flagsFile) : project.projectRoot, ['.cpp', '.h', '.hpp', '.cc', '.m', 'mm'], initalizationOptions, 5 * 60 * 1000);
 
+      lsp.setProjectChecker(function (file) {
+        const checkProject = _this._projectManager.getProjectForFile(file);
+        return checkProject != null ? _this._projectManager.getProjectKey(checkProject) === projectKey : // TODO pelmers: header files aren't in the map because they do not
+        // appear in compile_commands.json, but they should be cached!
+        (0, (_utils || _load_utils()).isHeaderFile)(file);
+      });
+      lsp.setProgressInfo({ id: projectKey, label: lsp._projectRoot });
       lsp.start(); // Kick off 'Initializing'...
       return lsp;
     })();
@@ -183,8 +195,7 @@ class CqueryLanguageServer extends (_nuclideLanguageServiceRpc || _load_nuclideL
     var _this4 = this;
 
     return (0, _asyncToGenerator.default)(function* () {
-      // requires await to synchronize with getLanguageServiceForFile
-      yield _this4._projectManager.associateFileWithProject(file, project);
+      _this4._projectManager.associateFileWithProject(file, project);
       _this4._processes.get(_this4._projectManager.getProjectKey(project)); // spawn the process ahead of time
     })();
   }
@@ -193,7 +204,7 @@ class CqueryLanguageServer extends (_nuclideLanguageServiceRpc || _load_nuclideL
     var _this5 = this;
 
     return (0, _asyncToGenerator.default)(function* () {
-      const project = yield _this5._projectManager.getProjectForFile(file);
+      const project = _this5._projectManager.getProjectForFile(file);
       return project == null ? null : _this5._getLanguageServiceForProject(project);
     })();
   }
@@ -204,13 +215,8 @@ class CqueryLanguageServer extends (_nuclideLanguageServiceRpc || _load_nuclideL
     return (0, _asyncToGenerator.default)(function* () {
       const key = _this6._projectManager.getProjectKey(project);
       const client = _this6._processes.get(key);
-      if (client == null) {
-        _this6._logger.warn("Didn't find language service for ", project);
-        return null;
-      }
       if ((yield client) == null) {
-        _this6._logger.warn('Found invalid language service for ', project);
-        _this6._processes.delete(key); // Delete so we retry next time.
+        _this6._logger.warn("Didn't find language service for ", project);
         return null;
       } else {
         _this6._logger.info('Found existing language service for ', project);

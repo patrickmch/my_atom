@@ -9,12 +9,19 @@ var _asyncToGenerator = _interopRequireDefault(require('async-to-generator'));
 
 let getInitializationOptions = exports.getInitializationOptions = (() => {
   var _ref = (0, _asyncToGenerator.default)(function* (project) {
+    let options;
     if (project.hasCompilationDb) {
-      return getInitializationOptionsWithCompilationDb(project.projectRoot, project.compilationDbDir);
+      options = yield getInitializationOptionsWithCompilationDb(project.projectRoot, project.compilationDbDir);
     } else if (project.defaultFlags != null) {
-      return getInitializationOptionsWithoutCompilationDb(project.projectRoot, project.defaultFlags);
+      options = yield getInitializationOptionsWithoutCompilationDb(project.projectRoot, project.defaultFlags);
     }
-    return null;
+    if (options != null) {
+      try {
+        // $FlowFB
+        options = require('./fb-init-options').default(options, project);
+      } catch (e) {}
+    }
+    return options;
   });
 
   return function getInitializationOptions(_x) {
@@ -111,6 +118,7 @@ function staticInitializationOptions() {
     diagnosticsOnCodeCompletion: true,
     codeLensOnLocalVariables: false,
     enableSnippetInsertion: true,
+    progressReportFrequencyMs: 500,
     clientVersion: 3
   };
 }

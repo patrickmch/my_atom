@@ -1151,6 +1151,7 @@ class FileTreeStore {
 
   collectDebugState() {
     return {
+      currentWorkingRoot: this.getCwdKey(),
       openFilesExpanded: this.openFilesExpanded,
       uncommittedChangesExpanded: this.uncommittedChangesExpanded,
       foldersExpanded: this.foldersExpanded,

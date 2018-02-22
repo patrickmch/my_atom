@@ -184,7 +184,7 @@ class HhvmDebuggerService extends (_nuclideDebuggerCommon || _load_nuclideDebugg
 
       const startupDocumentPath = yield _this4._getStartupDocumentPath(config);
 
-      const logFilePath = _this4._getHHVMLogFilePath();
+      const logFilePath = yield _this4._getHHVMLogFilePath();
 
       return {
         hhvmPath,
@@ -198,7 +198,21 @@ class HhvmDebuggerService extends (_nuclideDebuggerCommon || _load_nuclideDebugg
   }
 
   _getHHVMLogFilePath() {
-    return (_nuclideUri || _load_nuclideUri()).default.join(_os.default.tmpdir(), `nuclide-${_os.default.userInfo().username}-logs`, 'hhvm-debugger.log');
+    return (0, _asyncToGenerator.default)(function* () {
+      const path = (_nuclideUri || _load_nuclideUri()).default.join(_os.default.tmpdir(), `nuclide-${_os.default.userInfo().username}-logs`, 'hhvm-debugger.log');
+
+      // Ensure the log file exists, and is write-able by everyone so that
+      // HHVM, which is running as a different user, can append to it.
+      const mode = 0o666;
+      try {
+        const fd = yield (_fsPromise || _load_fsPromise()).default.open(path, 'a+', mode);
+        if (fd >= 0) {
+          yield (_fsPromise || _load_fsPromise()).default.chmod(path, mode);
+        }
+      } catch (_) {}
+
+      return path;
+    })();
   }
 
   createLogFilePaste() {
@@ -208,7 +222,7 @@ class HhvmDebuggerService extends (_nuclideDebuggerCommon || _load_nuclideDebugg
       try {
         // $FlowFB
         const fbPaste = require('../../fb-pastebin');
-        return (_fsPromise || _load_fsPromise()).default.readFile(_this5._getHHVMLogFilePath(), 'utf8').then(function (contents) {
+        return (_fsPromise || _load_fsPromise()).default.readFile((yield _this5._getHHVMLogFilePath()), 'utf8').then(function (contents) {
           return fbPaste.createPasteFromContents(contents, { title: 'HHVM-Debugger' });
         });
       } catch (error) {
@@ -222,7 +236,7 @@ class HhvmDebuggerService extends (_nuclideDebuggerCommon || _load_nuclideDebugg
 
     return (0, _asyncToGenerator.default)(function* () {
       const startupDocumentPath = yield _this6._getStartupDocumentPath(config);
-      const logFilePath = _this6._getHHVMLogFilePath();
+      const logFilePath = yield _this6._getHHVMLogFilePath();
       return {
         debugPort: config.debugPort,
         startupDocumentPath,

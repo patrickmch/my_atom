@@ -191,6 +191,7 @@ class DebuggerModel {
         atom.workspace.open(path, { searchAllPanes: true }).then(function (editor) {
           const buffer = editor.getBuffer();
           const rowRange = buffer.rangeForRow(notificationLineNumber);
+          _this._cleanUpDatatip();
           _this._threadChangeDatatip = datatipService.createPinnedDataTip({
             component: function () {
               return _react.createElement(

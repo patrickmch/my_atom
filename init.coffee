@@ -31,7 +31,6 @@
 #       else
 #         panel.item.openSelectedEntry(pending: true, activatePane: false)
 #         return
-fs = require('fs')
 # Adds space chars without moving the cursor
 atom.commands.add 'atom-text-editor',
   'custom:insert-space-keep-cursor-place': ->
@@ -76,20 +75,47 @@ atom.commands.add 'atom-workspace', 'my:dismiss-notifications', ->
     notification.dismiss()
   atom.notifications.clear()
 
-atom.commands.add 'atom-workspace', 'my:get-file-paths-improved', ->
-  filePaths = []
-  pathRegEx = ///^\/(.+)\/([^\/]+)$///i
-  atom.project.buffers.forEach (editorWindow) ->
-    filePath = editorWindow.file.path
-    if filePath isnt undefined && filePath.match(pathRegEx) isnt null
-      filePaths.push(filePath)
-  projectTitle = atom.project.repositories[0].branch.split('/')[2]
-  fileString = JSON.stringify({
-      title: projectTitle
-      paths: filePaths
-      icon: 'icon-squirrel'
-    }, null, '\t')
-  fs.appendFile '/Users/mchey/projects.json', fileString
+fs = require('fs')
+projectsFile = '/Users/mchey/projects.json'
 
+atom.commands.add 'atom-workspace', 'my:get-file-paths', ->
+  jsonData = fs.readFile projectsFile, (err, data)->
+    filePaths = []
+    pathRegEx = ///^\/(.+)\/([^\/]+)$///i
+    atom.project.buffers.forEach (editorWindow) ->
+      filePath = editorWindow.file.path
+      if filePath isnt undefined && filePath.match(pathRegEx) isnt null
+        filePaths.push(filePath)
+    json = JSON.parse(data)
+    branchName = atom.project.repositories[0].branch.split('/')[2]
+    # did this so that we can use the object literal branchName as a key instead of 'branchName'
+    project = JSON.parse('{"' + branchName + '":' + '{"paths":["' + filePaths + '"]}' + '}')
+    # this converts the paths back to an array: they get smooshed in to one because of the line above
+    project[branchName].paths = project[branchName].paths[0].split(',')
+    json.push(project)
+    fs.writeFile projectsFile, JSON.stringify(json, null, '\t')
 
-# atom.commands.add 'atom-workspace', 'my:open-my-project', ->
+atom.commands.add 'atom-workspace', 'my:open-my-project', ->
+  jsonData = fs.readFile projectsFile, (err, data)->
+    element = document.createElement 'div'
+    element.classList.add 'select-list'
+
+    listSelect = document.createElement 'ol'
+    listSelect.textContent = 'allo guv'
+    listSelect.classList.add 'list-select'
+    element.appendChild listSelect
+
+    # json = JSON.parse(data)
+    # stuff = json.keys()
+    # json.forEach (obj) ->
+      # listItem = document.createElement 'li'
+      # console.log obj['hello-to-you']
+      # listItem.textContent = k
+      # listItem.classList.add 'open-project-li'
+      # listSelect.appendChild listItem
+
+    modalPanel = atom.workspace.addModalPanel {
+        item: element,
+        visible: false
+    }
+    if modalPanel.isVisible() then modalPanel.hide() else modalPanel.show()

@@ -9,12 +9,6 @@ var _asyncToGenerator = _interopRequireDefault(require('async-to-generator'));
 
 var _rxjsBundlesRxMinJs = require('rxjs/bundles/Rx.min.js');
 
-var _observable;
-
-function _load_observable() {
-  return _observable = require('nuclide-commons/observable');
-}
-
 var _convert;
 
 function _load_convert() {
@@ -58,55 +52,75 @@ function shortenByOneCharacter({ newText, range }) {
 
 // Provides some extra commands on top of base Lsp.
 class CqueryLanguageClient extends (_LspLanguageService || _load_LspLanguageService()).LspLanguageService {
+  constructor(...args) {
+    var _temp;
+
+    return _temp = super(...args), this._checkProject = _ => false, _temp;
+  }
+
   start() {
     // Workaround for https://github.com/babel/babel/issues/3930
     return super.start().then(() => this.startCquery());
+  }
+
+  setProjectChecker(check) {
+    this._checkProject = check;
+  }
+
+  setProgressInfo(info) {
+    this._progressInfo = info;
   }
 
   startCquery() {
     var _this = this;
 
     return (0, _asyncToGenerator.default)(function* () {
-      const progressSubject = new _rxjsBundlesRxMinJs.Subject();
-      _this._lspConnection._jsonRpcConnection.onNotification({ method: '$cquery/progress' }, function (args) {
-        const {
-          indexRequestCount,
-          doIdMapCount,
-          loadPreviousIndexCount,
-          onIdMappedCount,
-          onIndexedCount
-        } = args;
-        const total = indexRequestCount + doIdMapCount + loadPreviousIndexCount + onIdMappedCount + onIndexedCount;
-        progressSubject.next(total);
-      });
-      // cquery progress is strange; sometimes it reaches 0 then goes back up
-      // again, so we wait a bit before clearing the progress icon at 0.
-      progressSubject.distinctUntilChanged().throttleTime(50).do(
-      // update progress text
-      function (value) {
-        const label = `cquery: ${value} jobs`;
-        _this._handleProgressNotification({ id: 'cquery-progress', label });
-      })
-      // if progress has not changed for 2 seconds and is now 0 then complete.
-      .let((0, (_observable || _load_observable()).fastDebounce)(2000)).subscribe(
-      // next
-      function (value) {
-        if (value === 0) {
-          progressSubject.complete();
-        }
-      },
-      // error
-      null,
-      // complete
-      function () {
-        _this._handleProgressNotification({
-          id: 'cquery-progress',
-          label: null
+      const progressObservable = _rxjsBundlesRxMinJs.Observable.create(function (subscriber) {
+        _this._lspConnection._jsonRpcConnection.onNotification({ method: '$cquery/progress' }, function (args) {
+          const {
+            indexRequestCount,
+            doIdMapCount,
+            loadPreviousIndexCount,
+            onIdMappedCount,
+            onIndexedCount
+          } = args;
+          const total = indexRequestCount + doIdMapCount + loadPreviousIndexCount + onIdMappedCount + onIndexedCount;
+          subscriber.next(total);
         });
-      });
+      }).distinctUntilChanged();
+      if (_this._progressInfo != null) {
+        const { id, label } = _this._progressInfo;
+        // Because of the 'freshen' command, cquery may finish
+        // (i.e. progress reaches 0) then start emitting progress events again.
+        // So each time it reaches 0 create a new id by adding a monotonic number.
+        let progressId = 0;
+        _this._progressSubscription = progressObservable.subscribe(function (totalJobs) {
+          const taggedId = id + progressId;
+          if (totalJobs === 0) {
+            // label null clears the indicator.
+            _this._handleProgressNotification({
+              id: taggedId,
+              label: null
+            });
+            progressId++;
+          } else {
+            _this._handleProgressNotification({
+              id: taggedId,
+              label: `cquery ${label}: ${totalJobs} jobs`
+            });
+          }
+        });
+      }
       // TODO pelmers Register handlers for other custom cquery messages.
       // TODO pelmers hook into refactorizer for renaming?
     })();
+  }
+
+  dispose() {
+    if (this._progressSubscription != null) {
+      this._progressSubscription.unsubscribe();
+    }
+    super.dispose();
   }
 
   _createOutlineTreeHierarchy(list) {
@@ -150,6 +164,10 @@ class CqueryLanguageClient extends (_LspLanguageService || _load_LspLanguageServ
       }
     }
     return super._convertCommands_CodeActions(outputCommands);
+  }
+
+  _isFileInProject(file) {
+    return super._isFileInProject(file) && this._checkProject(file);
   }
 
   _notifyOnFail(success, falseMessage) {

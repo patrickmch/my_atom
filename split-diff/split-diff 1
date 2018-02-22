@@ -1,34 +1,160 @@
-nols_website/admissions/dashboard/gui_tests/academic_credit_tests.py
-nols_website/admissions/dashboard/gui_tests/dashboard_tests.py
-nols_website/admissions/dashboard/gui_tests/emt_prerequisites_tests.py
-nols_website/admissions/dashboard/gui_tests/letters_of_recommendation_tests.py
-nols_website/admissions/dashboard/gui_tests/page_objects/student_form_pages.py
-nols_website/admissions/dashboard/gui_tests/tuition_protection_plan_tests.py
-nols_website/admissions/dashboard/migrations/0007_auto_20180131_1135.py
-nols_website/admissions/dashboard/migrations/0008_remove_duplicate_emt_studentformcategory.py
-nols_website/admissions/dashboard/static/admissions/dashboard/img/emt_prerequisites_test_upload.png
-nols_website/admissions/dashboard/static/admissions/dashboard/js/ic_app_refs.js
-nols_website/admissions/dashboard/templates/admissions/dashboard/student_form_views/ajax_error_modal.html
-nols_website/admissions/dashboard/templates/admissions/dashboard/student_form_views/confirm_success_modal.html
-nols_website/admissions/dashboard/templates/admissions/dashboard/student_form_views/error_modal.html
-nols_website/admissions/dashboard/templates/admissions/dashboard/student_form_views/ic_app_lor_base.html
-nols_website/admissions/dashboard/templates/admissions/dashboard/student_form_views/ic_app_lor_form_base.html
-nols_website/admissions/dashboard/templates/admissions/dashboard/student_form_views/notif_modal.html
-nols_website/admissions/dashboard/templates/admissions/dashboard/student_form_views/use_old_form_modal.html
-nols_website/cms_plugins/button/migrations/0003_update_link_title_from_text.py
-nols_website/cms_plugins/stage/migrations/0004_delete_basetile_imagetile_teasertile_videotile.py
-nols_website/cms_plugins/tile_grid/migrations/0002_imagetile_teasertile_videotile.py
-nols_website/cms_plugins/tile_grid/migrations/0003_move_data.py
-nols_website/cms_plugins/tile_grid/migrations/0004_teasertile_link_title.py
-nols_website/info_sys/migrations/0002_auto_20180131_1211.py
-nols_website/info_sys/migrations/0003_auto_20180131_1233.py
-nols_website/nols_email/migrations/0003_auto_20180131_0951.py
-nols_website/nolspro/migrations/0007_auto_20180131_1135.py
-nols_website/payment/migrations/add_flexible_reference_ids_to_order.py
-nols_website/payment/static/payment/js/stripe.js
-nols_website/payment/static/payment/js/stripe_payments.js
-nols_website/payment/static/payment/scss/payment.scss
-nols_website/payment/stripe_utils.py
-nols_website/payment/templates/payment/stripe_payments.html
-nols_website/payment/templates/payment/stripe_payments_receipt.html
-nols_website/wmi/gui_tests/page_objects/wildmed_pages.py
+// Headings
+//
+// Heading styles
+//
+// Markup: headings.hbs
+//
+// Weight: 2
+//
+// Style guide: headings
+
+/// @author Mark Wirblich <mark@lincolnloop.com>
+
+.heading-xxxxxx-large {
+  @include heading('xxxxxx-large');
+}
+
+.heading-xxxxx-large {
+  @include heading('xxxxx-large');
+}
+
+.heading-xxxx-large {
+  @include heading('xxxx-large');
+}
+
+.heading-xxx-large {
+  @include heading('xxx-large');
+}
+
+.heading-xx-large {
+  @include heading('xx-large');
+}
+
+.heading-x-large {
+  @include heading('x-large');
+}
+
+.heading-large {
+  @include heading('large');
+}
+
+.heading-regular {
+  @include heading('regular', .5em);
+}
+
+.heading-small {
+  @include heading('small');
+}
+
+.heading-lead {
+  @include heading-lead;
+}
+
+.heading-group {
+  margin-bottom: rem-calc(60);
+
+  h2 {
+    margin-bottom: 0;
+  }
+
+  h2 + h3 {
+    margin-top: .1em;
+  }
+
+  &--has-location {
+      display: block;
+      float: left;
+      margin-right: $heading-location-icon-margin;
+      width: $heading-location-icon-width;
+      height: rem-calc(140);
+      background: svg('fieldnote_location_icon.svg') no-repeat;
+      background-size: 100% 100%;
+      transform: translateY(-10px);
+      -webkit-transform: translateY(-10px);
+
+      @include breakpoint(large) {
+        margin-left: -($heading-location-icon-margin + $heading-location-icon-width);
+      }
+
+    & ~ div {
+      padding-left: ($heading-location-icon-margin + $heading-location-icon-width);
+
+      @include breakpoint(large) {
+        padding-left: 0;
+      }
+    }
+  }
+}
+
+.stage--is-hero {
+  .heading-group {
+    //margin-top: 2em;
+    //
+    //
+    margin-bottom: rem-calc(30);
+
+    & > * {
+      line-height: 1;
+    }
+
+    h3 {
+      margin-top: 1em;
+    }
+
+    h4 {
+      margin-bottom: .2em;
+    }
+
+    &--wrapper {
+      padding-top: rem-calc(50);
+
+      @include breakpoint(medium) {
+        padding-top: rem-calc(100);
+      }
+    }
+  }
+}
+
+.heading-intro {
+  margin-bottom: 1em;
+
+  [class*='heading-'] {
+    margin-bottom: .5em;
+    padding-bottom: .5em;
+    color: $color-mud;
+    border-bottom: 1px solid $color-mud;
+  }
+
+  p {
+    @include text-xlarge;
+  //  padding: 0 2em;
+
+    @include breakpoint(medium) {
+      padding: 0 2em;
+    }
+  }
+}
+
+.heading-block {
+  background: $color-light;
+  text-align: center;
+
+  * {
+    @include heading('large');
+    margin-bottom: 0;
+    padding: rem-calc($gutter);
+  }
+}
+
+.heading-arrow {
+  &--down {
+    display: inline-block;
+    width: rem-calc(40);
+
+    svg {
+      width: 100%;
+      max-width: 100%;
+      height: 100%;
+    }
+  }
+}

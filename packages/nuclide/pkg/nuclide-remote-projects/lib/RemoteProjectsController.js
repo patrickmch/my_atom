@@ -19,7 +19,7 @@ function _load_nuclideRemoteConnection() {
 var _NuclideSocket;
 
 function _load_NuclideSocket() {
-  return _NuclideSocket = require('../../nuclide-server/lib/NuclideSocket');
+  return _NuclideSocket = require('big-dig/src/socket/NuclideSocket');
 }
 
 var _react = _interopRequireWildcard(require('react'));

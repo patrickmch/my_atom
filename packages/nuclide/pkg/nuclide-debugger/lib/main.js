@@ -1,7 +1,5 @@
 'use strict';
 
-var _asyncToGenerator = _interopRequireDefault(require('async-to-generator'));
-
 var _collection;
 
 function _load_collection() {
@@ -358,7 +356,7 @@ class Activation {
     this._connectionProviders.set(key, availableProviders);
   }
 
-  getSuggestions(request) {
+  _getSuggestions(request) {
     let text = request.editor.getText();
     const lines = text.split('\n');
     const { row, column } = request.bufferPosition;
@@ -787,13 +785,7 @@ class Activation {
       labels: ['nuclide-console'],
       selector: '*',
       filterSuggestions: true,
-      getSuggestions(request) {
-        var _this = this;
-
-        return (0, _asyncToGenerator.default)(function* () {
-          return _this.getSuggestions(request);
-        })();
-      }
+      getSuggestions: this._getSuggestions.bind(this)
     };
   }
 

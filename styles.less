@@ -1,3 +1,4 @@
+@import "ui-variables";
 /*
  * Your Stylesheet
  *
@@ -37,4 +38,84 @@ atom-text-editor .cursor {
 }
 .path-input-container>atom-text-editor.path-input.editor.mini>div {
     height: 50px !important;
+}
+
+
+@cursor-color: rgba(97,210,255,1.0);
+atom-text-editor.vim-mode-plus.normal-mode,
+atom-text-editor.vim-mode-plus.visual-mode,
+{
+    &.is-focused {
+      .cursor{
+        // transition: opacity ease-in-out !important;
+        // transition-duration: 500ms !important;
+        // opacity: .6 !important;
+        // opacity: .6 !important;
+        // background-color: rgba(97,295,255,1.0) !important;
+        // box-shadow: 0px 0px 6px 0px rgba(75, 213, 255, 1) !important;
+        // border: none;
+        // animation: find .2s 1;
+        // animation-delay: 0ms;
+
+        display: block;
+        position: absolute;
+        border-radius: 1px;
+        width: 2px;
+        height: 2px;
+        z-index: -1;
+        -webkit-animation: ripple .085s;
+        content: '';
+        // top: -6px;
+        &.tab-beacon {
+            // TODO: Really work needs to be done to trigger *after* tab switch
+            left: 18px;
+            top: -15px;
+        }
+    @-webkit-keyframes ripple {
+        0% {
+            box-shadow:0 0 0 0 transparent,
+                       0 0 0 0 transparent,
+                       0 0 0 0 transparent,
+                       0 0 0 0 transparent;
+        }
+        5%  {
+            box-shadow:0 0 0 0 rgba(97,295,255,1.0),
+                       0 0 0 0 rgba(255,255,255,0.5),
+                       0 0 0 0 rgba(97,295,255,1.0),
+                       0 0 0 0 rgba(0,0,0,0.1);
+        }
+        100% {
+            box-shadow:0 0 4px 24px rgba(97,295,255,1.0),
+                       0 0 0 0 transparent,
+                       0 0 0 0 transparent,
+                       0 0 0 0 transparent;
+        }
+    }
+    }
+  }
+}// Original code / inspiration: http://codepen.io/daless14/pen/ELFgj/
+// Greatly modified of course...
+
+
+
+
+// @keyframes find {
+//   100%{
+//    box-shadow: 0px 0px 6px 0px rgba(75, 213, 255, 1) !important;
+//     // opacity: 1;
+//   }
+//   0%{
+//    box-shadow: 0px 0px 100px 0px rgba(75, 213, 255, 1) !important;
+//     // opacity: 0;
+//   }
+// }
+
+atom-text-editor.vim-mode-plus.insert-mode.replace,
+{
+  &.is-focused {
+    .cursor {
+      background-color: fade(@cursor-color, 20%);
+      visibility: visible;
+    }
+  }
 }

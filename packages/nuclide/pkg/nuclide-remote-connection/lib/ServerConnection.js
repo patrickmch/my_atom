@@ -86,7 +86,7 @@ function _load_SharedObservableCache() {
 var _NuclideSocket;
 
 function _load_NuclideSocket() {
-  return _NuclideSocket = require('../../nuclide-server/lib/NuclideSocket');
+  return _NuclideSocket = require('big-dig/src/socket/NuclideSocket');
 }
 
 var _NuclideServer;

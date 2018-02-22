@@ -418,12 +418,42 @@ module.exports = _client => {
     });
   };
 
-  remoteModule.loadFlagsFromCompilationDatabaseAndCacheThem = function (arg0) {
-    return _client.marshalArguments(Array.from(arguments), [{
-      name: "requestSettings",
+  remoteModule.loadFilesFromCompilationDatabaseAndCacheThem = function (arg0, arg1) {
+    return Observable.fromPromise(_client.marshalArguments(Array.from(arguments), [{
+      name: "dbFile",
       type: {
-        kind: "named",
-        name: "ClangRequestSettings"
+        kind: "string"
+      }
+    }, {
+      name: "flagsFile",
+      type: {
+        kind: "nullable",
+        type: {
+          kind: "string"
+        }
+      }
+    }])).switchMap(args => {
+      return _client.callRemoteFunction("ClangService/loadFilesFromCompilationDatabaseAndCacheThem", "observable", args);
+    }).concatMap(value => {
+      return _client.unmarshal(value, {
+        kind: "string"
+      });
+    }).publish();
+  };
+
+  remoteModule.loadFlagsFromCompilationDatabaseAndCacheThem = function (arg0, arg1) {
+    return _client.marshalArguments(Array.from(arguments), [{
+      name: "dbFile",
+      type: {
+        kind: "string"
+      }
+    }, {
+      name: "flagsFile",
+      type: {
+        kind: "nullable",
+        type: {
+          kind: "string"
+        }
       }
     }]).then(args => {
       return _client.callRemoteFunction("ClangService/loadFlagsFromCompilationDatabaseAndCacheThem", "promise", args);
@@ -1621,6 +1651,43 @@ Object.defineProperty(module.exports, "defs", {
         }
       }
     },
+    loadFilesFromCompilationDatabaseAndCacheThem: {
+      kind: "function",
+      name: "loadFilesFromCompilationDatabaseAndCacheThem",
+      location: {
+        type: "source",
+        fileName: "ClangService.js",
+        line: 312
+      },
+      type: {
+        location: {
+          type: "source",
+          fileName: "ClangService.js",
+          line: 312
+        },
+        kind: "function",
+        argumentTypes: [{
+          name: "dbFile",
+          type: {
+            kind: "string"
+          }
+        }, {
+          name: "flagsFile",
+          type: {
+            kind: "nullable",
+            type: {
+              kind: "string"
+            }
+          }
+        }],
+        returnType: {
+          kind: "observable",
+          type: {
+            kind: "string"
+          }
+        }
+      }
+    },
     ClangFlags: {
       kind: "alias",
       location: {
@@ -1664,20 +1731,27 @@ Object.defineProperty(module.exports, "defs", {
       location: {
         type: "source",
         fileName: "ClangService.js",
-        line: 310
+        line: 325
       },
       type: {
         location: {
           type: "source",
           fileName: "ClangService.js",
-          line: 310
+          line: 325
         },
         kind: "function",
         argumentTypes: [{
-          name: "requestSettings",
+          name: "dbFile",
           type: {
-            kind: "named",
-            name: "ClangRequestSettings"
+            kind: "string"
+          }
+        }, {
+          name: "flagsFile",
+          type: {
+            kind: "nullable",
+            type: {
+              kind: "string"
+            }
           }
         }],
         returnType: {
@@ -1701,13 +1775,13 @@ Object.defineProperty(module.exports, "defs", {
       location: {
         type: "source",
         fileName: "ClangService.js",
-        line: 331
+        line: 348
       },
       type: {
         location: {
           type: "source",
           fileName: "ClangService.js",
-          line: 331
+          line: 348
         },
         kind: "function",
         argumentTypes: [{
@@ -1728,13 +1802,13 @@ Object.defineProperty(module.exports, "defs", {
       location: {
         type: "source",
         fileName: "ClangService.js",
-        line: 338
+        line: 355
       },
       type: {
         location: {
           type: "source",
           fileName: "ClangService.js",
-          line: 338
+          line: 355
         },
         kind: "function",
         argumentTypes: [],
@@ -1749,13 +1823,13 @@ Object.defineProperty(module.exports, "defs", {
       location: {
         type: "source",
         fileName: "ClangService.js",
-        line: 342
+        line: 359
       },
       type: {
         location: {
           type: "source",
           fileName: "ClangService.js",
-          line: 342
+          line: 359
         },
         kind: "function",
         argumentTypes: [],
@@ -1770,13 +1844,13 @@ Object.defineProperty(module.exports, "defs", {
       location: {
         type: "source",
         fileName: "ClangService.js",
-        line: 346
+        line: 363
       },
       type: {
         location: {
           type: "source",
           fileName: "ClangService.js",
-          line: 346
+          line: 363
         },
         kind: "function",
         argumentTypes: [{

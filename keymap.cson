@@ -17,8 +17,9 @@
   'alt-cmd-o': 'advanced-open-file:toggle'
   'alt-space': 'choose-pane:start'
   'ctrl-alt-cmd-f': 'jumpy:toggle'
-  'alt-cmd-j': 'pane:show-previous-item'
-  'alt-cmd-k': 'pane:show-next-item'
+  'alt-cmd-h': 'pane:show-previous-item'
+  'alt-cmd-l': 'pane:show-next-item'
+  'ctrl-alt-cmd-j': 'window:toggle-dev-tools'
 
 'atom-text-editor':
   'ctrl-k': 'unset!'
@@ -27,7 +28,7 @@
   'ctrl-alt-r':'pane:reopen-closed-item'
   # 'alt-shift-v': 'clipboard-plus:toggle'
   'cmd-shift-e': 'platformio-ide-terminal:fullscreen'
-  'alt-/': 'advanced-open-file:delete-path-component'
+  'cmd-l': 'advanced-open-file:delete-path-component'
   'cmd-q cmd-q': 'application:quit'
   'ctrl-cmd-o': 'nuclide-open-filenames-provider:toggle-provider'
   'shift-cmd-j': 'atom-notes:toggle'
@@ -52,18 +53,6 @@
   # panes
   'ctrl->': 'pane:move-item-right'
   'ctrl-<': 'pane:move-item-left'
-
-  # pane splitting
-  'cmd-; ctrl-left':'window:move-active-item-to-pane-on-left'
-  'cmd-; ctrl-right':'window:move-active-item-to-pane-on-right'
-  'cmd-; ctrl-up':'window:move-active-item-to-pane-above'
-  'cmd-; ctrl-down':'window:move-active-item-to-pane-below'
-
-  'cmd-; alt-left':'pane:split-left-and-move-active-item'
-  'cmd-; alt-right':'pane:split-right-and-move-active-item'
-  'cmd-; alt-up':'pane:split-up-and-move-active-item'
-  'cmd-; alt-down':'pane:split-down-and-move-active-item'
-  'alt-;': 'hey-pane:toggle-follow-mode'
 
   # cursor
   'alt-,': 'last-cursor-position:previous'
@@ -144,8 +133,18 @@
   'm v': 'bookmarks:view-all'
   'm c': 'bookmarks:clear-bookmarks'
 
+  # 'p': 'vim-mode-plus:put-after-with-auto-indent'
+  # 'P': 'vim-mode-plus:put-before-with-auto-indent'
+  'p': 'keystroke i left cmd-v escape'
+  'P': 'keystroke i cmd-v escape'
+  'ctrl-p': 'keystroke cmd-enter shift-cmd-space p'
+  'ctrl-P': 'keystroke shift-cmd-enter shift-cmd-space p'
+
 'atom-text-editor.vim-mode-plus:not(.insert-mode)':
+  'ctrl-n': 'vim-mode-plus:move-to-next-occurrence'
+
   # 'cmd-j': 'vim-mode-plus:join'
+  'Y': 'keystroke y i l'
   'cmd-enter': 'editor:newline-below'
   'space escape': 'vim-mode-plus:undo'
   # pane splitting
@@ -194,7 +193,6 @@
   'space D D': 'quick-file-actions:delete'
 
   'space 1': 'window:reload'
-  'space 2': 'window:toggle-dev-tools'
 
   'shift-alt-j': 'vim-mode-plus:move-down-to-edge'
   'shift-alt-k': 'vim-mode-plus:move-up-to-edge'
@@ -254,5 +252,8 @@
   'ctrl-k': 'focus-pane-or-panel:focus-above'
 
 '.platform-darwin .advanced-open-file':
-  'ctrl-j': 'advanced-open-file:move-cursor-down'
-  'ctrl-k': 'advanced-open-file:move-cursor-up'
+  # 'ctrl-j': 'advanced-open-file:move-cursor-down'
+  # 'ctrl-k': 'advanced-open-file:move-cursor-up'
+  'cmd-;': 'advanced-open-file:delete-path-component'
+  'ctrl-j': 'keystroke down down down down'
+  'ctrl-k': 'keystroke up up up up'

@@ -137,6 +137,8 @@ class AttachProcessInfo extends (_nuclideDebuggerCommon || _load_nuclideDebugger
     var _this2 = this;
 
     return (0, _asyncToGenerator.default)(function* () {
+      _this2.preAttachActions();
+
       const useNewDebugger = yield (0, (_passesGK || _load_passesGK()).default)('nuclide_hhvm_debugger_vscode');
       if (useNewDebugger) {
         // TODO: Ericblue - this will be cleaned up when the old debugger
@@ -146,8 +148,6 @@ class AttachProcessInfo extends (_nuclideDebuggerCommon || _load_nuclideDebugger
       }
 
       (_utils || _load_utils()).default.info('Connecting to: ' + _this2.getTargetUri());
-      _this2.preAttachActions();
-
       const rpcService = _this2._getRpcService();
       const sessionConfig = (0, (_utils2 || _load_utils2()).getSessionConfig)((_nuclideUri || _load_nuclideUri()).default.getPath(_this2.getTargetUri()), false);
       (_utils || _load_utils()).default.info(`Connection session config: ${JSON.stringify(sessionConfig)}`);

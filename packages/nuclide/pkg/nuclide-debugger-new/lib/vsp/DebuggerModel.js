@@ -377,7 +377,7 @@ class Variable extends ExpressionContainer {
     return (0, _asyncToGenerator.default)(function* () {
       const process = (0, (_nullthrows || _load_nullthrows()).default)(_this4.process);
       (0, (_nuclideAnalytics || _load_nuclideAnalytics()).track)((_constants || _load_constants()).AnalyticsEvents.DEBUGGER_EDIT_VARIABLE, {
-        language: process.configuration.debuggerName
+        language: process.configuration.adapterType
       });
       try {
         const response = yield process.session.setVariable({

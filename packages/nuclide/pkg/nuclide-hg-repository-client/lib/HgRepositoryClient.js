@@ -1029,6 +1029,10 @@ class HgRepositoryClient {
     return this._service.log(filePaths, limit);
   }
 
+  getFullHashForRevision(rev) {
+    return this._service.getFullHashForRevision(rev);
+  }
+
   continueOperation(commandWithOptions) {
     // TODO(T17463635)
     return this._service.continueOperation(commandWithOptions).refCount();

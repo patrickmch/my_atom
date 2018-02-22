@@ -183,19 +183,20 @@ class ConnectionDetailsForm extends _react.Component {
   }
 
   render() {
-    const { className } = this.props;
+    const { className, needsPasswordValue } = this.props;
     const activeAuthMethod = authMethods[this.state.selectedAuthMethodIndex];
     // We need native-key-bindings so that delete works and we need
     // _onKeyPress so that escape and enter work
+    const passwordLabelName = 'Password' + (needsPasswordValue ? ':' : '');
     const passwordLabel = _react.createElement(
       'div',
       { className: 'nuclide-auth-method' },
       _react.createElement(
         'div',
         { className: 'nuclide-auth-method-label' },
-        'Password:'
+        passwordLabelName
       ),
-      _react.createElement(
+      needsPasswordValue ? _react.createElement(
         'div',
         {
           className: 'nuclide-auth-method-input nuclide-auth-method-password',
@@ -210,7 +211,7 @@ class ConnectionDetailsForm extends _react.Component {
             this._password = el;
           }
         })
-      )
+      ) : null
     );
     const privateKeyLabel = _react.createElement(
       'div',

@@ -94,6 +94,7 @@
       "atom-material-syntax"
     ]
     titleBar: "custom"
+  "cursor-blink-interval": {}
   editor:
     fontFamily: "Source Code Pro for Powerline"
     fontSize: 11
@@ -120,6 +121,8 @@
     fontFamily: "Inconsolata-g"
   "git-blame":
     columnWidth: 412
+  "glowing-cursor":
+    cursorWidth: 7
   "hey-pane":
     expandedWidth: 97
   "highlight-line":

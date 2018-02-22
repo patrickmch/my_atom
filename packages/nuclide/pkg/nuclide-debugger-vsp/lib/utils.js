@@ -3,7 +3,7 @@
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.getReactNativeLaunchProcessInfo = exports.getReactNativeAttachProcessInfo = exports.getNodeAttachProcessInfo = exports.getOCamlLaunchProcessInfo = exports.getNodeLaunchProcessInfo = exports.getPrepackLaunchProcessInfo = exports.getPythonScriptLaunchProcessInfo = exports.getPythonParLaunchProcessInfo = exports.REACT_NATIVE_PACKAGER_DEFAULT_PORT = undefined;
+exports.getReactNativeLaunchProcessInfo = exports.getReactNativeAttachProcessInfo = exports.getNodeAttachProcessInfo = exports.getGdbAttachProcessInfo = exports.getGdbLaunchProcessInfo = exports.getOCamlLaunchProcessInfo = exports.getNodeLaunchProcessInfo = exports.getPrepackLaunchProcessInfo = exports.getPythonScriptLaunchProcessInfo = exports.getPythonParLaunchProcessInfo = exports.REACT_NATIVE_PACKAGER_DEFAULT_PORT = undefined;
 
 var _asyncToGenerator = _interopRequireDefault(require('async-to-generator'));
 
@@ -112,59 +112,83 @@ let getOCamlLaunchProcessInfo = exports.getOCamlLaunchProcessInfo = (() => {
   };
 })();
 
+let getGdbLaunchProcessInfo = exports.getGdbLaunchProcessInfo = (() => {
+  var _ref10 = (0, _asyncToGenerator.default)(function* (program, args, cwd) {
+    const adapterInfo = yield getAdapterExecutableWithProperNode('native', program);
+    return new (_VspProcessInfo || _load_VspProcessInfo()).default(program, 'launch', (_main || _load_main()).VsAdapterTypes.NATIVE, adapterInfo, true, // showThreads
+    { program: (_nuclideUri || _load_nuclideUri()).default.getPath(program), args, cwd });
+  });
+
+  return function getGdbLaunchProcessInfo(_x25, _x26, _x27) {
+    return _ref10.apply(this, arguments);
+  };
+})();
+
+let getGdbAttachProcessInfo = exports.getGdbAttachProcessInfo = (() => {
+  var _ref11 = (0, _asyncToGenerator.default)(function* (targetUri, pid) {
+    const adapterInfo = yield getAdapterExecutableWithProperNode('native', targetUri);
+    return new (_VspProcessInfo || _load_VspProcessInfo()).default(targetUri, 'attach', (_main || _load_main()).VsAdapterTypes.NATIVE, adapterInfo, true, // showThreads
+    { pid });
+  });
+
+  return function getGdbAttachProcessInfo(_x28, _x29) {
+    return _ref11.apply(this, arguments);
+  };
+})();
+
 let getNodeAttachProcessInfo = exports.getNodeAttachProcessInfo = (() => {
-  var _ref10 = (0, _asyncToGenerator.default)(function* (targetUri, port) {
+  var _ref12 = (0, _asyncToGenerator.default)(function* (targetUri, port) {
     const adapterInfo = yield getNodeAdapterInfo(targetUri);
     return new (_VspProcessInfo || _load_VspProcessInfo()).default(targetUri, 'attach', (_main || _load_main()).VsAdapterTypes.NODE, adapterInfo, false, // showThreads
     getAttachNodeConfig(port));
   });
 
-  return function getNodeAttachProcessInfo(_x25, _x26) {
-    return _ref10.apply(this, arguments);
+  return function getNodeAttachProcessInfo(_x30, _x31) {
+    return _ref12.apply(this, arguments);
   };
 })();
 
 let getNodeAdapterInfo = (() => {
-  var _ref11 = (0, _asyncToGenerator.default)(function* (path) {
+  var _ref13 = (0, _asyncToGenerator.default)(function* (path) {
     return getAdapterExecutableWithProperNode('node', path);
   });
 
-  return function getNodeAdapterInfo(_x27) {
-    return _ref11.apply(this, arguments);
+  return function getNodeAdapterInfo(_x32) {
+    return _ref13.apply(this, arguments);
   };
 })();
 
 let getReactNativeAttachProcessInfo = exports.getReactNativeAttachProcessInfo = (() => {
-  var _ref12 = (0, _asyncToGenerator.default)(function* (args) {
+  var _ref14 = (0, _asyncToGenerator.default)(function* (args) {
     const adapterInfo = yield getReactNativeAdapterInfo(args.program);
     return new (_VspProcessInfo || _load_VspProcessInfo()).default(args.program, 'attach', (_main || _load_main()).VsAdapterTypes.REACT_NATIVE, adapterInfo, false, // showThreads
     args);
   });
 
-  return function getReactNativeAttachProcessInfo(_x28) {
-    return _ref12.apply(this, arguments);
+  return function getReactNativeAttachProcessInfo(_x33) {
+    return _ref14.apply(this, arguments);
   };
 })();
 
 let getReactNativeLaunchProcessInfo = exports.getReactNativeLaunchProcessInfo = (() => {
-  var _ref13 = (0, _asyncToGenerator.default)(function* (args) {
+  var _ref15 = (0, _asyncToGenerator.default)(function* (args) {
     const adapterInfo = yield getReactNativeAdapterInfo(args.program);
     return new (_VspProcessInfo || _load_VspProcessInfo()).default(args.program, 'launch', (_main || _load_main()).VsAdapterTypes.REACT_NATIVE, adapterInfo, false, // showThreads
     args);
   });
 
-  return function getReactNativeLaunchProcessInfo(_x29) {
-    return _ref13.apply(this, arguments);
+  return function getReactNativeLaunchProcessInfo(_x34) {
+    return _ref15.apply(this, arguments);
   };
 })();
 
 let getReactNativeAdapterInfo = (() => {
-  var _ref14 = (0, _asyncToGenerator.default)(function* (path) {
+  var _ref16 = (0, _asyncToGenerator.default)(function* (path) {
     return getAdapterExecutableWithProperNode('react-native', path);
   });
 
-  return function getReactNativeAdapterInfo(_x30) {
-    return _ref14.apply(this, arguments);
+  return function getReactNativeAdapterInfo(_x35) {
+    return _ref16.apply(this, arguments);
   };
 })();
 
@@ -358,7 +382,7 @@ function listenToRemoteDebugCommands() {
       return _rxjsBundlesRxMinJs.Observable.empty();
     }).map(command => ({ rootUri, command }));
   }).let((0, (_observable || _load_observable()).fastDebounce)(500)).subscribe((() => {
-    var _ref15 = (0, _asyncToGenerator.default)(function* ({ rootUri, command }) {
+    var _ref17 = (0, _asyncToGenerator.default)(function* ({ rootUri, command }) {
       const attachProcessInfo = yield getPythonAttachTargetProcessInfo(rootUri, command.target);
       const debuggerService = yield (0, (_debugger || _load_debugger()).getDebuggerService)();
       const debuggerName = debuggerService.getCurrentDebuggerName();
@@ -373,8 +397,8 @@ function listenToRemoteDebugCommands() {
       // Otherwise, we're already debugging that target.
     });
 
-    return function (_x31) {
-      return _ref15.apply(this, arguments);
+    return function (_x36) {
+      return _ref17.apply(this, arguments);
     };
   })()));
 }

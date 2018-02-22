@@ -2,39 +2,39 @@
   "_args": [
     [
       {
-        "raw": "/private/var/folders/dp/vj05cwss7pz9mjl62ccqzysm0000gp/T/d-118114-99472-qdwfwk.zvyevzpvi/package.tgz",
+        "raw": "/private/var/folders/dp/vj05cwss7pz9mjl62ccqzysm0000gp/T/d-118122-75093-zrkd5w.948r02uik9/package.tgz",
         "scope": null,
         "escapedName": null,
         "name": null,
-        "rawSpec": "/private/var/folders/dp/vj05cwss7pz9mjl62ccqzysm0000gp/T/d-118114-99472-qdwfwk.zvyevzpvi/package.tgz",
-        "spec": "/private/var/folders/dp/vj05cwss7pz9mjl62ccqzysm0000gp/T/d-118114-99472-qdwfwk.zvyevzpvi/package.tgz",
+        "rawSpec": "/private/var/folders/dp/vj05cwss7pz9mjl62ccqzysm0000gp/T/d-118122-75093-zrkd5w.948r02uik9/package.tgz",
+        "spec": "/private/var/folders/dp/vj05cwss7pz9mjl62ccqzysm0000gp/T/d-118122-75093-zrkd5w.948r02uik9/package.tgz",
         "type": "local"
       },
-      "/private/var/folders/dp/vj05cwss7pz9mjl62ccqzysm0000gp/T/apm-install-dir-118114-99472-1caxk06.tppfmbzkt9"
+      "/private/var/folders/dp/vj05cwss7pz9mjl62ccqzysm0000gp/T/apm-install-dir-118122-75093-1tg2gkw.cp56mbzkt9"
     ]
   ],
-  "_from": "../d-118114-99472-qdwfwk.zvyevzpvi/package.tgz",
-  "_id": "nuclide@0.283.0",
+  "_from": "../d-118122-75093-zrkd5w.948r02uik9/package.tgz",
+  "_id": "nuclide@0.284.0",
   "_inCache": true,
   "_location": "/nuclide",
   "_phantomChildren": {},
   "_requested": {
-    "raw": "/private/var/folders/dp/vj05cwss7pz9mjl62ccqzysm0000gp/T/d-118114-99472-qdwfwk.zvyevzpvi/package.tgz",
+    "raw": "/private/var/folders/dp/vj05cwss7pz9mjl62ccqzysm0000gp/T/d-118122-75093-zrkd5w.948r02uik9/package.tgz",
     "scope": null,
     "escapedName": null,
     "name": null,
-    "rawSpec": "/private/var/folders/dp/vj05cwss7pz9mjl62ccqzysm0000gp/T/d-118114-99472-qdwfwk.zvyevzpvi/package.tgz",
-    "spec": "/private/var/folders/dp/vj05cwss7pz9mjl62ccqzysm0000gp/T/d-118114-99472-qdwfwk.zvyevzpvi/package.tgz",
+    "rawSpec": "/private/var/folders/dp/vj05cwss7pz9mjl62ccqzysm0000gp/T/d-118122-75093-zrkd5w.948r02uik9/package.tgz",
+    "spec": "/private/var/folders/dp/vj05cwss7pz9mjl62ccqzysm0000gp/T/d-118122-75093-zrkd5w.948r02uik9/package.tgz",
     "type": "local"
   },
   "_requiredBy": [
     "#USER"
   ],
-  "_resolved": "file:../d-118114-99472-qdwfwk.zvyevzpvi/package.tgz",
-  "_shasum": "48bce738ca9e132e333434475a4f7e9bb7178bc8",
+  "_resolved": "file:../d-118122-75093-zrkd5w.948r02uik9/package.tgz",
+  "_shasum": "af6204005c76be828249fc5d6463bf17a5ef156a",
   "_shrinkwrap": null,
-  "_spec": "/private/var/folders/dp/vj05cwss7pz9mjl62ccqzysm0000gp/T/d-118114-99472-qdwfwk.zvyevzpvi/package.tgz",
-  "_where": "/private/var/folders/dp/vj05cwss7pz9mjl62ccqzysm0000gp/T/apm-install-dir-118114-99472-1caxk06.tppfmbzkt9",
+  "_spec": "/private/var/folders/dp/vj05cwss7pz9mjl62ccqzysm0000gp/T/d-118122-75093-zrkd5w.948r02uik9/package.tgz",
+  "_where": "/private/var/folders/dp/vj05cwss7pz9mjl62ccqzysm0000gp/T/apm-install-dir-118122-75093-1tg2gkw.cp56mbzkt9",
   "atomTestRunner": "./lib/test-runner-entry.js",
   "bin": {
     "nuclide-start-server": "./pkg/nuclide-server/nuclide-start-server"
@@ -243,7 +243,7 @@
     "test": "npm run lint-all && npm run flow"
   },
   "urlMain": "./lib/url-main-entry.js",
-  "version": "0.283.0",
+  "version": "0.284.0",
   "warnings": [
     {
       "code": "ENOTSUP",
@@ -251,7 +251,7 @@
         "atom": ">=1.23.2",
         "node": ">=7.4.0"
       },
-      "pkgid": "nuclide@0.283.0"
+      "pkgid": "nuclide@0.284.0"
     },
     {
       "code": "ENOTSUP",
@@ -259,7 +259,7 @@
         "atom": ">=1.23.2",
         "node": ">=7.4.0"
       },
-      "pkgid": "nuclide@0.283.0"
+      "pkgid": "nuclide@0.284.0"
     }
   ],
   "workspaces": [

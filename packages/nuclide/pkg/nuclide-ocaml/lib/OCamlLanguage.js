@@ -11,9 +11,11 @@ let createOCamlLanguageService = (() => {
     const service = (0, (_nuclideRemoteConnection || _load_nuclideRemoteConnection()).getVSCodeLanguageServiceByConnection)(connection);
     const [fileNotifier, host] = yield Promise.all([(0, (_nuclideOpenFiles || _load_nuclideOpenFiles()).getNotifierByConnection)(connection), (0, (_nuclideLanguageService || _load_nuclideLanguageService()).getHostServices)()]);
 
+    const logLevel = (0, (_rpcTypes || _load_rpcTypes()).parseLogLevel)((_featureConfig || _load_featureConfig()).default.get('nuclide-ocaml.logLevel'), 'DEBUG');
+
     const lspService = yield service.createMultiLspLanguageService('ocaml', 'ocaml-language-server', ['--stdio'], {
       logCategory: 'OcamlService',
-      logLevel: 'INFO',
+      logLevel,
       fileNotifier,
       host,
       projectFileNames: ['esy', 'esy.json', 'package.json', '.merlin'],
@@ -68,6 +70,12 @@ let createOCamlLanguageService = (() => {
 
 exports.createLanguageService = createLanguageService;
 
+var _featureConfig;
+
+function _load_featureConfig() {
+  return _featureConfig = _interopRequireDefault(require('nuclide-commons-atom/feature-config'));
+}
+
 var _nuclideLanguageService;
 
 function _load_nuclideLanguageService() {
@@ -78,6 +86,12 @@ var _nuclideLanguageServiceRpc;
 
 function _load_nuclideLanguageServiceRpc() {
   return _nuclideLanguageServiceRpc = require('../../nuclide-language-service-rpc');
+}
+
+var _rpcTypes;
+
+function _load_rpcTypes() {
+  return _rpcTypes = require('../../nuclide-logging/lib/rpc-types');
 }
 
 var _nuclideOpenFiles;

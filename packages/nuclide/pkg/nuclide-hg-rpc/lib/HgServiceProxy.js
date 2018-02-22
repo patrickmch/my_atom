@@ -1426,6 +1426,30 @@ module.exports = _client => {
       }).publish();
     }
 
+    getFullHashForRevision(arg0) {
+      return Promise.all([_client.marshalArguments(Array.from(arguments), [{
+        name: "rev",
+        type: {
+          kind: "string"
+        }
+      }]), _client.marshal(this, {
+        kind: "named",
+        location: {
+          type: "source",
+          fileName: "HgService.js",
+          line: 321
+        },
+        name: "HgService"
+      })]).then(([args, id]) => _client.callRemoteMethod(id, "getFullHashForRevision", "promise", args)).then(value => {
+        return _client.unmarshal(value, {
+          kind: "nullable",
+          type: {
+            kind: "string"
+          }
+        });
+      });
+    }
+
     fold(arg0, arg1, arg2) {
       return Observable.fromPromise(Promise.all([_client.marshalArguments(Array.from(arguments), [{
         name: "from",
@@ -2662,7 +2686,7 @@ Object.defineProperty(module.exports, "defs", {
       location: {
         type: "source",
         fileName: "process.js",
-        line: 600
+        line: 634
       },
       name: "ProcessExitMessage",
       definition: {
@@ -2700,7 +2724,7 @@ Object.defineProperty(module.exports, "defs", {
       location: {
         type: "source",
         fileName: "process.js",
-        line: 606
+        line: 640
       },
       name: "ProcessMessage",
       definition: {
@@ -2774,7 +2798,7 @@ Object.defineProperty(module.exports, "defs", {
       location: {
         type: "source",
         fileName: "process.js",
-        line: 619
+        line: 653
       },
       name: "LegacyProcessMessage",
       definition: {
@@ -4245,11 +4269,34 @@ Object.defineProperty(module.exports, "defs", {
             }
           }
         },
+        getFullHashForRevision: {
+          location: {
+            type: "source",
+            fileName: "HgService.js",
+            line: 1729
+          },
+          kind: "function",
+          argumentTypes: [{
+            name: "rev",
+            type: {
+              kind: "string"
+            }
+          }],
+          returnType: {
+            kind: "promise",
+            type: {
+              kind: "nullable",
+              type: {
+                kind: "string"
+              }
+            }
+          }
+        },
         fold: {
           location: {
             type: "source",
             fileName: "HgService.js",
-            line: 1731
+            line: 1743
           },
           kind: "function",
           argumentTypes: [{

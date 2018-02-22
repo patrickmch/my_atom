@@ -3,17 +3,25 @@
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.CqueryProjectManager = undefined;
+exports.CqueryProjectManager = exports.COMPILATION_DATABASE_FILE = undefined;
 
-var _asyncToGenerator = _interopRequireDefault(require('async-to-generator'));
+var _nuclideClangRpc;
 
-var _fsPromise;
+function _load_nuclideClangRpc() {
+  return _nuclideClangRpc = _interopRequireWildcard(require('../../nuclide-clang-rpc'));
+}
 
-function _load_fsPromise() {
-  return _fsPromise = _interopRequireDefault(require('nuclide-commons/fsPromise'));
+var _nuclideUri;
+
+function _load_nuclideUri() {
+  return _nuclideUri = _interopRequireDefault(require('nuclide-commons/nuclideUri'));
 }
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
+
+const COMPILATION_DATABASE_FILE = exports.COMPILATION_DATABASE_FILE = 'compile_commands.json';
 
 /**
  * Manages the existing projects and the files associated with them
@@ -43,23 +51,29 @@ class CqueryProjectManager {
   }
 
   associateFileWithProject(file, project) {
-    var _this = this;
-
-    return (0, _asyncToGenerator.default)(function* () {
-      const key = _this.getProjectKey(project);
-      _this._keyToProject.set(key, project);
-      _this._fileToProjectKey.set((yield (_fsPromise || _load_fsPromise()).default.realpath(file)), key);
-    })();
+    const key = this.getProjectKey(project);
+    this._keyToProject.set(key, project);
+    if (this._fileToProjectKey.get(file) === key) {
+      return Promise.resolve();
+    }
+    if (!this._keyToProject.has(key) && project.hasCompilationDb) {
+      const dbFile = (_nuclideUri || _load_nuclideUri()).default.join(project.compilationDbDir, COMPILATION_DATABASE_FILE);
+      // Cache keys for all the files in the project.
+      return new Promise((resolve, reject) => {
+        (_nuclideClangRpc || _load_nuclideClangRpc()).loadFilesFromCompilationDatabaseAndCacheThem(dbFile, project.flagsFile).refCount().subscribe(path => this._fileToProjectKey.set(path, key), reject, // on error
+        resolve // on complete
+        );
+      });
+    } else {
+      this._fileToProjectKey.set(file, key);
+      return Promise.resolve();
+    }
   }
 
   getProjectForFile(file) {
-    var _this2 = this;
-
-    return (0, _asyncToGenerator.default)(function* () {
-      const key = _this2._fileToProjectKey.get((yield (_fsPromise || _load_fsPromise()).default.realpath(file)));
-      _this2._logger.debug('key for', file, ':', key);
-      return key == null ? null : _this2._keyToProject.get(key);
-    })();
+    const key = this._fileToProjectKey.get(file);
+    this._logger.debug('key for', file, ':', key);
+    return key == null ? null : this._keyToProject.get(key);
   }
 
   getProjectFromKey(projectKey) {

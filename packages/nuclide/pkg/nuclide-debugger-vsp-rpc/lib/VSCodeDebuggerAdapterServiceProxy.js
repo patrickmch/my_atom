@@ -39,7 +39,7 @@ module.exports = _client => {
         location: {
           type: "source",
           fileName: "VSCodeDebuggerAdapterService.js",
-          line: 30
+          line: 31
         },
         name: "VSCodeDebuggerAdapterService"
       })]).then(([args, id]) => _client.callRemoteMethod(id, "debug", "promise", args)).then(value => {
@@ -60,7 +60,7 @@ module.exports = _client => {
         location: {
           type: "source",
           fileName: "VSCodeDebuggerAdapterService.js",
-          line: 30
+          line: 31
         },
         name: "VSCodeDebuggerAdapterService"
       })]).then(([args, id]) => _client.callRemoteMethod(id, "sendCommand", "promise", args)).then(value => {
@@ -76,7 +76,7 @@ module.exports = _client => {
         location: {
           type: "source",
           fileName: "VSCodeDebuggerAdapterService.js",
-          line: 30
+          line: 31
         },
         name: "VSCodeDebuggerAdapterService"
       })])).switchMap(([args, id]) => _client.callRemoteMethod(id, "getOutputWindowObservable", "observable", args)).concatMap(value => {
@@ -92,7 +92,7 @@ module.exports = _client => {
         location: {
           type: "source",
           fileName: "VSCodeDebuggerAdapterService.js",
-          line: 30
+          line: 31
         },
         name: "VSCodeDebuggerAdapterService"
       })])).switchMap(([args, id]) => _client.callRemoteMethod(id, "getAtomNotificationObservable", "observable", args)).concatMap(value => {
@@ -109,12 +109,54 @@ module.exports = _client => {
         location: {
           type: "source",
           fileName: "VSCodeDebuggerAdapterService.js",
-          line: 30
+          line: 31
         },
         name: "VSCodeDebuggerAdapterService"
       })])).switchMap(([args, id]) => _client.callRemoteMethod(id, "getServerMessageObservable", "observable", args)).concatMap(value => {
         return _client.unmarshal(value, {
           kind: "string"
+        });
+      }).publish();
+    }
+
+    custom(arg0, arg1) {
+      return Promise.all([_client.marshalArguments(Array.from(arguments), [{
+        name: "request",
+        type: {
+          kind: "string"
+        }
+      }, {
+        name: "args",
+        type: {
+          kind: "any"
+        }
+      }]), _client.marshal(this, {
+        kind: "named",
+        location: {
+          type: "source",
+          fileName: "VSCodeDebuggerAdapterService.js",
+          line: 31
+        },
+        name: "VSCodeDebuggerAdapterService"
+      })]).then(([args, id]) => _client.callRemoteMethod(id, "custom", "promise", args)).then(value => {
+        return _client.unmarshal(value, {
+          kind: "any"
+        });
+      });
+    }
+
+    observeCustomEvents() {
+      return Observable.fromPromise(Promise.all([_client.marshalArguments(Array.from(arguments), []), _client.marshal(this, {
+        kind: "named",
+        location: {
+          type: "source",
+          fileName: "VSCodeDebuggerAdapterService.js",
+          line: 31
+        },
+        name: "VSCodeDebuggerAdapterService"
+      })])).switchMap(([args, id]) => _client.callRemoteMethod(id, "observeCustomEvents", "observable", args)).concatMap(value => {
+        return _client.unmarshal(value, {
+          kind: "any"
         });
       }).publish();
     }
@@ -141,7 +183,7 @@ module.exports = _client => {
         location: {
           type: "source",
           fileName: "VSCodeDebuggerAdapterService.js",
-          line: 89
+          line: 111
         },
         name: "VsRawAdapterSpawnerService"
       })])).switchMap(([args, id]) => _client.callRemoteMethod(id, "spawnAdapter", "observable", args)).concatMap(value => {
@@ -163,7 +205,7 @@ module.exports = _client => {
         location: {
           type: "source",
           fileName: "VSCodeDebuggerAdapterService.js",
-          line: 89
+          line: 111
         },
         name: "VsRawAdapterSpawnerService"
       })]).then(([args, id]) => _client.callRemoteMethod(id, "write", "promise", args)).then(value => {
@@ -278,6 +320,9 @@ Object.defineProperty(module.exports, "defs", {
         }, {
           kind: "string-literal",
           value: "mobilejs"
+        }, {
+          kind: "string-literal",
+          value: "native"
         }]
       }
     },
@@ -385,7 +430,7 @@ Object.defineProperty(module.exports, "defs", {
       location: {
         type: "source",
         fileName: "VSCodeDebuggerAdapterService.js",
-        line: 30
+        line: 31
       },
       constructorArgs: [{
         name: "adapterType",
@@ -400,7 +445,7 @@ Object.defineProperty(module.exports, "defs", {
           location: {
             type: "source",
             fileName: "VSCodeDebuggerAdapterService.js",
-            line: 39
+            line: 40
           },
           kind: "function",
           argumentTypes: [{
@@ -433,7 +478,7 @@ Object.defineProperty(module.exports, "defs", {
           location: {
             type: "source",
             fileName: "VSCodeDebuggerAdapterService.js",
-            line: 62
+            line: 63
           },
           kind: "function",
           argumentTypes: [{
@@ -453,7 +498,7 @@ Object.defineProperty(module.exports, "defs", {
           location: {
             type: "source",
             fileName: "VSCodeDebuggerAdapterService.js",
-            line: 72
+            line: 73
           },
           kind: "function",
           argumentTypes: [],
@@ -468,7 +513,7 @@ Object.defineProperty(module.exports, "defs", {
           location: {
             type: "source",
             fileName: "VSCodeDebuggerAdapterService.js",
-            line: 76
+            line: 77
           },
           kind: "function",
           argumentTypes: [],
@@ -484,7 +529,7 @@ Object.defineProperty(module.exports, "defs", {
           location: {
             type: "source",
             fileName: "VSCodeDebuggerAdapterService.js",
-            line: 80
+            line: 81
           },
           kind: "function",
           argumentTypes: [],
@@ -495,11 +540,51 @@ Object.defineProperty(module.exports, "defs", {
             }
           }
         },
+        custom: {
+          location: {
+            type: "source",
+            fileName: "VSCodeDebuggerAdapterService.js",
+            line: 85
+          },
+          kind: "function",
+          argumentTypes: [{
+            name: "request",
+            type: {
+              kind: "string"
+            }
+          }, {
+            name: "args",
+            type: {
+              kind: "any"
+            }
+          }],
+          returnType: {
+            kind: "promise",
+            type: {
+              kind: "any"
+            }
+          }
+        },
+        observeCustomEvents: {
+          location: {
+            type: "source",
+            fileName: "VSCodeDebuggerAdapterService.js",
+            line: 93
+          },
+          kind: "function",
+          argumentTypes: [],
+          returnType: {
+            kind: "observable",
+            type: {
+              kind: "any"
+            }
+          }
+        },
         dispose: {
           location: {
             type: "source",
             fileName: "VSCodeDebuggerAdapterService.js",
-            line: 84
+            line: 106
           },
           kind: "function",
           argumentTypes: [],
@@ -517,7 +602,7 @@ Object.defineProperty(module.exports, "defs", {
       location: {
         type: "source",
         fileName: "process.js",
-        line: 600
+        line: 634
       },
       name: "ProcessExitMessage",
       definition: {
@@ -555,7 +640,7 @@ Object.defineProperty(module.exports, "defs", {
       location: {
         type: "source",
         fileName: "process.js",
-        line: 606
+        line: 640
       },
       name: "ProcessMessage",
       definition: {
@@ -630,7 +715,7 @@ Object.defineProperty(module.exports, "defs", {
       location: {
         type: "source",
         fileName: "VSCodeDebuggerAdapterService.js",
-        line: 89
+        line: 111
       },
       constructorArgs: [],
       staticMethods: {},
@@ -639,7 +724,7 @@ Object.defineProperty(module.exports, "defs", {
           location: {
             type: "source",
             fileName: "VSCodeDebuggerAdapterService.js",
-            line: 90
+            line: 112
           },
           kind: "function",
           argumentTypes: [{
@@ -661,7 +746,7 @@ Object.defineProperty(module.exports, "defs", {
           location: {
             type: "source",
             fileName: "VSCodeDebuggerAdapterService.js",
-            line: 96
+            line: 118
           },
           kind: "function",
           argumentTypes: [{
@@ -681,7 +766,7 @@ Object.defineProperty(module.exports, "defs", {
           location: {
             type: "source",
             fileName: "VSCodeDebuggerAdapterService.js",
-            line: 100
+            line: 122
           },
           kind: "function",
           argumentTypes: [],

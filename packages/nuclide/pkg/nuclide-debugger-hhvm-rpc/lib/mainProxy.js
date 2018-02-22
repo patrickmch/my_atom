@@ -776,7 +776,7 @@ Object.defineProperty(module.exports, "defs", {
           location: {
             type: "source",
             fileName: "main.js",
-            line: 202
+            line: 214
           },
           kind: "function",
           argumentTypes: [],
@@ -791,7 +791,7 @@ Object.defineProperty(module.exports, "defs", {
           location: {
             type: "source",
             fileName: "main.js",
-            line: 283
+            line: 295
           },
           kind: "function",
           argumentTypes: [],
@@ -822,7 +822,7 @@ Object.defineProperty(module.exports, "defs", {
           location: {
             type: "source",
             fileName: "main.js",
-            line: 304
+            line: 316
           },
           kind: "function",
           argumentTypes: [],

@@ -43,16 +43,19 @@ class RemoteControlService {
     var _this = this;
 
     return (0, _asyncToGenerator.default)(function* () {
-      yield _this._startVspDebugging({
-        debuggerName: processInfo._serviceName,
+      const instance = _this._startVspDebugging({
         targetUri: processInfo.getTargetUri(),
-        debugMode: processInfo._debugMode,
-        adapterType: processInfo._adapterType,
+        debugMode: processInfo.getDebugMode(),
+        adapterType: processInfo.getAdapterType(),
         adapterExecutable: processInfo._adapterExecutable,
         capabilities: processInfo.getDebuggerCapabilities(),
         properties: processInfo.getDebuggerProps(),
-        config: processInfo._config
+        config: processInfo.getConfig(),
+        clientPreprocessor: processInfo.getVspClientPreprocessor(),
+        adapterPreprocessor: processInfo.getVspAdapterPreprocessor()
       });
+
+      processInfo.setVspDebuggerInstance(instance);
     })();
   }
 
@@ -61,51 +64,48 @@ class RemoteControlService {
     if (focusedProcess == null) {
       return null;
     } else {
-      return focusedProcess.configuration.debuggerName;
+      return focusedProcess.configuration.adapterType;
     }
   }
 
   _startVspDebugging(config) {
-    var _this2 = this;
+    this._service.startDebugging(config);
 
-    return (0, _asyncToGenerator.default)(function* () {
-      yield _this2._service.startDebugging(config);
-      const { viewModel } = _this2._service;
-      const { focusedProcess } = viewModel;
+    const { viewModel } = this._service;
+    const { focusedProcess } = viewModel;
 
-      if (!(focusedProcess != null)) {
-        throw new Error('Invariant violation: "focusedProcess != null"');
-      }
+    if (!(focusedProcess != null)) {
+      throw new Error('Invariant violation: "focusedProcess != null"');
+    }
 
-      const isFocussedProcess = function () {
-        return _this2._service.getDebuggerMode() !== (_constants || _load_constants()).DebuggerMode.STOPPED && viewModel.focusedProcess === focusedProcess;
-      };
+    const isFocusedProcess = () => {
+      return this._service.getDebuggerMode() !== (_constants || _load_constants()).DebuggerMode.STOPPED && viewModel.focusedProcess === focusedProcess;
+    };
 
-      const customRequest = (() => {
-        var _ref = (0, _asyncToGenerator.default)(function* (request, args) {
-          if (!isFocussedProcess()) {
-            throw new Error('Cannot send custom requests to a no longer active debug session!');
-          }
-          return focusedProcess.session.custom(request, args);
-        });
-
-        return function customRequest(_x, _x2) {
-          return _ref.apply(this, arguments);
-        };
-      })();
-
-      const observeCustomEvents = function () {
-        if (!isFocussedProcess()) {
+    const customRequest = (() => {
+      var _ref = (0, _asyncToGenerator.default)(function* (request, args) {
+        if (!isFocusedProcess()) {
           throw new Error('Cannot send custom requests to a no longer active debug session!');
         }
-        return focusedProcess.session.observeCustomEvents();
-      };
+        return focusedProcess.session.custom(request, args);
+      });
 
-      return {
-        customRequest,
-        observeCustomEvents
+      return function customRequest(_x, _x2) {
+        return _ref.apply(this, arguments);
       };
     })();
+
+    const observeCustomEvents = () => {
+      if (!isFocusedProcess()) {
+        throw new Error('Cannot send custom requests to a no longer active debug session!');
+      }
+      return focusedProcess.session.observeCustomEvents();
+    };
+
+    return Object.freeze({
+      customRequest,
+      observeCustomEvents
+    });
   }
 
   canLaunchDebugTargetInTerminal(targetUri) {

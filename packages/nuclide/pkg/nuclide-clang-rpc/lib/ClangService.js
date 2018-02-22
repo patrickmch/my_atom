@@ -168,12 +168,17 @@ let getArcanistClangFormatBinary = (() => {
   };
 })();
 
+// Read the provided database file, optionally associate it with the provided
+// flags file, and return an observable of the filenames it contains.
+
+
+// Remark: this isn't really rpc-safe, the big databases can be > 1 GB.
 let loadFlagsFromCompilationDatabaseAndCacheThem = exports.loadFlagsFromCompilationDatabaseAndCacheThem = (() => {
-  var _ref11 = (0, _asyncToGenerator.default)(function* (requestSettings) {
+  var _ref11 = (0, _asyncToGenerator.default)(function* (dbFile, flagsFile) {
     const flagsManager = serverManager.getClangFlagsManager();
-    const compilationHandles = yield flagsManager.loadFlagsFromCompilationDatabase(requestSettings);
+    const flagHandles = yield flagsManager.loadFlagsFromCompilationDatabase(dbFile, flagsFile);
     const compilationFlags = new Map();
-    for (const [src, handle] of compilationHandles) {
+    for (const [src, handle] of flagHandles) {
       const flags = flagsManager.getFlags(handle);
       if (flags != null) {
         compilationFlags.set(src, flags);
@@ -182,7 +187,7 @@ let loadFlagsFromCompilationDatabaseAndCacheThem = exports.loadFlagsFromCompilat
     return compilationFlags;
   });
 
-  return function loadFlagsFromCompilationDatabaseAndCacheThem(_x44) {
+  return function loadFlagsFromCompilationDatabaseAndCacheThem(_x44, _x45) {
     return _ref11.apply(this, arguments);
   };
 })();
@@ -194,6 +199,7 @@ let loadFlagsFromCompilationDatabaseAndCacheThem = exports.loadFlagsFromCompilat
 
 
 exports.compile = compile;
+exports.loadFilesFromCompilationDatabaseAndCacheThem = loadFilesFromCompilationDatabaseAndCacheThem;
 exports.resetForSource = resetForSource;
 exports.reset = reset;
 exports.dispose = dispose;
@@ -314,7 +320,10 @@ function compile(src, contents, requestSettings, defaultFlags) {
   return _rxjsBundlesRxMinJs.Observable.fromPromise(doCompile()).publish();
 }
 
-function resetForSource(src) {
+function loadFilesFromCompilationDatabaseAndCacheThem(dbFile, flagsFile) {
+  const flagsManager = serverManager.getClangFlagsManager();
+  return _rxjsBundlesRxMinJs.Observable.from(flagsManager.loadFlagsFromCompilationDatabase(dbFile, flagsFile)).flatMap(flagsMap => flagsMap.keys()).publish();
+}function resetForSource(src) {
   serverManager.reset(src);
 }
 

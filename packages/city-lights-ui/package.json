@@ -2,39 +2,39 @@
   "_args": [
     [
       {
-        "raw": "/private/var/folders/dp/vj05cwss7pz9mjl62ccqzysm0000gp/T/d-118021-6176-l3saul.jm3k4holxr/package.tgz",
+        "raw": "/private/var/folders/dp/vj05cwss7pz9mjl62ccqzysm0000gp/T/d-118116-57200-13rxmad.xwzecgcik9/package.tgz",
         "scope": null,
         "escapedName": null,
         "name": null,
-        "rawSpec": "/private/var/folders/dp/vj05cwss7pz9mjl62ccqzysm0000gp/T/d-118021-6176-l3saul.jm3k4holxr/package.tgz",
-        "spec": "/private/var/folders/dp/vj05cwss7pz9mjl62ccqzysm0000gp/T/d-118021-6176-l3saul.jm3k4holxr/package.tgz",
+        "rawSpec": "/private/var/folders/dp/vj05cwss7pz9mjl62ccqzysm0000gp/T/d-118116-57200-13rxmad.xwzecgcik9/package.tgz",
+        "spec": "/private/var/folders/dp/vj05cwss7pz9mjl62ccqzysm0000gp/T/d-118116-57200-13rxmad.xwzecgcik9/package.tgz",
         "type": "local"
       },
-      "/private/var/folders/dp/vj05cwss7pz9mjl62ccqzysm0000gp/T/apm-install-dir-118021-6176-1akhyf.iqstkpgb9"
+      "/private/var/folders/dp/vj05cwss7pz9mjl62ccqzysm0000gp/T/apm-install-dir-118116-57200-1di7ui4.1u4onwxw29"
     ]
   ],
-  "_from": "../d-118021-6176-l3saul.jm3k4holxr/package.tgz",
-  "_id": "city-lights-ui@1.3.1",
+  "_from": "../d-118116-57200-13rxmad.xwzecgcik9/package.tgz",
+  "_id": "city-lights-ui@1.3.3",
   "_inCache": true,
   "_location": "/city-lights-ui",
   "_phantomChildren": {},
   "_requested": {
-    "raw": "/private/var/folders/dp/vj05cwss7pz9mjl62ccqzysm0000gp/T/d-118021-6176-l3saul.jm3k4holxr/package.tgz",
+    "raw": "/private/var/folders/dp/vj05cwss7pz9mjl62ccqzysm0000gp/T/d-118116-57200-13rxmad.xwzecgcik9/package.tgz",
     "scope": null,
     "escapedName": null,
     "name": null,
-    "rawSpec": "/private/var/folders/dp/vj05cwss7pz9mjl62ccqzysm0000gp/T/d-118021-6176-l3saul.jm3k4holxr/package.tgz",
-    "spec": "/private/var/folders/dp/vj05cwss7pz9mjl62ccqzysm0000gp/T/d-118021-6176-l3saul.jm3k4holxr/package.tgz",
+    "rawSpec": "/private/var/folders/dp/vj05cwss7pz9mjl62ccqzysm0000gp/T/d-118116-57200-13rxmad.xwzecgcik9/package.tgz",
+    "spec": "/private/var/folders/dp/vj05cwss7pz9mjl62ccqzysm0000gp/T/d-118116-57200-13rxmad.xwzecgcik9/package.tgz",
     "type": "local"
   },
   "_requiredBy": [
     "#USER"
   ],
-  "_resolved": "file:../d-118021-6176-l3saul.jm3k4holxr/package.tgz",
-  "_shasum": "e23d71465afbecfb08c15ae3b80a87c6eaa11bb8",
+  "_resolved": "file:../d-118116-57200-13rxmad.xwzecgcik9/package.tgz",
+  "_shasum": "93283d92334bd2936886293bdaab618dc19717af",
   "_shrinkwrap": null,
-  "_spec": "/private/var/folders/dp/vj05cwss7pz9mjl62ccqzysm0000gp/T/d-118021-6176-l3saul.jm3k4holxr/package.tgz",
-  "_where": "/private/var/folders/dp/vj05cwss7pz9mjl62ccqzysm0000gp/T/apm-install-dir-118021-6176-1akhyf.iqstkpgb9",
+  "_spec": "/private/var/folders/dp/vj05cwss7pz9mjl62ccqzysm0000gp/T/d-118116-57200-13rxmad.xwzecgcik9/package.tgz",
+  "_where": "/private/var/folders/dp/vj05cwss7pz9mjl62ccqzysm0000gp/T/apm-install-dir-118116-57200-1di7ui4.1u4onwxw29",
   "author": {
     "name": "Noud Adrichem"
   },
@@ -76,5 +76,5 @@
     "url": "git+https://github.com/Yummygum/city-lights-ui-atom.git"
   },
   "theme": "ui",
-  "version": "1.3.1"
+  "version": "1.3.3"
 }

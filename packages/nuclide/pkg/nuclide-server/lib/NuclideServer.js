@@ -42,7 +42,7 @@ function _load_blocked() {
 var _QueuedAckTransport;
 
 function _load_QueuedAckTransport() {
-  return _QueuedAckTransport = require('./QueuedAckTransport');
+  return _QueuedAckTransport = require('big-dig/src/socket/QueuedAckTransport');
 }
 
 var _utils;
@@ -78,7 +78,7 @@ function _load_nuclideRpc() {
 var _WebSocketTransport;
 
 function _load_WebSocketTransport() {
-  return _WebSocketTransport = require('./WebSocketTransport');
+  return _WebSocketTransport = require('big-dig/src/socket/WebSocketTransport');
 }
 
 var _nuclideMarshalersCommon;

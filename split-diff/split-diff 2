@@ -1,32 +1,36 @@
-nols_website/admissions/dashboard/gui_tests/academic_credit_tests.py
-nols_website/admissions/dashboard/gui_tests/dashboard_tests.py
-nols_website/admissions/dashboard/gui_tests/emt_prerequisites_tests.py
-nols_website/admissions/dashboard/gui_tests/letters_of_recommendation_tests.py
-nols_website/admissions/dashboard/gui_tests/page_objects/student_form_pages.py
-nols_website/admissions/dashboard/gui_tests/tuition_protection_plan_tests.py
-nols_website/admissions/dashboard/migrations/0007_auto_20180131_1135.py
-nols_website/admissions/dashboard/migrations/0008_remove_duplicate_emt_studentformcategory.py
-nols_website/admissions/dashboard/static/admissions/dashboard/js/ic_app_refs.js
-nols_website/admissions/dashboard/templates/admissions/dashboard/student_form_views/ajax_error_modal.html
-nols_website/admissions/dashboard/templates/admissions/dashboard/student_form_views/confirm_success_modal.html
-nols_website/admissions/dashboard/templates/admissions/dashboard/student_form_views/error_modal.html
-nols_website/admissions/dashboard/templates/admissions/dashboard/student_form_views/ic_app_lor_base.html
-nols_website/admissions/dashboard/templates/admissions/dashboard/student_form_views/ic_app_lor_form_base.html
-nols_website/admissions/dashboard/templates/admissions/dashboard/student_form_views/notif_modal.html
-nols_website/admissions/dashboard/templates/admissions/dashboard/student_form_views/use_old_form_modal.html
-nols_website/cms_plugins/button/migrations/0003_update_link_title_from_text.py
-nols_website/cms_plugins/stage/migrations/0004_delete_basetile_imagetile_teasertile_videotile.py
-nols_website/cms_plugins/tile_grid/migrations/0002_imagetile_teasertile_videotile.py
-nols_website/cms_plugins/tile_grid/migrations/0003_move_data.py
-nols_website/cms_plugins/tile_grid/migrations/0004_teasertile_link_title.py
-nols_website/info_sys/migrations/0002_auto_20180131_1211.py
-nols_website/info_sys/migrations/0003_auto_20180131_1233.py
-nols_website/nols_email/migrations/0003_auto_20180131_0951.py
-nols_website/nolspro/migrations/0007_auto_20180131_1135.py
-nols_website/payment/migrations/add_flexible_reference_ids_to_order.py
-nols_website/payment/static/payment/js/stripe.js
-nols_website/payment/static/payment/js/stripe_payments.js
-nols_website/payment/stripe_utils.py
-nols_website/payment/templates/payment/stripe_payments.html
-nols_website/payment/templates/payment/stripe_payments_receipt.html
-nols_website/wmi/gui_tests/page_objects/wildmed_pages.py
+#id_jagged_edge, #id_template {
+  visibility: hidden;
+}
+
+.cms-helptext {
+  padding: 20px;
+  margin-bottom: 40px;
+  background: lighten(#e67e22, 40%);
+  border-left: 4px solid #e67e22;
+  font-style: italic;
+}
+
+.mask-thumbnails,
+.template-thumbnails {
+  padding-top: 1rem;
+  padding-bottom: 1rem;
+  width: 100%;
+
+  .mask-thumb,
+  .template-thumb {
+    box-sizing: border-box !important;
+    margin: 5px;
+    padding: 5px;
+    width: 20%;
+
+    &.selected {
+      border: solid 1px rgba(212, 99, 0, 1);
+      border-radius: 0;
+      background-color: #F2F2F2;
+    }
+  }
+
+  .template-thumb {
+    border: solid 1px #F3F3F3;
+  }
+}

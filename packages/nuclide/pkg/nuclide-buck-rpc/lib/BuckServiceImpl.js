@@ -17,11 +17,20 @@ let _getBuckCommandAndOptions = exports._getBuckCommandAndOptions = (() => {
     if (pathToBuck === 'buck' && _os.platform() === 'win32') {
       pathToBuck = 'buck.bat';
     }
+    let env = yield (0, (_process || _load_process()).getOriginalEnvironment)();
+    try {
+      // $FlowFB
+      const { getRealUsername } = require('./fb/realUsername');
+      const username = yield getRealUsername(env.USER);
+      if (username != null) {
+        env = Object.assign({}, env, { USER: username });
+      }
+    } catch (_) {}
     const buckCommandOptions = Object.assign({
       cwd: rootPath,
       // Buck restarts itself if the environment changes, so try to preserve
       // the original environment that Nuclide was started in.
-      env: yield (0, (_process || _load_process()).getOriginalEnvironment)()
+      env
     }, commandOptions);
     return { pathToBuck, buckCommandOptions };
   });

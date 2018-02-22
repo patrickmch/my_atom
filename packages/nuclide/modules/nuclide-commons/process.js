@@ -95,9 +95,12 @@ let getDescendantsOfProcess = (() => {
 
 let psTree = exports.psTree = (() => {
   var _ref9 = (0, _asyncToGenerator.default)(function* () {
-    const stdout = isWindowsPlatform() ? // See also: https://github.com/nodejs/node-v0.x-archive/issues/2318
-    yield runCommand('wmic.exe', ['PROCESS', 'GET', 'ParentProcessId,ProcessId,Name']).toPromise() : yield runCommand('ps', ['-A', '-o', 'ppid,pid,comm']).toPromise();
-    return parsePsOutput(stdout);
+    if (isWindowsPlatform()) {
+      return psTreeWindows();
+    }
+    const [commands, withArgs] = yield Promise.all([runCommand('ps', ['-A', '-o', 'ppid,pid,comm']).toPromise(), runCommand('ps', ['-A', '-ww', '-o', 'pid,args']).toPromise()]);
+
+    return parsePsOutput(commands, withArgs);
   });
 
   return function psTree() {
@@ -105,8 +108,19 @@ let psTree = exports.psTree = (() => {
   };
 })();
 
+let psTreeWindows = (() => {
+  var _ref10 = (0, _asyncToGenerator.default)(function* () {
+    const stdout = yield runCommand('wmic.exe', ['PROCESS', 'GET', 'ParentProcessId,ProcessId,Name']).toPromise();
+    return parsePsOutput(stdout);
+  });
+
+  return function psTreeWindows() {
+    return _ref10.apply(this, arguments);
+  };
+})();
+
 let _killProcess = (() => {
-  var _ref10 = (0, _asyncToGenerator.default)(function* (proc, killTree) {
+  var _ref11 = (0, _asyncToGenerator.default)(function* (proc, killTree) {
     proc.wasKilled = true;
     if (!killTree) {
       proc.kill();
@@ -120,12 +134,12 @@ let _killProcess = (() => {
   });
 
   return function _killProcess(_x3, _x4) {
-    return _ref10.apply(this, arguments);
+    return _ref11.apply(this, arguments);
   };
 })();
 
 let killUnixProcessTree = exports.killUnixProcessTree = (() => {
-  var _ref11 = (0, _asyncToGenerator.default)(function* (proc) {
+  var _ref12 = (0, _asyncToGenerator.default)(function* (proc) {
     const descendants = yield getDescendantsOfProcess(proc.pid);
     // Kill the processes, starting with those of greatest depth.
     for (const info of descendants.reverse()) {
@@ -134,7 +148,7 @@ let killUnixProcessTree = exports.killUnixProcessTree = (() => {
   });
 
   return function killUnixProcessTree(_x5) {
-    return _ref11.apply(this, arguments);
+    return _ref12.apply(this, arguments);
   };
 })();
 
@@ -571,19 +585,32 @@ function exitEventToMessage(event) {
   }
 }
 
-function parsePsOutput(psOutput) {
+function parsePsOutput(psOutput, argsOutput) {
   // Remove the first header line.
-  const lines = psOutput.split(/\n|\r\n/).slice(1);
+  const lines = psOutput.trim().split(/\n|\r\n/).slice(1);
+
+  let withArgs = new Map();
+  if (argsOutput != null) {
+    withArgs = new Map(argsOutput.trim().split(/\n|\r\n/).slice(1).map(line => {
+      const columns = line.trim().split(/\s+/);
+      const pid = parseInt(columns[0], 10);
+      const command = columns.slice(1).join(' ');
+      return [pid, command];
+    }));
+  }
 
   return lines.map(line => {
     const columns = line.trim().split(/\s+/);
-    const [parentPid, pid] = columns;
+    const [parentPid, pidStr] = columns;
+    const pid = parseInt(pidStr, 10);
     const command = columns.slice(2).join(' ');
+    const commandWithArgs = withArgs.get(pid);
 
     return {
       command,
       parentPid: parseInt(parentPid, 10),
-      pid: parseInt(pid, 10)
+      pid,
+      commandWithArgs: commandWithArgs == null ? command : commandWithArgs
     };
   });
 }
@@ -815,7 +842,7 @@ function createProcessStream(type = 'spawn', commandOrModulePath, args = [], opt
     //
     // [1]: https://github.com/nodejs/node/blob/v7.10.0/lib/internal/child_process.js#L301
     proc.pid == null ? _rxjsBundlesRxMinJs.Observable.empty() : _rxjsBundlesRxMinJs.Observable.of(proc), _rxjsBundlesRxMinJs.Observable.never() // Don't complete until we say so!
-    )).takeUntil(errors).takeUntil(exitEvents).merge(
+    )).merge(
     // Write any input to stdin. This is just for the side-effect. We merge it here to
     // ensure that writing to the stdin stream happens after our event listeners are added.
     input == null ? _rxjsBundlesRxMinJs.Observable.empty() : input.do({
@@ -825,7 +852,7 @@ function createProcessStream(type = 'spawn', commandOrModulePath, args = [], opt
       complete: () => {
         proc.stdin.end();
       }
-    }).ignoreElements()).do({
+    }).ignoreElements()).takeUntil(errors).takeUntil(exitEvents).do({
       error: () => {
         finished = true;
       },

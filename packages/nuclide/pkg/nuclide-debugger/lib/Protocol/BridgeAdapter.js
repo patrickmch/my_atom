@@ -190,8 +190,18 @@ class BridgeAdapter {
   }
 
   setSelectedCallFrameIndex(index) {
-    this._stackTraceManager.setSelectedCallFrameIndex(index);
-    this._updateCurrentScopes();
+    const threadId = this._threadManager.getSelectedThread();
+    if (threadId == null || Number.isNaN(threadId)) {
+      this._stackTraceManager.setSelectedCallFrameIndex(index);
+      this._updateCurrentScopes();
+      return;
+    }
+
+    this._threadManager.getThreadStack(threadId).then(stackFrames => {
+      this._stackTraceManager.refreshStack(stackFrames, false);
+      this._stackTraceManager.setSelectedCallFrameIndex(index);
+      this._updateCurrentScopes();
+    });
   }
 
   _updateCurrentScopes() {
@@ -250,7 +260,7 @@ class BridgeAdapter {
   selectThread(threadId) {
     this._threadManager.selectThread(threadId);
     this._threadManager.getThreadStack(threadId).then(stackFrames => {
-      this._stackTraceManager.refreshStack(stackFrames);
+      this._stackTraceManager.refreshStack(stackFrames, true);
       this._updateCurrentScopes();
     });
   }
@@ -291,9 +301,11 @@ class BridgeAdapter {
 
   _handlePausedEvent(params) {
     this._pausedMode = true;
-    this._stackTraceManager.refreshStack(params.callFrames);
+    this._threadManager.setSelectedThread(String(params.stopThreadId));
+    this._stackTraceManager.refreshStack(params.callFrames, true);
     const currentFrame = this._stackTraceManager.getCurrentFrame();
     this._executionManager.raiseDebuggerPause(params, currentFrame ? currentFrame.location : null);
+    this._stackTraceManager.refreshStack(params.callFrames, true);
     this._updateCurrentScopes();
   }
 

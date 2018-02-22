@@ -7,6 +7,26 @@ exports.AvdComponentProvider = undefined;
 
 var _asyncToGenerator = _interopRequireDefault(require('async-to-generator'));
 
+var _View;
+
+function _load_View() {
+  return _View = require('nuclide-commons-ui/View');
+}
+
+var _react = _interopRequireWildcard(require('react'));
+
+var _renderReactRoot;
+
+function _load_renderReactRoot() {
+  return _renderReactRoot = require('nuclide-commons-ui/renderReactRoot');
+}
+
+var _expected;
+
+function _load_expected() {
+  return _expected = require('../../../commons-node/expected');
+}
+
 var _fsPromise;
 
 function _load_fsPromise() {
@@ -41,12 +61,36 @@ function _load_AvdTable() {
   return _AvdTable = _interopRequireDefault(require('./ui/AvdTable'));
 }
 
+var _AvdTableHeader;
+
+function _load_AvdTableHeader() {
+  return _AvdTableHeader = _interopRequireDefault(require('./ui/AvdTableHeader'));
+}
+
+function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
+
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 class AvdComponentProvider {
+  constructor() {
+    this._refresh = new _rxjsBundlesRxMinJs.Subject();
 
-  constructor(state) {
-    this._avds = [];
+    this._refreshAvds = () => {
+      this._refresh.next();
+    };
+
+    this._startAvd = avd => {
+      if (!(this._emulator != null)) {
+        throw new Error('Invariant violation: "this._emulator != null"');
+      }
+
+      (0, (_process || _load_process()).runCommand)(this._emulator, ['@' + avd]).subscribe(stdout => {}, err => {
+        atom.notifications.addError(`Failed to start up emulator ${avd}. Perhaps it's already running?`, {
+          detail: err,
+          dismissable: true
+        });
+      });
+    };
   }
 
   getType() {
@@ -58,54 +102,50 @@ class AvdComponentProvider {
   }
 
   observe(host, callback) {
-    this._getEmulator().then(emulator => {
-      this._emulator = emulator;
-      return emulator == null ? Promise.reject(new Error('No `emulator` found')) : this._getAvds();
-    }).then(avds => {
-      callback({
-        order: 0,
-        component: (0, (_bindObservableAsProps || _load_bindObservableAsProps()).bindObservableAsProps)(_rxjsBundlesRxMinJs.Observable.of({ avds, startAvd: this._startAvd.bind(this) }), (_AvdTable || _load_AvdTable()).default)
-      });
-    }).catch(error => {});
+    const headerElement = _react.createElement((_View || _load_View()).View, {
+      item: (0, (_renderReactRoot || _load_renderReactRoot()).renderReactRoot)(_react.createElement((_AvdTableHeader || _load_AvdTableHeader()).default, { refreshAvds: this._refreshAvds }))
+    });
+    const getProps = this._getAvds().map(avds => {
+      return {
+        avds,
+        headerElement,
+        startAvd: this._startAvd
+      };
+    });
+    const props = getProps.concat(this._refresh.exhaustMap(_ => getProps));
+    callback({
+      order: 0,
+      component: (0, (_bindObservableAsProps || _load_bindObservableAsProps()).bindObservableAsProps)(props, (_AvdTable || _load_AvdTable()).default)
+    });
     return new (_UniversalDisposable || _load_UniversalDisposable()).default();
   }
 
   _getEmulator() {
-    return (0, _asyncToGenerator.default)(function* () {
+    var _this = this;
+
+    return _rxjsBundlesRxMinJs.Observable.defer((0, _asyncToGenerator.default)(function* () {
       const androidHome = process.env.ANDROID_HOME;
       const emulator = androidHome != null ? `${androidHome}/tools/emulator` : null;
       if (emulator == null) {
         return null;
       }
       const exists = yield (_fsPromise || _load_fsPromise()).default.exists(emulator);
-      return exists ? emulator : null;
-    })();
+      _this._emulator = exists ? emulator : null;
+      return _this._emulator;
+    }));
   }
 
   _parseAvds(emulatorOutput) {
-    return emulatorOutput.trim().split(_os.default.EOL);
+    const trimmedOutput = emulatorOutput.trim();
+    return trimmedOutput === '' ? [] : trimmedOutput.split(_os.default.EOL);
   }
 
   _getAvds() {
-    if (!(this._emulator != null)) {
-      throw new Error('Invariant violation: "this._emulator != null"');
-    }
-
-    return (0, (_process || _load_process()).runCommand)(this._emulator, ['-list-avds']).map(this._parseAvds).toPromise();
-  }
-
-  _startAvd(avd) {
-    if (!(this._emulator != null)) {
-      throw new Error('Invariant violation: "this._emulator != null"');
-    }
-
-    (0, (_process || _load_process()).runCommand)(this._emulator, ['@' + avd]).subscribe(stdout => {}, err => {
-      atom.notifications.addError(`Failed to start up emulator ${avd}. Perhaps it's already running?`, {
-        detail: err,
-        dismissable: true
-      });
+    return this._getEmulator().switchMap(emulator => {
+      return emulator != null ? (0, (_process || _load_process()).runCommand)(emulator, ['-list-avds']).map(this._parseAvds).map((_expected || _load_expected()).Expect.value) : _rxjsBundlesRxMinJs.Observable.of((_expected || _load_expected()).Expect.error(new Error("Cannot find 'emulator' command.")));
     });
   }
+
 }
 exports.AvdComponentProvider = AvdComponentProvider; /**
                                                       * Copyright (c) 2015-present, Facebook, Inc.

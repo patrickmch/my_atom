@@ -140,7 +140,7 @@ const OUTPUT_CATEGORY_TO_LEVEL = Object.freeze({
   success: 'success'
 });
 
-// VSP deoesn't provide process id.
+// VSP doesn't provide process id.
 const VSP_PROCESS_ID = -1;
 
 /**
@@ -395,7 +395,8 @@ class VsDebugSessionTranslator {
           callFrames = threadInfo.callFrames;
           if (threadInfo.callFrames == null || threadInfo.callFrames.length === 0 || !threadInfo.callStackLoaded) {
             // Need to fetch this thread's frames.
-            threadInfo.callFrames = yield _this._getTranslatedCallFramesForThread(command.params.threadId, null);
+            threadInfo.callFrames = yield _this._getTranslatedCallFramesForThread(command.params.threadId, null, true);
+            threadInfo.callStackLoaded = true;
             callFrames = threadInfo.callFrames;
           }
         }
@@ -882,7 +883,7 @@ class VsDebugSessionTranslator {
         var _ref21 = (0, _asyncToGenerator.default)(function* (id) {
           let callFrames = [];
           try {
-            callFrames = _this10._pausedThreadId === threadId ? yield _this10._getTranslatedCallFramesForThread(id, null) : yield _this10._getTranslatedCallFramesForThread(id, 1);
+            callFrames = _this10._pausedThreadId === threadId ? yield _this10._getTranslatedCallFramesForThread(id, null, false) : yield _this10._getTranslatedCallFramesForThread(id, 1, false);
           } catch (e) {
             callFrames = [];
           }
@@ -912,7 +913,7 @@ class VsDebugSessionTranslator {
             state: 'paused',
             callFrames: pausedEvent.callFrames,
             stopReason: pausedEvent.reason,
-            callStackLoaded: this._pausedThreadId === stopThreadId
+            callStackLoaded: false
           });
         }
       }
@@ -1003,7 +1004,10 @@ class VsDebugSessionTranslator {
     for (const threadId of threadIds) {
       const threadInfo = this._threadsById.get(threadId);
       if (threadInfo == null || state === 'running') {
-        this._threadsById.set(threadId, { state, callStackLoaded: false });
+        this._threadsById.set(threadId, {
+          state,
+          callStackLoaded: false
+        });
       } else {
         this._threadsById.set(threadId, Object.assign({}, threadInfo, {
           state
@@ -1069,7 +1073,7 @@ class VsDebugSessionTranslator {
     this._commands.next(command);
   }
 
-  _getTranslatedCallFramesForThread(threadId, levels = null) {
+  _getTranslatedCallFramesForThread(threadId, levels = null, allScopes) {
     var _this12 = this;
 
     return (0, _asyncToGenerator.default)(function* () {
@@ -1084,7 +1088,7 @@ class VsDebugSessionTranslator {
         }, options));
         // $FlowFixMe(>=0.55.0) Flow suppress
         return Promise.all(stackFrames.map((() => {
-          var _ref23 = (0, _asyncToGenerator.default)(function* (frame) {
+          var _ref23 = (0, _asyncToGenerator.default)(function* (frame, idx) {
             let scriptId;
             if (frame.source != null && frame.source.path != null) {
               scriptId = frame.source.path;
@@ -1098,12 +1102,12 @@ class VsDebugSessionTranslator {
               functionName: frame.name,
               location: nuclideDebuggerLocation(scriptId, frame.line - 1, frame.column - 1),
               hasSource: frame.source != null,
-              scopeChain: yield _this12._getScopesForFrame(frame.id),
+              scopeChain: allScopes || idx === 0 ? yield _this12._getScopesForFrame(frame.id) : [],
               this: undefined
             };
           });
 
-          return function (_x21) {
+          return function (_x21, _x22) {
             return _ref23.apply(this, arguments);
           };
         })()));

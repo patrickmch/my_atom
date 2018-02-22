@@ -23,6 +23,7 @@ let version; /**
               * @format
               */
 
+// eslint-disable-next-line
 function getVersion() {
   if (!version) {
     // Don't use require() because it may be reading from the module cache.

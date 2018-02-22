@@ -44,6 +44,12 @@ const _adapters = new Map([['node', {
     args: [(_nuclideUri || _load_nuclideUri()).default.join(__dirname, 'vscode-ocaml/vscode-debugger-entry.js')]
   },
   root: (_nuclideUri || _load_nuclideUri()).default.join(__dirname, 'vscode-ocaml')
+}], ['native', {
+  executable: {
+    command: 'node',
+    args: [(_nuclideUri || _load_nuclideUri()).default.join(__dirname, 'fb-native-debugger-vsp/src/RunTranspiledServer.js')]
+  },
+  root: (_nuclideUri || _load_nuclideUri()).default.join(__dirname, 'fb-native-debugger-vsp/src')
 }]]); /**
        * Copyright (c) 2017-present, Facebook, Inc.
        * All rights reserved.

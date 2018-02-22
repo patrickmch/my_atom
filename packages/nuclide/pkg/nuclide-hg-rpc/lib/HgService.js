@@ -1407,6 +1407,22 @@ class HgService {
   }
 
   /**
+   * Given a short hash or revset, returns the full 40-char hash.
+   */
+  getFullHashForRevision(rev) {
+    var _this23 = this;
+
+    return (0, _asyncToGenerator.default)(function* () {
+      const args = ['log', '--template', '{node}', '--limit', '1', '-r', rev];
+      const options = {
+        cwd: _this23._workingDirectory
+      };
+      const output = yield _this23._hgAsyncExecute(args, options);
+      return output.stdout ? output.stdout.trim() : null;
+    })();
+  }
+
+  /**
    * @param from This could be a changeset ID, name of a bookmark, revision number, etc.
    * @param to This could be a changeset ID, name of a bookmark, revision number, etc.
    * @param message New message for the resulting folded commit.

@@ -20,7 +20,7 @@ var _asyncToGenerator = _interopRequireDefault(require('async-to-generator'));
 
 let findNearestCompilationDbDir = exports.findNearestCompilationDbDir = (() => {
   var _ref = (0, _asyncToGenerator.default)(function* (source) {
-    return (_fsPromise || _load_fsPromise()).default.findNearestFile((_CqueryLanguageServer || _load_CqueryLanguageServer()).COMPILATION_DATABASE_FILE, (_nuclideUri || _load_nuclideUri()).default.dirname(source));
+    return (_fsPromise || _load_fsPromise()).default.findNearestFile((_CqueryProjectManager || _load_CqueryProjectManager()).COMPILATION_DATABASE_FILE, (_nuclideUri || _load_nuclideUri()).default.dirname(source));
   });
 
   return function findNearestCompilationDbDir(_x) {
@@ -34,16 +34,16 @@ function _load_nuclideUri() {
   return _nuclideUri = _interopRequireDefault(require('nuclide-commons/nuclideUri'));
 }
 
-var _CqueryLanguageServer;
-
-function _load_CqueryLanguageServer() {
-  return _CqueryLanguageServer = require('./CqueryLanguageServer');
-}
-
 var _fsPromise;
 
 function _load_fsPromise() {
   return _fsPromise = _interopRequireDefault(require('nuclide-commons/fsPromise'));
+}
+
+var _CqueryProjectManager;
+
+function _load_CqueryProjectManager() {
+  return _CqueryProjectManager = require('./CqueryProjectManager');
 }
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }

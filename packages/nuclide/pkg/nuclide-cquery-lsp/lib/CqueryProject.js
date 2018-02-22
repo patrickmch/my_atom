@@ -82,10 +82,10 @@ function _load_libclang() {
   return _libclang = require('../../nuclide-clang/lib/libclang');
 }
 
-var _CqueryLanguageServer;
+var _CqueryProjectManager;
 
-function _load_CqueryLanguageServer() {
-  return _CqueryLanguageServer = require('../../nuclide-cquery-lsp-rpc/lib/CqueryLanguageServer');
+function _load_CqueryProjectManager() {
+  return _CqueryProjectManager = require('../../nuclide-cquery-lsp-rpc/lib/CqueryProjectManager');
 }
 
 var _nuclideRemoteConnection;
@@ -134,5 +134,5 @@ function findNearestCompilationDbDir(file) {
 }
 
 function getCompilationDbFile(compilationDbDir) {
-  return (_nuclideUri || _load_nuclideUri()).default.join(compilationDbDir, (_CqueryLanguageServer || _load_CqueryLanguageServer()).COMPILATION_DATABASE_FILE);
+  return (_nuclideUri || _load_nuclideUri()).default.join(compilationDbDir, (_CqueryProjectManager || _load_CqueryProjectManager()).COMPILATION_DATABASE_FILE);
 }

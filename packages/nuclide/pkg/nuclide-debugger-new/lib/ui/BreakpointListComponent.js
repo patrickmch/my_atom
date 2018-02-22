@@ -156,7 +156,7 @@ class BreakpointListComponent extends _react.Component {
           {
             className: (0, (_classnames || _load_classnames()).default)({
               'nuclide-debugger-breakpoint-disabled': !enabled,
-              'nuclide-debugger-breakpoint-with-condition': breakpoint.condition !== ''
+              'nuclide-debugger-breakpoint-with-condition': Boolean(breakpoint.condition)
             }),
             key: i },
           _react.createElement((_Checkbox || _load_Checkbox()).Checkbox, {

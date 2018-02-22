@@ -166,6 +166,7 @@ class CreateConnectionProfileForm extends _react.Component {
         onCancel: emptyFunction,
         onConfirm: this._clickSave,
         onDidChange: emptyFunction,
+        needsPasswordValue: false,
         ref: details => {
           this._connectionDetails = details;
         }

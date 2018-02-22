@@ -370,7 +370,7 @@ class DebuggerModel {
           this._scheduleNativeNotification();
         } else if (payload.data === (_constants || _load_constants()).DebuggerMode.STOPPED) {
           this._cancelRequestsToBridge();
-          this._clearEvaluationValues();
+          this._handleClearInterface();
           this.loaderBreakpointResumePromise = new Promise(resolve => {
             this._onLoaderBreakpointResume = resolve;
           });
@@ -727,6 +727,7 @@ class DebuggerModel {
         atom.workspace.open(path, { searchAllPanes: true }).then(function (editor) {
           const buffer = editor.getBuffer();
           const rowRange = buffer.rangeForRow(notificationLineNumber);
+          _this._cleanUpDatatip();
           _this._threadChangeDatatip = datatipService.createPinnedDataTip({
             component: _this._createAlertComponentClass(message),
             range: rowRange,
@@ -1344,19 +1345,6 @@ class DebuggerModel {
       const updatedBp = this.getBreakpointAtLine(path, line);
       if (updatedBp != null) {
         this._updateBreakpointCondition(updatedBp.id, '');
-      }
-    }
-  }
-
-  _handleDebuggerModeChange(newMode) {
-    if (newMode === (_constants || _load_constants()).DebuggerMode.STOPPED) {
-      // All breakpoints should be unresolved after stop debugging.
-      this._resetBreakpoints();
-    } else {
-      for (const breakpoint of this.getAllBreakpoints()) {
-        if (!breakpoint.resolved) {
-          this._emitter.emit(BREAKPOINT_NEED_UI_UPDATE, breakpoint.path);
-        }
       }
     }
   }

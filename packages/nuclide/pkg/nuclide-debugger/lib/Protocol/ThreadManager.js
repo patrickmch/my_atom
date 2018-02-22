@@ -31,10 +31,20 @@ class ThreadManager {
   constructor(debuggerDispatcher) {
     this._debuggerDispatcher = debuggerDispatcher;
     this._threadEvent$ = new _rxjsBundlesRxMinJs.Subject();
+    this._selectedThread = null;
   }
 
   selectThread(threadId) {
+    this._selectedThread = threadId;
     this._debuggerDispatcher.selectThread(Number(threadId));
+  }
+
+  getSelectedThread() {
+    return this._selectedThread;
+  }
+
+  setSelectedThread(threadId) {
+    this._selectedThread = threadId;
   }
 
   getThreadStack(threadId) {

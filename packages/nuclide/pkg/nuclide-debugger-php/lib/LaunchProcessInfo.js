@@ -189,7 +189,10 @@ class LaunchProcessInfo extends (_nuclideDebuggerCommon || _load_nuclideDebugger
     var _this2 = this;
 
     return (0, _asyncToGenerator.default)(function* () {
-      const useNewDebugger = yield (0, (_passesGK || _load_passesGK()).default)('nuclide_hhvm_debugger_vscode');
+      const userConfig = (_featureConfig || _load_featureConfig()).default.get('nuclide-debugger-php');
+      const useXDebug = userConfig.useXDebug || false;
+      const useNewDebugger = !useXDebug && (yield (0, (_passesGK || _load_passesGK()).default)('nuclide_hhvm_debugger_vscode'));
+
       if (useNewDebugger) {
         // TODO: Ericblue - this will be cleaned up when the old debugger
         // is removed. For now we need to leave both in place until the new

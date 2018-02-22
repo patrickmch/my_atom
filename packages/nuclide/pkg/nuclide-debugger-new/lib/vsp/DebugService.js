@@ -24,6 +24,12 @@ function _load_observable() {
   return _observable = require('nuclide-commons/observable');
 }
 
+var _event;
+
+function _load_event() {
+  return _event = require('nuclide-commons/event');
+}
+
 var _promise;
 
 function _load_promise() {
@@ -129,16 +135,16 @@ function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj;
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 // This must match URI defined in ../../nuclide-console/lib/ui/ConsoleContainer
-/**
- * Copyright (c) 2015-present, Facebook, Inc.
- * All rights reserved.
- *
- * This source code is licensed under the license found in the LICENSE file in
- * the root directory of this source tree.
- *
- * 
- * @format
- */
+const CONSOLE_VIEW_URI = 'atom://nuclide/console'; /**
+                                                    * Copyright (c) 2015-present, Facebook, Inc.
+                                                    * All rights reserved.
+                                                    *
+                                                    * This source code is licensed under the license found in the LICENSE file in
+                                                    * the root directory of this source tree.
+                                                    *
+                                                    * 
+                                                    * @format
+                                                    */
 
 /**
 The following debug service implementation was ported from VSCode's debugger implementation
@@ -169,13 +175,14 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-const CONSOLE_VIEW_URI = 'atom://nuclide/console';
-
 const CUSTOM_DEBUG_EVENT = 'CUSTOM_DEBUG_EVENT';
 const CHANGE_DEBUG_MODE = 'CHANGE_DEBUG_MODE';
 
-const CHANGE_FOCUSSED_PROCESS = 'CHANGE_FOCUSSED_PROCESS';
-const CHANGE_FOCUSSED_STACKFRAME = 'CHANGE_FOCUSSED_STACKFRAME';
+const CHANGE_FOCUSED_PROCESS = 'CHANGE_FOCUSED_PROCESS';
+const CHANGE_FOCUSED_STACKFRAME = 'CHANGE_FOCUSED_STACKFRAME';
+
+// Berakpoint events may arrive sooner than breakpoint responses.
+const MAX_BREAKPOINT_EVENT_DELAY_MS = 5 * 1000;
 
 class ViewModel {
 
@@ -199,11 +206,11 @@ class ViewModel {
   }
 
   onDidFocusProcess(callback) {
-    return this._emitter.on(CHANGE_FOCUSSED_PROCESS, callback);
+    return this._emitter.on(CHANGE_FOCUSED_PROCESS, callback);
   }
 
   onDidFocusStackFrame(callback) {
-    return this._emitter.on(CHANGE_FOCUSSED_STACKFRAME, callback);
+    return this._emitter.on(CHANGE_FOCUSED_STACKFRAME, callback);
   }
 
   isMultiProcessView() {
@@ -211,16 +218,16 @@ class ViewModel {
   }
 
   setFocus(stackFrame, thread, process, explicit) {
-    const shouldEmit = this._focusedProcess !== process || this._focusedThread !== thread || this._focusedStackFrame !== stackFrame;
+    const shouldEmit = this._focusedProcess !== process || this._focusedThread !== thread || this._focusedStackFrame !== stackFrame || explicit;
     if (this._focusedProcess !== process) {
       this._focusedProcess = process;
-      this._emitter.emit(CHANGE_FOCUSSED_PROCESS, process);
+      this._emitter.emit(CHANGE_FOCUSED_PROCESS, process);
     }
     this._focusedThread = thread;
     this._focusedStackFrame = stackFrame;
 
     if (shouldEmit) {
-      this._emitter.emit(CHANGE_FOCUSSED_STACKFRAME, { stackFrame, explicit });
+      this._emitter.emit(CHANGE_FOCUSED_STACKFRAME, { stackFrame, explicit });
     }
   }
 }
@@ -228,6 +235,37 @@ class ViewModel {
 class DebugService {
 
   constructor(state) {
+    this._onSessionEnd = () => {
+      const session = this._getCurrentSession();
+      if (session == null) {
+        return;
+      }
+      (0, (_nuclideAnalytics || _load_nuclideAnalytics()).track)((_constants || _load_constants()).AnalyticsEvents.DEBUGGER_STOP);
+      this._model.removeProcess(session.getId());
+      this._sessionEndDisposables.dispose();
+      this._consoleDisposables.dispose();
+      if (this._timer != null) {
+        this._timer.onSuccess();
+        this._timer = null;
+      }
+
+      this.focusStackFrame(null, null, null);
+      this._updateModeAndEmit((_constants || _load_constants()).DebuggerMode.STOPPED);
+
+      // set breakpoints back to unverified since the session ended.
+      const data = {};
+      this._model.getBreakpoints().forEach(bp => {
+        data[bp.getId()] = {
+          line: bp.line,
+          verified: false,
+          column: bp.column,
+          endLine: bp.endLine == null ? undefined : bp.endLine,
+          endColumn: bp.endColumn == null ? undefined : bp.endColumn
+        };
+      });
+      this._model.updateBreakpoints(data);
+    };
+
     this._disposables = new (_UniversalDisposable || _load_UniversalDisposable()).default();
     this._sessionEndDisposables = new (_UniversalDisposable || _load_UniversalDisposable()).default();
     this._consoleDisposables = new (_UniversalDisposable || _load_UniversalDisposable()).default();
@@ -306,29 +344,22 @@ class DebugService {
   }
 
   _tryToAutoFocusStackFrame(thread) {
-    var _this2 = this;
+    const callStack = thread.getCallStack();
+    if (!callStack.length || this._viewModel.focusedStackFrame && this._viewModel.focusedStackFrame.thread.getId() === thread.getId()) {
+      return;
+    }
 
-    return (0, _asyncToGenerator.default)(function* () {
-      const callStack = thread.getCallStack();
-      if (!callStack.length || _this2._viewModel.focusedStackFrame && _this2._viewModel.focusedStackFrame.thread.getId() === thread.getId()) {
-        return;
-      }
+    // Focus first stack frame from top that has source location if no other stack frame is focused
+    const stackFrameToFocus = callStack.find(sf => sf.source != null && sf.source.available);
+    if (stackFrameToFocus == null) {
+      return;
+    }
 
-      // Focus first stack frame from top that has source location if no other stack frame is focused
-      const stackFrameToFocus = callStack.find(function (sf) {
-        return sf.source != null && sf.source.available;
-      });
-      if (stackFrameToFocus == null) {
-        return;
-      }
-
-      _this2.focusStackFrame(stackFrameToFocus, null, null);
-      yield stackFrameToFocus.openInEditor();
-    })();
+    this.focusStackFrame(stackFrameToFocus, null, null);
   }
 
   _registerSessionListeners(process, session) {
-    var _this3 = this;
+    var _this2 = this;
 
     this._sessionEndDisposables = new (_UniversalDisposable || _load_UniversalDisposable()).default(session);
     this._sessionEndDisposables.add(session.observeInitializeEvents().subscribe((() => {
@@ -338,7 +369,7 @@ class DebugService {
             if (session && session.getCapabilities().supportsConfigurationDoneRequest) {
               return session.configurationDone().catch(function (e) {
                 // Disconnect the debug session on configuration done error #10596
-                session.disconnect().catch((_utils || _load_utils()).onUnexpectedError);
+                session.disconnect().catch((_utils || _load_utils()).onUnexpectedError).then(_this2._onSessionEnd);
                 atom.notifications.addError('Failed to configure debugger', {
                   detail: e.message
                 });
@@ -352,8 +383,8 @@ class DebugService {
         })();
 
         try {
-          yield _this3._sendAllBreakpoints().then(sendConfigurationDone, sendConfigurationDone);
-          yield _this3._fetchThreads(session);
+          yield _this2._sendAllBreakpoints().then(sendConfigurationDone, sendConfigurationDone);
+          yield _this2._fetchThreads(session);
         } catch (error) {
           (0, (_utils || _load_utils()).onUnexpectedError)(error);
         }
@@ -366,16 +397,16 @@ class DebugService {
 
     this._sessionEndDisposables.add(session.observeStopEvents().subscribe((() => {
       var _ref4 = (0, _asyncToGenerator.default)(function* (event) {
-        _this3._updateModeAndEmit((_constants || _load_constants()).DebuggerMode.PAUSED);
-        _this3._scheduleNativeNotification();
+        _this2._updateModeAndEmit((_constants || _load_constants()).DebuggerMode.PAUSED);
+        _this2._scheduleNativeNotification();
         try {
-          yield _this3._fetchThreads(session, event.body);
+          yield _this2._fetchThreads(session, event.body);
           const thread = event.body.threadId != null ? process.getThread(event.body.threadId) : null;
           if (thread != null) {
             // UX: That'll fetch the top stack frame first (to allow the UI to focus on it),
             // then the rest of the call stack.
-            yield _this3._model.fetchCallStack(thread);
-            yield _this3._tryToAutoFocusStackFrame(thread);
+            yield _this2._model.fetchCallStack(thread);
+            _this2._tryToAutoFocusStackFrame(thread);
           }
         } catch (error) {
           (0, (_utils || _load_utils()).onUnexpectedError)(error);
@@ -390,9 +421,9 @@ class DebugService {
     this._sessionEndDisposables.add(session.observeThreadEvents().subscribe((() => {
       var _ref5 = (0, _asyncToGenerator.default)(function* (event) {
         if (event.body.reason === 'started') {
-          yield _this3._fetchThreads(session);
+          yield _this2._fetchThreads(session);
         } else if (event.body.reason === 'exited') {
-          _this3._model.clearThreads(session.getId(), true, event.body.threadId);
+          _this2._model.clearThreads(session.getId(), true, event.body.threadId);
         }
       });
 
@@ -410,7 +441,7 @@ class DebugService {
             });
           });
         } else {
-          session.disconnect().catch((_utils || _load_utils()).onUnexpectedError);
+          session.disconnect().catch((_utils || _load_utils()).onUnexpectedError).then(this._onSessionEnd);
         }
       }
     }));
@@ -449,48 +480,75 @@ class DebugService {
       );
     }
 
-    this._sessionEndDisposables.add(session.observeBreakpointEvents().subscribe(event => {
-      const { breakpoint: bp } = event.body;
-      const breakpoint = this._model.getBreakpoints().filter(b => b.idFromAdapter === bp.id).pop();
-      const functionBreakpoint = this._model.getFunctionBreakpoints().filter(b => b.idFromAdapter === bp.id).pop();
+    this._sessionEndDisposables.add(session.observeBreakpointEvents().flatMap(event => {
+      const { breakpoint, reason } = event.body;
+      if (reason !== (_constants || _load_constants()).BreakpointEventReasons.CHANGED && reason !== (_constants || _load_constants()).BreakpointEventReasons.REMOVED) {
+        return _rxjsBundlesRxMinJs.Observable.of({
+          reason,
+          breakpoint,
+          sourceBreakpoint: null,
+          functionBreakpoint: null
+        });
+      }
 
-      if (event.body.reason === 'new' && bp.source) {
-        const source = process.getSource(bp.source);
+      // Breakpoint events may arrive sooner than their responses.
+      // Hence, we'll keep them cached and try re-processing on every change to the model's breakpoints
+      // for a set maximum time, then discard.
+      return (0, (_event || _load_event()).observableFromSubscribeFunction)(this._model.onDidChangeBreakpoints.bind(this._model)).startWith(null).switchMap(() => {
+        const sourceBreakpoint = this._model.getBreakpoints().filter(b => b.idFromAdapter === breakpoint.id).pop();
+        const functionBreakpoint = this._model.getFunctionBreakpoints().filter(b => b.idFromAdapter === breakpoint.id).pop();
+        if (sourceBreakpoint == null && functionBreakpoint == null) {
+          return _rxjsBundlesRxMinJs.Observable.empty();
+        } else {
+          return _rxjsBundlesRxMinJs.Observable.of({
+            reason,
+            breakpoint,
+            sourceBreakpoint,
+            functionBreakpoint
+          });
+        }
+      }).take(1).timeout(MAX_BREAKPOINT_EVENT_DELAY_MS).catch(error => {
+        if (error instanceof _rxjsBundlesRxMinJs.TimeoutError) {
+          (_logger || _load_logger()).default.error('Timed out breakpoint event handler', process.configuration.adapterType, reason, breakpoint);
+        }
+        return _rxjsBundlesRxMinJs.Observable.empty();
+      });
+    }).subscribe(({ reason, breakpoint, sourceBreakpoint, functionBreakpoint }) => {
+      if (reason === (_constants || _load_constants()).BreakpointEventReasons.NEW && breakpoint.source) {
+        const source = process.getSource(breakpoint.source);
         const bps = this._model.addBreakpoints(source.uri, [{
-          column: bp.column || 0,
+          column: breakpoint.column || 0,
           enabled: true,
-          line: bp.line == null ? -1 : bp.line
+          line: breakpoint.line == null ? -1 : breakpoint.line
         }], false);
         if (bps.length === 1) {
           this._model.updateBreakpoints({
-            [bps[0].getId()]: bp
+            [bps[0].getId()]: breakpoint
           });
         }
-      }
-
-      if (event.body.reason === 'removed') {
-        if (breakpoint != null) {
-          this._model.removeBreakpoints([breakpoint]);
+      } else if (reason === (_constants || _load_constants()).BreakpointEventReasons.REMOVED) {
+        if (sourceBreakpoint != null) {
+          this._model.removeBreakpoints([sourceBreakpoint]);
         }
         if (functionBreakpoint != null) {
           this._model.removeFunctionBreakpoints(functionBreakpoint.getId());
         }
-      }
-
-      if (event.body.reason === 'changed') {
-        if (breakpoint != null) {
-          if (!breakpoint.column) {
-            bp.column = undefined;
+      } else if (reason === (_constants || _load_constants()).BreakpointEventReasons.CHANGED) {
+        if (sourceBreakpoint != null) {
+          if (!sourceBreakpoint.column) {
+            breakpoint.column = undefined;
           }
           this._model.updateBreakpoints({
-            [breakpoint.getId()]: bp
+            [sourceBreakpoint.getId()]: breakpoint
           });
         }
         if (functionBreakpoint != null) {
           this._model.updateFunctionBreakpoints({
-            [functionBreakpoint.getId()]: bp
+            [functionBreakpoint.getId()]: breakpoint
           });
         }
+      } else {
+        (_logger || _load_logger()).default.warn('Unknown breakpoint event', reason, breakpoint);
       }
     }));
 
@@ -525,13 +583,13 @@ class DebugService {
   }
 
   _fetchThreads(session, stoppedDetails) {
-    var _this4 = this;
+    var _this3 = this;
 
     return (0, _asyncToGenerator.default)(function* () {
       const response = yield session.threads();
       if (response && response.body && response.body.threads) {
         response.body.threads.forEach(function (thread) {
-          _this4._model.rawUpdate({
+          _this3._model.rawUpdate({
             sessionId: session.getId(),
             threadId: thread.id,
             thread,
@@ -685,10 +743,10 @@ class DebugService {
   }
 
   removeBreakpoints(id, skipAnalytics = false) {
-    var _this5 = this;
+    var _this4 = this;
 
     return (0, _asyncToGenerator.default)(function* () {
-      const toRemove = _this5._model.getBreakpoints().filter(function (bp) {
+      const toRemove = _this4._model.getBreakpoints().filter(function (bp) {
         return id == null || bp.getId() === id;
       });
       const urisToClear = (0, (_collection || _load_collection()).distinct)(toRemove, function (bp) {
@@ -697,7 +755,7 @@ class DebugService {
         return bp.uri;
       });
 
-      _this5._model.removeBreakpoints(toRemove);
+      _this4._model.removeBreakpoints(toRemove);
 
       if (id == null) {
         (0, (_nuclideAnalytics || _load_nuclideAnalytics()).track)((_constants || _load_constants()).AnalyticsEvents.DEBUGGER_BREAKPOINT_DELETE_ALL);
@@ -706,7 +764,7 @@ class DebugService {
       }
 
       yield Promise.all(urisToClear.map(function (uri) {
-        return _this5._sendBreakpoints(uri);
+        return _this4._sendBreakpoints(uri);
       }));
     })();
   }
@@ -750,14 +808,15 @@ class DebugService {
   }
 
   _doCreateProcess(configuration, sessionId) {
-    var _this6 = this;
+    var _this5 = this;
 
     return (0, _asyncToGenerator.default)(function* () {
       let process;
-      const session = _this6._createVsDebugSession(configuration, sessionId);
+      const session = _this5._createVsDebugSession(configuration, sessionId);
       try {
-        process = _this6._model.addProcess(configuration, session);
-        _this6._registerSessionListeners(process, session);
+        process = _this5._model.addProcess(configuration, session);
+        _this5.focusStackFrame(null, null, process);
+        _this5._registerSessionListeners(process, session);
         yield session.initialize({
           clientID: 'atom',
           adapterID: configuration.adapterType,
@@ -769,33 +828,33 @@ class DebugService {
           supportsRunInTerminalRequest: false,
           locale: 'en_US'
         });
-        _this6._model.setExceptionBreakpoints(session.getCapabilities().exceptionBreakpointFilters || []);
-        if (configuration.request === 'attach') {
+        _this5._model.setExceptionBreakpoints(session.getCapabilities().exceptionBreakpointFilters || []);
+        if (configuration.debugMode === 'attach') {
           yield session.attach(configuration.config);
         } else {
+          // It's 'launch'
           yield session.launch(configuration.config);
         }
         if (session.isDisconnected()) {
           return;
         }
-        _this6.focusStackFrame(null, null, process);
-        _this6._updateModeAndEmit((_constants || _load_constants()).DebuggerMode.RUNNING);
+        _this5._updateModeAndEmit((_constants || _load_constants()).DebuggerMode.RUNNING);
         return process;
       } catch (error) {
-        if (_this6._timer != null) {
-          _this6._timer.onError(error);
-          _this6._timer = null;
+        if (_this5._timer != null) {
+          _this5._timer.onError(error);
+          _this5._timer = null;
         }
         (0, (_nuclideAnalytics || _load_nuclideAnalytics()).track)((_constants || _load_constants()).AnalyticsEvents.DEBUGGER_START_FAIL, {});
         const errorMessage = error instanceof Error ? error.message : error;
         atom.notifications.addError(`Failed to start debugger process: ${errorMessage}`);
-        _this6._consoleDisposables.dispose();
-        _this6._updateModeAndEmit((_constants || _load_constants()).DebuggerMode.STOPPED);
+        _this5._consoleDisposables.dispose();
+        _this5._updateModeAndEmit((_constants || _load_constants()).DebuggerMode.STOPPED);
         if (!session.isDisconnected()) {
-          session.disconnect().catch((_utils || _load_utils()).onUnexpectedError);
+          session.disconnect().catch((_utils || _load_utils()).onUnexpectedError).then(_this5._onSessionEnd);
         }
         if (process != null) {
-          _this6._model.removeProcess(process.getId());
+          _this5._model.removeProcess(process.getId());
         }
         return null;
       }
@@ -825,10 +884,10 @@ class DebugService {
   }
 
   restartProcess() {
-    var _this7 = this;
+    var _this6 = this;
 
     return (0, _asyncToGenerator.default)(function* () {
-      const process = _this7._getCurrentProcess();
+      const process = _this6._getCurrentProcess();
       if (process == null) {
         return;
       }
@@ -837,7 +896,7 @@ class DebugService {
       }
       yield process.session.disconnect(true);
       yield (0, (_promise || _load_promise()).sleep)(300);
-      yield _this7.startDebugging(process.configuration);
+      yield _this6.startDebugging(process.configuration);
     })();
   }
 
@@ -847,51 +906,20 @@ class DebugService {
    * and resolveds configurations via DebugConfigurationProviders.
    */
   startDebugging(config) {
-    var _this8 = this;
+    var _this7 = this;
 
     return (0, _asyncToGenerator.default)(function* () {
-      _this8._timer = (0, (_nuclideAnalytics || _load_nuclideAnalytics()).startTracking)('nuclide-debugger-atom:startDebugging');
-      _this8._onSessionEnd();
+      _this7._timer = (0, (_nuclideAnalytics || _load_nuclideAnalytics()).startTracking)('nuclide-debugger-atom:startDebugging');
+      _this7._onSessionEnd();
 
-      _this8._updateModeAndEmit((_constants || _load_constants()).DebuggerMode.STARTING);
+      _this7._updateModeAndEmit((_constants || _load_constants()).DebuggerMode.STARTING);
       // Open the console window if it's not already opened.
       // eslint-disable-next-line rulesdir/atom-apis
       atom.workspace.open(CONSOLE_VIEW_URI, { searchAllPanes: true });
-      _this8._consoleDisposables = _this8._registerConsoleExecutor();
+      _this7._consoleDisposables = _this7._registerConsoleExecutor();
       atom.commands.dispatch(atom.views.getView(atom.workspace), 'nuclide-debugger:show');
-      yield _this8._doCreateProcess(config, (_uuid || _load_uuid()).default.v4());
+      yield _this7._doCreateProcess(config, (_uuid || _load_uuid()).default.v4());
     })();
-  }
-
-  _onSessionEnd() {
-    const session = this._getCurrentSession();
-    if (session == null) {
-      return;
-    }
-    (0, (_nuclideAnalytics || _load_nuclideAnalytics()).track)((_constants || _load_constants()).AnalyticsEvents.DEBUGGER_STOP);
-    this._model.removeProcess(session.getId());
-    this._sessionEndDisposables.dispose();
-    this._consoleDisposables.dispose();
-    if (this._timer != null) {
-      this._timer.onSuccess();
-      this._timer = null;
-    }
-
-    this.focusStackFrame(null, null, null);
-    this._updateModeAndEmit((_constants || _load_constants()).DebuggerMode.STOPPED);
-
-    // set breakpoints back to unverified since the session ended.
-    const data = {};
-    this._model.getBreakpoints().forEach(bp => {
-      data[bp.getId()] = {
-        line: bp.line,
-        verified: false,
-        column: bp.column,
-        endLine: bp.endLine == null ? undefined : bp.endLine,
-        endColumn: bp.endColumn == null ? undefined : bp.endColumn
-      };
-    });
-    this._model.updateBreakpoints(data);
   }
 
   getModel() {
@@ -899,32 +927,32 @@ class DebugService {
   }
 
   _sendAllBreakpoints() {
-    var _this9 = this;
+    var _this8 = this;
 
     return (0, _asyncToGenerator.default)(function* () {
-      yield Promise.all((0, (_collection || _load_collection()).distinct)(_this9._model.getBreakpoints(), function (bp) {
+      yield Promise.all((0, (_collection || _load_collection()).distinct)(_this8._model.getBreakpoints(), function (bp) {
         return bp.uri.toString();
       }).map(function (bp) {
-        return _this9._sendBreakpoints(bp.uri, false);
+        return _this8._sendBreakpoints(bp.uri, false);
       }));
-      yield _this9._sendFunctionBreakpoints();
+      yield _this8._sendFunctionBreakpoints();
       // send exception breakpoints at the end since some debug adapters rely on the order
-      yield _this9._sendExceptionBreakpoints();
+      yield _this8._sendExceptionBreakpoints();
     })();
   }
 
   _sendBreakpoints(modelUri, sourceModified = false) {
-    var _this10 = this;
+    var _this9 = this;
 
     return (0, _asyncToGenerator.default)(function* () {
-      const process = _this10._getCurrentProcess();
-      const session = _this10._getCurrentSession();
+      const process = _this9._getCurrentProcess();
+      const session = _this9._getCurrentSession();
       if (process == null || session == null || !session.isReadyForBreakpoints()) {
         return;
       }
 
-      const breakpointsToSend = _this10._model.getBreakpoints().filter(function (bp) {
-        return _this10._model.areBreakpointsActivated() && bp.enabled && bp.uri.toString() === modelUri;
+      const breakpointsToSend = _this9._model.getBreakpoints().filter(function (bp) {
+        return _this9._model.areBreakpointsActivated() && bp.enabled && bp.uri.toString() === modelUri;
       });
 
       const source = process.sources.get(modelUri);
@@ -973,7 +1001,7 @@ class DebugService {
         }
       }
 
-      _this10._model.updateBreakpoints(data);
+      _this9._model.updateBreakpoints(data);
     })();
   }
 
@@ -986,16 +1014,16 @@ class DebugService {
   }
 
   _sendFunctionBreakpoints() {
-    var _this11 = this;
+    var _this10 = this;
 
     return (0, _asyncToGenerator.default)(function* () {
-      const session = _this11._getCurrentSession();
+      const session = _this10._getCurrentSession();
       if (session == null || !session.isReadyForBreakpoints() || !session.getCapabilities().supportsFunctionBreakpoints) {
         return;
       }
 
-      const breakpointsToSend = _this11._model.getFunctionBreakpoints().filter(function (fbp) {
-        return fbp.enabled && _this11._model.areBreakpointsActivated();
+      const breakpointsToSend = _this10._model.getFunctionBreakpoints().filter(function (fbp) {
+        return fbp.enabled && _this10._model.areBreakpointsActivated();
       });
       const response = yield session.setFunctionBreakpoints({
         breakpoints: breakpointsToSend
@@ -1009,20 +1037,20 @@ class DebugService {
         data[breakpointsToSend[i].getId()] = response.body.breakpoints[i];
       }
 
-      _this11._model.updateFunctionBreakpoints(data);
+      _this10._model.updateFunctionBreakpoints(data);
     })();
   }
 
   _sendExceptionBreakpoints() {
-    var _this12 = this;
+    var _this11 = this;
 
     return (0, _asyncToGenerator.default)(function* () {
-      const session = _this12._getCurrentSession();
-      if (session == null || !session.isReadyForBreakpoints() || _this12._model.getExceptionBreakpoints().length === 0) {
+      const session = _this11._getCurrentSession();
+      if (session == null || !session.isReadyForBreakpoints() || _this11._model.getExceptionBreakpoints().length === 0) {
         return;
       }
 
-      const enabledExceptionBps = _this12._model.getExceptionBreakpoints().filter(function (exb) {
+      const enabledExceptionBps = _this11._model.getExceptionBreakpoints().filter(function (exb) {
         return exb.enabled;
       });
       yield session.setExceptionBreakpoints({

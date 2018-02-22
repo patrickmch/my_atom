@@ -444,6 +444,23 @@ class VsDebugSession extends (_V8Protocol || _load_V8Protocol()).default {
 
     this._disconnected = true;
     this._adapterProcessSubscription.unsubscribe();
+    this._endHandlers();
+  }
+
+  _endHandlers() {
+    this._onDidInitialize.complete();
+    this._onDidStop.complete();
+    this._onDidContinued.complete();
+    this._onDidTerminateDebugee.complete();
+    this._onDidExitDebugee.complete();
+    this._onDidExitAdapter.complete();
+    this._onDidThread.complete();
+    this._onDidOutput.complete();
+    this._onDidBreakpoint.complete();
+    this._onDidModule.complete();
+    this._onDidLoadSource.complete();
+    this._onDidCustom.complete();
+    this._onDidEvent.complete();
   }
 
   onServerError(error) {

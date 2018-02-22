@@ -64,11 +64,13 @@ class StackTraceManager {
    * Refresh with new list of stack frames.
    * Like, user switches to a new thread.
    */
-  refreshStack(stackFrames) {
+  refreshStack(stackFrames, userUpdate) {
     this._currentThreadFrames = stackFrames;
     const callstack = this._parseCallstack();
-    this._raiseIPCEvent('CallstackUpdate', callstack);
-    this._selectFirstFrameWithSource();
+    if (userUpdate) {
+      this._raiseIPCEvent('CallstackUpdate', callstack);
+      this._selectFirstFrameWithSource();
+    }
   }
 
   _selectFirstFrameWithSource() {

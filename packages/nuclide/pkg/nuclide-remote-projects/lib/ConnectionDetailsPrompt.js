@@ -316,6 +316,7 @@ class ConnectionDetailsPrompt extends _react.Component {
         onConfirm: this.props.onConfirm,
         onCancel: this.props.onCancel,
         onDidChange: this._handleConnectionDetailsFormDidChange,
+        needsPasswordValue: true,
         ref: form => {
           this._connectionDetailsForm = form;
         }

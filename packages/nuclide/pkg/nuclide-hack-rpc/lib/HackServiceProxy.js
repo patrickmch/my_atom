@@ -3056,7 +3056,7 @@ Object.defineProperty(module.exports, "defs", {
       location: {
         type: "source",
         fileName: "types.js",
-        line: 56
+        line: 57
       },
       name: "NuclideEvaluationExpression",
       definition: {

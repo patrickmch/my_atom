@@ -26,34 +26,52 @@ var _react = _interopRequireWildcard(require('react'));
 
 function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
 
+/**
+ * Copyright (c) 2015-present, Facebook, Inc.
+ * All rights reserved.
+ *
+ * This source code is licensed under the license found in the LICENSE file in
+ * the root directory of this source tree.
+ *
+ * 
+ * @format
+ */
+
 class AvdTable extends _react.Component {
-  _renderAvd(rowProps) {
-    const { startAvd } = this.props;
-    const avd = rowProps.data;
-    return _react.createElement(
-      'div',
-      { className: 'nuclide-adb-sdb-emulator-row' },
-      avd,
-      _react.createElement(
-        (_ButtonGroup || _load_ButtonGroup()).ButtonGroup,
-        null,
-        _react.createElement((_Button || _load_Button()).Button, {
-          icon: 'triangle-right',
-          onClick: () => startAvd(avd),
-          size: 'SMALL'
-        })
-      )
-    );
+  constructor(...args) {
+    var _temp;
+
+    return _temp = super(...args), this._renderAvd = rowProps => {
+      const { startAvd } = this.props;
+      const avd = rowProps.data;
+      return _react.createElement(
+        'div',
+        { className: 'nuclide-adb-sdb-emulator-row' },
+        avd,
+        _react.createElement(
+          (_ButtonGroup || _load_ButtonGroup()).ButtonGroup,
+          null,
+          _react.createElement((_Button || _load_Button()).Button, {
+            icon: 'triangle-right',
+            onClick: () => startAvd(avd),
+            size: 'SMALL'
+          })
+        )
+      );
+    }, this._renderEmptyComponent = () => {
+      const { avds } = this.props;
+      return _react.createElement(
+        'div',
+        { className: 'nuclide-adb-sdb-emulator-empty-message' },
+        avds.isError ? avds.error.message : 'No emulators found.'
+      );
+    }, _temp;
   }
 
   render() {
-    const { avds } = this.props;
+    const { avds, headerElement } = this.props;
 
-    if (avds.length === 0) {
-      return null;
-    }
-
-    const rowData = avds.map(avd => {
+    const rowData = avds.getOrDefault([]).map(avd => {
       return { avd };
     });
 
@@ -64,20 +82,13 @@ class AvdTable extends _react.Component {
         key: 'avd',
         component: this._renderAvd.bind(this)
       }],
+      emptyComponent: this._renderEmptyComponent,
       fixedHeader: true,
+      headerElement: headerElement,
       rows: rowData.map(data => {
         return { data };
       })
     });
   }
 }
-exports.default = AvdTable; /**
-                             * Copyright (c) 2015-present, Facebook, Inc.
-                             * All rights reserved.
-                             *
-                             * This source code is licensed under the license found in the LICENSE file in
-                             * the root directory of this source tree.
-                             *
-                             * 
-                             * @format
-                             */
+exports.default = AvdTable;
