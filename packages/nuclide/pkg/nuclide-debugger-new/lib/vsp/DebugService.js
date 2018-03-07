@@ -272,6 +272,7 @@ class DebugService {
     this._emitter = new _atom.Emitter();
     this._debuggerMode = (_constants || _load_constants()).DebuggerMode.STOPPED;
     this._viewModel = new ViewModel();
+    this._breakpointsToSendOnSave = new Set();
 
     this._model = new (_DebuggerModel || _load_DebuggerModel()).Model(this._loadBreakpoints(state), true, this._loadFunctionBreakpoints(state), this._loadExceptionBreakpoints(state), this._loadWatchExpressions(state));
     this._disposables.add(this._model);
@@ -362,10 +363,29 @@ class DebugService {
     var _this2 = this;
 
     this._sessionEndDisposables = new (_UniversalDisposable || _load_UniversalDisposable()).default(session);
+
+    const openFilesSaved = (0, (_event || _load_event()).observableFromSubscribeFunction)(atom.workspace.observeTextEditors.bind(atom.workspace)).flatMap(editor => {
+      return (0, (_event || _load_event()).observableFromSubscribeFunction)(editor.onDidSave.bind(editor)).map(() => editor.getPath()).takeUntil((0, (_event || _load_event()).observableFromSubscribeFunction)(editor.onDidDestroy.bind(editor)));
+    });
+
+    this._sessionEndDisposables.add(openFilesSaved.subscribe((() => {
+      var _ref2 = (0, _asyncToGenerator.default)(function* (filePath) {
+        if (filePath == null || !_this2._breakpointsToSendOnSave.has(filePath)) {
+          return;
+        }
+        _this2._breakpointsToSendOnSave.delete(filePath);
+        yield _this2._sendBreakpoints(filePath, true);
+      });
+
+      return function (_x2) {
+        return _ref2.apply(this, arguments);
+      };
+    })()));
+
     this._sessionEndDisposables.add(session.observeInitializeEvents().subscribe((() => {
-      var _ref2 = (0, _asyncToGenerator.default)(function* (event) {
+      var _ref3 = (0, _asyncToGenerator.default)(function* (event) {
         const sendConfigurationDone = (() => {
-          var _ref3 = (0, _asyncToGenerator.default)(function* () {
+          var _ref4 = (0, _asyncToGenerator.default)(function* () {
             if (session && session.getCapabilities().supportsConfigurationDoneRequest) {
               return session.configurationDone().catch(function (e) {
                 // Disconnect the debug session on configuration done error #10596
@@ -378,7 +398,7 @@ class DebugService {
           });
 
           return function sendConfigurationDone() {
-            return _ref3.apply(this, arguments);
+            return _ref4.apply(this, arguments);
           };
         })();
 
@@ -390,13 +410,13 @@ class DebugService {
         }
       });
 
-      return function (_x2) {
-        return _ref2.apply(this, arguments);
+      return function (_x3) {
+        return _ref3.apply(this, arguments);
       };
     })()));
 
     this._sessionEndDisposables.add(session.observeStopEvents().subscribe((() => {
-      var _ref4 = (0, _asyncToGenerator.default)(function* (event) {
+      var _ref5 = (0, _asyncToGenerator.default)(function* (event) {
         _this2._updateModeAndEmit((_constants || _load_constants()).DebuggerMode.PAUSED);
         _this2._scheduleNativeNotification();
         try {
@@ -413,13 +433,13 @@ class DebugService {
         }
       });
 
-      return function (_x3) {
-        return _ref4.apply(this, arguments);
+      return function (_x4) {
+        return _ref5.apply(this, arguments);
       };
     })()));
 
     this._sessionEndDisposables.add(session.observeThreadEvents().subscribe((() => {
-      var _ref5 = (0, _asyncToGenerator.default)(function* (event) {
+      var _ref6 = (0, _asyncToGenerator.default)(function* (event) {
         if (event.body.reason === 'started') {
           yield _this2._fetchThreads(session);
         } else if (event.body.reason === 'exited') {
@@ -427,8 +447,8 @@ class DebugService {
         }
       });
 
-      return function (_x4) {
-        return _ref5.apply(this, arguments);
+      return function (_x5) {
+        return _ref6.apply(this, arguments);
       };
     })()));
 
@@ -740,6 +760,7 @@ class DebugService {
 
   updateBreakpoints(uri, data) {
     this._model.updateBreakpoints(data);
+    this._breakpointsToSendOnSave.add(uri);
   }
 
   removeBreakpoints(id, skipAnalytics = false) {

@@ -394,9 +394,9 @@ class VsDebugSession extends (_V8Protocol || _load_V8Protocol()).default {
     const event = {
       type: 'event',
       event: 'continued',
-      // $FlowFixMe
       body: {
         threadId,
+        // $FlowFixMe
         allThreadsContinued
       },
       seq: 0

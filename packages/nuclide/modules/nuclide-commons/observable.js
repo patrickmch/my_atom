@@ -493,7 +493,7 @@ exports.SingletonExecutor = SingletonExecutor; /**
 function poll(delay) {
   return source => _rxjsBundlesRxMinJs.Observable.defer(() => {
     const delays = new _rxjsBundlesRxMinJs.Subject();
-    return delays.switchMap(n => _rxjsBundlesRxMinJs.Observable.timer(n)).startWith(null).switchMap(() => {
+    return delays.switchMap(n => _rxjsBundlesRxMinJs.Observable.timer(n)).merge(_rxjsBundlesRxMinJs.Observable.of(null)).switchMap(() => {
       const subscribedAt = Date.now();
       return source.do({
         complete: () => {

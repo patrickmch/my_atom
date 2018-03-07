@@ -4,6 +4,12 @@ Object.defineProperty(exports, "__esModule", {
   value: true
 });
 
+var _classnames;
+
+function _load_classnames() {
+  return _classnames = _interopRequireDefault(require('classnames'));
+}
+
 var _Button;
 
 function _load_Button() {
@@ -26,16 +32,7 @@ var _react = _interopRequireWildcard(require('react'));
 
 function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
 
-/**
- * Copyright (c) 2015-present, Facebook, Inc.
- * All rights reserved.
- *
- * This source code is licensed under the license found in the LICENSE file in
- * the root directory of this source tree.
- *
- * 
- * @format
- */
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 class AvdTable extends _react.Component {
   constructor(...args) {
@@ -44,14 +41,21 @@ class AvdTable extends _react.Component {
     return _temp = super(...args), this._renderAvd = rowProps => {
       const { startAvd } = this.props;
       const avd = rowProps.data;
+
       return _react.createElement(
         'div',
-        { className: 'nuclide-adb-sdb-emulator-row' },
-        avd,
+        {
+          className: (0, (_classnames || _load_classnames()).default)('nuclide-adb-sdb-emulator-row', {
+            'nuclide-adb-sdb-emulator-running': avd.running
+          }) },
+        avd.name,
+        ' ',
+        avd.running ? ' (running)' : '',
         _react.createElement(
           (_ButtonGroup || _load_ButtonGroup()).ButtonGroup,
           null,
           _react.createElement((_Button || _load_Button()).Button, {
+            disabled: avd.running,
             icon: 'triangle-right',
             onClick: () => startAvd(avd),
             size: 'SMALL'
@@ -91,4 +95,13 @@ class AvdTable extends _react.Component {
     });
   }
 }
-exports.default = AvdTable;
+exports.default = AvdTable; /**
+                             * Copyright (c) 2015-present, Facebook, Inc.
+                             * All rights reserved.
+                             *
+                             * This source code is licensed under the license found in the LICENSE file in
+                             * the root directory of this source tree.
+                             *
+                             * 
+                             * @format
+                             */

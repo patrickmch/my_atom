@@ -170,6 +170,8 @@ class CqueryLanguageClient extends (_LspLanguageService || _load_LspLanguageServ
     return super._isFileInProject(file) && this._checkProject(file);
   }
 
+  // TODO pelmers: override handleClose
+
   _notifyOnFail(success, falseMessage) {
     var _this2 = this;
 

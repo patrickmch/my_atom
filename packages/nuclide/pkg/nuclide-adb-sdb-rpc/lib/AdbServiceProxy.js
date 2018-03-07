@@ -554,6 +554,16 @@ module.exports = _client => {
     });
   };
 
+  remoteModule.killServer = function () {
+    return _client.marshalArguments(Array.from(arguments), []).then(args => {
+      return _client.callRemoteFunction("AdbService/killServer", "promise", args);
+    }).then(value => {
+      return _client.unmarshal(value, {
+        kind: "void"
+      });
+    });
+  };
+
   remoteModule.getApkManifest = function (arg0, arg1) {
     return _client.marshalArguments(Array.from(arguments), [{
       name: "apkPath",
@@ -1959,19 +1969,43 @@ Object.defineProperty(module.exports, "defs", {
         }
       }
     },
+    killServer: {
+      kind: "function",
+      name: "killServer",
+      location: {
+        type: "source",
+        fileName: "AdbService.js",
+        line: 202
+      },
+      type: {
+        location: {
+          type: "source",
+          fileName: "AdbService.js",
+          line: 202
+        },
+        kind: "function",
+        argumentTypes: [],
+        returnType: {
+          kind: "promise",
+          type: {
+            kind: "void"
+          }
+        }
+      }
+    },
     getApkManifest: {
       kind: "function",
       name: "getApkManifest",
       location: {
         type: "source",
         fileName: "AdbService.js",
-        line: 223
+        line: 227
       },
       type: {
         location: {
           type: "source",
           fileName: "AdbService.js",
-          line: 223
+          line: 227
         },
         kind: "function",
         argumentTypes: [{

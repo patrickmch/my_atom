@@ -2,39 +2,39 @@
   "_args": [
     [
       {
-        "raw": "/private/var/folders/dp/vj05cwss7pz9mjl62ccqzysm0000gp/T/d-118122-75093-zrkd5w.948r02uik9/package.tgz",
+        "raw": "/private/var/folders/dp/vj05cwss7pz9mjl62ccqzysm0000gp/T/d-11821-3541-jflpyk.boo8icz0k9/package.tgz",
         "scope": null,
         "escapedName": null,
         "name": null,
-        "rawSpec": "/private/var/folders/dp/vj05cwss7pz9mjl62ccqzysm0000gp/T/d-118122-75093-zrkd5w.948r02uik9/package.tgz",
-        "spec": "/private/var/folders/dp/vj05cwss7pz9mjl62ccqzysm0000gp/T/d-118122-75093-zrkd5w.948r02uik9/package.tgz",
+        "rawSpec": "/private/var/folders/dp/vj05cwss7pz9mjl62ccqzysm0000gp/T/d-11821-3541-jflpyk.boo8icz0k9/package.tgz",
+        "spec": "/private/var/folders/dp/vj05cwss7pz9mjl62ccqzysm0000gp/T/d-11821-3541-jflpyk.boo8icz0k9/package.tgz",
         "type": "local"
       },
-      "/private/var/folders/dp/vj05cwss7pz9mjl62ccqzysm0000gp/T/apm-install-dir-118122-75093-1tg2gkw.cp56mbzkt9"
+      "/private/var/folders/dp/vj05cwss7pz9mjl62ccqzysm0000gp/T/apm-install-dir-11821-3541-12ci2ll.vhc8mvaemi"
     ]
   ],
-  "_from": "../d-118122-75093-zrkd5w.948r02uik9/package.tgz",
-  "_id": "nuclide@0.284.0",
+  "_from": "../d-11821-3541-jflpyk.boo8icz0k9/package.tgz",
+  "_id": "nuclide@0.286.0",
   "_inCache": true,
   "_location": "/nuclide",
   "_phantomChildren": {},
   "_requested": {
-    "raw": "/private/var/folders/dp/vj05cwss7pz9mjl62ccqzysm0000gp/T/d-118122-75093-zrkd5w.948r02uik9/package.tgz",
+    "raw": "/private/var/folders/dp/vj05cwss7pz9mjl62ccqzysm0000gp/T/d-11821-3541-jflpyk.boo8icz0k9/package.tgz",
     "scope": null,
     "escapedName": null,
     "name": null,
-    "rawSpec": "/private/var/folders/dp/vj05cwss7pz9mjl62ccqzysm0000gp/T/d-118122-75093-zrkd5w.948r02uik9/package.tgz",
-    "spec": "/private/var/folders/dp/vj05cwss7pz9mjl62ccqzysm0000gp/T/d-118122-75093-zrkd5w.948r02uik9/package.tgz",
+    "rawSpec": "/private/var/folders/dp/vj05cwss7pz9mjl62ccqzysm0000gp/T/d-11821-3541-jflpyk.boo8icz0k9/package.tgz",
+    "spec": "/private/var/folders/dp/vj05cwss7pz9mjl62ccqzysm0000gp/T/d-11821-3541-jflpyk.boo8icz0k9/package.tgz",
     "type": "local"
   },
   "_requiredBy": [
     "#USER"
   ],
-  "_resolved": "file:../d-118122-75093-zrkd5w.948r02uik9/package.tgz",
-  "_shasum": "af6204005c76be828249fc5d6463bf17a5ef156a",
+  "_resolved": "file:../d-11821-3541-jflpyk.boo8icz0k9/package.tgz",
+  "_shasum": "b16db0b367625fa745540fd9ba2e775c6974cdfb",
   "_shrinkwrap": null,
-  "_spec": "/private/var/folders/dp/vj05cwss7pz9mjl62ccqzysm0000gp/T/d-118122-75093-zrkd5w.948r02uik9/package.tgz",
-  "_where": "/private/var/folders/dp/vj05cwss7pz9mjl62ccqzysm0000gp/T/apm-install-dir-118122-75093-1tg2gkw.cp56mbzkt9",
+  "_spec": "/private/var/folders/dp/vj05cwss7pz9mjl62ccqzysm0000gp/T/d-11821-3541-jflpyk.boo8icz0k9/package.tgz",
+  "_where": "/private/var/folders/dp/vj05cwss7pz9mjl62ccqzysm0000gp/T/apm-install-dir-11821-3541-12ci2ll.vhc8mvaemi",
   "atomTestRunner": "./lib/test-runner-entry.js",
   "bin": {
     "nuclide-start-server": "./pkg/nuclide-server/nuclide-start-server"
@@ -84,6 +84,7 @@
     "log4js": "1.1.1",
     "lru-cache": "4.0.2",
     "marked": "0.3.9",
+    "micromatch": "3.1.5",
     "mime-types": "2.1.16",
     "minimatch": "3.0.4",
     "mkdirp": "0.5.1",
@@ -171,7 +172,7 @@
     "eslint-plugin-prettier": "2.3.1",
     "eslint-plugin-react": "7.4.0",
     "eslint-plugin-rulesdir": "0.1.0",
-    "flow-bin": "0.64.0",
+    "flow-bin": "0.66.0",
     "fs-extra": "2.0.0",
     "jasmine-node": "1.14.5",
     "mock-spawn": "0.2.6",
@@ -183,7 +184,7 @@
     "webfonts-generator": "0.3.5"
   },
   "engines": {
-    "atom": ">=1.23.2",
+    "atom": ">=1.24.0",
     "node": ">=7.4.0"
   },
   "homepage": "https://nuclide.io/",
@@ -210,8 +211,8 @@
   "name": "nuclide",
   "optionalDependencies": {},
   "package-deps": [
-    "file-icons:2.1.16",
-    "tool-bar:1.1.4",
+    "file-icons:2.1.17",
+    "tool-bar:1.1.6",
     "highlight-selected",
     "language-babel",
     "language-graphql",
@@ -224,7 +225,7 @@
     "language-thrift",
     "language-scala",
     "MagicPython",
-    "nuclide-format-js:0.0.43",
+    "nuclide-format-js:0.0.44",
     "set-syntax",
     "sort-lines"
   ],
@@ -236,30 +237,34 @@
   },
   "scripts": {
     "fix-all": "eslint --fix .",
-    "flow": "flow check --show-all-errors",
+    "flow": "flow check --show-all-errors --max-warnings 0",
     "lint": "eslint",
     "lint-all": "eslint .",
     "release-transpile": "./modules/nuclide-node-transpiler/bin/release-transpile.js",
     "test": "npm run lint-all && npm run flow"
   },
+  "uriHandler": {
+    "method": "handleURI",
+    "deferActivation": false
+  },
   "urlMain": "./lib/url-main-entry.js",
-  "version": "0.284.0",
+  "version": "0.286.0",
   "warnings": [
     {
       "code": "ENOTSUP",
       "required": {
-        "atom": ">=1.23.2",
+        "atom": ">=1.24.0",
         "node": ">=7.4.0"
       },
-      "pkgid": "nuclide@0.284.0"
+      "pkgid": "nuclide@0.286.0"
     },
     {
       "code": "ENOTSUP",
       "required": {
-        "atom": ">=1.23.2",
+        "atom": ">=1.24.0",
         "node": ">=7.4.0"
       },
-      "pkgid": "nuclide@0.284.0"
+      "pkgid": "nuclide@0.286.0"
     }
   ],
   "workspaces": [

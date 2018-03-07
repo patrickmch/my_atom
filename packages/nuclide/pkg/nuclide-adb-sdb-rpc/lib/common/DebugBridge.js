@@ -64,5 +64,9 @@ class DebugBridge {
       return commandObs.toArray().switchMap(deviceList => _rxjsBundlesRxMinJs.Observable.of(deviceList.reduce((a, b) => a != null ? a.concat(...b) : b)));
     });
   }
+
+  static killServer() {
+    return this.configObs.switchMap(config => (0, (_process || _load_process()).runCommand)(config.path, ['kill-server'])).mapTo(undefined).toPromise();
+  }
 }
 exports.DebugBridge = DebugBridge;

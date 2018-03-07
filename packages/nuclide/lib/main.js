@@ -3,7 +3,7 @@
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.serialize = exports.deactivate = exports.activate = exports.config = undefined;
+exports.handleURI = exports.serialize = exports.deactivate = exports.activate = exports.config = undefined;
 
 require('./preload-dependencies');
 
@@ -67,6 +67,12 @@ function _load_package() {
   return _package = _interopRequireDefault(require('../package.json'));
 }
 
+var _deepLink;
+
+function _load_deepLink() {
+  return _deepLink = require('../pkg/commons-atom/deep-link');
+}
+
 var _nuclideLogging;
 
 function _load_nuclideLogging() {
@@ -83,6 +89,11 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
 
 // The minimum version of Atom required to run Nuclide. Anything less than this and users will get
 // a redbox and Nuclide will not activate.
+
+// eslint-disable-next-line rulesdir/prefer-nuclide-uri
+const MINIMUM_SUPPORTED_ATOM_VERSION = '1.19.0';
+
+// Install the error reporting even before Nuclide is activated.
 /**
  * Copyright (c) 2015-present, Facebook, Inc.
  * All rights reserved.
@@ -104,11 +115,6 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
  *
  */
 
-const MINIMUM_SUPPORTED_ATOM_VERSION = '1.19.0';
-
-// Install the error reporting even before Nuclide is activated.
-
-// eslint-disable-next-line rulesdir/prefer-nuclide-uri
 let errorReporterDisposable = (0, (_installErrorReporter || _load_installErrorReporter()).default)();
 // Install the logger config before Nuclide is activated.
 (0, (_nuclideLogging || _load_nuclideLogging()).initializeLogging)();
@@ -235,6 +241,10 @@ function _activate() {
       label: `Version ${(_package || _load_package()).default.version}`,
       enabled: false
     }]
+  }, {
+    label: process.platform === 'win32' ? '&Go' : 'Go',
+    // an empty submenu is required to manipulate its position below
+    submenu: []
   }]));
 
   // Manually manipulate the menu template order.
@@ -243,6 +253,15 @@ function _activate() {
     const nuclideIndex = atom.menu.template.findIndex(item => item.label === 'Nuclide');
     const menuItem = atom.menu.template.splice(nuclideIndex, 1)[0];
     const newIndex = insertIndex > nuclideIndex ? insertIndex - 1 : insertIndex;
+    atom.menu.template.splice(newIndex, 0, menuItem);
+    atom.menu.update();
+  }
+
+  const goInsertIndex = atom.menu.template.findIndex(item => item.label === 'Packages');
+  if (goInsertIndex !== -1) {
+    const goIndex = atom.menu.template.findIndex(item => item.label === 'Go');
+    const menuItem = atom.menu.template.splice(goIndex, 1)[0];
+    const newIndex = goInsertIndex > goIndex ? goInsertIndex - 1 : goInsertIndex;
     atom.menu.template.splice(newIndex, 0, menuItem);
     atom.menu.update();
   }
@@ -360,6 +379,18 @@ function _serialize() {
   featureLoader.serialize();
 }
 
+function _handleURI({ pathname, query }, uri) {
+  if (pathname == null || pathname === '') {
+    atom.notifications.addError(`Invalid URI ${uri}: must have a path.`);
+    return;
+  }
+  const message = pathname.substr(1);
+
+  // Atom waits for Nuclide to initialize before sending the URI through.
+  // So, at this point it should be fairly safe to delegate to nuclide-deep-link.
+  (0, (_deepLink || _load_deepLink()).sendDeepLink)(remote.getCurrentWindow(), message, query || {});
+}
+
 function ensureAtomVersion() {
   if ((_semver || _load_semver()).default.lt(atom.getVersion(), MINIMUM_SUPPORTED_ATOM_VERSION)) {
     const notification = atom.notifications.addError('**Atom Upgrade Required**', {
@@ -396,3 +427,4 @@ function ensureAtomVersion() {
 const activate = exports.activate = shouldInitialize ? _activate : undefined;
 const deactivate = exports.deactivate = shouldInitialize ? _deactivate : undefined;
 const serialize = exports.serialize = shouldInitialize ? _serialize : undefined;
+const handleURI = exports.handleURI = shouldInitialize ? _handleURI : undefined;

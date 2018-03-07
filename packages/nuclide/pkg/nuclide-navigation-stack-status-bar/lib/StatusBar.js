@@ -51,28 +51,38 @@ function _load_shallowequal() {
   return _shallowequal = _interopRequireDefault(require('shallowequal'));
 }
 
+var _nuclideAnalytics;
+
+function _load_nuclideAnalytics() {
+  return _nuclideAnalytics = _interopRequireWildcard(require('../../nuclide-analytics'));
+}
+
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
 
 // Since this is a button which can change the current file, place it where
 // it won't change position when the current file name changes, which means way left.
-/**
- * Copyright (c) 2015-present, Facebook, Inc.
- * All rights reserved.
- *
- * This source code is licensed under the license found in the LICENSE file in
- * the root directory of this source tree.
- *
- * 
- * @format
- */
-
-const STATUS_BAR_PRIORITY = -100;
+const STATUS_BAR_PRIORITY = -100; /**
+                                   * Copyright (c) 2015-present, Facebook, Inc.
+                                   * All rights reserved.
+                                   *
+                                   * This source code is licensed under the license found in the LICENSE file in
+                                   * the root directory of this source tree.
+                                   *
+                                   * 
+                                   * @format
+                                   */
 
 function consumeStatusBar(statusBar, navigationStack) {
-  const onBack = navigationStack.navigateBackwards;
-  const onForward = navigationStack.navigateForwards;
+  const onBack = () => {
+    (_nuclideAnalytics || _load_nuclideAnalytics()).track('status-bar-nav-stack-clicked-back');
+    navigationStack.navigateBackwards;
+  };
+  const onForward = () => {
+    (_nuclideAnalytics || _load_nuclideAnalytics()).track('status-bar-nav-stack-clicked-forward');
+    navigationStack.navigateForwards;
+  };
   const props = (0, (_event || _load_event()).observableFromSubscribeFunction)(navigationStack.subscribe).map(stack => ({
     enableBack: stack.hasPrevious,
     enableForward: stack.hasNext,
@@ -103,7 +113,7 @@ class NavStackStatusBarTile extends _react.Component {
         onClick: this.props.onBack,
         disabled: !this.props.enableBack,
         tooltip: {
-          title: 'Navigate Backwards',
+          title: 'Go Back',
           keyBindingCommand: 'nuclide-navigation-stack:navigate-backwards'
         },
         className: 'nuclide-navigation-stack-button'
@@ -113,7 +123,7 @@ class NavStackStatusBarTile extends _react.Component {
         onClick: this.props.onForward,
         disabled: !this.props.enableForward,
         tooltip: {
-          title: 'Navigate Forwards',
+          title: 'Go Forward',
           keyBindingCommand: 'nuclide-navigation-stack:navigate-forwards'
         },
         className: 'nuclide-navigation-stack-button'

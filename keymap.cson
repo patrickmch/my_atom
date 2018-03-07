@@ -139,6 +139,7 @@
   'P': 'keystroke i cmd-v escape'
   'ctrl-p': 'keystroke cmd-enter shift-cmd-space p'
   'ctrl-P': 'keystroke shift-cmd-enter shift-cmd-space p'
+  'alt-/': 'vim-mode-plus:toggle-case-and-move-right'
 
 'atom-text-editor.vim-mode-plus:not(.insert-mode)':
   'ctrl-n': 'vim-mode-plus:move-to-next-occurrence'
@@ -194,14 +195,16 @@
 
   'space 1': 'window:reload'
 
+  'space b': 'git-blame:toggle'
+
   'shift-alt-j': 'vim-mode-plus:move-down-to-edge'
   'shift-alt-k': 'vim-mode-plus:move-up-to-edge'
   'ctrl-cmd-k': 'my:move-line-up'
   'ctrl-cmd-j': 'my:move-line-down'
 
-  'shift-l': 'vim-mode-plus:move-to-next-word'
+  'alt-l': 'vim-mode-plus:move-to-next-word'
   'ctrl-l': 'vim-mode-plus:move-to-last-character-of-line'
-  'shift-h': 'vim-mode-plus:move-to-previous-word'
+  'alt-h': 'vim-mode-plus:move-to-previous-word'
   'ctrl-h': 'vim-mode-plus:move-to-first-character-of-line'
 
   'D': 'vim-mode-plus:delete-line'
@@ -255,5 +258,3 @@
   # 'ctrl-j': 'advanced-open-file:move-cursor-down'
   # 'ctrl-k': 'advanced-open-file:move-cursor-up'
   'cmd-;': 'advanced-open-file:delete-path-component'
-  'ctrl-j': 'keystroke down down down down'
-  'ctrl-k': 'keystroke up up up up'

@@ -116,6 +116,7 @@ class BreakpointConfigComponent extends _react.Component {
       const { breakpoint, service } = _this.props;
       const condition = (0, (_nullthrows || _load_nullthrows()).default)(_this._condition).getText().trim();
       if (condition === (breakpoint.condition || '')) {
+        _this.props.onDismiss();
         return;
       }
       yield service.removeBreakpoints(breakpoint.getId());

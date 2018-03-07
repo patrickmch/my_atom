@@ -36,12 +36,6 @@ function _load_lruCache() {
 
 var _os = _interopRequireDefault(require('os'));
 
-var _process;
-
-function _load_process() {
-  return _process = require('nuclide-commons/process');
-}
-
 var _promise;
 
 function _load_promise() {
@@ -70,6 +64,12 @@ var _findClangServerArgs;
 
 function _load_findClangServerArgs() {
   return _findClangServerArgs = _interopRequireDefault(require('./find-clang-server-args'));
+}
+
+var _utils;
+
+function _load_utils() {
+  return _utils = require('./utils');
 }
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
@@ -201,23 +201,10 @@ class ClangServerManager {
         return 0;
       }
 
-      let total = 0;
-      const usage = new Map();
-      try {
-        const stdout = yield (0, (_process || _load_process()).runCommand)('ps', ['-p', serverPids.join(','), '-o', 'pid=', '-o', 'rss=']).toPromise();
-        stdout.split('\n').forEach(function (line) {
-          const parts = line.split(/\s+/);
-          if (parts.length === 2) {
-            const [pid, rss] = parts.map(function (x) {
-              return parseInt(x, 10);
-            });
-            usage.set(pid, rss);
-            total += rss;
-          }
-        });
-      } catch (err) {}
-      // Ignore errors.
-
+      const usage = yield (0, (_utils || _load_utils()).memoryUsagePerPid)(serverPids);
+      let total = Array.from(usage.values()).reduce(function (a, b) {
+        return a + b;
+      }, 0);
 
       // Remove servers until we're under the memory limit.
       // Make sure we allow at least one server to stay alive.

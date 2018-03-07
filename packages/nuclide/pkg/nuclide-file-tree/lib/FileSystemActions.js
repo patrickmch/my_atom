@@ -235,16 +235,11 @@ class FileSystemActions {
     return (_FileTreeHelpers || _load_FileTreeHelpers()).default.getDirectoryByKey(cbMeta.directory);
   }
 
-  _onConfirmPaste(newDirPath, addToVCS, onDidConfirm = function () {}) {
+  _onConfirmPaste(newPath, addToVCS, onDidConfirm = function () {}) {
     var _this2 = this;
 
     return (0, _asyncToGenerator.default)(function* () {
-      const newDir = (_FileTreeHelpers || _load_FileTreeHelpers()).default.getDirectoryByKey(newDirPath);
-      if (newDir == null) {
-        // bad target
-        return;
-      }
-
+      const copyPaths = [];
       const cb = atom.clipboard.readWithMetadata();
       const oldDir = _this2.getDirectoryFromMetadata(cb.metadata);
       if (oldDir == null) {
@@ -252,13 +247,41 @@ class FileSystemActions {
         return;
       }
 
-      const copyPaths = [];
-      cb.text.split(',').forEach(function (encodedFilename) {
-        const filename = decodeURIComponent(encodedFilename);
-        const oldPath = oldDir.getFile(filename).getPath();
-        const newPath = newDir.getFile(filename).getPath();
-        copyPaths.push({ old: oldPath, new: newPath });
-      });
+      const filenames = cb.text.split(',');
+      const newFile = (_FileTreeHelpers || _load_FileTreeHelpers()).default.getFileByKey(newPath);
+      const newDir = (_FileTreeHelpers || _load_FileTreeHelpers()).default.getDirectoryByKey(newPath);
+
+      if (newFile == null && newDir == null) {
+        // newPath doesn't resolve to a file or path
+        atom.notifications.addError('Invalid target');
+        return;
+      } else if (filenames.length === 1) {
+        const origFilePath = oldDir.getFile(cb.text).getPath();
+        if (newFile != null) {
+          // single file on clibboard; Path resolves to a file.
+          // => copy old file into new file
+          const destFilePath = newFile.getPath();
+          copyPaths.push({ old: origFilePath, new: destFilePath });
+        } else if (newDir != null) {
+          // single file on clibboard; Path resolves to a folder.
+          // => copy old file into new newDir folder
+          const destFilePath = newDir.getFile(cb.text).getPath();
+          copyPaths.push({ old: origFilePath, new: destFilePath });
+        }
+      } else {
+        // multiple files in cb
+        if (newDir == null) {
+          atom.notifications.addError('Cannot rename when pasting multiple files');
+          return;
+        }
+
+        filenames.forEach(function (encodedFilename) {
+          const filename = decodeURIComponent(encodedFilename);
+          const origFilePath = oldDir.getFile(filename).getPath();
+          const destFilePath = newDir.getFile(filename).getPath();
+          copyPaths.push({ old: origFilePath, new: destFilePath });
+        });
+      }
 
       yield _this2._doCopy(copyPaths, addToVCS, onDidConfirm);
     })();
@@ -400,6 +423,32 @@ class FileSystemActions {
     (0, (_FileActionModal || _load_FileActionModal()).openDialog)(dialogProps);
   }
 
+  // provide appropriate UI feedback depending on whether user
+  // has single or multiple files in the clipboard
+  _getPasteDialogProps(path) {
+    const cb = atom.clipboard.readWithMetadata();
+    const filenames = cb.text.split(',');
+    if (filenames.length === 1) {
+      return {
+        initialValue: path.getFile(cb.text).getPath(),
+        message: _react.createElement(
+          'span',
+          null,
+          'Paste file from clipboard into'
+        )
+      };
+    } else {
+      return {
+        initialValue: (_FileTreeHelpers || _load_FileTreeHelpers()).default.dirPathToKey(path.getPath()),
+        message: _react.createElement(
+          'span',
+          null,
+          'Paste files from clipboard into the following folder'
+        )
+      };
+    }
+  }
+
   openPasteDialog() {
     const store = (_FileTreeStore || _load_FileTreeStore()).FileTreeStore.getInstance();
     const node = store.getSingleSelectedNode();
@@ -407,15 +456,16 @@ class FileSystemActions {
       // don't paste if unselected
       return;
     }
-    let newDir = (_FileTreeHelpers || _load_FileTreeHelpers()).default.getDirectoryByKey(node.uri);
-    if (newDir == null) {
+
+    let newPath = (_FileTreeHelpers || _load_FileTreeHelpers()).default.getDirectoryByKey(node.uri);
+    if (newPath == null) {
       // maybe it's a file?
       const file = (_FileTreeHelpers || _load_FileTreeHelpers()).default.getFileByKey(node.uri);
       if (file == null) {
         // nope! do nothing if we can't find an entry
         return;
       }
-      newDir = file.getParent();
+      newPath = file.getParent();
     }
 
     const additionalOptions = {};
@@ -423,14 +473,9 @@ class FileSystemActions {
     if ((_FileTreeHgHelpers || _load_FileTreeHgHelpers()).default.getHgRepositoryForNode(node) !== null) {
       additionalOptions.addToVCS = 'Add the new file(s) to version control.';
     }
-    (0, (_FileActionModal || _load_FileActionModal()).openDialog)({
-      iconClassName: 'icon-arrow-right',
-      initialValue: (_FileTreeHelpers || _load_FileTreeHelpers()).default.dirPathToKey(newDir.getPath()),
-      message: _react.createElement(
-        'span',
-        null,
-        'Paste file(s) from clipboard into'
-      ),
+    (0, (_FileActionModal || _load_FileActionModal()).openDialog)(Object.assign({
+      iconClassName: 'icon-arrow-right'
+    }, this._getPasteDialogProps(newPath), {
       onConfirm: (pasteDirPath, options) => {
         this._onConfirmPaste(pasteDirPath.trim(), Boolean(options.addToVCS)).catch(error => {
           atom.notifications.addError(`Failed to paste into '${pasteDirPath}': ${error}`);
@@ -438,7 +483,7 @@ class FileSystemActions {
       },
       onClose: (_FileActionModal || _load_FileActionModal()).closeDialog,
       additionalOptions
-    });
+    }));
   }
 
   _getSelectedContainerNode() {

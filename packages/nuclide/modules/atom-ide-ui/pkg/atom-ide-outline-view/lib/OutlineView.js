@@ -17,6 +17,12 @@ function _load_collection() {
   return _collection = require('nuclide-commons/collection');
 }
 
+var _memoizeUntilChanged;
+
+function _load_memoizeUntilChanged() {
+  return _memoizeUntilChanged = _interopRequireDefault(require('nuclide-commons/memoizeUntilChanged'));
+}
+
 var _UniversalDisposable;
 
 function _load_UniversalDisposable() {
@@ -77,6 +83,18 @@ function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj;
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
+/**
+ * Copyright (c) 2017-present, Facebook, Inc.
+ * All rights reserved.
+ *
+ * This source code is licensed under the BSD-style license found in the
+ * LICENSE file in the root directory of this source tree. An additional grant
+ * of patent rights can be found in the PATENTS file in the same directory.
+ *
+ * 
+ * @format
+ */
+
 const TOKEN_KIND_TO_CLASS_NAME_MAP = {
   keyword: 'syntax--keyword',
   'class-name': 'syntax--entity syntax--name syntax--class',
@@ -87,17 +105,7 @@ const TOKEN_KIND_TO_CLASS_NAME_MAP = {
   whitespace: '',
   plain: '',
   type: 'syntax--support syntax--type'
-}; /**
-    * Copyright (c) 2017-present, Facebook, Inc.
-    * All rights reserved.
-    *
-    * This source code is licensed under the BSD-style license found in the
-    * LICENSE file in the root directory of this source tree. An additional grant
-    * of patent rights can be found in the PATENTS file in the same directory.
-    *
-    * 
-    * @format
-    */
+};
 
 class OutlineView extends _react.PureComponent {
   constructor(...args) {
@@ -326,7 +334,9 @@ class OutlineViewCore extends _react.PureComponent {
       // cursor to the start of the symbol. Let's activate the pane now.
       pane.activate();
       pane.activateItem(editor);
-    }, this._outlineTreeToNode = outlineTree => {
+    }, this._getNodes = (0, (_memoizeUntilChanged || _load_memoizeUntilChanged()).default)(outlineTrees => {
+      return outlineTrees.map(this._outlineTreeToNode);
+    }), this._outlineTreeToNode = outlineTree => {
       const searchResult = this.state.searchResults.get(outlineTree);
 
       if (outlineTree.children.length === 0) {
@@ -387,7 +397,7 @@ class OutlineViewCore extends _react.PureComponent {
           className: 'outline-view-trees atom-ide-filterable',
           collapsedPaths: this.state.collapsedPaths,
           itemClassName: 'outline-view-item',
-          items: outline.outlineTrees.map(this._outlineTreeToNode),
+          items: this._getNodes(outline.outlineTrees),
           onCollapse: this._handleCollapse,
           onConfirm: this._handleConfirm,
           onExpand: this._handleExpand,

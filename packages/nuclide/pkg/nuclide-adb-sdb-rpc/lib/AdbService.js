@@ -3,7 +3,7 @@
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.getApkManifest = exports.getInstalledPackages = exports.removeFile = exports.touchFile = exports.dumpsysPackage = exports.activityExists = exports.launchService = exports.launchMainActivity = exports.launchActivity = exports.removeJdwpForwardSpec = exports.forwardJdwpPortToPid = exports.getPidFromPackageName = exports.stopProcess = exports.registerCustomPath = exports.getFullConfig = exports.registerAdbPath = undefined;
+exports.getApkManifest = exports.killServer = exports.getInstalledPackages = exports.removeFile = exports.touchFile = exports.dumpsysPackage = exports.activityExists = exports.launchService = exports.launchMainActivity = exports.launchActivity = exports.removeJdwpForwardSpec = exports.forwardJdwpPortToPid = exports.getPidFromPackageName = exports.stopProcess = exports.registerCustomPath = exports.getFullConfig = exports.registerAdbPath = undefined;
 
 var _asyncToGenerator = _interopRequireDefault(require('async-to-generator'));
 
@@ -157,8 +157,18 @@ let getInstalledPackages = exports.getInstalledPackages = (() => {
   };
 })();
 
+let killServer = exports.killServer = (() => {
+  var _ref16 = (0, _asyncToGenerator.default)(function* () {
+    return (_Adb || _load_Adb()).Adb.killServer();
+  });
+
+  return function killServer() {
+    return _ref16.apply(this, arguments);
+  };
+})();
+
 let getAaptBinary = (() => {
-  var _ref16 = (0, _asyncToGenerator.default)(function* (buildToolsVersion) {
+  var _ref17 = (0, _asyncToGenerator.default)(function* (buildToolsVersion) {
     if (process.env.ANDROID_SDK == null || buildToolsVersion == null) {
       return 'aapt';
     } else {
@@ -174,18 +184,18 @@ let getAaptBinary = (() => {
   });
 
   return function getAaptBinary(_x37) {
-    return _ref16.apply(this, arguments);
+    return _ref17.apply(this, arguments);
   };
 })();
 
 let getApkManifest = exports.getApkManifest = (() => {
-  var _ref17 = (0, _asyncToGenerator.default)(function* (apkPath, buildToolsVersion) {
+  var _ref18 = (0, _asyncToGenerator.default)(function* (apkPath, buildToolsVersion) {
     const aaptBinary = yield getAaptBinary(buildToolsVersion);
     return (0, (_process || _load_process()).runCommand)(aaptBinary, ['dump', 'badging', apkPath]).toPromise();
   });
 
   return function getApkManifest(_x38, _x39) {
-    return _ref17.apply(this, arguments);
+    return _ref18.apply(this, arguments);
   };
 })();
 

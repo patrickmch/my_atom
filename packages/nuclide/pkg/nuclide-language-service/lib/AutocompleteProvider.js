@@ -16,6 +16,12 @@ function _load_fuzzaldrinPlus() {
   return _fuzzaldrinPlus = _interopRequireDefault(require('fuzzaldrin-plus'));
 }
 
+var _textEditor;
+
+function _load_textEditor() {
+  return _textEditor = require('nuclide-commons-atom/text-editor');
+}
+
 var _simpleTextBuffer;
 
 function _load_simpleTextBuffer() {
@@ -53,6 +59,17 @@ function _load_textEdit() {
 }
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+/**
+ * Copyright (c) 2015-present, Facebook, Inc.
+ * All rights reserved.
+ *
+ * This source code is licensed under the license found in the LICENSE file in
+ * the root directory of this source tree.
+ *
+ * 
+ * @format
+ */
 
 class AutocompleteProvider {
 
@@ -154,17 +171,7 @@ class AutocompleteProvider {
   }
 }
 
-exports.AutocompleteProvider = AutocompleteProvider; /**
-                                                      * Copyright (c) 2015-present, Facebook, Inc.
-                                                      * All rights reserved.
-                                                      *
-                                                      * This source code is licensed under the license found in the LICENSE file in
-                                                      * the root directory of this source tree.
-                                                      *
-                                                      * 
-                                                      * @format
-                                                      */
-
+exports.AutocompleteProvider = AutocompleteProvider;
 function maybeApplyTextEdits(insertedSuggestionArgument) {
   const { editor, suggestion } = insertedSuggestionArgument;
   const textEdits = suggestion.textEdits;
@@ -205,9 +212,8 @@ function getLanguageSpecificPrefix(request) {
   const { editor } = request;
   const position = getPosition(request);
 
-  const defaultWordRules = editor.getNonWordCharacters();
-  const scope = editor.scopeDescriptorForBufferPosition(position);
-  const langWordRules = editor.getNonWordCharacters(scope); // {scope} ?
+  const defaultWordRules = (0, (_textEditor || _load_textEditor()).getNonWordCharacters)(editor);
+  const langWordRules = (0, (_textEditor || _load_textEditor()).getNonWordCharacters)(editor, position);
   if (defaultWordRules !== langWordRules) {
     return findAtomWordPrefix(editor, position);
   }

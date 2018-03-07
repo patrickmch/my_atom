@@ -4,7 +4,6 @@ Object.defineProperty(exports, "__esModule", {
   value: true
 });
 exports.getWindowLoadSettings = getWindowLoadSettings;
-exports.setWindowLoadSettings = setWindowLoadSettings;
 
 var _electron = require('electron');
 
@@ -33,14 +32,4 @@ function getWindowLoadSettings(browserWindow = _electron.remote.getCurrentWindow
   return loadSettingsJSON != null ? // Atom 1.17+ only.
   JSON.parse(loadSettingsJSON) : // Atom 1.16.
   browserWindow.loadSettings || {};
-}
-
-function setWindowLoadSettings(settings, browserWindow = _electron.remote.getCurrentWindow()) {
-  if (browserWindow.loadSettings) {
-    browserWindow.loadSettings = settings;
-  } else {
-    // Atom 1.17+ only.
-    // $FlowIgnore: add to defs when it comes.
-    browserWindow.loadSettingsJSON = JSON.stringify(settings);
-  }
 }

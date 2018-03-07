@@ -2,39 +2,39 @@
   "_args": [
     [
       {
-        "raw": "/private/var/folders/dp/vj05cwss7pz9mjl62ccqzysm0000gp/T/d-11796-31577-113s45p.ltaqaj1yvi/package.tgz",
+        "raw": "/private/var/folders/dp/vj05cwss7pz9mjl62ccqzysm0000gp/T/d-118126-16088-1gapzpd.gytv9m5cdi/package.tgz",
         "scope": null,
         "escapedName": null,
         "name": null,
-        "rawSpec": "/private/var/folders/dp/vj05cwss7pz9mjl62ccqzysm0000gp/T/d-11796-31577-113s45p.ltaqaj1yvi/package.tgz",
-        "spec": "/private/var/folders/dp/vj05cwss7pz9mjl62ccqzysm0000gp/T/d-11796-31577-113s45p.ltaqaj1yvi/package.tgz",
+        "rawSpec": "/private/var/folders/dp/vj05cwss7pz9mjl62ccqzysm0000gp/T/d-118126-16088-1gapzpd.gytv9m5cdi/package.tgz",
+        "spec": "/private/var/folders/dp/vj05cwss7pz9mjl62ccqzysm0000gp/T/d-118126-16088-1gapzpd.gytv9m5cdi/package.tgz",
         "type": "local"
       },
-      "/private/var/folders/dp/vj05cwss7pz9mjl62ccqzysm0000gp/T/apm-install-dir-11796-31577-t0kvd6.rhhryynwmi"
+      "/private/var/folders/dp/vj05cwss7pz9mjl62ccqzysm0000gp/T/apm-install-dir-118126-16088-16a4wwp.2s0olmcxr"
     ]
   ],
-  "_from": "../d-11796-31577-113s45p.ltaqaj1yvi/package.tgz",
-  "_id": "minimap@4.29.7",
+  "_from": "../d-118126-16088-1gapzpd.gytv9m5cdi/package.tgz",
+  "_id": "minimap@4.29.8",
   "_inCache": true,
   "_location": "/minimap",
   "_phantomChildren": {},
   "_requested": {
-    "raw": "/private/var/folders/dp/vj05cwss7pz9mjl62ccqzysm0000gp/T/d-11796-31577-113s45p.ltaqaj1yvi/package.tgz",
+    "raw": "/private/var/folders/dp/vj05cwss7pz9mjl62ccqzysm0000gp/T/d-118126-16088-1gapzpd.gytv9m5cdi/package.tgz",
     "scope": null,
     "escapedName": null,
     "name": null,
-    "rawSpec": "/private/var/folders/dp/vj05cwss7pz9mjl62ccqzysm0000gp/T/d-11796-31577-113s45p.ltaqaj1yvi/package.tgz",
-    "spec": "/private/var/folders/dp/vj05cwss7pz9mjl62ccqzysm0000gp/T/d-11796-31577-113s45p.ltaqaj1yvi/package.tgz",
+    "rawSpec": "/private/var/folders/dp/vj05cwss7pz9mjl62ccqzysm0000gp/T/d-118126-16088-1gapzpd.gytv9m5cdi/package.tgz",
+    "spec": "/private/var/folders/dp/vj05cwss7pz9mjl62ccqzysm0000gp/T/d-118126-16088-1gapzpd.gytv9m5cdi/package.tgz",
     "type": "local"
   },
   "_requiredBy": [
     "#USER"
   ],
-  "_resolved": "file:../d-11796-31577-113s45p.ltaqaj1yvi/package.tgz",
-  "_shasum": "55a8dfc8003d29c8fc895a8583ddf4a80e85191e",
+  "_resolved": "file:../d-118126-16088-1gapzpd.gytv9m5cdi/package.tgz",
+  "_shasum": "e411643a04c0e163b11e9f7d412f1cdf06e8bfe6",
   "_shrinkwrap": null,
-  "_spec": "/private/var/folders/dp/vj05cwss7pz9mjl62ccqzysm0000gp/T/d-11796-31577-113s45p.ltaqaj1yvi/package.tgz",
-  "_where": "/private/var/folders/dp/vj05cwss7pz9mjl62ccqzysm0000gp/T/apm-install-dir-11796-31577-t0kvd6.rhhryynwmi",
+  "_spec": "/private/var/folders/dp/vj05cwss7pz9mjl62ccqzysm0000gp/T/d-118126-16088-1gapzpd.gytv9m5cdi/package.tgz",
+  "_where": "/private/var/folders/dp/vj05cwss7pz9mjl62ccqzysm0000gp/T/apm-install-dir-118126-16088-16a4wwp.2s0olmcxr",
   "author": {
     "name": "Fangdun Cai",
     "email": "cfddream@gmail.com"
@@ -255,7 +255,7 @@
       "IntersectionObserver"
     ]
   },
-  "version": "4.29.7",
+  "version": "4.29.8",
   "viewProviders": [
     "minimapViewProvider"
   ]

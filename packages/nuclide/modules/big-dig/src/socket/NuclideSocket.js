@@ -51,12 +51,6 @@ function _load_event() {
   return _event = require('nuclide-commons/event');
 }
 
-var _string;
-
-function _load_string() {
-  return _string = require('nuclide-commons/string');
-}
-
 var _log4js;
 
 function _load_log4js() {
@@ -65,17 +59,19 @@ function _load_log4js() {
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-const logger = (0, (_log4js || _load_log4js()).getLogger)('nuclide-server'); /**
-                                                                              * Copyright (c) 2017-present, Facebook, Inc.
-                                                                              * All rights reserved.
-                                                                              *
-                                                                              * This source code is licensed under the BSD-style license found in the
-                                                                              * LICENSE file in the root directory of this source tree. An additional grant
-                                                                              * of patent rights can be found in the PATENTS file in the same directory.
-                                                                              *
-                                                                              * 
-                                                                              * @format
-                                                                              */
+/**
+ * Copyright (c) 2017-present, Facebook, Inc.
+ * All rights reserved.
+ *
+ * This source code is licensed under the BSD-style license found in the
+ * LICENSE file in the root directory of this source tree. An additional grant
+ * of patent rights can be found in the PATENTS file in the same directory.
+ *
+ * 
+ * @format
+ */
+
+const logger = (0, (_log4js || _load_log4js()).getLogger)('nuclide-socket');
 
 const PING_SEND_INTERVAL = 5000;
 const PING_WAIT_INTERVAL = 5000;
@@ -124,9 +120,16 @@ class NuclideSocket {
       }
     });
 
-    const { protocol, host } = _url.default.parse(serverUri);
-    // TODO verify that `host` is non-null rather than using maybeToString
-    this._websocketUri = `ws${protocol === 'https:' ? 's' : ''}://${(0, (_string || _load_string()).maybeToString)(host)}`;
+    const { protocol, host, path } = _url.default.parse(serverUri);
+
+    if (!(host != null)) {
+      throw new Error('Invariant violation: "host != null"');
+    }
+
+    const pathString = path != null ? path : '';
+    this._websocketUri = `ws${protocol === 'https:' ? 's' : ''}://${host}${pathString}`;
+
+    logger.info(`websocket uri: ${this._websocketUri}`);
 
     this._heartbeat = new (_XhrConnectionHeartbeat || _load_XhrConnectionHeartbeat()).XhrConnectionHeartbeat(serverUri, this._heartbeatChannel, options);
     this._heartbeat.onConnectionRestored(() => {
@@ -184,6 +187,7 @@ class NuclideSocket {
 
     const onSocketOpen = (() => {
       var _ref = (0, _asyncToGenerator.default)(function* () {
+        logger.info(`sending the id: ${_this.id}`);
         const sendIdResult = yield sendOneMessage(websocket, _this.id);
         switch (sendIdResult.kind) {
           case 'close':
@@ -306,6 +310,10 @@ class NuclideSocket {
   // Will reject quickly if the connection looks unhealthy.
   testConnection() {
     return this._heartbeat.sendHeartBeat();
+  }
+
+  getAddress() {
+    return this._serverUri;
   }
 
   getServerUri() {

@@ -10,8 +10,8 @@ function getUsername() {
   // flowlint-next-line sketchy-null-string:off
   const username = env.LOGNAME || env.USER || env.LNAME || env.USERNAME;
 
-  if (!username) {
-    throw new Error('Invariant violation: "username"');
+  if (!(username != null)) {
+    throw new Error('Invariant violation: "username != null"');
   }
 
   return username;

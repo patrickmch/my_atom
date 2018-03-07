@@ -1,10 +1,5 @@
 'use strict';
 
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-exports.__test__ = undefined;
-
 var _asyncToGenerator = _interopRequireDefault(require('async-to-generator'));
 
 var _electron = _interopRequireDefault(require('electron'));
@@ -90,19 +85,6 @@ function getAtomInitializerScript() {
 function initAtomWindow(blobStore, initialPaths) {
   const initScript = getAtomInitializerScript();
 
-  // Modify some of the load settings to match a real Atom window.
-  const loadSettings = (0, (_windowLoadSettings || _load_windowLoadSettings()).getWindowLoadSettings)();
-  // Replace the initialization script so reloading works.
-  loadSettings.windowInitializationScript = initScript;
-  // Inherit the initialPaths from the first state.
-  // We need to set this before initializing Atom to restore the state.
-  loadSettings.initialPaths = initialPaths;
-  // When launched from an existing window, loadSettings lacks an environment.
-  if (loadSettings.env == null) {
-    loadSettings.env = process.env;
-  }
-  (0, (_windowLoadSettings || _load_windowLoadSettings()).setWindowLoadSettings)(loadSettings);
-
   // Start up a real Atom instance in the current window.
   // Note that the `atom` global becomes accessible synchronously.
   // $FlowIgnore
@@ -159,8 +141,8 @@ function hasPaths(browserWindow) {
 
 // This function gets called by the Atom package-level URL handler.
 // Normally this is expected to set up the Atom application window.
-
-exports.default = (() => {
+// eslint-disable-next-line rulesdir/no-commonjs
+module.exports = (() => {
   var _ref5 = (0, _asyncToGenerator.default)(function* (blobStore) {
     const currentWindow = remote.getCurrentWindow();
     try {
@@ -222,9 +204,8 @@ exports.default = (() => {
 })();
 
 // Exported for testing.
-
-
-const __test__ = exports.__test__ = {
+// eslint-disable-next-line rulesdir/no-commonjs
+module.exports.__test__ = {
   getApplicationState,
   getAtomInitializerScript,
   acquireLock,

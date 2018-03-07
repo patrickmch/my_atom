@@ -97,12 +97,6 @@ function _load_BuckToolbar() {
   return _BuckToolbar = _interopRequireDefault(require('./BuckToolbar'));
 }
 
-var _observeBuildCommands;
-
-function _load_observeBuildCommands() {
-  return _observeBuildCommands = _interopRequireDefault(require('./observeBuildCommands'));
-}
-
 var _react = _interopRequireWildcard(require('react'));
 
 var _collection;
@@ -120,17 +114,6 @@ function _load_shallowequal() {
 function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-/**
- * Copyright (c) 2015-present, Facebook, Inc.
- * All rights reserved.
- *
- * This source code is licensed under the license found in the LICENSE file in
- * the root directory of this source tree.
- *
- * 
- * @format
- */
 
 const TASKS = [{
   type: 'build',
@@ -155,6 +138,17 @@ const TASKS = [{
 }];
 
 // This must match URI defined in ../../nuclide-console/lib/ui/ConsoleContainer
+/**
+ * Copyright (c) 2015-present, Facebook, Inc.
+ * All rights reserved.
+ *
+ * This source code is licensed under the license found in the LICENSE file in
+ * the root directory of this source tree.
+ *
+ * 
+ * @format
+ */
+
 const CONSOLE_VIEW_URI = exports.CONSOLE_VIEW_URI = 'atom://nuclide/console';
 
 function shouldEnableTask(taskType, ruleType) {
@@ -289,7 +283,6 @@ class BuckTaskRunner {
         return stream;
       });
       this._store = (0, (_redux || _load_redux()).createStore)((_Reducers || _load_Reducers()).default, initialState, (0, (_redux || _load_redux()).applyMiddleware)((0, (_reduxObservable || _load_reduxObservable()).createEpicMiddleware)(rootEpic)));
-      this._disposables.add((0, (_observeBuildCommands || _load_observeBuildCommands()).default)(this._store));
     }
     return this._store;
   }

@@ -148,17 +148,14 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
 // Marshals messages from Nuclide's LanguageService
 // to VS Code's Language Server Protocol
 class LspLanguageService {
-  // is really "?LspConnection"
+  // child process id
   // Fields which become live after we receive an initializeResponse:
 
-  // Fields which become live inside start(), when we spawn the LSP process.
-  // Disposing of the _lspConnection will dispose of all of them.
-  // tracks which fileversions we've received from Nuclide client
-  // supplies the options for spawning a process
-  // this is created per-connection
-  // tracks which fileversions we've received from Nuclide client
 
-  // These fields are provided upon construction
+  // These fields reflect our own state.
+  // (Most should be nullable types, but it's not worth the bother.)
+  // tracks which fileversions we've sent to LSP
+  // this is the one we're given
   constructor(logger, fileCache, host, languageServerName, command, args, spawnOptions = {}, projectRoot, fileExtensions, initializationOptions, additionalLogFilesRetentionPeriod, useOriginalEnvironment = false) {
     this._state = 'Initial';
     this._stateIndicator = new (_UniversalDisposable || _load_UniversalDisposable()).default();
@@ -195,12 +192,16 @@ class LspLanguageService {
   // only one request of these types would be active at a time. Note that the
   // language server is free to ignore any cancellation request, so we could
   // still potentially have multiple outstanding requests of the same type.
+  // is really "?LspConnection"
 
+  // Fields which become live inside start(), when we spawn the LSP process.
+  // Disposing of the _lspConnection will dispose of all of them.
+  // tracks which fileversions we've received from Nuclide client
+  // supplies the options for spawning a process
+  // this is created per-connection
+  // tracks which fileversions we've received from Nuclide client
 
-  // These fields reflect our own state.
-  // (Most should be nullable types, but it's not worth the bother.)
-  // tracks which fileversions we've sent to LSP
-  // this is the one we're given
+  // These fields are provided upon construction
 
 
   dispose() {
@@ -344,8 +345,9 @@ class LspLanguageService {
           // disposing of the stream will kill the process, if it still exists
           const processPromise = childProcessStream.take(1).toPromise();
           perConnectionDisposables.add(childProcessStream.connect());
-          childProcess = yield processPromise;
           // if spawn failed to launch it, this await will throw.
+          childProcess = yield processPromise;
+          _this._childPid = childProcess.pid;
         } catch (e) {
           _this._logLspException(e);
           (0, (_nuclideAnalytics || _load_nuclideAnalytics()).track)('lsp-start', {

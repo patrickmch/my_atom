@@ -7,7 +7,7 @@ Object.defineProperty(exports, "__esModule", {
 var _asyncToGenerator = _interopRequireDefault(require('async-to-generator'));
 
 let getArcanistRelativePath = (() => {
-  var _ref2 = (0, _asyncToGenerator.default)(function* (path) {
+  var _ref3 = (0, _asyncToGenerator.default)(function* (path) {
     try {
       const {
         getArcanistServiceByNuclideUri
@@ -21,7 +21,7 @@ let getArcanistRelativePath = (() => {
   });
 
   return function getArcanistRelativePath(_x) {
-    return _ref2.apply(this, arguments);
+    return _ref3.apply(this, arguments);
   };
 })();
 
@@ -129,6 +129,20 @@ function copyRepositoryRelativePath() {
   }));
 }
 
+function copyHostname() {
+  trackOperation('copyRepositoryRelativePath', (0, _asyncToGenerator.default)(function* () {
+    const uri = getCurrentNuclideUri();
+    if (uri == null) {
+      return;
+    }
+    const { hostname } = (_nuclideUri || _load_nuclideUri()).default.parse(uri);
+    if (hostname == null) {
+      return;
+    }
+    copyToClipboard('Copied hostname', hostname);
+  }));
+}
+
 function getRepositoryRelativePath(path) {
   // TODO(peterhal): repositoryForPath is the same as projectRelativePath
   // only less robust. We'll need a version of findHgRepository which is
@@ -171,6 +185,7 @@ class Activation {
   constructor(state) {
     this._subscriptions = new (_UniversalDisposable || _load_UniversalDisposable()).default();
     this._subscriptions.add(atom.commands.add('atom-workspace', 'nuclide-clipboard-path:copy-absolute-path', copyAbsolutePath));
+    this._subscriptions.add(atom.commands.add('atom-workspace', 'nuclide-clipboard-path:copy-hostname-of-current-path', copyHostname));
     this._subscriptions.add(atom.commands.add('atom-workspace', 'nuclide-clipboard-path:copy-repository-relative-path', copyRepositoryRelativePath));
     this._subscriptions.add(atom.commands.add('atom-workspace', 'nuclide-clipboard-path:copy-project-relative-path', copyProjectRelativePath));
   }

@@ -21,6 +21,18 @@ function _load_getVersion() {
   return _getVersion = require('../common/getVersion');
 }
 
+var _WebSocketTransport;
+
+function _load_WebSocketTransport() {
+  return _WebSocketTransport = require('../socket/WebSocketTransport');
+}
+
+var _QueuedAckTransport;
+
+function _load_QueuedAckTransport() {
+  return _QueuedAckTransport = require('../socket/QueuedAckTransport');
+}
+
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 const HEARTBEAT_CHANNEL = exports.HEARTBEAT_CHANNEL = 'big-dig-heartbeat'; /**
@@ -46,6 +58,7 @@ class BigDigServer {
     this._tagToSubscriber = new Map();
     this._httpsServer = httpsServer;
     this._httpsServer.on('request', this._onHttpsRequest.bind(this));
+    this._clientIdToTransport = new Map();
     this._webSocketServer = webSocketServer;
     this._webSocketServer.on('connection', this._onWebSocketConnection.bind(this));
   }
@@ -65,7 +78,7 @@ class BigDigServer {
 
   _onHttpsRequest(request, response) {
     const { pathname } = _url.default.parse(request.url);
-    if (pathname === `/${HEARTBEAT_CHANNEL}`) {
+    if (pathname === `/v1/${HEARTBEAT_CHANNEL}`) {
       response.write((0, (_getVersion || _load_getVersion()).getVersion)());
       response.end();
       return;
@@ -74,44 +87,77 @@ class BigDigServer {
   }
 
   _onWebSocketConnection(ws, req) {
-    // Note that in ws@3.0.0, the upgradeReq property of ws has been removed:
-    // it is passed as the second argument to this callback instead.
     const { pathname } = _url.default.parse(req.url);
+    this._logger.info(`connection negotiation via path ${String(pathname)}`);
+
     if (pathname !== '/v1') {
       this._logger.info(`Ignored WSS connection for ${String(pathname)}`);
       return;
     }
 
-    // Every subscriber must be notified of the new connection because it may
-    // want to broadcast messages to it.
-    const tagToTransport = new Map();
-    for (const [tag, subscriber] of this._tagToSubscriber) {
-      const transport = new InternalTransport(tag, ws);
-      this._logger.info(`Created new InternalTransport for ${tag}`);
-      tagToTransport.set(tag, transport);
-      subscriber.onConnection(transport);
-    }
+    // TODO: send clientId in the http headers on the websocket connection
 
-    // Is message a string or could it be a Buffer?
-    ws.on('message', message => {
-      // The message must start with a header identifying its route.
-      const index = message.indexOf('\0');
-      const tag = message.substring(0, index);
-      const body = message.substring(index + 1);
+    // the first message after a connection should only include
+    // the clientId of the connecting client; the BigDig connection
+    // is not actually made until we get this connection
+    ws.once('message', clientId => {
+      const cachedTransport = this._clientIdToTransport.get(clientId);
+      const wsTransport = new (_WebSocketTransport || _load_WebSocketTransport()).WebSocketTransport(clientId, ws);
 
-      const transport = tagToTransport.get(tag);
-      if (transport != null) {
-        transport.broadcastMessage(body);
+      if (cachedTransport == null) {
+        // handle first message which should include the clientId
+        this._logger.info(`got first message from client with clientId ${clientId}`);
+
+        const qaTransport = new (_QueuedAckTransport || _load_QueuedAckTransport()).QueuedAckTransport(clientId, wsTransport);
+        this._clientIdToTransport.set(clientId, qaTransport);
+
+        // Every subscriber must be notified of the new connection because it may
+        // want to broadcast messages to it.
+        const tagToTransport = new Map();
+        for (const [tag, subscriber] of this._tagToSubscriber) {
+          const transport = new InternalTransport(tag, qaTransport);
+          this._logger.info(`Created new InternalTransport for ${tag}`);
+          tagToTransport.set(tag, transport);
+          subscriber.onConnection(transport);
+        }
+
+        // subsequent messages will be BigDig messages
+        // TODO: could the message be a Buffer?
+        qaTransport.onMessage().subscribe(message => {
+          this._handleBigDigMessage(tagToTransport, message);
+        });
+
+        ws.once('close', () => {
+          for (const transport of tagToTransport.values()) {
+            transport.close();
+          }
+          // This may be garbage-collected automatically, but clearing it won't hurt...
+          tagToTransport.clear();
+        });
       } else {
-        this._logger.info(`No route for ${tag}.`);
+        if (!(clientId === cachedTransport.id)) {
+          throw new Error('Invariant violation: "clientId === cachedTransport.id"');
+        }
+
+        cachedTransport.reconnect(wsTransport);
       }
     });
 
-    // TODO(mbolin): When ws disconnects, do we explicitly have to clear out
-    // tagToTransport? It seems like it should get garbage-collected
-    // automatically, assuming this._webSocketServer no longer has a reference
-    // to ws. But we should probably call InternalTransport.close() on all of
-    // the entries in tagToTransport?
+    // TODO: need to handle ws errors.
+  }
+
+  _handleBigDigMessage(tagToTransport, message) {
+    // The message must start with a header identifying its route.
+    const index = message.indexOf('\0');
+    const tag = message.substring(0, index);
+    const body = message.substring(index + 1);
+
+    const transport = tagToTransport.get(tag);
+    if (transport != null) {
+      transport.broadcastMessage(body);
+    } else {
+      this._logger.info(`No route for ${tag}.`);
+    }
   }
 }
 
@@ -127,17 +173,11 @@ class InternalTransport {
   constructor(tag, ws) {
     this._messages = new _rxjsBundlesRxMinJs.Subject();
     this._tag = tag;
-    this._ws = ws;
+    this._transport = ws;
   }
 
   send(message) {
-    this._ws.send(`${this._tag}\0${message}`, err => {
-      if (err != null) {
-        // This may happen if the client disconnects.
-        // TODO: use the reliable transport from Nuclide when that's ready.
-        (0, (_log4js || _load_log4js()).getLogger)().warn('Error sending websocket message', err);
-      }
-    });
+    this._transport.send(`${this._tag}\0${message}`);
   }
 
   onMessage() {

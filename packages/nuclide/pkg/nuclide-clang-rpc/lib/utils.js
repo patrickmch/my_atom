@@ -3,7 +3,7 @@
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.guessBuildFile = undefined;
+exports.memoryUsagePerPid = exports.guessBuildFile = undefined;
 
 var _asyncToGenerator = _interopRequireDefault(require('async-to-generator'));
 
@@ -39,6 +39,34 @@ let guessBuildFile = exports.guessBuildFile = (() => {
 // Strip off the extension and conventional suffixes like "Internal" and "-inl".
 
 
+// Get memory usage for an array of process id's as a map.
+let memoryUsagePerPid = exports.memoryUsagePerPid = (() => {
+  var _ref3 = (0, _asyncToGenerator.default)(function* (pids) {
+    const usage = new Map();
+    if (pids.length >= 1) {
+      try {
+        const stdout = yield (0, (_process || _load_process()).runCommand)('ps', ['-p', pids.join(','), '-o', 'pid=', '-o', 'rss=']).toPromise();
+        stdout.split('\n').forEach(function (line) {
+          const parts = line.trim().split(/\s+/);
+          if (parts.length === 2) {
+            const [pid, rss] = parts.map(function (x) {
+              return parseInt(x, 10);
+            });
+            usage.set(pid, rss);
+          }
+        });
+      } catch (err) {
+        // Ignore errors.
+      }
+    }
+    return usage;
+  });
+
+  return function memoryUsagePerPid(_x3) {
+    return _ref3.apply(this, arguments);
+  };
+})();
+
 exports.isHeaderFile = isHeaderFile;
 exports.isSourceFile = isSourceFile;
 exports.commonPrefix = commonPrefix;
@@ -56,20 +84,25 @@ function _load_fsPromise() {
   return _fsPromise = _interopRequireDefault(require('nuclide-commons/fsPromise'));
 }
 
+var _process;
+
+function _load_process() {
+  return _process = require('nuclide-commons/process');
+}
+
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-/**
- * Copyright (c) 2015-present, Facebook, Inc.
- * All rights reserved.
- *
- * This source code is licensed under the license found in the LICENSE file in
- * the root directory of this source tree.
- *
- * 
- * @format
- */
+const HEADER_EXTENSIONS = new Set(['.h', '.hh', '.hpp', '.hxx', '.h++']); /**
+                                                                           * Copyright (c) 2015-present, Facebook, Inc.
+                                                                           * All rights reserved.
+                                                                           *
+                                                                           * This source code is licensed under the license found in the LICENSE file in
+                                                                           * the root directory of this source tree.
+                                                                           *
+                                                                           * 
+                                                                           * @format
+                                                                           */
 
-const HEADER_EXTENSIONS = new Set(['.h', '.hh', '.hpp', '.hxx', '.h++']);
 const SOURCE_EXTENSIONS = new Set(['.c', '.cc', '.cpp', '.cxx', '.c++', '.m', '.mm']);
 
 function isHeaderFile(filename) {

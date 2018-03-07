@@ -92,17 +92,36 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
  */
 
 class CqueryLanguageServer extends (_nuclideLanguageServiceRpc || _load_nuclideLanguageServiceRpc()).MultiProjectLanguageService {
-  // Maps clang settings => settings metadata with same key as _processes field.
-  constructor(languageId, command, logger, fileCache, host, enableLibclangLogs) {
-    super();
 
+  constructor(languageId, command, logger, fileCache, host, enableLibclangLogs) {
+    var _this;
+
+    _this = super();
+    // Invalidator disposes a project which then disposes the process.
     this._disposables = new (_UniversalDisposable || _load_UniversalDisposable()).default();
+    const disposeProject = project => this._projectManager.delete(project);
+    const disposeProcess = projectKey => {
+      this._processes.delete(projectKey);
+    };
     this._fileCache = fileCache;
     this._command = command;
     this._host = host;
     this._languageId = languageId;
     this._logger = logger;
-    this._projectManager = new (_CqueryProjectManager || _load_CqueryProjectManager()).CqueryProjectManager(logger);
+    this._projectManager = new (_CqueryProjectManager || _load_CqueryProjectManager()).CqueryProjectManager(logger, disposeProcess);
+    this._projectInvalidator = new (_CqueryInvalidator || _load_CqueryInvalidator()).CqueryInvalidator(fileCache, logger, disposeProject, () => this._projectManager.getMRUProjects(), (() => {
+      var _ref = (0, _asyncToGenerator.default)(function* (project) {
+        const key = (_CqueryProjectManager || _load_CqueryProjectManager()).CqueryProjectManager.getProjectKey(project);
+        if (_this._processes.has(key)) {
+          const lsp = yield _this._processes.get(key);
+          return lsp != null ? lsp._childPid : null;
+        }
+      });
+
+      return function (_x) {
+        return _ref.apply(this, arguments);
+      };
+    })());
 
     this._processes = new (_cache || _load_cache()).Cache(projectKey => this._createCqueryLanguageClient(projectKey, enableLibclangLogs), value => {
       value.then(service => {
@@ -114,9 +133,11 @@ class CqueryLanguageServer extends (_nuclideLanguageServiceRpc || _load_nuclideL
 
     this._registerDisposables();
   }
+  // Maps clang settings => settings metadata with same key as _processes field.
+
 
   _registerDisposables() {
-    this._disposables.add(this._host, this._processes, new (_CqueryInvalidator || _load_CqueryInvalidator()).CqueryInvalidator(this._fileCache, this._projectManager, this._logger, this._processes).subscribe(), () => this._closeProcesses());
+    this._disposables.add(this._host, this._projectInvalidator.subscribeFileEvents(), this._projectInvalidator.subscribeResourceUsage(), this._processes);
   }
 
   dispose() {
@@ -125,10 +146,10 @@ class CqueryLanguageServer extends (_nuclideLanguageServiceRpc || _load_nuclideL
   }
 
   _createCqueryLanguageClient(projectKey, enableLibclangLogs) {
-    var _this = this;
+    var _this2 = this;
 
     return (0, _asyncToGenerator.default)(function* () {
-      const project = yield _this._projectManager.getProjectFromKey(projectKey);
+      const project = _this2._projectManager.getProjectFromKey(projectKey);
       if (project == null) {
         return null;
       }
@@ -138,9 +159,9 @@ class CqueryLanguageServer extends (_nuclideLanguageServiceRpc || _load_nuclideL
         return null;
       }
 
-      _this._logger.info(`Using cache dir: ${initalizationOptions.cacheDirectory}`);
+      _this2._logger.info(`Using cache dir: ${initalizationOptions.cacheDirectory}`);
 
-      const [, host] = yield Promise.all([_this.hasObservedDiagnostics(), (0, (_nuclideLanguageServiceRpc || _load_nuclideLanguageServiceRpc()).forkHostServices)(_this._host, _this._logger)]);
+      const [, host] = yield Promise.all([_this2.hasObservedDiagnostics(), (0, (_nuclideLanguageServiceRpc || _load_nuclideLanguageServiceRpc()).forkHostServices)(_this2._host, _this2._logger)]);
 
       const stderrFd = yield (_fsPromise || _load_fsPromise()).default.open((_nuclideUri || _load_nuclideUri()).default.join(initalizationOptions.cacheDirectory, '..', 'stderr'), 'a');
       const spawnOptions = {
@@ -150,11 +171,11 @@ class CqueryLanguageServer extends (_nuclideLanguageServiceRpc || _load_nuclideL
       if (enableLibclangLogs) {
         spawnOptions.env.LIBCLANG_LOGGING = 1;
       }
-      const lsp = new (_CqueryLanguageClient || _load_CqueryLanguageClient()).CqueryLanguageClient(_this._logger, _this._fileCache, host, _this._languageId, _this._command, ['--language-server', '--log-file', (_nuclideUri || _load_nuclideUri()).default.join(initalizationOptions.cacheDirectory, '..', 'diagnostics')], spawnOptions, project.hasCompilationDb ? (_nuclideUri || _load_nuclideUri()).default.dirname(project.flagsFile) : project.projectRoot, ['.cpp', '.h', '.hpp', '.cc', '.m', 'mm'], initalizationOptions, 5 * 60 * 1000);
+      const lsp = new (_CqueryLanguageClient || _load_CqueryLanguageClient()).CqueryLanguageClient(_this2._logger, _this2._fileCache, host, _this2._languageId, _this2._command, ['--language-server', '--log-file', (_nuclideUri || _load_nuclideUri()).default.join(initalizationOptions.cacheDirectory, '..', 'diagnostics')], spawnOptions, project.hasCompilationDb ? (_nuclideUri || _load_nuclideUri()).default.dirname(project.flagsFile) : project.projectRoot, ['.cpp', '.h', '.hpp', '.cc', '.m', 'mm'], initalizationOptions, 5 * 60 * 1000);
 
       lsp.setProjectChecker(function (file) {
-        const checkProject = _this._projectManager.getProjectForFile(file);
-        return checkProject != null ? _this._projectManager.getProjectKey(checkProject) === projectKey : // TODO pelmers: header files aren't in the map because they do not
+        const checkProject = _this2._projectManager.getProjectForFile(file);
+        return checkProject != null ? (_CqueryProjectManager || _load_CqueryProjectManager()).CqueryProjectManager.getProjectKey(checkProject) === projectKey : // TODO pelmers: header files aren't in the map because they do not
         // appear in compile_commands.json, but they should be cached!
         (0, (_utils || _load_utils()).isHeaderFile)(file);
       });
@@ -165,61 +186,61 @@ class CqueryLanguageServer extends (_nuclideLanguageServiceRpc || _load_nuclideL
   }
 
   requestLocationsCommand(methodName, path, point) {
-    var _this2 = this;
+    var _this3 = this;
 
     return (0, _asyncToGenerator.default)(function* () {
-      const cqueryProcess = yield _this2.getLanguageServiceForFile(path);
+      const cqueryProcess = yield _this3.getLanguageServiceForFile(path);
       if (cqueryProcess) {
         return cqueryProcess.requestLocationsCommand(methodName, path, point);
       } else {
-        _this2._host.consoleNotification(_this2._languageId, 'warning', 'Could not freshen: no cquery index found for ' + path);
+        _this3._host.consoleNotification(_this3._languageId, 'warning', 'Could not freshen: no cquery index found for ' + path);
         return [];
       }
     })();
   }
 
   freshenIndexForFile(file) {
-    var _this3 = this;
+    var _this4 = this;
 
     return (0, _asyncToGenerator.default)(function* () {
-      const cqueryProcess = yield _this3.getLanguageServiceForFile(file);
+      const cqueryProcess = yield _this4.getLanguageServiceForFile(file);
       if (cqueryProcess) {
         cqueryProcess.freshenIndex();
       } else {
-        _this3._host.consoleNotification(_this3._languageId, 'warning', 'Could not freshen: no cquery index found for ' + file);
+        _this4._host.consoleNotification(_this4._languageId, 'warning', 'Could not freshen: no cquery index found for ' + file);
       }
     })();
   }
 
   associateFileWithProject(file, project) {
-    var _this4 = this;
+    var _this5 = this;
 
     return (0, _asyncToGenerator.default)(function* () {
-      _this4._projectManager.associateFileWithProject(file, project);
-      _this4._processes.get(_this4._projectManager.getProjectKey(project)); // spawn the process ahead of time
+      yield _this5._projectManager.associateFileWithProject(file, project);
+      _this5._processes.get((_CqueryProjectManager || _load_CqueryProjectManager()).CqueryProjectManager.getProjectKey(project)); // spawn the process ahead of time
     })();
   }
 
   getLanguageServiceForFile(file) {
-    var _this5 = this;
+    var _this6 = this;
 
     return (0, _asyncToGenerator.default)(function* () {
-      const project = _this5._projectManager.getProjectForFile(file);
-      return project == null ? null : _this5._getLanguageServiceForProject(project);
+      const project = _this6._projectManager.getProjectForFile(file);
+      return project == null ? null : _this6._getLanguageServiceForProject(project);
     })();
   }
 
   _getLanguageServiceForProject(project) {
-    var _this6 = this;
+    var _this7 = this;
 
     return (0, _asyncToGenerator.default)(function* () {
-      const key = _this6._projectManager.getProjectKey(project);
-      const client = _this6._processes.get(key);
+      const key = (_CqueryProjectManager || _load_CqueryProjectManager()).CqueryProjectManager.getProjectKey(project);
+      const client = _this7._processes.get(key);
       if ((yield client) == null) {
-        _this6._logger.warn("Didn't find language service for ", project);
+        _this7._logger.warn("Didn't find language service for ", project);
         return null;
       } else {
-        _this6._logger.info('Found existing language service for ', project);
+        _this7._logger.info('Found existing language service for ', project);
         return client;
       }
     })();

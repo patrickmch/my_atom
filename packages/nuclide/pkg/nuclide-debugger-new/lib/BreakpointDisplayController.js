@@ -4,12 +4,22 @@ Object.defineProperty(exports, "__esModule", {
   value: true
 });
 
-var _asyncToGenerator = _interopRequireDefault(require('async-to-generator'));
-
 var _mouseToPosition;
 
 function _load_mouseToPosition() {
   return _mouseToPosition = require('nuclide-commons-atom/mouse-to-position');
+}
+
+var _event;
+
+function _load_event() {
+  return _event = require('nuclide-commons/event');
+}
+
+var _observable;
+
+function _load_observable() {
+  return _observable = require('nuclide-commons/observable');
 }
 
 var _UniversalDisposable;
@@ -72,9 +82,11 @@ class BreakpointDisplayController {
       // Priority is -200 by default and 0 is the line number
       priority: -1100
     });
+    const debuggerModel = this._service.getModel();
     this._gutter = gutter;
-    this._disposables.add(gutter.onDidDestroy(this._handleGutterDestroyed.bind(this)), editor.observeGutters(this._registerGutterMouseHandlers.bind(this)), this._service.getModel().onDidChangeBreakpoints(this._handleBreakpointsChanged.bind(this)), this._editor.onDidDestroy(this._handleTextEditorDestroyed.bind(this)), this._registerEditorContextMenuHandler());
-    this._update();
+    this._disposables.add(gutter.onDidDestroy(this._handleGutterDestroyed.bind(this)), editor.observeGutters(this._registerGutterMouseHandlers.bind(this)), (0, (_event || _load_event()).observableFromSubscribeFunction)(debuggerModel.onDidChangeBreakpoints.bind(debuggerModel))
+    // Debounce to account for bulk updates and not block the UI
+    .let((0, (_observable || _load_observable()).fastDebounce)(10)).startWith(null).subscribe(this._update.bind(this)), this._editor.onDidDestroy(this._handleTextEditorDestroyed.bind(this)), this._registerEditorContextMenuHandler());
   }
 
   _isDebugging() {
@@ -209,9 +221,7 @@ class BreakpointDisplayController {
     for (const [line, breakpoint] of lineMap) {
       // Remove any breakpoints that are past the end of the file.
       if (line >= fileLength) {
-        process.nextTick(() => {
-          this._service.removeBreakpoints(breakpoint.getId());
-        });
+        this._service.removeBreakpoints(breakpoint.getId());
         continue;
       }
 
@@ -241,32 +251,19 @@ class BreakpointDisplayController {
    * Handler for marker movements due to text being edited.
    */
   _handleMarkerChange(breakpoint, event) {
-    var _this = this;
-
-    return (0, _asyncToGenerator.default)(function* () {
-      const path = _this._editor.getPath();
-      if (path == null || path.length === 0) {
-        return;
-      }
-      if (!event.isValid) {
-        yield _this._service.removeBreakpoints(breakpoint.getId());
-      } else if (event.oldHeadBufferPosition.row !== event.newHeadBufferPosition.row) {
-        _this._service.updateBreakpoints(breakpoint.uri, {
-          [breakpoint.getId()]: Object.assign({}, breakpoint, {
-            line: event.newHeadBufferPosition.row
-          })
-        });
-      }
-    })();
-  }
-
-  _handleBreakpointsChanged(event) {
-    if (event == null) {
+    const path = this._editor.getPath();
+    if (path == null || path.length === 0) {
       return;
     }
-    const changedBreakpoints = [...(event.added || []), ...(event.changed || []), ...(event.removed || [])];
-    if (changedBreakpoints.some(bp => bp.uri != null && bp.uri === this._editor.getPath())) {
-      this._update();
+    if (!event.isValid) {
+      this._service.removeBreakpoints(breakpoint.getId());
+    } else if (event.oldHeadBufferPosition.row !== event.newHeadBufferPosition.row) {
+      this._service.updateBreakpoints(breakpoint.uri, {
+        [breakpoint.getId()]: Object.assign({}, breakpoint, {
+          // VSP is 1-based line numbers.
+          line: event.newHeadBufferPosition.row + 1
+        })
+      });
     }
   }
 

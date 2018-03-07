@@ -104,9 +104,6 @@ class Combobox extends _react.Component {
     };
 
     this._handleInputBlur = event => {
-      if (!this._shouldBlur) {
-        return;
-      }
       this._handleCancel();
       const { onBlur } = this.props;
       if (onBlur != null) {
@@ -115,7 +112,6 @@ class Combobox extends _react.Component {
     };
 
     this._handleInputClick = () => {
-      this._shouldBlur = true;
       this.setState({ optionsVisible: true });
     };
 
@@ -161,7 +157,6 @@ class Combobox extends _react.Component {
     };
 
     this._subscriptions = new (_UniversalDisposable || _load_UniversalDisposable()).default();
-    this._shouldBlur = true;
     this.state = {
       error: null,
       filteredOptions: [],
@@ -230,7 +225,6 @@ class Combobox extends _react.Component {
   }
 
   focus(showOptions) {
-    this._shouldBlur = true;
     (0, (_nullthrows || _load_nullthrows()).default)(this._freeformInput).focus();
     this.setState({ optionsVisible: showOptions });
   }
@@ -288,7 +282,6 @@ class Combobox extends _react.Component {
   }
 
   _handleItemClick(selectedValue, event) {
-    this._shouldBlur = false;
     this.selectValue(selectedValue, () => {
       // Focus the input again because the click will cause the input to blur. This mimics native
       // <select> behavior by keeping focus in the form being edited.
@@ -353,6 +346,10 @@ class Combobox extends _react.Component {
           {
             className: isSelected ? 'selected' : null,
             key: 'option-' + option,
+            onMouseDown: e => {
+              // Prevent the input's blur event from firing.
+              e.preventDefault();
+            },
             onClick: this._handleItemClick.bind(this, option),
             onMouseOver: this._setSelectedIndex.bind(this, i),
             ref: isSelected ? this._handleSelectedOption : null },

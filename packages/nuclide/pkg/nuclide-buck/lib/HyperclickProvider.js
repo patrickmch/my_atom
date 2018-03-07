@@ -112,7 +112,7 @@ let getSuggestion = exports.getSuggestion = (() => {
     }
 
     const baseName = (_nuclideUri || _load_nuclideUri()).default.basename(absolutePath);
-    if (!VALID_BUILD_FILE_NAMES.has(baseName)) {
+    if (!VALID_BUILD_FILE_NAMES.has(baseName) && !VALID_BUILD_FILE_EXTENSIONS.has((_nuclideUri || _load_nuclideUri()).default.extname(baseName))) {
       return null;
     }
 
@@ -310,6 +310,7 @@ function _load_escapeStringRegexp() {
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 const VALID_BUILD_FILE_NAMES = new Set(['BUCK', 'BUCK.autodeps', 'TARGETS']);
+const VALID_BUILD_FILE_EXTENSIONS = new Set(['.bzl']);
 
 const TARGET_REGEX = /(\/(?:\/[\w.-]*)*){0,1}:([\w.-]+)/;const LOAD_REGEX = /(@[\w-]+)?\/\/([\w.\-/]*):([\w.-]+\.bzl)/;
 

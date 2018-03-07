@@ -89,10 +89,27 @@ class NativeLaunchUiComponent extends _react.Component {
       const args = (0, (_string || _load_string()).shellParse)((0, (_nullthrows || _load_nullthrows()).default)(_this._args).getText());
       const workingDirectory = (0, (_nullthrows || _load_nullthrows()).default)(_this._workingDirectory).getText().trim();
 
+      const environmentVariables = (0, (_string || _load_string()).shellParse)((0, (_nullthrows || _load_nullthrows()).default)(_this._environmentVariables).getText());
+
+      // NB this is an object, not a map, because Map doesn't seem to be
+      // expressable in the VSP package.json type system
+      let environment = {};
+      environmentVariables.forEach(function (_) {
+        const equal = _.indexOf('=');
+        if (equal === -1) {
+          throw new Error('Given environment is malformed.');
+        }
+        const key = _.substr(0, equal);
+        const value = _.substr(equal + 1);
+        environment = Object.assign({}, environment, {
+          [key]: value
+        });
+      });
+
       const { hostname } = (_nuclideUri || _load_nuclideUri()).default.parse(_this.props.targetUri);
       const programUri = hostname != null ? (_nuclideUri || _load_nuclideUri()).default.createRemoteUri(hostname, program) : program;
 
-      const launchInfo = yield (0, (_utils || _load_utils()).getGdbLaunchProcessInfo)(programUri, args, workingDirectory);
+      const launchInfo = yield (0, (_utils || _load_utils()).getGdbLaunchProcessInfo)(programUri, args, workingDirectory, environment, _this.state.sourcePath);
 
       const debuggerService = yield (0, (_debugger || _load_debugger()).getDebuggerService)();
       debuggerService.startDebugging(launchInfo);
@@ -100,14 +117,18 @@ class NativeLaunchUiComponent extends _react.Component {
       (0, (_nuclideDebuggerCommon || _load_nuclideDebuggerCommon()).serializeDebuggerConfig)(..._this._getSerializationArgs(), {
         program: _this.state.program,
         args: _this.state.args,
-        workingDirectory: _this.state.workingDirectory
+        workingDirectory: _this.state.workingDirectory,
+        environmentVariables: _this.state.environmentVariables,
+        sourcePath: _this.state.sourcePath
       });
     });
     this._disposables = new (_UniversalDisposable || _load_UniversalDisposable()).default();
     this.state = {
       program: '',
       args: '',
-      workingDirectory: ''
+      workingDirectory: '',
+      environmentVariables: '',
+      sourcePath: ''
     };
   }
 
@@ -124,10 +145,14 @@ class NativeLaunchUiComponent extends _react.Component {
     (0, (_nuclideDebuggerCommon || _load_nuclideDebuggerCommon()).deserializeDebuggerConfig)(...this._getSerializationArgs(), (transientSettings, savedSettings) => {
       const program = savedSettings.program || '';
       const workingDirectory = savedSettings.workingDirectory || (program.length > 0 ? (_nuclideUri || _load_nuclideUri()).default.dirname(program) : '');
+      const environmentVariables = savedSettings.environmentVariables || '';
+      const sourcePath = savedSettings.sourcePath || '';
       this.setState({
         program,
         args: savedSettings.args || '',
-        workingDirectory
+        workingDirectory,
+        environmentVariables,
+        sourcePath
       });
     });
 
@@ -193,16 +218,40 @@ class NativeLaunchUiComponent extends _react.Component {
       _react.createElement(
         'label',
         null,
-        '(Optional) Working directory: '
+        'Environment Variables: '
+      ),
+      _react.createElement((_AtomInput || _load_AtomInput()).AtomInput, {
+        ref: input => {
+          this._environmentVariables = input;
+        },
+        tabIndex: '3',
+        placeholderText: 'Environment variables (.e.g, SHELL=/bin/bash PATH=/bin) (optional)',
+        value: this.state.environmentVariables,
+        onDidChange: value => this.setState({ environmentVariables: value })
+      }),
+      _react.createElement(
+        'label',
+        null,
+        'Working directory: '
       ),
       _react.createElement((_AtomInput || _load_AtomInput()).AtomInput, {
         ref: input => {
           this._workingDirectory = input;
         },
         tabIndex: '5',
-        placeholderText: 'Working directory for the launched program',
+        placeholderText: 'Working directory for the launched program (optional)',
         value: this.state.workingDirectory,
         onDidChange: value => this.setState({ workingDirectory: value })
+      }),
+      _react.createElement(
+        'label',
+        null,
+        'Source path: '
+      ),
+      _react.createElement((_AtomInput || _load_AtomInput()).AtomInput, {
+        placeholderText: 'Optional base path for sources',
+        value: this.state.sourcePath,
+        onDidChange: value => this.setState({ sourcePath: value })
       })
     );
   }

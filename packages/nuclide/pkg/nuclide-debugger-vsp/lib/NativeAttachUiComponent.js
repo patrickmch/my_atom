@@ -183,7 +183,7 @@ class NativeAttachUiComponent extends _react.Component {
 
       (0, (_nuclideAnalytics || _load_nuclideAnalytics()).track)('fb-native-debugger-attach-from-dialog');
       const pid = selectedProcess.pid;
-      const attachInfo = yield (0, (_utils || _load_utils()).getGdbAttachProcessInfo)(_this.props.targetUri, pid);
+      const attachInfo = yield (0, (_utils || _load_utils()).getGdbAttachProcessInfo)(_this.props.targetUri, pid, _this.state.sourcePath);
 
       const debuggerService = yield (0, (_debugger || _load_debugger()).getDebuggerService)();
       debuggerService.startDebugging(attachInfo);
@@ -191,7 +191,8 @@ class NativeAttachUiComponent extends _react.Component {
       (0, (_nuclideDebuggerCommon || _load_nuclideDebuggerCommon()).serializeDebuggerConfig)(..._this._getSerializationArgs(), {}, {
         sortDescending: _this.state.sortDescending,
         sortedColumn: _this.state.sortedColumn,
-        filterText: _this.state.filterText
+        filterText: _this.state.filterText,
+        sourcePath: _this.state.sourcePath
       });
     });
     this._disposables = new (_UniversalDisposable || _load_UniversalDisposable()).default();
@@ -200,7 +201,8 @@ class NativeAttachUiComponent extends _react.Component {
       selectedProcess: null,
       sortDescending: false,
       sortedColumn: null,
-      filterText: ''
+      filterText: '',
+      sourcePath: ''
     };
   }
 
@@ -217,7 +219,8 @@ class NativeAttachUiComponent extends _react.Component {
     const defaults = {
       sortDescending: false,
       sortedColumn: null,
-      filterText: ''
+      filterText: '',
+      sourcePath: ''
     };
 
     (0, (_nuclideDebuggerCommon || _load_nuclideDebuggerCommon()).deserializeDebuggerConfig)(...this._getSerializationArgs(), (transientSettings, savedSettings) => {
@@ -295,6 +298,16 @@ class NativeAttachUiComponent extends _react.Component {
         selectedIndex: selectedIndex,
         onSelect: this._handleSelectTableRow,
         collapsable: true
+      }),
+      _react.createElement(
+        'label',
+        null,
+        'Source path: '
+      ),
+      _react.createElement((_AtomInput || _load_AtomInput()).AtomInput, {
+        placeholderText: 'Optional base path for sources',
+        value: this.state.sourcePath,
+        onDidChange: value => this.setState({ sourcePath: value })
       })
     );
   }

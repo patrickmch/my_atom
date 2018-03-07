@@ -3,7 +3,7 @@
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.resetCompilationDatabase = exports.resetCompilationDatabaseForSource = exports.getLastCommandInfo = exports.queryWithAttributes = exports.queryWithArgs = exports.getHTTPServerPort = exports._buildRuleTypeFor = exports.buildRuleTypeFor = exports.showOutput = exports.listFlavors = exports.listAliases = exports.getBuckConfig = exports.MULTIPLE_TARGET_RULE_TYPE = undefined;
+exports.resetCompilationDatabase = exports.resetCompilationDatabaseForSource = exports.queryWithAttributes = exports.queryWithArgs = exports.getHTTPServerPort = exports._buildRuleTypeFor = exports.buildRuleTypeFor = exports.showOutput = exports.listFlavors = exports.listAliases = exports.getBuckConfig = exports.MULTIPLE_TARGET_RULE_TYPE = undefined;
 
 var _asyncToGenerator = _interopRequireDefault(require('async-to-generator'));
 
@@ -284,58 +284,23 @@ let queryWithAttributes = exports.queryWithAttributes = (() => {
 // all possible message types. For now, we'll manually typecast at the callsite.
 
 
-let getLastCommandInfo = exports.getLastCommandInfo = (() => {
-  var _ref11 = (0, _asyncToGenerator.default)(function* (rootPath, maxArgs) {
-    const logFile = (_nuclideUri || _load_nuclideUri()).default.join(rootPath, LOG_PATH);
-    if (yield (_fsPromise || _load_fsPromise()).default.exists(logFile)) {
-      let line;
-      try {
-        line = yield (0, (_process || _load_process()).runCommand)('head', ['-n', '1', logFile]).toPromise();
-      } catch (err) {
-        return null;
-      }
-      const matches = line.match(LOG_REGEX);
-      if (matches == null || matches.length < 2) {
-        return null;
-      }
-      // Log lines are of the form:
-      // [time][level][?][?][JavaClass] .... [args]
-      // Parse this to figure out what the last command was.
-      const timestamp = Number(new Date(stripBrackets(matches[0])));
-      if (isNaN(timestamp)) {
-        return null;
-      }
-      const args = stripBrackets(matches[matches.length - 1]).split(', ');
-      if (args.length <= 1 || maxArgs != null && args.length - 1 > maxArgs) {
-        return null;
-      }
-      return { timestamp, command: args[0], args: args.slice(1) };
-    }
-    return null;
+let resetCompilationDatabaseForSource = exports.resetCompilationDatabaseForSource = (() => {
+  var _ref11 = (0, _asyncToGenerator.default)(function* (src, params) {
+    (0, (_BuckClangCompilationDatabase || _load_BuckClangCompilationDatabase()).getCompilationDatabaseHandler)(params).resetForSource(src);
   });
 
-  return function getLastCommandInfo(_x21, _x22) {
+  return function resetCompilationDatabaseForSource(_x21, _x22) {
     return _ref11.apply(this, arguments);
   };
 })();
 
-let resetCompilationDatabaseForSource = exports.resetCompilationDatabaseForSource = (() => {
-  var _ref12 = (0, _asyncToGenerator.default)(function* (src, params) {
-    (0, (_BuckClangCompilationDatabase || _load_BuckClangCompilationDatabase()).getCompilationDatabaseHandler)(params).resetForSource(src);
-  });
-
-  return function resetCompilationDatabaseForSource(_x23, _x24) {
-    return _ref12.apply(this, arguments);
-  };
-})();
-
 let resetCompilationDatabase = exports.resetCompilationDatabase = (() => {
-  var _ref13 = (0, _asyncToGenerator.default)(function* (params) {
+  var _ref12 = (0, _asyncToGenerator.default)(function* (params) {
     (0, (_BuckClangCompilationDatabase || _load_BuckClangCompilationDatabase()).getCompilationDatabaseHandler)(params).reset();
   });
 
-  return function resetCompilationDatabase(_x25) {
-    return _ref13.apply(this, arguments);
+  return function resetCompilationDatabase(_x23) {
+    return _ref12.apply(this, arguments);
   };
 })();
 
@@ -584,13 +549,6 @@ function query(rootPath, queryString, extraArguments) {
   return (_BuckServiceImpl || _load_BuckServiceImpl()).query(rootPath, queryString, extraArguments);
 }function getWebSocketStream(rootPath, httpPort) {
   return (0, (_createBuckWebSocket || _load_createBuckWebSocket()).default)(httpPort).publish();
-}
-
-const LOG_PATH = 'buck-out/log/buck-0.log';
-const LOG_REGEX = /\[([^\]]+)]/g;
-
-function stripBrackets(str) {
-  return str.substring(1, str.length - 1);
 }
 
 function getCompilationDatabase(src, params) {

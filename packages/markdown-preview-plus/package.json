@@ -2,39 +2,39 @@
   "_args": [
     [
       {
-        "raw": "/private/var/folders/dp/vj05cwss7pz9mjl62ccqzysm0000gp/T/d-118120-15156-1f3yqc4.4sheiv0a4i/package.tgz",
+        "raw": "/private/var/folders/dp/vj05cwss7pz9mjl62ccqzysm0000gp/T/d-11821-3521-1kc4e99.uyp1dr6bt9/package.tgz",
         "scope": null,
         "escapedName": null,
         "name": null,
-        "rawSpec": "/private/var/folders/dp/vj05cwss7pz9mjl62ccqzysm0000gp/T/d-118120-15156-1f3yqc4.4sheiv0a4i/package.tgz",
-        "spec": "/private/var/folders/dp/vj05cwss7pz9mjl62ccqzysm0000gp/T/d-118120-15156-1f3yqc4.4sheiv0a4i/package.tgz",
+        "rawSpec": "/private/var/folders/dp/vj05cwss7pz9mjl62ccqzysm0000gp/T/d-11821-3521-1kc4e99.uyp1dr6bt9/package.tgz",
+        "spec": "/private/var/folders/dp/vj05cwss7pz9mjl62ccqzysm0000gp/T/d-11821-3521-1kc4e99.uyp1dr6bt9/package.tgz",
         "type": "local"
       },
-      "/private/var/folders/dp/vj05cwss7pz9mjl62ccqzysm0000gp/T/apm-install-dir-118120-15156-19cjr7d.o8o6t4vx6r"
+      "/private/var/folders/dp/vj05cwss7pz9mjl62ccqzysm0000gp/T/apm-install-dir-11821-3521-vuw59.wxhyh6ko6r"
     ]
   ],
-  "_from": "../d-118120-15156-1f3yqc4.4sheiv0a4i/package.tgz",
-  "_id": "markdown-preview-plus@2.5.2",
+  "_from": "../d-11821-3521-1kc4e99.uyp1dr6bt9/package.tgz",
+  "_id": "markdown-preview-plus@2.5.5",
   "_inCache": true,
   "_location": "/markdown-preview-plus",
   "_phantomChildren": {},
   "_requested": {
-    "raw": "/private/var/folders/dp/vj05cwss7pz9mjl62ccqzysm0000gp/T/d-118120-15156-1f3yqc4.4sheiv0a4i/package.tgz",
+    "raw": "/private/var/folders/dp/vj05cwss7pz9mjl62ccqzysm0000gp/T/d-11821-3521-1kc4e99.uyp1dr6bt9/package.tgz",
     "scope": null,
     "escapedName": null,
     "name": null,
-    "rawSpec": "/private/var/folders/dp/vj05cwss7pz9mjl62ccqzysm0000gp/T/d-118120-15156-1f3yqc4.4sheiv0a4i/package.tgz",
-    "spec": "/private/var/folders/dp/vj05cwss7pz9mjl62ccqzysm0000gp/T/d-118120-15156-1f3yqc4.4sheiv0a4i/package.tgz",
+    "rawSpec": "/private/var/folders/dp/vj05cwss7pz9mjl62ccqzysm0000gp/T/d-11821-3521-1kc4e99.uyp1dr6bt9/package.tgz",
+    "spec": "/private/var/folders/dp/vj05cwss7pz9mjl62ccqzysm0000gp/T/d-11821-3521-1kc4e99.uyp1dr6bt9/package.tgz",
     "type": "local"
   },
   "_requiredBy": [
     "#USER"
   ],
-  "_resolved": "file:../d-118120-15156-1f3yqc4.4sheiv0a4i/package.tgz",
-  "_shasum": "c912a6995704c04d1ee4349368e6f13f8575e027",
+  "_resolved": "file:../d-11821-3521-1kc4e99.uyp1dr6bt9/package.tgz",
+  "_shasum": "331a50e4ee52cdb83858096f1add6c77ef916722",
   "_shrinkwrap": null,
-  "_spec": "/private/var/folders/dp/vj05cwss7pz9mjl62ccqzysm0000gp/T/d-118120-15156-1f3yqc4.4sheiv0a4i/package.tgz",
-  "_where": "/private/var/folders/dp/vj05cwss7pz9mjl62ccqzysm0000gp/T/apm-install-dir-118120-15156-19cjr7d.o8o6t4vx6r",
+  "_spec": "/private/var/folders/dp/vj05cwss7pz9mjl62ccqzysm0000gp/T/d-11821-3521-1kc4e99.uyp1dr6bt9/package.tgz",
+  "_where": "/private/var/folders/dp/vj05cwss7pz9mjl62ccqzysm0000gp/T/apm-install-dir-11821-3521-vuw59.wxhyh6ko6r",
   "atomTestRunner": "./spec/runner.js",
   "bugs": {
     "url": "https://github.com/atom-community/markdown-preview-plus/issues"
@@ -108,5 +108,5 @@
     "test": "npm run typecheck && npm run lint && npm run prettier-check",
     "typecheck": "tsc --noEmit -p . && tsc --noEmit -p spec"
   },
-  "version": "2.5.2"
+  "version": "2.5.5"
 }

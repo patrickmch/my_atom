@@ -55,7 +55,7 @@ class VSCodeDebuggerAdapterService extends (_nuclideDebuggerCommon || _load_nucl
 
     return (0, _asyncToGenerator.default)(function* () {
       if (_this2._translator == null) {
-        _this2.getLogger().info(`No active session / translator: ${message}`);
+        _this2.getLogger().error(`No active session / translator: ${message}`);
       } else {
         _this2._translator.processCommand(JSON.parse(message));
       }

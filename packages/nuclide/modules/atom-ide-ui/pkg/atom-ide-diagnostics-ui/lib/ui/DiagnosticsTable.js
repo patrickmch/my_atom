@@ -22,12 +22,6 @@ function _load_memoizeUntilChanged() {
   return _memoizeUntilChanged = _interopRequireDefault(require('nuclide-commons/memoizeUntilChanged'));
 }
 
-var _UniversalDisposable;
-
-function _load_UniversalDisposable() {
-  return _UniversalDisposable = _interopRequireDefault(require('nuclide-commons/UniversalDisposable'));
-}
-
 var _humanizePath;
 
 function _load_humanizePath() {
@@ -88,19 +82,18 @@ function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj;
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-/**
- * Copyright (c) 2017-present, Facebook, Inc.
- * All rights reserved.
- *
- * This source code is licensed under the BSD-style license found in the
- * LICENSE file in the root directory of this source tree. An additional grant
- * of patent rights can be found in the PATENTS file in the same directory.
- *
- * 
- * @format
- */
+const DIAGNOSTICS_TO_ROWS_TRACES_MAP = new WeakMap(); /**
+                                                       * Copyright (c) 2017-present, Facebook, Inc.
+                                                       * All rights reserved.
+                                                       *
+                                                       * This source code is licensed under the BSD-style license found in the
+                                                       * LICENSE file in the root directory of this source tree. An additional grant
+                                                       * of patent rights can be found in the PATENTS file in the same directory.
+                                                       *
+                                                       * 
+                                                       * @format
+                                                       */
 
-const DIAGNOSTICS_TO_ROWS_TRACES_MAP = new WeakMap();
 const DIAGNOSTICS_TO_ROWS_NO_TRACES_MAP = new WeakMap();
 
 // text is always used for sorting, while we render the element.
@@ -125,14 +118,6 @@ class DiagnosticsTable extends _react.PureComponent {
       sortDescending: true,
       sortedColumn: 'classification'
     };
-  }
-
-  componentWillUnmount() {
-    if (!(this._disposables != null)) {
-      throw new Error('Invariant violation: "this._disposables != null"');
-    }
-
-    this._disposables.dispose();
   }
 
   _getColumns() {

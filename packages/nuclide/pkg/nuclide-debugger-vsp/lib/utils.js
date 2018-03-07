@@ -113,25 +113,25 @@ let getOCamlLaunchProcessInfo = exports.getOCamlLaunchProcessInfo = (() => {
 })();
 
 let getGdbLaunchProcessInfo = exports.getGdbLaunchProcessInfo = (() => {
-  var _ref10 = (0, _asyncToGenerator.default)(function* (program, args, cwd) {
+  var _ref10 = (0, _asyncToGenerator.default)(function* (program, args, cwd, environment, sourcePath) {
     const adapterInfo = yield getAdapterExecutableWithProperNode('native', program);
     return new (_VspProcessInfo || _load_VspProcessInfo()).default(program, 'launch', (_main || _load_main()).VsAdapterTypes.NATIVE, adapterInfo, true, // showThreads
-    { program: (_nuclideUri || _load_nuclideUri()).default.getPath(program), args, cwd });
+    { program: (_nuclideUri || _load_nuclideUri()).default.getPath(program), args, cwd, environment, sourcePath });
   });
 
-  return function getGdbLaunchProcessInfo(_x25, _x26, _x27) {
+  return function getGdbLaunchProcessInfo(_x25, _x26, _x27, _x28, _x29) {
     return _ref10.apply(this, arguments);
   };
 })();
 
 let getGdbAttachProcessInfo = exports.getGdbAttachProcessInfo = (() => {
-  var _ref11 = (0, _asyncToGenerator.default)(function* (targetUri, pid) {
+  var _ref11 = (0, _asyncToGenerator.default)(function* (targetUri, pid, sourcePath) {
     const adapterInfo = yield getAdapterExecutableWithProperNode('native', targetUri);
     return new (_VspProcessInfo || _load_VspProcessInfo()).default(targetUri, 'attach', (_main || _load_main()).VsAdapterTypes.NATIVE, adapterInfo, true, // showThreads
-    { pid });
+    { pid, sourcePath });
   });
 
-  return function getGdbAttachProcessInfo(_x28, _x29) {
+  return function getGdbAttachProcessInfo(_x30, _x31, _x32) {
     return _ref11.apply(this, arguments);
   };
 })();
@@ -143,7 +143,7 @@ let getNodeAttachProcessInfo = exports.getNodeAttachProcessInfo = (() => {
     getAttachNodeConfig(port));
   });
 
-  return function getNodeAttachProcessInfo(_x30, _x31) {
+  return function getNodeAttachProcessInfo(_x33, _x34) {
     return _ref12.apply(this, arguments);
   };
 })();
@@ -153,7 +153,7 @@ let getNodeAdapterInfo = (() => {
     return getAdapterExecutableWithProperNode('node', path);
   });
 
-  return function getNodeAdapterInfo(_x32) {
+  return function getNodeAdapterInfo(_x35) {
     return _ref13.apply(this, arguments);
   };
 })();
@@ -165,7 +165,7 @@ let getReactNativeAttachProcessInfo = exports.getReactNativeAttachProcessInfo = 
     args);
   });
 
-  return function getReactNativeAttachProcessInfo(_x33) {
+  return function getReactNativeAttachProcessInfo(_x36) {
     return _ref14.apply(this, arguments);
   };
 })();
@@ -177,7 +177,7 @@ let getReactNativeLaunchProcessInfo = exports.getReactNativeLaunchProcessInfo = 
     args);
   });
 
-  return function getReactNativeLaunchProcessInfo(_x34) {
+  return function getReactNativeLaunchProcessInfo(_x37) {
     return _ref15.apply(this, arguments);
   };
 })();
@@ -187,7 +187,7 @@ let getReactNativeAdapterInfo = (() => {
     return getAdapterExecutableWithProperNode('react-native', path);
   });
 
-  return function getReactNativeAdapterInfo(_x35) {
+  return function getReactNativeAdapterInfo(_x38) {
     return _ref16.apply(this, arguments);
   };
 })();
@@ -397,7 +397,7 @@ function listenToRemoteDebugCommands() {
       // Otherwise, we're already debugging that target.
     });
 
-    return function (_x36) {
+    return function (_x39) {
       return _ref17.apply(this, arguments);
     };
   })()));

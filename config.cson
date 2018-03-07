@@ -97,7 +97,7 @@
   "cursor-blink-interval": {}
   editor:
     fontFamily: "Source Code Pro for Powerline"
-    fontSize: 11
+    fontSize: 10
     nonWordCharacters: "/\\()\"':,.;<>~!@#$%^&*|+=[]{}`?…-"
     preferredLineLength: 100
     scrollPastEnd: true
@@ -115,12 +115,11 @@
     userId: "bf1a28f2-4481-4777-b187-9b8e1da674c0"
   "file-icons": {}
   "find-and-replace":
-    closeFindPanelAfterSearch: true
     focusEditorAfterSearch: true
   fonts:
     fontFamily: "Inconsolata-g"
   "git-blame":
-    columnWidth: 412
+    columnWidth: 171
   "glowing-cursor":
     cursorWidth: 7
   "hey-pane":

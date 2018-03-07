@@ -13,6 +13,12 @@ function _load_View() {
   return _View = require('nuclide-commons-ui/View');
 }
 
+var _nuclideUri;
+
+function _load_nuclideUri() {
+  return _nuclideUri = _interopRequireDefault(require('nuclide-commons/nuclideUri'));
+}
+
 var _react = _interopRequireWildcard(require('react'));
 
 var _renderReactRoot;
@@ -71,9 +77,26 @@ function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj;
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
+/**
+ * Copyright (c) 2015-present, Facebook, Inc.
+ * All rights reserved.
+ *
+ * This source code is licensed under the license found in the LICENSE file in
+ * the root directory of this source tree.
+ *
+ * 
+ * @format
+ */
+
+const AVD_LOCKFILE = 'hardware-qemu.ini.lock';
+
 class AvdComponentProvider {
   constructor() {
     this._refresh = new _rxjsBundlesRxMinJs.Subject();
+
+    this._populateAvdPIDs = avds => {
+      return _rxjsBundlesRxMinJs.Observable.fromPromise(Promise.all(avds.map(this._populateAvdPID)));
+    };
 
     this._refreshAvds = () => {
       this._refresh.next();
@@ -84,8 +107,8 @@ class AvdComponentProvider {
         throw new Error('Invariant violation: "this._emulator != null"');
       }
 
-      (0, (_process || _load_process()).runCommand)(this._emulator, ['@' + avd]).subscribe(stdout => {}, err => {
-        atom.notifications.addError(`Failed to start up emulator ${avd}. Perhaps it's already running?`, {
+      (0, (_process || _load_process()).runCommand)(this._emulator, ['@' + avd.name]).subscribe(stdout => {}, err => {
+        atom.notifications.addError(`Failed to start up emulator ${avd.name}.`, {
           detail: err,
           dismissable: true
         });
@@ -102,6 +125,12 @@ class AvdComponentProvider {
   }
 
   observe(host, callback) {
+    // TODO (T26257016): Don't hide the table when ADB tunneling is on.
+    if ((_nuclideUri || _load_nuclideUri()).default.isRemote(host)) {
+      callback(null);
+      return new (_UniversalDisposable || _load_UniversalDisposable()).default();
+    }
+
     const headerElement = _react.createElement((_View || _load_View()).View, {
       item: (0, (_renderReactRoot || _load_renderReactRoot()).renderReactRoot)(_react.createElement((_AvdTableHeader || _load_AvdTableHeader()).default, { refreshAvds: this._refreshAvds }))
     });
@@ -140,20 +169,30 @@ class AvdComponentProvider {
     return trimmedOutput === '' ? [] : trimmedOutput.split(_os.default.EOL);
   }
 
+  _populateAvdPID(avdName) {
+    return (0, _asyncToGenerator.default)(function* () {
+      const lockFile = `${_os.default.homedir()}/.android/avd/${avdName}.avd/${AVD_LOCKFILE}`;
+      if (yield (_fsPromise || _load_fsPromise()).default.exists(lockFile)) {
+        const pid = parseInt((yield (_fsPromise || _load_fsPromise()).default.readFile(lockFile, 'utf8')), 10);
+        return {
+          name: avdName,
+          running: true,
+          pid
+        };
+      } else {
+        return {
+          name: avdName,
+          running: false
+        };
+      }
+    })();
+  }
+
   _getAvds() {
     return this._getEmulator().switchMap(emulator => {
-      return emulator != null ? (0, (_process || _load_process()).runCommand)(emulator, ['-list-avds']).map(this._parseAvds).map((_expected || _load_expected()).Expect.value) : _rxjsBundlesRxMinJs.Observable.of((_expected || _load_expected()).Expect.error(new Error("Cannot find 'emulator' command.")));
+      return emulator != null ? (0, (_process || _load_process()).runCommand)(emulator, ['-list-avds']).map(this._parseAvds).switchMap(this._populateAvdPIDs).map((_expected || _load_expected()).Expect.value) : _rxjsBundlesRxMinJs.Observable.of((_expected || _load_expected()).Expect.error(new Error("Cannot find 'emulator' command.")));
     });
   }
 
 }
-exports.AvdComponentProvider = AvdComponentProvider; /**
-                                                      * Copyright (c) 2015-present, Facebook, Inc.
-                                                      * All rights reserved.
-                                                      *
-                                                      * This source code is licensed under the license found in the LICENSE file in
-                                                      * the root directory of this source tree.
-                                                      *
-                                                      * 
-                                                      * @format
-                                                      */
+exports.AvdComponentProvider = AvdComponentProvider;

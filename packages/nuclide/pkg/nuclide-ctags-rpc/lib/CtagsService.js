@@ -13,6 +13,15 @@ let getCtagsService = exports.getCtagsService = (() => {
     if (dir == null) {
       return null;
     }
+    // TAGS and tags are very much incompatible (emacs vs ctags style).
+    // Currently the TAGS format also makes node-ctags crash (!!)
+    // As such, on case-insensitive filesystems we need to double check.
+    if (process.platform !== 'linux') {
+      const files = yield (_fsPromise || _load_fsPromise()).default.readdir(dir);
+      if (!files.includes(TAGS_FILENAME)) {
+        return null;
+      }
+    }
     return new CtagsService((_nuclideUri || _load_nuclideUri()).default.join(dir, TAGS_FILENAME));
   });
 

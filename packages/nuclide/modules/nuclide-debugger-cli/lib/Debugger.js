@@ -120,6 +120,12 @@ function _load_PrintCommand() {
   return _PrintCommand = _interopRequireDefault(require('./PrintCommand'));
 }
 
+var _RunCommand;
+
+function _load_RunCommand() {
+  return _RunCommand = _interopRequireDefault(require('./RunCommand'));
+}
+
 var _VsDebugSession;
 
 function _load_VsDebugSession() {
@@ -129,6 +135,18 @@ function _load_VsDebugSession() {
 function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+/**
+ * Copyright (c) 2017-present, Facebook, Inc.
+ * All rights reserved.
+ *
+ * This source code is licensed under the BSD-style license found in the
+ * LICENSE file in the root directory of this source tree. An additional grant
+ * of patent rights can be found in the PATENTS file in the same directory.
+ *
+ * 
+ * @format
+ */
 
 class Debugger {
 
@@ -153,6 +171,7 @@ class Debugger {
     dispatcher.registerCommand(new (_ListCommand || _load_ListCommand()).default(this._console, this));
     dispatcher.registerCommand(new (_RestartCommand || _load_RestartCommand()).default(this));
     dispatcher.registerCommand(new (_PrintCommand || _load_PrintCommand()).default(this._console, this));
+    dispatcher.registerCommand(new (_RunCommand || _load_RunCommand()).default(this));
   }
 
   getThreads() {
@@ -292,7 +311,8 @@ class Debugger {
     var _this8 = this;
 
     return (0, _asyncToGenerator.default)(function* () {
-      const session = _this8._ensureDebugSession();
+      // NB this call is allowed before the program is launched
+      const session = _this8._ensureDebugSession(true);
       const index = _this8._breakpoints.addSourceBreakpoint(path, line);
 
       const breakpoint = yield _this8._setSourceBreakpointsForPath(session, path, index);
@@ -466,16 +486,6 @@ class Debugger {
       yield _this13.createSession(adapter.adapterInfo);
 
       switch (adapter.action) {
-        case 'launch':
-          const launchArgs = adapter.launchArgs;
-
-          if (!(launchArgs != null)) {
-            throw new Error('Invariant violation: "launchArgs != null"');
-          }
-
-          yield _this13._ensureDebugSession().launch(launchArgs);
-          break;
-
         case 'attach':
           const attachArgs = adapter.attachArgs;
 
@@ -483,29 +493,52 @@ class Debugger {
             throw new Error('Invariant violation: "attachArgs != null"');
           }
 
-          yield _this13._ensureDebugSession().attach(attachArgs);
+          yield _this13._ensureDebugSession(true).attach(attachArgs);
+          yield _this13._cacheThreads();
+          _this13._launching = false;
           break;
 
-        default:
-          if (!false) {
-            throw new Error('Invalid action passed in adapter init state');
-          }
-
+        case 'launch':
+          // If we are launching, that will happen after the user issues the 'run'
+          // command.
+          _this13._console.startInput();
+          break;
       }
-      yield _this13._cacheThreads();
-      _this13._launching = false;
+    })();
+  }
+
+  run() {
+    var _this14 = this;
+
+    return (0, _asyncToGenerator.default)(function* () {
+      const adapter = _this14._adapter;
+
+      if (!_this14._launching || adapter == null || adapter.action !== 'launch') {
+        throw new Error('There is nothing to run, or already attached to a process.');
+      }
+
+      const launchArgs = adapter.launchArgs;
+
+      if (!(launchArgs != null)) {
+        throw new Error('Invariant violation: "launchArgs != null"');
+      }
+
+      yield _this14._ensureDebugSession(true).launch(launchArgs);
+
+      yield _this14._cacheThreads();
+      _this14._launching = false;
     })();
   }
 
   evaluateExpression(expression) {
-    var _this14 = this;
+    var _this15 = this;
 
     return (0, _asyncToGenerator.default)(function* () {
-      const session = _this14._ensureDebugSession();
+      const session = _this15._ensureDebugSession();
 
       let args = { expression, context: 'repl' };
 
-      const frame = yield _this14.getCurrentStackFrame();
+      const frame = yield _this15.getCurrentStackFrame();
       if (frame != null) {
         args = Object.assign({}, args, { frameId: frame.id });
       }
@@ -515,62 +548,62 @@ class Debugger {
   }
 
   createSession(adapterInfo) {
-    var _this15 = this;
+    var _this16 = this;
 
     return (0, _asyncToGenerator.default)(function* () {
-      _this15._terminated = false;
-      _this15._console.stopInput();
+      _this16._terminated = false;
+      _this16._console.stopInput();
 
-      _this15._debugSession = new (_VsDebugSession || _load_VsDebugSession()).default(process.pid.toString(), _this15._logger, adapterInfo);
+      _this16._debugSession = new (_VsDebugSession || _load_VsDebugSession()).default(process.pid.toString(), _this16._logger, adapterInfo);
 
-      _this15._initializeObservers();
+      _this16._initializeObservers();
 
-      if (!(_this15._debugSession != null)) {
+      if (!(_this16._debugSession != null)) {
         throw new Error('Invariant violation: "this._debugSession != null"');
       }
 
-      const { body } = yield _this15._debugSession.initialize({
+      const { body } = yield _this16._debugSession.initialize({
         adapterID: 'fbdbg',
         pathFormat: 'path',
         linesStartAt1: true,
         columnsStartAt1: true
       });
 
-      _this15._capabilities = body;
+      _this16._capabilities = body;
     })();
   }
 
   _finishInitialization() {
-    var _this16 = this;
-
-    return (0, _asyncToGenerator.default)(function* () {
-      const session = _this16._ensureDebugSession();
-
-      yield session.setExceptionBreakpoints({ filters: [] });
-      yield _this16._resetAllBreakpoints();
-
-      if (!(_this16._capabilities != null)) {
-        throw new Error('Invariant violation: "this._capabilities != null"');
-      }
-
-      if (_this16._capabilities.supportsConfigurationDoneRequest) {
-        yield session.configurationDone();
-      }
-
-      // On attach, we won't get a stop event, so start the console here.
-      if (_this16._adapter != null && _this16._adapter.action === 'attach') {
-        _this16._console.startInput();
-      }
-    })();
-  }
-
-  _resetAllBreakpoints() {
     var _this17 = this;
 
     return (0, _asyncToGenerator.default)(function* () {
       const session = _this17._ensureDebugSession();
 
-      const sourceBreakpoints = _this17._breakpoints.getAllEnabledBreakpointsByPath();
+      yield session.setExceptionBreakpoints({ filters: [] });
+      yield _this17._resetAllBreakpoints();
+
+      if (!(_this17._capabilities != null)) {
+        throw new Error('Invariant violation: "this._capabilities != null"');
+      }
+
+      if (_this17._capabilities.supportsConfigurationDoneRequest) {
+        yield session.configurationDone();
+      }
+
+      // On attach, we won't get a stop event, so start the console here.
+      if (_this17._adapter != null && _this17._adapter.action === 'attach') {
+        _this17._console.startInput();
+      }
+    })();
+  }
+
+  _resetAllBreakpoints() {
+    var _this18 = this;
+
+    return (0, _asyncToGenerator.default)(function* () {
+      const session = _this18._ensureDebugSession();
+
+      const sourceBreakpoints = _this18._breakpoints.getAllEnabledBreakpointsByPath();
 
       yield Promise.all(Array.from(sourceBreakpoints).map((() => {
         var _ref8 = (0, _asyncToGenerator.default)(function* ([path, breakpointLines]) {
@@ -611,7 +644,7 @@ class Debugger {
   }
 
   _initializeObservers() {
-    const session = this._ensureDebugSession();
+    const session = this._ensureDebugSession(true);
 
     session.observeInitializeEvents().subscribe(() => {
       try {
@@ -637,24 +670,24 @@ class Debugger {
   }
 
   closeSession() {
-    var _this18 = this;
+    var _this19 = this;
 
     return (0, _asyncToGenerator.default)(function* () {
-      if (_this18._debugSession == null) {
+      if (_this19._debugSession == null) {
         return;
       }
 
-      _this18._terminated = true;
+      _this19._terminated = true;
 
-      yield _this18._debugSession.disconnect();
-      _this18._threads = new Map();
-      _this18._debugSession = null;
-      _this18._activeThread = null;
+      yield _this19._debugSession.disconnect();
+      _this19._threads = new Map();
+      _this19._debugSession = null;
+      _this19._activeThread = null;
 
       // $TODO perf - there may be some value in not immediately flushing
       // and keeping the cache around if we reattach to the same target,
       // using watch to see if the file has changed in the meantime
-      _this18._sourceFiles.flush();
+      _this19._sourceFiles.flush();
     })();
   }
 
@@ -674,35 +707,35 @@ class Debugger {
   }
 
   _onStopped(event) {
-    var _this19 = this;
+    var _this20 = this;
 
     return (0, _asyncToGenerator.default)(function* () {
       const { body: { description, threadId } } = event;
 
       if (description != null) {
-        _this19._console.outputLine(description);
+        _this20._console.outputLine(description);
       }
 
       // $TODO handle allThreadsStopped
       if (threadId != null) {
-        let thread = _this19._threads.get(threadId);
+        let thread = _this20._threads.get(threadId);
 
         if (thread == null) {
-          yield _this19._cacheThreads();
-          thread = _this19._threads.get(threadId);
+          yield _this20._cacheThreads();
+          thread = _this20._threads.get(threadId);
         }
 
         (0, (_nullthrows || _load_nullthrows()).default)(thread).clearSelectedStackFrame();
 
-        if (threadId === _this19.getActiveThread().id()) {
-          const topOfStack = yield _this19._getTopOfStackSourceInfo(threadId);
+        if (threadId === _this20.getActiveThread().id()) {
+          const topOfStack = yield _this20._getTopOfStackSourceInfo(threadId);
           if (topOfStack != null) {
-            _this19._console.outputLine(`${topOfStack.name}:${topOfStack.frame.line} ${topOfStack.line}`);
+            _this20._console.outputLine(`${topOfStack.name}:${topOfStack.frame.line} ${topOfStack.line}`);
           }
         }
       }
 
-      _this19._console.startInput();
+      _this20._console.startInput();
     })();
   }
 
@@ -722,21 +755,23 @@ class Debugger {
   }
 
   _cacheThreads() {
-    var _this20 = this;
+    var _this21 = this;
 
     return (0, _asyncToGenerator.default)(function* () {
-      if (!(_this20._debugSession != null)) {
+      if (!(_this21._debugSession != null)) {
         throw new Error('_cacheThreads called without session');
       }
 
-      const { body: { threads } } = yield _this20._debugSession.threads();
-      _this20._threads = new Map(threads.map(function (thd) {
+      const { body } = yield _this21._debugSession.threads();
+      const threads = body.threads != null ? body.threads : [];
+
+      _this21._threads = new Map(threads.map(function (thd) {
         return [thd.id, new (_Thread || _load_Thread()).default(thd.id, thd.name)];
       }));
 
-      _this20._activeThread = null;
+      _this21._activeThread = null;
       if (threads.length > 0) {
-        _this20._activeThread = threads[0].id;
+        _this21._activeThread = threads[0].id;
       }
     })();
   }
@@ -755,18 +790,18 @@ class Debugger {
   }
 
   _getTopOfStackSourceInfo(threadId) {
-    var _this21 = this;
+    var _this22 = this;
 
     return (0, _asyncToGenerator.default)(function* () {
       // $TODO paths relative to project root?
-      const frames = yield _this21.getStackTrace(threadId, 1);
+      const frames = yield _this22.getStackTrace(threadId, 1);
       const source = Debugger._sourceFromTopFrame(frames);
       if (source == null) {
         return null;
       }
 
       const frame = frames[0];
-      const lines = yield _this21.getSourceLines(source, frames[0].line, 1);
+      const lines = yield _this22.getSourceLines(source, frames[0].line, 1);
 
       let name;
 
@@ -796,31 +831,26 @@ class Debugger {
   }
 
   _getSourceByReference(sourceReference) {
-    var _this22 = this;
+    var _this23 = this;
 
     return (0, _asyncToGenerator.default)(function* () {
-      const { body: { content } } = yield _this22._ensureDebugSession().source({
+      const { body: { content } } = yield _this23._ensureDebugSession().source({
         sourceReference
       });
       return content;
     })();
   }
 
-  _ensureDebugSession() {
+  _ensureDebugSession(allowBeforeLaunch = false) {
     if (this._debugSession == null) {
       throw new Error('There is no active debugging session.');
     }
+
+    if (this._launching && !allowBeforeLaunch) {
+      throw new Error("The program is not yet running (use 'run' to start it).");
+    }
+
     return this._debugSession;
   }
 }
-exports.default = Debugger; /**
-                             * Copyright (c) 2017-present, Facebook, Inc.
-                             * All rights reserved.
-                             *
-                             * This source code is licensed under the BSD-style license found in the
-                             * LICENSE file in the root directory of this source tree. An additional grant
-                             * of patent rights can be found in the PATENTS file in the same directory.
-                             *
-                             * 
-                             * @format
-                             */
+exports.default = Debugger;

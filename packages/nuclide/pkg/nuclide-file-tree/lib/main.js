@@ -176,9 +176,7 @@ class Activation {
     });
     // $FlowIgnore: Undocumented API
     atom.contextMenu.showForEvent = function (event) {
-      const sub = (_observable || _load_observable()).nextAnimationFrame.repeat(3)
-      // $FlowFixMe: Add last() to type def
-      .last().subscribe(() => {
+      const sub = (_observable || _load_observable()).nextAnimationFrame.repeat(3).last().subscribe(() => {
         showForEvent.call(atom.contextMenu, event);
         disposables.remove(sub);
       });

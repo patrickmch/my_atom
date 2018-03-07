@@ -6,9 +6,9 @@ Object.defineProperty(exports, "__esModule", {
 exports.getIgnoredNames = getIgnoredNames;
 exports.parseFileNameQuery = parseFileNameQuery;
 function getIgnoredNames() {
-  // $FlowIssue: Filter predicates
   const ignoredNames = atom.config.get('core.ignoredNames');
   if (Array.isArray(ignoredNames)) {
+    // $FlowIssue: Filter predicates
     return ignoredNames.filter(x => typeof x === 'string');
   } else {
     return [];

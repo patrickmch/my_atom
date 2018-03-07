@@ -118,13 +118,6 @@ class BreakpointListComponent extends _react.Component {
     } = this.state;
     const { service } = this.props;
     const isReadonlyTarget = false;
-    if (breakpoints == null || breakpoints.length === 0) {
-      return _react.createElement(
-        'span',
-        null,
-        '(no breakpoints)'
-      );
-    }
 
     const items = breakpoints
     // Show resolved breakpoints at the top of the list, then order by filename & line number.
@@ -213,22 +206,26 @@ class BreakpointListComponent extends _react.Component {
         content
       );
     });
+    const separator = breakpoints.length !== 0 ? _react.createElement('hr', { className: 'nuclide-ui-hr nuclide-debugger-breakpoint-separator' }) : null;
     return _react.createElement(
       'div',
       null,
       exceptionBreakpoints.map(exceptionBreakpoint => {
         return _react.createElement(
           'div',
-          { key: exceptionBreakpoint.getId() },
+          {
+            className: 'nuclide-debugger-breakpoint',
+            key: exceptionBreakpoint.getId() },
           _react.createElement((_Checkbox || _load_Checkbox()).Checkbox, {
-            className: 'nuclide-debugger-exception-checkbox',
+            className: (0, (_classnames || _load_classnames()).default)('nuclide-debugger-breakpoint-checkbox', 'nuclide-debugger-exception-checkbox'),
             onChange: enabled => service.enableOrDisableBreakpoints(enabled, exceptionBreakpoint),
             checked: exceptionBreakpoint.enabled,
-            disabled: isReadonlyTarget,
-            label: exceptionBreakpoint.label || `${exceptionBreakpoint.filter} exceptions`
-          })
+            disabled: isReadonlyTarget
+          }),
+          exceptionBreakpoint.label || `${exceptionBreakpoint.filter} exceptions`
         );
       }),
+      separator,
       _react.createElement(
         (_ListView || _load_ListView()).ListView,
         {
