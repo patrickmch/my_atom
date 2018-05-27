@@ -5,3 +5,5 @@ storage
 .apm
 .node-gyp
 .npm
+.DS-Store
+atom-notes**
