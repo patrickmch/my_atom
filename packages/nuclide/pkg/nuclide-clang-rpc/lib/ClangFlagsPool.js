@@ -1,24 +1,28 @@
-'use strict';
+'use strict';Object.defineProperty(exports, "__esModule", { value: true });var _collection;
 
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
 
-var _collection;
 
-function _load_collection() {
-  return _collection = require('nuclide-commons/collection');
-}
 
-var _nuclideAnalytics;
 
-function _load_nuclideAnalytics() {
-  return _nuclideAnalytics = require('../../nuclide-analytics');
-}
+
+
+
+
+
+
+
+function _load_collection() {return _collection = require('../../../modules/nuclide-commons/collection');}var _nuclideAnalytics;
+function _load_nuclideAnalytics() {return _nuclideAnalytics = require('../../nuclide-analytics');}
 
 // Currently handles are just indices into the flag pool.
+
+
 function flagsAreEqual(left, right) {
-  return left.directory === right.directory && left.flagsFile === right.flagsFile && (0, (_collection || _load_collection()).arrayEqual)(left.flags, right.flags);
+  return (
+    left.directory === right.directory &&
+    left.flagsFile === right.flagsFile &&
+    (0, (_collection || _load_collection()).arrayEqual)(left.flags, right.flags));
+
 } /**
    * Copyright (c) 2015-present, Facebook, Inc.
    * All rights reserved.
@@ -28,17 +32,8 @@ function flagsAreEqual(left, right) {
    *
    * 
    * @format
-   */
+   */class ClangFlagsPool {constructor() {this._pool = [];this._totalFlags = 0;}getHandle(flags) {this._totalFlags++;const index = this._pool.findIndex(candidate => flagsAreEqual(flags, candidate));
 
-class ClangFlagsPool {
-  constructor() {
-    this._pool = [];
-    this._totalFlags = 0;
-  }
-
-  getHandle(flags) {
-    this._totalFlags++;
-    const index = this._pool.findIndex(candidate => flagsAreEqual(flags, candidate));
     if (index !== -1) {
       return index;
     } else {
@@ -55,8 +50,8 @@ class ClangFlagsPool {
   trackStats() {
     (0, (_nuclideAnalytics || _load_nuclideAnalytics()).track)('nuclide-clang.flag-pool', {
       totalFlags: this._totalFlags,
-      totalHandles: this._pool.length
-    });
+      totalHandles: this._pool.length });
+
   }
 
   reset() {
@@ -66,6 +61,4 @@ class ClangFlagsPool {
     // getHandle and match that against an internal version in getFlags.
     this._pool = [];
     this._totalFlags = 0;
-  }
-}
-exports.default = ClangFlagsPool;
+  }}exports.default = ClangFlagsPool;

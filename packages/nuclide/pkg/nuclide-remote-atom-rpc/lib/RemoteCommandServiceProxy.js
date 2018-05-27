@@ -4,6 +4,12 @@ let Observable;
 
 module.exports = _client => {
   const remoteModule = {};
+  remoteModule.Unregister = class {
+    dispose() {
+      return _client.disposeRemoteObject(this);
+    }
+
+  };
   remoteModule.FileNotifier = class {
     onFileEvent(arg0) {
       return Promise.all([_client.marshalArguments(Array.from(arguments), [{
@@ -101,7 +107,7 @@ module.exports = _client => {
         location: {
           type: "source",
           fileName: "rpc-types.js",
-          line: 16
+          line: 47
         },
         name: "AtomCommands"
       })])).switchMap(([args, id]) => _client.callRemoteMethod(id, "openFile", "observable", args)).concatMap(value => {
@@ -138,7 +144,7 @@ module.exports = _client => {
         location: {
           type: "source",
           fileName: "rpc-types.js",
-          line: 16
+          line: 47
         },
         name: "AtomCommands"
       })])).switchMap(([args, id]) => _client.callRemoteMethod(id, "openRemoteFile", "observable", args)).concatMap(value => {
@@ -166,10 +172,49 @@ module.exports = _client => {
         location: {
           type: "source",
           fileName: "rpc-types.js",
-          line: 16
+          line: 47
         },
         name: "AtomCommands"
       })]).then(([args, id]) => _client.callRemoteMethod(id, "addProject", "promise", args)).then(value => {
+        return _client.unmarshal(value, {
+          kind: "void"
+        });
+      });
+    }
+
+    getProjectState() {
+      return Promise.all([_client.marshalArguments(Array.from(arguments), []), _client.marshal(this, {
+        kind: "named",
+        location: {
+          type: "source",
+          fileName: "rpc-types.js",
+          line: 47
+        },
+        name: "AtomCommands"
+      })]).then(([args, id]) => _client.callRemoteMethod(id, "getProjectState", "promise", args)).then(value => {
+        return _client.unmarshal(value, {
+          kind: "named",
+          name: "ProjectState"
+        });
+      });
+    }
+
+    addNotification(arg0) {
+      return Promise.all([_client.marshalArguments(Array.from(arguments), [{
+        name: "notification",
+        type: {
+          kind: "named",
+          name: "AtomNotification"
+        }
+      }]), _client.marshal(this, {
+        kind: "named",
+        location: {
+          type: "source",
+          fileName: "rpc-types.js",
+          line: 47
+        },
+        name: "AtomCommands"
+      })]).then(([args, id]) => _client.callRemoteMethod(id, "addNotification", "promise", args)).then(value => {
         return _client.unmarshal(value, {
           kind: "void"
         });
@@ -181,39 +226,30 @@ module.exports = _client => {
     }
 
   };
-  remoteModule.RemoteCommandService = class {
-    static registerAtomCommands(arg0, arg1) {
-      return _client.marshalArguments(Array.from(arguments), [{
-        name: "fileNotifier",
-        type: {
-          kind: "named",
-          name: "FileNotifier"
-        }
-      }, {
-        name: "atomCommands",
-        type: {
-          kind: "named",
-          name: "AtomCommands"
-        }
-      }]).then(args => {
-        return _client.callRemoteFunction("RemoteCommandService/registerAtomCommands", "promise", args);
-      }).then(value => {
-        return _client.unmarshal(value, {
-          kind: "named",
-          name: "RemoteCommandService"
-        });
+
+  remoteModule.registerAtomCommands = function (arg0, arg1) {
+    return _client.marshalArguments(Array.from(arguments), [{
+      name: "fileNotifier",
+      type: {
+        kind: "named",
+        name: "FileNotifier"
+      }
+    }, {
+      name: "atomCommands",
+      type: {
+        kind: "named",
+        name: "AtomCommands"
+      }
+    }]).then(args => {
+      return _client.callRemoteFunction("RemoteCommandService/registerAtomCommands", "promise", args);
+    }).then(value => {
+      return _client.unmarshal(value, {
+        kind: "named",
+        name: "Unregister"
       });
-    }
-
-    constructor() {
-      _client.createRemoteObject("RemoteCommandService", this, [], []);
-    }
-
-    dispose() {
-      return _client.disposeRemoteObject(this);
-    }
-
+    });
   };
+
   return remoteModule;
 };
 
@@ -278,6 +314,31 @@ Object.defineProperty(module.exports, "defs", {
       name: "atom$Range",
       location: {
         type: "builtin"
+      }
+    },
+    Unregister: {
+      kind: "interface",
+      name: "Unregister",
+      location: {
+        type: "source",
+        fileName: "RemoteCommandService.js",
+        line: 24
+      },
+      constructorArgs: null,
+      staticMethods: {},
+      instanceMethods: {
+        dispose: {
+          location: {
+            type: "source",
+            fileName: "RemoteCommandService.js",
+            line: 25
+          },
+          kind: "function",
+          argumentTypes: [],
+          returnType: {
+            kind: "void"
+          }
+        }
       }
     },
     FileVersion: {
@@ -737,7 +798,7 @@ Object.defineProperty(module.exports, "defs", {
       location: {
         type: "source",
         fileName: "rpc-types.js",
-        line: 15
+        line: 24
       },
       name: "AtomFileEvent",
       definition: {
@@ -751,13 +812,113 @@ Object.defineProperty(module.exports, "defs", {
         }]
       }
     },
+    ProjectState: {
+      kind: "alias",
+      location: {
+        type: "source",
+        fileName: "rpc-types.js",
+        line: 15
+      },
+      name: "ProjectState",
+      definition: {
+        kind: "object",
+        fields: [{
+          name: "rootFolders",
+          type: {
+            kind: "array",
+            type: {
+              kind: "string"
+            }
+          },
+          optional: false
+        }]
+      }
+    },
+    AtomNotificationType: {
+      kind: "alias",
+      location: {
+        type: "source",
+        fileName: "rpc-types.js",
+        line: 26
+      },
+      name: "AtomNotificationType",
+      definition: {
+        kind: "union",
+        types: [{
+          kind: "string-literal",
+          value: "success"
+        }, {
+          kind: "string-literal",
+          value: "info"
+        }, {
+          kind: "string-literal",
+          value: "warning"
+        }, {
+          kind: "string-literal",
+          value: "error"
+        }, {
+          kind: "string-literal",
+          value: "fatal"
+        }]
+      }
+    },
+    AtomNotification: {
+      kind: "alias",
+      location: {
+        type: "source",
+        fileName: "rpc-types.js",
+        line: 33
+      },
+      name: "AtomNotification",
+      definition: {
+        kind: "object",
+        fields: [{
+          name: "message",
+          type: {
+            kind: "string"
+          },
+          optional: false
+        }, {
+          name: "type",
+          type: {
+            kind: "named",
+            name: "AtomNotificationType"
+          },
+          optional: false
+        }, {
+          name: "description",
+          type: {
+            kind: "string"
+          },
+          optional: true
+        }, {
+          name: "detail",
+          type: {
+            kind: "string"
+          },
+          optional: true
+        }, {
+          name: "icon",
+          type: {
+            kind: "string"
+          },
+          optional: true
+        }, {
+          name: "dismissable",
+          type: {
+            kind: "boolean"
+          },
+          optional: true
+        }]
+      }
+    },
     AtomCommands: {
       kind: "interface",
       name: "AtomCommands",
       location: {
         type: "source",
         fileName: "rpc-types.js",
-        line: 16
+        line: 47
       },
       constructorArgs: null,
       staticMethods: {},
@@ -766,7 +927,7 @@ Object.defineProperty(module.exports, "defs", {
           location: {
             type: "source",
             fileName: "rpc-types.js",
-            line: 17
+            line: 48
           },
           kind: "function",
           argumentTypes: [{
@@ -803,7 +964,7 @@ Object.defineProperty(module.exports, "defs", {
           location: {
             type: "source",
             fileName: "rpc-types.js",
-            line: 24
+            line: 55
           },
           kind: "function",
           argumentTypes: [{
@@ -839,7 +1000,7 @@ Object.defineProperty(module.exports, "defs", {
           location: {
             type: "source",
             fileName: "rpc-types.js",
-            line: 37
+            line: 68
           },
           kind: "function",
           argumentTypes: [{
@@ -861,11 +1022,48 @@ Object.defineProperty(module.exports, "defs", {
             }
           }
         },
+        getProjectState: {
+          location: {
+            type: "source",
+            fileName: "rpc-types.js",
+            line: 74
+          },
+          kind: "function",
+          argumentTypes: [],
+          returnType: {
+            kind: "promise",
+            type: {
+              kind: "named",
+              name: "ProjectState"
+            }
+          }
+        },
+        addNotification: {
+          location: {
+            type: "source",
+            fileName: "rpc-types.js",
+            line: 76
+          },
+          kind: "function",
+          argumentTypes: [{
+            name: "notification",
+            type: {
+              kind: "named",
+              name: "AtomNotification"
+            }
+          }],
+          returnType: {
+            kind: "promise",
+            type: {
+              kind: "void"
+            }
+          }
+        },
         dispose: {
           location: {
             type: "source",
             fileName: "rpc-types.js",
-            line: 38
+            line: 78
           },
           kind: "function",
           argumentTypes: [],
@@ -875,56 +1073,39 @@ Object.defineProperty(module.exports, "defs", {
         }
       }
     },
-    RemoteCommandService: {
-      kind: "interface",
-      name: "RemoteCommandService",
+    registerAtomCommands: {
+      kind: "function",
+      name: "registerAtomCommands",
       location: {
         type: "source",
         fileName: "RemoteCommandService.js",
-        line: 22
+        line: 31
       },
-      constructorArgs: [],
-      staticMethods: {
-        registerAtomCommands: {
-          location: {
-            type: "source",
-            fileName: "RemoteCommandService.js",
-            line: 45
-          },
-          kind: "function",
-          argumentTypes: [{
-            name: "fileNotifier",
-            type: {
-              kind: "named",
-              name: "FileNotifier"
-            }
-          }, {
-            name: "atomCommands",
-            type: {
-              kind: "named",
-              name: "AtomCommands"
-            }
-          }],
-          returnType: {
-            kind: "promise",
-            type: {
-              kind: "named",
-              name: "RemoteCommandService"
-            }
+      type: {
+        location: {
+          type: "source",
+          fileName: "RemoteCommandService.js",
+          line: 31
+        },
+        kind: "function",
+        argumentTypes: [{
+          name: "fileNotifier",
+          type: {
+            kind: "named",
+            name: "FileNotifier"
           }
-        }
-      },
-      instanceMethods: {
-        dispose: {
-          location: {
-            type: "source",
-            fileName: "RemoteCommandService.js",
-            line: 40
-          },
-          kind: "function",
-          argumentTypes: [],
-          returnType: {
-            kind: "void"
+        }, {
+          name: "atomCommands",
+          type: {
+            kind: "named",
+            name: "AtomCommands"
+          }
+        }],
+        returnType: {
+          kind: "promise",
+          type: {
+            kind: "named",
+            name: "Unregister"
           }
         }
       }

@@ -1,92 +1,139 @@
-'use strict';
+'use strict';Object.defineProperty(exports, "__esModule", { value: true });exports.CqueryLanguageClient = undefined;var _asyncToGenerator = _interopRequireDefault(require('async-to-generator'));var _fsPromise;
 
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-exports.CqueryLanguageClient = undefined;
 
-var _asyncToGenerator = _interopRequireDefault(require('async-to-generator'));
 
-var _rxjsBundlesRxMinJs = require('rxjs/bundles/Rx.min.js');
 
-var _convert;
 
-function _load_convert() {
-  return _convert = require('../../nuclide-vscode-language-service-rpc/lib/convert');
-}
 
-var _LspLanguageService;
 
-function _load_LspLanguageService() {
-  return _LspLanguageService = require('../../nuclide-vscode-language-service-rpc/lib/LspLanguageService');
-}
 
-var _CqueryOutlineParser;
 
-function _load_CqueryOutlineParser() {
-  return _CqueryOutlineParser = require('./outline/CqueryOutlineParser');
-}
 
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+function _load_fsPromise() {return _fsPromise = _interopRequireDefault(require('../../../modules/nuclide-commons/fsPromise'));}
+var _rxjsBundlesRxMinJs = require('rxjs/bundles/Rx.min.js');var _nuclideAnalytics;
+function _load_nuclideAnalytics() {return _nuclideAnalytics = require('../../nuclide-analytics');}var _utils;
+function _load_utils() {return _utils = require('../../nuclide-clang-rpc/lib/utils');}var _convert;
+function _load_convert() {return _convert = require('../../nuclide-vscode-language-service-rpc/lib/convert');}var _LspLanguageService;
+
+
+
+
+
+
+function _load_LspLanguageService() {return _LspLanguageService = require('../../nuclide-vscode-language-service-rpc/lib/LspLanguageService');}var _CqueryProjectManager;
+function _load_CqueryProjectManager() {return _CqueryProjectManager = require('./CqueryProjectManager');}var _CqueryOutlineParser;
+function _load_CqueryOutlineParser() {return _CqueryOutlineParser = require('./outline/CqueryOutlineParser');}function _interopRequireDefault(obj) {return obj && obj.__esModule ? obj : { default: obj };}
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 // FIXME pelmers: tracking cquery/issues/30
 // https://github.com/jacobdufault/cquery/issues/30#issuecomment-345536318
-function shortenByOneCharacter({ newText, range }) {
-  return {
-    newText,
-    range: {
-      start: range.start,
-      end: { line: range.end.line, character: range.end.character - 1 }
-    }
-  };
-} /**
-   * Copyright (c) 2015-present, Facebook, Inc.
-   * All rights reserved.
-   *
-   * This source code is licensed under the license found in the LICENSE file in
-   * the root directory of this source tree.
-   *
-   * 
-   * @format
-   */
+/**
+ * Copyright (c) 2015-present, Facebook, Inc.
+ * All rights reserved.
+ *
+ * This source code is licensed under the license found in the LICENSE file in
+ * the root directory of this source tree.
+ *
+ * 
+ * @format
+ */ // Provides some extra commands on top of base Lsp.
+function shortenByOneCharacter({ newText, range }) {return { newText, range: { start: range.start, end: { line: range.end.line, character: range.end.character - 1 } } };}class CqueryLanguageClient extends (_LspLanguageService || _load_LspLanguageService()).LspLanguageService {
 
-// Provides some extra commands on top of base Lsp.
-class CqueryLanguageClient extends (_LspLanguageService || _load_LspLanguageService()).LspLanguageService {
-  constructor(...args) {
-    var _temp;
 
-    return _temp = super(...args), this._checkProject = _ => false, _temp;
-  }
+
+
+
 
   start() {
     // Workaround for https://github.com/babel/babel/issues/3930
     return super.start().then(() => this.startCquery());
   }
 
-  setProjectChecker(check) {
-    this._checkProject = check;
+  constructor(
+  logger,
+  fileCache,
+  host,
+  languageServerName,
+  command,
+  args,
+  spawnOptions = {},
+  projectRoot,
+  fileExtensions,
+  initializationOptions,
+  additionalLogFilesRetentionPeriod,
+  logFile,
+  progressInfo,
+  projectKey,
+  projectManager,
+  useOriginalEnvironment = false)
+  {
+    super(
+    logger,
+    fileCache,
+    host,
+    languageServerName,
+    command,
+    args,
+    spawnOptions,
+    projectRoot,
+    fileExtensions,
+    initializationOptions,
+    additionalLogFilesRetentionPeriod,
+    useOriginalEnvironment);
+
+    this._logFile = logFile;
+    this._progressInfo = progressInfo;
+    this._projectKey = projectKey;
+    this._projectManager = projectManager;
   }
 
-  setProgressInfo(info) {
-    this._progressInfo = info;
-  }
-
-  startCquery() {
-    var _this = this;
-
-    return (0, _asyncToGenerator.default)(function* () {
+  startCquery() {var _this = this;return (0, _asyncToGenerator.default)(function* () {
       const progressObservable = _rxjsBundlesRxMinJs.Observable.create(function (subscriber) {
-        _this._lspConnection._jsonRpcConnection.onNotification({ method: '$cquery/progress' }, function (args) {
+        _this._lspConnection._jsonRpcConnection.onNotification(
+        { method: '$cquery/progress' },
+        function (args) {
           const {
             indexRequestCount,
             doIdMapCount,
             loadPreviousIndexCount,
             onIdMappedCount,
-            onIndexedCount
-          } = args;
-          const total = indexRequestCount + doIdMapCount + loadPreviousIndexCount + onIdMappedCount + onIndexedCount;
+            onIndexedCount } =
+          args;
+          const total =
+          indexRequestCount +
+          doIdMapCount +
+          loadPreviousIndexCount +
+          onIdMappedCount +
+          onIndexedCount;
           subscriber.next(total);
         });
+
       }).distinctUntilChanged();
       if (_this._progressInfo != null) {
         const { id, label } = _this._progressInfo;
@@ -100,21 +147,20 @@ class CqueryLanguageClient extends (_LspLanguageService || _load_LspLanguageServ
             // label null clears the indicator.
             _this._handleProgressNotification({
               id: taggedId,
-              label: null
-            });
+              label: null });
+
             progressId++;
           } else {
             _this._handleProgressNotification({
               id: taggedId,
-              label: `cquery ${label}: ${totalJobs} jobs`
-            });
+              label: `cquery ${label}: ${totalJobs} jobs` });
+
           }
         });
       }
       // TODO pelmers Register handlers for other custom cquery messages.
       // TODO pelmers hook into refactorizer for renaming?
-    })();
-  }
+    })();}
 
   dispose() {
     if (this._progressSubscription != null) {
@@ -123,14 +169,18 @@ class CqueryLanguageClient extends (_LspLanguageService || _load_LspLanguageServ
     super.dispose();
   }
 
-  _createOutlineTreeHierarchy(list) {
+  _createOutlineTreeHierarchy(
+  list)
+  {
     return (0, (_CqueryOutlineParser || _load_CqueryOutlineParser()).parseOutlineTree)(list);
   }
 
   _executeCommand(command, args) {
     const cqueryEditCommands = new Set(['cquery._applyFixIt']);
     if (cqueryEditCommands.has(command) && args != null && args.length === 2) {
-      return this._applyEdit(...args).then(result => this._notifyOnFail(result, 'Cquery: apply edit failed'));
+      return this._applyEdit(...args).then(result =>
+      this._notifyOnFail(result, 'Cquery: apply edit failed'));
+
     } else {
       return super._executeCommand(command, args);
     }
@@ -157,8 +207,8 @@ class CqueryLanguageClient extends (_LspLanguageService || _load_LspLanguageServ
             outputCommands.push({
               command: 'cquery._applyFixIt',
               title: 'Insert ' + includeValue,
-              arguments: [file, [edit]]
-            });
+              arguments: [file, [edit]] });
+
           }
         }
       }
@@ -167,58 +217,124 @@ class CqueryLanguageClient extends (_LspLanguageService || _load_LspLanguageServ
   }
 
   _isFileInProject(file) {
-    return super._isFileInProject(file) && this._checkProject(file);
+    const project = this._projectManager.getProjectForFile(file);
+    const checkProject =
+    project != null ?
+    (_CqueryProjectManager || _load_CqueryProjectManager()).CqueryProjectManager.getProjectKey(project) === this._projectKey :
+    // TODO pelmers: header files aren't in the map because they do not
+    // appear in compile_commands.json, but they should be cached!
+    (0, (_utils || _load_utils()).isHeaderFile)(file);
+
+    return checkProject && super._isFileInProject(file);
   }
 
-  // TODO pelmers: override handleClose
-
-  _notifyOnFail(success, falseMessage) {
-    var _this2 = this;
-
-    return (0, _asyncToGenerator.default)(function* () {
-      if (!success) {
-        return _this2._host.dialogNotification('warning', falseMessage).refCount().toPromise();
+  observeDiagnostics() {
+    // Only emit diagnostics for files in the project.
+    return super.
+    observeDiagnostics().
+    refCount().
+    do(diagnosticMap => {
+      for (const [file] of diagnosticMap) {
+        if (!this._isFileInProject(file)) {
+          diagnosticMap.delete(file);
+        }
       }
-    })();
+    }).
+    publish();
+  }
+
+  _handleClose() {
+    (0, (_nuclideAnalytics || _load_nuclideAnalytics()).track)('lsp-handle-close', {
+      name: this._languageServerName,
+      projectKey: this._projectKey,
+      fileList: this._projectManager.getFilesInProject(this._projectKey) });
+
+    this._logger.error('Lsp.Close - will auto-restart');
+    this._host.consoleNotification(
+    this._languageServerName,
+    'warning',
+    `Automatically restarting ${this._languageServerName} for ${
+    this._projectKey
+    } after a crash`);
+
+    (_fsPromise || _load_fsPromise()).default.
+    readFile(this._logFile).
+    then(contents => {
+      const lines = contents.toString('utf8').split('\n');
+      // Find a line with 'stack trace' and take the rest (or up to 40 lines.)
+      let foundStackTrace = false;
+      const stackTraceLines = lines.filter(line => {
+        // the string 'Stack trace:' matches loguru.hpp:
+        // https://github.com/emilk/loguru/blob/master/loguru.hpp#L2424
+        foundStackTrace = foundStackTrace || line.startsWith('Stack trace:');
+        return foundStackTrace;
+      });
+      (0, (_nuclideAnalytics || _load_nuclideAnalytics()).track)('cquery-crash-trace', {
+        projectKey: this._projectKey,
+        trace: stackTraceLines.slice(0, 40).join('\n') });
+
+      // Restart now because otherwise the restart would overwrite the log file.
+      this._setState('Initial');
+      this.start();
+    }).
+    catch(err => {
+      this._host.consoleNotification(
+      this._languageServerName,
+      'error',
+      `Unable to restart ${this._languageServerName} because of ${err}`);
+
+    });
+  }
+
+  _notifyOnFail(success, falseMessage) {var _this2 = this;return (0, _asyncToGenerator.default)(function* () {
+      if (!success) {
+        return _this2._host.
+        dialogNotification('warning', falseMessage).
+        refCount().
+        toPromise();
+      }})();
   }
 
   // TODO pelmers(T25418348): remove when cquery implements workspace/applyEdit
   // track https://github.com/jacobdufault/cquery/issues/283
-  _applyEdit(file, edits) {
-    var _this3 = this;
+  _applyEdit(file, edits) {var _this3 = this;return (0, _asyncToGenerator.default)(function* () {
+      return _this3._host.applyTextEditsForMultipleFiles(
+      new Map([
+      [
+      (0, (_convert || _load_convert()).lspUri_localPath)(file),
+      (0, (_convert || _load_convert()).lspTextEdits_atomTextEdits)(edits.map(shortenByOneCharacter))]]));})();
 
-    return (0, _asyncToGenerator.default)(function* () {
-      return _this3._host.applyTextEditsForMultipleFiles(new Map([[(0, (_convert || _load_convert()).lspUri_localPath)(file), (0, (_convert || _load_convert()).lspTextEdits_atomTextEdits)(edits.map(shortenByOneCharacter))]]));
-    })();
+
+
   }
 
-  freshenIndex() {
-    var _this4 = this;
-
-    return (0, _asyncToGenerator.default)(function* () {
+  freshenIndex() {var _this4 = this;return (0, _asyncToGenerator.default)(function* () {
       // identical to vscode extension, https://git.io/vbUbQ
-      _this4._lspConnection._jsonRpcConnection.sendNotification('$cquery/freshenIndex', {});
-    })();
+      _this4._lspConnection._jsonRpcConnection.sendNotification(
+      '$cquery/freshenIndex',
+      {});})();
+
   }
 
-  requestLocationsCommand(methodName, path, point) {
-    var _this5 = this;
-
-    return (0, _asyncToGenerator.default)(function* () {
+  requestLocationsCommand(
+  methodName,
+  path,
+  point)
+  {var _this5 = this;return (0, _asyncToGenerator.default)(function* () {
       const position = (0, (_convert || _load_convert()).atomPoint_lspPosition)(point);
-      const response = yield _this5._lspConnection._jsonRpcConnection.sendRequest(methodName, {
+      const response = yield _this5._lspConnection._jsonRpcConnection.sendRequest(
+      methodName,
+      {
         textDocument: {
-          uri: (0, (_convert || _load_convert()).localPath_lspUri)(path)
-        },
-        position
-      });
-      return response == null ? [] : response.map(function ({ uri, range }) {
-        return {
+          uri: (0, (_convert || _load_convert()).localPath_lspUri)(path) },
+
+        position });
+
+
+      return response == null ?
+      [] :
+      response.map(function ({ uri, range }) {return {
           uri: (0, (_convert || _load_convert()).lspUri_localPath)(uri),
-          range: (0, (_convert || _load_convert()).lspRange_atomRange)(range)
-        };
-      });
-    })();
-  }
-}
-exports.CqueryLanguageClient = CqueryLanguageClient;
+          range: (0, (_convert || _load_convert()).lspRange_atomRange)(range) };});})();
+
+  }}exports.CqueryLanguageClient = CqueryLanguageClient;

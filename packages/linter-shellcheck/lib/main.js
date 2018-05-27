@@ -21,13 +21,9 @@ export default {
       atom.config.observe('linter-shellcheck.shellcheckExecutablePath', (value) => {
         this.executablePath = value;
       }),
-    );
-    this.subscriptions.add(
       atom.config.observe('linter-shellcheck.enableNotice', (value) => {
         this.enableNotice = value;
       }),
-    );
-    this.subscriptions.add(
       atom.config.observe('linter-shellcheck.userParameters', (value) => {
         this.userParameters = value.trim().split(' ').filter(Boolean);
       }),
@@ -48,18 +44,29 @@ export default {
       scope: 'file',
       lintOnFly: true,
       lint: (textEditor) => {
+        if (!atom.workspace.isTextEditor(textEditor)) {
+          return null;
+        }
+
         const filePath = textEditor.getPath();
+        if (!filePath) {
+          // TextEditor has no path associated with it (yet)
+          return null;
+        }
+
         const fileExt = path.extname(filePath);
         if (fileExt === '.zsh' || fileExt === '.zsh-theme') {
           // shellcheck does not support zsh
           return [];
         }
+
         const text = textEditor.getText();
         const cwd = path.dirname(filePath);
         const showAll = this.enableNotice;
         // The first -f parameter overrides any others
         const parameters = [].concat(['-f', 'gcc'], this.userParameters, ['-']);
         const options = { stdin: text, cwd, ignoreExitCode: true };
+
         return helpers.exec(this.executablePath, parameters, options).then((output) => {
           if (textEditor.getText() !== text) {
             // The text has changed since the lint was triggered, tell Linter not to update

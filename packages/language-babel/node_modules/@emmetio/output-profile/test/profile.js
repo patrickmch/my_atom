@@ -1,8 +1,7 @@
 'use strict';
 
 const assert = require('assert');
-require('babel-register');
-const Profile = require('../index').default;
+const Profile = require('../');
 
 describe('Profile', () => {
 	const attr = (name, value, options) => ({name, value, options: options || {}});

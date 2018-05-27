@@ -121,10 +121,10 @@ module.exports = _client => {
 
   remoteModule.createTunnel = function (arg0, arg1) {
     return Observable.fromPromise(_client.marshalArguments(Array.from(arguments), [{
-      name: "td",
+      name: "t",
       type: {
         kind: "named",
-        name: "TunnelDescriptor"
+        name: "ResolvedTunnel"
       }
     }, {
       name: "cf",
@@ -488,14 +488,14 @@ Object.defineProperty(module.exports, "defs", {
         discriminantField: "type"
       }
     },
-    TunnelDescriptor: {
+    ResolvedTunnel: {
       kind: "alias",
       location: {
         type: "source",
         fileName: "types.js",
         line: 18
       },
-      name: "TunnelDescriptor",
+      name: "ResolvedTunnel",
       definition: {
         kind: "object",
         fields: [{
@@ -531,10 +531,10 @@ Object.defineProperty(module.exports, "defs", {
         },
         kind: "function",
         argumentTypes: [{
-          name: "td",
+          name: "t",
           type: {
             kind: "named",
-            name: "TunnelDescriptor"
+            name: "ResolvedTunnel"
           }
         }, {
           name: "cf",

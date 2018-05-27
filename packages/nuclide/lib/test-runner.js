@@ -1,30 +1,26 @@
-'use strict';
+'use strict';Object.defineProperty(exports, "__esModule", { value: true });var _asyncToGenerator = _interopRequireDefault(require('async-to-generator'));
 
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
 
-var _asyncToGenerator = _interopRequireDefault(require('async-to-generator'));
+
+
+
+
+
+
+
+
+
+
 
 var _console = require('console');
-
 var _electron = _interopRequireDefault(require('electron'));
+var _fs = _interopRequireDefault(require('fs'));var _testHelpers;
+function _load_testHelpers() {return _testHelpers = require('../modules/nuclide-commons/test-helpers');}
 
-var _fs = _interopRequireDefault(require('fs'));
 
-var _testHelpers;
+var _path = _interopRequireDefault(require('path'));function _interopRequireDefault(obj) {return obj && obj.__esModule ? obj : { default: obj };}
 
-function _load_testHelpers() {
-  return _testHelpers = require('nuclide-commons/test-helpers');
-}
-
-var _path = _interopRequireDefault(require('path'));
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-const { ipcRenderer } = _electron.default;
-
-// eslint-disable-next-line rulesdir/prefer-nuclide-uri
+const { ipcRenderer } = _electron.default; // eslint-disable-next-line nuclide-internal/prefer-nuclide-uri
 /**
  * Copyright (c) 2015-present, Facebook, Inc.
  * All rights reserved.
@@ -34,40 +30,27 @@ const { ipcRenderer } = _electron.default;
  *
  * 
  * @format
- */
-
-if (!(ipcRenderer != null)) {
-  throw new Error('Invariant violation: "ipcRenderer != null"');
-}
-
-// Patch `console` to output through the main process.
-
-
-global.console = new _console.Console(
-/* stdout */{
-  write(chunk) {
-    ipcRenderer.send('write-to-stdout', chunk);
-  }
-},
-/* stderr */{
-  write(chunk) {
+ */if (!(ipcRenderer != null)) {throw new Error('Invariant violation: "ipcRenderer != null"');} // Patch `console` to output through the main process.
+global.console = new _console.Console( /* stdout */{ write(chunk) {ipcRenderer.send('write-to-stdout', chunk);} }, /* stderr */{ write(chunk) {
     ipcRenderer.send('write-to-stderr', chunk);
-  }
-});
+  } });
 
-const integrationTestsDir = _path.default.join(__dirname, '../spec');
 
-exports.default = (() => {
-  var _ref = (0, _asyncToGenerator.default)(function* (params) {
-    const isIntegrationTest = params.testPaths.some(function (testPath) {
-      return testPath.startsWith(integrationTestsDir);
-    });
+
+const integrationTestsDir = _path.default.join(__dirname, '../spec');exports.default = (() => {var _ref = (0, _asyncToGenerator.default)(
+
+  function* (params) {
+    const isIntegrationTest = params.testPaths.some(function (testPath) {return (
+        testPath.startsWith(integrationTestsDir));});
+
     const isApmTest = !isIntegrationTest;
 
     // It's assumed that all of the tests belong to the same package.
     const pkg = getPackage(params.testPaths[0]);
     if (pkg == null) {
-      throw new Error(`Couldn't find a parent "package.json" for ${params.testPaths[0]}`);
+      throw new Error(
+      `Couldn't find a parent "package.json" for ${params.testPaths[0]}`);
+
     }
     const nuclideConfig = pkg.atomConfig || pkg.nuclide && pkg.nuclide.config;
 
@@ -86,7 +69,7 @@ exports.default = (() => {
         if (isIntegrationTest) {
           jasmine.getEnv().beforeEach(() => {
             // Integration tests have to activate all Nuclide packages.
-            jasmine.getEnv().defaultTimeoutInterval = 10000;
+            jasmine.getEnv().defaultTimeoutInterval = 20000;
             // If we're running integration tests in parallel, double the timeout.
             if (process.env.SANDCASTLE === '1') {
               jasmine.getEnv().defaultTimeoutInterval *= 2;
@@ -102,7 +85,9 @@ exports.default = (() => {
 
           jasmine.getEnv().afterEach(() => {
             if (atomGlobal.confirm.calls.length) {
-              const details = atomGlobal.confirm.argsForCall.map((args, i) => `call #${i} with ${JSON.stringify(args)}`);
+              const details = atomGlobal.confirm.argsForCall.map(
+              (args, i) => `call #${i} with ${JSON.stringify(args)}`);
+
               throw new Error('atom.confirm was called.\n' + details);
             }
           });
@@ -114,14 +99,17 @@ exports.default = (() => {
             // and it doesn't load for unit tests, it's necessary to manually
             // construct any default config that they define.
             Object.keys(nuclideConfig).forEach(key => {
-              atomGlobal.config.setSchema(`${pkg.name}.${key}`, nuclideConfig[key]);
+              atomGlobal.config.setSchema(
+              `${pkg.name}.${key}`,
+              nuclideConfig[key]);
+
             });
           });
         }
 
         return atomGlobal;
-      }
-    });
+      } });
+
 
     yield new Promise(function (resolve) {
       const temp = require('temp');
@@ -132,7 +120,7 @@ exports.default = (() => {
           resolve();
           if (err && err.message !== 'not tracking') {
             // eslint-disable-next-line no-console
-            console.log(`temp.cleanup() failed. ${err}`);
+            console.log('temp.cleanup() failed.', err);
           }
         });
       } else {
@@ -143,12 +131,7 @@ exports.default = (() => {
     });
 
     return statusCode;
-  });
-
-  return function (_x) {
-    return _ref.apply(this, arguments);
-  };
-})();
+  });return function (_x) {return _ref.apply(this, arguments);};})();
 
 function getPackage(start) {
   let current = _path.default.resolve(start);

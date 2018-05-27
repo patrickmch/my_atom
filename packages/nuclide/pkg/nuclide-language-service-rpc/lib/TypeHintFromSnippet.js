@@ -1,10 +1,20 @@
-'use strict';
+'use strict';Object.defineProperty(exports, "__esModule", { value: true });exports.
 
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-exports.typeHintFromSnippet = typeHintFromSnippet;
-function typeHintFromSnippet(snippet, range) {
+
+
+
+
+
+
+
+
+
+
+
+typeHintFromSnippet = typeHintFromSnippet;function typeHintFromSnippet(
+snippet,
+range)
+{
   return { hint: [{ type: 'snippet', value: snippet }], range };
 } /**
    * Copyright (c) 2015-present, Facebook, Inc.
@@ -13,6 +23,6 @@ function typeHintFromSnippet(snippet, range) {
    * This source code is licensed under the license found in the LICENSE file in
    * the root directory of this source tree.
    *
-   * 
+   *  strict
    * @format
    */

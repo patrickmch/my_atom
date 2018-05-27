@@ -1,41 +1,55 @@
-'use strict';
+'use strict';Object.defineProperty(exports, "__esModule", { value: true });var _nullthrows;
 
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
 
-var _vscodeDebugprotocol;
 
-function _load_vscodeDebugprotocol() {
-  return _vscodeDebugprotocol = _interopRequireWildcard(require('vscode-debugprotocol'));
-}
 
-function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
+
+
+
+
+
+
+
+function _load_nullthrows() {return _nullthrows = _interopRequireDefault(require('nullthrows'));}function _interopRequireDefault(obj) {return obj && obj.__esModule ? obj : { default: obj };}
 
 class Breakpoint {
 
-  // verified tracks if the breakpoint was successfully set by the adapter.
-  // it may not be if the referenced code was not yet loaded
 
-  // index is the name of the breakpoint we show externally in the UI
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  // The line number of the breakpoint (which may be undefined if we have an
+  // unresolved function breakpoint.)
+  // enabled tracks if the breakpoint has been enabled or disabled by the user.
+  // id is the attached breakpoint in the adapter (if the adapter supports it)
+
+
+
+
   constructor(index) {
     this._index = index;
     this._verified = false;
     this._enabled = true;
-  }
-
-  // enabled tracks if the breakpoint has been enabled or disabled by the user.
-
-
-  // id is the attached breakpoint in the adapter (if the adapter supports it)
-
-
-  get index() {
-    return this._index;
-  }
-
-  get id() {
-    return this._id;
+  } // The function name of the breakpoint (only defined if the breakpoint is
+  // a function breakpoint.)
+  // The source file of the breakpoint (which may be undefined if we have an
+  // unresolved function breakpoint.)
+  // verified tracks if the breakpoint was successfully set by the adapter.
+  // it may not be if the referenced code was not yet loaded
+  // index is the name of the breakpoint we show externally in the UI
+  get index() {return this._index;}get id() {return this._id;
   }
 
   setId(id) {
@@ -58,35 +72,49 @@ class Breakpoint {
     return this._enabled;
   }
 
+  setPath(path) {
+    this._path = path;
+  }
+
   get path() {
-    return null;
+    return this._path;
+  }
+
+  setLine(line) {
+    this._line = line;
   }
 
   get line() {
-    return -1;
+    return this._line;
+  }
+
+  setFunc(func) {
+    this._func = func;
+  }
+
+  get func() {
+    return this._func;
   }
 
   toString() {
-    if (!false) {
-      throw new Error('Breakpoint subclasses must implement toString()');
-    }
-  }
+    const func = this._func;
 
-  toProtocolBreakpoint() {
-    return {
-      verified: this._verified,
-      line: this.line
-    };
-  }
-}
-exports.default = Breakpoint; /**
-                               * Copyright (c) 2017-present, Facebook, Inc.
-                               * All rights reserved.
-                               *
-                               * This source code is licensed under the BSD-style license found in the
-                               * LICENSE file in the root directory of this source tree. An additional grant
-                               * of patent rights can be found in the PATENTS file in the same directory.
-                               *
-                               * 
-                               * @format
-                               */
+    if (func != null) {
+      if (this._path == null || this._line == null) {
+        return `${func}()`;
+      }
+      return `${func}() [${this._path}:${this._line}]`;
+    }
+
+    return `${(0, (_nullthrows || _load_nullthrows()).default)(this._path)}:${(0, (_nullthrows || _load_nullthrows()).default)(this._line)}`;
+  }}exports.default = Breakpoint; /**
+                                   * Copyright (c) 2017-present, Facebook, Inc.
+                                   * All rights reserved.
+                                   *
+                                   * This source code is licensed under the BSD-style license found in the
+                                   * LICENSE file in the root directory of this source tree. An additional grant
+                                   * of patent rights can be found in the PATENTS file in the same directory.
+                                   *
+                                   * 
+                                   * @format
+                                   */

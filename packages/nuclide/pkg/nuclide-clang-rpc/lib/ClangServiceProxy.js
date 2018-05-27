@@ -27,14 +27,12 @@ module.exports = _client => {
         }
       }
     }, {
-      name: "defaultFlags",
+      name: "defaultSettings",
       type: {
         kind: "nullable",
         type: {
-          kind: "array",
-          type: {
-            kind: "string"
-          }
+          kind: "named",
+          name: "ClangServerSettings"
         }
       }
     }])).switchMap(args => {
@@ -92,14 +90,12 @@ module.exports = _client => {
         }
       }
     }, {
-      name: "defaultFlags",
+      name: "defaultSettings",
       type: {
         kind: "nullable",
         type: {
-          kind: "array",
-          type: {
-            kind: "string"
-          }
+          kind: "named",
+          name: "ClangServerSettings"
         }
       }
     }]).then(args => {
@@ -150,14 +146,12 @@ module.exports = _client => {
         }
       }
     }, {
-      name: "defaultFlags",
+      name: "defaultSettings",
       type: {
         kind: "nullable",
         type: {
-          kind: "array",
-          type: {
-            kind: "string"
-          }
+          kind: "named",
+          name: "ClangServerSettings"
         }
       }
     }]).then(args => {
@@ -205,14 +199,12 @@ module.exports = _client => {
         }
       }
     }, {
-      name: "defaultFlags",
+      name: "defaultSettings",
       type: {
         kind: "nullable",
         type: {
-          kind: "array",
-          type: {
-            kind: "string"
-          }
+          kind: "named",
+          name: "ClangServerSettings"
         }
       }
     }]).then(args => {
@@ -282,14 +274,12 @@ module.exports = _client => {
         }
       }
     }, {
-      name: "defaultFlags",
+      name: "defaultSettings",
       type: {
         kind: "nullable",
         type: {
-          kind: "array",
-          type: {
-            kind: "string"
-          }
+          kind: "named",
+          name: "ClangServerSettings"
         }
       }
     }]).then(args => {
@@ -340,14 +330,12 @@ module.exports = _client => {
         }
       }
     }, {
-      name: "defaultFlags",
+      name: "defaultSettings",
       type: {
         kind: "nullable",
         type: {
-          kind: "array",
-          type: {
-            kind: "string"
-          }
+          kind: "named",
+          name: "ClangServerSettings"
         }
       }
     }]).then(args => {
@@ -754,7 +742,7 @@ Object.defineProperty(module.exports, "defs", {
       location: {
         type: "source",
         fileName: "rpc-types.js",
-        line: 119
+        line: 124
       },
       name: "ClangCompilationDatabase",
       definition: {
@@ -825,19 +813,53 @@ Object.defineProperty(module.exports, "defs", {
         }]
       }
     },
+    ClangServerSettings: {
+      kind: "alias",
+      location: {
+        type: "source",
+        fileName: "rpc-types.js",
+        line: 119
+      },
+      name: "ClangServerSettings",
+      definition: {
+        kind: "object",
+        fields: [{
+          name: "defaultFlags",
+          type: {
+            kind: "nullable",
+            type: {
+              kind: "array",
+              type: {
+                kind: "string"
+              }
+            }
+          },
+          optional: false
+        }, {
+          name: "libclangPath",
+          type: {
+            kind: "nullable",
+            type: {
+              kind: "string"
+            }
+          },
+          optional: false
+        }]
+      }
+    },
     compile: {
       kind: "function",
       name: "compile",
       location: {
         type: "source",
         fileName: "ClangService.js",
-        line: 118
+        line: 119
       },
       type: {
         location: {
           type: "source",
           fileName: "ClangService.js",
-          line: 118
+          line: 119
         },
         kind: "function",
         argumentTypes: [{
@@ -861,14 +883,12 @@ Object.defineProperty(module.exports, "defs", {
             }
           }
         }, {
-          name: "defaultFlags",
+          name: "defaultSettings",
           type: {
             kind: "nullable",
             type: {
-              kind: "array",
-              type: {
-                kind: "string"
-              }
+              kind: "named",
+              name: "ClangServerSettings"
             }
           }
         }],
@@ -970,13 +990,13 @@ Object.defineProperty(module.exports, "defs", {
       location: {
         type: "source",
         fileName: "ClangService.js",
-        line: 140
+        line: 141
       },
       type: {
         location: {
           type: "source",
           fileName: "ClangService.js",
-          line: 140
+          line: 141
         },
         kind: "function",
         argumentTypes: [{
@@ -1020,14 +1040,12 @@ Object.defineProperty(module.exports, "defs", {
             }
           }
         }, {
-          name: "defaultFlags",
+          name: "defaultSettings",
           type: {
             kind: "nullable",
             type: {
-              kind: "array",
-              type: {
-                kind: "string"
-              }
+              kind: "named",
+              name: "ClangServerSettings"
             }
           }
         }],
@@ -1104,13 +1122,13 @@ Object.defineProperty(module.exports, "defs", {
       location: {
         type: "source",
         fileName: "ClangService.js",
-        line: 167
+        line: 168
       },
       type: {
         location: {
           type: "source",
           fileName: "ClangService.js",
-          line: 167
+          line: 168
         },
         kind: "function",
         argumentTypes: [{
@@ -1144,14 +1162,12 @@ Object.defineProperty(module.exports, "defs", {
             }
           }
         }, {
-          name: "defaultFlags",
+          name: "defaultSettings",
           type: {
             kind: "nullable",
             type: {
-              kind: "array",
-              type: {
-                kind: "string"
-              }
+              kind: "named",
+              name: "ClangServerSettings"
             }
           }
         }],
@@ -1240,13 +1256,13 @@ Object.defineProperty(module.exports, "defs", {
       location: {
         type: "source",
         fileName: "ClangService.js",
-        line: 189
+        line: 190
       },
       type: {
         location: {
           type: "source",
           fileName: "ClangService.js",
-          line: 189
+          line: 190
         },
         kind: "function",
         argumentTypes: [{
@@ -1280,14 +1296,12 @@ Object.defineProperty(module.exports, "defs", {
             }
           }
         }, {
-          name: "defaultFlags",
+          name: "defaultSettings",
           type: {
             kind: "nullable",
             type: {
-              kind: "array",
-              type: {
-                kind: "string"
-              }
+              kind: "named",
+              name: "ClangServerSettings"
             }
           }
         }],
@@ -1312,13 +1326,13 @@ Object.defineProperty(module.exports, "defs", {
       location: {
         type: "source",
         fileName: "ClangService.js",
-        line: 208
+        line: 209
       },
       type: {
         location: {
           type: "source",
           fileName: "ClangService.js",
-          line: 208
+          line: 209
         },
         kind: "function",
         argumentTypes: [{
@@ -1422,13 +1436,13 @@ Object.defineProperty(module.exports, "defs", {
       location: {
         type: "source",
         fileName: "ClangService.js",
-        line: 220
+        line: 221
       },
       type: {
         location: {
           type: "source",
           fileName: "ClangService.js",
-          line: 220
+          line: 221
         },
         kind: "function",
         argumentTypes: [{
@@ -1452,14 +1466,12 @@ Object.defineProperty(module.exports, "defs", {
             }
           }
         }, {
-          name: "defaultFlags",
+          name: "defaultSettings",
           type: {
             kind: "nullable",
             type: {
-              kind: "array",
-              type: {
-                kind: "string"
-              }
+              kind: "named",
+              name: "ClangServerSettings"
             }
           }
         }],
@@ -1519,13 +1531,13 @@ Object.defineProperty(module.exports, "defs", {
       location: {
         type: "source",
         fileName: "ClangService.js",
-        line: 238
+        line: 239
       },
       type: {
         location: {
           type: "source",
           fileName: "ClangService.js",
-          line: 238
+          line: 239
         },
         kind: "function",
         argumentTypes: [{
@@ -1559,14 +1571,12 @@ Object.defineProperty(module.exports, "defs", {
             }
           }
         }, {
-          name: "defaultFlags",
+          name: "defaultSettings",
           type: {
             kind: "nullable",
             type: {
-              kind: "array",
-              type: {
-                kind: "string"
-              }
+              kind: "named",
+              name: "ClangServerSettings"
             }
           }
         }],
@@ -1588,13 +1598,13 @@ Object.defineProperty(module.exports, "defs", {
       location: {
         type: "source",
         fileName: "ClangService.js",
-        line: 258
+        line: 259
       },
       type: {
         location: {
           type: "source",
           fileName: "ClangService.js",
-          line: 258
+          line: 259
         },
         kind: "function",
         argumentTypes: [{
@@ -1657,13 +1667,13 @@ Object.defineProperty(module.exports, "defs", {
       location: {
         type: "source",
         fileName: "ClangService.js",
-        line: 312
+        line: 313
       },
       type: {
         location: {
           type: "source",
           fileName: "ClangService.js",
-          line: 312
+          line: 313
         },
         kind: "function",
         argumentTypes: [{
@@ -1693,7 +1703,7 @@ Object.defineProperty(module.exports, "defs", {
       location: {
         type: "source",
         fileName: "rpc-types.js",
-        line: 134
+        line: 139
       },
       name: "ClangFlags",
       definition: {
@@ -1731,13 +1741,13 @@ Object.defineProperty(module.exports, "defs", {
       location: {
         type: "source",
         fileName: "ClangService.js",
-        line: 325
+        line: 326
       },
       type: {
         location: {
           type: "source",
           fileName: "ClangService.js",
-          line: 325
+          line: 326
         },
         kind: "function",
         argumentTypes: [{
@@ -1775,13 +1785,13 @@ Object.defineProperty(module.exports, "defs", {
       location: {
         type: "source",
         fileName: "ClangService.js",
-        line: 348
+        line: 349
       },
       type: {
         location: {
           type: "source",
           fileName: "ClangService.js",
-          line: 348
+          line: 349
         },
         kind: "function",
         argumentTypes: [{
@@ -1802,13 +1812,13 @@ Object.defineProperty(module.exports, "defs", {
       location: {
         type: "source",
         fileName: "ClangService.js",
-        line: 355
+        line: 356
       },
       type: {
         location: {
           type: "source",
           fileName: "ClangService.js",
-          line: 355
+          line: 356
         },
         kind: "function",
         argumentTypes: [],
@@ -1823,13 +1833,13 @@ Object.defineProperty(module.exports, "defs", {
       location: {
         type: "source",
         fileName: "ClangService.js",
-        line: 359
+        line: 360
       },
       type: {
         location: {
           type: "source",
           fileName: "ClangService.js",
-          line: 359
+          line: 360
         },
         kind: "function",
         argumentTypes: [],
@@ -1844,13 +1854,13 @@ Object.defineProperty(module.exports, "defs", {
       location: {
         type: "source",
         fileName: "ClangService.js",
-        line: 363
+        line: 364
       },
       type: {
         location: {
           type: "source",
           fileName: "ClangService.js",
-          line: 363
+          line: 364
         },
         kind: "function",
         argumentTypes: [{

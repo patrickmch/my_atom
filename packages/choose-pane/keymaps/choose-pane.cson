@@ -1,3 +1,0 @@
-'atom-text-editor#choose-pane-editor':
-  '[': 'choose-pane:previous-item'
-  ']': 'choose-pane:next-item'

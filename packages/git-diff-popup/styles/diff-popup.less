@@ -1,0 +1,98 @@
+
+@import "ui-variables";
+
+atom-text-editor::shadow .gutter .line-number .icon-right.dif-pop-marker:before {
+  visibility: visible;
+  content:    "\f05e";
+}
+
+.git-diff-popup {
+  visibility:   hidden;
+  position:     absolute;
+	width:				auto;
+	top: 					auto;
+  right:        auto;
+  bottom:       auto;
+	left: 				auto;
+  margin:       0;
+  border:       1px solid gray;
+  
+  .git-diff-popup-toolbar {
+    position:relative;
+    top: -1em;
+    left: 0.2em;
+    height: 0.5em;
+    user-select: none;
+    
+    .drag-bkgd {
+      width: 100%;
+      height: 1px;
+      margin-top: 3px;
+      background-color:  rgba(128,128,128,0.5);
+      user-select: none;
+    }
+    
+    .btns {
+      position: absolute;
+      top:   -0.3em;
+      right:  0.0em;
+    
+      .btn, .icon-git {
+        position: relative;
+        margin-left: .2em;
+        height: 1.2em;
+        line-height: 1.3em;
+        font-family: "fontello";
+        font-style: normal;
+        font-weight: normal;
+        font-variant: normal;
+        text-transform: none;
+        font-size: 120%;
+      }
+      .icon-git {
+        margin-right: 0.55em;
+      }
+    }
+  }
+  
+  .diff-text-outer {
+    position: relative;
+    clear: both;
+    float:left;
+    min-width: 280px;
+    min-height: 40px;
+    
+		display:	inline-block;
+    overflow: auto;
+    
+    .diff-text {
+			display: inline-block;
+    }
+  }
+}
+
+@font-face {
+  font-family: 'fontello';
+  src: url('atom://git-diff-popup/font/fontello.woff') format('woff');
+  font-weight: normal;
+  font-style: normal;
+}
+
+.git-diff-popup .git-diff-popup-toolbar .icon-git:before { content: '\e800'; } /* '' */
+.git-diff-popup .git-diff-popup-toolbar .icon-reply:before { content: '\e801'; } /* '' */
+.git-diff-popup .git-diff-popup-toolbar .icon-cancel:before { content: '\e802'; } /* '' */
+.git-diff-popup .git-diff-popup-toolbar .icon-right-big:before { content: '\e803'; } /* '' */
+.git-diff-popup .git-diff-popup-toolbar .icon-left-big:before { content: '\e804'; } /* '' */
+.git-diff-popup .git-diff-popup-toolbar .icon-play:before { content: '\e805'; } /* '' */
+.git-diff-popup .git-diff-popup-toolbar .icon-history:before { content: '\e806'; } /* '' */
+.git-diff-popup .git-diff-popup-toolbar .icon-right-open:before { content: '\e807'; } /* '' */
+.git-diff-popup .git-diff-popup-toolbar .icon-left-open:before { content: '\e808'; } /* '' */
+.git-diff-popup .git-diff-popup-toolbar .icon-cancel-circled:before { content: '\e809'; } /* '' */
+.git-diff-popup .git-diff-popup-toolbar .icon-docs:before { content: '\e80a'; } /* '' */
+.git-diff-popup .git-diff-popup-toolbar .icon-angle-circled-left:before { content: '\e80b'; } /* '' */
+.git-diff-popup .git-diff-popup-toolbar .icon-angle-circled-right:before { content: '\e80c'; } /* '' */
+.git-diff-popup .git-diff-popup-toolbar .icon-right-circled:before { content: '\e80d'; } /* '' */
+.git-diff-popup .git-diff-popup-toolbar .icon-left-circled:before { content: '\e80e'; } /* '' */
+.git-diff-popup .git-diff-popup-toolbar .icon-fork:before { content: '\e80f'; } /* '' */
+.git-diff-popup .git-diff-popup-toolbar .icon-git-squared:before { content: '\e810'; } /* '' */
+

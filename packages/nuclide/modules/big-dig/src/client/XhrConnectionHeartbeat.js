@@ -1,53 +1,52 @@
-'use strict';
+'use strict';Object.defineProperty(exports, "__esModule", { value: true });exports.XhrConnectionHeartbeat = undefined;var _asyncToGenerator = _interopRequireDefault(require('async-to-generator'));var _asyncRequest;
 
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-exports.XhrConnectionHeartbeat = undefined;
 
-var _asyncToGenerator = _interopRequireDefault(require('async-to-generator'));
 
-var _asyncRequest;
 
-function _load_asyncRequest() {
-  return _asyncRequest = _interopRequireDefault(require('./utils/asyncRequest'));
-}
 
-var _eventKit;
 
-function _load_eventKit() {
-  return _eventKit = require('event-kit');
-}
 
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-/**
- * Copyright (c) 2017-present, Facebook, Inc.
- * All rights reserved.
- *
- * This source code is licensed under the BSD-style license found in the
- * LICENSE file in the root directory of this source tree. An additional grant
- * of patent rights can be found in the PATENTS file in the same directory.
- *
- * 
- * @format
- */
 
-const HEARTBEAT_INTERVAL_MS = 10000;
-const HEARTBEAT_TIMEOUT_MS = 10000;
-const MAX_HEARTBEAT_AWAY_RECONNECT_MS = 60000;
 
-class XhrConnectionHeartbeat {
 
-  constructor(serverUri, heartbeatChannel, agentOptions) {
+
+
+function _load_asyncRequest() {return _asyncRequest = _interopRequireDefault(require('./utils/asyncRequest'));}var _eventKit;
+function _load_eventKit() {return _eventKit = require('event-kit');}var _log4js;
+function _load_log4js() {return _log4js = require('log4js');}var _promise;
+function _load_promise() {return _promise = require('../../../nuclide-commons/promise');}function _interopRequireDefault(obj) {return obj && obj.__esModule ? obj : { default: obj };} /**
+                                                                                                                                                                                        * Copyright (c) 2017-present, Facebook, Inc.
+                                                                                                                                                                                        * All rights reserved.
+                                                                                                                                                                                        *
+                                                                                                                                                                                        * This source code is licensed under the BSD-style license found in the
+                                                                                                                                                                                        * LICENSE file in the root directory of this source tree. An additional grant
+                                                                                                                                                                                        * of patent rights can be found in the PATENTS file in the same directory.
+                                                                                                                                                                                        *
+                                                                                                                                                                                        *  strict-local
+                                                                                                                                                                                        * @format
+                                                                                                                                                                                        */const HEARTBEAT_INTERVAL_MS = 10000;const HEARTBEAT_TIMEOUT_MS = 10000;const MAX_HEARTBEAT_AWAY_RECONNECT_MS = 60000;const CERT_NOT_YET_VALID_DELAY = 3000;const CERT_NOT_YET_VALID_RETRIES = 3;class XhrConnectionHeartbeat {
+
+
+
+
+
+
+  constructor(
+  serverUri,
+  heartbeatChannel,
+  agentOptions)
+  {
     this._heartbeatConnectedOnce = false;
     this._lastHeartbeat = null;
     this._lastHeartbeatTime = null;
     const options = {
       uri: `${serverUri}/${heartbeatChannel}`,
       method: 'POST',
-      timeout: HEARTBEAT_TIMEOUT_MS
-    };
+      timeout: HEARTBEAT_TIMEOUT_MS,
+      // We're trying this to see if it resolves T28442202
+      forever: true };
+
     if (agentOptions != null) {
       options.agentOptions = agentOptions;
     }
@@ -59,30 +58,47 @@ class XhrConnectionHeartbeat {
 
   _monitorServerHeartbeat() {
     this._heartbeat();
-    this._heartbeatInterval = setInterval(() => this._heartbeat(), HEARTBEAT_INTERVAL_MS);
+    this._heartbeatInterval = setInterval(
+    () => this._heartbeat(),
+    HEARTBEAT_INTERVAL_MS);
+
   }
 
   // Returns version
-  sendHeartBeat() {
-    var _this = this;
+  sendHeartBeat() {var _this = this;return (0, _asyncToGenerator.default)(function* () {
+      let retries = CERT_NOT_YET_VALID_RETRIES;
+      while (true) {
+        try {
+          // eslint-disable-next-line no-await-in-loop
+          const { body } = yield (0, (_asyncRequest || _load_asyncRequest()).default)(_this._options);
+          return body;
+        } catch (err) {
+          if (retries-- > 0 && err.code === 'CERT_NOT_YET_VALID') {
+            (0, (_log4js || _load_log4js()).getLogger)('XhrConnectionHeartbeat').warn(
+            `Certificate not yet valid, retrying after ${CERT_NOT_YET_VALID_DELAY}ms...`);
 
-    return (0, _asyncToGenerator.default)(function* () {
-      const { body } = yield (0, (_asyncRequest || _load_asyncRequest()).default)(_this._options);
-      return body;
-    })();
+            // eslint-disable-next-line no-await-in-loop
+            yield (0, (_promise || _load_promise()).sleep)(CERT_NOT_YET_VALID_DELAY);
+          } else {
+            throw err;
+          }
+        }
+      }
+      // eslint-disable-next-line no-unreachable
+      throw Error('unreachable');})();
   }
 
-  _heartbeat() {
-    var _this2 = this;
-
-    return (0, _asyncToGenerator.default)(function* () {
+  _heartbeat() {var _this2 = this;return (0, _asyncToGenerator.default)(function* () {
       try {
         yield _this2.sendHeartBeat();
         _this2._heartbeatConnectedOnce = true;
         const now = Date.now();
         // flowlint-next-line sketchy-null-number:off
         _this2._lastHeartbeatTime = _this2._lastHeartbeatTime || now;
-        if (_this2._lastHeartbeat === 'away' || now - _this2._lastHeartbeatTime > MAX_HEARTBEAT_AWAY_RECONNECT_MS) {
+        if (
+        _this2._lastHeartbeat === 'away' ||
+        now - _this2._lastHeartbeatTime > MAX_HEARTBEAT_AWAY_RECONNECT_MS)
+        {
           // Trigger a websocket reconnect.
           _this2._emitter.emit('reconnect');
         }
@@ -127,18 +143,23 @@ class XhrConnectionHeartbeat {
             break;
           default:
             code = originalCode;
-            break;
-        }
+            break;}
+
         _this2._emitter.emit('heartbeat.error', { code, originalCode, message });
-      }
-    })();
+      }})();
   }
 
   onHeartbeat(callback) {
     return this._emitter.on('heartbeat', callback);
   }
 
-  onHeartbeatError(callback) {
+  onHeartbeatError(
+  callback)
+
+
+
+
+  {
     return this._emitter.on('heartbeat.error', callback);
   }
 
@@ -146,10 +167,12 @@ class XhrConnectionHeartbeat {
     return this._emitter.on('reconnect', callback);
   }
 
+  isAway() {
+    return this._lastHeartbeat === 'away';
+  }
+
   close() {
     if (this._heartbeatInterval != null) {
       clearInterval(this._heartbeatInterval);
     }
-  }
-}
-exports.XhrConnectionHeartbeat = XhrConnectionHeartbeat;
+  }}exports.XhrConnectionHeartbeat = XhrConnectionHeartbeat;

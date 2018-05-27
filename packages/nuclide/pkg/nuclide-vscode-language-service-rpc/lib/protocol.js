@@ -1,8 +1,63 @@
-'use strict';
+'use strict';Object.defineProperty(exports, "__esModule", { value: true });
 
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 const DiagnosticSeverity = exports.DiagnosticSeverity = {
   // Reports an error.
   Error: 1,
@@ -11,23 +66,65 @@ const DiagnosticSeverity = exports.DiagnosticSeverity = {
   // Reports an information.
   Information: 3,
   // Reports a hint.
-  Hint: 4
-}; /**
-    * Copyright (c) 2015-present, Facebook, Inc.
-    * All rights reserved.
-    *
-    * This source code is licensed under the license found in the LICENSE file in
-    * the root directory of this source tree.
-    *
-    * 
-    * @format
-    */
-
-// Flow definitions for Microsoft's Language Server Protocol
+  Hint: 4 }; /**
+              * Copyright (c) 2015-present, Facebook, Inc.
+              * All rights reserved.
+              *
+              * This source code is licensed under the license found in the LICENSE file in
+              * the root directory of this source tree.
+              *
+              * 
+              * @format
+              */ // Flow definitions for Microsoft's Language Server Protocol
 // https://github.com/Microsoft/language-server-protocol/blob/master/protocol.md
 // https://github.com/Microsoft/language-server-protocol/blob/master/versions/protocol-2-x.md
-
 // Structures
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 // General
 
@@ -41,13 +138,176 @@ const ErrorCodes = exports.ErrorCodes = {
   serverErrorEnd: -32000,
   ServerNotInitialized: -32002,
   UnknownErrorCode: -32001,
-  RequestCancelled: -32800
-};
+  // eslint-disable-next-line nuclide-internal/api-spelling
+  RequestCancelled: -32800 };
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 //  Workspace specific client capabilities.
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 //  Text document specific client capabilities.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 // Defines how the host (editor) should sync document changes to the language server.
@@ -58,34 +318,185 @@ const TextDocumentSyncKind = exports.TextDocumentSyncKind = {
   Full: 1,
   //  Documents are synced by sending the full content on open. After that only incremental
   //  updates to the document are sent.
-  Incremental: 2
-};
+  Incremental: 2 };
+
 
 // Completion options.
+
+
+
+
+
 
 
 // Signature help options.
 
 
+
+
+
 // Code Lens options.
+
+
+
 
 
 // Format document on type options
 
 
+
+
+
+
+
 // Save options.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 // Document
 
+
+
+
+
+
+
+
 // Represents a collection of [completion items](#CompletionItem) to be presented in the editor.
+
+
+
+
+
 
 
 // Defines whether the insert text in a completion item should be interpreted as plain text or a snippet.
 const InsertTextFormat = exports.InsertTextFormat = {
   PlainText: 1,
-  Snippet: 2
-};
+  Snippet: 2 };
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 // The kind of a completion entry.
 const CompletionItemKind = exports.CompletionItemKind = {
@@ -106,10 +517,16 @@ const CompletionItemKind = exports.CompletionItemKind = {
   Snippet: 15,
   Color: 16,
   File: 17,
-  Reference: 18
-};
+  Reference: 18 };
+
 
 // The result of a hover request.
+
+
+
+
+
+
 
 
 /**
@@ -125,44 +542,95 @@ const CompletionItemKind = exports.CompletionItemKind = {
 
 
 /**
- * Signature help represents the signature of something
- * callable. There can be multiple signature but only one
- * active and only one active parameter.
- */
+     * Signature help represents the signature of something
+     * callable. There can be multiple signature but only one
+     * active and only one active parameter.
+     */
 
 
-/**
- * Represents the signature of something callable. A signature
- * can have a label, like a function-name, a doc-comment, and
- * a set of parameters.
- */
 
 
-/**
- * Represents a parameter of a callable-signature. A parameter can
- * have a label and a doc-comment.
- */
+
+
+
 
 
 /**
- * A document highlight is a range inside a text document which deserves
- * special attention. Usually a document highlight is visualized by changing
- * the background color of its range.
- *
- */
+         * Represents the signature of something callable. A signature
+         * can have a label, like a function-name, a doc-comment, and
+         * a set of parameters.
+         */
+
+
+
+
+
+
+
+
+
+/**
+             * Represents a parameter of a callable-signature. A parameter can
+             * have a label and a doc-comment.
+             */
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+/**
+                 * A document highlight is a range inside a text document which deserves
+                 * special attention. Usually a document highlight is visualized by changing
+                 * the background color of its range.
+                 *
+                 */
+
+
+
+
+
+
+
 const DocumentHighlightKind = exports.DocumentHighlightKind = {
   // A textual occurrance.
   Text: 1,
   // Read-access of a symbol, like reading a variable.
   Read: 2,
   // Write-access of a symbol, like writing to a variable.
-  Write: 3
-};
+  Write: 3 };
+
+
+
+
+
+
 
 /**
- * Represents information about programming constructs like variables, classes,
- * interfaces etc.
- */
+               * Represents information about programming constructs like variables, classes,
+               * interfaces etc.
+               */
+
+
+
+
+
+
+
+
+
+
+
 const SymbolKind = exports.SymbolKind = {
   File: 1,
   Module: 2,
@@ -181,16 +649,34 @@ const SymbolKind = exports.SymbolKind = {
   String: 15,
   Number: 16,
   Boolean: 17,
-  Array: 18
-};
+  Array: 18 };
+
 
 // The parameters of a Workspace Symbol Request.
+
+
+
 
 
 // Params for the CodeActionRequest
 
 
+
+
+
+
+
+
+
 // Contains additional diagnostic information about the context in which a code action is run.
+
+
+
+
+
+
+
+
 
 
 /**
@@ -202,20 +688,108 @@ const SymbolKind = exports.SymbolKind = {
  */
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
 /**
- * A document link is a range in a text document that links to an internal or
- * external resource, like another
- * text document or a web site.
- */
+     * A document link is a range in a text document that links to an internal or
+     * external resource, like another
+     * text document or a web site.
+     */
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 // Value-object describing what options formatting should use.
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 // TypeCoverageParams: a nuclide-specific way to show type coverage for a file
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 // Window
+
+
+
+
+
+
+
 
 const MessageType = exports.MessageType = {
   // An error message.
@@ -225,13 +799,92 @@ const MessageType = exports.MessageType = {
   // An information message.
   Info: 3,
   // A log message.
-  Log: 4
-};
+  Log: 4 };
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 // Workspace
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 // An event describing a change to a text document. If range and rangeLength are omitted
 // the new text is considered to be the full content of the document.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 // The file event type.
@@ -241,7 +894,7 @@ const FileChangeType = exports.FileChangeType = {
   // The file got changed.
   Changed: 2,
   // The file got deleted.
-  Deleted: 3
-};
+  Deleted: 3 };
+
 
 // An event describing a file change.

@@ -1,30 +1,253 @@
-'use strict';
+'use strict';Object.defineProperty(exports, "__esModule", { value: true });exports.ActionTypes = undefined;var _Dispatcher;
 
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-exports.ActionTypes = undefined;
 
-var _Dispatcher;
 
-function _load_Dispatcher() {
-  return _Dispatcher = _interopRequireDefault(require('../../commons-node/Dispatcher'));
-}
 
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-/**
- * Copyright (c) 2015-present, Facebook, Inc.
- * All rights reserved.
- *
- * This source code is licensed under the license found in the LICENSE file in
- * the root directory of this source tree.
- *
- * 
- * @format
- */
 
-// $FlowFixMe(>=0.53.0) Flow suppress
+
+
+
+
+
+
+
+
+
+
+
+function _load_Dispatcher() {return _Dispatcher = _interopRequireDefault(require('../../commons-node/Dispatcher'));}function _interopRequireDefault(obj) {return obj && obj.__esModule ? obj : { default: obj };} /**
+                                                                                                                                                                                                                   * Copyright (c) 2015-present, Facebook, Inc.
+                                                                                                                                                                                                                   * All rights reserved.
+                                                                                                                                                                                                                   *
+                                                                                                                                                                                                                   * This source code is licensed under the license found in the LICENSE file in
+                                                                                                                                                                                                                   * the root directory of this source tree.
+                                                                                                                                                                                                                   *
+                                                                                                                                                                                                                   * 
+                                                                                                                                                                                                                   * @format
+                                                                                                                                                                                                                   */ // $FlowFixMe(>=0.53.0) Flow suppress
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 const ActionTypes = exports.ActionTypes = Object.freeze({
   COLLAPSE_NODE: 'COLLAPSE_NODE',
   COLLAPSE_NODE_DEEP: 'COLLAPSE_NODE_DEEP',
@@ -34,6 +257,7 @@ const ActionTypes = exports.ActionTypes = Object.freeze({
   EXPAND_NODE_DEEP: 'EXPAND_NODE_DEEP',
   SET_CWD: 'SET_CWD',
   SET_HIDE_IGNORED_NAMES: 'SET_HIDE_IGNORED_NAMES',
+  SET_HIDE_VCS_IGNORED_PATHS: 'SET_HIDE_VCS_IGNORED_PATHS',
   SET_IS_CALCULATING_CHANGES: 'SET_IS_CALCULATING_CHANGES',
   SET_IGNORED_NAMES: 'SET_IGNORED_NAMES',
   SET_ROOT_KEYS: 'SET_ROOT_KEYS',
@@ -75,15 +299,17 @@ const ActionTypes = exports.ActionTypes = Object.freeze({
   ENSURE_CHILD_NODE: 'ENSURE_CHILD_NODE',
   CLEAR_FILTER: 'CLEAR_FILTER',
   ADD_EXTRA_PROJECT_SELECTION_CONTENT: 'ADD_EXTRA_PROJECT_SELECTION_CONTENT',
-  REMOVE_EXTRA_PROJECT_SELECTION_CONTENT: 'REMOVE_EXTRA_PROJECT_SELECTION_CONTENT',
+  REMOVE_EXTRA_PROJECT_SELECTION_CONTENT:
+  'REMOVE_EXTRA_PROJECT_SELECTION_CONTENT',
   SET_OPEN_FILES_EXPANDED: 'SET_OPEN_FILES_EXPANDED',
   SET_UNCOMMITTED_CHANGES_EXPANDED: 'SET_UNCOMMITTED_CHANGES_EXPANDED',
   SET_FOLDERS_EXPANDED: 'SET_FOLDERS_EXPANDED',
   INVALIDATE_REMOVED_FOLDER: 'INVALIDATE_REMOVED_FOLDER',
-  SET_TARGET_NODE: 'SET_TARGET_NODE'
-});
+  SET_TARGET_NODE: 'SET_TARGET_NODE' });
+
 
 // Flow hack: Every FileTreeAction actionType must be in ActionTypes.
+// $FlowFixMe(>=0.68.0) Flow suppress (T27187857)
 '';
 
 let instance;
@@ -94,6 +320,4 @@ class FileTreeDispatcher extends (_Dispatcher || _load_Dispatcher()).default {
       instance = new FileTreeDispatcher();
     }
     return instance;
-  }
-}
-exports.default = FileTreeDispatcher;
+  }}exports.default = FileTreeDispatcher;

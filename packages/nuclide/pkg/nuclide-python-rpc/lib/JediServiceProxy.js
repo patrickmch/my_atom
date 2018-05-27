@@ -218,6 +218,49 @@ module.exports = _client => {
     });
   };
 
+  remoteModule.get_signature_help = function (arg0, arg1, arg2, arg3, arg4) {
+    return _client.marshalArguments(Array.from(arguments), [{
+      name: "src",
+      type: {
+        kind: "named",
+        name: "NuclideUri"
+      }
+    }, {
+      name: "contents",
+      type: {
+        kind: "string"
+      }
+    }, {
+      name: "sysPath",
+      type: {
+        kind: "array",
+        type: {
+          kind: "string"
+        }
+      }
+    }, {
+      name: "line",
+      type: {
+        kind: "number"
+      }
+    }, {
+      name: "column",
+      type: {
+        kind: "number"
+      }
+    }]).then(args => {
+      return _client.callRemoteFunction("get_signature_help", "promise", args);
+    }).then(value => {
+      return _client.unmarshal(value, {
+        kind: "nullable",
+        type: {
+          kind: "named",
+          name: "SignatureHelp"
+        }
+      });
+    });
+  };
+
   return remoteModule;
 };
 
@@ -289,7 +332,7 @@ Object.defineProperty(module.exports, "defs", {
       location: {
         type: "source",
         fileName: "JediService.js",
-        line: 16
+        line: 17
       },
       name: "JediCompletion",
       definition: {
@@ -332,7 +375,7 @@ Object.defineProperty(module.exports, "defs", {
       location: {
         type: "source",
         fileName: "JediService.js",
-        line: 23
+        line: 24
       },
       name: "JediDefinition",
       definition: {
@@ -376,7 +419,7 @@ Object.defineProperty(module.exports, "defs", {
       location: {
         type: "source",
         fileName: "JediService.js",
-        line: 31
+        line: 32
       },
       name: "JediReference",
       definition: {
@@ -426,7 +469,7 @@ Object.defineProperty(module.exports, "defs", {
       location: {
         type: "source",
         fileName: "JediService.js",
-        line: 40
+        line: 41
       },
       name: "Position",
       definition: {
@@ -451,7 +494,7 @@ Object.defineProperty(module.exports, "defs", {
       location: {
         type: "source",
         fileName: "JediService.js",
-        line: 55
+        line: 56
       },
       name: "JediClassItem",
       definition: {
@@ -516,7 +559,7 @@ Object.defineProperty(module.exports, "defs", {
       location: {
         type: "source",
         fileName: "JediService.js",
-        line: 66
+        line: 67
       },
       name: "JediStatementItem",
       definition: {
@@ -562,7 +605,7 @@ Object.defineProperty(module.exports, "defs", {
       location: {
         type: "source",
         fileName: "JediService.js",
-        line: 74
+        line: 75
       },
       name: "JediOutlineItem",
       definition: {
@@ -722,7 +765,7 @@ Object.defineProperty(module.exports, "defs", {
       location: {
         type: "source",
         fileName: "JediService.js",
-        line: 45
+        line: 46
       },
       name: "JediFunctionItem",
       definition: {
@@ -788,13 +831,13 @@ Object.defineProperty(module.exports, "defs", {
       location: {
         type: "source",
         fileName: "JediService.js",
-        line: 79
+        line: 80
       },
       type: {
         location: {
           type: "source",
           fileName: "JediService.js",
-          line: 79
+          line: 80
         },
         kind: "function",
         argumentTypes: [{
@@ -848,13 +891,13 @@ Object.defineProperty(module.exports, "defs", {
       location: {
         type: "source",
         fileName: "JediService.js",
-        line: 89
+        line: 90
       },
       type: {
         location: {
           type: "source",
           fileName: "JediService.js",
-          line: 89
+          line: 90
         },
         kind: "function",
         argumentTypes: [{
@@ -908,13 +951,13 @@ Object.defineProperty(module.exports, "defs", {
       location: {
         type: "source",
         fileName: "JediService.js",
-        line: 99
+        line: 100
       },
       type: {
         location: {
           type: "source",
           fileName: "JediService.js",
-          line: 99
+          line: 100
         },
         kind: "function",
         argumentTypes: [{
@@ -968,13 +1011,13 @@ Object.defineProperty(module.exports, "defs", {
       location: {
         type: "source",
         fileName: "JediService.js",
-        line: 109
+        line: 110
       },
       type: {
         location: {
           type: "source",
           fileName: "JediService.js",
-          line: 109
+          line: 110
         },
         kind: "function",
         argumentTypes: [{
@@ -1029,13 +1072,13 @@ Object.defineProperty(module.exports, "defs", {
       location: {
         type: "source",
         fileName: "JediService.js",
-        line: 121
+        line: 122
       },
       type: {
         location: {
           type: "source",
           fileName: "JediService.js",
-          line: 121
+          line: 122
         },
         kind: "function",
         argumentTypes: [{
@@ -1060,6 +1103,158 @@ Object.defineProperty(module.exports, "defs", {
                 kind: "named",
                 name: "JediOutlineItem"
               }
+            }
+          }
+        }
+      }
+    },
+    SignatureParameter: {
+      kind: "alias",
+      location: {
+        type: "source",
+        fileName: "types.js",
+        line: 56
+      },
+      name: "SignatureParameter",
+      definition: {
+        kind: "object",
+        fields: [{
+          name: "label",
+          type: {
+            kind: "string"
+          },
+          optional: false
+        }, {
+          name: "documentation",
+          type: {
+            kind: "string"
+          },
+          optional: true
+        }]
+      }
+    },
+    Signature: {
+      kind: "alias",
+      location: {
+        type: "source",
+        fileName: "types.js",
+        line: 50
+      },
+      name: "Signature",
+      definition: {
+        kind: "object",
+        fields: [{
+          name: "label",
+          type: {
+            kind: "string"
+          },
+          optional: false
+        }, {
+          name: "documentation",
+          type: {
+            kind: "string"
+          },
+          optional: true
+        }, {
+          name: "parameters",
+          type: {
+            kind: "array",
+            type: {
+              kind: "named",
+              name: "SignatureParameter"
+            }
+          },
+          optional: true
+        }]
+      }
+    },
+    SignatureHelp: {
+      kind: "alias",
+      location: {
+        type: "source",
+        fileName: "types.js",
+        line: 44
+      },
+      name: "SignatureHelp",
+      definition: {
+        kind: "object",
+        fields: [{
+          name: "signatures",
+          type: {
+            kind: "array",
+            type: {
+              kind: "named",
+              name: "Signature"
+            }
+          },
+          optional: false
+        }, {
+          name: "activeSignature",
+          type: {
+            kind: "number"
+          },
+          optional: true
+        }, {
+          name: "activeParameter",
+          type: {
+            kind: "number"
+          },
+          optional: true
+        }]
+      }
+    },
+    get_signature_help: {
+      kind: "function",
+      name: "get_signature_help",
+      location: {
+        type: "source",
+        fileName: "JediService.js",
+        line: 129
+      },
+      type: {
+        location: {
+          type: "source",
+          fileName: "JediService.js",
+          line: 129
+        },
+        kind: "function",
+        argumentTypes: [{
+          name: "src",
+          type: {
+            kind: "named",
+            name: "NuclideUri"
+          }
+        }, {
+          name: "contents",
+          type: {
+            kind: "string"
+          }
+        }, {
+          name: "sysPath",
+          type: {
+            kind: "array",
+            type: {
+              kind: "string"
+            }
+          }
+        }, {
+          name: "line",
+          type: {
+            kind: "number"
+          }
+        }, {
+          name: "column",
+          type: {
+            kind: "number"
+          }
+        }],
+        returnType: {
+          kind: "promise",
+          type: {
+            kind: "nullable",
+            type: {
+              kind: "named",
+              name: "SignatureHelp"
             }
           }
         }

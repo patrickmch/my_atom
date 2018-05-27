@@ -4,298 +4,198 @@ let Observable;
 
 module.exports = _client => {
   const remoteModule = {};
-  remoteModule.HhvmDebuggerService = class {
-    constructor() {
-      _client.createRemoteObject("HhvmDebuggerService", this, [], []);
-    }
 
-    getOutputWindowObservable() {
-      return Observable.fromPromise(Promise.all([_client.marshalArguments(Array.from(arguments), []), _client.marshal(this, {
-        kind: "named",
-        location: {
-          type: "source",
-          fileName: "main.js",
-          line: 36
-        },
-        name: "HhvmDebuggerService"
-      })])).switchMap(([args, id]) => _client.callRemoteMethod(id, "getOutputWindowObservable", "observable", args)).concatMap(value => {
-        return _client.unmarshal(value, {
-          kind: "string"
-        });
-      }).publish();
-    }
-
-    getAtomNotificationObservable() {
-      return Observable.fromPromise(Promise.all([_client.marshalArguments(Array.from(arguments), []), _client.marshal(this, {
-        kind: "named",
-        location: {
-          type: "source",
-          fileName: "main.js",
-          line: 36
-        },
-        name: "HhvmDebuggerService"
-      })])).switchMap(([args, id]) => _client.callRemoteMethod(id, "getAtomNotificationObservable", "observable", args)).concatMap(value => {
-        return _client.unmarshal(value, {
-          kind: "named",
-          name: "AtomNotification"
-        });
-      }).publish();
-    }
-
-    getNotificationObservable() {
-      return Observable.fromPromise(Promise.all([_client.marshalArguments(Array.from(arguments), []), _client.marshal(this, {
-        kind: "named",
-        location: {
-          type: "source",
-          fileName: "main.js",
-          line: 36
-        },
-        name: "HhvmDebuggerService"
-      })])).switchMap(([args, id]) => _client.callRemoteMethod(id, "getNotificationObservable", "observable", args)).concatMap(value => {
-        return _client.unmarshal(value, {
-          kind: "named",
-          name: "AtomNotification"
-        });
-      }).publish();
-    }
-
-    getServerMessageObservable() {
-      return Observable.fromPromise(Promise.all([_client.marshalArguments(Array.from(arguments), []), _client.marshal(this, {
-        kind: "named",
-        location: {
-          type: "source",
-          fileName: "main.js",
-          line: 36
-        },
-        name: "HhvmDebuggerService"
-      })])).switchMap(([args, id]) => _client.callRemoteMethod(id, "getServerMessageObservable", "observable", args)).concatMap(value => {
-        return _client.unmarshal(value, {
-          kind: "string"
-        });
-      }).publish();
-    }
-
-    debug(arg0) {
-      return Promise.all([_client.marshalArguments(Array.from(arguments), [{
-        name: "config",
-        type: {
-          kind: "union",
-          types: [{
-            kind: "object",
-            fields: [{
-              name: "action",
-              type: {
-                kind: "string-literal",
-                value: "attach"
-              },
-              optional: false
-            }, {
-              name: "targetUri",
-              type: {
-                kind: "named",
-                name: "NuclideUri"
-              },
-              optional: false
-            }, {
-              name: "startupDocumentPath",
-              type: {
-                kind: "string"
-              },
-              optional: true
-            }, {
-              name: "debugPort",
-              type: {
-                kind: "number"
-              },
-              optional: true
-            }]
+  remoteModule.getDebuggerArgs = function (arg0) {
+    return _client.marshalArguments(Array.from(arguments), [{
+      name: "config",
+      type: {
+        kind: "union",
+        types: [{
+          kind: "object",
+          fields: [{
+            name: "action",
+            type: {
+              kind: "string-literal",
+              value: "attach"
+            },
+            optional: false
           }, {
-            kind: "object",
-            fields: [{
-              name: "action",
-              type: {
-                kind: "string-literal",
-                value: "launch"
-              },
-              optional: false
-            }, {
-              name: "targetUri",
-              type: {
-                kind: "named",
-                name: "NuclideUri"
-              },
-              optional: false
-            }, {
-              name: "startupDocumentPath",
-              type: {
-                kind: "string"
-              },
-              optional: true
-            }, {
-              name: "launchScriptPath",
-              type: {
-                kind: "named",
-                name: "NuclideUri"
-              },
-              optional: false
-            }, {
-              name: "scriptArgs",
-              type: {
-                kind: "array",
-                type: {
-                  kind: "string"
-                }
-              },
-              optional: false
-            }, {
-              name: "hhvmRuntimePath",
-              type: {
-                kind: "string"
-              },
-              optional: true
-            }, {
-              name: "hhvmRuntimeArgs",
-              type: {
-                kind: "array",
-                type: {
-                  kind: "string"
-                }
-              },
-              optional: false
-            }, {
-              name: "deferLaunch",
-              type: {
-                kind: "boolean"
-              },
-              optional: false
-            }, {
-              name: "launchWrapperCommand",
+            name: "targetUri",
+            type: {
+              kind: "named",
+              name: "NuclideUri"
+            },
+            optional: false
+          }, {
+            name: "startupDocumentPath",
+            type: {
+              kind: "string"
+            },
+            optional: true
+          }, {
+            name: "debugPort",
+            type: {
+              kind: "number"
+            },
+            optional: true
+          }]
+        }, {
+          kind: "object",
+          fields: [{
+            name: "action",
+            type: {
+              kind: "string-literal",
+              value: "launch"
+            },
+            optional: false
+          }, {
+            name: "targetUri",
+            type: {
+              kind: "named",
+              name: "NuclideUri"
+            },
+            optional: false
+          }, {
+            name: "startupDocumentPath",
+            type: {
+              kind: "string"
+            },
+            optional: true
+          }, {
+            name: "launchScriptPath",
+            type: {
+              kind: "named",
+              name: "NuclideUri"
+            },
+            optional: false
+          }, {
+            name: "scriptArgs",
+            type: {
+              kind: "array",
               type: {
                 kind: "string"
-              },
-              optional: true
-            }, {
-              name: "cwd",
+              }
+            },
+            optional: false
+          }, {
+            name: "hhvmRuntimePath",
+            type: {
+              kind: "string"
+            },
+            optional: true
+          }, {
+            name: "hhvmRuntimeArgs",
+            type: {
+              kind: "array",
               type: {
                 kind: "string"
-              },
-              optional: true
-            }]
-          }],
-          discriminantField: "action"
-        }
-      }]), _client.marshal(this, {
+              }
+            },
+            optional: false
+          }, {
+            name: "deferLaunch",
+            type: {
+              kind: "boolean"
+            },
+            optional: false
+          }, {
+            name: "launchWrapperCommand",
+            type: {
+              kind: "string"
+            },
+            optional: true
+          }, {
+            name: "cwd",
+            type: {
+              kind: "string"
+            },
+            optional: true
+          }, {
+            name: "noDebug",
+            type: {
+              kind: "boolean"
+            },
+            optional: true
+          }]
+        }],
+        discriminantField: "action"
+      }
+    }]).then(args => {
+      return _client.callRemoteFunction("HhvmDebuggerService/getDebuggerArgs", "promise", args);
+    }).then(value => {
+      return _client.unmarshal(value, {
         kind: "named",
-        location: {
-          type: "source",
-          fileName: "main.js",
-          line: 36
-        },
-        name: "HhvmDebuggerService"
-      })]).then(([args, id]) => _client.callRemoteMethod(id, "debug", "promise", args)).then(value => {
-        return _client.unmarshal(value, {
-          kind: "string"
-        });
+        name: "Object"
       });
-    }
-
-    sendCommand(arg0) {
-      return Promise.all([_client.marshalArguments(Array.from(arguments), [{
-        name: "message",
-        type: {
-          kind: "string"
-        }
-      }]), _client.marshal(this, {
-        kind: "named",
-        location: {
-          type: "source",
-          fileName: "main.js",
-          line: 36
-        },
-        name: "HhvmDebuggerService"
-      })]).then(([args, id]) => _client.callRemoteMethod(id, "sendCommand", "promise", args)).then(value => {
-        return _client.unmarshal(value, {
-          kind: "void"
-        });
-      });
-    }
-
-    getLaunchArgs(arg0) {
-      return Promise.all([_client.marshalArguments(Array.from(arguments), [{
-        name: "config",
-        type: {
-          kind: "named",
-          name: "HHVMLaunchConfig"
-        }
-      }]), _client.marshal(this, {
-        kind: "named",
-        location: {
-          type: "source",
-          fileName: "main.js",
-          line: 36
-        },
-        name: "HhvmDebuggerService"
-      })]).then(([args, id]) => _client.callRemoteMethod(id, "getLaunchArgs", "promise", args)).then(value => {
-        return _client.unmarshal(value, {
-          kind: "named",
-          name: "Object"
-        });
-      });
-    }
-
-    createLogFilePaste() {
-      return Promise.all([_client.marshalArguments(Array.from(arguments), []), _client.marshal(this, {
-        kind: "named",
-        location: {
-          type: "source",
-          fileName: "main.js",
-          line: 36
-        },
-        name: "HhvmDebuggerService"
-      })]).then(([args, id]) => _client.callRemoteMethod(id, "createLogFilePaste", "promise", args)).then(value => {
-        return _client.unmarshal(value, {
-          kind: "string"
-        });
-      });
-    }
-
-    getAttachTargetList() {
-      return Promise.all([_client.marshalArguments(Array.from(arguments), []), _client.marshal(this, {
-        kind: "named",
-        location: {
-          type: "source",
-          fileName: "main.js",
-          line: 36
-        },
-        name: "HhvmDebuggerService"
-      })]).then(([args, id]) => _client.callRemoteMethod(id, "getAttachTargetList", "promise", args)).then(value => {
-        return _client.unmarshal(value, {
-          kind: "array",
-          type: {
-            kind: "object",
-            fields: [{
-              name: "pid",
-              type: {
-                kind: "number"
-              },
-              optional: false
-            }, {
-              name: "command",
-              type: {
-                kind: "string"
-              },
-              optional: false
-            }]
-          }
-        });
-      });
-    }
-
-    dispose() {
-      return _client.disposeRemoteObject(this);
-    }
-
+    });
   };
+
+  remoteModule.getLaunchArgs = function (arg0) {
+    return _client.marshalArguments(Array.from(arguments), [{
+      name: "config",
+      type: {
+        kind: "named",
+        name: "HHVMLaunchConfig"
+      }
+    }]).then(args => {
+      return _client.callRemoteFunction("HhvmDebuggerService/getLaunchArgs", "promise", args);
+    }).then(value => {
+      return _client.unmarshal(value, {
+        kind: "named",
+        name: "Object"
+      });
+    });
+  };
+
+  remoteModule.getHhvmStackTraces = function () {
+    return _client.marshalArguments(Array.from(arguments), []).then(args => {
+      return _client.callRemoteFunction("HhvmDebuggerService/getHhvmStackTraces", "promise", args);
+    }).then(value => {
+      return _client.unmarshal(value, {
+        kind: "array",
+        type: {
+          kind: "string"
+        }
+      });
+    });
+  };
+
+  remoteModule.createLogFilePaste = function () {
+    return _client.marshalArguments(Array.from(arguments), []).then(args => {
+      return _client.callRemoteFunction("HhvmDebuggerService/createLogFilePaste", "promise", args);
+    }).then(value => {
+      return _client.unmarshal(value, {
+        kind: "string"
+      });
+    });
+  };
+
+  remoteModule.getAttachTargetList = function () {
+    return _client.marshalArguments(Array.from(arguments), []).then(args => {
+      return _client.callRemoteFunction("HhvmDebuggerService/getAttachTargetList", "promise", args);
+    }).then(value => {
+      return _client.unmarshal(value, {
+        kind: "array",
+        type: {
+          kind: "object",
+          fields: [{
+            name: "pid",
+            type: {
+              kind: "number"
+            },
+            optional: false
+          }, {
+            name: "command",
+            type: {
+              kind: "string"
+            },
+            optional: false
+          }]
+        }
+      });
+    });
+  };
+
   return remoteModule;
 };
 
@@ -367,7 +267,7 @@ Object.defineProperty(module.exports, "defs", {
       location: {
         type: "source",
         fileName: "types.js",
-        line: 27
+        line: 28
       },
       name: "HHVMAttachConfig",
       definition: {
@@ -480,356 +380,271 @@ Object.defineProperty(module.exports, "defs", {
             kind: "string"
           },
           optional: true
-        }]
-      }
-    },
-    AtomNotificationType: {
-      kind: "alias",
-      location: {
-        type: "source",
-        fileName: "types.js",
-        line: 20
-      },
-      name: "AtomNotificationType",
-      definition: {
-        kind: "union",
-        types: [{
-          kind: "string-literal",
-          value: "info"
         }, {
-          kind: "string-literal",
-          value: "warning"
-        }, {
-          kind: "string-literal",
-          value: "error"
-        }, {
-          kind: "string-literal",
-          value: "fatalError"
-        }]
-      }
-    },
-    AtomNotification: {
-      kind: "alias",
-      location: {
-        type: "source",
-        fileName: "types.js",
-        line: 21
-      },
-      name: "AtomNotification",
-      definition: {
-        kind: "object",
-        fields: [{
-          name: "type",
+          name: "noDebug",
           type: {
-            kind: "named",
-            name: "AtomNotificationType"
+            kind: "boolean"
           },
-          optional: false
-        }, {
-          name: "message",
-          type: {
-            kind: "string"
-          },
-          optional: false
+          optional: true
         }]
       }
     },
-    HhvmDebuggerService: {
-      kind: "interface",
-      name: "HhvmDebuggerService",
+    getDebuggerArgs: {
+      kind: "function",
+      name: "getDebuggerArgs",
       location: {
         type: "source",
         fileName: "main.js",
-        line: 36
+        line: 29
       },
-      constructorArgs: [],
-      staticMethods: {},
-      instanceMethods: {
-        getOutputWindowObservable: {
-          location: {
-            type: "source",
-            fileName: "main.js",
-            line: 43
-          },
-          kind: "function",
-          argumentTypes: [],
-          returnType: {
-            kind: "observable",
-            type: {
-              kind: "string"
-            }
-          }
+      type: {
+        location: {
+          type: "source",
+          fileName: "main.js",
+          line: 29
         },
-        getAtomNotificationObservable: {
-          location: {
-            type: "source",
-            fileName: "main.js",
-            line: 47
-          },
-          kind: "function",
-          argumentTypes: [],
-          returnType: {
-            kind: "observable",
-            type: {
-              kind: "named",
-              name: "AtomNotification"
-            }
-          }
-        },
-        getNotificationObservable: {
-          location: {
-            type: "source",
-            fileName: "main.js",
-            line: 54
-          },
-          kind: "function",
-          argumentTypes: [],
-          returnType: {
-            kind: "observable",
-            type: {
-              kind: "named",
-              name: "AtomNotification"
-            }
-          }
-        },
-        getServerMessageObservable: {
-          location: {
-            type: "source",
-            fileName: "main.js",
-            line: 58
-          },
-          kind: "function",
-          argumentTypes: [],
-          returnType: {
-            kind: "observable",
-            type: {
-              kind: "string"
-            }
-          }
-        },
-        debug: {
-          location: {
-            type: "source",
-            fileName: "main.js",
-            line: 62
-          },
-          kind: "function",
-          argumentTypes: [{
-            name: "config",
-            type: {
-              kind: "union",
-              types: [{
-                kind: "object",
-                fields: [{
-                  name: "action",
-                  type: {
-                    kind: "string-literal",
-                    value: "attach"
-                  },
-                  optional: false
-                }, {
-                  name: "targetUri",
-                  type: {
-                    kind: "named",
-                    name: "NuclideUri"
-                  },
-                  optional: false
-                }, {
-                  name: "startupDocumentPath",
-                  type: {
-                    kind: "string"
-                  },
-                  optional: true
-                }, {
-                  name: "debugPort",
-                  type: {
-                    kind: "number"
-                  },
-                  optional: true
-                }]
+        kind: "function",
+        argumentTypes: [{
+          name: "config",
+          type: {
+            kind: "union",
+            types: [{
+              kind: "object",
+              fields: [{
+                name: "action",
+                type: {
+                  kind: "string-literal",
+                  value: "attach"
+                },
+                optional: false
               }, {
-                kind: "object",
-                fields: [{
-                  name: "action",
-                  type: {
-                    kind: "string-literal",
-                    value: "launch"
-                  },
-                  optional: false
-                }, {
-                  name: "targetUri",
-                  type: {
-                    kind: "named",
-                    name: "NuclideUri"
-                  },
-                  optional: false
-                }, {
-                  name: "startupDocumentPath",
-                  type: {
-                    kind: "string"
-                  },
-                  optional: true
-                }, {
-                  name: "launchScriptPath",
-                  type: {
-                    kind: "named",
-                    name: "NuclideUri"
-                  },
-                  optional: false
-                }, {
-                  name: "scriptArgs",
-                  type: {
-                    kind: "array",
-                    type: {
-                      kind: "string"
-                    }
-                  },
-                  optional: false
-                }, {
-                  name: "hhvmRuntimePath",
-                  type: {
-                    kind: "string"
-                  },
-                  optional: true
-                }, {
-                  name: "hhvmRuntimeArgs",
-                  type: {
-                    kind: "array",
-                    type: {
-                      kind: "string"
-                    }
-                  },
-                  optional: false
-                }, {
-                  name: "deferLaunch",
-                  type: {
-                    kind: "boolean"
-                  },
-                  optional: false
-                }, {
-                  name: "launchWrapperCommand",
+                name: "targetUri",
+                type: {
+                  kind: "named",
+                  name: "NuclideUri"
+                },
+                optional: false
+              }, {
+                name: "startupDocumentPath",
+                type: {
+                  kind: "string"
+                },
+                optional: true
+              }, {
+                name: "debugPort",
+                type: {
+                  kind: "number"
+                },
+                optional: true
+              }]
+            }, {
+              kind: "object",
+              fields: [{
+                name: "action",
+                type: {
+                  kind: "string-literal",
+                  value: "launch"
+                },
+                optional: false
+              }, {
+                name: "targetUri",
+                type: {
+                  kind: "named",
+                  name: "NuclideUri"
+                },
+                optional: false
+              }, {
+                name: "startupDocumentPath",
+                type: {
+                  kind: "string"
+                },
+                optional: true
+              }, {
+                name: "launchScriptPath",
+                type: {
+                  kind: "named",
+                  name: "NuclideUri"
+                },
+                optional: false
+              }, {
+                name: "scriptArgs",
+                type: {
+                  kind: "array",
                   type: {
                     kind: "string"
-                  },
-                  optional: true
-                }, {
-                  name: "cwd",
+                  }
+                },
+                optional: false
+              }, {
+                name: "hhvmRuntimePath",
+                type: {
+                  kind: "string"
+                },
+                optional: true
+              }, {
+                name: "hhvmRuntimeArgs",
+                type: {
+                  kind: "array",
                   type: {
                     kind: "string"
-                  },
-                  optional: true
-                }]
-              }],
-              discriminantField: "action"
-            }
-          }],
-          returnType: {
-            kind: "promise",
+                  }
+                },
+                optional: false
+              }, {
+                name: "deferLaunch",
+                type: {
+                  kind: "boolean"
+                },
+                optional: false
+              }, {
+                name: "launchWrapperCommand",
+                type: {
+                  kind: "string"
+                },
+                optional: true
+              }, {
+                name: "cwd",
+                type: {
+                  kind: "string"
+                },
+                optional: true
+              }, {
+                name: "noDebug",
+                type: {
+                  kind: "boolean"
+                },
+                optional: true
+              }]
+            }],
+            discriminantField: "action"
+          }
+        }],
+        returnType: {
+          kind: "promise",
+          type: {
+            kind: "named",
+            name: "Object"
+          }
+        }
+      }
+    },
+    getLaunchArgs: {
+      kind: "function",
+      name: "getLaunchArgs",
+      location: {
+        type: "source",
+        fileName: "main.js",
+        line: 55
+      },
+      type: {
+        location: {
+          type: "source",
+          fileName: "main.js",
+          line: 55
+        },
+        kind: "function",
+        argumentTypes: [{
+          name: "config",
+          type: {
+            kind: "named",
+            name: "HHVMLaunchConfig"
+          }
+        }],
+        returnType: {
+          kind: "promise",
+          type: {
+            kind: "named",
+            name: "Object"
+          }
+        }
+      }
+    },
+    getHhvmStackTraces: {
+      kind: "function",
+      name: "getHhvmStackTraces",
+      location: {
+        type: "source",
+        fileName: "main.js",
+        line: 180
+      },
+      type: {
+        location: {
+          type: "source",
+          fileName: "main.js",
+          line: 180
+        },
+        kind: "function",
+        argumentTypes: [],
+        returnType: {
+          kind: "promise",
+          type: {
+            kind: "array",
             type: {
               kind: "string"
             }
           }
+        }
+      }
+    },
+    createLogFilePaste: {
+      kind: "function",
+      name: "createLogFilePaste",
+      location: {
+        type: "source",
+        fileName: "main.js",
+        line: 189
+      },
+      type: {
+        location: {
+          type: "source",
+          fileName: "main.js",
+          line: 189
         },
-        sendCommand: {
-          location: {
-            type: "source",
-            fileName: "main.js",
-            line: 88
-          },
-          kind: "function",
-          argumentTypes: [{
-            name: "message",
-            type: {
-              kind: "string"
-            }
-          }],
-          returnType: {
-            kind: "promise",
-            type: {
-              kind: "void"
-            }
+        kind: "function",
+        argumentTypes: [],
+        returnType: {
+          kind: "promise",
+          type: {
+            kind: "string"
           }
+        }
+      }
+    },
+    getAttachTargetList: {
+      kind: "function",
+      name: "getAttachTargetList",
+      location: {
+        type: "source",
+        fileName: "main.js",
+        line: 274
+      },
+      type: {
+        location: {
+          type: "source",
+          fileName: "main.js",
+          line: 274
         },
-        getLaunchArgs: {
-          location: {
-            type: "source",
-            fileName: "main.js",
-            line: 120
-          },
-          kind: "function",
-          argumentTypes: [{
-            name: "config",
+        kind: "function",
+        argumentTypes: [],
+        returnType: {
+          kind: "promise",
+          type: {
+            kind: "array",
             type: {
-              kind: "named",
-              name: "HHVMLaunchConfig"
-            }
-          }],
-          returnType: {
-            kind: "promise",
-            type: {
-              kind: "named",
-              name: "Object"
-            }
-          }
-        },
-        createLogFilePaste: {
-          location: {
-            type: "source",
-            fileName: "main.js",
-            line: 214
-          },
-          kind: "function",
-          argumentTypes: [],
-          returnType: {
-            kind: "promise",
-            type: {
-              kind: "string"
-            }
-          }
-        },
-        getAttachTargetList: {
-          location: {
-            type: "source",
-            fileName: "main.js",
-            line: 295
-          },
-          kind: "function",
-          argumentTypes: [],
-          returnType: {
-            kind: "promise",
-            type: {
-              kind: "array",
-              type: {
-                kind: "object",
-                fields: [{
-                  name: "pid",
-                  type: {
-                    kind: "number"
-                  },
-                  optional: false
-                }, {
-                  name: "command",
-                  type: {
-                    kind: "string"
-                  },
-                  optional: false
-                }]
-              }
-            }
-          }
-        },
-        dispose: {
-          location: {
-            type: "source",
-            fileName: "main.js",
-            line: 316
-          },
-          kind: "function",
-          argumentTypes: [],
-          returnType: {
-            kind: "promise",
-            type: {
-              kind: "void"
+              kind: "object",
+              fields: [{
+                name: "pid",
+                type: {
+                  kind: "number"
+                },
+                optional: false
+              }, {
+                name: "command",
+                type: {
+                  kind: "string"
+                },
+                optional: false
+              }]
             }
           }
         }

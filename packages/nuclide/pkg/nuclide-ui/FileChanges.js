@@ -1,88 +1,81 @@
-'use strict';
+'use strict';Object.defineProperty(exports, "__esModule", { value: true });exports.HunkDiff = undefined;exports.
 
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-exports.HunkDiff = undefined;
-exports.createCustomLineNumberGutter = createCustomLineNumberGutter;
 
-var _AtomTextEditor;
 
-function _load_AtomTextEditor() {
-  return _AtomTextEditor = require('nuclide-commons-ui/AtomTextEditor');
-}
 
-var _goToLocation;
 
-function _load_goToLocation() {
-  return _goToLocation = require('nuclide-commons-atom/go-to-location');
-}
 
-var _nullthrows;
 
-function _load_nullthrows() {
-  return _nullthrows = _interopRequireDefault(require('nullthrows'));
-}
 
-var _string;
 
-function _load_string() {
-  return _string = require('nuclide-commons/string');
-}
 
-var _atom = require('atom');
 
-var _react = _interopRequireWildcard(require('react'));
 
-var _reactDom = _interopRequireDefault(require('react-dom'));
 
-var _renderReactRoot;
 
-function _load_renderReactRoot() {
-  return _renderReactRoot = require('nuclide-commons-ui/renderReactRoot');
-}
 
-var _Section;
 
-function _load_Section() {
-  return _Section = require('./Section');
-}
 
-var _UniversalDisposable;
 
-function _load_UniversalDisposable() {
-  return _UniversalDisposable = _interopRequireDefault(require('nuclide-commons/UniversalDisposable'));
-}
 
-function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
 
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-const MAX_GUTTER_WIDTH = 5; /**
-                             * Copyright (c) 2015-present, Facebook, Inc.
-                             * All rights reserved.
-                             *
-                             * This source code is licensed under the license found in the LICENSE file in
-                             * the root directory of this source tree.
-                             *
-                             * 
-                             * @format
-                             */
 
-function getHighlightClass(type) {
-  if (type === 'add') {
-    return 'nuclide-ui-hunk-diff-insert';
-  }
-  if (type === 'del') {
-    return 'nuclide-ui-hunk-diff-delete';
-  }
-  return null;
-}
 
-// add a gutter to a text editor with line numbers defined by an iterable, as
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+createCustomLineNumberGutter = createCustomLineNumberGutter;var _AtomTextEditor;function _load_AtomTextEditor() {return _AtomTextEditor = require('../../modules/nuclide-commons-ui/AtomTextEditor');}var _goToLocation;function _load_goToLocation() {return _goToLocation = require('../../modules/nuclide-commons-atom/go-to-location');}var _nullthrows;function _load_nullthrows() {return _nullthrows = _interopRequireDefault(require('nullthrows'));}var _string;function _load_string() {return _string = require('../../modules/nuclide-commons/string');}var _atom = require('atom');var _react = _interopRequireWildcard(require('react'));var _reactDom = _interopRequireDefault(require('react-dom'));var _renderReactRoot;function _load_renderReactRoot() {return _renderReactRoot = require('../../modules/nuclide-commons-ui/renderReactRoot');}var _Section;function _load_Section() {return _Section = require('../../modules/nuclide-commons-ui/Section');}var _UniversalDisposable;function _load_UniversalDisposable() {return _UniversalDisposable = _interopRequireDefault(require('../../modules/nuclide-commons/UniversalDisposable'));}var _classnames;function _load_classnames() {return _classnames = _interopRequireDefault(require('classnames'));}function _interopRequireWildcard(obj) {if (obj && obj.__esModule) {return obj;} else {var newObj = {};if (obj != null) {for (var key in obj) {if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key];}}newObj.default = obj;return newObj;}}function _interopRequireDefault(obj) {return obj && obj.__esModule ? obj : { default: obj };} /**
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                   * Copyright (c) 2015-present, Facebook, Inc.
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                   * All rights reserved.
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                   *
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                   * This source code is licensed under the license found in the LICENSE file in
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                   * the root directory of this source tree.
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                   *
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                   * 
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                   * @format
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                   */const MAX_GUTTER_WIDTH = 5;function getHighlightClass(type) {if (type === 'add') {return 'nuclide-ui-hunk-diff-insert';}if (type === 'del') {return 'nuclide-ui-hunk-diff-delete';}return null;} // add a gutter to a text editor with line numbers defined by an iterable, as
 // opposed to being forced to start at 1 and counting up
-function createCustomLineNumberGutter(editor, lineNumbers, gutterWidth, extraName) {
-  // 'nuclide-ui-file-changes-line-number-gutter-wX' makes a gutter Xem wide.
+function createCustomLineNumberGutter(editor, lineNumbers, gutterWidth, options = {}) {const { extraName, onClick } = options; // 'nuclide-ui-file-changes-line-number-gutter-wX' makes a gutter Xem wide.
   // 'nuclide-ui-file-changes-line-number-gutter' makes a gutter 5em wide
   const suffix = gutterWidth > 0 && gutterWidth < MAX_GUTTER_WIDTH ? `-w${gutterWidth}` : '';
   let name = `nuclide-ui-file-changes-line-number-gutter${suffix}`;
@@ -98,13 +91,13 @@ function createCustomLineNumberGutter(editor, lineNumbers, gutterWidth, extraNam
       continue;
     }
     const marker = editor.markBufferPosition([index, 0], {
-      invalidate: 'touch'
-    });
-    const item = createGutterItem(lineNumber, gutterWidth);
+      invalidate: 'touch' });
+
+    const item = createGutterItem(lineNumber, gutterWidth, onClick);
     gutter.decorateMarker(marker, {
       type: 'gutter',
-      item
-    });
+      item });
+
     gutter.onDidDestroy(() => {
       marker.destroy();
       _reactDom.default.unmountComponentAtNode(item);
@@ -115,25 +108,43 @@ function createCustomLineNumberGutter(editor, lineNumbers, gutterWidth, extraNam
 }
 
 const NBSP = '\xa0';
-function createGutterItem(lineNumber, gutterWidth) {
+function createGutterItem(
+lineNumber,
+gutterWidth,
+onClick)
+{
   const fillWidth = gutterWidth - String(lineNumber).length;
   // Paralleling the original line-number implementation,
   // pad the line number with leading spaces.
   const filler = fillWidth > 0 ? new Array(fillWidth).fill(NBSP).join('') : '';
   // Attempt to reuse the existing line-number styles.
-  return (0, (_renderReactRoot || _load_renderReactRoot()).renderReactRoot)(_react.createElement(
-    'div',
-    { className: 'line-number' },
+  return (0, (_renderReactRoot || _load_renderReactRoot()).renderReactRoot)(
+  _react.createElement('div', {
+      onClick: onClick && (() => onClick(lineNumber)),
+      className: (0, (_classnames || _load_classnames()).default)('line-number', { clickable: onClick != null }) },
     filler,
-    lineNumber
-  ));
+    lineNumber));
+
+
 }
 
 class HunkDiff extends _react.Component {
 
+
+
   constructor(props) {
     super(props);
-    this._disposables = new (_UniversalDisposable || _load_UniversalDisposable()).default();
+    this._disposables = new (_UniversalDisposable || _load_UniversalDisposable()).default(
+    // enable copying filename
+    atom.contextMenu.add({
+      '.nuclide-ui-file-changes-item': [
+      {
+        label: 'Copy',
+        command: 'core:copy' }] }));
+
+
+
+
   }
 
   componentDidMount() {
@@ -149,7 +160,9 @@ class HunkDiff extends _react.Component {
     const editor = (0, (_nullthrows || _load_nullthrows()).default)(this.editor);
 
     const newText = changes.map(change => change.content.slice(1)).join('\n');
-    const oldText = prevHunk.changes.map(change => change.content.slice(1)).join('\n');
+    const oldText = prevHunk.changes.
+    map(change => change.content.slice(1)).
+    join('\n');
     const oldGrammar = this.props.grammar;
 
     if (newText === oldText && grammar === oldGrammar) {
@@ -201,17 +214,21 @@ class HunkDiff extends _react.Component {
       }
     }
 
-    const gutter = createCustomLineNumberGutter(editor, lineNumberGenerator(), gutterWidth);
+    const gutter = createCustomLineNumberGutter(
+    editor,
+    lineNumberGenerator(),
+    gutterWidth);
+
     this._disposables.add(() => {
       gutter.destroy();
     });
   }
 
   /**
-   * @param lineNumber A buffer line number to be highlighted.
-   * @param type The type of highlight to be applied to the line.
-   *             Could be a value of: ['insert', 'delete'].
-   */
+     * @param lineNumber A buffer line number to be highlighted.
+     * @param type The type of highlight to be applied to the line.
+     *             Could be a value of: ['insert', 'delete'].
+     */
   _createLineMarkers(editor) {
     let hunkIndex = 0;
     for (const hunkChanges of this.props.hunk.changes) {
@@ -225,8 +242,8 @@ class HunkDiff extends _react.Component {
       }
       const decoration = editor.decorateMarker(marker, {
         type: 'highlight',
-        class: className
-      });
+        class: className });
+
 
       this._disposables.add(() => {
         decoration.destroy();
@@ -242,37 +259,38 @@ class HunkDiff extends _react.Component {
     const textBuffer = new _atom.TextBuffer();
     textBuffer.setText(text);
 
-    return _react.createElement((_AtomTextEditor || _load_AtomTextEditor()).AtomTextEditor, {
-      autoGrow: true,
-      className: 'nuclide-ui-hunk-diff-text-editor',
-      correctContainerWidth: false,
-      grammar: grammar,
-      gutterHidden: true,
-      readOnly: true,
-      ref: editorRef => {
-        // $FlowFixMe(>=0.53.0) Flow suppress
-        this.editor = editorRef && editorRef.getModel();
-      },
-      textBuffer: textBuffer
-    });
-  }
-}
+    return (
+      _react.createElement((_AtomTextEditor || _load_AtomTextEditor()).AtomTextEditor, {
+        autoGrow: true,
+        className: 'nuclide-ui-hunk-diff-text-editor',
+        correctContainerWidth: false,
+        grammar: grammar,
+        gutterHidden: true,
+        readOnly: true,
+        ref: editorRef => {
+          // $FlowFixMe(>=0.53.0) Flow suppress
+          this.editor = editorRef && editorRef.getModel();
+        },
+        textBuffer: textBuffer }));
 
-exports.HunkDiff = HunkDiff; /* Renders changes to a single file. */
 
-class FileChanges extends _react.Component {
-  constructor(...args) {
-    var _temp;
+  }}exports.HunkDiff = HunkDiff;
 
-    return _temp = super(...args), this._handleFilenameClick = event => {
+
+/* Renders changes to a single file. */
+class FileChanges extends _react.Component {constructor(...args) {var _temp;return _temp = super(...args), this.
+
+
+
+
+    _handleFilenameClick = event => {
       const { fullPath } = this.props;
       if (fullPath == null) {
         return;
       }
       (0, (_goToLocation || _load_goToLocation()).goToLocation)(fullPath);
       event.stopPropagation();
-    }, _temp;
-  }
+    }, _temp;}
 
   render() {
     const {
@@ -281,45 +299,52 @@ class FileChanges extends _react.Component {
       fullPath,
       collapsable,
       collapsedByDefault,
-      grammar
-    } = this.props;
+      grammar } =
+    this.props;
     const {
       additions,
       annotation,
       chunks,
       deletions,
       from: fromFileName,
-      to: toFileName
-    } = diff;
+      to: toFileName } =
+    diff;
     const fileName = toFileName !== '/dev/null' ? toFileName : fromFileName;
     const hunks = [];
     let i = 0;
     for (const chunk of chunks) {
       if (i > 0) {
-        hunks.push(_react.createElement('div', { className: 'nuclide-ui-hunk-diff-spacer', key: `spacer-${i}` }));
+        hunks.push(
+        _react.createElement('div', { className: 'nuclide-ui-hunk-diff-spacer', key: `spacer-${i}` }));
+
       }
       hunks.push(
       // $FlowFixMe(>=0.53.0) Flow suppress
       _react.createElement(this.props.hunkComponentClass, {
         extraData: this.props.extraData,
         key: chunk.oldStart,
-        grammar: grammar != null ? grammar : atom.grammars.selectGrammar(fileName, ''),
-        hunk: chunk
-      }));
+        grammar:
+        grammar != null ?
+        grammar :
+        atom.grammars.selectGrammar(fileName, ''),
+
+        hunk: chunk }));
+
+
       i++;
     }
     let annotationComponent;
     if (annotation != null) {
-      annotationComponent = _react.createElement(
-        'span',
-        null,
-        annotation.split('\n').map((line, index) => _react.createElement(
-          'span',
-          { key: index },
+      annotationComponent =
+      _react.createElement('span', null,
+        annotation.split('\n').map((line, index) =>
+        _react.createElement('span', { key: index },
           line,
-          _react.createElement('br', null)
-        ))
-      );
+          _react.createElement('br', null))));
+
+
+
+
     }
 
     let addedOrDeletedString = '';
@@ -328,50 +353,47 @@ class FileChanges extends _react.Component {
     } else if (fromFileName === '/dev/null') {
       addedOrDeletedString = 'file added - ';
     }
-    const diffDetails = _react.createElement(
-      'span',
-      null,
-      annotationComponent,
-      ' (',
+    const diffDetails =
+    _react.createElement('span', { className: 'nuclide-ui-file-changes-details' },
+      annotationComponent, ' (',
       addedOrDeletedString,
-      additions + deletions,
-      ' ',
-      (0, (_string || _load_string()).pluralize)('line', additions + deletions),
-      ')'
-    );
+      additions + deletions, ' ', (0, (_string || _load_string()).pluralize)('line', additions + deletions), ')');
 
-    const renderedFilename = fullPath != null ? _react.createElement(
-      'a',
-      { onClick: this._handleFilenameClick },
-      fileName
-    ) : fileName;
+
+
+
+    const renderedFilename =
+    fullPath != null ?
+    _react.createElement('a', {
+        className: 'nuclide-ui-file-changes-name',
+        onClick: this._handleFilenameClick },
+      fileName) :
+
+
+    fileName;
+
 
     if (hideHeadline) {
       return hunks;
     }
 
-    const headline = _react.createElement(
-      'span',
-      { className: 'nuclide-ui-file-changes-item' },
-      renderedFilename,
-      ' ',
-      diffDetails
-    );
+    const headline =
+    _react.createElement('span', {
+        className: (0, (_classnames || _load_classnames()).default)(
+        'nuclide-ui-file-changes-item',
+        'native-key-bindings'),
+
+        tabIndex: -1 },
+      renderedFilename, ' ', diffDetails);
+
+
     return (
-      // $FlowFixMe(>=0.53.0) Flow suppress
-      _react.createElement(
-        (_Section || _load_Section()).Section,
-        {
+      _react.createElement((_Section || _load_Section()).Section, {
           collapsable: collapsable,
           collapsedByDefault: collapsedByDefault,
           headline: headline,
           title: 'Click to open' },
-        hunks
-      )
-    );
-  }
-}
-exports.default = FileChanges;
-FileChanges.defaultProps = {
-  hunkComponentClass: HunkDiff
-};
+        hunks));
+
+
+  }}exports.default = FileChanges;FileChanges.defaultProps = { hunkComponentClass: HunkDiff };

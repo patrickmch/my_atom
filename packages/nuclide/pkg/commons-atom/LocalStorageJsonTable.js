@@ -1,17 +1,25 @@
-'use strict';
+'use strict';Object.defineProperty(exports, "__esModule", { value: true });exports.LocalStorageJsonTable = undefined;var _observable;
 
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-exports.LocalStorageJsonTable = undefined;
 
-var _observable;
 
-function _load_observable() {
-  return _observable = require('nuclide-commons/observable');
-}
+
+
+
+
+
+
+
+
+
+function _load_observable() {return _observable = require('../../modules/nuclide-commons/observable');}
+
+
 
 class LocalStorageJsonTable {
+
+
+
+
 
   constructor(localStorageKey, cacheSize = 100) {
     this._localStorageKey = localStorageKey;
@@ -70,17 +78,13 @@ class LocalStorageJsonTable {
 
   getEntries() {
     return this._open().slice();
-  }
-}
-exports.LocalStorageJsonTable = LocalStorageJsonTable; /**
-                                                        * Copyright (c) 2015-present, Facebook, Inc.
-                                                        * All rights reserved.
-                                                        *
-                                                        * This source code is licensed under the license found in the LICENSE file in
-                                                        * the root directory of this source tree.
-                                                        *
-                                                        * 
-                                                        * @format
-                                                        */
-
-/* global localStorage */
+  }}exports.LocalStorageJsonTable = LocalStorageJsonTable; /**
+                                                            * Copyright (c) 2015-present, Facebook, Inc.
+                                                            * All rights reserved.
+                                                            *
+                                                            * This source code is licensed under the license found in the LICENSE file in
+                                                            * the root directory of this source tree.
+                                                            *
+                                                            * 
+                                                            * @format
+                                                            */ /* global localStorage */

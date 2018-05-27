@@ -4,6 +4,12 @@
 # This source code is licensed under the license found in the LICENSE file in
 # the root directory of this source tree.
 
+from __future__ import absolute_import
+from __future__ import division
+from __future__ import print_function
+from __future__ import unicode_literals
+
+import errno
 import getpass
 import hashlib
 import json
@@ -19,7 +25,6 @@ import jedi
 from parso.python.tree import ImportFrom
 import outline
 
-LOGGING_DIR = 'nuclide-%s-logs/python' % getpass.getuser()
 LIB_DIR = os.path.abspath('../VendorLib')
 WORKING_DIR = os.getcwd()
 
@@ -56,7 +61,19 @@ class JediServer:
 
     def init_logging(self):
         # Be consistent with the main Nuclide logs.
-        log_path = os.path.join(tempfile.gettempdir(), 'nuclide-jedi.log')
+        log_dir = os.path.join(
+            tempfile.gettempdir(),
+            'nuclide-%s-logs' % getpass.getuser()
+        )
+        try:
+            os.makedirs(log_dir)
+        except OSError as e:
+            if e.errno != errno.EEXIST:
+                # Skip logging on any other exception.
+                return
+        except Exception as e:
+            return
+        log_path = os.path.join(log_dir, 'nuclide-jedi.log')
         handler = FileHandler(log_path)
         handler.setFormatter(logging.Formatter(
             'nuclide-jedi-py %(asctime)s: [%(name)s] %(message)s'
@@ -83,13 +100,16 @@ class JediServer:
                 res['result'] = outline.get_outline(data['src'], data['contents'])
             elif method == 'get_hover':
                 res['result'] = self.get_hover(self.make_script(data), data['word'])
+            elif method == 'get_signature_help':
+                res['result'] = self.get_signature_help(self.make_script(data))
             else:
                 res['type'] = 'error-response'
                 res['error'] = 'Unknown method to jediserver.py: %s.' % method
         # Catch and ignore KeyErrors from jedi
         # See https://github.com/davidhalter/jedi/issues/590
-        except KeyError:
-            res['result'] = []
+        except KeyError as e:
+            self.logger.warn('Got KeyError exception %s', e)
+            res['result'] = None
         except Exception:
             res['type'] = 'error-response'
             res['error'] = traceback.format_exc()
@@ -203,6 +223,47 @@ class JediServer:
         docstring = docstring.replace('*', '\\*')
         return docstring
 
+    def get_signature_help(self, script):
+        # Loosely adapted from:
+        # https://github.com/palantir/python-language-server/blob/develop/pyls/plugins/signature.py
+        signatures = script.call_signatures()
+        if not signatures:
+            return None
+
+        leaf = script._get_module_node().get_leaf_for_position(script._pos)
+        # Don't return signatures inside string literals.
+        if leaf and leaf.type == 'string':
+            return None
+
+        # Python shouldn't ever have multiple signatures
+        s = signatures[0]
+        docstring = s.docstring()
+        raw_docstring = s.docstring(raw=True)
+        # In most cases Jedi prepends the function signature to the non-raw docstring.
+        # But this isn't always the case for some builtins, like isinstance.
+        if docstring != raw_docstring:
+            label = docstring[:len(docstring)-len(raw_docstring)].rstrip()
+        else:
+            params = ', '.join(map(lambda x: x.name, s.params))
+            label = s.name + '(' + params + ')'
+        sig = {
+            # Jedi always prepends the signature to the docstring
+            'label': label,
+            'documentation': raw_docstring,
+        }
+
+        # If there are params, add those
+        if s.params:
+            sig['parameters'] = [{
+                'label': p.name,
+                'documentation': p.docstring(),
+            } for p in s.params]
+
+        sig_info = {'signatures': [sig], 'activeSignature': 0}
+        if s.index is not None and s.params:
+            sig_info['activeParameter'] = s.index
+        return sig_info
+
     def serialize_definition(self, definition):
         return {
             'text': definition.name,
@@ -233,6 +294,6 @@ if __name__ == '__main__':
     # Let's use a temporary directory instead so it doesn't grow forever.
     jedi.settings.cache_directory = os.path.join(
         tempfile.gettempdir(),
-        'jedi-cache',
+        'jedi-cache-%s' % getpass.getuser(),
     )
     JediServer(args.paths).run()

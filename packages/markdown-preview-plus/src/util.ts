@@ -1,6 +1,7 @@
 export function handlePromise(promise: Promise<any>): void {
   if (!promise) return
   promise.catch((error: Error) => {
+    console.error(error)
     atom.notifications.addFatalError(error.toString(), {
       detail: error.message,
       stack: error.stack,
@@ -28,4 +29,35 @@ export function pairUp<T>(arr: T[], option?: string): Array<[T, T]> {
     if (index % 2 === 0) result.push([array[index], array[index + 1]])
     return result
   }, [])
+}
+
+export function isElement(node: Node): node is Element {
+  return node.nodeType === Node.ELEMENT_NODE
+}
+
+import { MarkdownPreviewViewString } from './markdown-preview-view'
+export async function copyHtml(
+  text: string,
+  filePath: string | undefined,
+  renderLaTeX: boolean,
+): Promise<void> {
+  const view = new MarkdownPreviewViewString(
+    text,
+    'copy',
+    renderLaTeX,
+    filePath,
+  )
+  view.element.style.visibility = 'hidden'
+  view.element.style.position = 'absolute'
+  view.element.style.pointerEvents = 'none'
+  const ws = atom.views.getView(atom.workspace)
+  ws.appendChild(view.element)
+  await view.renderPromise
+  const res = await view.getHTMLSVG()
+  if (res) atom.clipboard.write(res)
+  view.destroy()
+}
+
+export function atomConfig() {
+  return atom.config.get('markdown-preview-plus')
 }

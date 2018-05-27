@@ -4,7 +4,23 @@ let Observable;
 
 module.exports = _client => {
   const remoteModule = {};
-  remoteModule.AtomCommands = class {
+  remoteModule.MultiConnectionAtomCommands = class {
+    getConnectionCount() {
+      return Promise.all([_client.marshalArguments(Array.from(arguments), []), _client.marshal(this, {
+        kind: "named",
+        location: {
+          type: "source",
+          fileName: "rpc-types.js",
+          line: 87
+        },
+        name: "MultiConnectionAtomCommands"
+      })]).then(([args, id]) => _client.callRemoteMethod(id, "getConnectionCount", "promise", args)).then(value => {
+        return _client.unmarshal(value, {
+          kind: "number"
+        });
+      });
+    }
+
     openFile(arg0, arg1, arg2, arg3) {
       return Observable.fromPromise(Promise.all([_client.marshalArguments(Array.from(arguments), [{
         name: "filePath",
@@ -32,9 +48,9 @@ module.exports = _client => {
         location: {
           type: "source",
           fileName: "rpc-types.js",
-          line: 16
+          line: 87
         },
-        name: "AtomCommands"
+        name: "MultiConnectionAtomCommands"
       })])).switchMap(([args, id]) => _client.callRemoteMethod(id, "openFile", "observable", args)).concatMap(value => {
         return _client.unmarshal(value, {
           kind: "named",
@@ -69,9 +85,9 @@ module.exports = _client => {
         location: {
           type: "source",
           fileName: "rpc-types.js",
-          line: 16
+          line: 87
         },
-        name: "AtomCommands"
+        name: "MultiConnectionAtomCommands"
       })])).switchMap(([args, id]) => _client.callRemoteMethod(id, "openRemoteFile", "observable", args)).concatMap(value => {
         return _client.unmarshal(value, {
           kind: "named",
@@ -97,10 +113,52 @@ module.exports = _client => {
         location: {
           type: "source",
           fileName: "rpc-types.js",
-          line: 16
+          line: 87
         },
-        name: "AtomCommands"
+        name: "MultiConnectionAtomCommands"
       })]).then(([args, id]) => _client.callRemoteMethod(id, "addProject", "promise", args)).then(value => {
+        return _client.unmarshal(value, {
+          kind: "void"
+        });
+      });
+    }
+
+    getProjectStates() {
+      return Promise.all([_client.marshalArguments(Array.from(arguments), []), _client.marshal(this, {
+        kind: "named",
+        location: {
+          type: "source",
+          fileName: "rpc-types.js",
+          line: 87
+        },
+        name: "MultiConnectionAtomCommands"
+      })]).then(([args, id]) => _client.callRemoteMethod(id, "getProjectStates", "promise", args)).then(value => {
+        return _client.unmarshal(value, {
+          kind: "array",
+          type: {
+            kind: "named",
+            name: "ProjectState"
+          }
+        });
+      });
+    }
+
+    addNotification(arg0) {
+      return Promise.all([_client.marshalArguments(Array.from(arguments), [{
+        name: "notification",
+        type: {
+          kind: "named",
+          name: "AtomNotification"
+        }
+      }]), _client.marshal(this, {
+        kind: "named",
+        location: {
+          type: "source",
+          fileName: "rpc-types.js",
+          line: 87
+        },
+        name: "MultiConnectionAtomCommands"
+      })]).then(([args, id]) => _client.callRemoteMethod(id, "addNotification", "promise", args)).then(value => {
         return _client.unmarshal(value, {
           kind: "void"
         });
@@ -118,11 +176,8 @@ module.exports = _client => {
       return _client.callRemoteFunction("CommandService/getAtomCommands", "promise", args);
     }).then(value => {
       return _client.unmarshal(value, {
-        kind: "nullable",
-        type: {
-          kind: "named",
-          name: "AtomCommands"
-        }
+        kind: "named",
+        name: "MultiConnectionAtomCommands"
       });
     });
   };
@@ -212,7 +267,7 @@ Object.defineProperty(module.exports, "defs", {
       location: {
         type: "source",
         fileName: "rpc-types.js",
-        line: 15
+        line: 24
       },
       name: "AtomFileEvent",
       definition: {
@@ -226,22 +281,137 @@ Object.defineProperty(module.exports, "defs", {
         }]
       }
     },
-    AtomCommands: {
-      kind: "interface",
-      name: "AtomCommands",
+    ProjectState: {
+      kind: "alias",
       location: {
         type: "source",
         fileName: "rpc-types.js",
-        line: 16
+        line: 15
+      },
+      name: "ProjectState",
+      definition: {
+        kind: "object",
+        fields: [{
+          name: "rootFolders",
+          type: {
+            kind: "array",
+            type: {
+              kind: "string"
+            }
+          },
+          optional: false
+        }]
+      }
+    },
+    AtomNotificationType: {
+      kind: "alias",
+      location: {
+        type: "source",
+        fileName: "rpc-types.js",
+        line: 26
+      },
+      name: "AtomNotificationType",
+      definition: {
+        kind: "union",
+        types: [{
+          kind: "string-literal",
+          value: "success"
+        }, {
+          kind: "string-literal",
+          value: "info"
+        }, {
+          kind: "string-literal",
+          value: "warning"
+        }, {
+          kind: "string-literal",
+          value: "error"
+        }, {
+          kind: "string-literal",
+          value: "fatal"
+        }]
+      }
+    },
+    AtomNotification: {
+      kind: "alias",
+      location: {
+        type: "source",
+        fileName: "rpc-types.js",
+        line: 33
+      },
+      name: "AtomNotification",
+      definition: {
+        kind: "object",
+        fields: [{
+          name: "message",
+          type: {
+            kind: "string"
+          },
+          optional: false
+        }, {
+          name: "type",
+          type: {
+            kind: "named",
+            name: "AtomNotificationType"
+          },
+          optional: false
+        }, {
+          name: "description",
+          type: {
+            kind: "string"
+          },
+          optional: true
+        }, {
+          name: "detail",
+          type: {
+            kind: "string"
+          },
+          optional: true
+        }, {
+          name: "icon",
+          type: {
+            kind: "string"
+          },
+          optional: true
+        }, {
+          name: "dismissable",
+          type: {
+            kind: "boolean"
+          },
+          optional: true
+        }]
+      }
+    },
+    MultiConnectionAtomCommands: {
+      kind: "interface",
+      name: "MultiConnectionAtomCommands",
+      location: {
+        type: "source",
+        fileName: "rpc-types.js",
+        line: 87
       },
       constructorArgs: null,
       staticMethods: {},
       instanceMethods: {
+        getConnectionCount: {
+          location: {
+            type: "source",
+            fileName: "rpc-types.js",
+            line: 89
+          },
+          kind: "function",
+          argumentTypes: [],
+          returnType: {
+            kind: "promise",
+            type: {
+              kind: "number"
+            }
+          }
+        },
         openFile: {
           location: {
             type: "source",
             fileName: "rpc-types.js",
-            line: 17
+            line: 95
           },
           kind: "function",
           argumentTypes: [{
@@ -278,7 +448,7 @@ Object.defineProperty(module.exports, "defs", {
           location: {
             type: "source",
             fileName: "rpc-types.js",
-            line: 24
+            line: 107
           },
           kind: "function",
           argumentTypes: [{
@@ -314,7 +484,7 @@ Object.defineProperty(module.exports, "defs", {
           location: {
             type: "source",
             fileName: "rpc-types.js",
-            line: 37
+            line: 123
           },
           kind: "function",
           argumentTypes: [{
@@ -336,11 +506,51 @@ Object.defineProperty(module.exports, "defs", {
             }
           }
         },
+        getProjectStates: {
+          location: {
+            type: "source",
+            fileName: "rpc-types.js",
+            line: 129
+          },
+          kind: "function",
+          argumentTypes: [],
+          returnType: {
+            kind: "promise",
+            type: {
+              kind: "array",
+              type: {
+                kind: "named",
+                name: "ProjectState"
+              }
+            }
+          }
+        },
+        addNotification: {
+          location: {
+            type: "source",
+            fileName: "rpc-types.js",
+            line: 134
+          },
+          kind: "function",
+          argumentTypes: [{
+            name: "notification",
+            type: {
+              kind: "named",
+              name: "AtomNotification"
+            }
+          }],
+          returnType: {
+            kind: "promise",
+            type: {
+              kind: "void"
+            }
+          }
+        },
         dispose: {
           location: {
             type: "source",
             fileName: "rpc-types.js",
-            line: 38
+            line: 136
           },
           kind: "function",
           argumentTypes: [],
@@ -356,24 +566,21 @@ Object.defineProperty(module.exports, "defs", {
       location: {
         type: "source",
         fileName: "CommandService.js",
-        line: 17
+        line: 21
       },
       type: {
         location: {
           type: "source",
           fileName: "CommandService.js",
-          line: 17
+          line: 21
         },
         kind: "function",
         argumentTypes: [],
         returnType: {
           kind: "promise",
           type: {
-            kind: "nullable",
-            type: {
-              kind: "named",
-              name: "AtomCommands"
-            }
+            kind: "named",
+            name: "MultiConnectionAtomCommands"
           }
         }
       }
@@ -383,7 +590,7 @@ Object.defineProperty(module.exports, "defs", {
       location: {
         type: "source",
         fileName: "rpc-types.js",
-        line: 41
+        line: 139
       },
       name: "ConnectionDetails",
       definition: {
@@ -409,13 +616,13 @@ Object.defineProperty(module.exports, "defs", {
       location: {
         type: "source",
         fileName: "CommandService.js",
-        line: 21
+        line: 25
       },
       type: {
         location: {
           type: "source",
           fileName: "CommandService.js",
-          line: 21
+          line: 25
         },
         kind: "function",
         argumentTypes: [],

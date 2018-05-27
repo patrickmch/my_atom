@@ -1,56 +1,37 @@
-'use strict';
+'use strict';Object.defineProperty(exports, "__esModule", { value: true });exports.BufferSubscription = undefined;var _asyncToGenerator = _interopRequireDefault(require('async-to-generator'));var _UniversalDisposable;
 
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-exports.BufferSubscription = undefined;
 
-var _asyncToGenerator = _interopRequireDefault(require('async-to-generator'));
 
-var _UniversalDisposable;
 
-function _load_UniversalDisposable() {
-  return _UniversalDisposable = _interopRequireDefault(require('nuclide-commons/UniversalDisposable'));
-}
 
-var _log4js;
 
-function _load_log4js() {
-  return _log4js = require('log4js');
-}
 
-var _semver;
 
-function _load_semver() {
-  return _semver = _interopRequireDefault(require('semver'));
-}
 
-var _nuclideOpenFilesRpc;
 
-function _load_nuclideOpenFilesRpc() {
-  return _nuclideOpenFilesRpc = require('../../nuclide-open-files-rpc');
-}
 
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-/**
- * Copyright (c) 2015-present, Facebook, Inc.
- * All rights reserved.
- *
- * This source code is licensed under the license found in the LICENSE file in
- * the root directory of this source tree.
- *
- * 
- * @format
- */
 
-const logger = (0, (_log4js || _load_log4js()).getLogger)('nuclide-open-files');
 
-const RESYNC_TIMEOUT_MS = 2000;
 
-const ATOM_VERSION_CHECK_FOR_LANGUAGE_ID = '1.24.0-beta0';
 
-// Watches a TextBuffer for change/rename/destroy events and then sends
+
+
+
+
+function _load_UniversalDisposable() {return _UniversalDisposable = _interopRequireDefault(require('../../../modules/nuclide-commons/UniversalDisposable'));}var _log4js;
+function _load_log4js() {return _log4js = require('log4js');}var _semver;
+function _load_semver() {return _semver = _interopRequireDefault(require('semver'));}var _nuclideOpenFilesRpc;
+function _load_nuclideOpenFilesRpc() {return _nuclideOpenFilesRpc = require('../../nuclide-open-files-rpc');}function _interopRequireDefault(obj) {return obj && obj.__esModule ? obj : { default: obj };} /**
+                                                                                                                                                                                                            * Copyright (c) 2015-present, Facebook, Inc.
+                                                                                                                                                                                                            * All rights reserved.
+                                                                                                                                                                                                            *
+                                                                                                                                                                                                            * This source code is licensed under the license found in the LICENSE file in
+                                                                                                                                                                                                            * the root directory of this source tree.
+                                                                                                                                                                                                            *
+                                                                                                                                                                                                            * 
+                                                                                                                                                                                                            * @format
+                                                                                                                                                                                                            */const logger = (0, (_log4js || _load_log4js()).getLogger)('nuclide-open-files');const RESYNC_TIMEOUT_MS = 2000;const ATOM_VERSION_CHECK_FOR_LANGUAGE_ID = '1.24.0-beta0'; // Watches a TextBuffer for change/rename/destroy events and then sends
 // those events to the FileNotifier or NotifiersByConnection as appropriate.
 //
 // change/rename events go to the FileNotifier.
@@ -64,9 +45,15 @@ const ATOM_VERSION_CHECK_FOR_LANGUAGE_ID = '1.24.0-beta0';
 // per-connection info in NotifiersByConnection.
 class BufferSubscription {
 
-  constructor(notifiers, buffer) {
-    var _this = this;
 
+
+
+
+
+
+
+
+  constructor(notifiers, buffer) {var _this = this;
     this._notifiers = notifiers;
     this._buffer = buffer;
     this._notifier = null;
@@ -77,8 +64,8 @@ class BufferSubscription {
 
     const subscriptions = new (_UniversalDisposable || _load_UniversalDisposable()).default();
 
-    subscriptions.add(buffer.onDidChangeText((() => {
-      var _ref = (0, _asyncToGenerator.default)(function* (event) {
+    subscriptions.add(
+    buffer.onDidChangeText((() => {var _ref = (0, _asyncToGenerator.default)(function* (event) {
         // It's important that we increment the change count *before* waiting on the notifier.
         // This makes sure that any users who use `getVersion` in between obtain the correct version.
         _this._changeCount += event.changes.length;
@@ -88,18 +75,11 @@ class BufferSubscription {
 
         // Must inspect the buffer before awaiting on the notifier
         // to avoid race conditions
-        const filePath = _this._buffer.getPath();
+        const filePath = _this._buffer.getPath();if (!(
+        filePath != null)) {throw new Error('Invariant violation: "filePath != null"');}
+        const version = _this._changeCount;if (!(
 
-        if (!(filePath != null)) {
-          throw new Error('Invariant violation: "filePath != null"');
-        }
-
-        const version = _this._changeCount;
-
-        if (!(_this._notifier != null)) {
-          throw new Error('Invariant violation: "this._notifier != null"');
-        }
-
+        _this._notifier != null)) {throw new Error('Invariant violation: "this._notifier != null"');}
         const notifier = yield _this._notifier;
         if (_this._sentOpen) {
           // Changes must be sent in reverse order to ensure that they are applied cleanly.
@@ -111,39 +91,30 @@ class BufferSubscription {
               fileVersion: {
                 notifier,
                 filePath,
-                version: version - i
-              },
+                version: version - i },
+
               oldRange: edit.oldRange,
               newRange: edit.newRange,
               oldText: edit.oldText,
-              newText: edit.newText
-            });
+              newText: edit.newText });
+
           }
         } else {
           _this._sendOpenByNotifier(notifier, version);
         }
-      });
+      });return function (_x) {return _ref.apply(this, arguments);};})()));
 
-      return function (_x) {
-        return _ref.apply(this, arguments);
-      };
-    })()));
 
-    subscriptions.add(buffer.onDidSave((0, _asyncToGenerator.default)(function* () {
+    subscriptions.add(
+    buffer.onDidSave((0, _asyncToGenerator.default)(function* () {
       if (_this._notifier == null) {
         return;
       }
 
-      const filePath = _this._buffer.getPath();
+      const filePath = _this._buffer.getPath();if (!(
+      filePath != null)) {throw new Error('Invariant violation: "filePath != null"');}if (!(
 
-      if (!(filePath != null)) {
-        throw new Error('Invariant violation: "filePath != null"');
-      }
-
-      if (!(_this._notifier != null)) {
-        throw new Error('Invariant violation: "this._notifier != null"');
-      }
-
+      _this._notifier != null)) {throw new Error('Invariant violation: "this._notifier != null"');}
       const notifier = yield _this._notifier;
       const version = _this._changeCount;
       if (_this._sentOpen) {
@@ -152,13 +123,14 @@ class BufferSubscription {
           fileVersion: {
             notifier,
             filePath,
-            version
-          }
-        });
+            version } });
+
+
       } else {
         _this._sendOpenByNotifier(notifier, version);
       }
     })));
+
 
     this._subscriptions = subscriptions;
 
@@ -170,16 +142,15 @@ class BufferSubscription {
     // TODO: Could watch onDidReload() which will catch the case where an empty file is opened
     // after startup, leaving the only failure the reopening of empty files at startup.
     if (this._buffer.getText() !== '' && this._notifier != null) {
-      this._notifier.then(notifier => this._sendOpenByNotifier(notifier, this._changeCount));
+      this._notifier.then(notifier =>
+      this._sendOpenByNotifier(notifier, this._changeCount));
+
     }
   }
 
   _sendOpenByNotifier(notifier, version) {
-    const filePath = this._buffer.getPath();
-
-    if (!(filePath != null)) {
-      throw new Error('Invariant violation: "filePath != null"');
-    }
+    const filePath = this._buffer.getPath();if (!(
+    filePath != null)) {throw new Error('Invariant violation: "filePath != null"');}
 
     const contents = this._buffer.getText();
     const languageId = this._getLanguageId(filePath, contents);
@@ -189,11 +160,11 @@ class BufferSubscription {
       fileVersion: {
         notifier,
         filePath,
-        version
-      },
+        version },
+
       contents,
-      languageId
-    });
+      languageId });
+
   }
 
   /** TODO(hansonw): remove version check after Atom 1.24 drops. */
@@ -209,14 +180,8 @@ class BufferSubscription {
     return this._changeCount;
   }
 
-  sendEvent(event) {
-    var _this2 = this;
-
-    return (0, _asyncToGenerator.default)(function* () {
-      if (!(event.kind !== (_nuclideOpenFilesRpc || _load_nuclideOpenFilesRpc()).FileEventKind.SYNC)) {
-        throw new Error('Invariant violation: "event.kind !== FileEventKind.SYNC"');
-      }
-
+  sendEvent(event) {var _this2 = this;return (0, _asyncToGenerator.default)(function* () {if (!(
+      event.kind !== (_nuclideOpenFilesRpc || _load_nuclideOpenFilesRpc()).FileEventKind.SYNC)) {throw new Error('Invariant violation: "event.kind !== FileEventKind.SYNC"');}
       try {
         yield event.fileVersion.notifier.onFileEvent(event);
         _this2.updateServerVersion(event.fileVersion.version);
@@ -229,8 +194,7 @@ class BufferSubscription {
         } else {
           logger.error('File renamed, so no resync attempted');
         }
-      }
-    })();
+      }})();
   }
 
   updateServerVersion(sentVersion) {
@@ -240,9 +204,7 @@ class BufferSubscription {
 
   // Something went awry in our synchronization protocol
   // Attempt a reset with a 'sync' event.
-  attemptResync() {
-    var _this3 = this;
-
+  attemptResync() {var _this3 = this;
     // always attempt to resync to the latest version
     const resyncVersion = this._changeCount;
     const filePath = this._buffer.getPath();
@@ -253,17 +215,12 @@ class BufferSubscription {
       logger.error('At most recent edit, attempting file resync');
       this._lastAttemptedSync = resyncVersion;
 
-      const sendResync = (() => {
-        var _ref3 = (0, _asyncToGenerator.default)(function* () {
+      const sendResync = (() => {var _ref3 = (0, _asyncToGenerator.default)(function* () {
           if (_this3._notifier == null) {
             logger.error('Resync preempted by remote connection closed');
             return;
-          }
-
-          if (!(filePath != null)) {
-            throw new Error('Invariant violation: "filePath != null"');
-          }
-
+          }if (!(
+          filePath != null)) {throw new Error('Invariant violation: "filePath != null"');}
           const notifier = yield _this3._notifier;
           if (_this3._buffer.isDestroyed()) {
             logger.error('Resync preempted by later event');
@@ -282,18 +239,23 @@ class BufferSubscription {
               fileVersion: {
                 notifier,
                 filePath,
-                version: resyncVersion
-              },
+                version: resyncVersion },
+
               contents,
-              languageId
-            };
+              languageId };
+
             try {
               yield notifier.onFileEvent(syncEvent);
               _this3.updateServerVersion(resyncVersion);
 
-              logger.error(`Successful resync event: ${eventToString(syncEvent)}`);
+              logger.error(
+              `Successful resync event: ${eventToString(syncEvent)}`);
+
             } catch (syncError) {
-              logger.error(`Error sending file sync event: ${eventToString(syncEvent)}`, syncError);
+              logger.error(
+              `Error sending file sync event: ${eventToString(syncEvent)}`,
+              syncError);
+
 
               // continue trying until either the file is closed,
               // or a resync to a later edit is attempted
@@ -301,12 +263,7 @@ class BufferSubscription {
               setTimeout(sendResync, RESYNC_TIMEOUT_MS);
             }
           }
-        });
-
-        return function sendResync() {
-          return _ref3.apply(this, arguments);
-        };
-      })();
+        });return function sendResync() {return _ref3.apply(this, arguments);};})();
 
       sendResync();
     } else {
@@ -325,10 +282,9 @@ class BufferSubscription {
     this.sendClose();
     this._notifier = null;
     this._subscriptions.dispose();
-  }
-}
+  }}exports.BufferSubscription = BufferSubscription;
 
-exports.BufferSubscription = BufferSubscription;
+
 function eventToString(event) {
   const jsonable = Object.assign({}, event);
   jsonable.fileVersion = Object.assign({}, event.fileVersion);

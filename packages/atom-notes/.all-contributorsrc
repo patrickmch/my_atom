@@ -146,6 +146,72 @@
       "contributions": [
         "bug"
       ]
+    },
+    {
+      "login": "jmroland",
+      "name": "jmroland",
+      "avatar_url": "https://avatars0.githubusercontent.com/u/10378631?v=4",
+      "profile": "https://github.com/jmroland",
+      "contributions": [
+        "bug"
+      ]
+    },
+    {
+      "login": "jonszcz",
+      "name": "jonszcz",
+      "avatar_url": "https://avatars0.githubusercontent.com/u/3603408?v=4",
+      "profile": "https://github.com/jonszcz",
+      "contributions": [
+        "bug"
+      ]
+    },
+    {
+      "login": "lodestone",
+      "name": "Matt Petty",
+      "avatar_url": "https://avatars3.githubusercontent.com/u/8401?v=4",
+      "profile": "http://spacerobots.net",
+      "contributions": [
+        "code"
+      ]
+    },
+    {
+      "login": "robwalton",
+      "name": "Rob Walton",
+      "avatar_url": "https://avatars1.githubusercontent.com/u/1565171?v=4",
+      "profile": "http://diamond.ac.uk",
+      "contributions": [
+        "code",
+        "bug",
+        "doc"
+      ]
+    },
+    {
+      "login": "tthkbw",
+      "name": "tthkbw",
+      "avatar_url": "https://avatars2.githubusercontent.com/u/6437525?v=4",
+      "profile": "https://github.com/tthkbw",
+      "contributions": [
+        "bug"
+      ]
+    },
+    {
+      "login": "instalab",
+      "name": "Samuel Boczek",
+      "avatar_url": "https://avatars2.githubusercontent.com/u/23265116?v=4",
+      "profile": "https://github.com/instalab",
+      "contributions": [
+        "code"
+      ]
+    },
+    {
+      "login": "rcraggs",
+      "name": "Richard",
+      "avatar_url": "https://avatars3.githubusercontent.com/u/3081903?v=4",
+      "profile": "https://github.com/rcraggs",
+      "contributions": [
+        "bug"
+      ]
     }
-  ]
+  ],
+  "repoType": "github"
 }

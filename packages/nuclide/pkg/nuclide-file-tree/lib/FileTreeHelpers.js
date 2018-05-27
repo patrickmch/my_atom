@@ -1,72 +1,65 @@
-'use strict';
+'use strict';Object.defineProperty(exports, "__esModule", { value: true });var _Constants;
 
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
 
-var _Constants;
 
-function _load_Constants() {
-  return _Constants = require('./Constants');
-}
 
-var _atom = require('atom');
 
-var _nuclideRemoteConnection;
 
-function _load_nuclideRemoteConnection() {
-  return _nuclideRemoteConnection = require('../../nuclide-remote-connection');
-}
 
-var _nuclideUri;
 
-function _load_nuclideUri() {
-  return _nuclideUri = _interopRequireDefault(require('nuclide-commons/nuclideUri'));
-}
 
-var _featureConfig;
 
-function _load_featureConfig() {
-  return _featureConfig = _interopRequireDefault(require('nuclide-commons-atom/feature-config'));
-}
 
-var _observable;
 
-function _load_observable() {
-  return _observable = require('nuclide-commons/observable');
-}
 
+
+
+
+
+function _load_Constants() {return _Constants = require('./Constants');}
+
+
+
+var _atom = require('atom');var _nuclideRemoteConnection;
+
+function _load_nuclideRemoteConnection() {return _nuclideRemoteConnection = require('../../nuclide-remote-connection');}var _nuclideUri;
+
+
+
+
+function _load_nuclideUri() {return _nuclideUri = _interopRequireDefault(require('../../../modules/nuclide-commons/nuclideUri'));}var _featureConfig;
+function _load_featureConfig() {return _featureConfig = _interopRequireDefault(require('../../../modules/nuclide-commons-atom/feature-config'));}var _observable;
+function _load_observable() {return _observable = require('../../../modules/nuclide-commons/observable');}
 var _rxjsBundlesRxMinJs = require('rxjs/bundles/Rx.min.js');
 
 var _crypto = _interopRequireDefault(require('crypto'));
+var _os = _interopRequireDefault(require('os'));var _nuclideFsAtom;
+function _load_nuclideFsAtom() {return _nuclideFsAtom = require('../../nuclide-fs-atom');}function _interopRequireDefault(obj) {return obj && obj.__esModule ? obj : { default: obj };} /**
+                                                                                                                                                                                         * Copyright (c) 2015-present, Facebook, Inc.
+                                                                                                                                                                                         * All rights reserved.
+                                                                                                                                                                                         *
+                                                                                                                                                                                         * This source code is licensed under the license found in the LICENSE file in
+                                                                                                                                                                                         * the root directory of this source tree.
+                                                                                                                                                                                         *
+                                                                                                                                                                                         * 
+                                                                                                                                                                                         * @format
+                                                                                                                                                                                         */
 
-var _os = _interopRequireDefault(require('os'));
 
-var _nuclideFsAtom;
 
-function _load_nuclideFsAtom() {
-  return _nuclideFsAtom = require('../../nuclide-fs-atom');
-}
 
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-/**
- * Copyright (c) 2015-present, Facebook, Inc.
- * All rights reserved.
- *
- * This source code is licensed under the license found in the LICENSE file in
- * the root directory of this source tree.
- *
- * 
- * @format
- */
 
 function dirPathToKey(path) {
-  return (_nuclideUri || _load_nuclideUri()).default.ensureTrailingSeparator((_nuclideUri || _load_nuclideUri()).default.trimTrailingSeparator(path));
+  return (_nuclideUri || _load_nuclideUri()).default.ensureTrailingSeparator(
+  (_nuclideUri || _load_nuclideUri()).default.trimTrailingSeparator(path));
+
 }
 
 function isDirOrArchiveKey(key) {
-  return (_nuclideUri || _load_nuclideUri()).default.endsWithSeparator(key) || (_nuclideUri || _load_nuclideUri()).default.hasKnownArchiveExtension(key);
+  return (
+    (_nuclideUri || _load_nuclideUri()).default.endsWithSeparator(key) ||
+    (_nuclideUri || _load_nuclideUri()).default.hasKnownArchiveExtension(key));
+
 }
 
 function keyToName(key) {
@@ -130,10 +123,12 @@ function getDirectoryByKey(key) {
       return connection.createDirectory(path);
     }
   } else if ((_nuclideUri || _load_nuclideUri()).default.hasKnownArchiveExtension(key)) {
+    // $FlowFixMe(>=0.68.0) Flow suppress (T27187857)
     return (_nuclideFsAtom || _load_nuclideFsAtom()).ROOT_ARCHIVE_FS.newArchiveFileAsDirectory(path);
   } else if (!(_nuclideUri || _load_nuclideUri()).default.isInArchive(path)) {
     return new _atom.Directory(path);
   } else {
+    // $FlowFixMe(>=0.68.0) Flow suppress (T27187857)
     return (_nuclideFsAtom || _load_nuclideFsAtom()).ROOT_ARCHIVE_FS.newArchiveDirectory(path);
   }
 }
@@ -151,6 +146,7 @@ function getFileByKey(key) {
   } else if (!(_nuclideUri || _load_nuclideUri()).default.isInArchive(path)) {
     return new _atom.File(path);
   } else {
+    // $FlowFixMe(>=0.68.0) Flow suppress (T27187857)
     return (_nuclideFsAtom || _load_nuclideFsAtom()).ROOT_ARCHIVE_FS.newArchiveFile(path);
   }
 }
@@ -189,15 +185,28 @@ function isLocalEntry(entry) {
 }
 
 function isContextClick(event) {
-  return event.button === 2 || event.button === 0 && event.ctrlKey === true && process.platform === 'darwin';
+  return (
+    event.button === 2 ||
+    event.button === 0 &&
+    event.ctrlKey === true &&
+    process.platform === 'darwin');
+
 }
 
 function buildHashKey(nodeKey) {
-  return _crypto.default.createHash('MD5').update(nodeKey).digest('base64');
+  return _crypto.default.
+  createHash('MD5').
+  update(nodeKey).
+  digest('base64');
 }
 
-function observeUncommittedChangesKindConfigKey() {
-  return (0, (_observable || _load_observable()).cacheWhileSubscribed)((_featureConfig || _load_featureConfig()).default.observeAsStream((_Constants || _load_Constants()).SHOW_UNCOMMITTED_CHANGES_KIND_CONFIG_KEY).map(setting => {
+function observeUncommittedChangesKindConfigKey()
+
+{
+  return (0, (_observable || _load_observable()).cacheWhileSubscribed)(
+  (_featureConfig || _load_featureConfig()).default.
+  observeAsStream((_Constants || _load_Constants()).SHOW_UNCOMMITTED_CHANGES_KIND_CONFIG_KEY).
+  map(setting => {
     // We need to map the unsanitized feature-setting string
     // into a properly typed value:
     switch (setting) {
@@ -206,12 +215,17 @@ function observeUncommittedChangesKindConfigKey() {
       case (_Constants || _load_Constants()).ShowUncommittedChangesKind.STACK:
         return (_Constants || _load_Constants()).ShowUncommittedChangesKind.STACK;
       default:
-        return (_Constants || _load_Constants()).ShowUncommittedChangesKind.UNCOMMITTED;
-    }
-  }).distinctUntilChanged());
+        return (_Constants || _load_Constants()).ShowUncommittedChangesKind.UNCOMMITTED;}
+
+  }).
+  distinctUntilChanged());
+
 }
 
-function updatePathInOpenedEditors(oldPath, newPath) {
+function updatePathInOpenedEditors(
+oldPath,
+newPath)
+{
   atom.workspace.getTextEditors().forEach(editor => {
     const buffer = editor.getBuffer();
     const bufferPath = buffer.getPath();
@@ -224,11 +238,10 @@ function updatePathInOpenedEditors(oldPath, newPath) {
       const newBufferPath = (_nuclideUri || _load_nuclideUri()).default.join(newPath, relativeToOld);
       // setPath() doesn't work correctly with remote files.
       // We need to create a new remote file and reset the underlying file.
-      const file = getFileByKey(newBufferPath);
+      const file = getFileByKey(newBufferPath);if (!(
 
-      if (!(file != null)) {
-        throw new Error(`Could not update open file ${oldPath} to ${newBufferPath}`);
-      }
+      file != null)) {throw new Error(
+        `Could not update open file ${oldPath} to ${newBufferPath}`);}
 
       buffer.setFile(file);
     }
@@ -236,7 +249,10 @@ function updatePathInOpenedEditors(oldPath, newPath) {
 }
 
 function getSelectionMode(event) {
-  if (_os.default.platform() === 'darwin' && event.metaKey && event.button === 0 || _os.default.platform() !== 'darwin' && event.ctrlKey && event.button === 0) {
+  if (
+  _os.default.platform() === 'darwin' && event.metaKey && event.button === 0 ||
+  _os.default.platform() !== 'darwin' && event.ctrlKey && event.button === 0)
+  {
     return 'multi-select';
   }
   if (_os.default.platform() === 'darwin' && event.ctrlKey && event.button === 0) {
@@ -249,9 +265,9 @@ function getSelectionMode(event) {
     return 'single-select';
   }
   return 'invalid-select';
-}
+}exports.default =
 
-exports.default = {
+{
   dirPathToKey,
   isDirOrArchiveKey,
   keyToName,
@@ -268,5 +284,4 @@ exports.default = {
   buildHashKey,
   observeUncommittedChangesKindConfigKey,
   updatePathInOpenedEditors,
-  getSelectionMode
-};
+  getSelectionMode };

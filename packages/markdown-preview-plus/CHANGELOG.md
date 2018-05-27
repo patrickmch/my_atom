@@ -1,3 +1,246 @@
+## 3.2.1
+
+-   Wrap code block lines in print media
+
+    Previously, code blocks with overlong lines would be printed to pdf/paper
+    with scroll-bars (which obviously can't be scrolled) and cut-off lines.
+    This has been fixed.
+
+## 3.2.0
+
+### Changes
+
+-   Updated MathJax CDN URL in saved HTML
+
+-   Enabled MathJax menu in saved HTML
+
+-   Added accessability extensions to MathJax config in saved HTML
+
+-   Saved HTML will use math config from package settings
+
+    This is mostly related to equation numbering
+
+### New features
+
+-   Context menu item to reopen preview in a new window. Caveats apply
+
+    It's now possible to move a given preview to a new Atom window. For
+    file-based previews, this could be done prior by simple tab drag-n-drop.
+    For editor-based previews, drag-n-drop doesn't work.
+
+    A new preview context menu option 'Open in new window' and command
+    `markdown-preview-plus:new-window` can be used on any preview to
+    move it to a new Atom window.
+
+    This can be useful in multi-monitor setups.
+
+### Fixes
+
+-   Force re-render of `li` elements on changes
+
+    In some cases, `li` elements wouldn't be updated properly due to
+    weridness in Chromium. To avoid that, those have to be forcibly re-rendered.
+    See [#386](https://github.com/atom-community/markdown-preview-plus/issues/386)
+    for details.
+
+-   Disable image fonts in MathJax config
+
+    Reportedly, in some rare cases, MathJax would try to load image fonts, but
+    our MathJax for Electron lacks those. The config was amended to tell
+    MathJax that it shouldn't look for math fonts.
+
+-   Fix preview reload on settings change
+
+    Preview could fail to reload when some settings were changed (in particular,
+    equation numbering)
+
+### Maintenence
+
+-   Reduce copying in UpdatePreview
+-   Better request-reply for webview
+-   Get saved HTML TeX config from preview
+
+## 3.1.1
+
+-   Fix preview navigating to external URLs
+-   When activatePreviewWithEditor enabled, don't activate preview if editor is
+    in the same pane as preview
+
+## 3.1.0
+
+### Changes
+
+-   Settings cleanup
+
+    Settings have been reworked to provide better categorization.
+    Old package config should be migrated automatically after upgrade,
+    but be sure to check just in case.
+
+-   MPP will now disable bundled `markdown-preview` on first activation to avoid
+    conflicts.
+
+-   Most package config changes related to rendering will now be automatically
+    applied to all open previews instantly.
+
+-   Removed makrdown-pdf compatibility. Since we provide our own PDF export,
+    and markdown-pdf not supporting compatiblity with MPP by default, and that
+    whole code branch being deprecated, this shouldn't affect many users.
+
+### New features
+
+-   Options to relativize media paths on save/copy
+
+    This behaviour is controlled by `saveConfig.mediaOnSaveAsHTMLBehaviour` and
+    `saveConfig.mediaOnCopyAsHTMLBehaviour`. Both can have value of:
+    -   `untouched` -- media paths will be left as they are in source Markdown
+    -   `relativized` -- media paths will be relativized wrt save path (on save)
+        or Markdown file path (on copy)
+    -   `absolutized` -- media paths will be absolutized. This is the behaviour
+        of all previous versions, and bundled markdown-preview.
+
+-   In addition to images, `audio` and `video` tags sources are also resolved
+    in the filesystem and are auto-updated on source file changes.
+
+-   Optional support for `markdown-it-table-of-contents` plugin.
+
+    When enabled in package config, `[[toc]]` will be replaced with table of
+    contents when using markdown-it parser/renderer.
+
+-   Added 'Print' menu item to preview context menu and
+    `markdown-preview-plus:print` command. This will display system
+    printing dialog, which will also offer saving to PDF.
+
+-   Continuous scroll syncronization.
+
+    There are two possible synchronization directions:
+
+    -   Autoscroll preview when editor is scrolled
+
+        This is controlled by `syncConfig.syncEditorOnPreviewScroll` setting
+
+    -   Autoscroll editor when preview is scrolled
+
+        This is controlled by `syncConfig.syncEditorOnPreviewScroll` setting
+
+    When both are enabled, preview/editor is autoscroleld only when
+    editor/preview respectively is in the active pane. In practice this can
+    mean an additional click to engage scroll syncronization.
+
+-   Support for auto-numbered math.
+
+    Note that to support this, all math has to be re-rendered if even one
+    equation changes. This can be slow, especially with documents containing
+    a lot of math, and re-rendering flicker can be distracting.
+
+### Fixes
+
+-   Fix github-style saved HTML scrollability
+
+    Due to botched CSS style, HTML saved with github style was not scrollable.
+
+-   Fix unneeded reinitializations in markdown-it parser/renderer
+
+    Due to botched check for changed settings, markdown-it was reinitialized
+    on every render. Now that this has been fixed, rendering with
+    markdown-it backend should be a little bit faster.
+
+-   Labelled MathJax math doesn't break on re-renders anymore. See
+    [#180](https://github.com/atom-community/markdown-preview-plus/issues/180)
+    for more details
+
+-   Math will only be typeset if there's any unprocessed math. This should
+    speed up rendering a tiny bit and it will avoid unnecessary re-renders
+    when math numbering is on.
+
+### Maintenence
+
+-   Don't use deprecated sinon.reset()
+-   Throw error when trying to saveAs a loading preview
+-   Spec for saveConfig configuration
+-   Add spec: disable bundled markdown-preview on activation
+-   Clean-up pandoc-helper exports
+-   Rewrite highlighting spec to be less hacky
+-   Avoid global state and more clean-up in markdown-it-helper
+-   Clean-up markdown-it-helper
+-   Fix mathjax-helper spec
+-   Add equation numbering spec
+
+## 3.0.1
+
+### Changes
+
+-   Preview is rendered inside a WebView now
+
+    This provides better isolation.
+    As a bonus, `pandoc --standalone`, `pandoc --toc` and `pandoc --css` should
+    now "just work", and PDF export is handled by the WebView
+    semi-automatically (see below).
+
+-   `openPreviewInSplitPane` option removed. Set `previewSplitPaneDir` to `none
+    if you want to disable pane splitting.
+
+-   Math is rendered using SVG renderer by default (due to it being faster).
+    You can change to HTML-CSS renderer using package settings.
+
+### New features
+
+-   Save to PDF
+
+    To use this feature, right-click on preview, choose 'Save As...' and use
+    a filename with '.pdf' extension.
+
+-   Configurable math renderer (HTML-CSS or SVG)
+-   Zoom on ctrl-scroll
+-   Open links in preview
+
+    Links to local files will be opened either in Atom, or via system
+    opener. URLs will be open with the default browser.
+
+### GUI options
+
+-   Add option to open preview in dock
+-   Sync on change
+-   Close preview with editor
+-   Activate preview when editor activates
+
+### Fixes
+
+-   Skip text{} in inline math
+-   Fix outdated JSDoc
+-   Fix task list CSS (remove extraneous bullet point)
+
+### Maintenence
+
+-   Clean-up code
+-   Bump dependencies (most notably, MathJax updated to 2.7.4)
+-   Switch to using morphdom library for diff-updates instead of using "home-grown" solution
+-   Stop ignoring package-lock
+-   Use atom-ts-spec-runner
+-   Disable persistence in spec runner (can lose config on Atom >= 1.25)
+-   Fix grammar in README (#356) (Steve Moser)
+-   Update styles during differential update
+-   Nested math example
+-   Memeber-access, member-ordering
+-   Factor MarkdownPreviewView into two subclasses
+-   Use old URL parser (less noise)
+-   Fix file URL parsing
+-   Fix latex macro name guide link
+-   Simplify mathjax rendering a bit
+-   Add spinner to placeholder view
+-   Bind preview to editor directly instead of via editorId
+-   Destroy preview on editor close
+-   Report copy\/save html errors more explicitly
+-   Use Atom's new save-as approach
+
+## 2.5.7
+
+-   Do not show list bullets for checkbox lists
+
+## 2.5.6
+
+-   Add overflow:auto to saved html code blocks style
+-   Updated spec to not break horribly on new Atom versions
+
 ## 2.5.5
 
 -   Make duplicate attachMathJax calls safe
@@ -9,7 +252,7 @@
 
 ## 2.5.3
 
--   [Workaround] Work around for Atom bug #16801
+-   \[Workaround\] Work around for Atom bug \#16801
 
 ## 2.5.2
 
@@ -520,7 +763,7 @@
     Sawicki)
 -   Prepare 0.147.0 release (Kevin Sawicki)
 -   Conditionally include deprecated APIs (Kevin Sawicki)
--   Style <code> blocks consistently with GitHub.com Remove nowrap from
+-   Style `<code>` blocks consistently with GitHub.com Remove nowrap from
     the styling (Adam Montgomery)
 -   Prepare 0.146.0 release (Kevin Sawicki)
 -   Merge pull request \#227 from m4b/patch-1 (Kevin Sawicki)

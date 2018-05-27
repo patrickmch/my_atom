@@ -1,160 +1,75 @@
-// Headings
-//
-// Heading styles
-//
-// Markup: headings.hbs
-//
-// Weight: 2
-//
-// Style guide: headings
+"""local settings intended to be used in the NOLS default dev environment."""
 
-/// @author Mark Wirblich <mark@lincolnloop.com>
+import os
+import sys
+from .base import *
 
-.heading-xxxxxx-large {
-  @include heading('xxxxxx-large');
+# Toggle use of local database VM
+USE_ORA_VM = os.getenv('ORAVM', False)
+if USE_ORA_VM:
+    NOLS_DA_DSN = 'oravm'
+    NOLS_DA_HTTP_HOST = 'oravm'
+    DATABASES['default']['NAME'] = 'oravm'
+    DATABASES['default']['HOST'] = 'oravm'
+    FLAMINGO_PASSWORD = 'florida'
+
+DEBUG = True
+TEMPLATE_DEBUG = DEBUG
+
+NOLS_WEB_HOST = 'localhost:8888'
+NEXUS_SERVER = NOLS_WEB_HOST if USE_ORA_VM else 'nexusclone.nols.edu'
+
+LOCAL_USER = environ['USER']
+DATABASES['default']['USER'] += '_%s' % LOCAL_USER
+
+# Test Database
+DATABASES['default']['TEST'] = {
+    'NAME': '_'.join(['test', DATABASES['default']['NAME'], LOCAL_USER])
+}
+DATABASES['default']['TEST']['TBLSPACE'] = '_'.join(
+    ['test', DATABASES['default']['NAME'], LOCAL_USER]
+)
+DATABASES['default']['TEST']['TBLSPACE_TMP'] = '_'.join(
+    ['test', DATABASES['default']['NAME'], 'temp', LOCAL_USER]
+)
+
+TEST_FIRST_NAME = u''.join([unicode(LOCAL_USER), u'\xe9'])
+
+CACHES['default'] = {
+    'BACKEND': 'django.core.cache.backends.locmem.LocMemCache'
 }
 
-.heading-xxxxx-large {
-  @include heading('xxxxx-large');
-}
+# debug toolbar settings
+USE_DEBUG_TOOLBAR = False
+INSTALLED_APPS.append('sslserver')
+if USE_DEBUG_TOOLBAR:
+    INSTALLED_APPS.append('debug_toolbar')
+    MIDDLEWARE_CLASSES.append('debug_toolbar.middleware.DebugToolbarMiddleware')
 
-.heading-xxxx-large {
-  @include heading('xxxx-large');
-}
 
-.heading-xxx-large {
-  @include heading('xxx-large');
-}
+EMAIL_BACKEND = 'django.core.mail.backends.filebased.EmailBackend'
+EMAIL_FILE_PATH = '/tmp/website-email'
 
-.heading-xx-large {
-  @include heading('xx-large');
-}
+LOGGING['handlers']['file']['level'] = 'DEBUG'
+for key in LOGGING['loggers'].keys():
+    LOGGING['loggers'][key]['handlers'] = ['mail_admins', 'file']
 
-.heading-x-large {
-  @include heading('x-large');
-}
+ALLOWED_HOSTS.append('localhost')
 
-.heading-large {
-  @include heading('large');
-}
+AXES_IP_WHITELIST.append('127.0.0.1')
 
-.heading-regular {
-  @include heading('regular', .5em);
-}
+# Use this test api key in dev. You can view activity from this api key by logging into NOLS
+# Mandrill account, and switching to test mode.
+MANDRILL_API_KEY = 'rp6IowynBLZ4M3PnoMnAUw'
+if len(sys.argv) > 1 and (sys.argv[1] == 'test' or sys.argv[0] == 'nosetests'):
+    MANDRILL_BACKEND = 'django.core.mail.backends.locmem.EmailBackend'
 
-.heading-small {
-  @include heading('small');
-}
+MEDIA_URL = '/'
 
-.heading-lead {
-  @include heading-lead;
-}
+STATICFILES_STORAGE = 'django.contrib.staticfiles.storage.StaticFilesStorage'
 
-.heading-group {
-  margin-bottom: rem-calc(60);
-
-  h2 {
-    margin-bottom: 0;
-  }
-
-  h2 + h3 {
-    margin-top: .1em;
-  }
-
-  &--has-location {
-      display: block;
-      float: left;
-      margin-right: $heading-location-icon-margin;
-      width: $heading-location-icon-width;
-      height: rem-calc(140);
-      background: svg('fieldnote_location_icon.svg') no-repeat;
-      background-size: 100% 100%;
-      transform: translateY(-10px);
-      -webkit-transform: translateY(-10px);
-
-      @include breakpoint(large) {
-        margin-left: -($heading-location-icon-margin + $heading-location-icon-width);
-      }
-
-    & ~ div {
-      padding-left: ($heading-location-icon-margin + $heading-location-icon-width);
-
-      @include breakpoint(large) {
-        padding-left: 0;
-      }
-    }
-  }
-}
-
-.stage--is-hero {
-  .heading-group {
-    //margin-top: 2em;
-    //
-    //
-    margin-bottom: rem-calc(30);
-
-    & > * {
-      line-height: 1;
-    }
-
-    h3 {
-      margin-top: 1em;
-    }
-
-    h4 {
-      margin-bottom: .2em;
-    }
-
-    &--wrapper {
-      padding-top: rem-calc(50);
-
-      @include breakpoint(medium) {
-        padding-top: rem-calc(100);
-      }
-    }
-  }
-}
-
-.heading-intro {
-  margin-bottom: 1em;
-
-  [class*='heading-'] {
-    margin-bottom: .5em;
-    padding-bottom: .5em;
-    color: $color-mud;
-    border-bottom: 1px solid $color-mud;
-  }
-
-  p {
-    @include text-xlarge;
-  //  padding: 0 2em;
-
-    @include breakpoint(medium) {
-      padding: 0 2em;
-    }
-  }
-}
-
-.heading-block {
-  background: $color-light;
-  text-align: center;
-
-  * {
-    @include heading('large');
-    margin-bottom: 0;
-    padding: rem-calc($gutter);
-  }
-}
-
-.heading-arrow {
-  &--down {
-    display: inline-block;
-    width: rem-calc(40);
-
-    svg {
-      width: 100%;
-      max-width: 100%;
-      height: 100%;
-    }
-  }
-}
+# CMS_HOST defaults to www.nols.edu
+# CMS_HOST = 'http://testweb.nols.edu'
+# CMS_HOST = 'http://localhost:3000'
+# API_HOST defaults to cs1.dev.nols.edu, but if you wan to run api locally, uncomment this
+# API_HOST = 'localhost:8080'

@@ -565,6 +565,24 @@ module.exports = _client => {
     });
   };
 
+  remoteModule.tempdir = function (arg0) {
+    return _client.marshalArguments(Array.from(arguments), [{
+      name: "prefix",
+      type: {
+        kind: "nullable",
+        type: {
+          kind: "string"
+        }
+      }
+    }]).then(args => {
+      return _client.callRemoteFunction("FileSystemService/tempdir", "promise", args);
+    }).then(value => {
+      return _client.unmarshal(value, {
+        kind: "string"
+      });
+    });
+  };
+
   return remoteModule;
 };
 
@@ -1601,6 +1619,38 @@ Object.defineProperty(module.exports, "defs", {
             type: {
               kind: "number"
             }
+          }
+        }
+      }
+    },
+    tempdir: {
+      kind: "function",
+      name: "tempdir",
+      location: {
+        type: "source",
+        fileName: "FileSystemService.js",
+        line: 361
+      },
+      type: {
+        location: {
+          type: "source",
+          fileName: "FileSystemService.js",
+          line: 361
+        },
+        kind: "function",
+        argumentTypes: [{
+          name: "prefix",
+          type: {
+            kind: "nullable",
+            type: {
+              kind: "string"
+            }
+          }
+        }],
+        returnType: {
+          kind: "promise",
+          type: {
+            kind: "string"
           }
         }
       }

@@ -46,12 +46,6 @@
           "type": "string"
         }
       },
-      "lintOnFly": {
-        "title": "Lint on the fly",
-        "type": "boolean",
-        "default": false,
-        "description": "Lint code on the fly, refreshing whenever the file contents are changed rather than when files are saved. Requires restarting Nuclide to take effect."
-      },
       "pathToFlake8": {
         "title": "Path to Flake8 Executable",
         "type": "string",
@@ -63,6 +57,12 @@
         "type": "boolean",
         "default": true,
         "description": "Show assignments to all global variables."
+      },
+      "showSignatureHelp": {
+        "title": "Show signature help",
+        "type": "boolean",
+        "default": false,
+        "description": "Display signature help while typing function/method calls. (requires restart)"
       }
     },
     "packageType": "Atom",

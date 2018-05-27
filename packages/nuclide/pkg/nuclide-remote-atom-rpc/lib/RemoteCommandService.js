@@ -1,73 +1,50 @@
-'use strict';
+'use strict';Object.defineProperty(exports, "__esModule", { value: true });exports.registerAtomCommands = undefined;var _asyncToGenerator = _interopRequireDefault(require('async-to-generator'));
 
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-exports.RemoteCommandService = undefined;
 
-var _asyncToGenerator = _interopRequireDefault(require('async-to-generator'));
 
-var _UniversalDisposable;
 
-function _load_UniversalDisposable() {
-  return _UniversalDisposable = _interopRequireDefault(require('nuclide-commons/UniversalDisposable'));
-}
 
-var _CommandServer;
 
-function _load_CommandServer() {
-  return _CommandServer = require('./CommandServer');
-}
 
-var _FileCache;
 
-function _load_FileCache() {
-  return _FileCache = require('../../nuclide-open-files-rpc/lib/FileCache');
-}
 
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-// This interface is exposed by the nuclide server process to the client side
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+/**
+                                                                                                                                                                                                    * Called by Atom once for each new remote connection.
+                                                                                                                                                                                                    */ // This interface is exposed by the nuclide server process to the client side
 // Atom process.
-class RemoteCommandService {
+/** Dummy alias for IDisposable to satisfy Nuclide-RPC. */let registerAtomCommands = exports.registerAtomCommands = (() => {var _ref = (0, _asyncToGenerator.default)(function* (fileNotifier,
+  atomCommands)
+  {if (!(
+    fileNotifier instanceof (_FileCache || _load_FileCache()).FileCache)) {throw new Error('Invariant violation: "fileNotifier instanceof FileCache"');}
+    const fileCache = fileNotifier;
 
-  constructor() {
-    this._disposables = new (_UniversalDisposable || _load_UniversalDisposable()).default();
-  }
-
-  _registerAtomCommands(fileNotifier, atomCommands) {
-    var _this = this;
-
-    return (0, _asyncToGenerator.default)(function* () {
-      if (!(fileNotifier instanceof (_FileCache || _load_FileCache()).FileCache)) {
-        throw new Error('Invariant violation: "fileNotifier instanceof FileCache"');
-      }
-
-      const fileCache = fileNotifier;
-      _this._disposables.add((yield (_CommandServer || _load_CommandServer()).CommandServer.register(fileCache, atomCommands)));
-    })();
-  }
-
-  dispose() {
-    this._disposables.dispose();
-  }
-
-  // Called by Atom once for each new remote connection.
-  static registerAtomCommands(fileNotifier, atomCommands) {
-    return (0, _asyncToGenerator.default)(function* () {
-      const result = new RemoteCommandService();
-      yield result._registerAtomCommands(fileNotifier, atomCommands);
-      return result;
-    })();
-  }
-}
-exports.RemoteCommandService = RemoteCommandService; /**
-                                                      * Copyright (c) 2015-present, Facebook, Inc.
-                                                      * All rights reserved.
-                                                      *
-                                                      * This source code is licensed under the license found in the LICENSE file in
-                                                      * the root directory of this source tree.
-                                                      *
-                                                      * 
-                                                      * @format
-                                                      */
+    const disposables = new (_UniversalDisposable || _load_UniversalDisposable()).default();
+    disposables.add((yield (0, (_commandServerSingleton || _load_commandServerSingleton()).getCommandServer)().register(fileCache, atomCommands)));
+    return disposables;
+  });return function registerAtomCommands(_x, _x2) {return _ref.apply(this, arguments);};})(); /**
+                                                                                                * Copyright (c) 2015-present, Facebook, Inc.
+                                                                                                * All rights reserved.
+                                                                                                *
+                                                                                                * This source code is licensed under the license found in the LICENSE file in
+                                                                                                * the root directory of this source tree.
+                                                                                                *
+                                                                                                * 
+                                                                                                * @format
+                                                                                                */var _UniversalDisposable;function _load_UniversalDisposable() {return _UniversalDisposable = _interopRequireDefault(require('../../../modules/nuclide-commons/UniversalDisposable'));}var _FileCache;function _load_FileCache() {return _FileCache = require('../../nuclide-open-files-rpc/lib/FileCache');}var _commandServerSingleton;function _load_commandServerSingleton() {return _commandServerSingleton = require('./command-server-singleton');}function _interopRequireDefault(obj) {return obj && obj.__esModule ? obj : { default: obj };}

@@ -1,46 +1,45 @@
-'use strict';
+'use strict';Object.defineProperty(exports, "__esModule", { value: true });var _CwdApi;
 
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-exports.Activation = undefined;
 
-var _CwdApi;
 
-function _load_CwdApi() {
-  return _CwdApi = require('./CwdApi');
-}
 
-var _UniversalDisposable;
 
-function _load_UniversalDisposable() {
-  return _UniversalDisposable = _interopRequireDefault(require('nuclide-commons/UniversalDisposable'));
-}
 
-var _projects;
 
-function _load_projects() {
-  return _projects = require('nuclide-commons-atom/projects');
-}
 
-var _getElementFilePath;
 
-function _load_getElementFilePath() {
-  return _getElementFilePath = _interopRequireDefault(require('../../commons-atom/getElementFilePath'));
-}
 
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-class Activation {
-
-  constructor(rawState) {
-    const state = rawState || {};
+function _load_CwdApi() {return _CwdApi = _interopRequireDefault(require('./CwdApi'));}var _UniversalDisposable;
+function _load_UniversalDisposable() {return _UniversalDisposable = _interopRequireDefault(require('../../../modules/nuclide-commons/UniversalDisposable'));}var _projects;
+function _load_projects() {return _projects = require('../../../modules/nuclide-commons-atom/projects');}var _getElementFilePath;
+function _load_getElementFilePath() {return _getElementFilePath = _interopRequireDefault(require('../../../modules/nuclide-commons-atom/getElementFilePath'));}function _interopRequireDefault(obj) {return obj && obj.__esModule ? obj : { default: obj };} /**
+                                                                                                                                                                                                                                                              * Copyright (c) 2015-present, Facebook, Inc.
+                                                                                                                                                                                                                                                              * All rights reserved.
+                                                                                                                                                                                                                                                              *
+                                                                                                                                                                                                                                                              * This source code is licensed under the license found in the LICENSE file in
+                                                                                                                                                                                                                                                              * the root directory of this source tree.
+                                                                                                                                                                                                                                                              *
+                                                                                                                                                                                                                                                              * 
+                                                                                                                                                                                                                                                              * @format
+                                                                                                                                                                                                                                                              */class Activation {constructor(rawState) {const state = rawState || {};
     const { initialCwdPath } = state;
-    this._cwdApi = new (_CwdApi || _load_CwdApi()).CwdApi(initialCwdPath);
+    this._cwdApi = new (_CwdApi || _load_CwdApi()).default(initialCwdPath);
     this._currentWorkingRootDirectory = this._cwdApi.getCwd();
-    this._disposables = new (_UniversalDisposable || _load_UniversalDisposable()).default(this._cwdApi, atom.commands.add('atom-workspace', 'nuclide-current-working-root:set-from-active-file', this._setFromActiveFile.bind(this)), atom.commands.add('atom-workspace', 'nuclide-current-working-root:switch-to-previous', this._switchToLastWorkingRoot.bind(this)), this._cwdApi.observeCwd(newCwd => {
+    this._disposables = new (_UniversalDisposable || _load_UniversalDisposable()).default(
+    this._cwdApi,
+    atom.commands.add(
+    'atom-workspace',
+    'nuclide-current-working-root:set-from-active-file',
+    this._setFromActiveFile.bind(this)),
+
+    atom.commands.add(
+    'atom-workspace',
+    'nuclide-current-working-root:switch-to-previous',
+    this._switchToLastWorkingRoot.bind(this)),
+
+    this._cwdApi.observeCwd(newCwd => {
       if (this._currentWorkingRootDirectory != null) {
-        const oldCwd = this._currentWorkingRootDirectory.getPath();
+        const oldCwd = this._currentWorkingRootDirectory;
         if (newCwd === oldCwd) {
           return;
         }
@@ -48,6 +47,7 @@ class Activation {
       }
       this._currentWorkingRootDirectory = newCwd;
     }));
+
   }
 
   dispose() {
@@ -61,8 +61,8 @@ class Activation {
   serialize() {
     const cwd = this._cwdApi.getCwd();
     return {
-      initialCwdPath: cwd == null ? null : cwd.getPath()
-    };
+      initialCwdPath: cwd };
+
   }
 
   _switchToLastWorkingRoot() {
@@ -94,15 +94,4 @@ class Activation {
     }
 
     this._cwdApi.setCwd(projectRoot);
-  }
-}
-exports.Activation = Activation; /**
-                                  * Copyright (c) 2015-present, Facebook, Inc.
-                                  * All rights reserved.
-                                  *
-                                  * This source code is licensed under the license found in the LICENSE file in
-                                  * the root directory of this source tree.
-                                  *
-                                  * 
-                                  * @format
-                                  */
+  }}exports.default = Activation;

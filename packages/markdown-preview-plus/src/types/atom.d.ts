@@ -1,13 +1,12 @@
 export {}
 import { MarkdownPreviewViewElement } from '../markdown-preview-view'
 declare module 'atom' {
-  interface TextEditor {
-    cursorLineDecorations: LayerDecoration[] | null | undefined
-  }
-  interface AtomEnvironment {
-    showSaveDialogSync(path: string): string | undefined
-  }
   interface CommandRegistryTargetMap {
-    'markdown-preview-plus-view': MarkdownPreviewViewElement
+    '.markdown-preview-plus': MarkdownPreviewViewElement
+  }
+  interface TextEditor {
+    getVisibleRowRange(): [number, number]
+    bufferRowForScreenRow(row: number): number
+    scrollToScreenRange(range: Range, options?: { center: boolean }): void
   }
 }

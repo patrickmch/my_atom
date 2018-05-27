@@ -1,17 +1,17 @@
-'use strict';
+'use strict';Object.defineProperty(exports, "__esModule", { value: true });exports.WorkingSetsConfig = undefined;var _featureConfig;
 
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-exports.WorkingSetsConfig = undefined;
 
-var _featureConfig;
 
-function _load_featureConfig() {
-  return _featureConfig = _interopRequireDefault(require('nuclide-commons-atom/feature-config'));
-}
 
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+
+
+
+
+
+function _load_featureConfig() {return _featureConfig = _interopRequireDefault(require('../../../modules/nuclide-commons-atom/feature-config'));}function _interopRequireDefault(obj) {return obj && obj.__esModule ? obj : { default: obj };}
+
+
 
 const CONFIG_KEY = 'nuclide-working-sets.workingSets'; /**
                                                         * Copyright (c) 2015-present, Facebook, Inc.
@@ -22,19 +22,8 @@ const CONFIG_KEY = 'nuclide-working-sets.workingSets'; /**
                                                         *
                                                         * 
                                                         * @format
-                                                        */
-
-class WorkingSetsConfig {
-  observeDefinitions(callback) {
-    const wrapped = definitions => {
-      // Got to create a deep copy, otherwise atom.config invariants might break
-      const copiedDefinitions = definitions.map(def => {
-        return {
-          name: def.name,
-          active: def.active,
-          uris: def.uris.slice()
-        };
-      });
+                                                        */class WorkingSetsConfig {observeDefinitions(callback) {const wrapped = definitions => {// Got to create a deep copy, otherwise atom.config invariants might break
+      const copiedDefinitions = definitions.map(def => {return Object.assign({}, def);});
 
       callback(copiedDefinitions);
     };
@@ -48,6 +37,4 @@ class WorkingSetsConfig {
 
   setDefinitions(definitions) {
     (_featureConfig || _load_featureConfig()).default.set(CONFIG_KEY, definitions);
-  }
-}
-exports.WorkingSetsConfig = WorkingSetsConfig;
+  }}exports.WorkingSetsConfig = WorkingSetsConfig;

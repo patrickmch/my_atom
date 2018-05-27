@@ -1,33 +1,25 @@
-'use strict';
+'use strict';Object.defineProperty(exports, "__esModule", { value: true });exports.RangeUtil = exports.SelectionRange = exports.RangeKey = undefined;var _FileTreeNode;
 
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-exports.RangeUtil = exports.SelectionRange = exports.RangeKey = undefined;
 
-var _FileTreeNode;
 
-function _load_FileTreeNode() {
-  return _FileTreeNode = require('./FileTreeNode');
-}
 
-/**
- * Copyright (c) 2015-present, Facebook, Inc.
- * All rights reserved.
- *
- * This source code is licensed under the license found in the LICENSE file in
- * the root directory of this source tree.
- *
- * 
- * @format
- */
 
-class RangeKey {
-  constructor(rootKey, nodeKey) {
-    this._rootKey = rootKey;
-    this._nodeKey = nodeKey;
-  }
 
+
+
+
+
+
+function _load_FileTreeNode() {return _FileTreeNode = require('./FileTreeNode');} /**
+                                                                                   * Copyright (c) 2015-present, Facebook, Inc.
+                                                                                   * All rights reserved.
+                                                                                   *
+                                                                                   * This source code is licensed under the license found in the LICENSE file in
+                                                                                   * the root directory of this source tree.
+                                                                                   *
+                                                                                   *  strict-local
+                                                                                   * @format
+                                                                                   */class RangeKey {constructor(rootKey, nodeKey) {this._rootKey = rootKey;this._nodeKey = nodeKey;}
   static of(node) {
     return new RangeKey(node.rootUri, node.uri);
   }
@@ -42,11 +34,12 @@ class RangeKey {
 
   equals(other) {
     return this._rootKey === other._rootKey && this._nodeKey === other._nodeKey;
-  }
-}
+  }}exports.RangeKey = RangeKey;
 
-exports.RangeKey = RangeKey;
+
 class SelectionRange {
+
+
   constructor(anchor, range) {
     this._anchor = anchor;
     this._range = range;
@@ -73,15 +66,16 @@ class SelectionRange {
   }
 
   equals(other) {
-    return this._anchor.equals(other._anchor) && this._range.equals(other._range);
-  }
-}
+    return (
+      this._anchor.equals(other._anchor) && this._range.equals(other._range));
 
-exports.SelectionRange = SelectionRange; /**
-                                          * Returns the current node if it is shown.
-                                          * Otherwise, returns a nearby node that is shown.
-                                          */
+  }}exports.SelectionRange = SelectionRange;
 
+
+/**
+                                              * Returns the current node if it is shown.
+                                              * Otherwise, returns a nearby node that is shown.
+                                              */
 function findShownNode(node) {
   if (node.shouldBeShown) {
     return node;
@@ -109,9 +103,9 @@ function findShownNode(node) {
 
 class RangeUtil {
   /**
-   * Returns the current node if it is shown and selected
-   * Otherwise, returns a nearby selected node.
-   */
+                  * Returns the current node if it is shown and selected
+                  * Otherwise, returns a nearby selected node.
+                  */
   static findSelectedNode(node) {
     const shown = findShownNode(node);
     if (shown == null) {
@@ -132,6 +126,4 @@ class RangeUtil {
       selected = selected.findPrevious();
     }
     return selected;
-  }
-}
-exports.RangeUtil = RangeUtil;
+  }}exports.RangeUtil = RangeUtil;

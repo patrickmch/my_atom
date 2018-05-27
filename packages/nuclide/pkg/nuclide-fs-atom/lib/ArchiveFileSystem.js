@@ -1,61 +1,37 @@
-'use strict';
+'use strict';Object.defineProperty(exports, "__esModule", { value: true });exports.ArchiveFileSystem = undefined;
 
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-exports.ArchiveFileSystem = undefined;
 
-var _fs = _interopRequireDefault(require('fs'));
 
-var _nuclideFs;
 
-function _load_nuclideFs() {
-  return _nuclideFs = require('../../nuclide-fs');
-}
 
-var _ArchiveFile;
 
-function _load_ArchiveFile() {
-  return _ArchiveFile = require('./ArchiveFile');
-}
 
-var _ArchiveFileAsDirectory;
 
-function _load_ArchiveFileAsDirectory() {
-  return _ArchiveFileAsDirectory = require('./ArchiveFileAsDirectory');
-}
 
-var _ArchiveDirectory;
 
-function _load_ArchiveDirectory() {
-  return _ArchiveDirectory = require('./ArchiveDirectory');
-}
 
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-/**
- * Copyright (c) 2015-present, Facebook, Inc.
- * All rights reserved.
- *
- * This source code is licensed under the license found in the LICENSE file in
- * the root directory of this source tree.
- *
- * 
- * @format
- */
 
-// This exists to break the cycle between ArchiveFile,
+
+
+
+
+var _fs = _interopRequireDefault(require('fs'));var _nuclideFs;
+function _load_nuclideFs() {return _nuclideFs = require('../../nuclide-fs');}var _ArchiveFile;
+function _load_ArchiveFile() {return _ArchiveFile = require('./ArchiveFile');}var _ArchiveFileAsDirectory;
+function _load_ArchiveFileAsDirectory() {return _ArchiveFileAsDirectory = require('./ArchiveFileAsDirectory');}var _ArchiveDirectory;
+function _load_ArchiveDirectory() {return _ArchiveDirectory = require('./ArchiveDirectory');}function _interopRequireDefault(obj) {return obj && obj.__esModule ? obj : { default: obj };} /**
+                                                                                                                                                                                            * Copyright (c) 2015-present, Facebook, Inc.
+                                                                                                                                                                                            * All rights reserved.
+                                                                                                                                                                                            *
+                                                                                                                                                                                            * This source code is licensed under the license found in the LICENSE file in
+                                                                                                                                                                                            * the root directory of this source tree.
+                                                                                                                                                                                            *
+                                                                                                                                                                                            *  strict-local
+                                                                                                                                                                                            * @format
+                                                                                                                                                                                            */ // This exists to break the cycle between ArchiveFile,
 // ArchiveDirectory, and ArchiveFileAsDirectory
-
-class ArchiveFileSystem {
-
-  constructor(fileSystem) {
-    this._fs = fileSystem;
-  }
-
-  newArchiveFile(path) {
-    return new (_ArchiveFile || _load_ArchiveFile()).ArchiveFile(path, this);
-  }
+class ArchiveFileSystem {constructor(fileSystem) {this._fs = fileSystem;}newArchiveFile(path) {return new (_ArchiveFile || _load_ArchiveFile()).ArchiveFile(path, this);}
 
   newArchiveFileAsDirectory(path) {
     return new (_ArchiveFileAsDirectory || _load_ArchiveFileAsDirectory()).ArchiveFileAsDirectory(path, this);
@@ -129,11 +105,18 @@ class ArchiveFileSystem {
     return this._fs.readFile(path, options);
   }
 
-  createReadStream(path, options) {
+  createReadStream(
+  path,
+  options)
+  {
     return this._fs.createReadStream(path, options);
   }
 
-  writeFile(path, data, options) {
+  writeFile(
+  path,
+  data,
+  options)
+  {
     return this._fs.writeFile(path, data, options);
   }
 
@@ -147,6 +130,4 @@ class ArchiveFileSystem {
 
   openArchive(path) {
     return this._fs.openArchive(path);
-  }
-}
-exports.ArchiveFileSystem = ArchiveFileSystem;
+  }}exports.ArchiveFileSystem = ArchiveFileSystem;

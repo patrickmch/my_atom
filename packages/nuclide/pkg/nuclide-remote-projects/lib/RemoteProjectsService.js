@@ -1,34 +1,25 @@
-'use strict';
+'use strict';Object.defineProperty(exports, "__esModule", { value: true });var _asyncToGenerator = _interopRequireDefault(require('async-to-generator'));
 
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
 
-var _asyncToGenerator = _interopRequireDefault(require('async-to-generator'));
 
-var _rxjsBundlesRxMinJs = require('rxjs/bundles/Rx.min.js');
 
-var _UniversalDisposable;
 
-function _load_UniversalDisposable() {
-  return _UniversalDisposable = _interopRequireDefault(require('nuclide-commons/UniversalDisposable'));
-}
 
-var _nuclideRemoteConnection;
 
-function _load_nuclideRemoteConnection() {
-  return _nuclideRemoteConnection = require('../../nuclide-remote-connection');
-}
 
-var _openConnection;
 
-function _load_openConnection() {
-  return _openConnection = require('./open-connection');
-}
 
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+
+
+
+var _rxjsBundlesRxMinJs = require('rxjs/bundles/Rx.min.js');var _UniversalDisposable;
+function _load_UniversalDisposable() {return _UniversalDisposable = _interopRequireDefault(require('../../../modules/nuclide-commons/UniversalDisposable'));}var _nuclideRemoteConnection;
+function _load_nuclideRemoteConnection() {return _nuclideRemoteConnection = require('../../nuclide-remote-connection');}var _openConnection;
+function _load_openConnection() {return _openConnection = require('./open-connection');}function _interopRequireDefault(obj) {return obj && obj.__esModule ? obj : { default: obj };}
 
 class RemoteProjectsService {
+
 
   constructor() {
     this._subject = new _rxjsBundlesRxMinJs.ReplaySubject(1);
@@ -43,19 +34,27 @@ class RemoteProjectsService {
     this._subject.complete();
   }
 
-  waitForRemoteProjectReload(callback) {
+  waitForRemoteProjectReload(
+  callback)
+  {
     return new (_UniversalDisposable || _load_UniversalDisposable()).default(this._subject.subscribe(callback));
   }
 
-  createRemoteConnection(remoteProjectConfig) {
-    return (0, _asyncToGenerator.default)(function* () {
+  createRemoteConnection(
+  remoteProjectConfig)
+  {return (0, _asyncToGenerator.default)(function* () {
       const {
         host,
         cwd,
         displayTitle,
-        promptReconnectOnFailure = true
-      } = remoteProjectConfig;
-      const connection = yield (_nuclideRemoteConnection || _load_nuclideRemoteConnection()).RemoteConnection.reconnect(host, cwd, displayTitle, promptReconnectOnFailure);
+        promptReconnectOnFailure = true } =
+      remoteProjectConfig;
+      const connection = yield (_nuclideRemoteConnection || _load_nuclideRemoteConnection()).RemoteConnection.reconnect(
+      host,
+      cwd,
+      displayTitle,
+      promptReconnectOnFailure);
+
       if (connection != null) {
         return connection;
       }
@@ -65,28 +64,27 @@ class RemoteProjectsService {
       // If connection fails using saved config, open connect dialog.
       return (0, (_openConnection || _load_openConnection()).openConnectionDialog)({
         initialServer: host,
-        initialCwd: cwd
-      });
-    })();
+        initialCwd: cwd });})();
+
   }
 
-  openConnectionDialog(options) {
+  openConnectionDialog(
+  options)
+  {
     return (0, (_openConnection || _load_openConnection()).openConnectionDialog)(options);
   }
 
-  findOrCreate(config) {
-    return (0, _asyncToGenerator.default)(function* () {
-      return (_nuclideRemoteConnection || _load_nuclideRemoteConnection()).RemoteConnection.findOrCreate(config);
-    })();
-  }
-}
-exports.default = RemoteProjectsService; /**
-                                          * Copyright (c) 2015-present, Facebook, Inc.
-                                          * All rights reserved.
-                                          *
-                                          * This source code is licensed under the license found in the LICENSE file in
-                                          * the root directory of this source tree.
-                                          *
-                                          * 
-                                          * @format
-                                          */
+  findOrCreate(
+  config)
+  {return (0, _asyncToGenerator.default)(function* () {
+      return (_nuclideRemoteConnection || _load_nuclideRemoteConnection()).RemoteConnection.findOrCreate(config);})();
+  }}exports.default = RemoteProjectsService; /**
+                                              * Copyright (c) 2015-present, Facebook, Inc.
+                                              * All rights reserved.
+                                              *
+                                              * This source code is licensed under the license found in the LICENSE file in
+                                              * the root directory of this source tree.
+                                              *
+                                              *  strict-local
+                                              * @format
+                                              */

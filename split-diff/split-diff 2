@@ -1,36 +1,35 @@
-#id_jagged_edge, #id_template {
-  visibility: hidden;
-}
+{% load dashboard %}
+<form method="POST" enctype="multipart/form-data" encoding="multipart/form-data" id="file-upload-form">
+  <div class="row">
+    <div class="column medium-12">
+  	{% if forms.1 %}
+  		{% with form=forms.1 %}
+  			{% include 'dataentry/bs_responsive_form_layout.html' %}
+  		{% endwith %}
+  	{% endif %}
+    {% with form=forms.0 %}
+  		{% include 'admissions/dashboard/student_form_views/generic_upload_form_middle.html' %}
+    {% endwith %}
+    <div class="form-divider"></div>
 
-.cms-helptext {
-  padding: 20px;
-  margin-bottom: 40px;
-  background: lighten(#e67e22, 40%);
-  border-left: 4px solid #e67e22;
-  font-style: italic;
-}
+    {% csrf_token %}
 
-.mask-thumbnails,
-.template-thumbnails {
-  padding-top: 1rem;
-  padding-bottom: 1rem;
-  width: 100%;
-
-  .mask-thumb,
-  .template-thumb {
-    box-sizing: border-box !important;
-    margin: 5px;
-    padding: 5px;
-    width: 20%;
-
-    &.selected {
-      border: solid 1px rgba(212, 99, 0, 1);
-      border-radius: 0;
-      background-color: #F2F2F2;
-    }
-  }
-
-  .template-thumb {
-    border: solid 1px #F3F3F3;
-  }
-}
+    {{ validate_only_form.as_p }}
+    <a class="button button--hollow float-left disable_on_click" href="{% url 'dashboard:csr_detail' csr_id=csr.pk %}">
+      <span>
+        Back to Course Dashboard
+      </span>
+    </a>
+    <button type="submit" id="confirm-submit" data-loading-text="Uploading..." class="button disable_on_click">
+      <span>
+        Submit
+      </span>
+    </button>
+    <div class="form-space upload-progress"></div>
+    <div class="progress secondary upload-progress hide">
+      <div class="progress-meter" role="progressbar" style="width: 0%;">
+      </div>
+    </div>
+    </div>
+  </div>
+</form>

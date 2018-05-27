@@ -1,41 +1,37 @@
-'use strict';
+'use strict';Object.defineProperty(exports, "__esModule", { value: true });var _asyncToGenerator = _interopRequireDefault(require('async-to-generator'));function _interopRequireDefault(obj) {return obj && obj.__esModule ? obj : { default: obj };} /**
+                                                                                                                                                                                                                                                        * Copyright (c) 2017-present, Facebook, Inc.
+                                                                                                                                                                                                                                                        * All rights reserved.
+                                                                                                                                                                                                                                                        *
+                                                                                                                                                                                                                                                        * This source code is licensed under the BSD-style license found in the
+                                                                                                                                                                                                                                                        * LICENSE file in the root directory of this source tree. An additional grant
+                                                                                                                                                                                                                                                        * of patent rights can be found in the PATENTS file in the same directory.
+                                                                                                                                                                                                                                                        *
+                                                                                                                                                                                                                                                        *  strict
+                                                                                                                                                                                                                                                        * @format
+                                                                                                                                                                                                                                                        */
 
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
 
-var _asyncToGenerator = _interopRequireDefault(require('async-to-generator'));
 
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-/**
- * Copyright (c) 2017-present, Facebook, Inc.
- * All rights reserved.
- *
- * This source code is licensed under the BSD-style license found in the
- * LICENSE file in the root directory of this source tree. An additional grant
- * of patent rights can be found in the PATENTS file in the same directory.
- *
- * 
- * @format
- */
 
 class CommandDispatcher {
-  constructor() {
-    this.commands = [];
+
+
+
+  constructor(aliases) {this._commands = [];
+    this._aliases = aliases;
   }
 
   registerCommand(command) {
-    this.commands.push(command);
+    this._commands.push(command);
   }
 
   getCommands() {
-    return this.commands;
+    return this._commands;
   }
 
   getCommandsMatching(prefix) {
     const re = new RegExp(`^${prefix}`);
-    return this.commands.filter(x => x.name.match(re));
+    return this._commands.filter(x => x.name.match(re));
   }
 
   commandListToString(commands) {
@@ -43,10 +39,7 @@ class CommandDispatcher {
     return `"${names.join('", "')}"`;
   }
 
-  execute(line) {
-    var _this = this;
-
-    return (0, _asyncToGenerator.default)(function* () {
+  execute(line) {var _this = this;return (0, _asyncToGenerator.default)(function* () {
       let tail = line;
       const tokens = [];
 
@@ -67,33 +60,55 @@ class CommandDispatcher {
         tail = rest;
       }
 
-      return _this.executeTokenizedLine(tokens);
-    })();
+      return _this.executeTokenizedLine(tokens);})();
   }
 
-  executeTokenizedLine(tokens) {
-    var _this2 = this;
-
-    return (0, _asyncToGenerator.default)(function* () {
+  executeTokenizedLine(tokens) {var _this2 = this;return (0, _asyncToGenerator.default)(function* () {
       if (tokens.length === 0 || !tokens[0]) {
         return;
       }
 
       // Get all commands of which the given command is a prefix
       const cmd = tokens[0];
+
+      // resolve aliases
+      const alias = _this2.resolveAlias(tokens);
+      if (alias != null) {
+        return _this2.execute(alias);
+      }
+
       const matches = _this2.getCommandsMatching(cmd);
 
       if (matches.length === 0) {
-        throw new Error(`No command matches "${cmd}".`);
+        return new Error(`No command matches "${cmd}".`);
       }
 
       if (matches.length > 1) {
         const list = _this2.commandListToString(matches);
-        throw new Error(`Multiple commands match "${cmd}": ${list}`);
+        return new Error(`Multiple commands match "${cmd}": ${list}`);
       }
 
-      return matches[0].execute(tokens.slice(1));
-    })();
+      return new Promise(function (resolve, reject) {
+        matches[0].
+        execute(tokens.slice(1)).
+        then(function (_) {return resolve(null);}, function (_) {return resolve(_);});
+      });})();
   }
-}
-exports.default = CommandDispatcher;
+
+  resolveAlias(tokens) {
+    const alias = this._aliases.get(tokens[0]);
+    if (alias != null) {
+      return `${alias} ${tokens.splice(1).join(' ')}`;
+    }
+
+    const match = tokens[0].match(/^([^a-zA-Z0-9]+)(.*)$/);
+    if (match != null) {
+      const [, prefix, tail] = match;
+      const puncAlias = this._aliases.get(prefix);
+      if (puncAlias != null) {
+        return `${puncAlias} ${tail} ${tokens.splice(1).join(' ')}`;
+      }
+    }
+
+    return null;
+  }}exports.default = CommandDispatcher;

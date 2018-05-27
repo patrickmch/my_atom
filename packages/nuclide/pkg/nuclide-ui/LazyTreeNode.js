@@ -1,20 +1,39 @@
-'use strict';
+'use strict';Object.defineProperty(exports, "__esModule", { value: true });
 
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
+
+
+
+
+
+
+
+
+
+
+
 class LazyTreeNode {
 
+
+
+
+
+
+
+
+
+
+
+
   /**
-   * @param fetchChildren returns a Promise that resolves to an Immutable.List
-   *     of LazyTreeNode objects.
-   */
-
-
-  // Private
-
+                     * @param fetchChildren returns a Promise that resolves to an Immutable.List
+                     *     of LazyTreeNode objects.
+                     */ // Private
   // Protected
-  constructor(item, parent, isContainer, fetchChildren) {
+  constructor(item,
+  parent,
+  isContainer,
+  fetchChildren)
+  {
     this.__item = item;
     this.__parent = parent;
     this.__isContainer = isContainer;
@@ -64,9 +83,9 @@ class LazyTreeNode {
   }
 
   /**
-   * Each node should have a key that uniquely identifies it among the
-   * LazyTreeNodes that make up the tree.
-   */
+     * Each node should have a key that uniquely identifies it among the
+     * LazyTreeNodes that make up the tree.
+     */
   getKey() {
     let key = this.__key;
     // flowlint-next-line sketchy-null-string:off
@@ -81,15 +100,15 @@ class LazyTreeNode {
   }
 
   /**
-   * @return the string that the tree UI should display for the node
-   */
+     * @return the string that the tree UI should display for the node
+     */
   getLabel() {
     throw new Error('subclasses must override this method');
   }
 
   /**
-   * This can return a richer element for a node and will be used instead of the label if present.
-   */
+     * This can return a richer element for a node and will be used instead of the label if present.
+     */
   getLabelElement() {
     return null;
   }
@@ -104,15 +123,13 @@ class LazyTreeNode {
 
   invalidateCache() {
     this._isCacheValid = false;
-  }
-}
-exports.LazyTreeNode = LazyTreeNode; /**
-                                      * Copyright (c) 2015-present, Facebook, Inc.
-                                      * All rights reserved.
-                                      *
-                                      * This source code is licensed under the license found in the LICENSE file in
-                                      * the root directory of this source tree.
-                                      *
-                                      * 
-                                      * @format
-                                      */
+  }}exports.LazyTreeNode = LazyTreeNode; /**
+                                          * Copyright (c) 2015-present, Facebook, Inc.
+                                          * All rights reserved.
+                                          *
+                                          * This source code is licensed under the license found in the LICENSE file in
+                                          * the root directory of this source tree.
+                                          *
+                                          * 
+                                          * @format
+                                          */

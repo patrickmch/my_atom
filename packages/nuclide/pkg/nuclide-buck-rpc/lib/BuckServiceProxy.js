@@ -476,6 +476,38 @@ module.exports = _client => {
     });
   };
 
+  remoteModule.clean = function (arg0) {
+    return _client.marshalArguments(Array.from(arguments), [{
+      name: "rootPath",
+      type: {
+        kind: "named",
+        name: "NuclideUri"
+      }
+    }]).then(args => {
+      return _client.callRemoteFunction("BuckService/clean", "promise", args);
+    }).then(value => {
+      return _client.unmarshal(value, {
+        kind: "void"
+      });
+    });
+  };
+
+  remoteModule.kill = function (arg0) {
+    return _client.marshalArguments(Array.from(arguments), [{
+      name: "rootPath",
+      type: {
+        kind: "named",
+        name: "NuclideUri"
+      }
+    }]).then(args => {
+      return _client.callRemoteFunction("BuckService/kill", "promise", args);
+    }).then(value => {
+      return _client.unmarshal(value, {
+        kind: "void"
+      });
+    });
+  };
+
   remoteModule.getHTTPServerPort = function (arg0) {
     return _client.marshalArguments(Array.from(arguments), [{
       name: "rootPath",
@@ -1441,7 +1473,7 @@ Object.defineProperty(module.exports, "defs", {
       location: {
         type: "source",
         fileName: "process.js",
-        line: 634
+        line: 663
       },
       name: "ProcessExitMessage",
       definition: {
@@ -1479,7 +1511,7 @@ Object.defineProperty(module.exports, "defs", {
       location: {
         type: "source",
         fileName: "process.js",
-        line: 640
+        line: 669
       },
       name: "ProcessMessage",
       definition: {
@@ -1553,7 +1585,7 @@ Object.defineProperty(module.exports, "defs", {
       location: {
         type: "source",
         fileName: "process.js",
-        line: 653
+        line: 682
       },
       name: "LegacyProcessMessage",
       definition: {
@@ -2087,19 +2119,79 @@ Object.defineProperty(module.exports, "defs", {
         }
       }
     },
+    clean: {
+      kind: "function",
+      name: "clean",
+      location: {
+        type: "source",
+        fileName: "BuckService.js",
+        line: 446
+      },
+      type: {
+        location: {
+          type: "source",
+          fileName: "BuckService.js",
+          line: 446
+        },
+        kind: "function",
+        argumentTypes: [{
+          name: "rootPath",
+          type: {
+            kind: "named",
+            name: "NuclideUri"
+          }
+        }],
+        returnType: {
+          kind: "promise",
+          type: {
+            kind: "void"
+          }
+        }
+      }
+    },
+    kill: {
+      kind: "function",
+      name: "kill",
+      location: {
+        type: "source",
+        fileName: "BuckService.js",
+        line: 450
+      },
+      type: {
+        location: {
+          type: "source",
+          fileName: "BuckService.js",
+          line: 450
+        },
+        kind: "function",
+        argumentTypes: [{
+          name: "rootPath",
+          type: {
+            kind: "named",
+            name: "NuclideUri"
+          }
+        }],
+        returnType: {
+          kind: "promise",
+          type: {
+            kind: "void"
+          }
+        }
+      }
+    },
     getHTTPServerPort: {
       kind: "function",
       name: "getHTTPServerPort",
       location: {
         type: "source",
         fileName: "BuckService.js",
-        line: 522
+        line: 527
       },
       type: {
         location: {
           type: "source",
           fileName: "BuckService.js",
-          line: 522
+          line: 527
         },
         kind: "function",
         argumentTypes: [{
@@ -2123,13 +2215,13 @@ Object.defineProperty(module.exports, "defs", {
       location: {
         type: "source",
         fileName: "BuckService.js",
-        line: 555
+        line: 560
       },
       type: {
         location: {
           type: "source",
           fileName: "BuckService.js",
-          line: 555
+          line: 560
         },
         kind: "function",
         argumentTypes: [{
@@ -2169,13 +2261,13 @@ Object.defineProperty(module.exports, "defs", {
       location: {
         type: "source",
         fileName: "BuckService.js",
-        line: 572
+        line: 577
       },
       type: {
         location: {
           type: "source",
           fileName: "BuckService.js",
-          line: 572
+          line: 577
         },
         kind: "function",
         argumentTypes: [{
@@ -2213,13 +2305,13 @@ Object.defineProperty(module.exports, "defs", {
       location: {
         type: "source",
         fileName: "BuckService.js",
-        line: 605
+        line: 610
       },
       type: {
         location: {
           type: "source",
           fileName: "BuckService.js",
-          line: 605
+          line: 610
         },
         kind: "function",
         argumentTypes: [{
@@ -2257,13 +2349,13 @@ Object.defineProperty(module.exports, "defs", {
       location: {
         type: "source",
         fileName: "BuckService.js",
-        line: 626
+        line: 631
       },
       type: {
         location: {
           type: "source",
           fileName: "BuckService.js",
-          line: 626
+          line: 631
         },
         kind: "function",
         argumentTypes: [{
@@ -2292,7 +2384,7 @@ Object.defineProperty(module.exports, "defs", {
       location: {
         type: "source",
         fileName: "types.js",
-        line: 115
+        line: 116
       },
       name: "CompilationDatabaseParams",
       definition: {
@@ -2315,6 +2407,12 @@ Object.defineProperty(module.exports, "defs", {
             }
           },
           optional: false
+        }, {
+          name: "useDefaultPlatform",
+          type: {
+            kind: "boolean"
+          },
+          optional: true
         }]
       }
     },
@@ -2324,13 +2422,13 @@ Object.defineProperty(module.exports, "defs", {
       location: {
         type: "source",
         fileName: "BuckService.js",
-        line: 633
+        line: 638
       },
       type: {
         location: {
           type: "source",
           fileName: "BuckService.js",
-          line: 633
+          line: 638
         },
         kind: "function",
         argumentTypes: [{
@@ -2360,13 +2458,13 @@ Object.defineProperty(module.exports, "defs", {
       location: {
         type: "source",
         fileName: "BuckService.js",
-        line: 640
+        line: 645
       },
       type: {
         location: {
           type: "source",
           fileName: "BuckService.js",
-          line: 640
+          line: 645
         },
         kind: "function",
         argumentTypes: [{
@@ -2439,13 +2537,13 @@ Object.defineProperty(module.exports, "defs", {
       location: {
         type: "source",
         fileName: "BuckService.js",
-        line: 646
+        line: 651
       },
       type: {
         location: {
           type: "source",
           fileName: "BuckService.js",
-          line: 646
+          line: 651
         },
         kind: "function",
         argumentTypes: [{

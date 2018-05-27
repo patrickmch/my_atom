@@ -1,80 +1,27 @@
-
-# your keymap
-#
-# atom keymaps work similarly to style sheets. just as style sheets use
-# selectors to apply styles to elements, atom keymaps use selectors to associate
-# keystrokes with events in specific contexts. unlike style sheets however,
-# each selector can only be declared once.
-#
-# you can create a new keybinding in this file by typing "key" and then hitting
-# tab.
+# ctrl-alt-shift-cmd is bound to pressing and holding the semicolon in karabiner elements
 
 'atom-workspace':
-  'ctrl-k': 'core:move-up'
-  'ctrl-j': 'core:move-down'
-  'ctrl-h': 'core:move-left'
-  'ctrl-l': 'core:move-right'
   'alt-cmd-o': 'advanced-open-file:toggle'
   'alt-space': 'choose-pane:start'
-  'ctrl-alt-cmd-f': 'jumpy:toggle'
   'alt-cmd-h': 'pane:show-previous-item'
   'alt-cmd-l': 'pane:show-next-item'
   'ctrl-alt-cmd-j': 'window:toggle-dev-tools'
+  'cmd-q': 'unset!'
+  'cmd-q cmd-q': 'application:quit'
+  'shift-space': 'nuclide-quick-open:find-anything-via-omni-search'
 
 'atom-text-editor':
+  'ctrl-enter': 'editor:newline-above'
+  'shift-cmd-enter': 'hey-pane:toggle-focus-of-active-pane'
   'ctrl-k': 'unset!'
-  # 'alt-cmd': 'datatip:toggle'
-  # 'cmd-b': 'python-tools:goto-definition'
-  'ctrl-alt-r':'pane:reopen-closed-item'
-  # 'alt-shift-v': 'clipboard-plus:toggle'
-  'cmd-shift-e': 'platformio-ide-terminal:fullscreen'
-  'cmd-l': 'advanced-open-file:delete-path-component'
-  'cmd-q cmd-q': 'application:quit'
   'ctrl-cmd-o': 'nuclide-open-filenames-provider:toggle-provider'
   'shift-cmd-j': 'atom-notes:toggle'
   'shift-cmd-alt-t': 'markdown-writer:toggle-task'
   'shift-cmd-alt-x': 'markdown-writer:toggle-taskdone'
-  'alt-w': 'ctrl-dir-scroll:scroll-up'
-  'alt-s': 'ctrl-dir-scroll:scroll-down'
-  'alt-shift-s': 'ctrl-dir-scroll:scroll-down-big'
-  'alt-shift-w': 'ctrl-dir-scroll:scroll-up-big'
-  # 'shift': 'autocomplete-plus:cancel'
-  'ctrl-cmd-left': 'editor:delete-line'
-  'ctrl-cmd-right': 'editor:delete-to-end-of-line'
-  'shift-cmd-v': 'clipboard-plus:toggle'
-  # movement
-  'alt-down': 'line-jumper:move-down'
-  'alt-shift-down': 'line-jumper:select-down'
-  'alt-up': 'line-jumper:move-up'
-  'alt-shift-up': 'line-jumper:select-up'
-  'ctrl-down': 'multi-cursor:expanddown'
-  'ctrl-up': 'multi-cursor:expandup'
-
-  # panes
-  'ctrl->': 'pane:move-item-right'
-  'ctrl-<': 'pane:move-item-left'
 
   # cursor
   'alt-,': 'last-cursor-position:previous'
   'alt-.': 'last-cursor-position:next'
-
-  # key bindings for multi-cursor-plus
-  'alt-x': 'multi-cursor-plus:mark'
-  'ctrl-alt-up': 'multi-cursor-plus:move-up'
-  'ctrl-alt-down': 'multi-cursor-plus:move-down'
-  'ctrl-alt-left': 'multi-cursor-plus:move-left'
-  'ctrl-alt-right': 'multi-cursor-plus:move-right'
-  'ctrl-alt-cmd-left': 'multi-cursor-plus:move-to-beginning-of-word'
-  'ctrl-alt-cmd-right': 'multi-cursor-plus:move-to-end-of-word'
-
-  # select inside various things
-  'cmd-alt-up': 'expand-region:expand'
-  'cmd-alt-down': 'expand-region:shrink'
-  'cmd-alt-e w': 'expand-region:select-word-include-dash',
-  'cmd-alt-e f': 'expand-region:select-fold'
-  'cmd-alt-e q': 'expand-selection-to-quotes:toggle'
-  'cmd-alt-e b': 'bracket-matcher:select-inside-brackets'
-  'cmd-alt-e t': 'expand-region:select-tag-attribute'
 
   # emmet
   'ctrl-:': 'emmet:remove-tag'
@@ -93,10 +40,7 @@
 ##############################-------vim mode keybindings-------##############################
 ##############################################################################################
 
-  'cmd-escape': 'vim-mode-plus:redo'
 'atom-text-editor.vim-mode-plus:not(.visual-mode)':
-  'ctrl-j': 'keystroke 1 0 j'
-  'ctrl-k': 'keystroke 1 0 k'
   # key bindings for multi-cursor-plus
   'alt-x': 'multi-cursor-plus:mark'
   'ctrl-alt-k': 'multi-cursor-plus:move-up'
@@ -112,8 +56,8 @@
 'atom-text-editor.vim-mode-plus.visual-mode':
   'ctrl-t': 'vim-mode-plus-user:move-selected-text-toggle-overwrite'
 
-  'ctrl-k': 'keystroke 5 k'
-  'ctrl-j': 'keystroke 5 j'
+  'shift-k': 'keystroke 5 k'
+  'shift-j': 'keystroke 5 j'
 
   'alt-h': 'vim-mode-plus-user:move-selected-text-left'
   'alt-l': 'vim-mode-plus-user:move-selected-text-right'
@@ -124,35 +68,31 @@
   'escape': 'jumpy:clear'
 
 'atom-text-editor:not(.mini).vim-mode-plus:not(.insert-mode):not(.jumpy-jump-mode), .tree-view':
-  'cmd-f': 'jumpy:toggle'
+  'ctrl-f': 'jumpy:toggle'
 
 'atom-text-editor.vim-mode-plus.normal-mode':
+  'shift-j': 'keystroke 1 0 j'
+  'shift-k': 'keystroke 1 0 k'
+
   'm m': 'bookmarks:toggle-bookmark'
-  '\'': 'bookmarks:jump-to-next-bookmark'
+  '\'':  'bookmarks:jump-to-next-bookmark'
   'm p': 'bookmarks:jump-to-previous-bookmark'
   'm v': 'bookmarks:view-all'
   'm c': 'bookmarks:clear-bookmarks'
-
-  # 'p': 'vim-mode-plus:put-after-with-auto-indent'
-  # 'P': 'vim-mode-plus:put-before-with-auto-indent'
-  'p': 'keystroke i left cmd-v escape'
-  'P': 'keystroke i cmd-v escape'
-  'ctrl-p': 'keystroke cmd-enter shift-cmd-space p'
-  'ctrl-P': 'keystroke shift-cmd-enter shift-cmd-space p'
   'alt-/': 'vim-mode-plus:toggle-case-and-move-right'
 
 'atom-text-editor.vim-mode-plus:not(.insert-mode)':
   'ctrl-n': 'vim-mode-plus:move-to-next-occurrence'
 
-  # 'cmd-j': 'vim-mode-plus:join'
+  'cmd-j': 'vim-mode-plus:join'
   'Y': 'keystroke y i l'
   'cmd-enter': 'editor:newline-below'
   'space escape': 'vim-mode-plus:undo'
   # pane splitting
-  'up': 'window:focus-pane-above'
-  'down': 'window:focus-pane-below'
-  'right': 'window:focus-pane-on-right'
-  'left': 'window:focus-pane-on-left'
+  'ctrl-alt-shift-cmd-k': 'window:focus-pane-above'
+  'ctrl-alt-shift-cmd-j': 'window:focus-pane-below'
+  'ctrl-alt-shift-cmd-l': 'window:focus-pane-on-right'
+  'ctrl-alt-shift-cmd-h': 'window:focus-pane-on-left'
 
   'space left':'window:move-active-item-to-pane-on-left'
   'space right':'window:move-active-item-to-pane-on-right'
@@ -173,12 +113,12 @@
   # space keys!
   'space p': 'clipboard-plus:toggle'
   'space t f': 'nuclide-fuzzy-filename-provider:toggle-provider'
-  'shift-space': 'nuclide-quick-open:find-anything-via-omni-search'
   'space m': 'application:open-your-keymap'
 
   'space g g': 'git-plus:menu'
   'space g c': 'git-plus:add-all-and-commit'
-  'space g p': 'git-plus:push'
+  'space g p s': 'git-plus:push'
+  'space g p l': 'git-plus:pull'
   'space g o': 'git-plus:checkout'
   'space g s': 'git-plus:status'
   'space g l': 'git-plus:log'
@@ -191,7 +131,11 @@
   'space d l': 'window:toggle-right-dock'
   'space d h': 'window:toggle-left-dock'
   'space d d': 'my:dismiss-notifications'
-  'space D D': 'quick-file-actions:delete'
+
+  'space r m': 'quick-file-actions:delete'
+  'space m v': 'quick-file-actions:move'
+  'space c p': 'quick-file-actions:copy'
+  'shift-space': 'nuclide-quick-open:find-anything-via-omni-search'
 
   'space 1': 'window:reload'
 
@@ -203,38 +147,22 @@
   'ctrl-cmd-j': 'my:move-line-down'
 
   'alt-l': 'vim-mode-plus:move-to-next-word'
-  'ctrl-l': 'vim-mode-plus:move-to-last-character-of-line'
+  'shift-l': 'vim-mode-plus:move-to-last-character-of-line'
   'alt-h': 'vim-mode-plus:move-to-previous-word'
-  'ctrl-h': 'vim-mode-plus:move-to-first-character-of-line'
+  'shift-h': 'vim-mode-plus:move-to-first-character-of-line'
 
   'D': 'vim-mode-plus:delete-line'
   'd x': 'vim-mode-plus:delete-to-last-character-of-line'
   'd X': 'keystroke v ctrl-h x'
   '>': 'editor:delete-to-end-of-word'
   '<': 'editor:delete-to-beginning-of-word'
-  'ctrl-,': 'editor:outdent-selected-rows'
-  'ctrl-.': 'editor:indent-selected-rows'
-  '_': 'vim-mode-plus:replace-with-register'
+  '[': 'editor:outdent-selected-rows'
+  ']': 'editor:indent-selected-rows'
   'g -':   'vim-mode-plus:dash-case'
   'g _': 'vim-mode-plus:snake-case'
+  'ctrl-z': 'vim-mode-plus:upper-case-first'
+  '_': 'vim-mode-plus:replace-with-register'
 
-  'v i space w': 'expand-region:select-word-include-dash'
-  'c i space w': 'keystroke v i space w cmd-x i'
-  'd i space w': 'keystroke v i space w cmd-x'
-  'y i space w': 'keystroke v i space w cmd-c escape'
-
-  # ')': 'unset!'
-  # '(': 'unset!'
-  # '}': 'unset!'
-  # '{': 'unset!'
-  # ']': 'unset!'
-  # '[': 'unset!'
-  # 'shift-j': 'vim-mode-plus:previous-tab'
-  # 'shift-k': 'vim-mode-plus:next-tab'
-
-# ':': 'vim-mode-plus:repeat-find'
-
-  # ';': 'vim-mode-plus:set-register-name'
 'atom-text-editor.vim-mode-plus.operator-pending-mode':
   'c': 'vim-mode-plus:inner-word'
   'C': 'vim-mode-plus:inner-smart-word'
@@ -255,6 +183,4 @@
   'ctrl-k': 'focus-pane-or-panel:focus-above'
 
 '.platform-darwin .advanced-open-file':
-  # 'ctrl-j': 'advanced-open-file:move-cursor-down'
-  # 'ctrl-k': 'advanced-open-file:move-cursor-up'
-  'cmd-;': 'advanced-open-file:delete-path-component'
+  'ctrl-;': 'advanced-open-file:delete-path-component'

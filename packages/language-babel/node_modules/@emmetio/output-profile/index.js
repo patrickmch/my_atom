@@ -3,13 +3,16 @@
 import defaultOptions from './defaults';
 
 /**
- * Creates output profile for given options (@see defaults)
- * @param {defaults} options
+ * Creates output profile for given options
  */
 export default class Profile {
+	/**
+	 * @param {EmmetOutputProfile} options 
+	 */
     constructor(options) {
-        this.options = Object.assign({}, defaultOptions, options);
-        this.quoteChar = this.options.attributeQuotes === 'single' ? '\'' : '"';
+		/** @type {EmmetOutputProfile} */
+		this.options = Object.assign({}, defaultOptions, options);
+		this.quoteChar = this.options.attributeQuotes === 'single' ? '\'' : '"';
     }
 
 	/**
@@ -31,7 +34,7 @@ export default class Profile {
     }
 
     /**
-     * Output given tag name accoding to options
+     * Output given tag name according to options
      * @param {String} name
      * @return {String}
      */
@@ -40,8 +43,8 @@ export default class Profile {
     }
 
 	/**
-	 * Outputs attribute name accoding to current settings
-	 * @param {String} Attribute name
+	 * Outputs attribute name according to current settings
+	 * @param {String} attr Attribute name
 	 * @return {String}
 	 */
     attribute(attr) {
@@ -50,7 +53,7 @@ export default class Profile {
 
     /**
      * Check if given attribute is boolean
-     * @param {Attribute} attr
+     * @param {Object} attr
      * @return {Boolean}
      */
     isBooleanAttribute(attr) {
@@ -87,7 +90,7 @@ export default class Profile {
 
 	/**
 	 * Check if given tag name belongs to inline-level element
-	 * @param {Node|String} node Parsed node or tag name
+	 * @param {Object|String} node Parsed node or tag name
 	 * @return {Boolean}
 	 */
 	isInline(node) {
@@ -112,7 +115,8 @@ export default class Profile {
 
 function strcase(string, type) {
     if (type) {
-        string = type === 'upper' ? string.toUpperCase() : string.toLowerCase();
-    }
+        return type === 'upper' ? string.toUpperCase() : string.toLowerCase();
+	}
+	
     return string;
 }

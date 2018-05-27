@@ -1,6 +1,25 @@
 $x$ math at the start of the document
 
+Nested: $M = \text{while e^2 $e^2$ do $c^2$ end}$
+
 This document is to test $\LaTeX$ rendering with [markdown-preview-plus](https://atom.io/packages/markdown-preview-plus).
+
+**Numbered equations**
+
+$$
+\begin{equation}
+\int_0^x \sin(x) dx
+\label{eq:test}
+\end{equation}
+$$
+
+$\eqref{eq:test}$
+
+**Blockquotes**
+
+> 1.  A block quote
+> 2.  With a list inside
+> 3.  With $math$
 
 **Math environment Syntax testing**
 
@@ -152,6 +171,12 @@ _math $x^2$ in emphasis_
 ~~math $x^2$ in strikethrough~~
 
 **In Tables**
+
+| Left-Aligned  | Center Aligned  | Right Aligned |
+| :------------ |:---------------:| -----:|
+| $a+b$         | some wordy text | $1600 |
+| $a+b$         | some wordy text | $1600 |
+| $a+b$         | some wordy text | $1600 |
 
 (only works with Pandoc)
 

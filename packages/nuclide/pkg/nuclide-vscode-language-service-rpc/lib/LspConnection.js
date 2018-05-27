@@ -1,19 +1,19 @@
-'use strict';
+'use strict';Object.defineProperty(exports, "__esModule", { value: true });exports.LspConnection = undefined;var _protocol;
 
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-exports.LspConnection = undefined;
 
-var _protocol;
 
-function _load_protocol() {
-  return _protocol = _interopRequireWildcard(require('./protocol'));
-}
 
-function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
 
-// This is a strongly typed encapsulation over an underlying JsonRpcConnection
+
+
+
+
+
+
+
+function _load_protocol() {return _protocol = _interopRequireWildcard(require('./protocol'));}function _interopRequireWildcard(obj) {if (obj && obj.__esModule) {return obj;} else {var newObj = {};if (obj != null) {for (var key in obj) {if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key];}}newObj.default = obj;return newObj;}}
+
+// This is a strongly typed encapsulation over an underlying MessageConnection
 // transport, which exposes only the LSP methods.
 /**
  * Copyright (c) 2015-present, Facebook, Inc.
@@ -24,17 +24,7 @@ function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj;
  *
  * 
  * @format
- */
-
-class LspConnection {
-
-  constructor(jsonRpcConnection) {
-    this._jsonRpcConnection = jsonRpcConnection;
-  }
-
-  dispose() {
-    this._jsonRpcConnection.dispose();
-  }
+ */class LspConnection {constructor(jsonRpcConnection) {this._jsonRpcConnection = jsonRpcConnection;}dispose() {this._jsonRpcConnection.dispose();}
 
   onDispose(callback) {
     this._jsonRpcConnection.onDispose(callback);
@@ -60,8 +50,13 @@ class LspConnection {
     this._jsonRpcConnection.sendNotification('window/showMessage', params);
   }
 
-  showMessageRequest(params) {
-    return this._jsonRpcConnection.sendRequest('window/showMessageRequest', params);
+  showMessageRequest(
+  params)
+  {
+    return this._jsonRpcConnection.sendRequest(
+    'window/showMessageRequest',
+    params);
+
   }
 
   logMessage(params) {
@@ -69,7 +64,10 @@ class LspConnection {
   }
 
   didChangeConfiguration(params) {
-    this._jsonRpcConnection.sendNotification('workspace/didChangeConfiguration', params);
+    this._jsonRpcConnection.sendNotification(
+    'workspace/didChangeConfiguration',
+    params);
+
   }
 
   didOpenTextDocument(params) {
@@ -89,59 +87,128 @@ class LspConnection {
   }
 
   didChangeWatchedFiles(params) {
-    this._jsonRpcConnection.sendNotification('workspace/didChangeWatchedFiles', params);
+    this._jsonRpcConnection.sendNotification(
+    'workspace/didChangeWatchedFiles',
+    params);
+
   }
 
   publishDiagnostics(params) {
-    this._jsonRpcConnection.sendNotification('textDocument/publishDiagnostics', params);
+    this._jsonRpcConnection.sendNotification(
+    'textDocument/publishDiagnostics',
+    params);
+
   }
 
-  completion(params, token) {
-    return this._jsonRpcConnection.sendRequest('textDocument/completion', params, token);
+  completion(
+  params,
+  token)
+  {
+    return this._jsonRpcConnection.sendRequest(
+    'textDocument/completion',
+    params,
+    token);
+
   }
 
   completionItemResolve(params) {
-    return this._jsonRpcConnection.sendRequest('completionItem/resolve', params);
+    return this._jsonRpcConnection.sendRequest(
+    'completionItem/resolve',
+    params);
+
   }
 
-  hover(params, token) {
-    return this._jsonRpcConnection.sendRequest('textDocument/hover', params, token);
+  hover(
+  params,
+  token)
+  {
+    return this._jsonRpcConnection.sendRequest(
+    'textDocument/hover',
+    params,
+    token);
+
   }
 
-  signatureHelp(params) {
-    return this._jsonRpcConnection.sendRequest('textDocument/signatureHelp', params);
+  signatureHelp(
+  params)
+  {
+    return this._jsonRpcConnection.sendRequest(
+    'textDocument/signatureHelp',
+    params);
+
   }
 
-  gotoDefinition(params, token) {
-    return this._jsonRpcConnection.sendRequest('textDocument/definition', params, token);
+  gotoDefinition(
+  params,
+  token)
+  {
+    return this._jsonRpcConnection.sendRequest(
+    'textDocument/definition',
+    params,
+    token);
+
   }
 
-  findReferences(params) {
-    return this._jsonRpcConnection.sendRequest('textDocument/references', params);
+  findReferences(
+  params)
+  {
+    return this._jsonRpcConnection.sendRequest(
+    'textDocument/references',
+    params);
+
   }
 
-  documentHighlight(params, token) {
-    return this._jsonRpcConnection.sendRequest('textDocument/documentHighlight', params, token);
+  documentHighlight(
+  params,
+  token)
+  {
+    return this._jsonRpcConnection.sendRequest(
+    'textDocument/documentHighlight',
+    params,
+    token);
+
   }
 
-  documentSymbol(params, token) {
-    return this._jsonRpcConnection.sendRequest('textDocument/documentSymbol', params, token);
+  documentSymbol(
+  params,
+  token)
+  {
+    return this._jsonRpcConnection.sendRequest(
+    'textDocument/documentSymbol',
+    params,
+    token);
+
   }
 
   typeCoverage(params) {
-    return this._jsonRpcConnection.sendRequest('textDocument/typeCoverage', params);
+    return this._jsonRpcConnection.sendRequest(
+    'textDocument/typeCoverage',
+    params);
+
   }
 
-  workspaceSymbol(params) {
+  toggleTypeCoverage(params) {
+    this._jsonRpcConnection.sendRequest('workspace/toggleTypeCoverage', params);
+  }
+
+  workspaceSymbol(
+  params)
+  {
     return this._jsonRpcConnection.sendRequest('workspace/symbol', params);
   }
 
   executeCommand(params) {
-    return this._jsonRpcConnection.sendRequest('workspace/executeCommand', params);
+    return this._jsonRpcConnection.sendRequest(
+    'workspace/executeCommand',
+    params);
+
   }
 
   codeAction(params) {
-    return this._jsonRpcConnection.sendRequest('textDocument/codeAction', params);
+    return this._jsonRpcConnection.sendRequest(
+    'textDocument/codeAction',
+    params);
+
   }
 
   codeLens(params) {
@@ -153,59 +220,108 @@ class LspConnection {
   }
 
   documentLink(params) {
-    return this._jsonRpcConnection.sendRequest('textDocument/documentLink', params);
+    return this._jsonRpcConnection.sendRequest(
+    'textDocument/documentLink',
+    params);
+
   }
 
   documentLinkResolve(params) {
     return this._jsonRpcConnection.sendRequest('documentLink/resolve', params);
   }
 
-  documentFormatting(params) {
-    return this._jsonRpcConnection.sendRequest('textDocument/formatting', params);
+  documentFormatting(
+  params)
+  {
+    return this._jsonRpcConnection.sendRequest(
+    'textDocument/formatting',
+    params);
+
   }
 
-  documentRangeFormatting(params) {
-    return this._jsonRpcConnection.sendRequest('textDocument/rangeFormatting', params);
+  documentRangeFormatting(
+  params)
+  {
+    return this._jsonRpcConnection.sendRequest(
+    'textDocument/rangeFormatting',
+    params);
+
   }
 
-  documentOnTypeFormatting(params) {
-    return this._jsonRpcConnection.sendRequest('textDocument/onTypeFormatting', params);
+  documentOnTypeFormatting(
+  params)
+  {
+    return this._jsonRpcConnection.sendRequest(
+    'textDocument/onTypeFormatting',
+    params);
+
   }
 
   rename(params) {
     return this._jsonRpcConnection.sendRequest('textDocument/rename', params);
   }
 
-  onDiagnosticsNotification(callback) {
-    this._jsonRpcConnection.onNotification({ method: 'textDocument/publishDiagnostics' }, callback);
+  onDiagnosticsNotification(
+  callback)
+  {
+    this._jsonRpcConnection.onNotification(
+    { method: 'textDocument/publishDiagnostics' },
+    callback);
+
   }
 
   onTelemetryNotification(callback) {
-    this._jsonRpcConnection.onNotification({ method: 'telemetry/event' }, callback);
+    this._jsonRpcConnection.onNotification(
+    { method: 'telemetry/event' },
+    callback);
+
   }
 
   onLogMessageNotification(callback) {
-    this._jsonRpcConnection.onNotification({ method: 'window/logMessage' }, callback);
+    this._jsonRpcConnection.onNotification(
+    { method: 'window/logMessage' },
+    callback);
+
   }
 
   onShowMessageNotification(callback) {
-    this._jsonRpcConnection.onNotification({ method: 'window/showMessage' }, callback);
+    this._jsonRpcConnection.onNotification(
+    { method: 'window/showMessage' },
+    callback);
+
   }
 
-  onShowMessageRequest(callback) {
-    this._jsonRpcConnection.onRequest({ method: 'window/showMessageRequest' }, callback);
+  onShowMessageRequest(
+  callback)
+  {
+    this._jsonRpcConnection.onRequest(
+    { method: 'window/showMessageRequest' },
+    callback);
+
   }
 
-  onApplyEditRequest(callback) {
-    this._jsonRpcConnection.onRequest({ method: 'workspace/applyEdit' }, callback);
+  onApplyEditRequest(
+  callback)
+
+
+
+  {
+    this._jsonRpcConnection.onRequest(
+    { method: 'workspace/applyEdit' },
+    callback);
+
   }
 
   onProgressNotification(callback) {
-    this._jsonRpcConnection.onNotification({ method: 'window/progress' }, callback);
+    this._jsonRpcConnection.onNotification(
+    { method: 'window/progress' },
+    callback);
+
   }
 
   onActionRequiredNotification(callback) {
-    this._jsonRpcConnection.onNotification({ method: 'window/actionRequired' }, callback);
-  }
-}
-exports.LspConnection = LspConnection;
+    this._jsonRpcConnection.onNotification(
+    { method: 'window/actionRequired' },
+    callback);
+
+  }}exports.LspConnection = LspConnection;

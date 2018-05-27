@@ -1,14 +1,30 @@
-'use strict';
+'use strict';Object.defineProperty(exports, "__esModule", { value: true });exports.forkHostServices = undefined;var _asyncToGenerator = _interopRequireDefault(require('async-to-generator'));let forkHostServices = exports.forkHostServices = (() => {var _ref = (0, _asyncToGenerator.default)(
 
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-exports.forkHostServices = undefined;
 
-var _asyncToGenerator = _interopRequireDefault(require('async-to-generator'));
 
-let forkHostServices = exports.forkHostServices = (() => {
-  var _ref = (0, _asyncToGenerator.default)(function* (host, logger) {
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  function* (
+  host,
+  logger)
+  {
     const child = new HostServicesAggregator();
     const howChildShouldRelayBackToHost = yield host.childRegister(child);
     child.initialize(howChildShouldRelayBackToHost, logger);
@@ -48,24 +64,7 @@ let forkHostServices = exports.forkHostServices = (() => {
     // aggregator, and so the parent aggregator can know which child that message
     // was relayed from, and so we can do all this without lots of duplicate
     // methods in the HostServices interface.
-  });
-
-  return function forkHostServices(_x, _x2) {
-    return _ref.apply(this, arguments);
-  };
-})();
-
-var _rxjsBundlesRxMinJs = require('rxjs/bundles/Rx.min.js');
-
-var _UniversalDisposable;
-
-function _load_UniversalDisposable() {
-  return _UniversalDisposable = _interopRequireDefault(require('nuclide-commons/UniversalDisposable'));
-}
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-// This is how we declare in Flow that a type fulfills an interface.
+  });return function forkHostServices(_x, _x2) {return _ref.apply(this, arguments);};})();var _rxjsBundlesRxMinJs = require('rxjs/bundles/Rx.min.js');var _UniversalDisposable;function _load_UniversalDisposable() {return _UniversalDisposable = _interopRequireDefault(require('../../../modules/nuclide-commons/UniversalDisposable'));}function _interopRequireDefault(obj) {return obj && obj.__esModule ? obj : { default: obj };} // This is how we declare in Flow that a type fulfills an interface.
 /**
  * Copyright (c) 2015-present, Facebook, Inc.
  * All rights reserved.
@@ -75,19 +74,7 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
  *
  * 
  * @format
- */
-
-null;
-null;
-
-class HostServicesAggregator {
-
-  constructor() {
-    this._childRelays = new Map();
-    this._counter = 0;
-    this._isDisposed = false;
-
-    // HostServiceAggregator objects are only ever constructed from forkHostServices:
+ */null;null;class HostServicesAggregator {constructor() {this._childRelays = new Map();this._counter = 0;this._isDisposed = false; // HostServiceAggregator objects are only ever constructed from forkHostServices:
     // 1. it calls the constructor (here)
     // 2. it calls parent.childRegister(child)
     // 3. it calls child.initialize(parent)
@@ -101,36 +88,57 @@ class HostServicesAggregator {
   }
 
   _selfRelay() {
-    const relay = this._childRelays.get(0);
-
-    if (!(relay != null)) {
-      throw new Error('Invariant violation: "relay != null"');
-    }
-
+    const relay = this._childRelays.get(0);if (!(
+    relay != null)) {throw new Error('Invariant violation: "relay != null"');}
     return relay;
   }
 
-  consoleNotification(source, level, text) {
+  consoleNotification(
+  source,
+  level,
+  text)
+  {
     this._selfRelay().consoleNotification(source, level, text);
   }
 
-  dialogNotification(level, text) {
+  dialogNotification(
+  level,
+  text)
+  {
     return this._selfRelay().dialogNotification(level, text);
   }
 
-  applyTextEditsForMultipleFiles(changes) {
+  applyTextEditsForMultipleFiles(
+  changes)
+  {
     return this._selfRelay().applyTextEditsForMultipleFiles(changes);
   }
 
-  dialogRequest(level, text, buttonLabels, closeLabel) {
-    return this._selfRelay().dialogRequest(level, text, buttonLabels, closeLabel);
+  dialogRequest(
+  level,
+  text,
+  buttonLabels,
+  closeLabel)
+  {
+    return this._selfRelay().dialogRequest(
+    level,
+    text,
+    buttonLabels,
+    closeLabel);
+
   }
 
-  showProgress(title, options) {
+  showProgress(
+  title,
+  options)
+  {
     return this._selfRelay().showProgress(title, options);
   }
 
-  showActionRequired(title, options) {
+  showActionRequired(
+  title,
+  options)
+  {
     return this._selfRelay().showActionRequired(title, options);
   }
 
@@ -170,10 +178,7 @@ class HostServicesAggregator {
     }
   }
 
-  childRegister(child) {
-    var _this = this;
-
-    return (0, _asyncToGenerator.default)(function* () {
+  childRegister(child) {var _this = this;return (0, _asyncToGenerator.default)(function* () {
       // The code which has a HostServices object doesn't necessarily know that
       // its parent might have been disposed. And if it tries to fork, that
       // should still succeed and produce a disposed child HostServices object.
@@ -184,73 +189,102 @@ class HostServicesAggregator {
       } else {
         _this._childRelays.set(_this._counter, relay);
       }
-      return relay;
-    })();
-  }
-}
+      return relay;})();
+  }}
+
 
 class HostServicesRelay {
+
+
+
+
   // _childIsDisposed is consumed by using observable.takeUntil(_childIsDisposed),
   // which unsubscribes from 'obs' as soon as _childIsDisposed.next() gets
   // fired. It is signaled by calling _disposables.dispose(), which fires
   // the _childIsDisposed.next().
-  constructor(aggregator, id, child) {
-    this._childIsDisposed = new _rxjsBundlesRxMinJs.Subject();
-    this._disposables = new (_UniversalDisposable || _load_UniversalDisposable()).default();
 
+
+
+  constructor(
+  aggregator,
+  id,
+  child)
+  {this._childIsDisposed = new _rxjsBundlesRxMinJs.Subject();this._disposables = new (_UniversalDisposable || _load_UniversalDisposable()).default();
     this._aggregator = aggregator;
     this._id = id;
     this._child = child;
     this._disposables.add(() => {
       this._childIsDisposed.next();
     });
-  }
-  //
+  } //
 
-
-  consoleNotification(source, level, text) {
+  consoleNotification(
+  source,
+  level,
+  text)
+  {
     if (this._aggregator.isDisposed()) {
       return;
     }
     this._aggregator._parent.consoleNotification(source, level, text);
   }
 
-  dialogNotification(level, text) {
+  dialogNotification(
+  level,
+  text)
+  {
     if (this._aggregator.isDisposed()) {
       return _rxjsBundlesRxMinJs.Observable.empty().publish();
     }
-    return this._aggregator._parent.dialogNotification(level, text).refCount().takeUntil(this._childIsDisposed).publish();
+    return this._aggregator._parent.
+    dialogNotification(level, text).
+    refCount().
+    takeUntil(this._childIsDisposed).
+    publish();
     // If the host is disposed, then the ConnectedObservable we return will
     // complete without ever having emitted a value. If you .toPromise on it
     // your promise will complete successfully with value 'undefined'.
   }
 
-  dialogRequest(level, text, buttonLabels, closeLabel) {
+  dialogRequest(
+  level,
+  text,
+  buttonLabels,
+  closeLabel)
+  {
     if (this._aggregator.isDisposed()) {
       return _rxjsBundlesRxMinJs.Observable.empty().publish();
     }
-    return this._aggregator._parent.dialogRequest(level, text, buttonLabels, closeLabel).refCount().takeUntil(this._childIsDisposed).publish();
+    return this._aggregator._parent.
+    dialogRequest(level, text, buttonLabels, closeLabel).
+    refCount().
+    takeUntil(this._childIsDisposed).
+    publish();
   }
 
-  applyTextEditsForMultipleFiles(changes) {
+  applyTextEditsForMultipleFiles(
+  changes)
+  {
     if (this._aggregator.isDisposed()) {
       return Promise.resolve(false);
     }
     return this._aggregator._parent.applyTextEditsForMultipleFiles(changes);
   }
 
-  showProgress(title, options) {
-    var _this2 = this;
-
-    return (0, _asyncToGenerator.default)(function* () {
+  showProgress(
+  title,
+  options)
+  {var _this2 = this;return (0, _asyncToGenerator.default)(function* () {
       // TODO: this whole function would work better with CancellationToken,
       // particularly in the case where a HostAggregator is disposed after the
       // request has already been sent out to its parent. In the absence of
       // CancellationToken, we can't cancel the parent, and instead have to
+
+
       const no_op = {
         setTitle: function (_) {},
-        dispose: function () {}
-      };
+        dispose: function () {} };
+
 
       // If we're already disposed, then return a no-op wrapper.
       if (_this2._aggregator.isDisposed()) {
@@ -268,10 +302,12 @@ class HostServicesRelay {
       // The "or" check below is in case parentProgress returned something
       // but also either the parent aggregator or the child aggregator
       // were disposed.
-      if (progress == null || _this2._aggregator.isDisposed() || _this2._disposables.disposed) {
-        parentPromise.then(function (progress2) {
-          return progress2.dispose();
-        });
+      if (
+      progress == null ||
+      _this2._aggregator.isDisposed() ||
+      _this2._disposables.disposed)
+      {
+        parentPromise.then(function (progress2) {return progress2.dispose();});
         return no_op;
       }
 
@@ -290,18 +326,24 @@ class HostServicesRelay {
             progress.dispose();
             progress = null;
           }
-        }
-      };
+        } };
+
       _this2._disposables.add(wrapper);
-      return wrapper;
-    })();
+      return wrapper;})();
   }
 
-  showActionRequired(title, options) {
+  showActionRequired(
+  title,
+  options)
+  {
     if (this._aggregator.isDisposed()) {
       return _rxjsBundlesRxMinJs.Observable.empty().publish();
     }
-    return this._aggregator._parent.showActionRequired(title, options).refCount().takeUntil(this._childIsDisposed).publish();
+    return this._aggregator._parent.
+    showActionRequired(title, options).
+    refCount().
+    takeUntil(this._childIsDisposed).
+    publish();
   }
 
   dispose() {
@@ -314,9 +356,6 @@ class HostServicesRelay {
     }
   }
 
-  childRegister(child) {
-    if (!false) {
-      throw new Error('relay should never be asked to relay childRegister');
-    }
-  }
-}
+  childRegister(child) {if (!
+    false) {throw new Error('relay should never be asked to relay childRegister');}
+  }}

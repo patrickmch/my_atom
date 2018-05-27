@@ -1,59 +1,31 @@
-'use strict';
+'use strict';Object.defineProperty(exports, "__esModule", { value: true });exports.
 
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
 
-var _UniversalDisposable;
 
-function _load_UniversalDisposable() {
-  return _UniversalDisposable = _interopRequireDefault(require('nuclide-commons/UniversalDisposable'));
-}
 
-var _nuclideRemoteConnection;
 
-function _load_nuclideRemoteConnection() {
-  return _nuclideRemoteConnection = require('../../nuclide-remote-connection');
-}
 
-var _NuclideSocket;
 
-function _load_NuclideSocket() {
-  return _NuclideSocket = require('big-dig/src/socket/NuclideSocket');
-}
 
-var _react = _interopRequireWildcard(require('react'));
 
-var _reactDom = _interopRequireDefault(require('react-dom'));
 
-var _StatusBarTile;
 
-function _load_StatusBarTile() {
-  return _StatusBarTile = _interopRequireDefault(require('./StatusBarTile'));
-}
 
-var _textEditor;
 
-function _load_textEditor() {
-  return _textEditor = require('nuclide-commons-atom/text-editor');
-}
 
-var _nuclideUri;
 
-function _load_nuclideUri() {
-  return _nuclideUri = _interopRequireDefault(require('nuclide-commons/nuclideUri'));
-}
 
-var _ConnectionState;
 
-function _load_ConnectionState() {
-  return _ConnectionState = _interopRequireDefault(require('./ConnectionState'));
-}
 
-function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
 
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
+
+
+
+
+
+
+_observeConnectionState = _observeConnectionState;var _bindObservableAsProps;function _load_bindObservableAsProps() {return _bindObservableAsProps = require('../../../modules/nuclide-commons-ui/bindObservableAsProps');}var _renderReactRoot;function _load_renderReactRoot() {return _renderReactRoot = require('../../../modules/nuclide-commons-ui/renderReactRoot');}var _event;function _load_event() {return _event = require('../../../modules/nuclide-commons/event');}var _observable;function _load_observable() {return _observable = require('../../../modules/nuclide-commons/observable');}var _UniversalDisposable;function _load_UniversalDisposable() {return _UniversalDisposable = _interopRequireDefault(require('../../../modules/nuclide-commons/UniversalDisposable'));}var _react = _interopRequireWildcard(require('react'));var _rxjsBundlesRxMinJs = require('rxjs/bundles/Rx.min.js');var _nuclideRemoteConnection;function _load_nuclideRemoteConnection() {return _nuclideRemoteConnection = require('../../nuclide-remote-connection');}var _ConnectionState;function _load_ConnectionState() {return _ConnectionState = _interopRequireDefault(require('./ConnectionState'));}var _StatusBarTile;function _load_StatusBarTile() {return _StatusBarTile = _interopRequireDefault(require('./StatusBarTile'));}function _interopRequireWildcard(obj) {if (obj && obj.__esModule) {return obj;} else {var newObj = {};if (obj != null) {for (var key in obj) {if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key];}}newObj.default = obj;return newObj;}}function _interopRequireDefault(obj) {return obj && obj.__esModule ? obj : { default: obj };}const THROTTLE_TIME_MS = 500; // Exported for testing.
 /**
  * Copyright (c) 2015-present, Facebook, Inc.
  * All rights reserved.
@@ -63,120 +35,66 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
  *
  * 
  * @format
- */
+ */function _observeConnectionState(connectionStream) {return connectionStream.switchMap(connections => {if (connections.length === 0) {return _rxjsBundlesRxMinJs.Observable.of([]);} // Observe the connection states of all connections simultaneously.
+    // $FlowFixMe: add array signature to combineLatest
+    return _rxjsBundlesRxMinJs.Observable.combineLatest(
+    connections.map(conn => {
+      const heartbeat = conn.getHeartbeat();
+      return (
+        _rxjsBundlesRxMinJs.Observable.of(
+        heartbeat.isAway() ?
+        (_ConnectionState || _load_ConnectionState()).default.DISCONNECTED :
+        (_ConnectionState || _load_ConnectionState()).default.CONNECTED).
+
+        concat(
+        _rxjsBundlesRxMinJs.Observable.merge(
+        (0, (_event || _load_event()).observableFromSubscribeFunction)(cb =>
+        heartbeat.onHeartbeat(cb)).
+        mapTo((_ConnectionState || _load_ConnectionState()).default.CONNECTED),
+        (0, (_event || _load_event()).observableFromSubscribeFunction)(cb =>
+        heartbeat.onHeartbeatError(cb)).
+        mapTo((_ConnectionState || _load_ConnectionState()).default.DISCONNECTED))).
+
+
+        distinctUntilChanged()
+        // Key the connection states by hostname.
+        .map(state => [conn.getRemoteHostname(), state]));
+
+    }));
+
+  }).
+  map(states => ({
+    connectionStates: new Map(states) }));
+
+}
 
 class RemoteProjectsController {
 
+
   constructor() {
-    this._statusBarTile = null;
     this._disposables = new (_UniversalDisposable || _load_UniversalDisposable()).default();
-
-    this._statusSubscription = null;
-    this._disposables.add(atom.workspace.onDidChangeActivePaneItem(this._disposeSubscription.bind(this)), atom.workspace.onDidStopChangingActivePaneItem(this._updateConnectionStatus.bind(this)));
-  }
-
-  _disposeSubscription() {
-    const subscription = this._statusSubscription;
-    if (subscription) {
-      this._disposables.remove(subscription);
-      subscription.dispose();
-      this._statusSubscription = null;
-    }
-  }
-
-  _updateConnectionStatus(paneItem) {
-    this._disposeSubscription();
-
-    if (!(0, (_textEditor || _load_textEditor()).isValidTextEditor)(paneItem)) {
-      this._renderStatusBar((_ConnectionState || _load_ConnectionState()).default.NONE);
-      return;
-    }
-    // Flow does not understand that isTextEditor refines the type to atom$TextEditor
-    const textEditor = paneItem;
-    const fileUri = textEditor.getPath();
-    // flowlint-next-line sketchy-null-string:off
-    if (!fileUri) {
-      return;
-    }
-    if ((_nuclideUri || _load_nuclideUri()).default.isLocal(fileUri)) {
-      this._renderStatusBar((_ConnectionState || _load_ConnectionState()).default.LOCAL, fileUri);
-      return;
-    }
-
-    const updateStatus = isConnected => {
-      this._renderStatusBar(isConnected ? (_ConnectionState || _load_ConnectionState()).default.CONNECTED : (_ConnectionState || _load_ConnectionState()).default.DISCONNECTED, fileUri);
-    };
-
-    const connection = (_nuclideRemoteConnection || _load_nuclideRemoteConnection()).ServerConnection.getForUri(fileUri);
-    if (connection == null) {
-      updateStatus(false);
-      return;
-    }
-
-    const socket = connection.getClient().getTransport();
-    updateStatus(!socket.isClosed());
-
-    // TODO: implement for big-dig
-    if (socket instanceof (_NuclideSocket || _load_NuclideSocket()).NuclideSocket) {
-      this._statusSubscription = socket.onStatus(updateStatus);
-      this._disposables.add(this._statusSubscription);
-    }
   }
 
   consumeStatusBar(statusBar) {
-    this._statusBarDiv = document.createElement('div');
-    this._statusBarDiv.className = 'nuclide-remote-projects inline-block';
+    const BoundStatusBarTile = (0, (_bindObservableAsProps || _load_bindObservableAsProps()).bindObservableAsProps)(
+    _observeConnectionState((_nuclideRemoteConnection || _load_nuclideRemoteConnection()).ServerConnection.observeRemoteConnections()).let(
+    (0, (_observable || _load_observable()).throttle)(THROTTLE_TIME_MS)), (_StatusBarTile || _load_StatusBarTile()).default);
 
-    const tooltip = atom.tooltips.add(this._statusBarDiv, {
-      title: 'Click to show details of connection.'
+
+
+    const item = (0, (_renderReactRoot || _load_renderReactRoot()).renderReactRoot)(_react.createElement(BoundStatusBarTile, null));
+    item.className = 'inline-block';
+    const statusBarTile = statusBar.addLeftTile({
+      item,
+      priority: -99 });
+
+    const disposable = new (_UniversalDisposable || _load_UniversalDisposable()).default(() => statusBarTile.destroy());
+    this._disposables.add(disposable);
+    return new (_UniversalDisposable || _load_UniversalDisposable()).default(() => {
+      this._disposables.remove(disposable);
     });
-
-    if (!this._statusBarDiv) {
-      throw new Error('Invariant violation: "this._statusBarDiv"');
-    }
-
-    const rightTile = statusBar.addLeftTile({
-      item: this._statusBarDiv,
-      priority: -99
-    });
-
-    this._disposables.add(new (_UniversalDisposable || _load_UniversalDisposable()).default(() => {
-      if (!this._statusBarDiv) {
-        throw new Error('Invariant violation: "this._statusBarDiv"');
-      }
-
-      const parentNode = this._statusBarDiv.parentNode;
-      if (parentNode) {
-        parentNode.removeChild(this._statusBarDiv);
-      }
-      _reactDom.default.unmountComponentAtNode(this._statusBarDiv);
-      this._statusBarDiv = null;
-      rightTile.destroy();
-      tooltip.dispose();
-    }));
-
-    const textEditor = atom.workspace.getActiveTextEditor();
-    if (textEditor != null) {
-      this._updateConnectionStatus(textEditor);
-    }
   }
 
-  _renderStatusBar(connectionState, fileUri) {
-    if (!this._statusBarDiv) {
-      return;
-    }
-
-    const component = _reactDom.default.render(_react.createElement((_StatusBarTile || _load_StatusBarTile()).default, { connectionState: connectionState, fileUri: fileUri }), this._statusBarDiv);
-
-    if (!(component instanceof (_StatusBarTile || _load_StatusBarTile()).default)) {
-      throw new Error('Invariant violation: "component instanceof StatusBarTile"');
-    }
-
-    this._statusBarTile = component;
-  }
-
-  destroy() {
+  dispose() {
     this._disposables.dispose();
-  }
-}
-exports.default = RemoteProjectsController;
+  }}exports.default = RemoteProjectsController;

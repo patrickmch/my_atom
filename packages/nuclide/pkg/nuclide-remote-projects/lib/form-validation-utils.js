@@ -1,37 +1,53 @@
-'use strict';
+'use strict';Object.defineProperty(exports, "__esModule", { value: true });exports.
 
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-exports.validateFormInputs = validateFormInputs;
 
-var _nuclideRemoteConnection;
 
-function _load_nuclideRemoteConnection() {
-  return _nuclideRemoteConnection = require('../../nuclide-remote-connection');
-}
 
-/*
- * This function checks that the required inputs to a connection profile are non-empty
- * (i.e. required strings are at least length 1). It also removes the password
- * if provided, and only retains the remote server command if it is not the default.
- * @param profileName The profile name to validate.
- * @param connectionDetails The connection details to validate.
- * @param defaultRemoteServerCommand The default remote server command. If the user's
- *   input matches this string (meaning the user hasn't changed it), the user's
- *   input will not be saved as part of the profile.
- * @return If the validation fails: an error object. If validation succeeds:
- * an object containing a valid profile to save.
- */
-function validateFormInputs(profileName, connectionDetails, defaultRemoteServerCommand) {
-  // Validate the form inputs. The form must be fully filled-out.
-  const missingFields = [];
-  const profileParams = {};
 
-  if (!profileName) {
-    missingFields.push('Profile Name');
-  } else {
-    profileParams.displayTitle = profileName;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+validateFormInputs = validateFormInputs;var _nuclideRemoteConnection;function _load_nuclideRemoteConnection() {return _nuclideRemoteConnection = require('../../nuclide-remote-connection');} /*
+                                                                                                                                                                                               * This function checks that the required inputs to a connection profile are non-empty
+                                                                                                                                                                                               * (i.e. required strings are at least length 1). It also removes the password
+                                                                                                                                                                                               * if provided, and only retains the remote server command if it is not the default.
+                                                                                                                                                                                               * @param profileName The profile name to validate.
+                                                                                                                                                                                               * @param connectionDetails The connection details to validate.
+                                                                                                                                                                                               * @param defaultRemoteServerCommand The default remote server command. If the user's
+                                                                                                                                                                                               *   input matches this string (meaning the user hasn't changed it), the user's
+                                                                                                                                                                                               *   input will not be saved as part of the profile.
+                                                                                                                                                                                               * @return If the validation fails: an error object. If validation succeeds:
+                                                                                                                                                                                               * an object containing a valid profile to save.
+                                                                                                                                                                                               */function validateFormInputs(profileName, connectionDetails, defaultRemoteServerCommand) {// Validate the form inputs. The form must be fully filled-out.
+  const missingFields = [];const profileParams = {};if (!profileName) {missingFields.push('Profile Name');} else {profileParams.displayTitle = profileName;
   }
   if (!connectionDetails.username) {
     missingFields.push('Username');
@@ -60,8 +76,13 @@ function validateFormInputs(profileName, connectionDetails, defaultRemoteServerC
   } else {
     profileParams.authMethod = authMethod;
   }
-  if (authMethod === (_nuclideRemoteConnection || _load_nuclideRemoteConnection()).SshHandshake.SupportedMethods.PRIVATE_KEY && !connectionDetails.pathToPrivateKey) {
-    missingFields.push('Private Key File (required for the authentication method you selected)');
+  if (
+  authMethod === (_nuclideRemoteConnection || _load_nuclideRemoteConnection()).SshHandshake.SupportedMethods.PRIVATE_KEY &&
+  !connectionDetails.pathToPrivateKey)
+  {
+    missingFields.push(
+    'Private Key File (required for the authentication method you selected)');
+
   } else {
     profileParams.pathToPrivateKey = connectionDetails.pathToPrivateKey;
   }
@@ -78,11 +99,20 @@ function validateFormInputs(profileName, connectionDetails, defaultRemoteServerC
   let warningMessage = '';
 
   // 1. If a password is provided, all parts of the profile will be save except the password.
-  if (authMethod === (_nuclideRemoteConnection || _load_nuclideRemoteConnection()).SshHandshake.SupportedMethods.PASSWORD && connectionDetails.password) {
-    warningMessage += '* You provided a password for this profile. ' + 'For security, Nuclide will save the other parts of this profile, ' + 'but not the password.\n';
+  if (
+  authMethod === (_nuclideRemoteConnection || _load_nuclideRemoteConnection()).SshHandshake.SupportedMethods.PASSWORD &&
+  connectionDetails.password)
+  {
+    warningMessage +=
+    '* You provided a password for this profile. ' +
+    'For security, Nuclide will save the other parts of this profile, ' +
+    'but not the password.\n';
   }
   // 2. Save the remote server command only if it is changed.
-  if (connectionDetails.remoteServerCommand && connectionDetails.remoteServerCommand !== defaultRemoteServerCommand) {
+  if (
+  connectionDetails.remoteServerCommand &&
+  connectionDetails.remoteServerCommand !== defaultRemoteServerCommand)
+  {
     profileParams.remoteServerCommand = connectionDetails.remoteServerCommand;
   } else {
     profileParams.remoteServerCommand = '';
@@ -91,12 +121,15 @@ function validateFormInputs(profileName, connectionDetails, defaultRemoteServerC
     deletable: true,
     displayTitle: profileName,
     params: profileParams,
-    saveable: true
-  };
-  const validationResult = warningMessage.length > 0 ? {
+    saveable: true };
+
+  const validationResult =
+  warningMessage.length > 0 ?
+  {
     validatedProfile,
-    warningMessage
-  } : { validatedProfile };
+    warningMessage } :
+
+  { validatedProfile };
   return validationResult;
 } /**
    * Copyright (c) 2015-present, Facebook, Inc.
@@ -105,6 +138,6 @@ function validateFormInputs(profileName, connectionDetails, defaultRemoteServerC
    * This source code is licensed under the license found in the LICENSE file in
    * the root directory of this source tree.
    *
-   * 
+   *  strict-local
    * @format
    */

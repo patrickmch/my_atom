@@ -1,0 +1,499 @@
+div.container-fluid.content_container-fluid {
+    margin-top: 80px;
+    min-height: 450px;
+    @include breakpoint(small only) {
+        min-height: 350px;
+    }
+    padding-bottom: 30px;
+    @include breakpoint(large) {
+        margin-top: 70px;
+    }
+
+    input:not(.button), select, textarea {
+        background-color: $color-sand !important;
+    }
+    input {
+        border: none;
+        box-shadow: none;
+        &.button {
+            border: 4px solid !important;
+            border-color: $color-mud !important;
+            &:hover {
+                border-color: darken($color-sand, 5%) !important;
+            }
+        }
+    }
+    .fieldwrapper {
+        margin-bottom: 10px;
+    }
+}
+
+body {
+    background: $color-light;
+}
+
+.off-canvas-content, off-canvas-wrapper {
+    background-color: $color-light !important;
+}
+
+.errorlist {
+    color: red;
+}
+
+.give-space {
+    margin-right:30px;
+}
+
+.error input, input.error, textarea.error, .error textarea{
+    border: 1px solid red;
+}
+
+input.button:not(.button--hollow):hover {
+    background: darken($color-sand, 4%);
+}
+
+input.button.button--hollow:hover {
+    color: $color-sand;
+    background: darken($color-mud, 4%);
+}
+
+label, legend {
+    color: $color-mud;
+    font-family: "Stratum2WebBlack",Gerogia,Times New Roman,serif;
+    text-transform: uppercase;
+    & strong {
+        text-transform: none;
+    }
+}
+
+.phoneset {
+    .phoneset-label {
+        margin-bottom: 0;
+        margin-top: 15px;
+    }
+
+    table tbody {
+        td {
+            padding: 0;
+        }
+        tr:nth-child(even) {
+            background-color: $color-light;
+        }
+
+    }
+}
+
+.gift_segment table tbody tr:nth-child(even) {
+    background: $color-light;
+}
+
+@include breakpoint(small only) {
+  .small-float-none{
+    float:none !important;
+  }
+}
+
+// -----------------  Legacy Styles -----------------
+
+form label.required:before,
+.form-group.required>label:before,
+.fieldwrapper.required label:before {
+	content: "* ";
+}
+
+.notext {
+	line-height: 0;
+	font-size: 0;
+}
+
+.breadcrumbs {
+    padding: .3em;
+    background-color: white;
+    color: gray;
+    font-size: small;
+}
+
+.erroralert{
+    font-weight: bold;
+    font-size: x-large;
+    color: red;
+    background-color: $color-sand-dark;
+    border: 1px solid red;
+    padding: 0.5em;
+    margin: 1em 11.5em 1em 1em;
+}
+.errors {
+    border: 1px solid red;
+    background-color: $color-sand-dark;
+    margin: 1em .5em;
+    padding: 0.3em;
+}
+.errorlist {
+
+    color: red;
+    font-weight: bold;
+    list-style-type: none;
+    margin: 0.2em;
+}
+.errorheader {
+	/*width: 665px;*/
+}
+.hidden {
+    display: none;
+}
+.wide {
+    @include breakpoint(medium) {
+        width: 25em !important;
+    }
+}
+.row0 {
+    background-color: gray;
+    color: white;
+}
+.row1 {
+    background-color: #efefef;
+}
+.row2 {
+    background-color: #cccccc;
+}
+.short {
+    width: 5em !important;
+}
+.subtle {
+    padding-top: 5px;
+    font-size: $font-size-regular;
+    color: #999999;
+}
+.tbl_number, .tbl_date {
+    text-align: right;
+}
+.messages ul{
+    padding: 1em;
+    font-weight: bold;
+    background-color: #cccccc;
+    list-style-type: none;
+}
+#content-block {
+    background-color: white;
+    color: black;
+    margin: 0;
+    padding: 20px;
+}
+
+form p.helptext {
+	margin-top: 0;
+	margin-bottom: 0.75em;
+	line-height: 1em;
+}
+form p.helptext .subtle {
+	padding-top: 0;
+	font-size: smaller;
+        @include breakpoint(medium down) {
+            display: none;
+        }
+}
+form p.reverse label {
+    text-align: left;
+}
+form p.required label {
+    font-weight: bold;
+}
+form p.required label:before {
+	content: "* ";
+}
+/* optionally required ... sigh, well if a BLOCK of data, say an address, is optional we need some
+   way to communicate to the user that if they choose to supply some information (line 1) they need
+   to provide complete information */
+form p.optional_required label:before {
+    content: "+ ";
+}
+fieldset.nolabel li{
+    clear: left;
+    list-style-type: none;
+}
+fieldset.nolabel p label {
+    display: none;
+}
+fieldset.widelabel p label, form.widelabel p label {
+    width: 40%;
+}
+fieldset.nobold p label {
+    font-weight: normal;
+}
+form div.block_fieldwrapper {
+    padding-top: .5em;
+    padding-bottom: .5em;
+}
+form div.block_fieldwrapper p.block_label label {
+    padding: 0;
+}
+form div.block_fieldwrapper p.block_label .long_label {
+    white-space: normal;
+}
+form div.block_fieldwrapper p.block_label .required label {
+    font-weight: bold;
+}
+form div.block_fieldwrapper li {
+    list-style: none;
+}
+.displayonly {
+    font-weight: bold;
+}
+input[readonly="readonly"].displayonly {
+    background: inherit;
+    font-size: inherit;
+}
+#register {
+    background-color: #dcefff;
+    color: #447196;
+    font-weight: bold;
+    padding: .5em;
+    margin: .5em 0;
+}
+#register p {
+    margin: .5em 0;
+}
+.field_detail_text {
+    font-size: smaller;
+    border: 1px solid gray;
+    overflow: auto;
+    margin: .5em;
+    padding: .5em;
+    width: 50em;
+    height:10em;
+}
+
+.std_form_follow_text {
+    font-weight: bold;
+}
+
+@media print {
+    .print_suppress, .button,  #footer, #top-banner, .notext, #page-header-logo-block, #page-header-nav-block {
+    	display: none;
+	}
+	fieldset {
+		border: 0;
+	}
+    th {
+    	color: black;
+        font-weight: bold;
+        border-top: 2px solid black;
+        border-bottom: 2px solid black;
+    }
+}
+
+#captcha-message {
+    padding: .5em;
+    border: thin solid #FF0000;
+    background-color: #FFDA73;
+    margin: .5em;
+    margin-bottom: 20px;
+    max-width: 318px;
+}
+
+#captcha-message h1, #captcha-message p , #captcha-message li {
+    color: #FF0000;
+}
+
+#captcha-message a, .errorlist a {
+    color: #AE1500;
+    font-weight: bold;
+}
+
+table#lineitems {
+    & td, & th {
+        text-align: center;
+    }
+}
+
+.list-links:last-of-type {
+    border-bottom: none !important;
+}
+
+.has-success span{
+    color: green;
+}
+
+.has-warning span {
+    color: red;
+}
+
+.button:not(:hover):not(.button--hollow) {
+    &:focus, &:active {
+        color: $color-light;
+    }
+}
+
+table#app_nav {
+    @include breakpoint(medium down) {
+        display: none;
+    }
+    border-spacing: 10px 5px;
+    border-collapse: separate;
+    font-family :"Stratum2WebBlack",Helvetica,Arial,sans-serif;
+    table-layout: fixed;
+    margin-top: 25px;
+    margin-bottom: 25px;
+    text-transform: uppercase;
+    & td {
+        width: 130px;
+        font-weight: bold;
+        background-color: #c8c5b7;
+        text-align: center;
+
+        &.active_nav:not(.alumni-giving) {
+            background: $color-sand;
+            .nav_step_desc, .nav_step_number {
+                color: $color-rock;
+            }
+        }
+        &.active_nav.alumni-giving {
+            background: $color-light;
+        }
+        & .nav_step_desc, & .nav_step_number {
+                color: $color-mud;
+        }
+        &:hover:not(.alumni-giving), &:focus, &.active_nav {
+            & .nav_step_desc, & .nav_step_number {
+                text-decoration: underline;
+            }
+        }
+        & a {
+            text-decoration: none;
+            display: block;
+            width: 100%;
+        }
+    }
+}
+
+#open_application_page .row {
+    margin:0;
+}
+
+@mixin large-column($columns) {
+    @include breakpoint(large) {
+        @include grid-column($columns);
+    }
+}
+
+@mixin medium-down-column($columns) {
+    @include breakpoint(medium down) {
+        @include grid-column($columns);
+    }
+}
+
+.title-row {
+    background-color: $color-rock;
+    text-align: center;
+    min-height: 300px;
+    max-width: none;
+    margin-bottom: 50px;
+
+    & .title-text-container {
+        padding-top: 100px;
+        padding-bottom: 60px;
+        & h1 {
+            color: white;
+            font-size: 3rem;
+        }
+        & h2 {
+            color: $color-sun;
+        }
+    }
+}
+
+.progress {
+    height: 25px;
+
+    & .progress-meter {
+        background-color: $color-sun;
+    }
+
+    & .progress-text {
+        font-size: 1.25em;
+        font-family: Stratum2WebBlack, sans-serif;
+        margin: 20px 0 30px 0;
+        color: $color-rock;
+        & .progress-percent {
+            color: $color-sun;
+        }
+    }
+}
+
+a {
+    color: $color-mud;
+    font-weight: bold;
+    &:hover {
+        color: $color-mud;
+    }
+}
+
+.fa-check {
+    color: green;
+}
+
+.fa-remove {
+    color: red;
+}
+
+.form-link-row {
+    position: relative;
+    .std_form_field_link, .std_form_field_link + label {
+        display: inline;
+    }
+    label {
+        float: left;
+    }
+}
+#birth_date-controls {
+    .t-t {
+        position: absolute;
+        top: 4px;
+        left: 10px;
+    }
+}
+
+.message-row {
+    position: absolute;
+    width: 100%;
+    z-index: 1000;
+}
+
+// The scrollable class is used for making table elements mobile friendly.
+// scrollable is applied to tables dynamically via static/js/mobile-tables.js
+// These styles were copied from:
+// http://www.456bereastreet.com/archive/201309/responsive_scrollable_tables/
+.scrollable {
+    overflow-x:auto;
+    &.has-scroll {
+	position:relative;
+	overflow:hidden;
+        &:after {
+            position:absolute;
+	    top:0;
+	    left:100%;
+	    width:50px;
+	    height:100%;
+	    border-radius:10px 0 0 10px / 50% 0 0 50%;
+	    box-shadow:-5px 0 10px rgba(0, 0, 0, 0.25);
+	    content:'';
+        }
+        & > div {
+	    overflow-x:auto;
+        }
+    }
+
+    &  > div::-webkit-scrollbar {
+	height:12px;
+    }
+
+    & > div::-webkit-scrollbar-track {
+	box-shadow:0 0 2px rgba(0,0,0,0.15) inset;
+	background:#f0f0f0;
+    }
+
+    & > div::-webkit-scrollbar-thumb {
+	border-radius:6px;
+	background:#ccc;
+    }
+}

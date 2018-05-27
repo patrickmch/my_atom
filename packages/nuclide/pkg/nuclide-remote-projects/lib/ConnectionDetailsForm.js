@@ -1,99 +1,124 @@
-'use strict';
+'use strict';Object.defineProperty(exports, "__esModule", { value: true });var _asyncToGenerator = _interopRequireDefault(require('async-to-generator'));var _connectionProfileUtils;
 
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
 
-var _asyncToGenerator = _interopRequireDefault(require('async-to-generator'));
 
-var _connectionProfileUtils;
 
-function _load_connectionProfileUtils() {
-  return _connectionProfileUtils = require('./connection-profile-utils');
-}
 
-var _addTooltip;
 
-function _load_addTooltip() {
-  return _addTooltip = _interopRequireDefault(require('nuclide-commons-ui/addTooltip'));
-}
 
-var _AtomInput;
 
-function _load_AtomInput() {
-  return _AtomInput = require('nuclide-commons-ui/AtomInput');
-}
 
-var _UniversalDisposable;
 
-function _load_UniversalDisposable() {
-  return _UniversalDisposable = _interopRequireDefault(require('nuclide-commons/UniversalDisposable'));
-}
 
-var _nullthrows;
 
-function _load_nullthrows() {
-  return _nullthrows = _interopRequireDefault(require('nullthrows'));
-}
 
-var _lookupPreferIpV;
 
-function _load_lookupPreferIpV() {
-  return _lookupPreferIpV = _interopRequireDefault(require('../../nuclide-remote-connection/lib/lookup-prefer-ip-v6'));
-}
+function _load_connectionProfileUtils() {return _connectionProfileUtils = require('./connection-profile-utils');}var _addTooltip;
 
-var _RadioGroup;
+function _load_addTooltip() {return _addTooltip = _interopRequireDefault(require('../../../modules/nuclide-commons-ui/addTooltip'));}var _AtomInput;
+function _load_AtomInput() {return _AtomInput = require('../../../modules/nuclide-commons-ui/AtomInput');}var _UniversalDisposable;
+function _load_UniversalDisposable() {return _UniversalDisposable = _interopRequireDefault(require('../../../modules/nuclide-commons/UniversalDisposable'));}var _nullthrows;
+function _load_nullthrows() {return _nullthrows = _interopRequireDefault(require('nullthrows'));}var _lookupPreferIpV;
 
-function _load_RadioGroup() {
-  return _RadioGroup = _interopRequireDefault(require('nuclide-commons-ui/RadioGroup'));
-}
-
+function _load_lookupPreferIpV() {return _lookupPreferIpV = _interopRequireDefault(require('../../nuclide-remote-connection/lib/lookup-prefer-ip-v6'));}var _RadioGroup;
+function _load_RadioGroup() {return _RadioGroup = _interopRequireDefault(require('../../../modules/nuclide-commons-ui/RadioGroup'));}
 var _react = _interopRequireWildcard(require('react'));
+var _reactDom = _interopRequireDefault(require('react-dom'));var _nuclideRemoteConnection;
+function _load_nuclideRemoteConnection() {return _nuclideRemoteConnection = require('../../nuclide-remote-connection');}function _interopRequireWildcard(obj) {if (obj && obj.__esModule) {return obj;} else {var newObj = {};if (obj != null) {for (var key in obj) {if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key];}}newObj.default = obj;return newObj;}}function _interopRequireDefault(obj) {return obj && obj.__esModule ? obj : { default: obj };} /**
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       * Copyright (c) 2015-present, Facebook, Inc.
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       * All rights reserved.
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       *
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       * This source code is licensed under the license found in the LICENSE file in
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       * the root directory of this source tree.
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       *
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       *  strict-local
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       * @format
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       */const { SupportedMethods } = (_nuclideRemoteConnection || _load_nuclideRemoteConnection()).SshHandshake;const authMethods = [SupportedMethods.PASSWORD, SupportedMethods.SSL_AGENT, SupportedMethods.PRIVATE_KEY];
 
-var _reactDom = _interopRequireDefault(require('react-dom'));
 
-var _nuclideRemoteConnection;
 
-function _load_nuclideRemoteConnection() {
-  return _nuclideRemoteConnection = require('../../nuclide-remote-connection');
-}
 
-function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
 
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-/**
- * Copyright (c) 2015-present, Facebook, Inc.
- * All rights reserved.
- *
- * This source code is licensed under the license found in the LICENSE file in
- * the root directory of this source tree.
- *
- * 
- * @format
- */
 
-const { SupportedMethods } = (_nuclideRemoteConnection || _load_nuclideRemoteConnection()).SshHandshake;
-const authMethods = [SupportedMethods.PASSWORD, SupportedMethods.SSL_AGENT, SupportedMethods.PRIVATE_KEY];
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 /** Component to prompt the user for connection details. */
-class ConnectionDetailsForm extends _react.Component {
+class ConnectionDetailsForm extends _react.Component
+
+
+{
+
+
+
+
+
+
+
+
+
+
 
   constructor(props) {
-    super(props);
+    super(props);this.
 
-    this._handleAuthMethodChange = newIndex => {
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    _handleAuthMethodChange = newIndex => {
       this.props.onDidChange();
       this.setState({
-        selectedAuthMethodIndex: newIndex
-      });
-    };
+        selectedAuthMethodIndex: newIndex });
 
-    this._handleInputDidChange = () => {
+    };this.
+
+    _handleInputDidChange = () => {
       this.props.onDidChange();
-    };
+    };this.
 
-    this._handleInputDidChangeForServer = () => {
+    _handleInputDidChangeForServer = () => {
       // If the input changed due to a higher level change in the
       // ConnectionDetailsPrompt, don't check for host collisions
       if (!this._promptChanged) {
@@ -101,59 +126,41 @@ class ConnectionDetailsForm extends _react.Component {
         this.props.onDidChange();
       }
       this._promptChanged = false;
-    };
+    };this.
 
-    this._handleKeyFileInputClick = event => {
-      const privateKeyAuthMethodIndex = authMethods.indexOf(SupportedMethods.PRIVATE_KEY);
-      this.setState({
-        selectedAuthMethodIndex: privateKeyAuthMethodIndex
-      }, () => {
+    _handleKeyFileInputClick = event => {
+      const privateKeyAuthMethodIndex = authMethods.indexOf(
+      SupportedMethods.PRIVATE_KEY);
+
+      this.setState(
+      {
+        selectedAuthMethodIndex: privateKeyAuthMethodIndex },
+
+      () => {
         // when setting this immediately, Atom will unset the focus...
         setTimeout(() => {
           // $FlowFixMe
           _reactDom.default.findDOMNode(this._pathToPrivateKey).focus();
         }, 0);
       });
-    };
 
-    this._handlePasswordInputClick = event => {
-      const passwordAuthMethodIndex = authMethods.indexOf(SupportedMethods.PASSWORD);
-      this.setState({
-        selectedAuthMethodIndex: passwordAuthMethodIndex
-      }, () => {
+    };this.
+
+    _handlePasswordInputClick = event => {
+      const passwordAuthMethodIndex = authMethods.indexOf(
+      SupportedMethods.PASSWORD);
+
+      this.setState(
+      {
+        selectedAuthMethodIndex: passwordAuthMethodIndex },
+
+      () => {
         (0, (_nullthrows || _load_nullthrows()).default)(this._password).focus();
       });
-    };
 
-    this._promptChanged = false;
-    this.state = {
-      username: props.initialUsername,
-      server: props.initialServer,
-      cwd: props.initialCwd,
-      remoteServerCommand: props.initialRemoteServerCommand,
-      sshPort: props.initialSshPort,
-      pathToPrivateKey: props.initialPathToPrivateKey,
-      selectedAuthMethodIndex: authMethods.indexOf(props.initialAuthMethod),
-      displayTitle: props.initialDisplayTitle,
-      IPs: null,
-      shouldDisplayTooltipWarning: false
-    };
-  }
+    };this._promptChanged = false;this.state = { username: props.initialUsername, server: props.initialServer, cwd: props.initialCwd, remoteServerCommand: props.initialRemoteServerCommand, sshPort: props.initialSshPort, pathToPrivateKey: props.initialPathToPrivateKey, selectedAuthMethodIndex: authMethods.indexOf(props.initialAuthMethod), displayTitle: props.initialDisplayTitle, IPs: null, shouldDisplayTooltipWarning: false };}_onKeyPress(e) {if (e.key === 'Enter') {this.props.onConfirm();}if (e.key === 'Escape') {this.props.onCancel();}}
 
-  _onKeyPress(e) {
-    if (e.key === 'Enter') {
-      this.props.onConfirm();
-    }
-
-    if (e.key === 'Escape') {
-      this.props.onCancel();
-    }
-  }
-
-  _checkForHostCollisions(hostName) {
-    var _this = this;
-
-    return (0, _asyncToGenerator.default)(function* () {
+  _checkForHostCollisions(hostName) {var _this = this;return (0, _asyncToGenerator.default)(function* () {
       const uniqueHosts = _this.props.profileHosts;
       if (uniqueHosts == null || _this.state.IPs == null) {
         return;
@@ -178,8 +185,7 @@ class ConnectionDetailsForm extends _react.Component {
         if (_this.state.shouldDisplayTooltipWarning !== shouldDisplayWarning) {
           _this.setState({ shouldDisplayTooltipWarning: shouldDisplayWarning });
         }
-      }
-    })();
+      }})();
   }
 
   render() {
@@ -188,17 +194,11 @@ class ConnectionDetailsForm extends _react.Component {
     // We need native-key-bindings so that delete works and we need
     // _onKeyPress so that escape and enter work
     const passwordLabelName = 'Password' + (needsPasswordValue ? ':' : '');
-    const passwordLabel = _react.createElement(
-      'div',
-      { className: 'nuclide-auth-method' },
-      _react.createElement(
-        'div',
-        { className: 'nuclide-auth-method-label' },
-        passwordLabelName
-      ),
-      needsPasswordValue ? _react.createElement(
-        'div',
-        {
+    const passwordLabel =
+    _react.createElement('div', { className: 'nuclide-auth-method' },
+      _react.createElement('div', { className: 'nuclide-auth-method-label' }, passwordLabelName),
+      needsPasswordValue ?
+      _react.createElement('div', {
           className: 'nuclide-auth-method-input nuclide-auth-method-password',
           onClick: this._handlePasswordInputClick },
         _react.createElement('input', {
@@ -209,21 +209,16 @@ class ConnectionDetailsForm extends _react.Component {
           onKeyPress: this._onKeyPress.bind(this),
           ref: el => {
             this._password = el;
-          }
-        })
-      ) : null
-    );
-    const privateKeyLabel = _react.createElement(
-      'div',
-      { className: 'nuclide-auth-method' },
-      _react.createElement(
-        'div',
-        { className: 'nuclide-auth-method-label' },
-        'Private Key File:'
-      ),
-      _react.createElement(
-        'div',
-        { className: 'nuclide-auth-method-input nuclide-auth-method-privatekey' },
+          } })) :
+
+
+      null);
+
+
+    const privateKeyLabel =
+    _react.createElement('div', { className: 'nuclide-auth-method' },
+      _react.createElement('div', { className: 'nuclide-auth-method-label' }, 'Private Key File:'),
+      _react.createElement('div', { className: 'nuclide-auth-method-input nuclide-auth-method-privatekey' },
         _react.createElement((_AtomInput || _load_AtomInput()).AtomInput, {
           disabled: activeAuthMethod !== SupportedMethods.PRIVATE_KEY,
           initialValue: this.state.pathToPrivateKey,
@@ -233,21 +228,24 @@ class ConnectionDetailsForm extends _react.Component {
           ref: input => {
             this._pathToPrivateKey = input;
           },
-          unstyled: true
-        })
-      )
-    );
-    const sshAgentLabel = _react.createElement(
-      'div',
-      { className: 'nuclide-auth-method' },
-      'Use ssh-agent'
-    );
+          unstyled: true })));
+
+
+
+
+    const sshAgentLabel =
+    _react.createElement('div', { className: 'nuclide-auth-method' }, 'Use ssh-agent');
+
     let toolTipWarning;
     if (this.state.shouldDisplayTooltipWarning) {
-      toolTipWarning = _react.createElement('span', {
+      toolTipWarning =
+      _react.createElement('span', {
         style: { paddingLeft: 10 },
-        className: 'icon icon-info pull-right nuclide-remote-projects-tooltip-warning',
-        ref: (0, (_addTooltip || _load_addTooltip()).default)({
+        className:
+        'icon icon-info pull-right nuclide-remote-projects-tooltip-warning'
+
+        // eslint-disable-next-line nuclide-internal/jsx-simple-callback-refs
+        , ref: (0, (_addTooltip || _load_addTooltip()).default)({
           // Intentionally *not* an arrow function so the jQuery
           // Tooltip plugin can set the context to the Tooltip
           // instance.
@@ -257,119 +255,87 @@ class ConnectionDetailsForm extends _react.Component {
             this.tip.style.zIndex = 10999;
             return 'right';
           },
-          title: 'One of your profiles uses a host name that resolves to the' + ' same IP as this one. Consider using the uniform host ' + 'name to avoid potential collisions.'
-        })
-      });
+          title:
+          'One of your profiles uses a host name that resolves to the' +
+          ' same IP as this one. Consider using the uniform host ' +
+          'name to avoid potential collisions.' }) });
+
+
+
     }
 
-    return _react.createElement(
-      'div',
-      { className: className },
-      _react.createElement(
-        'div',
-        { className: 'form-group' },
-        _react.createElement(
-          'label',
-          null,
-          'Username:'
-        ),
-        _react.createElement((_AtomInput || _load_AtomInput()).AtomInput, {
-          initialValue: this.state.username,
-          onDidChange: this._handleInputDidChange,
-          ref: input => {
-            this._username = input;
-          },
-          unstyled: true
-        })
-      ),
-      _react.createElement(
-        'div',
-        { className: 'form-group nuclide-auth-server-group' },
-        _react.createElement(
-          'div',
-          { className: 'nuclide-auth-server' },
-          _react.createElement(
-            'label',
-            null,
-            'Server:',
-            toolTipWarning
-          ),
+    return (
+      _react.createElement('div', { className: className },
+        _react.createElement('div', { className: 'form-group' },
+          _react.createElement('label', null, 'Username:'),
           _react.createElement((_AtomInput || _load_AtomInput()).AtomInput, {
-            initialValue: this.state.server,
-            onDidChange: this._handleInputDidChangeForServer,
-            ref: input => {
-              this._server = input;
-            },
-            unstyled: true
-          })
-        ),
-        _react.createElement(
-          'div',
-          { className: 'col-xs-3' },
-          _react.createElement(
-            'label',
-            null,
-            'SSH Port:'
-          ),
-          _react.createElement((_AtomInput || _load_AtomInput()).AtomInput, {
-            initialValue: this.state.sshPort,
+            initialValue: this.state.username,
             onDidChange: this._handleInputDidChange,
             ref: input => {
-              this._sshPort = input;
+              this._username = input;
             },
-            unstyled: true
-          })
-        )
-      ),
-      _react.createElement(
-        'div',
-        { className: 'form-group' },
-        _react.createElement(
-          'label',
-          null,
-          'Initial Directory:'
-        ),
-        _react.createElement((_AtomInput || _load_AtomInput()).AtomInput, {
-          initialValue: this.state.cwd,
-          onDidChange: this._handleInputDidChange,
-          ref: input => {
-            this._cwd = input;
-          },
-          unstyled: true
-        })
-      ),
-      _react.createElement(
-        'div',
-        { className: 'form-group' },
-        _react.createElement(
-          'label',
-          null,
-          'Authentication method:'
-        ),
-        _react.createElement((_RadioGroup || _load_RadioGroup()).default, {
-          optionLabels: [passwordLabel, sshAgentLabel, privateKeyLabel],
-          onSelectedChange: this._handleAuthMethodChange,
-          selectedIndex: this.state.selectedAuthMethodIndex
-        })
-      ),
-      _react.createElement(
-        'div',
-        { className: 'form-group' },
-        _react.createElement(
-          'label',
-          null,
-          'Remote Server Command:'
-        ),
-        _react.createElement((_AtomInput || _load_AtomInput()).AtomInput, {
-          initialValue: this.state.remoteServerCommand,
-          onDidChange: this._handleInputDidChange,
-          ref: input => {
-            this._remoteServerCommand = input;
-          },
-          unstyled: true
-        })
-      )
-    );
+            unstyled: true })),
+
+
+        _react.createElement('div', { className: 'form-group nuclide-auth-server-group' },
+          _react.createElement('div', { className: 'nuclide-auth-server' },
+            _react.createElement('label', null, 'Server:',
+
+              toolTipWarning),
+
+            _react.createElement((_AtomInput || _load_AtomInput()).AtomInput, {
+              initialValue: this.state.server,
+              onDidChange: this._handleInputDidChangeForServer,
+              ref: input => {
+                this._server = input;
+              },
+              unstyled: true })),
+
+
+          _react.createElement('div', { className: 'col-xs-3' },
+            _react.createElement('label', null, 'SSH Port:'),
+            _react.createElement((_AtomInput || _load_AtomInput()).AtomInput, {
+              initialValue: this.state.sshPort,
+              onDidChange: this._handleInputDidChange,
+              ref: input => {
+                this._sshPort = input;
+              },
+              unstyled: true }))),
+
+
+
+        _react.createElement('div', { className: 'form-group' },
+          _react.createElement('label', null, 'Initial Directory:'),
+          _react.createElement((_AtomInput || _load_AtomInput()).AtomInput, {
+            initialValue: this.state.cwd,
+            onDidChange: this._handleInputDidChange,
+            ref: input => {
+              this._cwd = input;
+            },
+            unstyled: true })),
+
+
+        _react.createElement('div', { className: 'form-group' },
+          _react.createElement('label', null, 'Authentication method:'),
+          _react.createElement((_RadioGroup || _load_RadioGroup()).default, {
+            optionLabels: [passwordLabel, sshAgentLabel, privateKeyLabel],
+            onSelectedChange: this._handleAuthMethodChange,
+            selectedIndex: this.state.selectedAuthMethodIndex })),
+
+
+        _react.createElement('div', { className: 'form-group' },
+          _react.createElement('label', null, 'Remote Server Command:'),
+          _react.createElement((_AtomInput || _load_AtomInput()).AtomInput, {
+            initialValue: this.state.remoteServerCommand,
+            onDidChange: this._handleInputDidChange,
+            ref: input => {
+              this._remoteServerCommand = input;
+            },
+            unstyled: true }))));
+
+
+
+
   }
 
   componentDidMount() {
@@ -378,12 +344,21 @@ class ConnectionDetailsForm extends _react.Component {
     const root = _reactDom.default.findDOMNode(this);
 
     // Hitting enter when this panel has focus should confirm the dialog.
-    disposables.add(atom.commands.add(
+    disposables.add(
+    atom.commands.add(
     // $FlowFixMe
-    root, 'core:confirm', event => this.props.onConfirm()));
+    root,
+    'core:confirm',
+    event => this.props.onConfirm()));
+
+
 
     // Hitting escape should cancel the dialog.
-    disposables.add(atom.commands.add('atom-workspace', 'core:cancel', event => this.props.onCancel()));
+    disposables.add(
+    atom.commands.add('atom-workspace', 'core:cancel', event =>
+    this.props.onCancel()));
+
+
     if (this.props.profileHosts) {
       this.setState({ IPs: (0, (_connectionProfileUtils || _load_connectionProfileUtils()).getIPsForHosts)(this.props.profileHosts) });
     }
@@ -401,13 +376,15 @@ class ConnectionDetailsForm extends _react.Component {
       username: this._getText(this._username),
       server: this._getText(this._server),
       cwd: this._getText(this._cwd),
-      remoteServerCommand: this._getText(this._remoteServerCommand) || (0, (_connectionProfileUtils || _load_connectionProfileUtils()).getOfficialRemoteServerCommand)(),
+      remoteServerCommand:
+      this._getText(this._remoteServerCommand) ||
+      (0, (_connectionProfileUtils || _load_connectionProfileUtils()).getOfficialRemoteServerCommand)(),
       sshPort: this._getText(this._sshPort),
       pathToPrivateKey: this._getText(this._pathToPrivateKey),
       authMethod: this._getAuthMethod(),
       password: this._getPassword(),
-      displayTitle: this.state.displayTitle
-    };
+      displayTitle: this.state.displayTitle };
+
   }
 
   focus() {
@@ -415,7 +392,16 @@ class ConnectionDetailsForm extends _react.Component {
   }
 
   // Note: 'password' is not settable. The only exposed method is 'clearPassword'.
-  setFormFields(fields) {
+  setFormFields(fields)
+
+
+
+
+
+
+
+
+  {
     this._setText(this._username, fields.username);
     this._setText(this._server, fields.server);
     this._setText(this._cwd, fields.cwd);
@@ -469,6 +455,4 @@ class ConnectionDetailsForm extends _react.Component {
   promptChanged() {
     this._promptChanged = true;
     this.setState({ shouldDisplayTooltipWarning: false });
-  }
-}
-exports.default = ConnectionDetailsForm;
+  }}exports.default = ConnectionDetailsForm;

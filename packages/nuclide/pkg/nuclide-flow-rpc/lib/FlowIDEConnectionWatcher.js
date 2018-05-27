@@ -1,52 +1,31 @@
-'use strict';
+'use strict';Object.defineProperty(exports, "__esModule", { value: true });exports.FlowIDEConnectionWatcher = undefined;var _asyncToGenerator = _interopRequireDefault(require('async-to-generator'));var _FlowIDEConnection;
 
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-exports.FlowIDEConnectionWatcher = undefined;
 
-var _asyncToGenerator = _interopRequireDefault(require('async-to-generator'));
 
-var _FlowIDEConnection;
 
-function _load_FlowIDEConnection() {
-  return _FlowIDEConnection = require('./FlowIDEConnection');
-}
 
-var _promise;
 
-function _load_promise() {
-  return _promise = require('nuclide-commons/promise');
-}
 
-var _log4js;
 
-function _load_log4js() {
-  return _log4js = require('log4js');
-}
 
-var _rxjsBundlesRxMinJs = require('rxjs/bundles/Rx.min.js');
 
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+function _load_FlowIDEConnection() {return _FlowIDEConnection = require('./FlowIDEConnection');}var _promise;
 
-/**
- * Copyright (c) 2015-present, Facebook, Inc.
- * All rights reserved.
- *
- * This source code is licensed under the license found in the LICENSE file in
- * the root directory of this source tree.
- *
- * 
- * @format
- */
-
-const defaultIDEConnectionFactory = (proc, fileCache) => new (_FlowIDEConnection || _load_FlowIDEConnection()).FlowIDEConnection(proc, fileCache);
-
-// ESLint thinks the comment at the end is whitespace and warns. Worse, the autofix removes the
+function _load_promise() {return _promise = require('../../../modules/nuclide-commons/promise');}var _log4js;
+function _load_log4js() {return _log4js = require('log4js');}
+var _rxjsBundlesRxMinJs = require('rxjs/bundles/Rx.min.js');function _interopRequireDefault(obj) {return obj && obj.__esModule ? obj : { default: obj };} /**
+                                                                                                                                                           * Copyright (c) 2015-present, Facebook, Inc.
+                                                                                                                                                           * All rights reserved.
+                                                                                                                                                           *
+                                                                                                                                                           * This source code is licensed under the license found in the LICENSE file in
+                                                                                                                                                           * the root directory of this source tree.
+                                                                                                                                                           *
+                                                                                                                                                           *  strict-local
+                                                                                                                                                           * @format
+                                                                                                                                                           */const defaultIDEConnectionFactory = (proc, fileCache) => new (_FlowIDEConnection || _load_FlowIDEConnection()).FlowIDEConnection(proc, fileCache); // ESLint thinks the comment at the end is whitespace and warns. Worse, the autofix removes the
 // entire comment as well as the whitespace.
 // eslint-disable-next-line semi-spacing
 const IDE_CONNECTION_MAX_WAIT_MS = 20 /* min */ * 60 /* s/min */ * 1000 /* ms/s */;
-
 const IDE_CONNECTION_MIN_INTERVAL_MS = 1000;
 
 // If a connection lives shorter than this, it is considered unhealthy (it probably crashed
@@ -56,13 +35,37 @@ const IDE_CONNECTION_HEALTHY_THRESHOLD_MS = 10 * 1000;
 // If we get this many unhealthy connections in a row, give up.
 const MAX_UNHEALTHY_CONNECTIONS = 20;
 
+
+
+
+
+
 // For the lifetime of this class instance, keep a FlowIDEConnection alive, assuming we do not have
 // too many failures in a row.
 class FlowIDEConnectionWatcher {
 
-  constructor(processFactory, fileCache, ideConnectionCallback,
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  constructor(
+  processFactory,
+  fileCache,
+  ideConnectionCallback,
   // Can be injected for testing purposes
-  ideConnectionFactory = defaultIDEConnectionFactory) {
+  ideConnectionFactory = defaultIDEConnectionFactory)
+  {
     this._processFactory = processFactory;
     this._fileCache = fileCache;
     this._ideConnectionFactory = ideConnectionFactory;
@@ -86,10 +89,7 @@ class FlowIDEConnectionWatcher {
     }
   }
 
-  _makeIDEConnection() {
-    var _this = this;
-
-    return (0, _asyncToGenerator.default)(function* () {
+  _makeIDEConnection() {var _this = this;return (0, _asyncToGenerator.default)(function* () {
       (0, (_log4js || _load_log4js()).getLogger)('nuclide-flow-rpc').info('Attempting to start IDE connection...');
       let proc = null;
       const endTimeMS = _this._getTimeMS() + IDE_CONNECTION_MAX_WAIT_MS;
@@ -116,18 +116,25 @@ class FlowIDEConnectionWatcher {
         if (proc != null || attemptEndTime > endTimeMS) {
           break;
         } else {
-          (0, (_log4js || _load_log4js()).getLogger)('nuclide-flow-rpc').info('Failed to start Flow IDE connection... retrying');
+          (0, (_log4js || _load_log4js()).getLogger)('nuclide-flow-rpc').info(
+          'Failed to start Flow IDE connection... retrying');
+
           const attemptWallTime = attemptEndTime - attemptStartTime;
-          const additionalWaitTime = IDE_CONNECTION_MIN_INTERVAL_MS - attemptWallTime;
+          const additionalWaitTime =
+          IDE_CONNECTION_MIN_INTERVAL_MS - attemptWallTime;
           if (additionalWaitTime > 0) {
-            (0, (_log4js || _load_log4js()).getLogger)('nuclide-flow-rpc').info(`Waiting an additional ${additionalWaitTime} ms before retrying`);
+            (0, (_log4js || _load_log4js()).getLogger)('nuclide-flow-rpc').info(
+            `Waiting an additional ${additionalWaitTime} ms before retrying`);
+
             // eslint-disable-next-line no-await-in-loop
             yield _this._sleep(additionalWaitTime);
           }
         }
       }
       if (proc == null) {
-        (0, (_log4js || _load_log4js()).getLogger)('nuclide-flow-rpc').error('Failed to start Flow IDE connection too many times... giving up');
+        (0, (_log4js || _load_log4js()).getLogger)('nuclide-flow-rpc').error(
+        'Failed to start Flow IDE connection too many times... giving up');
+
         return;
       }
       const connectionStartTime = _this._getTimeMS();
@@ -138,8 +145,12 @@ class FlowIDEConnectionWatcher {
         const connectionAliveTime = _this._getTimeMS() - connectionStartTime;
         if (connectionAliveTime < IDE_CONNECTION_HEALTHY_THRESHOLD_MS) {
           _this._consecutiveUnhealthyConnections++;
-          if (_this._consecutiveUnhealthyConnections >= MAX_UNHEALTHY_CONNECTIONS) {
-            (0, (_log4js || _load_log4js()).getLogger)('nuclide-flow-rpc').error('Too many consecutive unhealthy Flow IDE connections... giving up');
+          if (
+          _this._consecutiveUnhealthyConnections >= MAX_UNHEALTHY_CONNECTIONS)
+          {
+            (0, (_log4js || _load_log4js()).getLogger)('nuclide-flow-rpc').error(
+            'Too many consecutive unhealthy Flow IDE connections... giving up');
+
             return;
           }
         } else {
@@ -148,8 +159,7 @@ class FlowIDEConnectionWatcher {
         _this._makeIDEConnection();
       });
 
-      _this._currentIDEConnection = ideConnection;
-    })();
+      _this._currentIDEConnection = ideConnection;})();
   }
 
   // Split this out just so it's easy to mock
@@ -172,6 +182,4 @@ class FlowIDEConnectionWatcher {
         this._currentIDEConnection.dispose();
       }
     }
-  }
-}
-exports.FlowIDEConnectionWatcher = FlowIDEConnectionWatcher;
+  }}exports.FlowIDEConnectionWatcher = FlowIDEConnectionWatcher;

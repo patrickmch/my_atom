@@ -1,6 +1,6 @@
 [
   {
-    "implementation": "../nuclide-adb-sdb-rpc/lib/AdbService.js",
+    "implementation": "../../modules/nuclide-adb/lib/AdbService.js",
     "name": "AdbService"
   },
   {
@@ -64,45 +64,36 @@
     "name": "InfoService"
   },
   {
-    "implementation": "../nuclide-js-imports-client-rpc/lib/JsImportsService.js",
-    "name": "JSAutoImportsService"
+    "implementation": "../../modules/atom-ide-debugger-java/JavaDebuggerHelpersService.js",
+    "name": "JavaDebuggerHelpersService"
   },
   {
-    "implementation": "../nuclide-ocaml-rpc/lib/MerlinService.js",
-    "name": "MerlinService"
+    "implementation": "../nuclide-css-lsp-client-rpc/lib/CSSLSPService.js",
+    "name": "CSSLSPService"
+  },
+  {
+    "implementation": "../nuclide-js-imports-client-rpc/lib/JsImportsService.js",
+    "name": "JSAutoImportsService"
   },
   {
     "implementation": "../nuclide-metro-rpc/lib/MetroService.js",
     "name": "MetroService"
   },
   {
-    "definition": "../nuclide-debugger-native-rpc/lib/NativeDebuggerServiceInterface.js",
-    "implementation": "../nuclide-debugger-native-rpc/lib/NativeDebuggerServiceImplementation.js",
-    "name": "NativeDebuggerService"
-  },
-  {
     "implementation": "../nuclide-open-files-rpc/lib/OpenFilesService.js",
     "name": "OpenFilesService"
-  },
-  {
-    "implementation": "../nuclide-debugger-php-rpc/lib/PhpDebuggerService.js",
-    "name": "PhpDebuggerService"
   },
   {
     "implementation": "../nuclide-debugger-hhvm-rpc/lib/main.js",
     "name": "HhvmDebuggerService"
   },
   {
-    "implementation": "../nuclide-pty-rpc/lib/PtyService.js",
+    "implementation": "../../modules/atom-ide-ui/pkg/atom-ide-terminal/lib/pty-service/PtyService.js",
     "name": "PtyService"
   },
   {
     "implementation": "../nuclide-python-rpc/lib/PythonService.js",
     "name": "PythonService"
-  },
-  {
-    "implementation": "../nuclide-ocaml-rpc/lib/ReasonService.js",
-    "name": "ReasonService"
   },
   {
     "implementation": "../nuclide-remote-atom-rpc/lib/RemoteCommandService.js",
@@ -129,11 +120,11 @@
     "name": "CqueryLSPService"
   },
   {
-    "implementation": "../nuclide-debugger-vsp-rpc/lib/RemoteDebuggerCommandService.js",
+    "implementation": "../../modules/atom-ide-debugger-python/RemoteDebuggerCommandService.js",
     "name": "RemoteDebuggerCommandService"
   },
   {
-    "implementation": "../nuclide-debugger-vsp-rpc/lib/VSCodeDebuggerAdapterService.js",
+    "implementation": "../../modules/nuclide-debugger-common/VSCodeDebuggerAdapterService.js",
     "name": "VSCodeDebuggerAdapterService"
   }
 ]

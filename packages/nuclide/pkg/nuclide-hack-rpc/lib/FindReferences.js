@@ -1,17 +1,33 @@
-'use strict';
+'use strict';Object.defineProperty(exports, "__esModule", { value: true });exports.
 
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-exports.convertReferences = convertReferences;
 
-var _HackHelpers;
 
-function _load_HackHelpers() {
-  return _HackHelpers = require('./HackHelpers');
-}
 
-function convertReferences(hackResult, projectRoot) {
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+convertReferences = convertReferences;var _HackHelpers;function _load_HackHelpers() {return _HackHelpers = require('./HackHelpers');}function convertReferences(
+hackResult,
+projectRoot)
+{
   let symbolName = hackResult[0].name;
   // Strip off the global namespace indicator.
   if (symbolName.startsWith('\\')) {
@@ -23,16 +39,16 @@ function convertReferences(hackResult, projectRoot) {
     return {
       uri: ref.filename,
       name: null, // TODO(hansonw): Get the caller when it's available
-      range: (0, (_HackHelpers || _load_HackHelpers()).hackRangeToAtomRange)(ref)
-    };
+      range: (0, (_HackHelpers || _load_HackHelpers()).hackRangeToAtomRange)(ref) };
+
   });
 
   return {
     type: 'data',
     baseUri: projectRoot,
     referencedSymbolName: symbolName,
-    references
-  };
+    references };
+
 } /**
    * Copyright (c) 2015-present, Facebook, Inc.
    * All rights reserved.
@@ -40,6 +56,6 @@ function convertReferences(hackResult, projectRoot) {
    * This source code is licensed under the license found in the LICENSE file in
    * the root directory of this source tree.
    *
-   * 
+   *  strict-local
    * @format
    */

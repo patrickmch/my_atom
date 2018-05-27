@@ -252,6 +252,17 @@ describe('Functional tests', () => {
 
             expect(currentPathList()).toEqual(['..', 'subsample.js']);
         });
+
+        it('does not list files if they match the ignoredPatterns config', () => {
+            atom.config.set('advanced-open-file.ignoredPatterns', ['prefix_*']);
+            setPath(fixturePath() + stdPath.sep);
+
+            expect(currentPathList()).toEqual([
+                '..',
+                'examples',
+                'sample.js'
+            ]);
+        });
     });
 
     describe('Path input', () => {
@@ -859,7 +870,7 @@ describe('Functional tests', () => {
     let windowsDescribe = process.env.AOF_WINDOWS_TESTS ? describe : xdescribe;
     windowsDescribe('Windows-specific tests', () => {
         // Just as a note, we're assuming C:\ exists and is the root
-        // system drive. It is on AppVeyor, and that's good enough.
+        // system drive.
 
         it('can read the root directory without failing', () => {
             // This potentially fails because we stat in-use files like

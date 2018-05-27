@@ -288,6 +288,10 @@ module.exports = new Settings('vim-mode-plus', {
     description:
       'Hide most commands(such as `j`(`vim-mode-plus:move-down`)) from command-palette. Require restart to make change take effect.'
   },
+  autoDisableInputMethodWhenLeavingInsertMode: {
+    default: false,
+    description: '[Experimental] Automatically disable input method when leaving insert-mode'
+  },
   setCursorToStartOfChangeOnUndoRedo: true,
   setCursorToStartOfChangeOnUndoRedoStrategy: {
     default: 'smart',
@@ -316,6 +320,16 @@ module.exports = new Settings('vim-mode-plus', {
     description: 'Escape insert-mode on tab switch, pane switch'
   },
   wrapLeftRightMotion: false,
+  useLanguageIndependentNonWordCharacters: {
+    default: false,
+    description:
+      'Non word characters is used to detect **word** boundary which is normally based on current language mode(or grammar).<br>If you want to use **static** non word chars enable this.'
+  },
+  // Default value is copied from `DEFAULT_NON_WORD_CHARACTERS` in `text-editor.js`
+  languageIndependentNonWordCharacters: {
+    default: '/\\()"\':,.;<>~!@#$%^&*|+=[]{}`?-…',
+    description: 'Used only when `useLanguageIndependentNonWordCharacters` was enabled'
+  },
   numberRegex: {
     default: '-?[0-9]+',
     description:

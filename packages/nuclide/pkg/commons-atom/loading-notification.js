@@ -1,26 +1,32 @@
-'use strict';
+'use strict';Object.defineProperty(exports, "__esModule", { value: true });exports.default =
 
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-exports.default = loadingNotification;
 
-var _promise;
 
-function _load_promise() {
-  return _promise = require('nuclide-commons/promise');
-}
 
-/**
- * Displays a loading notification while waiting for a promise.
- * Waits delayMs before actually showing the notification (to prevent flicker).
- */
-function loadingNotification(promise, message, delayMs = 100, options = {}) {
+
+
+
+
+
+
+
+
+
+
+
+
+loadingNotification;var _promise;function _load_promise() {return _promise = require('../../modules/nuclide-commons/promise');} /**
+                                                                                                                                 * Displays a loading notification while waiting for a promise.
+                                                                                                                                 * Waits delayMs before actually showing the notification (to prevent flicker).
+                                                                                                                                 */function loadingNotification(promise, message, delayMs = 100,
+options = {})
+{
   let notif = null;
   const timeoutFn = () => {
     notif = atom.notifications.addInfo(message, Object.assign({
-      dismissable: true
-    }, options));
+      dismissable: true },
+    options));
+
   };
   const cleanupFn = () => {
     if (notif) {

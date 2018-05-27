@@ -372,7 +372,7 @@ Object.defineProperty(module.exports, "defs", {
       location: {
         type: "source",
         fileName: "types.js",
-        line: 43
+        line: 44
       },
       name: "DebugBridgeFullConfig",
       definition: {
@@ -469,7 +469,7 @@ Object.defineProperty(module.exports, "defs", {
       location: {
         type: "source",
         fileName: "types.js",
-        line: 22
+        line: 23
       },
       name: "DeviceId",
       definition: {
@@ -530,7 +530,7 @@ Object.defineProperty(module.exports, "defs", {
       location: {
         type: "source",
         fileName: "types.js",
-        line: 24
+        line: 25
       },
       name: "DeviceDescription",
       definition: {
@@ -671,7 +671,7 @@ Object.defineProperty(module.exports, "defs", {
       location: {
         type: "source",
         fileName: "process.js",
-        line: 634
+        line: 663
       },
       name: "ProcessExitMessage",
       definition: {
@@ -709,7 +709,7 @@ Object.defineProperty(module.exports, "defs", {
       location: {
         type: "source",
         fileName: "process.js",
-        line: 640
+        line: 669
       },
       name: "ProcessMessage",
       definition: {
@@ -783,7 +783,7 @@ Object.defineProperty(module.exports, "defs", {
       location: {
         type: "source",
         fileName: "process.js",
-        line: 653
+        line: 682
       },
       name: "LegacyProcessMessage",
       definition: {
@@ -1022,7 +1022,7 @@ Object.defineProperty(module.exports, "defs", {
       location: {
         type: "source",
         fileName: "types.js",
-        line: 32
+        line: 33
       },
       name: "Process",
       definition: {

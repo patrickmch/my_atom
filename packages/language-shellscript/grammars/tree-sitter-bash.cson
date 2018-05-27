@@ -1,11 +1,12 @@
 id: 'bash'
-name: 'Bash'
+name: 'Shell Script'
 type: 'tree-sitter'
 parser: 'tree-sitter-bash'
 legacyScopeName: 'source.shell'
 
 fileTypes: [
   'sh'
+  'bash'
 ]
 
 contentRegExp: '^#!.*\\b(bash|sh)\\r?\\n'
@@ -42,7 +43,7 @@ folds: [
       'do_group'
       'subshell'
       'expansion'
-      'bracket_command'
+      'test_command'
       'compound_statement'
       'process_substitution'
       'command_substitution'
@@ -63,6 +64,7 @@ scopes:
   'string': 'string'
   'raw_string': 'string'
   'heredoc': 'string'
+  'regex': 'string.regexp'
 
   'function_definition > word': 'entity.name.function'
   'command_name': 'entity.name.function'
@@ -84,5 +86,26 @@ scopes:
   '"while"': 'keyword.control'
   '"until"': 'keyword.control'
   '"function"': 'keyword.control'
+  '"local"': 'keyword.control'
+  '"declare"': 'keyword.control'
+  '"export"': 'keyword.control'
+  '"readonly"': 'keyword.control'
+  '"typeset"': 'keyword.control'
+  '"unset"': 'keyword.control'
+  '"unsetenv"': 'keyword.control'
+
+  '"&"': 'keyword.operator'
+  '"&&"': 'keyword.operator'
+  '"|"': 'keyword.operator'
+  '"||"': 'keyword.operator'
+  '"<"': 'keyword.operator'
+  '">"': 'keyword.operator'
+  '">>"': 'keyword.operator'
+  '"&>"': 'keyword.operator'
+  '"&>>"': 'keyword.operator'
+  '"<&"': 'keyword.operator'
+  '">&"': 'keyword.operator'
+  '"<<-"': 'keyword.operator'
+  '"<<<"': 'keyword.operator'
 
   '"$"': 'punctuation.section.embedded'

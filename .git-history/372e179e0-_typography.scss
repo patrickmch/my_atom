@@ -1,0 +1,148 @@
+// Typgraphy
+//
+// Settings, webfonts and fonts maps
+//
+// @author Mark Wirblich <mark@lincolnloop.com>
+
+@font-face {
+  font-family:"Stratum2WebRegular";
+  font-weight: normal;
+  font-style: normal;
+  src: local("☺"), fonts("Stratum2WebRegular/Stratum2WebRegular.eot") format("eot"), fonts("Stratum2WebRegular/Stratum2WebRegular.woff2") format("woff2"), fonts("Stratum2WebRegular/Stratum2WebRegular.worem-calcff") format("woff");
+}
+
+@font-face {
+  font-family:"Stratum2WebBlack";
+  font-weight: normal;
+  font-style: normal;
+  src: local("☺"), fonts("Stratum2WebBlack/Stratum2WebBlack.eot") format("eot"), fonts("Stratum2WebBlack/Stratum2WebBlack.woff2") format("woff2"), fonts("Stratum2WebBlack/Stratum2WebBlack.woff") format("woff");
+
+}
+
+@font-face {
+  font-family: "SentinelMedium";
+  font-weight: normal;
+  font-style: normal;
+  src: fonts("sentinel/sentinel-medium-webfont.eot");
+  src: local("☺"), fonts("sentinel/sentinel-medium-webfont.woff") format("woff"), fonts("sentinel/sentinel-medium-webfont.ttf") format("truetype"), fonts("sentinel/sentinel-medium-webfont.svg#webfontoKrxME3u") format("svg");
+}
+
+@font-face {
+  font-family: "Sentinel A";
+  font-weight: normal;
+  font-style: normal;
+  src: fonts("sentinel/sentinel-book-webfont.eot");
+  src: local("☺"), fonts("sentinel/sentinel-book-webfont.woff") format("woff"), fonts("sentinel/sentinel-book-webfont.ttf") format("truetype"), fonts("sentinel/sentinel-book-webfont.svg#webfontQQCqhvKp") format("svg");
+}
+
+@font-face {
+  font-family: "Sentinel B";
+  font-weight: normal;
+  font-style: normal;
+  src: fonts("sentinel/sentinel-bold-webfont.eot");
+  src: local("☺"), fonts("sentinel/sentinel-bold-webfont.woff") format("woff"), fonts("sentinel/sentinel-bold-webfont.ttf") format("truetype"), fonts("sentinel/sentinel-bold-webfont.svg#webfontljkuIEaa") format("svg");
+}
+
+@font-face {
+  font-family: "GT-Pressura-Regular";
+  font-weight: normal;
+  font-style: normal;
+  src: fonts("GT-Pressura-Regular-Web/GT-Pressura-Regular.eot");
+  src: fonts("GT-Pressura-Regular-Web/GT-Pressura-Regular.woff") format("woff"), fonts("GT-Pressura-Regular-Web/GT-Pressura-Regular.ttf") format("truetype");
+}
+
+@font-face {
+  font-family: "GT-Pressura-Bold";
+  font-weight: normal;
+  font-style: normal;
+  src: fonts("GT-Pressura-Bold-Web/GT-Pressura-Bold.eot");
+  src: fonts("GT-Pressura-Bold-Web/GT-Pressura-Bold.woff") format("woff"), fonts("GT-Pressura-Bold-Web/GT-Pressura-Bold.ttf") format("truetype");
+}
+
+
+
+/// Font stack
+$font-stack: ('Gerogia', 'Times New Roman', serif);
+
+/// Font variables for basic font settings and font-sizes
+/// @example
+///   .element {
+///     font-size: font(size, 'xxl');
+///     line-height: font(base, 'line-height');
+///   }
+
+$fonts: (
+  base: (
+    'stack':          $font-stack,
+    'heading':        ('Stratum2WebBlack', #{$font-stack}),
+    'copy':           ('Sentinel A', 'Sentinel B', #{$font-stack}),
+    'size':           100%,
+    'line-height':    1.5,
+    'line-height-copy': 1.75
+  ),
+  size: (
+    'small':          12px,
+    'medium':         14px,
+    'regular':        16px,
+    'large':          20px,
+    'x-large':        24px,
+    'xx-large':       30px,
+    'xxx-large':      34px,
+    'xxxx-large':     46px,
+    'xxxxx-large':    70px,
+    'xxxxxx-large':   80px
+  )
+);
+
+/// Function to parse font map
+@function font($font, $type: 'base') {
+  @return map-get(map-get($fonts, $font), $type);
+}
+
+$font-size-small: font(size, 'small');
+$font-size-medium: font(size, 'medium');
+$font-size-regular: font(size, 'regular');
+$font-size-large: font(size, 'large');
+$font-size-x-large: font(size, 'x-large');
+$font-size-xx-large: font(size, 'xx-large');
+$font-size-xxx-large: font(size, 'xxx-large');
+$font-size-xxxx-large: font(size, 'xxxx-large');
+$font-size-xxxxx-large: font(size, 'xxxxx-large');
+$font-size-xxxxxx-large: font(size, 'xxxxxx-large');
+
+
+@mixin text-static() {
+  font-family: $font-copy;
+  line-height: font(base, 'line-height-copy');
+}
+
+@mixin text() {
+  @include text-static;
+  font-size: $font-size-regular;
+}
+
+@mixin text-large() {
+  @include text-static;
+  font-size: $font-size-large;
+}
+
+@mixin text-xlarge() {
+  @include text-static;
+  font-size: $font-size-x-large;
+}
+
+@mixin text-lead() {
+  @include text-static;
+  font-size: $font-size-xxxx-large;
+  line-height: 1.2;
+}
+
+@mixin text-xl() {
+  @include text-static;
+  font-size: $font-size-xxxxx-large;
+  line-height: 1.2;
+}
+
+.text-large {
+  @include text-large;
+}

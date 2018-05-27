@@ -1,9 +1,6 @@
 # Advanced Open File
 
 [![TravisCI Build Status](https://travis-ci.org/Osmose/advanced-open-file.svg)](https://travis-ci.org/Osmose/advanced-open-file)
-[![AppVeyor Build status](https://ci.appveyor.com/api/projects/status/cwyb7f46dd1bbuxh/branch/master?svg=true)](https://ci.appveyor.com/project/Osmose/advanced-open-file/branch/master)
-
-
 
 Advanced Open File is a package for helping Atom users to open files and folders
 easily. It can also create new files and folders if they don't exist.
@@ -186,6 +183,12 @@ following to your keymap to map `Ctrl-x Ctrl-f` to toggle the dialog and
         current project's root directory.
       </li>
     </ul>
+  </dd>
+
+  <dt>Ignore patterns</dt>
+  <dd>
+    A list of glob patterns. Any files that match the patterns will be hidden
+    from the file listing.
   </dd>
 </dl>
 

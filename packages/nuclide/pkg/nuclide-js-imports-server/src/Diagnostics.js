@@ -1,27 +1,20 @@
-'use strict';
+'use strict';Object.defineProperty(exports, "__esModule", { value: true });exports.Diagnostics = exports.DIAGNOSTIC_SOURCE = undefined;var _vscodeLanguageserver;
 
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-exports.Diagnostics = exports.DIAGNOSTIC_SOURCE = undefined;
 
-var _vscodeLanguageserver;
 
-function _load_vscodeLanguageserver() {
-  return _vscodeLanguageserver = require('vscode-languageserver');
-}
 
-var _AutoImportsManager;
 
-function _load_AutoImportsManager() {
-  return _AutoImportsManager = require('./lib/AutoImportsManager');
-}
 
-var _ImportFormatter;
 
-function _load_ImportFormatter() {
-  return _ImportFormatter = require('./lib/ImportFormatter');
-}
+
+
+
+function _load_vscodeLanguageserver() {return _vscodeLanguageserver = require('vscode-languageserver');}var _AutoImportsManager;
+function _load_AutoImportsManager() {return _AutoImportsManager = require('./lib/AutoImportsManager');}var _ImportFormatter;
+function _load_ImportFormatter() {return _ImportFormatter = require('./lib/ImportFormatter');}
+
+
+
 
 const DIAGNOSTIC_SOURCE = exports.DIAGNOSTIC_SOURCE = 'JS Auto-imports'; /**
                                                                           * Copyright (c) 2015-present, Facebook, Inc.
@@ -32,11 +25,7 @@ const DIAGNOSTIC_SOURCE = exports.DIAGNOSTIC_SOURCE = 'JS Auto-imports'; /**
                                                                           *
                                                                           * 
                                                                           * @format
-                                                                          */
-
-class Diagnostics {
-
-  constructor(autoImportsManager, importFormatter) {
+                                                                          */class Diagnostics {constructor(autoImportsManager, importFormatter) {
     this.autoImportsManager = autoImportsManager;
     this.importFormatter = importFormatter;
   }
@@ -46,26 +35,36 @@ class Diagnostics {
     // It's too hard to match Flow's knowledge of types, particularly flow libs & flow builtins.
     // Instead, we'll rely on returning code actions for Flow's diagnostics.
     // (Of course, this is a much slower user experience, but being wrong is even worse.)
-    return this.autoImportsManager.findMissingImports(uri, text).filter(missingImport => missingImport.symbol.type === 'value').map(missingImport => missingImportToDiagnostic(this.importFormatter, missingImport, uri));
-  }
-}
+    return this.autoImportsManager.
+    findMissingImports(uri, text).
+    filter(missingImport => missingImport.symbol.type === 'value').
+    map(missingImport =>
+    missingImportToDiagnostic(this.importFormatter, missingImport, uri));
 
-exports.Diagnostics = Diagnostics;
-function missingImportToDiagnostic(importFormatter, importSuggestion, uri) {
+  }}exports.Diagnostics = Diagnostics;
+
+
+function missingImportToDiagnostic(
+importFormatter,
+importSuggestion,
+uri)
+{
   const { symbol } = importSuggestion;
   return {
     severity: (_vscodeLanguageserver || _load_vscodeLanguageserver()).DiagnosticSeverity.Information,
     range: {
       start: {
         character: symbol.location.start.col,
-        line: symbol.location.start.line - 1
-      },
+        line: symbol.location.start.line - 1 },
+
       end: {
         character: symbol.location.end.col,
-        line: symbol.location.end.line - 1
-      }
-    },
-    message: `The ${symbol.type} ${symbol.id} is not imported.\n` + 'Select a suggestion from the text editor.',
-    source: DIAGNOSTIC_SOURCE
-  };
+        line: symbol.location.end.line - 1 } },
+
+
+    message:
+    `The ${symbol.type} ${symbol.id} is not imported.\n` +
+    'Select a suggestion from the text editor.',
+    source: DIAGNOSTIC_SOURCE };
+
 }

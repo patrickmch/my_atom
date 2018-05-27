@@ -44,7 +44,8 @@ module.exports = _client => {
       type: {
         kind: "nullable",
         type: {
-          kind: "string"
+          kind: "named",
+          name: "CodeSearchTool"
         }
       }
     }, {
@@ -54,6 +55,65 @@ module.exports = _client => {
       }
     }])).switchMap(args => {
       return _client.callRemoteFunction("CodeSearchService/codeSearch", "observable", args);
+    }).concatMap(value => {
+      return _client.unmarshal(value, {
+        kind: "named",
+        name: "CodeSearchResult"
+      });
+    }).publish();
+  };
+
+  remoteModule.searchFiles = function (arg0, arg1, arg2, arg3, arg4, arg5) {
+    return Observable.fromPromise(_client.marshalArguments(Array.from(arguments), [{
+      name: "files",
+      type: {
+        kind: "array",
+        type: {
+          kind: "named",
+          name: "NuclideUri"
+        }
+      }
+    }, {
+      name: "regex",
+      type: {
+        kind: "named",
+        name: "RegExp"
+      }
+    }, {
+      name: "tool",
+      type: {
+        kind: "nullable",
+        type: {
+          kind: "named",
+          name: "CodeSearchTool"
+        }
+      }
+    }, {
+      name: "leadingLines",
+      type: {
+        kind: "nullable",
+        type: {
+          kind: "number"
+        }
+      }
+    }, {
+      name: "trailingLines",
+      type: {
+        kind: "nullable",
+        type: {
+          kind: "number"
+        }
+      }
+    }, {
+      name: "maxResults",
+      type: {
+        kind: "nullable",
+        type: {
+          kind: "number"
+        }
+      }
+    }])).switchMap(args => {
+      return _client.callRemoteFunction("CodeSearchService/searchFiles", "observable", args);
     }).concatMap(value => {
       return _client.unmarshal(value, {
         kind: "named",
@@ -93,7 +153,8 @@ module.exports = _client => {
       type: {
         kind: "nullable",
         type: {
-          kind: "string"
+          kind: "named",
+          name: "CodeSearchTool"
         }
       }
     }])).switchMap(args => {
@@ -178,13 +239,13 @@ Object.defineProperty(module.exports, "defs", {
       location: {
         type: "source",
         fileName: "CodeSearchService.js",
-        line: 29
+        line: 30
       },
       type: {
         location: {
           type: "source",
           fileName: "CodeSearchService.js",
-          line: 29
+          line: 30
         },
         kind: "function",
         argumentTypes: [{
@@ -207,7 +268,7 @@ Object.defineProperty(module.exports, "defs", {
       location: {
         type: "source",
         fileName: "types.js",
-        line: 14
+        line: 34
       },
       name: "CodeSearchResult",
       definition: {
@@ -237,6 +298,52 @@ Object.defineProperty(module.exports, "defs", {
             kind: "string"
           },
           optional: false
+        }, {
+          name: "matchLength",
+          type: {
+            kind: "number"
+          },
+          optional: false
+        }, {
+          name: "leadingContext",
+          type: {
+            kind: "array",
+            type: {
+              kind: "string"
+            }
+          },
+          optional: false
+        }, {
+          name: "trailingContext",
+          type: {
+            kind: "array",
+            type: {
+              kind: "string"
+            }
+          },
+          optional: false
+        }]
+      }
+    },
+    CodeSearchTool: {
+      kind: "alias",
+      location: {
+        type: "source",
+        fileName: "types.js",
+        line: 14
+      },
+      name: "CodeSearchTool",
+      definition: {
+        kind: "union",
+        types: [{
+          kind: "string-literal",
+          value: "rg"
+        }, {
+          kind: "string-literal",
+          value: "ack"
+        }, {
+          kind: "string-literal",
+          value: "grep"
         }]
       }
     },
@@ -246,13 +353,13 @@ Object.defineProperty(module.exports, "defs", {
       location: {
         type: "source",
         fileName: "CodeSearchService.js",
-        line: 53
+        line: 50
       },
       type: {
         location: {
           type: "source",
           fileName: "CodeSearchService.js",
-          line: 53
+          line: 50
         },
         kind: "function",
         argumentTypes: [{
@@ -277,7 +384,8 @@ Object.defineProperty(module.exports, "defs", {
           type: {
             kind: "nullable",
             type: {
-              kind: "string"
+              kind: "named",
+              name: "CodeSearchTool"
             }
           }
         }, {
@@ -295,12 +403,85 @@ Object.defineProperty(module.exports, "defs", {
         }
       }
     },
+    searchFiles: {
+      kind: "function",
+      name: "searchFiles",
+      location: {
+        type: "source",
+        fileName: "CodeSearchService.js",
+        line: 70
+      },
+      type: {
+        location: {
+          type: "source",
+          fileName: "CodeSearchService.js",
+          line: 70
+        },
+        kind: "function",
+        argumentTypes: [{
+          name: "files",
+          type: {
+            kind: "array",
+            type: {
+              kind: "named",
+              name: "NuclideUri"
+            }
+          }
+        }, {
+          name: "regex",
+          type: {
+            kind: "named",
+            name: "RegExp"
+          }
+        }, {
+          name: "tool",
+          type: {
+            kind: "nullable",
+            type: {
+              kind: "named",
+              name: "CodeSearchTool"
+            }
+          }
+        }, {
+          name: "leadingLines",
+          type: {
+            kind: "nullable",
+            type: {
+              kind: "number"
+            }
+          }
+        }, {
+          name: "trailingLines",
+          type: {
+            kind: "nullable",
+            type: {
+              kind: "number"
+            }
+          }
+        }, {
+          name: "maxResults",
+          type: {
+            kind: "nullable",
+            type: {
+              kind: "number"
+            }
+          }
+        }],
+        returnType: {
+          kind: "observable",
+          type: {
+            kind: "named",
+            name: "CodeSearchResult"
+          }
+        }
+      }
+    },
     search$Match: {
       kind: "alias",
       location: {
         type: "source",
         fileName: "types.js",
-        line: 21
+        line: 44
       },
       name: "search$Match",
       definition: {
@@ -343,7 +524,7 @@ Object.defineProperty(module.exports, "defs", {
       location: {
         type: "source",
         fileName: "types.js",
-        line: 28
+        line: 51
       },
       name: "search$FileResult",
       definition: {
@@ -374,13 +555,13 @@ Object.defineProperty(module.exports, "defs", {
       location: {
         type: "source",
         fileName: "CodeSearchService.js",
-        line: 76
+        line: 99
       },
       type: {
         location: {
           type: "source",
           fileName: "CodeSearchService.js",
-          line: 76
+          line: 99
         },
         kind: "function",
         argumentTypes: [{
@@ -413,7 +594,8 @@ Object.defineProperty(module.exports, "defs", {
           type: {
             kind: "nullable",
             type: {
-              kind: "string"
+              kind: "named",
+              name: "CodeSearchTool"
             }
           }
         }],

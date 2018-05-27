@@ -5,25 +5,53 @@ let Observable;
 module.exports = _client => {
   const remoteModule = {};
 
-  remoteModule.queryFuzzyFile = function (arg0, arg1, arg2) {
+  remoteModule.queryFuzzyFile = function (arg0) {
     return _client.marshalArguments(Array.from(arguments), [{
-      name: "rootDirectory",
+      name: "config",
       type: {
-        kind: "named",
-        name: "NuclideUri"
-      }
-    }, {
-      name: "queryString",
-      type: {
-        kind: "string"
-      }
-    }, {
-      name: "ignoredNames",
-      type: {
-        kind: "array",
-        type: {
-          kind: "string"
-        }
+        kind: "object",
+        fields: [{
+          name: "rootDirectory",
+          type: {
+            kind: "named",
+            name: "NuclideUri"
+          },
+          optional: false
+        }, {
+          name: "queryRoot",
+          type: {
+            kind: "named",
+            name: "NuclideUri"
+          },
+          optional: true
+        }, {
+          name: "queryString",
+          type: {
+            kind: "string"
+          },
+          optional: false
+        }, {
+          name: "ignoredNames",
+          type: {
+            kind: "array",
+            type: {
+              kind: "string"
+            }
+          },
+          optional: false
+        }, {
+          name: "smartCase",
+          type: {
+            kind: "boolean"
+          },
+          optional: true
+        }, {
+          name: "preferCustomSearch",
+          type: {
+            kind: "boolean"
+          },
+          optional: false
+        }]
       }
     }]).then(args => {
       return _client.callRemoteFunction("FuzzyFileSearchService/queryFuzzyFile", "promise", args);
@@ -38,7 +66,7 @@ module.exports = _client => {
     });
   };
 
-  remoteModule.queryAllExistingFuzzyFile = function (arg0, arg1) {
+  remoteModule.queryAllExistingFuzzyFile = function (arg0, arg1, arg2) {
     return _client.marshalArguments(Array.from(arguments), [{
       name: "queryString",
       type: {
@@ -51,6 +79,11 @@ module.exports = _client => {
         type: {
           kind: "string"
         }
+      }
+    }, {
+      name: "preferCustomSearch",
+      type: {
+        kind: "boolean"
       }
     }]).then(args => {
       return _client.callRemoteFunction("FuzzyFileSearchService/queryAllExistingFuzzyFile", "promise", args);
@@ -204,33 +237,61 @@ Object.defineProperty(module.exports, "defs", {
       location: {
         type: "source",
         fileName: "FuzzyFileSearchService.js",
-        line: 48
+        line: 71
       },
       type: {
         location: {
           type: "source",
           fileName: "FuzzyFileSearchService.js",
-          line: 48
+          line: 71
         },
         kind: "function",
         argumentTypes: [{
-          name: "rootDirectory",
+          name: "config",
           type: {
-            kind: "named",
-            name: "NuclideUri"
-          }
-        }, {
-          name: "queryString",
-          type: {
-            kind: "string"
-          }
-        }, {
-          name: "ignoredNames",
-          type: {
-            kind: "array",
-            type: {
-              kind: "string"
-            }
+            kind: "object",
+            fields: [{
+              name: "rootDirectory",
+              type: {
+                kind: "named",
+                name: "NuclideUri"
+              },
+              optional: false
+            }, {
+              name: "queryRoot",
+              type: {
+                kind: "named",
+                name: "NuclideUri"
+              },
+              optional: true
+            }, {
+              name: "queryString",
+              type: {
+                kind: "string"
+              },
+              optional: false
+            }, {
+              name: "ignoredNames",
+              type: {
+                kind: "array",
+                type: {
+                  kind: "string"
+                }
+              },
+              optional: false
+            }, {
+              name: "smartCase",
+              type: {
+                kind: "boolean"
+              },
+              optional: true
+            }, {
+              name: "preferCustomSearch",
+              type: {
+                kind: "boolean"
+              },
+              optional: false
+            }]
           }
         }],
         returnType: {
@@ -251,13 +312,13 @@ Object.defineProperty(module.exports, "defs", {
       location: {
         type: "source",
         fileName: "FuzzyFileSearchService.js",
-        line: 90
+        line: 102
       },
       type: {
         location: {
           type: "source",
           fileName: "FuzzyFileSearchService.js",
-          line: 90
+          line: 102
         },
         kind: "function",
         argumentTypes: [{
@@ -272,6 +333,11 @@ Object.defineProperty(module.exports, "defs", {
             type: {
               kind: "string"
             }
+          }
+        }, {
+          name: "preferCustomSearch",
+          type: {
+            kind: "boolean"
           }
         }],
         returnType: {
@@ -292,13 +358,13 @@ Object.defineProperty(module.exports, "defs", {
       location: {
         type: "source",
         fileName: "FuzzyFileSearchService.js",
-        line: 112
+        line: 130
       },
       type: {
         location: {
           type: "source",
           fileName: "FuzzyFileSearchService.js",
-          line: 112
+          line: 130
         },
         kind: "function",
         argumentTypes: [{
@@ -322,13 +388,13 @@ Object.defineProperty(module.exports, "defs", {
       location: {
         type: "source",
         fileName: "FuzzyFileSearchService.js",
-        line: 121
+        line: 139
       },
       type: {
         location: {
           type: "source",
           fileName: "FuzzyFileSearchService.js",
-          line: 121
+          line: 139
         },
         kind: "function",
         argumentTypes: [{

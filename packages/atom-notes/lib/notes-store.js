@@ -1,12 +1,17 @@
 /** @babel */
 
-import chokidar from 'chokidar'
 import elasticlunr from 'elasticlunr'
 import fs from 'fs-plus'
 import path from 'path'
 import matter from 'gray-matter'
+import * as NotesFs from './notes-fs'
 
 let {EventEmitter} = require('events')
+const {watchPath} = require('atom')
+
+function isEmpty (obj) {
+  return Object.keys(obj).length === 0 && obj.constructor === Object
+}
 
 /**
   * @typedef DocumentItem
@@ -26,12 +31,28 @@ let {EventEmitter} = require('events')
  * @return {DocumentItem}
  */
 function createDocument (filePath) {
+  if (!fs.existsSync(filePath)) { return false }
+
+  // we can't just check isFile() b/c we want to support symlinks to files
   let fileStats = fs.statSync(filePath)
+  if (fileStats.isDirectory() ||
+      fileStats.isBlockDevice() ||
+      fileStats.isCharacterDevice() ||
+      fileStats.isFIFO() ||
+      fileStats.isSocket()) { return false }
+
   let fileName = path.basename(filePath)
   let title = path.basename(fileName, path.extname(fileName))
-  let body = fs.readFileSync(filePath, {encoding: 'utf8'})
   let keywords = []
   let abstract = null
+
+  let body
+  try {
+    body = fs.readFileSync(filePath, {encoding: 'utf8'})
+  } catch (_) {
+    // if we fail to read the file for whatever reason, let's ignore the file
+    return false
+  }
 
   let meta
   try {
@@ -48,15 +69,44 @@ function createDocument (filePath) {
     abstract = meta.abstract
   }
 
-  return {
-    filePath: filePath,
-    fileName: fileName,
-    title: title,
-    modifiedAt: fileStats.mtime,
-    body: body,
-    keywords: keywords,
-    abstract: abstract
+  try {
+    return {
+      filePath: filePath,
+      fileName: fileName,
+      title: title,
+      modifiedAt: fileStats.mtime,
+      body: body,
+      keywords: keywords,
+      abstract: abstract
+    }
+  } catch (_) {
+    return {}
   }
+}
+
+async function setupFileWatcher (directoryPath) {
+  const watchedDirectory = fs.normalize(directoryPath)
+  fs.listTreeSync(watchedDirectory).forEach(path => {
+    if (!fs.isDirectorySync(path)) {
+      if (NotesFs.isNote(path)) {
+        this.addDocument(createDocument(path))
+      }
+    }
+  })
+  return watchPath(watchedDirectory, {}, events => {
+    for (const event of events) {
+      if (event.action === 'created') {
+        this.addDocument(createDocument(event.path))
+      } else if (event.action === 'modified') {
+        this.updateDocument(createDocument(event.path))
+      } else if (event.action === 'deleted') {
+        this.removeDocument(this._documents[event.path])
+      } else if (event.action === 'renamed') {
+        this.removeDocument(this._documents[event.oldPath])
+        this.addDocument(createDocument(event.path))
+      }
+    }
+  })
 }
 
 class NotesStore extends EventEmitter {
@@ -68,13 +118,21 @@ class NotesStore extends EventEmitter {
    */
   constructor (directoryPath, extensions, index = null) {
     super()
+    this.directoryPath = directoryPath
     this.extensions = extensions
+    this.index = index
     this._documents = {}
+  }
 
-    if (index) {
+  /**
+   * Initialize document storage by creating the document index.
+   * Emits "ready" when index is ready.
+   */
+  initialize () {
+    if (this.index) {
       console.log('atom-notes: loading...')
       this.loaded = true
-      this.index = elasticlunr.Index.load(index)
+      this.index = elasticlunr.Index.load(this.index)
     } else {
       console.log('atom-notes: indexing...')
       this.loaded = false
@@ -86,23 +144,8 @@ class NotesStore extends EventEmitter {
       })
     }
 
-    this.watcher = chokidar.watch(null, {
-      depth: undefined, // recursive
-      useFsEvents: false, // avoid native module issues on macOS
-      persistent: true,
-      ignored: (watchedPath, fileStats) => {
-        if (!fileStats) return false
-        if (fileStats.isDirectory()) return false
-        return !(this.extensions.indexOf(path.extname(watchedPath)) > -1)
-      }
-    })
-
-    this.watcher
-      .on('add', filePath => this.addDocument(createDocument(filePath)))
-      .on('change', filePath => this.updateDocument(createDocument(filePath)))
-      .on('unlink', filePath => this.removeDocument(this._documents[filePath]))
-      .on('ready', () => this.emit('ready'))
-    this.watcher.add(fs.normalize(directoryPath))
+    this.watcher = setupFileWatcher.bind(this)(this.directoryPath)
+    this.emit('ready')
   }
 
   /**
@@ -110,6 +153,7 @@ class NotesStore extends EventEmitter {
    * @param {DocumentItem} doc
    */
   addDocument (doc) {
+    if (isEmpty(doc)) return
     this._documents[doc.filePath] = doc
     let data = {
       id: doc.filePath,
@@ -129,6 +173,7 @@ class NotesStore extends EventEmitter {
    * @param {DocumentItem} doc
    */
   updateDocument (doc) {
+    if (isEmpty(doc)) return
     this._documents[doc.filePath] = doc
     let data = {
       id: doc.filePath,
@@ -148,6 +193,8 @@ class NotesStore extends EventEmitter {
    * @param {DocumentItem} doc
    */
   removeDocument (doc) {
+    if (isEmpty(doc)) return false
+    if (doc === undefined) return false
     delete this._documents[doc.filePath]
     let data = {
       id: doc.filePath,
@@ -178,7 +225,7 @@ class NotesStore extends EventEmitter {
       bool: 'OR',
       expand: true
     }
-    return this.index.search(query, config).map((result) => {
+    return this.index.search(query, config).map(result => {
       return this._documents[result.ref]
     })
   }

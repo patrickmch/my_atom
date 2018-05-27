@@ -1,176 +1,192 @@
-'use strict';
+'use strict';Object.defineProperty(exports, "__esModule", { value: true });exports.LspLanguageService = undefined;var _asyncToGenerator = _interopRequireDefault(require('async-to-generator'));var _process;
 
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-exports.LspLanguageService = undefined;
 
-var _asyncToGenerator = _interopRequireDefault(require('async-to-generator'));
 
-var _process;
 
-function _load_process() {
-  return _process = require('../../../modules/nuclide-commons/process');
-}
 
-var _promise;
 
-function _load_promise() {
-  return _promise = require('nuclide-commons/promise');
-}
 
-var _string;
 
-function _load_string() {
-  return _string = require('nuclide-commons/string');
-}
 
-var _through;
 
-function _load_through() {
-  return _through = _interopRequireDefault(require('through'));
-}
 
-var _process2;
 
-function _load_process2() {
-  return _process2 = require('nuclide-commons/process');
-}
 
-var _nuclideUri;
 
-function _load_nuclideUri() {
-  return _nuclideUri = _interopRequireDefault(require('nuclide-commons/nuclideUri'));
-}
 
-var _collection;
 
-function _load_collection() {
-  return _collection = require('nuclide-commons/collection');
-}
 
-var _observable;
 
-function _load_observable() {
-  return _observable = require('nuclide-commons/observable');
-}
 
-var _SafeStreamMessageReader;
 
-function _load_SafeStreamMessageReader() {
-  return _SafeStreamMessageReader = _interopRequireDefault(require('../../commons-node/SafeStreamMessageReader'));
-}
 
-var _nuclideAnalytics;
 
-function _load_nuclideAnalytics() {
-  return _nuclideAnalytics = require('../../nuclide-analytics');
-}
 
-var _range;
 
-function _load_range() {
-  return _range = require('nuclide-commons/range');
-}
 
-var _nuclideOpenFilesRpc;
 
-function _load_nuclideOpenFilesRpc() {
-  return _nuclideOpenFilesRpc = require('../../nuclide-open-files-rpc');
-}
 
-var _vscodeJsonrpc;
 
-function _load_vscodeJsonrpc() {
-  return _vscodeJsonrpc = _interopRequireWildcard(require('vscode-jsonrpc'));
-}
 
-var _convert;
 
-function _load_convert() {
-  return _convert = _interopRequireWildcard(require('./convert'));
-}
 
-var _rxjsBundlesRxMinJs = require('rxjs/bundles/Rx.min.js');
 
-var _UniversalDisposable;
 
-function _load_UniversalDisposable() {
-  return _UniversalDisposable = _interopRequireDefault(require('nuclide-commons/UniversalDisposable'));
-}
 
-var _simpleTextBuffer;
 
-function _load_simpleTextBuffer() {
-  return _simpleTextBuffer = require('simple-text-buffer');
-}
 
-var _memoryLogger;
 
-function _load_memoryLogger() {
-  return _memoryLogger = require('../../commons-node/memoryLogger');
-}
 
-var _nuclideLanguageServiceRpc;
 
-function _load_nuclideLanguageServiceRpc() {
-  return _nuclideLanguageServiceRpc = require('../../nuclide-language-service-rpc');
-}
 
-var _jsonrpc;
 
-function _load_jsonrpc() {
-  return _jsonrpc = require('./jsonrpc');
-}
 
-var _languageIdMap;
 
-function _load_languageIdMap() {
-  return _languageIdMap = require('./languageIdMap');
-}
 
-var _LspConnection;
 
-function _load_LspConnection() {
-  return _LspConnection = require('./LspConnection');
-}
 
-var _protocol;
 
-function _load_protocol() {
-  return _protocol = require('./protocol');
-}
 
-function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
 
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+function _load_process() {return _process = require('../../../modules/nuclide-commons/process');}var _promise;
+
+function _load_promise() {return _promise = require('../../../modules/nuclide-commons/promise');}var _string;
+function _load_string() {return _string = require('../../../modules/nuclide-commons/string');}var _through;
+function _load_through() {return _through = _interopRequireDefault(require('through'));}var _nuclideUri;
+
+function _load_nuclideUri() {return _nuclideUri = _interopRequireDefault(require('../../../modules/nuclide-commons/nuclideUri'));}var _collection;
+function _load_collection() {return _collection = require('../../../modules/nuclide-commons/collection');}var _observable;
+function _load_observable() {return _observable = require('../../../modules/nuclide-commons/observable');}var _SafeStreamMessageReader;
+function _load_SafeStreamMessageReader() {return _SafeStreamMessageReader = _interopRequireDefault(require('../../../modules/nuclide-commons/SafeStreamMessageReader'));}var _nuclideAnalytics;
+function _load_nuclideAnalytics() {return _nuclideAnalytics = require('../../nuclide-analytics');}var _range;
+function _load_range() {return _range = require('../../../modules/nuclide-commons/range');}var _nuclideOpenFilesRpc;
+function _load_nuclideOpenFilesRpc() {return _nuclideOpenFilesRpc = require('../../nuclide-open-files-rpc');}var _vscodeJsonrpc;
+
+
+
+
+function _load_vscodeJsonrpc() {return _vscodeJsonrpc = _interopRequireWildcard(require('vscode-jsonrpc'));}var _convert;
+function _load_convert() {return _convert = _interopRequireWildcard(require('./convert'));}
+var _rxjsBundlesRxMinJs = require('rxjs/bundles/Rx.min.js');var _UniversalDisposable;
+function _load_UniversalDisposable() {return _UniversalDisposable = _interopRequireDefault(require('../../../modules/nuclide-commons/UniversalDisposable'));}var _simpleTextBuffer;
+function _load_simpleTextBuffer() {return _simpleTextBuffer = require('simple-text-buffer');}var _memoryLogger;
+function _load_memoryLogger() {return _memoryLogger = require('../../commons-node/memoryLogger');}var _nuclideLanguageServiceRpc;
+function _load_nuclideLanguageServiceRpc() {return _nuclideLanguageServiceRpc = require('../../nuclide-language-service-rpc');}var _languageIdMap;
+
+
+
+function _load_languageIdMap() {return _languageIdMap = require('./languageIdMap');}var _LspConnection;
+function _load_LspConnection() {return _LspConnection = require('./LspConnection');}var _protocol;
+function _load_protocol() {return _protocol = require('./protocol');}function _interopRequireWildcard(obj) {if (obj && obj.__esModule) {return obj;} else {var newObj = {};if (obj != null) {for (var key in obj) {if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key];}}newObj.default = obj;return newObj;}}function _interopRequireDefault(obj) {return obj && obj.__esModule ? obj : { default: obj };}
+
+
+
+
+
+
+const WORD_REGEX = /\w+/gi; /**
+                             * Copyright (c) 2015-present, Facebook, Inc.
+                             * All rights reserved.
+                             *
+                             * This source code is licensed under the license found in the LICENSE file in
+                             * the root directory of this source tree.
+                             *
+                             * 
+                             * @format
+                             */
 // Marshals messages from Nuclide's LanguageService
 // to VS Code's Language Server Protocol
 class LspLanguageService {
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
   // child process id
   // Fields which become live after we receive an initializeResponse:
-
-
   // These fields reflect our own state.
   // (Most should be nullable types, but it's not worth the bother.)
   // tracks which fileversions we've sent to LSP
   // this is the one we're given
-  constructor(logger, fileCache, host, languageServerName, command, args, spawnOptions = {}, projectRoot, fileExtensions, initializationOptions, additionalLogFilesRetentionPeriod, useOriginalEnvironment = false) {
-    this._state = 'Initial';
-    this._stateIndicator = new (_UniversalDisposable || _load_UniversalDisposable()).default();
-    this._progressIndicators = new Map();
-    this._actionRequiredIndicators = new Map();
-    this._recentRestarts = [];
-    this._diagnosticUpdates = new _rxjsBundlesRxMinJs.BehaviorSubject(_rxjsBundlesRxMinJs.Observable.empty());
-    this._supportsSymbolSearch = new _rxjsBundlesRxMinJs.BehaviorSubject(null);
-    this._childOut = { stdout: '', stderr: '' };
-    this._hoverCancellation = new (_vscodeJsonrpc || _load_vscodeJsonrpc()).CancellationTokenSource();
-    this._highlightCancellation = new (_vscodeJsonrpc || _load_vscodeJsonrpc()).CancellationTokenSource();
-    this._definitionCancellation = new (_vscodeJsonrpc || _load_vscodeJsonrpc()).CancellationTokenSource();
-    this._autocompleteCancellation = new (_vscodeJsonrpc || _load_vscodeJsonrpc()).CancellationTokenSource();
-    this._outlineCancellation = new (_vscodeJsonrpc || _load_vscodeJsonrpc()).CancellationTokenSource();
 
+
+
+
+
+
+
+
+
+
+  constructor(
+  logger,
+  fileCache,
+  host,
+  languageServerName,
+  command,
+  args,
+  spawnOptions = {},
+  projectRoot,
+  fileExtensions,
+  initializationOptions,
+  additionalLogFilesRetentionPeriod,
+  useOriginalEnvironment = false)
+  {this._state = 'Initial';this._stateIndicator = new (_UniversalDisposable || _load_UniversalDisposable()).default();this._progressIndicators = new Map();this._actionRequiredIndicators = new Map();this._recentRestarts = [];this._diagnosticUpdates = new _rxjsBundlesRxMinJs.BehaviorSubject(_rxjsBundlesRxMinJs.Observable.empty());this._supportsSymbolSearch = new _rxjsBundlesRxMinJs.BehaviorSubject(null);this._childOut = { stdout: '', stderr: '' };this._hoverCancellation = new (_vscodeJsonrpc || _load_vscodeJsonrpc()).CancellationTokenSource();this._highlightCancellation = new (_vscodeJsonrpc || _load_vscodeJsonrpc()).CancellationTokenSource();this._definitionCancellation = new (_vscodeJsonrpc || _load_vscodeJsonrpc()).CancellationTokenSource();this._autocompleteCancellation = new (_vscodeJsonrpc || _load_vscodeJsonrpc()).CancellationTokenSource();this._outlineCancellation = new (_vscodeJsonrpc || _load_vscodeJsonrpc()).CancellationTokenSource();
     this._snapshotter = new (_memoryLogger || _load_memoryLogger()).SnapshotLogger(additionalLogFilesRetentionPeriod);
     this._logger = new (_memoryLogger || _load_memoryLogger()).MemoryLogger(logger, additionalLogFilesRetentionPeriod);
     this._underlyingLogger = logger;
@@ -187,32 +203,22 @@ class LspLanguageService {
     this._additionalLogFilesRetentionPeriod = additionalLogFilesRetentionPeriod;
     this._useOriginalEnvironment = useOriginalEnvironment;
   } // tracks which fileversions we've sent to LSP
-
   // Whenever we trigger a new request, we cancel the outstanding request, so
   // only one request of these types would be active at a time. Note that the
   // language server is free to ignore any cancellation request, so we could
   // still potentially have multiple outstanding requests of the same type.
   // is really "?LspConnection"
-
   // Fields which become live inside start(), when we spawn the LSP process.
   // Disposing of the _lspConnection will dispose of all of them.
   // tracks which fileversions we've received from Nuclide client
   // supplies the options for spawning a process
   // this is created per-connection
   // tracks which fileversions we've received from Nuclide client
-
   // These fields are provided upon construction
-
-
-  dispose() {
-    this._stop().catch(_ => {}).then(_ => {
-      this._masterHost.dispose();
-      this._snapshotter.dispose();
-      this._logger.dispose();
-    });
-  }
-
-  _setState(state, actionRequiredDialogMessage, existingDialogToDismiss) {
+  dispose() {this._stop().catch(_ => {}).then(_ => {this._masterHost.dispose();this._snapshotter.dispose();this._logger.dispose();});}_setState(state,
+  actionRequiredDialogMessage,
+  existingDialogToDismiss)
+  {
     this._logger.trace(`State ${this._state} -> ${state}`);
     this._state = state;
     this._stateIndicator.dispose();
@@ -225,7 +231,10 @@ class LspLanguageService {
       // in this state is when we're about to call start().
     } else if (state === 'Starting' || state === 'Stopping') {
       // Show a progress spinner
-      const tooltip = state === 'Starting' ? `Starting ${this._languageServerName} language service...` : `Stopping ${this._languageServerName} language service...`;
+      const tooltip =
+      state === 'Starting' ?
+      `Starting ${this._languageServerName} language service...` :
+      `Stopping ${this._languageServerName} language service...`;
       this._masterHost.showProgress(tooltip).then(progress => {
         if (nextDisposable.disposed) {
           progress.dispose();
@@ -238,18 +247,30 @@ class LspLanguageService {
       // Stopped is when the JsonRPC transport has been erroring,
       // or when the connection has been closed too many times and we give up.
 
-      const tooltip = state === 'StartFailed' ? `Failed to start ${this._languageServerName} - click to retry.` : `Crash in ${this._languageServerName} - click to restart.`;
-      const defaultMessage = state === 'StartFailed' ? `Failed to start ${this._languageServerName} language service.` : `Language service ${this._languageServerName} has crashed.`;
+      const tooltip =
+      state === 'StartFailed' ?
+      `Failed to start ${this._languageServerName} - click to retry.` :
+      `Crash in ${this._languageServerName} - click to restart.`;
+      const defaultMessage =
+      state === 'StartFailed' ?
+      `Failed to start ${this._languageServerName} language service.` :
+      `Language service ${this._languageServerName} has crashed.`;
       const button = state === 'StartFailed' ? 'Retry' : 'Restart';
       // flowlint-next-line sketchy-null-string:off
       const message = actionRequiredDialogMessage || defaultMessage;
 
-      const subscription = this._masterHost.showActionRequired(tooltip, { clickable: true }).refCount().switchMap(_ => {
+      const subscription = this._masterHost.
+      showActionRequired(tooltip, { clickable: true }).
+      refCount().
+      switchMap(_ => {
         if (existingDialogToDismiss != null) {
           existingDialogToDismiss.unsubscribe();
         }
-        return this._masterHost.dialogRequest('error', message, [button], 'Close').refCount();
-      }).subscribe(dialogResponse => {
+        return this._masterHost.
+        dialogRequest('error', message, [button], 'Close').
+        refCount();
+      }).
+      subscribe(dialogResponse => {
         if (dialogResponse !== button) {
           return;
         }
@@ -258,28 +279,23 @@ class LspLanguageService {
         // required indicator, (2) dismiss the dialogRequest. The fact that
         // we're here now means that this has not happened, i.e. a new state
         // has not come along.
-        this._masterHost.consoleNotification(this._languageServerName, 'info', `Restarting ${this._languageServerName}`);
+        this._masterHost.consoleNotification(
+        this._languageServerName,
+        'info',
+        `Restarting ${this._languageServerName}`);
+
         this._setState('Initial');
         this.start();
       });
       nextDisposable.add(subscription);
     } else {
-      state;
-
-      if (!false) {
-        throw new Error('unreachable state');
-      }
+      state;if (!
+      false) {throw new Error('unreachable state');}
     }
   }
 
-  start() {
-    var _this = this;
-
-    return (0, _asyncToGenerator.default)(function* () {
-      if (!(_this._state === 'Initial')) {
-        throw new Error('Invariant violation: "this._state === \'Initial\'"');
-      }
-
+  start() {var _this = this;return (0, _asyncToGenerator.default)(function* () {if (!(
+      _this._state === 'Initial')) {throw new Error('Invariant violation: "this._state === \'Initial\'"');}
       _this._setState('Starting');
 
       const startTimeMs = Date.now();
@@ -296,7 +312,10 @@ class LspLanguageService {
         // Each connection gets its own 'host' object, as an easy way to
         // get rid of all outstanding busy-signals and notifications and
         // dialogs from that connection.
-        _this._host = yield (0, (_nuclideLanguageServiceRpc || _load_nuclideLanguageServiceRpc()).forkHostServices)(_this._masterHost, _this._underlyingLogger);
+        _this._host = yield (0, (_nuclideLanguageServiceRpc || _load_nuclideLanguageServiceRpc()).forkHostServices)(
+        _this._masterHost,
+        _this._underlyingLogger);
+
         perConnectionDisposables.add(function () {
           _this._host.dispose();
           _this._host = _this._masterHost;
@@ -318,18 +337,22 @@ class LspLanguageService {
           }
 
           const lspSpawnOptions = Object.assign({
-            cwd: _this._projectRoot
-          }, _this._spawnOptions, {
-            killTreeWhenDone: true
-          });
+            cwd: _this._projectRoot },
+          _this._spawnOptions, {
+            killTreeWhenDone: true });
+
 
           if (_this._useOriginalEnvironment && !lspSpawnOptions.env) {
             // NodeJS is the one thing where we need to make sure to use Nuclide's
             // version.
             const originalEnvironment = yield (0, (_process || _load_process()).getOriginalEnvironment)();
-            const nodePath = (_nuclideUri || _load_nuclideUri()).default.dirname((yield (0, (_process || _load_process()).runCommand)('which', ['node']).toPromise()));
+            const nodePath = (_nuclideUri || _load_nuclideUri()).default.dirname((
+            yield (0, (_process || _load_process()).runCommand)('which', ['node']).toPromise()));
+
             if (originalEnvironment.PATH) {
-              originalEnvironment.PATH = `${nodePath}:${originalEnvironment.PATH}`;
+              originalEnvironment.PATH = `${nodePath}:${
+              originalEnvironment.PATH
+              }`;
             } else {
               _this._logger.error('No path found in original environment.');
               originalEnvironment.PATH = nodePath;
@@ -338,10 +361,17 @@ class LspLanguageService {
             // If they specify both useOriginalEnvironment and an env key in their
             // spawn options, merge them with the explicitly provided keys taking
             // precedence.
-            lspSpawnOptions.env = Object.assign({}, originalEnvironment, lspSpawnOptions.env);
+            lspSpawnOptions.env = Object.assign({},
+            originalEnvironment,
+            lspSpawnOptions.env);
+
           }
 
-          const childProcessStream = (0, (_process2 || _load_process2()).spawn)(_this._command, _this._args, lspSpawnOptions).publish();
+          const childProcessStream = (0, (_process || _load_process()).spawn)(
+          _this._command,
+          _this._args,
+          lspSpawnOptions).
+          publish();
           // disposing of the stream will kill the process, if it still exists
           const processPromise = childProcessStream.take(1).toPromise();
           perConnectionDisposables.add(childProcessStream.connect());
@@ -356,11 +386,16 @@ class LspLanguageService {
             spawn: spawnCommandForLogs,
             message: e.message,
             stack: e.stack,
-            timeTakenMs: Date.now() - startTimeMs
-          });
+            timeTakenMs: Date.now() - startTimeMs });
 
-          const message = `Couldn't start ${_this._languageServerName} server` + ` - ${_this._errorString(e, _this._command)}`;
-          const dialog = _this._masterHost.dialogNotification('error', message).refCount().subscribe();
+
+          const message =
+          `Couldn't start ${_this._languageServerName} server` +
+          ` - ${_this._errorString(e, _this._command)}`;
+          const dialog = _this._masterHost.
+          dialogNotification('error', message).
+          refCount().
+          subscribe();
           _this._setState('StartFailed', message, dialog);
           return;
         }
@@ -373,28 +408,36 @@ class LspLanguageService {
         // because we've established that the connection is JsonRPC".
         _this._childOut = { stdout: '', stderr: '' };
         const accumulate = function (streamName, data) {
-          if (_this._childOut[streamName] != null && _this._childOut[streamName].length < 600) {
+          if (
+          _this._childOut[streamName] != null &&
+          _this._childOut[streamName].length < 600)
+          {
             const s = (_this._childOut[streamName] + data).substr(0, 600);
             _this._childOut[streamName] = s;
           }
         };
-        childProcess.stdout.pipe((0, (_through || _load_through()).default)(function (data) {
-          return accumulate('stdout', data);
-        }));
+        childProcess.stdout.pipe((0, (_through || _load_through()).default)(function (data) {return accumulate('stdout', data);}));
         if (childProcess.stderr != null) {
-          childProcess.stderr.pipe((0, (_through || _load_through()).default)(function (data) {
-            return accumulate('stderr', data);
-          }));
+          childProcess.stderr.pipe((0, (_through || _load_through()).default)(function (data) {return accumulate('stderr', data);}));
         }
 
-        const jsonRpcConnection = (_vscodeJsonrpc || _load_vscodeJsonrpc()).createMessageConnection(new (_SafeStreamMessageReader || _load_SafeStreamMessageReader()).default(childProcess.stdout), new (_vscodeJsonrpc || _load_vscodeJsonrpc()).StreamMessageWriter(childProcess.stdin), new JsonRpcLogger(_this._logger));
-        jsonRpcConnection.trace((_jsonrpc || _load_jsonrpc()).JsonRpcTrace.Verbose, new JsonRpcTraceLogger(_this._logger));
+        const jsonRpcConnection = (_vscodeJsonrpc || _load_vscodeJsonrpc()).createMessageConnection(
+        new (_SafeStreamMessageReader || _load_SafeStreamMessageReader()).default(childProcess.stdout),
+        new (_vscodeJsonrpc || _load_vscodeJsonrpc()).StreamMessageWriter(childProcess.stdin),
+        new JsonRpcLogger(_this._logger));
+
+        jsonRpcConnection.trace(
+        (_vscodeJsonrpc || _load_vscodeJsonrpc()).Trace.Verbose,
+        new JsonRpcTraceLogger(_this._logger));
+
 
         // We assign _lspConnection and wire up the handlers before calling
         // initialize, because any of these events might fire before initialize
         // has even returned.
         _this._lspConnection = new (_LspConnection || _load_LspConnection()).LspConnection(jsonRpcConnection);
-        _this._lspConnection.onDispose(perConnectionDisposables.dispose.bind(perConnectionDisposables));
+        _this._lspConnection.onDispose(
+        perConnectionDisposables.dispose.bind(perConnectionDisposables));
+
         perConnectionDisposables.add(function () {
           _this._lspConnection = null;
           // cheating here: we're saying "no thank you" to compile-time warnings
@@ -403,7 +446,9 @@ class LspLanguageService {
         });
 
         const perConnectionUpdates = new _rxjsBundlesRxMinJs.Subject();
-        perConnectionDisposables.add(perConnectionUpdates.complete.bind(perConnectionUpdates));
+        perConnectionDisposables.add(
+        perConnectionUpdates.complete.bind(perConnectionUpdates));
+
         jsonRpcConnection.onError(_this._handleError.bind(_this));
         jsonRpcConnection.onClose(_this._handleClose.bind(_this));
         // Following handlers all set _childOut.stdout to null, to indicate
@@ -421,16 +466,10 @@ class LspLanguageService {
           _this._childOut.stdout = null;
           _this._handleShowMessageNotification(params);
         });
-        _this._lspConnection.onShowMessageRequest((() => {
-          var _ref = (0, _asyncToGenerator.default)(function* (params, cancel) {
+        _this._lspConnection.onShowMessageRequest((() => {var _ref = (0, _asyncToGenerator.default)(function* (params, cancel) {
             _this._childOut.stdout = null;
             return _this._handleShowMessageRequest(params, cancel);
-          });
-
-          return function (_x, _x2) {
-            return _ref.apply(this, arguments);
-          };
-        })());
+          });return function (_x, _x2) {return _ref.apply(this, arguments);};})());
         _this._lspConnection.onProgressNotification(function (params) {
           _this._childOut.stdout = null;
           return _this._handleProgressNotification(params);
@@ -439,16 +478,10 @@ class LspLanguageService {
           _this._childOut.stdout = null;
           return _this._handleActionRequiredNotification(params);
         });
-        _this._lspConnection.onApplyEditRequest((() => {
-          var _ref2 = (0, _asyncToGenerator.default)(function* (params, cancel) {
+        _this._lspConnection.onApplyEditRequest((() => {var _ref2 = (0, _asyncToGenerator.default)(function* (params, cancel) {
             _this._childOut.stdout = null;
             return _this._handleApplyEditRequest(params, cancel);
-          });
-
-          return function (_x3, _x4) {
-            return _ref2.apply(this, arguments);
-          };
-        })());
+          });return function (_x3, _x4) {return _ref2.apply(this, arguments);};})());
         _this._lspConnection.onDiagnosticsNotification(function (params) {
           _this._childOut.stdout = null;
           perConnectionUpdates.next(params);
@@ -471,83 +504,83 @@ class LspLanguageService {
           workspace: {
             applyEdit: true,
             workspaceEdit: {
-              documentChanges: true
-            },
+              documentChanges: true },
+
             didChangeConfiguration: {
-              dynamicRegistration: false
-            },
+              dynamicRegistration: false },
+
             didChangeWatchedFiles: {
-              dynamicRegistration: false
-            },
+              dynamicRegistration: false },
+
             symbol: {
-              dynamicRegistration: false
-            },
+              dynamicRegistration: false },
+
             executeCommand: {
-              dynamicRegistration: false
-            }
-          },
+              dynamicRegistration: false } },
+
+
           textDocument: {
             synchronization: {
               dynamicRegistration: false,
               willSave: false,
               willSaveWaitUntil: false,
-              didSave: true
-            },
+              didSave: true },
+
             completion: {
               dynamicRegistration: false,
               completionItem: {
-                snippetSupport: true
-              }
-            },
+                snippetSupport: true } },
+
+
             hover: {
-              dynamicRegistration: false
-            },
+              dynamicRegistration: false },
+
             signatureHelp: {
-              dynamicRegistration: false
-            },
+              dynamicRegistration: false },
+
             references: {
-              dynamicRegistration: false
-            },
+              dynamicRegistration: false },
+
             documentHighlight: {
-              dynamicRegistration: false
-            },
+              dynamicRegistration: false },
+
             documentSymbol: {
-              dynamicRegistration: false
-            },
+              dynamicRegistration: false },
+
             formatting: {
-              dynamicRegistration: false
-            },
+              dynamicRegistration: false },
+
             rangeFormatting: {
-              dynamicRegistration: false
-            },
+              dynamicRegistration: false },
+
             onTypeFormatting: {
-              dynamicRegistration: false
-            },
+              dynamicRegistration: false },
+
             definition: {
-              dynamicRegistration: false
-            },
+              dynamicRegistration: false },
+
             codeAction: {
-              dynamicRegistration: false
-            },
+              dynamicRegistration: false },
+
             codeLens: {
-              dynamicRegistration: false
-            },
+              dynamicRegistration: false },
+
             documentLink: {
-              dynamicRegistration: false
-            },
+              dynamicRegistration: false },
+
             rename: {
-              dynamicRegistration: false
-            }
-          },
+              dynamicRegistration: false } },
+
+
           window: {
             progress: {
-              dynamicRegistration: false
-            },
+              dynamicRegistration: false },
+
             actionRequired: {
-              dynamicRegistration: false
-            }
-          }
-        };
+              dynamicRegistration: false } } };
+
+
+
 
         const params = {
           processId: process.pid,
@@ -555,8 +588,10 @@ class LspLanguageService {
           rootUri: (_convert || _load_convert()).localPath_lspUri(_this._projectRoot),
           capabilities,
           initializationOptions: _this._initializationOptions,
-          trace: _this._underlyingLogger.isLevelEnabled('TRACE') ? 'verbose' : 'off'
-        };
+          trace: _this._underlyingLogger.isLevelEnabled('TRACE') ?
+          'verbose' :
+          'off' };
+
 
         // We'll keep sending initialize requests until it either succeeds
         // or the user says to stop retrying. This while loop will be potentially
@@ -589,14 +624,16 @@ class LspLanguageService {
               message: e.message,
               stack: e.stack,
               timeTakenMs: Date.now() - startTimeMs,
-              userRetryCount
-            });
+              userRetryCount });
+
 
             // CARE! Inside any exception handler of an rpc request,
             // the lspConnection might already have been torn down.
 
             _this._childOut = { stdout: '', stderr: '' };
-            const message = `Couldn't initialize ${_this._languageServerName} server`;
+            const message = `Couldn't initialize ${
+            _this._languageServerName
+            } server`;
             const longMessage = `${message} - ${_this._errorString(e)}`;
 
             // LSP has the notion that only some failures-to-start should
@@ -607,7 +644,10 @@ class LspLanguageService {
             // re-initialize from the start.
             const offerRetry = e.data != null && Boolean(e.data.retry);
             if (!offerRetry) {
-              const dialog = _this._masterHost.dialogNotification('error', longMessage).refCount().subscribe();
+              const dialog = _this._masterHost.
+              dialogNotification('error', longMessage).
+              refCount().
+              subscribe();
               _this._setState('StartFailed', message, dialog);
               if (_this._lspConnection != null) {
                 _this._lspConnection.dispose();
@@ -616,10 +656,17 @@ class LspLanguageService {
             }
 
             // eslint-disable-next-line no-await-in-loop
-            const button = yield _this._host.dialogRequest('error', message, ['Retry'], 'Close').refCount().toPromise();
+            const button = yield _this._host.
+            dialogRequest('error', message, ['Retry'], 'Close').
+            refCount().
+            toPromise();
             if (button === 'Retry') {
               _this._logger.trace('Lsp.Initialize.retry');
-              _this._host.consoleNotification(_this._languageServerName, 'info', 'Retrying initialize');
+              _this._host.consoleNotification(
+              _this._languageServerName,
+              'info',
+              'Retrying initialize');
+
               if (_this._lspConnection != null) {
                 _this._logger.trace('Lsp.Initialize.retrying');
                 continue;
@@ -638,7 +685,11 @@ class LspLanguageService {
           // If the process wrote to stderr but succeeded to initialize, we'd
           // also like to log that. It was probably informational not error.
           if (_this._childOut.stderr !== '') {
-            _this._host.consoleNotification(_this._languageServerName, 'info', _this._childOut.stderr);
+            _this._host.consoleNotification(
+            _this._languageServerName,
+            'info',
+            _this._childOut.stderr);
+
           }
 
           // We'll reset _childOut now: stdout will become null because we've
@@ -649,7 +700,10 @@ class LspLanguageService {
           _this._childOut = { stdout: null, stderr: '' };
 
           _this._serverCapabilities = initializeResponse.capabilities;
-          _this._derivedServerCapabilities = new DerivedServerCapabilities(_this._serverCapabilities, _this._logger);
+          _this._derivedServerCapabilities = new DerivedServerCapabilities(
+          _this._serverCapabilities,
+          _this._logger);
+
           perConnectionDisposables.add(function () {
             _this._serverCapabilities = null;
             _this._derivedServerCapabilities = null;
@@ -671,8 +725,8 @@ class LspLanguageService {
             status: 'ok',
             spawn: spawnCommandForLogs,
             timeTakenMs: Date.now() - startTimeMs,
-            initializeTimeTakenMs
-          });
+            initializeTimeTakenMs });
+
 
           return;
         }
@@ -689,13 +743,15 @@ class LspLanguageService {
           spawn: spawnCommandForLogs,
           message: e.message,
           stack: e.stack,
-          timeTakenMs: Date.now() - startTimeMs
-        });
+          timeTakenMs: Date.now() - startTimeMs });
+
         throw e;
       } finally {
-        _this._supportsSymbolSearch.next(_this._serverCapabilities != null && Boolean(_this._serverCapabilities.workspaceSymbolProvider));
-      }
-    })();
+        _this._supportsSymbolSearch.next(
+        _this._serverCapabilities != null &&
+        Boolean(_this._serverCapabilities.workspaceSymbolProvider));
+
+      }})();
   }
 
   _subscribeToFileEvents() {
@@ -716,49 +772,53 @@ class LspLanguageService {
     // then it will be out of sync. JsonRPC doesn't allow for notifications to have
     // responses. So all we can do is trust the LSP server to terminate itself it
     // it encounters a problem.
-    return this._fileCache.observeFileEvents()
-    // The "observeFileEvents" will first send an 'open' event for every
-    // already-open file, and after that it will give live updates.
-    .filter(fileEvent => {
-      const fileExtension = (_nuclideUri || _load_nuclideUri()).default.extname(fileEvent.fileVersion.filePath);
-      return this._fileExtensions.indexOf(fileExtension) !== -1 && this._isFileInProject(fileEvent.fileVersion.filePath);
-    }).subscribe(fileEvent => {
-      if (!(fileEvent.fileVersion.notifier === this._fileCache)) {
-        throw new Error('Invariant violation: "fileEvent.fileVersion.notifier === this._fileCache"');
-      }
-      // This invariant just self-documents that _fileCache is asked on observe file
-      // events about fileVersions that themselves point directly back to the _fileCache.
-      // (It's a convenience so that folks can pass around just a fileVersion on its own.)
+    return (
+      this._fileCache.
+      observeFileEvents()
+      // The "observeFileEvents" will first send an 'open' event for every
+      // already-open file, and after that it will give live updates.
+      .filter(fileEvent => {
+        const fileExtension = (_nuclideUri || _load_nuclideUri()).default.extname(
+        fileEvent.fileVersion.filePath);
 
-      // TODO: if LSP responds with error to any of the file events, then we'll become
-      // out of sync, and we must stop. (potentially restart).
+        return (
+          this._fileExtensions.indexOf(fileExtension) !== -1 &&
+          this._isFileInProject(fileEvent.fileVersion.filePath));
+
+      }).
+      subscribe(fileEvent => {if (!(
+        fileEvent.fileVersion.notifier === this._fileCache)) {throw new Error('Invariant violation: "fileEvent.fileVersion.notifier === this._fileCache"');}
+        // This invariant just self-documents that _fileCache is asked on observe file
+        // events about fileVersions that themselves point directly back to the _fileCache.
+        // (It's a convenience so that folks can pass around just a fileVersion on its own.)
+
+        // TODO: if LSP responds with error to any of the file events, then we'll become
+        // out of sync, and we must stop. (potentially restart).
+        switch (fileEvent.kind) {
+          case (_nuclideOpenFilesRpc || _load_nuclideOpenFilesRpc()).FileEventKind.OPEN:
+            this._fileOpen(fileEvent);
+            break;
+          case (_nuclideOpenFilesRpc || _load_nuclideOpenFilesRpc()).FileEventKind.CLOSE:
+            this._fileClose(fileEvent);
+            break;
+          case (_nuclideOpenFilesRpc || _load_nuclideOpenFilesRpc()).FileEventKind.EDIT:
+            this._fileEdit(fileEvent);
+            break;
+          case (_nuclideOpenFilesRpc || _load_nuclideOpenFilesRpc()).FileEventKind.SAVE:
+            this._fileSave(fileEvent);
+            break;
+          default:
+            fileEvent.kind;
+            this._logger.error(
+            'Unrecognized fileEvent ' + JSON.stringify(fileEvent));}
 
 
-      switch (fileEvent.kind) {
-        case (_nuclideOpenFilesRpc || _load_nuclideOpenFilesRpc()).FileEventKind.OPEN:
-          this._fileOpen(fileEvent);
-          break;
-        case (_nuclideOpenFilesRpc || _load_nuclideOpenFilesRpc()).FileEventKind.CLOSE:
-          this._fileClose(fileEvent);
-          break;
-        case (_nuclideOpenFilesRpc || _load_nuclideOpenFilesRpc()).FileEventKind.EDIT:
-          this._fileEdit(fileEvent);
-          break;
-        case (_nuclideOpenFilesRpc || _load_nuclideOpenFilesRpc()).FileEventKind.SAVE:
-          this._fileSave(fileEvent);
-          break;
-        default:
-          fileEvent.kind;
-          this._logger.error('Unrecognized fileEvent ' + JSON.stringify(fileEvent));
-      }
-      this._lspFileVersionNotifier.onEvent(fileEvent);
-    });
+        this._lspFileVersionNotifier.onEvent(fileEvent);
+      }));
+
   }
 
-  _stop() {
-    var _this2 = this;
-
-    return (0, _asyncToGenerator.default)(function* () {
+  _stop() {var _this2 = this;return (0, _asyncToGenerator.default)(function* () {
       _this2._logger.trace('Lsp._stop');
       if (_this2._state === 'Stopping' || _this2._state === 'Stopped') {
         return;
@@ -786,8 +846,7 @@ class LspLanguageService {
       // (If we didn't dispose, then they'd be stuck indefinitely).
       // The dispose handler also resets _lspConnection to null.
 
-      _this2._setState('Stopped');
-    })();
+      _this2._setState('Stopped');})();
   }
 
   _errorString(error, command) {
@@ -813,7 +872,11 @@ class LspLanguageService {
     // If the error was a well-formed JsonRPC error, then there's no reason to
     // include stdout: all the contents of stdout are presumably already in
     // the ResponseError object. Otherwise we should include stdout.
-    if (!(error instanceof (_vscodeJsonrpc || _load_vscodeJsonrpc()).ResponseError) && this._childOut.stdout != null && this._childOut.stdout !== '') {
+    if (
+    !(error instanceof (_vscodeJsonrpc || _load_vscodeJsonrpc()).ResponseError) &&
+    this._childOut.stdout != null &&
+    this._childOut.stdout !== '')
+    {
       msg = `${msg} - ${this._childOut.stdout} [stdout]`;
     }
 
@@ -830,7 +893,9 @@ class LspLanguageService {
     // shows who rejected that promise. We also want a stack for who awaited...
     const exceptionStack = e.stack;
     const callStack = new Error().stack;
-    const remoteStack = e.data != null && e.data.stack != null ? e.data.stack : null;
+    const remoteStack =
+    // $FlowFixMe(>=0.68.0) Flow suppress (T27187857)
+    e.data != null && e.data.stack != null ? e.data.stack : null;
 
     (0, (_nuclideAnalytics || _load_nuclideAnalytics()).track)('lsp-exception', {
       name: this._languageServerName,
@@ -839,10 +904,17 @@ class LspLanguageService {
       callStack,
       remoteStack,
       state: this._state,
-      code: typeof e.code === 'number' ? e.code : null
-    });
+      // $FlowFixMe(>=0.68.0) Flow suppress (T27187857)
+      code: typeof e.code === 'number' ? e.code : null });
 
-    if (e.code != null && Number(e.code) === (_protocol || _load_protocol()).ErrorCodes.RequestCancelled && this._state === 'Running') {
+
+    if (
+    // $FlowFixMe(>=0.68.0) Flow suppress (T27187857)
+    e.code != null &&
+    // eslint-disable-next-line nuclide-internal/api-spelling
+    Number(e.code) === (_protocol || _load_protocol()).ErrorCodes.RequestCancelled &&
+    this._state === 'Running')
+    {
       // RequestCancelled is normal and shouldn't be logged.
       return;
     }
@@ -867,14 +939,28 @@ class LspLanguageService {
     // Count is how many writes total have failed over this jsonRpcConnection.
     // Message is the JsonRPC object we were trying to write.
     if (message != null && count != null) {
-      this._logger.error(`Lsp.JsonRpc.${String(error)} - ${count} errors so far - ${JSON.stringify(message)}`);
+      this._logger.error(
+      `Lsp.JsonRpc.${String(
+      error)
+      } - ${count} errors so far - ${JSON.stringify(message)}`);
+
     } else {
       this._logger.error(`Lsp.JsonRpc.${String(error)}`);
     }
     if (count != null && count <= 3) {
       return;
     }
-    this._host.dialogNotification('error', `Connection to the ${this._languageServerName} language server is erroring; shutting it down - ${this._errorString(error)}`).refCount().subscribe(); // fire and forget
+    this._host.
+    dialogNotification(
+    'error',
+    `Connection to the ${
+    this._languageServerName
+    } language server is erroring; shutting it down - ${this._errorString(
+    error)
+    }`).
+
+    refCount().
+    subscribe(); // fire and forget
     this._stop(); // method is awaitable, but we kick it off fire-and-forget.
   }
 
@@ -905,14 +991,23 @@ class LspLanguageService {
     }
     (0, (_nuclideAnalytics || _load_nuclideAnalytics()).track)('lsp-handle-close', {
       name: this._languageServerName,
-      recentRestarts: this._recentRestarts.length
-    });
+      recentRestarts: this._recentRestarts.length });
+
     if (this._recentRestarts.length >= 5) {
       this._logger.error('Lsp.Close - will not auto-restart.');
-      const message = `Language server '${this._languageServerName}' ` + 'has crashed 5 times in the last 3 minutes.';
-      const dialog = this._host.dialogRequest('error', message, ['Restart'], 'Close').refCount().subscribe(response => {
+      const message =
+      `Language server '${this._languageServerName}' ` +
+      'has crashed 5 times in the last 3 minutes.';
+      const dialog = this._host.
+      dialogRequest('error', message, ['Restart'], 'Close').
+      refCount().
+      subscribe(response => {
         if (response === 'Restart') {
-          this._host.consoleNotification(this._languageServerName, 'warning', `Restarting ${this._languageServerName}`);
+          this._host.consoleNotification(
+          this._languageServerName,
+          'warning',
+          `Restarting ${this._languageServerName}`);
+
           this._setState('Initial');
           this.start();
         }
@@ -924,7 +1019,11 @@ class LspLanguageService {
       this._setState('Stopped', message, dialog);
     } else {
       this._logger.error('Lsp.Close - will auto-restart');
-      this._host.consoleNotification(this._languageServerName, 'warning', `Automatically restarting ${this._languageServerName} after a crash`);
+      this._host.consoleNotification(
+      this._languageServerName,
+      'warning',
+      `Automatically restarting ${this._languageServerName} after a crash`);
+
       this._setState('Initial');
       this.start();
     }
@@ -936,7 +1035,12 @@ class LspLanguageService {
     // LSP doesn't specify the format of params. What we'll do is this:
     // if the params look like LogMessageParams then we'll log the message it
     // contains, otherwise we'll just log the entire params structure.
-    if (typeof params.type === 'number' && params.type >= 1 && params.type <= 4 && typeof params.message === 'string') {
+    if (
+    typeof params.type === 'number' &&
+    params.type >= 1 &&
+    params.type <= 4 &&
+    typeof params.message === 'string')
+    {
       switch (params.type) {
         case (_protocol || _load_protocol()).MessageType.Log:
         case (_protocol || _load_protocol()).MessageType.Info:
@@ -947,8 +1051,8 @@ class LspLanguageService {
           break;
         case (_protocol || _load_protocol()).MessageType.Error:
         default:
-          this._logger.error(`Lsp.telemetry: ${params.message}`);
-      }
+          this._logger.error(`Lsp.telemetry: ${params.message}`);}
+
     } else {
       this._logger.info(`Lsp.telemetry: ${JSON.stringify(params)}`);
     }
@@ -956,71 +1060,95 @@ class LspLanguageService {
 
   _handleLogMessageNotification(params) {
     // CARE! This method may be called before initialization has finished.
-    this._host.consoleNotification(this._languageServerName, (_convert || _load_convert()).lspMessageType_atomShowNotificationLevel(params.type), params.message);
+    this._host.consoleNotification(
+    this._languageServerName,
+    (_convert || _load_convert()).lspMessageType_atomShowNotificationLevel(params.type),
+    params.message);
+
   }
 
   _handleShowMessageNotification(params) {
     // CARE! This method may be called before initialization has finished.
-    this._host.dialogNotification((_convert || _load_convert()).lspMessageType_atomShowNotificationLevel(params.type), params.message).refCount().subscribe(); // fire and forget
+    this._host.
+    dialogNotification(
+    (_convert || _load_convert()).lspMessageType_atomShowNotificationLevel(params.type),
+    params.message).
+
+    refCount().
+    subscribe(); // fire and forget
   }
 
-  _handleApplyEditRequest(params, token) {
-    var _this3 = this;
-
-    return (0, _asyncToGenerator.default)(function* () {
-      const applyEdits = (() => {
-        var _ref3 = (0, _asyncToGenerator.default)(function* (editsMap) {
+  _handleApplyEditRequest(
+  params,
+  token)
+  {var _this3 = this;return (0, _asyncToGenerator.default)(function* () {
+      const applyEdits = (() => {var _ref3 = (0, _asyncToGenerator.default)(function* (editsMap) {
           const applied = yield _this3._host.applyTextEditsForMultipleFiles(editsMap);
           return { applied };
-        });
-
-        return function applyEdits(_x5) {
-          return _ref3.apply(this, arguments);
-        };
-      })();
+        });return function applyEdits(_x5) {return _ref3.apply(this, arguments);};})();
 
       const { changes, documentChanges } = params.edit;
       if (documentChanges != null) {
-        const fileVersions = yield Promise.all(documentChanges.map(function (documentChange) {
-          return _this3._lspFileVersionNotifier.getVersion((_convert || _load_convert()).lspUri_localPath(documentChange.textDocument.uri));
-        }));
-        const filesMatch = documentChanges.reduce(function (filesMatchSoFar, documentChange, i) {
+        const fileVersions = yield Promise.all(
+        documentChanges.map(function (documentChange) {return (
+            _this3._lspFileVersionNotifier.getVersion(
+            (_convert || _load_convert()).lspUri_localPath(documentChange.textDocument.uri)));}));
+
+
+
+        const filesMatch = documentChanges.reduce(
+        function (filesMatchSoFar, documentChange, i) {
           const { textDocument } = documentChange;
           return filesMatchSoFar && textDocument.version === fileVersions[i];
-        }, true);
+        },
+        true);
+
         if (filesMatch) {
-          const editsMap = new Map(documentChanges.map(function (documentChange) {
-            return [(_convert || _load_convert()).lspUri_localPath(documentChange.textDocument.uri), (_convert || _load_convert()).lspTextEdits_atomTextEdits(documentChange.edits || [])];
-          }));
+          const editsMap = new Map(
+          documentChanges.map(function (documentChange) {return [
+            (_convert || _load_convert()).lspUri_localPath(documentChange.textDocument.uri),
+            (_convert || _load_convert()).lspTextEdits_atomTextEdits(documentChange.edits || [])];}));
+
+
           return applyEdits(editsMap);
         }
       } else if (changes != null) {
         const editsMap = new Map();
         Object.keys(changes).forEach(function (fileForChange) {
-          editsMap.set((_convert || _load_convert()).lspUri_localPath(fileForChange), (_convert || _load_convert()).lspTextEdits_atomTextEdits(changes[fileForChange]));
+          editsMap.set(
+          (_convert || _load_convert()).lspUri_localPath(fileForChange),
+          (_convert || _load_convert()).lspTextEdits_atomTextEdits(changes[fileForChange]));
+
         });
         return applyEdits(editsMap);
       }
-      return { applied: false };
-    })();
+      return { applied: false };})();
   }
 
-  _handleShowMessageRequest(params, token) {
-    var _this4 = this;
-
-    return (0, _asyncToGenerator.default)(function* () {
+  _handleShowMessageRequest(
+  params,
+  token)
+  {var _this4 = this;return (0, _asyncToGenerator.default)(function* () {
       // CARE! This method may be called before initialization has finished.
 
-      const cancelIsRequested = _rxjsBundlesRxMinJs.Observable.bindCallback(token.onCancellationRequested.bind(token))();
+      const cancelIsRequested = _rxjsBundlesRxMinJs.Observable.bindCallback(
+      token.onCancellationRequested.bind(token))();
+
       const actions = params.actions || [];
 
       // LSP gives us just a list of titles e.g. ['Open', 'Retry']
       // Nuclide will display an 'X' close icon in addition to those whichever
       // will deliver the result 'null'. (similar to how VSCode works).
-      const response = yield _this4._host.dialogRequest((_convert || _load_convert()).lspMessageType_atomShowNotificationLevel(params.type), params.message, actions.map(function (action) {
-        return action.title;
-      }), '@@X@@' // a sentinel response forwhen user clicks "X"
-      ).refCount().takeUntil(cancelIsRequested).toPromise();
+      const response = yield _this4._host.
+      dialogRequest(
+      (_convert || _load_convert()).lspMessageType_atomShowNotificationLevel(params.type),
+      params.message,
+      actions.map(function (action) {return action.title;}),
+      '@@X@@' // a sentinel response forwhen user clicks "X"
+      ).
+      refCount().
+      takeUntil(cancelIsRequested).
+      toPromise();
 
       if (response === undefined) {
         // cancellation was requested (that's how takeUntil/toPromise works)
@@ -1030,17 +1158,10 @@ class LspLanguageService {
         return null;
       } else {
         // return whichever MessageActionItem corresponded to the click,
-        const chosenAction = actions.find(function (action) {
-          return action.title === response;
-        });
-
-        if (!(chosenAction != null)) {
-          throw new Error('Invariant violation: "chosenAction != null"');
-        }
-
+        const chosenAction = actions.find(function (action) {return action.title === response;});if (!(
+        chosenAction != null)) {throw new Error('Invariant violation: "chosenAction != null"');}
         return chosenAction;
-      }
-    })();
+      }})();
   }
 
   _handleProgressNotification(params) {
@@ -1060,7 +1181,10 @@ class LspLanguageService {
         this._progressIndicators.delete(params.id);
       }
     } else {
-      const indicatorPromise2 = indicatorPromise == null ? this._host.showProgress(label) : indicatorPromise.then(indicator => {
+      const indicatorPromise2 =
+      indicatorPromise == null ?
+      this._host.showProgress(label) :
+      indicatorPromise.then(indicator => {
         indicator.setTitle(label);
         return indicator;
       });
@@ -1075,7 +1199,12 @@ class LspLanguageService {
       this._actionRequiredIndicators.delete(params.id);
     }
     if (params.label != null) {
-      const newIndicator = new (_UniversalDisposable || _load_UniversalDisposable()).default(this._host.showActionRequired(params.label).refCount().subscribe());
+      const newIndicator = new (_UniversalDisposable || _load_UniversalDisposable()).default(
+      this._host.
+      showActionRequired(params.label).
+      refCount().
+      subscribe());
+
       this._actionRequiredIndicators.set(params.id, newIndicator);
     }
   }
@@ -1084,10 +1213,9 @@ class LspLanguageService {
     return this._projectRoot;
   }
 
-  tryGetBufferWhenWeAndLspAtSameVersion(fileVersion) {
-    var _this5 = this;
-
-    return (0, _asyncToGenerator.default)(function* () {
+  tryGetBufferWhenWeAndLspAtSameVersion(
+  fileVersion)
+  {var _this5 = this;return (0, _asyncToGenerator.default)(function* () {
       if (_this5._state !== 'Running') {
         return null;
       }
@@ -1095,20 +1223,19 @@ class LspLanguageService {
       // Await until we have received this exact version from the client.
       // (Might be null in the case the user had already typed further
       // before we got a chance to be called.)
-      const buffer = yield _this5._fileCache.getBufferAtVersion(fileVersion);
-
-      if (!(buffer == null || buffer.changeCount === fileVersion.version)) {
-        throw new Error('Invariant violation: "buffer == null || buffer.changeCount === fileVersion.version"');
-      }
+      const buffer = yield _this5._fileCache.getBufferAtVersion(fileVersion);if (!(
+      buffer == null || buffer.changeCount === fileVersion.version)) {throw new Error('Invariant violation: "buffer == null || buffer.changeCount === fileVersion.version"');}
 
       // Await until this exact version has been pushed to LSP too.
-
-
-      if (!(yield _this5._lspFileVersionNotifier.waitForBufferAtVersion(fileVersion))) {
+      if (
+      !(yield _this5._lspFileVersionNotifier.waitForBufferAtVersion(fileVersion)))
+      {
         if (buffer != null) {
           // Invariant: LSP is never ahead of our fileCache.
           // Therefore it will eventually catch up.
-          _this5._logger.error('LSP.version - could not catch up to version=' + fileVersion.version);
+          _this5._logger.error(
+          'LSP.version - could not catch up to version=' + fileVersion.version);
+
         }
         return null;
       }
@@ -1116,22 +1243,14 @@ class LspLanguageService {
       // During that second await, if the server received further edits from the client,
       // then the buffer object might have been mutated in place, so its file-verion will
       // no longer match. In this case we return null.
-      return buffer != null && buffer.changeCount === fileVersion.version ? buffer : null;
-    })();
+      return buffer != null && buffer.changeCount === fileVersion.version ?
+      buffer :
+      null;})();
   }
 
-  _fileOpen(fileEvent) {
-    var _this6 = this;
-
-    return (0, _asyncToGenerator.default)(function* () {
-      if (!(_this6._lspConnection != null)) {
-        throw new Error('Invariant violation: "this._lspConnection != null"');
-      }
-
-      if (!(_this6._state === 'Running' || _this6._state === 'Stopping')) {
-        throw new Error('Invariant violation: "this._state === \'Running\' || this._state === \'Stopping\'"');
-      }
-
+  _fileOpen(fileEvent) {var _this6 = this;return (0, _asyncToGenerator.default)(function* () {if (!(
+      _this6._lspConnection != null)) {throw new Error('Invariant violation: "this._lspConnection != null"');}if (!(
+      _this6._state === 'Running' || _this6._state === 'Stopping')) {throw new Error('Invariant violation: "this._state === \'Running\' || this._state === \'Stopping\'"');}
       if (_this6._state !== 'Running') {
         return;
       }
@@ -1142,10 +1261,14 @@ class LspLanguageService {
       let languageId = (0, (_languageIdMap || _load_languageIdMap()).mapAtomLanguageIdToVsCode)(fileEvent.languageId);
       if (languageId == null) {
         languageId = _this6._languageServerName;
-        _this6._logger.warn(`Could not find a mapping for ${fileEvent.languageId}, falling back to ${languageId}.`);
+        _this6._logger.warn(
+        `Could not find a mapping for ${
+        fileEvent.languageId
+        }, falling back to ${languageId}.`);
+
         (0, (_nuclideAnalytics || _load_nuclideAnalytics()).track)('language-server-no-mapping', {
-          languageId: fileEvent.languageId
-        });
+          languageId: fileEvent.languageId });
+
       } else {
         _this6._logger.info(`Mapped ${fileEvent.languageId} to ${languageId}.`);
       }
@@ -1155,22 +1278,15 @@ class LspLanguageService {
           uri: (_convert || _load_convert()).localPath_lspUri(fileEvent.fileVersion.filePath),
           languageId,
           version: fileEvent.fileVersion.version,
-          text: fileEvent.contents
-        }
-      };
-      _this6._lspConnection.didOpenTextDocument(params);
-    })();
+          text: fileEvent.contents } };
+
+
+      _this6._lspConnection.didOpenTextDocument(params);})();
   }
 
-  _fileClose(fileEvent) {
-    if (!(this._lspConnection != null)) {
-      throw new Error('Invariant violation: "this._lspConnection != null"');
-    }
-
-    if (!(this._state === 'Running' || this._state === 'Stopping')) {
-      throw new Error('Invariant violation: "this._state === \'Running\' || this._state === \'Stopping\'"');
-    }
-
+  _fileClose(fileEvent) {if (!(
+    this._lspConnection != null)) {throw new Error('Invariant violation: "this._lspConnection != null"');}if (!(
+    this._state === 'Running' || this._state === 'Stopping')) {throw new Error('Invariant violation: "this._state === \'Running\' || this._state === \'Stopping\'"');}
     if (this._state !== 'Running') {
       return;
     }
@@ -1179,68 +1295,56 @@ class LspLanguageService {
     }
     const params = {
       textDocument: {
-        uri: (_convert || _load_convert()).localPath_lspUri(fileEvent.fileVersion.filePath)
-      }
-    };
+        uri: (_convert || _load_convert()).localPath_lspUri(fileEvent.fileVersion.filePath) } };
+
+
     this._lspConnection.didCloseTextDocument(params);
     this._snapshotter.close(fileEvent.fileVersion.filePath);
   }
 
-  _fileEdit(fileEvent) {
-    if (!(this._lspConnection != null)) {
-      throw new Error('Invariant violation: "this._lspConnection != null"');
-    }
-
-    if (!(this._state === 'Running' || this._state === 'Stopping')) {
-      throw new Error('Invariant violation: "this._state === \'Running\' || this._state === \'Stopping\'"');
-    }
-
+  _fileEdit(fileEvent) {if (!(
+    this._lspConnection != null)) {throw new Error('Invariant violation: "this._lspConnection != null"');}if (!(
+    this._state === 'Running' || this._state === 'Stopping')) {throw new Error('Invariant violation: "this._state === \'Running\' || this._state === \'Stopping\'"');}
     if (this._state !== 'Running') {
       return;
     }
     const buffer = this._fileCache.getBufferForFileEvent(fileEvent);
-    this._snapshotter.snapshot(fileEvent.fileVersion.filePath, fileEvent.fileVersion.version, buffer);
+    this._snapshotter.snapshot(
+    fileEvent.fileVersion.filePath,
+    fileEvent.fileVersion.version,
+    buffer);
+
     let contentChange;
     switch (this._derivedServerCapabilities.serverWantsChange) {
       case 'incremental':
         contentChange = {
           range: (_convert || _load_convert()).atomRange_lspRange(fileEvent.oldRange),
           rangeLength: fileEvent.oldText.length,
-          text: fileEvent.newText
-        };
+          text: fileEvent.newText };
+
         break;
       case 'full':
         contentChange = { text: buffer.getText() };
         break;
       case 'none':
         return;
-      default:
-        if (!false) {
-          throw new Error('Invariant violation: "false"');
-        }
-
-      // unreachable
+      default:if (!
+        false) {throw new Error('Invariant violation: "false"');} // unreachable
     }
 
     const params = {
       textDocument: {
         uri: (_convert || _load_convert()).localPath_lspUri(fileEvent.fileVersion.filePath),
-        version: fileEvent.fileVersion.version
-      },
-      contentChanges: [contentChange]
-    };
+        version: fileEvent.fileVersion.version },
+
+      contentChanges: [contentChange] };
+
     this._lspConnection.didChangeTextDocument(params);
   }
 
-  _fileSave(fileEvent) {
-    if (!(this._lspConnection != null)) {
-      throw new Error('Invariant violation: "this._lspConnection != null"');
-    }
-
-    if (!(this._state === 'Running' || this._state === 'Stopping')) {
-      throw new Error('Invariant violation: "this._state === \'Running\' || this._state === \'Stopping\'"');
-    }
-
+  _fileSave(fileEvent) {if (!(
+    this._lspConnection != null)) {throw new Error('Invariant violation: "this._lspConnection != null"');}if (!(
+    this._state === 'Running' || this._state === 'Stopping')) {throw new Error('Invariant violation: "this._state === \'Running\' || this._state === \'Stopping\'"');}
     if (this._state !== 'Running') {
       return;
     }
@@ -1254,14 +1358,14 @@ class LspLanguageService {
         text = buffer.getText();
         break;
       default:
-        this._derivedServerCapabilities.serverWantsTextOnSave;
-    }
+        this._derivedServerCapabilities.serverWantsTextOnSave;}
+
     const params = {
       textDocument: {
-        uri: (_convert || _load_convert()).localPath_lspUri(fileEvent.fileVersion.filePath)
-      },
-      text
-    };
+        uri: (_convert || _load_convert()).localPath_lspUri(fileEvent.fileVersion.filePath) },
+
+      text };
+
     this._lspConnection.didSaveTextDocument(params);
   }
 
@@ -1274,68 +1378,130 @@ class LspLanguageService {
     // Note: this function can (and should!) be called even before
     // we reach state 'Running'.
 
-    return this._diagnosticUpdates.switchMap(perConnectionUpdates => (0, (_nuclideLanguageServiceRpc || _load_nuclideLanguageServiceRpc()).ensureInvalidations)(this._underlyingLogger, perConnectionUpdates.map((_convert || _load_convert()).lspDiagnostics_atomDiagnostics))).publish();
+    return this._diagnosticUpdates.
+    switchMap(perConnectionUpdates =>
+    (0, (_nuclideLanguageServiceRpc || _load_nuclideLanguageServiceRpc()).ensureInvalidations)(
+    this._underlyingLogger,
+    perConnectionUpdates.map((_convert || _load_convert()).lspDiagnostics_atomDiagnostics))).
+
+
+    publish();
   }
 
-  getAutocompleteSuggestions(fileVersion, position, request) {
-    var _this7 = this;
-
-    return (0, _asyncToGenerator.default)(function* () {
-      if (_this7._state !== 'Running' || _this7._serverCapabilities.completionProvider == null || !(yield _this7._lspFileVersionNotifier.waitForBufferAtVersion(fileVersion))) {
+  getAutocompleteSuggestions(
+  fileVersion,
+  position,
+  request)
+  {var _this7 = this;return (0, _asyncToGenerator.default)(function* () {
+      if (
+      _this7._state !== 'Running' ||
+      _this7._serverCapabilities.completionProvider == null ||
+      !(yield _this7._lspFileVersionNotifier.waitForBufferAtVersion(fileVersion)))
+      {
         return null;
       }
 
-      const activatedAutomaticallyOkay = request.triggerCharacter != null && _this7._derivedServerCapabilities.completionTriggerCharacters.has(request.triggerCharacter);
+      const activatedAutomaticallyOkay =
+      request.triggerCharacter != null &&
+      _this7._derivedServerCapabilities.completionTriggerCharacters.has(
+      request.triggerCharacter);
+
       if (!request.activatedManually && !activatedAutomaticallyOkay) {
         return null;
       }
 
-      const params = (_convert || _load_convert()).atom_lspPositionParams(fileVersion.filePath, position);
+      const params = (_convert || _load_convert()).atom_lspPositionParams(
+      fileVersion.filePath,
+      position);
+
 
       let response;
       try {
         _this7._autocompleteCancellation.cancel();
         _this7._autocompleteCancellation = new (_vscodeJsonrpc || _load_vscodeJsonrpc()).CancellationTokenSource();
-        response = yield _this7._lspConnection.completion(params, _this7._autocompleteCancellation.token);
+        response = yield _this7._lspConnection.completion(
+        params,
+        _this7._autocompleteCancellation.token);if (!(
 
-        if (!(response != null)) {
-          throw new Error('null textDocument/completion');
-        }
+        response != null)) {throw new Error('null textDocument/completion');}
       } catch (e) {
         _this7._logLspException(e);
         return null;
       }
 
-      const isIncomplete = Array.isArray(response) ? false : response.isIncomplete;
+      const isIncomplete = Array.isArray(response) ?
+      false :
+      response.isIncomplete;
       const responseArray = Array.isArray(response) ? response : response.items;
 
       return {
         isIncomplete,
-        items: responseArray.map((_convert || _load_convert()).lspCompletionItem_atomCompletion)
-      };
-    })();
+        items: responseArray.map(function (x) {return (
+            (_convert || _load_convert()).lspCompletionItem_atomCompletion(
+            x,
+            _this7._supportsAutocompleteResolve()));}) };})();
+
+
+
   }
 
-  getDefinition(fileVersion, position) {
-    var _this8 = this;
+  resolveAutocompleteSuggestion(
+  suggestion)
+  {var _this8 = this;return (0, _asyncToGenerator.default)(function* () {
+      if (_this8._state !== 'Running' || !_this8._supportsAutocompleteResolve()) {
+        return null;
+      }if (!(
 
-    return (0, _asyncToGenerator.default)(function* () {
-      if (_this8._state !== 'Running' || !_this8._serverCapabilities.definitionProvider || !(yield _this8._lspFileVersionNotifier.waitForBufferAtVersion(fileVersion))) {
+      typeof suggestion.extraData === 'string')) {throw new Error('Invariant violation: "typeof suggestion.extraData === \'string\'"');}
+
+      try {
+        const result = yield _this8._lspConnection.completionItemResolve(
+        JSON.parse(suggestion.extraData));
+
+        return Object.assign({},
+        suggestion,
+        (_convert || _load_convert()).lspCompletionItem_atomCompletion(result, true));
+
+      } catch (e) {
+        _this8._logLspException(e);
+        return null;
+      }})();
+  }
+
+  _supportsAutocompleteResolve() {
+    return (
+      this._serverCapabilities.completionProvider != null &&
+      this._serverCapabilities.completionProvider.resolveProvider === true);
+
+  }
+
+  getDefinition(
+  fileVersion,
+  position)
+  {var _this9 = this;return (0, _asyncToGenerator.default)(function* () {
+      if (
+      _this9._state !== 'Running' ||
+      !_this9._serverCapabilities.definitionProvider ||
+      !(yield _this9._lspFileVersionNotifier.waitForBufferAtVersion(fileVersion)))
+      {
         return null;
       }
-      const params = (_convert || _load_convert()).atom_lspPositionParams(fileVersion.filePath, position);
+      const params = (_convert || _load_convert()).atom_lspPositionParams(
+      fileVersion.filePath,
+      position);
+
 
       let response;
       try {
-        _this8._definitionCancellation.cancel();
-        _this8._definitionCancellation = new (_vscodeJsonrpc || _load_vscodeJsonrpc()).CancellationTokenSource();
-        response = yield _this8._lspConnection.gotoDefinition(params, _this8._definitionCancellation.token);
+        _this9._definitionCancellation.cancel();
+        _this9._definitionCancellation = new (_vscodeJsonrpc || _load_vscodeJsonrpc()).CancellationTokenSource();
+        response = yield _this9._lspConnection.gotoDefinition(
+        params,
+        _this9._definitionCancellation.token);if (!(
 
-        if (!(response != null)) {
-          throw new Error('null textDocument/definition');
-        }
+        response != null)) {throw new Error('null textDocument/definition');}
       } catch (e) {
-        _this8._logLspException(e);
+        _this9._logLspException(e);
         return null;
       }
 
@@ -1350,40 +1516,48 @@ class LspLanguageService {
 
       return {
         queryRange: null, // editor uses wordAtPos to determine current identifier
-        definitions: responseArray.map(function (d) {
-          return (_convert || _load_convert()).lspLocation_atomDefinition(d, _this8._projectRoot);
-        })
-      };
-    })();
+        definitions: responseArray.map(function (d) {return (
+            (_convert || _load_convert()).lspLocation_atomDefinition(d, _this9._projectRoot));}) };})();
+
+
   }
 
-  findReferences(fileVersion, position) {
-    return _rxjsBundlesRxMinJs.Observable.fromPromise(this._findReferences(fileVersion, position)).publish();
+  findReferences(
+  fileVersion,
+  position)
+  {
+    return _rxjsBundlesRxMinJs.Observable.fromPromise(
+    this._findReferences(fileVersion, position)).
+    publish();
   }
 
-  _findReferences(fileVersion, position) {
-    var _this9 = this;
-
-    return (0, _asyncToGenerator.default)(function* () {
-      if (_this9._state !== 'Running' || !_this9._serverCapabilities.referencesProvider || !(yield _this9._lspFileVersionNotifier.waitForBufferAtVersion(fileVersion))) {
+  _findReferences(
+  fileVersion,
+  position)
+  {var _this10 = this;return (0, _asyncToGenerator.default)(function* () {
+      if (
+      _this10._state !== 'Running' ||
+      !_this10._serverCapabilities.referencesProvider ||
+      !(yield _this10._lspFileVersionNotifier.waitForBufferAtVersion(fileVersion)))
+      {
         return null;
       }
-      const buffer = yield _this9._fileCache.getBufferAtVersion(fileVersion);
+      const buffer = yield _this10._fileCache.getBufferAtVersion(fileVersion);
       // buffer may still be null despite the above check. We do handle that!
 
-      const positionParams = (_convert || _load_convert()).atom_lspPositionParams(fileVersion.filePath, position);
+      const positionParams = (_convert || _load_convert()).atom_lspPositionParams(
+      fileVersion.filePath,
+      position);
+
       const params = Object.assign({}, positionParams, { context: { includeDeclaration: true } });
       // ReferenceParams is like TextDocumentPositionParams but with one extra field.
 
       let response;
       try {
-        response = yield _this9._lspConnection.findReferences(params);
-
-        if (!(response != null)) {
-          throw new Error('null textDocument/references');
-        }
+        response = yield _this10._lspConnection.findReferences(params);if (!(
+        response != null)) {throw new Error('null textDocument/references');}
       } catch (e) {
-        _this9._logLspException(e);
+        _this10._logLspException(e);
         return null;
       }
 
@@ -1402,9 +1576,9 @@ class LspLanguageService {
       // so we can guarantee that the ranges returned by LSP are identical
       // to what we have in hand.
       if (buffer != null) {
-        const refInBuffer = references.find(function (ref) {
-          return ref.uri === fileVersion.filePath;
-        });
+        const refInBuffer = references.find(
+        function (ref) {return ref.uri === fileVersion.filePath;});
+
         if (refInBuffer != null) {
           referencedSymbolName = buffer.getTextInRange(refInBuffer.range);
         }
@@ -1414,7 +1588,7 @@ class LspLanguageService {
       // the ranges that LSP sent us back, so it might be a little off.)
       if (referencedSymbolName == null) {
         for (const ref of references) {
-          const refBuffer = _this9._fileCache.getBuffer(ref.uri);
+          const refBuffer = _this10._fileCache.getBuffer(ref.uri);
           if (refBuffer != null) {
             referencedSymbolName = refBuffer.getTextInRange(ref.range);
             break;
@@ -1423,7 +1597,6 @@ class LspLanguageService {
       }
       // Failing that we'll try using a regexp on the buffer. (belt and braces!)
       if (referencedSymbolName == null && buffer != null) {
-        const WORD_REGEX = /\w+/gi;
         const match = (0, (_range || _load_range()).wordAtPositionFromBuffer)(buffer, position, WORD_REGEX);
         if (match != null && match.wordMatch.length > 0) {
           referencedSymbolName = match.wordMatch[0];
@@ -1436,72 +1609,80 @@ class LspLanguageService {
 
       return {
         type: 'data',
-        baseUri: _this9._projectRoot,
+        baseUri: _this10._projectRoot,
         referencedSymbolName,
-        references
-      };
-    })();
+        references };})();
+
   }
 
-  getCoverage(filePath) {
-    var _this10 = this;
-
-    return (0, _asyncToGenerator.default)(function* () {
-      if (_this10._state !== 'Running' || !_this10._serverCapabilities.typeCoverageProvider) {
+  getCoverage(filePath) {var _this11 = this;return (0, _asyncToGenerator.default)(function* () {
+      if (
+      _this11._state !== 'Running' ||
+      !_this11._serverCapabilities.typeCoverageProvider)
+      {
         return null;
       }
       const params = {
-        textDocument: (_convert || _load_convert()).localPath_lspTextDocumentIdentifier(filePath)
-      };
+        textDocument: (_convert || _load_convert()).localPath_lspTextDocumentIdentifier(filePath) };
+
 
       let response;
       try {
-        response = yield _this10._lspConnection.typeCoverage(params);
-
-        if (!(response != null)) {
-          throw new Error('null textDocument/coverage');
-        }
-      } catch (e) {
-        _this10._logLspException(e);
-        return null;
-      }
-
-      const convertUncovered = function (uncovered) {
-        return {
-          range: (_convert || _load_convert()).lspRange_atomRange(uncovered.range),
-          message: uncovered.message
-        };
-      };
-      return {
-        percentage: response.coveredPercent,
-        uncoveredRegions: response.uncoveredRanges.map(convertUncovered)
-      };
-    })();
-  }
-
-  getOutline(fileVersion) {
-    var _this11 = this;
-
-    return (0, _asyncToGenerator.default)(function* () {
-      if (_this11._state !== 'Running' || !_this11._serverCapabilities.documentSymbolProvider || !(yield _this11._lspFileVersionNotifier.waitForBufferAtVersion(fileVersion))) {
-        return null;
-      }
-      const params = {
-        textDocument: (_convert || _load_convert()).localPath_lspTextDocumentIdentifier(fileVersion.filePath)
-      };
-
-      let response;
-      try {
-        _this11._outlineCancellation.cancel();
-        _this11._outlineCancellation = new (_vscodeJsonrpc || _load_vscodeJsonrpc()).CancellationTokenSource();
-        const token = _this11._outlineCancellation.token;
-        response = yield _this11._lspConnection.documentSymbol(params, token);
-
-        if (!(response != null)) {
-          throw new Error('null textDocument/documentSymbol');
-        }
+        response = yield _this11._lspConnection.typeCoverage(params);if (!(
+        response != null)) {throw new Error('null textDocument/coverage');}
       } catch (e) {
         _this11._logLspException(e);
+        return null;
+      }
+
+      const convertUncovered = function (uncovered) {return {
+          range: (_convert || _load_convert()).lspRange_atomRange(uncovered.range),
+          message: uncovered.message };};
+
+      return {
+        percentage: response.coveredPercent,
+        uncoveredRegions: response.uncoveredRanges.map(convertUncovered) };})();
+
+  }
+
+  onToggleCoverage(set) {var _this12 = this;return (0, _asyncToGenerator.default)(function* () {if (!(
+      _this12._lspConnection != null)) {throw new Error('Invariant violation: "this._lspConnection != null"');}
+
+      if (
+      _this12._state !== 'Running' ||
+      !_this12._serverCapabilities.typeCoverageProvider)
+      {
+        return;
+      }
+      const params = {
+        toggle: set };
+
+      _this12._lspConnection.toggleTypeCoverage(params);})();
+  }
+
+  getOutline(fileVersion) {var _this13 = this;return (0, _asyncToGenerator.default)(function* () {
+      if (
+      _this13._state !== 'Running' ||
+      !_this13._serverCapabilities.documentSymbolProvider ||
+      !(yield _this13._lspFileVersionNotifier.waitForBufferAtVersion(fileVersion)))
+      {
+        return null;
+      }
+      const params = {
+        textDocument: (_convert || _load_convert()).localPath_lspTextDocumentIdentifier(
+        fileVersion.filePath) };
+
+
+
+      let response;
+      try {
+        _this13._outlineCancellation.cancel();
+        _this13._outlineCancellation = new (_vscodeJsonrpc || _load_vscodeJsonrpc()).CancellationTokenSource();
+        const token = _this13._outlineCancellation.token;
+        response = yield _this13._lspConnection.documentSymbol(params, token);if (!(
+        response != null)) {throw new Error('null textDocument/documentSymbol');}
+      } catch (e) {
+        _this13._logLspException(e);
         return null;
       }
 
@@ -1513,21 +1694,29 @@ class LspLanguageService {
       // We'll also sort the nodes in lexical order of occurrence in the source
       // document. This is useful because containers always come lexically before their
       // children. (This isn't a LSP guarantee; just a heuristic.)
-      const list = response.map(function (symbol) {
-        return [symbol, {
+      const list = response.map(
+      function (symbol) {return [
+        symbol,
+        {
           icon: (_convert || _load_convert()).lspSymbolKind_atomIcon(symbol.kind),
           representativeName: symbol.name,
           tokenizedText: (_convert || _load_convert()).lspSymbolInformation_atomTokenizedText(symbol),
-          startPosition: (_convert || _load_convert()).lspPosition_atomPoint(symbol.location.range.start),
-          children: []
-        }];
-      });
-      return { outlineTrees: _this11._createOutlineTreeHierarchy(list).children };
-    })();
+          startPosition: (_convert || _load_convert()).lspPosition_atomPoint(
+          symbol.location.range.start),
+
+          children: [] }];});
+
+
+
+      return { outlineTrees: _this13._createOutlineTreeHierarchy(list).children };})();
   }
 
-  _createOutlineTreeHierarchy(list) {
-    list.sort(([, aNode], [, bNode]) => aNode.startPosition.compare(bNode.startPosition));
+  _createOutlineTreeHierarchy(
+  list)
+  {
+    list.sort(([, aNode], [, bNode]) =>
+    aNode.startPosition.compare(bNode.startPosition));
+
 
     // We'll need to look up for parents by name, so construct a map from names to nodes
     // of that name. Note: an undefined SymbolInformation.containerName means root,
@@ -1535,7 +1724,9 @@ class LspLanguageService {
     const mapElements = list.map(([symbol, node]) => [symbol.name, node]);
     const map = (0, (_collection || _load_collection()).collect)(mapElements);
     if (map.has('')) {
-      this._logger.error('Outline textDocument/documentSymbol returned an empty symbol name');
+      this._logger.error(
+      'Outline textDocument/documentSymbol returned an empty symbol name');
+
     }
 
     // The algorithm for reconstructing the tree out of list items rests on identifying
@@ -1546,30 +1737,39 @@ class LspLanguageService {
     const root = {
       plainText: '',
       startPosition: new (_simpleTextBuffer || _load_simpleTextBuffer()).Point(0, 0),
-      children: []
-    };
+      children: [] };
+
     map.set('', [root]);
     for (const [symbol, node] of list) {
       const parentName = symbol.containerName || '';
       const parentCandidates = map.get(parentName);
       if (parentCandidates == null) {
-        this._logger.error(`Outline textDocument/documentSymbol ${symbol.name} is missing container ${parentName}`);
-      } else {
-        if (!(parentCandidates.length > 0)) {
-          throw new Error('Invariant violation: "parentCandidates.length > 0"');
-        }
+        this._logger.error(
+        `Outline textDocument/documentSymbol ${
+        symbol.name
+        } is missing container ${parentName}, setting container to root`);
+
+        root.children.push(node);
+      } else {if (!(
+        parentCandidates.length > 0)) {throw new Error('Invariant violation: "parentCandidates.length > 0"');}
         // Find the first candidate that's lexically *after* our symbol.
+        const symbolPos = (_convert || _load_convert()).lspPosition_atomPoint(
+        symbol.location.range.start);
 
+        const iAfter = parentCandidates.findIndex(
+        p => p.startPosition.compare(symbolPos) > 0);
 
-        const symbolPos = (_convert || _load_convert()).lspPosition_atomPoint(symbol.location.range.start);
-        const iAfter = parentCandidates.findIndex(p => p.startPosition.compare(symbolPos) > 0);
         if (iAfter === -1) {
           // No candidates after item? Then item's parent is the last candidate.
           parentCandidates[parentCandidates.length - 1].children.push(node);
         } else if (iAfter === 0) {
           // All candidates after item? That's an error! We'll arbitrarily pick first one.
           parentCandidates[0].children.push(node);
-          this._logger.error(`Outline textDocument/documentSymbol ${symbol.name} comes after its container`);
+          this._logger.error(
+          `Outline textDocument/documentSymbol ${
+          symbol.name
+          } comes after its container`);
+
         } else {
           // Some candidates before+after? Then item's parent is the last candidate before.
           parentCandidates[iAfter - 1].children.push(node);
@@ -1580,105 +1780,160 @@ class LspLanguageService {
     return root;
   }
 
+  /** Returns code lens information for the given file. */
+  getCodeLens(fileVersion) {var _this14 = this;return (0, _asyncToGenerator.default)(function* () {
+      if (
+      _this14._state !== 'Running' ||
+      !(yield _this14._lspFileVersionNotifier.waitForBufferAtVersion(fileVersion)))
+      {
+        return null;
+      }
+      const params = {
+        textDocument: (_convert || _load_convert()).localPath_lspTextDocumentIdentifier(
+        fileVersion.filePath) };
+
+
+
+      try {
+        const response = yield _this14._lspConnection.codeLens(params);if (!(
+        response != null)) {throw new Error('null textDocument/codeLens');}
+        return response.map((_convert || _load_convert()).lspCodeLens_codeLensData);
+      } catch (e) {
+        _this14._logLspException(e);
+        return null;
+      }})();
+  }
+
+  /** Resolves an individual code lens. */
+  resolveCodeLens(
+  filePath,
+  data)
+  {var _this15 = this;return (0, _asyncToGenerator.default)(function* () {
+      if (_this15._state !== 'Running') {
+        return null;
+      }
+
+      if (
+      !_this15._serverCapabilities.codeLensProvider ||
+      !_this15._serverCapabilities.codeLensProvider.resolveProvider)
+      {
+        return data;
+      }
+
+      try {
+        const response = yield _this15._lspConnection.codeLensResolve(
+        (_convert || _load_convert()).codeLensData_lspCodeLens(data));if (!(
+
+        response != null)) {throw new Error('null textDocument/codeLensResolve');}
+        return (_convert || _load_convert()).lspCodeLens_codeLensData(response);
+      } catch (e) {
+        _this15._logLspException(e);
+        return null;
+      }})();
+  }
+
   // Private API to send executeCommand requests to the server. Returns a
   // boolean indicating whether executing the command was successful.
   // This function will throw an error if the server isn't in a state to handle
   // the request, the server can't handle this type of request, or if the LSP
   // server throws its own exception (ex: an internal server error exception)
-  _executeCommand(command, args) {
-    var _this12 = this;
+  _executeCommand(command, args) {var _this16 = this;return (0, _asyncToGenerator.default)(function* () {
+      if (_this16._state !== 'Running') {
+        throw new Error(
+        `${
+        _this16._languageServerName
+        } is not currently in a state to handle the request`);
 
-    return (0, _asyncToGenerator.default)(function* () {
-      if (_this12._state !== 'Running') {
-        throw new Error(`${_this12._languageServerName} is not currently in a state to handle the request`);
-        // flowlint-next-line sketchy-null-mixed:off
-      } else if (!_this12._serverCapabilities.executeCommandProvider) {
-        throw new Error(`${_this12._languageServerName} cannot handle the request`);
+        // $FlowFixMe(>=0.68.0) Flow suppress (T27187857)
+      } else if (!_this16._serverCapabilities.executeCommandProvider) {
+        throw new Error(`${_this16._languageServerName} cannot handle the request`);
       }
       try {
-        yield _this12._lspConnection.executeCommand({
+        yield _this16._lspConnection.executeCommand({
           command,
-          arguments: args
-        });
+          arguments: args });
+
       } catch (e) {
-        _this12._logLspException(e);
+        _this16._logLspException(e);
         // Rethrow the exception so the upsteam caller has access to the error message.
         throw e;
-      }
-    })();
+      }})();
   }
 
-  getCodeActions(fileVersion, range, diagnostics) {
-    var _this13 = this;
-
-    return (0, _asyncToGenerator.default)(function* () {
-      if (_this13._state !== 'Running' || !_this13._serverCapabilities.codeActionProvider) {
+  getCodeActions(
+  fileVersion,
+  range,
+  diagnostics)
+  {var _this17 = this;return (0, _asyncToGenerator.default)(function* () {
+      if (
+      _this17._state !== 'Running' ||
+      !_this17._serverCapabilities.codeActionProvider)
+      {
         return [];
       }
 
       const params = {
-        textDocument: (_convert || _load_convert()).localPath_lspTextDocumentIdentifier(fileVersion.filePath),
+        textDocument: (_convert || _load_convert()).localPath_lspTextDocumentIdentifier(
+        fileVersion.filePath),
+
         range: (_convert || _load_convert()).atomRange_lspRange(range),
         context: {
-          diagnostics: (0, (_collection || _load_collection()).arrayCompact)(diagnostics.map((_convert || _load_convert()).atomDiagnostic_lspDiagnostic))
-        }
-      };
+          diagnostics: (0, (_collection || _load_collection()).arrayCompact)(
+          diagnostics.map((_convert || _load_convert()).atomDiagnostic_lspDiagnostic)) } };
+
+
+
 
       let response;
       try {
-        response = yield _this13._lspConnection.codeAction(params);
+        response = yield _this17._lspConnection.codeAction(params);
       } catch (e) {
-        _this13._logLspException(e);
+        _this17._logLspException(e);
         return [];
       }
-      return _this13._convertCommands_CodeActions(response);
-    })();
+      return _this17._convertCommands_CodeActions(response);})();
   }
 
-  _convertCommands_CodeActions(commands) {
-    var _this14 = this;
-
+  _convertCommands_CodeActions(commands) {var _this18 = this;
     return commands.map(command => {
       // This function, which will be called when the CodeAction is applied
       // by the user, returns Promise<void>. If the Promise is fulfilled, then
       // the CodeAction was successful. If unsuccessful, the Promise will be rejected
       // and the upstream caller (ex: a CodeAction UI package) should catch the
       // error and display it to the user in whatever way they think best.
-      const applyFunc = (() => {
-        var _ref4 = (0, _asyncToGenerator.default)(function* () {
-          yield _this14._executeCommand(command.command, command.arguments);
-        });
-
-        return function applyFunc() {
-          return _ref4.apply(this, arguments);
-        };
-      })();
+      const applyFunc = (() => {var _ref4 = (0, _asyncToGenerator.default)(function* () {
+          yield _this18._executeCommand(command.command, command.arguments);
+        });return function applyFunc() {return _ref4.apply(this, arguments);};})();
       return (_convert || _load_convert()).lspCommand_atomCodeAction(command, applyFunc);
     });
   }
 
-  getAdditionalLogFiles(deadline) {
-    var _this15 = this;
-
-    return (0, _asyncToGenerator.default)(function* () {
+  getAdditionalLogFiles(
+  deadline)
+  {var _this19 = this;return (0, _asyncToGenerator.default)(function* () {
       const results = [];
 
       // The LSP server sends back either titled data (each one of which gets
       // written as an AdditionalLogFile) or untitled data (which we accumulate
       // and send in a single AdditionalLogFile with our own logs).
-      const lspAnonymousTitle = `${_this15._projectRoot}:LSP#${_this15._languageServerName}`;
+      const lspAnonymousTitle = `${_this19._projectRoot}:LSP#${
+      _this19._languageServerName
+      }`;
       let lspAnonymousRage = '';
 
-      if (_this15._state === 'Running' && Boolean(_this15._serverCapabilities.rageProvider)) {
+      if (
+      _this19._state === 'Running' &&
+      Boolean(_this19._serverCapabilities.rageProvider))
+      {
         let response = null;
         try {
-          response = yield (0, (_promise || _load_promise()).timeoutAfterDeadline)(deadline, _this15._lspConnection.rage());
+          response = yield (0, (_promise || _load_promise()).timeoutAfterDeadline)(
+          deadline,
+          _this19._lspConnection.rage());if (!(
 
-          if (!(response != null)) {
-            throw new Error('null telemetry/rage');
-          }
+          response != null)) {throw new Error('null telemetry/rage');}
         } catch (e) {
-          _this15._logLspException(e);
+          _this19._logLspException(e);
           response = [{ title: null, data: (0, (_string || _load_string()).stringifyError)(e) }];
         }
         for (const rageItem of response) {
@@ -1687,24 +1942,22 @@ class LspLanguageService {
           } else {
             results.push({
               title: rageItem.title,
-              data: rageItem.data
-            });
+              data: rageItem.data });
+
           }
         }
       }
 
-      if (_this15._additionalLogFilesRetentionPeriod > 0) {
+      if (_this19._additionalLogFilesRetentionPeriod > 0) {
         // verbose trace of LSP messages over past few minutes
         results.push({
           title: lspAnonymousTitle,
           mimeType: 'text/plain',
-          data: lspAnonymousRage + '\n\n' + _this15._logger.dump()
-        });
+          data: lspAnonymousRage + '\n\n' + _this19._logger.dump() });
+
         lspAnonymousRage = '';
         // snapshots of files over past few minutes
-        for (const _ref5 of _this15._snapshotter.dump()) {
-          const { title, text } = _ref5;
-
+        for (const _ref5 of _this19._snapshotter.dump()) {const { title, text } = _ref5;
           results.push({ title, mimeType: 'text/plain', data: text });
         }
       }
@@ -1713,43 +1966,50 @@ class LspLanguageService {
         results.push({
           title: lspAnonymousTitle,
           mimeType: 'text/plain',
-          data: lspAnonymousRage
-        });
+          data: lspAnonymousRage });
+
         lspAnonymousRage = '';
       }
 
-      return results;
-    })();
+      return results;})();
   }
 
-  typeHint(fileVersion, position) {
-    var _this16 = this;
-
-    return (0, _asyncToGenerator.default)(function* () {
-      if (_this16._state !== 'Running' || !_this16._serverCapabilities.hoverProvider || !(yield _this16._lspFileVersionNotifier.waitForBufferAtVersion(fileVersion))) {
+  typeHint(
+  fileVersion,
+  position)
+  {var _this20 = this;return (0, _asyncToGenerator.default)(function* () {
+      if (
+      _this20._state !== 'Running' ||
+      !_this20._serverCapabilities.hoverProvider ||
+      !(yield _this20._lspFileVersionNotifier.waitForBufferAtVersion(fileVersion)))
+      {
         return null;
       }
-      const params = (_convert || _load_convert()).atom_lspPositionParams(fileVersion.filePath, position);
+      const params = (_convert || _load_convert()).atom_lspPositionParams(
+      fileVersion.filePath,
+      position);
+
 
       let response;
       try {
-        _this16._hoverCancellation.cancel();
-        _this16._hoverCancellation = new (_vscodeJsonrpc || _load_vscodeJsonrpc()).CancellationTokenSource();
-        response = yield _this16._lspConnection.hover(params, _this16._hoverCancellation.token);
+        _this20._hoverCancellation.cancel();
+        _this20._hoverCancellation = new (_vscodeJsonrpc || _load_vscodeJsonrpc()).CancellationTokenSource();
+        response = yield _this20._lspConnection.hover(
+        params,
+        _this20._hoverCancellation.token);
 
-        if (!(response != null)) {
-          throw new Error('null textDocument/hover');
-        }
       } catch (e) {
-        _this16._logLspException(e);
+        _this20._logLspException(e);
         return null;
       }
 
-      if (response.contents == null) {
+      if (response == null || response.contents == null) {
         return null;
       }
 
-      const responseHint = Array.isArray(response.contents) ? response.contents : [response.contents];
+      const responseHint = Array.isArray(response.contents) ?
+      response.contents :
+      [response.contents];
 
       const hint = responseHint.map(function (h) {
         if (typeof h === 'string') {
@@ -1769,47 +2029,62 @@ class LspLanguageService {
       let range = new (_simpleTextBuffer || _load_simpleTextBuffer()).Range(position, position);
       if (response.range) {
         range = (_convert || _load_convert()).lspRange_atomRange(response.range);
+      } else {
+        const buffer = yield _this20.tryGetBufferWhenWeAndLspAtSameVersion(
+        fileVersion);
+
+        if (buffer != null) {
+          const match = (0, (_range || _load_range()).wordAtPositionFromBuffer)(buffer, position, WORD_REGEX);
+          if (match != null && match.wordMatch.length > 0) {
+            range = match.range;
+          }
+        }
       }
 
-      return { hint, range };
-    })();
+      return { hint, range };})();
   }
 
-  highlight(fileVersion, position) {
-    var _this17 = this;
-
-    return (0, _asyncToGenerator.default)(function* () {
-      if (_this17._state !== 'Running' || !_this17._serverCapabilities.documentHighlightProvider || !(yield _this17._lspFileVersionNotifier.waitForBufferAtVersion(fileVersion))) {
+  highlight(
+  fileVersion,
+  position)
+  {var _this21 = this;return (0, _asyncToGenerator.default)(function* () {
+      if (
+      _this21._state !== 'Running' ||
+      !_this21._serverCapabilities.documentHighlightProvider ||
+      !(yield _this21._lspFileVersionNotifier.waitForBufferAtVersion(fileVersion)))
+      {
         return null;
       }
-      const params = (_convert || _load_convert()).atom_lspPositionParams(fileVersion.filePath, position);
+      const params = (_convert || _load_convert()).atom_lspPositionParams(
+      fileVersion.filePath,
+      position);
+
 
       let response;
       try {
-        _this17._highlightCancellation.cancel();
-        _this17._highlightCancellation = new (_vscodeJsonrpc || _load_vscodeJsonrpc()).CancellationTokenSource();
-        response = yield _this17._lspConnection.documentHighlight(params, _this17._highlightCancellation.token);
+        _this21._highlightCancellation.cancel();
+        _this21._highlightCancellation = new (_vscodeJsonrpc || _load_vscodeJsonrpc()).CancellationTokenSource();
+        response = yield _this21._lspConnection.documentHighlight(
+        params,
+        _this21._highlightCancellation.token);if (!(
 
-        if (!(response != null)) {
-          throw new Error('null textDocument/documentHighlight');
-        }
+        response != null)) {throw new Error('null textDocument/documentHighlight');}
       } catch (e) {
-        _this17._logLspException(e);
+        _this21._logLspException(e);
         return null;
       }
 
-      const convertHighlight = function (highlight) {
-        return (_convert || _load_convert()).lspRange_atomRange(highlight.range);
-      };
-      return response.map(convertHighlight);
-    })();
+      const convertHighlight = function (highlight) {return (
+          (_convert || _load_convert()).lspRange_atomRange(highlight.range));};
+      return response.map(convertHighlight);})();
   }
 
-  formatSource(fileVersion, atomRange, options) {
-    var _this18 = this;
-
-    return (0, _asyncToGenerator.default)(function* () {
-      if (_this18._state !== 'Running') {
+  formatSource(
+  fileVersion,
+  atomRange,
+  options)
+  {var _this22 = this;return (0, _asyncToGenerator.default)(function* () {
+      if (_this22._state !== 'Running') {
         return null;
       }
 
@@ -1823,32 +2098,37 @@ class LspLanguageService {
       // But we do need the buffer, to know whether atomRange covers the whole document.
       // And if we can't get it for reasons of syncing, then we'll have to bail by reporting
       // the same error as that upstream caller.
-      const buffer = yield _this18.tryGetBufferWhenWeAndLspAtSameVersion(fileVersion);
+      const buffer = yield _this22.tryGetBufferWhenWeAndLspAtSameVersion(
+      fileVersion);
+
       if (buffer == null) {
-        _this18._logger.error('LSP.formatSource - buffer changed before we could format');
+        _this22._logger.error(
+        'LSP.formatSource - buffer changed before we could format');
+
         return null;
       }
       const params = {
-        textDocument: (_convert || _load_convert()).localPath_lspTextDocumentIdentifier(fileVersion.filePath),
-        options
-      };
+        textDocument: (_convert || _load_convert()).localPath_lspTextDocumentIdentifier(
+        fileVersion.filePath),
+
+        options };
+
       let response;
 
       // The user might have requested to format either some or all of the buffer.
       // And the LSP server might have the capability to format some or all.
       // We'll match up the request+capability as best we can...
-      const canAll = Boolean(_this18._serverCapabilities.documentFormattingProvider);
-      const canRange = Boolean(_this18._serverCapabilities.documentRangeFormattingProvider);
+      const canAll = Boolean(_this22._serverCapabilities.documentFormattingProvider);
+      const canRange = Boolean(
+      _this22._serverCapabilities.documentRangeFormattingProvider);
+
       const wantAll = buffer.getRange().compare(atomRange) === 0;
       if (canAll && (wantAll || !canRange)) {
         try {
-          response = yield _this18._lspConnection.documentFormatting(params);
-
-          if (!(response != null)) {
-            throw new Error('null textDocument/documentFormatting');
-          }
+          response = yield _this22._lspConnection.documentFormatting(params);if (!(
+          response != null)) {throw new Error('null textDocument/documentFormatting');}
         } catch (e) {
-          _this18._logLspException(e);
+          _this22._logLspException(e);
           return null;
         }
       } else if (canRange) {
@@ -1858,97 +2138,136 @@ class LspLanguageService {
         const range = (_convert || _load_convert()).atomRange_lspRange(atomRange);
         const params2 = Object.assign({}, params, { range });
         try {
-          response = yield _this18._lspConnection.documentRangeFormatting(params2);
+          response = yield _this22._lspConnection.documentRangeFormatting(params2);if (!(
 
-          if (!(response != null)) {
-            throw new Error('null textDocument/documentRangeFormatting');
-          }
+          response != null)) {throw new Error(
+            'null textDocument/documentRangeFormatting');}
+
         } catch (e) {
-          _this18._logLspException(e);
+          _this22._logLspException(e);
           return null;
         }
       } else {
-        _this18._logger.error('LSP.formatSource - not supported by server');
+        _this22._logger.error('LSP.formatSource - not supported by server');
         return null;
       }
 
       // As mentioned, the user might have done further typing during that 'await', but if so then
       // our upstream caller will catch it and report an error: no need to re-verify here.
 
-      return (_convert || _load_convert()).lspTextEdits_atomTextEdits(response);
-    })();
+      return (_convert || _load_convert()).lspTextEdits_atomTextEdits(response);})();
   }
 
-  formatEntireFile(fileVersion, range, options) {
+  formatEntireFile(
+  fileVersion,
+  range,
+  options)
+
+
+
+  {
     // A language service implements either formatSource or formatEntireFile,
     // and we should pick formatSource in our AtomLanguageServiceConfig.
-    this._logger.error('LSP CodeFormat providers should use formatEntireFile: false');
+    this._logger.error(
+    'LSP CodeFormat providers should use formatEntireFile: false');
+
     return Promise.resolve(null);
   }
 
-  formatAtPosition(fileVersion, point, triggerCharacter, options) {
-    var _this19 = this;
-
-    return (0, _asyncToGenerator.default)(function* () {
-      const triggerCharacters = _this19._derivedServerCapabilities.onTypeFormattingTriggerCharacters;
-      if (_this19._state !== 'Running' || !triggerCharacters.has(triggerCharacter) || !(yield _this19._lspFileVersionNotifier.waitForBufferAtVersion(fileVersion))) {
+  formatAtPosition(
+  fileVersion,
+  point,
+  triggerCharacter,
+  options)
+  {var _this23 = this;return (0, _asyncToGenerator.default)(function* () {
+      const triggerCharacters = _this23._derivedServerCapabilities.
+      onTypeFormattingTriggerCharacters;
+      if (
+      _this23._state !== 'Running' ||
+      !triggerCharacters.has(triggerCharacter) ||
+      !(yield _this23._lspFileVersionNotifier.waitForBufferAtVersion(fileVersion)))
+      {
         return null;
       }
       const params = {
-        textDocument: (_convert || _load_convert()).localPath_lspTextDocumentIdentifier(fileVersion.filePath),
+        textDocument: (_convert || _load_convert()).localPath_lspTextDocumentIdentifier(
+        fileVersion.filePath),
+
         position: (_convert || _load_convert()).atomPoint_lspPosition(point),
         ch: triggerCharacter,
-        options
-      };
+        options };
+
 
       let response;
       try {
-        response = yield _this19._lspConnection.documentOnTypeFormatting(params);
-
-        if (!(response != null)) {
-          throw new Error('null textDocument/documentOnTypeFormatting');
-        }
+        response = yield _this23._lspConnection.documentOnTypeFormatting(params);if (!(
+        response != null)) {throw new Error('null textDocument/documentOnTypeFormatting');}
       } catch (e) {
-        _this19._logLspException(e);
+        _this23._logLspException(e);
         return null;
       }
 
-      return (_convert || _load_convert()).lspTextEdits_atomTextEdits(response);
-    })();
+      return (_convert || _load_convert()).lspTextEdits_atomTextEdits(response);})();
   }
 
-  getEvaluationExpression(fileVersion, position) {
-    this._logger.error('NYI: getEvaluationExpression');
-    return Promise.resolve(null);
+  signatureHelp(
+  fileVersion,
+  position)
+  {var _this24 = this;return (0, _asyncToGenerator.default)(function* () {
+      if (
+      _this24._state !== 'Running' ||
+      !_this24._serverCapabilities.signatureHelpProvider ||
+      !(yield _this24._lspFileVersionNotifier.waitForBufferAtVersion(fileVersion)))
+      {
+        return null;
+      }
+      const params = {
+        textDocument: (_convert || _load_convert()).localPath_lspTextDocumentIdentifier(
+        fileVersion.filePath),
+
+        position: (_convert || _load_convert()).atomPoint_lspPosition(position) };
+
+
+      try {
+        const result = yield _this24._lspConnection.signatureHelp(params);
+        if (result == null) {
+          return null;
+        }
+        return (_convert || _load_convert()).lspSignatureHelp_atomSignatureHelp(result);
+      } catch (e) {
+        _this24._logLspException(e);
+        return null;
+      }})();
   }
 
   supportsSymbolSearch(directories) {
-    return (0, (_observable || _load_observable()).compact)(this._supportsSymbolSearch).take(1).toPromise();
+    return (0, (_observable || _load_observable()).compact)(this._supportsSymbolSearch).
+    take(1).
+    toPromise();
   }
 
-  symbolSearch(query, directories) {
-    var _this20 = this;
-
-    return (0, _asyncToGenerator.default)(function* () {
-      if (_this20._state !== 'Running' || !_this20._serverCapabilities.workspaceSymbolProvider) {
+  symbolSearch(
+  query,
+  directories)
+  {var _this25 = this;return (0, _asyncToGenerator.default)(function* () {
+      if (
+      _this25._state !== 'Running' ||
+      !_this25._serverCapabilities.workspaceSymbolProvider)
+      {
         return null;
       }
       const params = { query };
 
       let response;
       try {
-        response = yield _this20._lspConnection.workspaceSymbol(params);
-
-        if (!(response != null)) {
-          throw new Error('null workspace/symbol');
-        }
+        response = yield _this25._lspConnection.workspaceSymbol(params);if (!(
+        response != null)) {throw new Error('null workspace/symbol');}
       } catch (e) {
-        _this20._logLspException(e);
+        _this25._logLspException(e);
         return null;
       }
 
-      return response.map((_convert || _load_convert()).lspSymbolInformation_atomSymbolResult);
-    })();
+      return response.map((_convert || _load_convert()).lspSymbolInformation_atomSymbolResult);})();
   }
 
   getProjectRoot(fileUri) {
@@ -1964,29 +2283,30 @@ class LspLanguageService {
     return Promise.resolve(this._isFileInProject(fileUri));
   }
 
-  getExpandedSelectionRange(fileVersion, currentSelection) {
+  getExpandedSelectionRange(
+  fileVersion,
+  currentSelection)
+  {
     this._logger.error('NYI: getExpandedSelectionRange');
     return Promise.resolve(null);
   }
 
-  getCollapsedSelectionRange(fileVersion, currentSelection, originalCursorPosition) {
+  getCollapsedSelectionRange(
+  fileVersion,
+  currentSelection,
+  originalCursorPosition)
+  {
     this._logger.error('NYI: getCollapsedSelectionRange');
     return Promise.resolve(null);
-  }
-}
+  }}exports.LspLanguageService = LspLanguageService;
 
-exports.LspLanguageService = LspLanguageService; /**
-                                                  * Copyright (c) 2015-present, Facebook, Inc.
-                                                  * All rights reserved.
-                                                  *
-                                                  * This source code is licensed under the license found in the LICENSE file in
-                                                  * the root directory of this source tree.
-                                                  *
-                                                  * 
-                                                  * @format
-                                                  */
 
 class DerivedServerCapabilities {
+
+
+
+
+
 
   constructor(capabilities, logger) {
     let syncKind;
@@ -2008,7 +2328,10 @@ class DerivedServerCapabilities {
       this.serverWantsOpenClose = false;
       syncKind = (_protocol || _load_protocol()).TextDocumentSyncKind.None;
       if (sync != null) {
-        logger.error('LSP - invalid capabilities.textDocumentSync from server: ' + JSON.stringify(sync));
+        logger.error(
+        'LSP - invalid capabilities.textDocumentSync from server: ' +
+        JSON.stringify(sync));
+
       }
     }
 
@@ -2025,15 +2348,18 @@ class DerivedServerCapabilities {
       this.serverWantsChange = 'none';
     }
 
-    const onTypeFormattingSettings = capabilities.documentOnTypeFormattingProvider;
+    const onTypeFormattingSettings =
+    capabilities.documentOnTypeFormattingProvider;
     if (onTypeFormattingSettings == null) {
       this.onTypeFormattingTriggerCharacters = new Set();
     } else {
       const {
         firstTriggerCharacter,
-        moreTriggerCharacter
-      } = onTypeFormattingSettings;
-      const triggerCharacters = [firstTriggerCharacter].concat(moreTriggerCharacter || []);
+        moreTriggerCharacter } =
+      onTypeFormattingSettings;
+      const triggerCharacters = [firstTriggerCharacter].concat(
+      moreTriggerCharacter || []);
+
       this.onTypeFormattingTriggerCharacters = new Set(triggerCharacters);
     }
 
@@ -2041,13 +2367,18 @@ class DerivedServerCapabilities {
       this.completionTriggerCharacters = new Set();
     } else {
       const lspChars = capabilities.completionProvider.triggerCharacters || [];
-      const intrinsicChars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz'.split('');
-      this.completionTriggerCharacters = new Set(lspChars.concat(intrinsicChars));
+      const intrinsicChars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz_'.split(
+      '');
+
+      this.completionTriggerCharacters = new Set(
+      lspChars.concat(intrinsicChars));
+
     }
-  }
-}
+  }}
+
 
 class JsonRpcLogger {
+
 
   constructor(logger) {
     this._logger = logger;
@@ -2067,10 +2398,11 @@ class JsonRpcLogger {
 
   log(message) {
     this._logger.trace(message);
-  }
-}
+  }}
+
 
 class JsonRpcTraceLogger {
+
 
   constructor(logger) {
     this._logger = logger;
@@ -2078,5 +2410,4 @@ class JsonRpcTraceLogger {
 
   log(message, data) {
     this._logger.trace(`LSP.trace: ${message} ${data || ''}`);
-  }
-}
+  }}

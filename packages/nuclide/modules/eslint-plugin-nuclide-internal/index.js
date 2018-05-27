@@ -13,17 +13,19 @@
 /* eslint
   comma-dangle: [1, always-multiline],
   prefer-object-spread/prefer-object-spread: 0,
-  rulesdir/no-commonjs: 0,
+  nuclide-internal/no-commonjs: 0,
   */
 
 module.exports = {
   rules: {
+    'api-spelling': require('./api-spelling'),
     'atom-apis': require('./atom-apis'),
     'consistent-import-name': require('./consistent-import-name'),
     'disallowed-modules': require('./disallowed-modules'),
     'dom-apis': require('./dom-apis'),
     'flow-fb-oss': require('./flow-fb-oss'),
     'import-type-style': require('./import-type-style'),
+    'jsx-simple-callback-refs': require('./jsx-simple-callback-refs'),
     'license-header': require('./license-header'),
     'modules-dependencies': require('./modules-dependencies'),
     'no-commonjs': require('./no-commonjs'),
@@ -32,15 +34,18 @@ module.exports = {
     'no-unresolved': require('./no-unresolved'),
     'prefer-nuclide-uri': require('./prefer-nuclide-uri'),
     'react-virtualized-import': require('./react-virtualized-import'),
+    'require-universal-disposable': require('./require-universal-disposable'),
     'use-nuclide-ui-components': require('./use-nuclide-ui-components'),
   },
   rulesConfig: {
+    'api-spelling': 0,
     'atom-apis': 0,
     'consistent-import-name': 0,
     'disallowed-modules': 0,
     'dom-apis': 0,
     'flow-fb-oss': 0,
     'import-type-style': 0,
+    'jsx-simple-callback-refs': 0,
     'license-header': 0,
     'modules-dependencies': 0,
     'no-cross-atom-imports': 0,
@@ -48,6 +53,7 @@ module.exports = {
     'no-unresolved': 0,
     'prefer-nuclide-uri': 0,
     'react-virtualized-import': 0,
+    'require-universal-disposable': 0,
     'use-nuclide-ui-components': 0,
   },
 };

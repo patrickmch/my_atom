@@ -1,36 +1,55 @@
-'use strict';
+'use strict';Object.defineProperty(exports, "__esModule", { value: true });exports.DiagnosticsProviderBase = undefined;
 
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-exports.DiagnosticsProviderBase = undefined;
 
-var _atom = require('atom');
 
-var _textEvent;
 
-function _load_textEvent() {
-  return _textEvent = require('nuclide-commons-atom/text-event');
-}
 
-var _UniversalDisposable;
 
-function _load_UniversalDisposable() {
-  return _UniversalDisposable = _interopRequireDefault(require('nuclide-commons/UniversalDisposable'));
-}
 
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-/**
- * Copyright (c) 2015-present, Facebook, Inc.
- * All rights reserved.
- *
- * This source code is licensed under the license found in the LICENSE file in
- * the root directory of this source tree.
- *
- * 
- * @format
- */
+
+
+
+
+
+
+
+
+
+var _atom = require('atom');var _textEvent;
+function _load_textEvent() {return _textEvent = require('../../../modules/nuclide-commons-atom/text-event');}var _UniversalDisposable;
+function _load_UniversalDisposable() {return _UniversalDisposable = _interopRequireDefault(require('../../../modules/nuclide-commons/UniversalDisposable'));}function _interopRequireDefault(obj) {return obj && obj.__esModule ? obj : { default: obj };} /**
+                                                                                                                                                                                                                                                            * Copyright (c) 2015-present, Facebook, Inc.
+                                                                                                                                                                                                                                                            * All rights reserved.
+                                                                                                                                                                                                                                                            *
+                                                                                                                                                                                                                                                            * This source code is licensed under the license found in the LICENSE file in
+                                                                                                                                                                                                                                                            * the root directory of this source tree.
+                                                                                                                                                                                                                                                            *
+                                                                                                                                                                                                                                                            * 
+                                                                                                                                                                                                                                                            * @format
+                                                                                                                                                                                                                                                            */
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 const UPDATE_EVENT = 'update';
 const INVALIDATE_EVENT = 'invalidate';
@@ -46,14 +65,38 @@ function getTextEventDispatcher() {
 
 class DiagnosticsProviderBase {
 
-  constructor(options, textEventDispatcher = getTextEventDispatcher()) {
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  constructor(
+  options,
+  textEventDispatcher = getTextEventDispatcher())
+  {
     this._textEventDispatcher = textEventDispatcher;
     this._emitter = new _atom.Emitter();
     this._disposables = new (_UniversalDisposable || _load_UniversalDisposable()).default();
 
     this._textEventCallback = callbackOrNoop(options.onTextEditorEvent);
-    this._newUpdateSubscriberCallback = callbackOrNoop(options.onNewUpdateSubscriber);
-    this._newInvalidateSubscriberCallback = callbackOrNoop(options.onNewInvalidateSubscriber);
+    this._newUpdateSubscriberCallback = callbackOrNoop(
+    options.onNewUpdateSubscriber);
+
+    this._newInvalidateSubscriberCallback = callbackOrNoop(
+    options.onNewInvalidateSubscriber);
+
 
     // The Set constructor creates an empty Set if passed null or undefined.
     this._grammarScopes = new Set(options.grammarScopes);
@@ -62,12 +105,9 @@ class DiagnosticsProviderBase {
   }
 
   /**
-   * Subscribes to the appropriate event depending on whether we should run on
-   * the fly or not.
-   */
-
-
-  // callbacks provided by client
+     * Subscribes to the appropriate event depending on whether we should run on
+     * the fly or not.
+     */ // callbacks provided by client
   _subscribeToTextEditorEvent(shouldRunOnTheFly) {
     this._disposeEventSubscription();
     const dispatcher = this._textEventDispatcher;
@@ -76,13 +116,19 @@ class DiagnosticsProviderBase {
       if (this._allGrammarScopes) {
         subscription = dispatcher.onAnyFileChange(this._textEventCallback);
       } else {
-        subscription = dispatcher.onFileChange(this._grammarScopes, this._textEventCallback);
+        subscription = dispatcher.onFileChange(
+        this._grammarScopes,
+        this._textEventCallback);
+
       }
     } else {
       if (this._allGrammarScopes) {
         subscription = dispatcher.onAnyFileSave(this._textEventCallback);
       } else {
-        subscription = dispatcher.onFileSave(this._grammarScopes, this._textEventCallback);
+        subscription = dispatcher.onFileSave(
+        this._grammarScopes,
+        this._textEventCallback);
+
       }
     }
     this._currentEventSubscription = subscription;
@@ -110,8 +156,8 @@ class DiagnosticsProviderBase {
   }
 
   /**
-   * Clients can call these methods to publish messages
-   */
+     * Clients can call these methods to publish messages
+     */
 
   publishMessageUpdate(update) {
     this._emitter.emit(UPDATE_EVENT, update);
@@ -122,8 +168,8 @@ class DiagnosticsProviderBase {
   }
 
   /**
-   * Clients should delegate to these
-   */
+     * Clients should delegate to these
+     */
 
   onMessageUpdate(callback) {
     const disposable = this._emitter.on(UPDATE_EVENT, callback);
@@ -135,10 +181,9 @@ class DiagnosticsProviderBase {
     const disposable = this._emitter.on(INVALIDATE_EVENT, callback);
     this._newInvalidateSubscriberCallback(callback);
     return disposable;
-  }
-}
+  }}exports.DiagnosticsProviderBase = DiagnosticsProviderBase;
 
-exports.DiagnosticsProviderBase = DiagnosticsProviderBase;
+
 function callbackOrNoop(callback) {
   return callback ? callback.bind(undefined) : () => {};
 }

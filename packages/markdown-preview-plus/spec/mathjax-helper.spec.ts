@@ -1,10 +1,12 @@
+/// <reference path="../src-client/node.d.ts"/>
+/// <reference path="../src-client/global-shims.d.ts"/>
 import * as path from 'path'
 import * as fs from 'fs'
 import * as temp from 'temp'
-import mathjaxHelper = require('../lib/mathjax-helper')
-import * as sinon from 'sinon'
 import { waitsFor } from './util'
 import { expect } from 'chai'
+global.require = require
+import * as mathjaxHelper from '../src-client/mathjax-helper'
 
 temp.track()
 
@@ -21,44 +23,37 @@ describe('MathJax helper module', () =>
     let configDirPath: string
     let macrosPath: string
     let macros: { [key: string]: any }
-    let stub: sinon.SinonStub
-    let div: HTMLDivElement
+    let spans = [] as Element[]
 
-    before(async () =>
-      atom.packages.activatePackage(path.join(__dirname, '..')),
-    )
-    after(async () => atom.packages.deactivatePackage('markdown-preview-plus'))
+    before(async () => {
+      await atom.packages.activatePackage(path.join(__dirname, '..'))
+    })
+    after(async () => {
+      await atom.packages.deactivatePackage('markdown-preview-plus')
+    })
 
-    beforeEach(function() {
+    beforeEach(async function() {
       configDirPath = temp.mkdirSync('atom-config-dir-')
       macrosPath = path.join(configDirPath, 'markdown-preview-plus.cson')
 
-      stub = sinon.stub(atom, 'getConfigDirPath').returns(configDirPath)
-
-      mathjaxHelper.testing.resetMathJax()
-
-      div = document.createElement('div')
-      div.style.visibility = 'hidden'
-      document.body.appendChild(div)
+      window.atomVars = {
+        home: Promise.resolve(configDirPath) as any,
+        numberEqns: Promise.resolve(false) as any,
+        revSourceMap: new WeakMap(),
+        sourceLineMap: new Map(),
+      }
     })
 
     afterEach(function() {
-      mathjaxHelper.testing.resetMathJax()
-      stub.restore()
-      div.remove()
+      delete window.atomVars
+      mathjaxHelper.unloadMathJax()
+      spans.forEach((x) => {
+        x.remove()
+      })
+      spans = []
     })
 
     const waitsForMacrosToLoad = async function() {
-      mathjaxHelper.testing.loadMathJax()
-
-      await waitsFor.msg(
-        'MathJax to load',
-        // tslint:disable-next-line:strict-type-predicates
-        () => typeof MathJax !== 'undefined' && MathJax !== null,
-      )
-
-      expect(stub).to.be.called
-
       // Trigger MathJax TeX extension to load
 
       const span = document.createElement('span')
@@ -66,12 +61,14 @@ describe('MathJax helper module', () =>
       equation.type = 'math/tex; mode=display'
       equation.textContent = '\\int_1^2'
       span.appendChild(equation)
-      div.appendChild(span)
-      mathjaxHelper.mathProcessor([span])
+      atom.views.getView(atom.workspace).appendChild(span)
+      spans.push(span)
+      await mathjaxHelper.mathProcessor(span, 'SVG')
 
       macros = await waitsFor.msg('MathJax macros to be defined', function() {
         try {
-          return MathJax.InputJax.TeX.Definitions.macros as typeof macros
+          // tslint:disable-next-line:no-unsafe-any
+          return window.MathJax.InputJax.TeX.Definitions.macros as typeof macros
         } catch {
           return undefined
         }

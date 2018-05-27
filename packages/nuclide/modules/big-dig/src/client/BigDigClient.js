@@ -1,31 +1,38 @@
-'use strict';
+'use strict';Object.defineProperty(exports, "__esModule", { value: true });exports.BigDigClient = undefined;
 
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-exports.BigDigClient = undefined;
 
-var _rxjsBundlesRxMinJs = require('rxjs/bundles/Rx.min.js');
 
-var _log4js;
 
-function _load_log4js() {
-  return _log4js = require('log4js');
-}
+
+
+
+
+
+
+
+
+
+
+
+var _rxjsBundlesRxMinJs = require('rxjs/bundles/Rx.min.js');var _log4js;
+function _load_log4js() {return _log4js = require('log4js');}
 
 /**
- * This class is responsible for talking to a Big Dig server, which enables the
- * client to launch a remote process and communication with its stdin, stdout,
- * and stderr.
- */
+                                                               * This class is responsible for talking to a Big Dig server, which enables the
+                                                               * client to launch a remote process and communication with its stdin, stdout,
+                                                               * and stderr.
+                                                               */
 class BigDigClient {
 
-  constructor(nuclideSocketTransport, heartbeat) {
+
+
+
+  constructor(reliableSocketTransport) {
     this._logger = (0, (_log4js || _load_log4js()).getLogger)();
-    this._transport = nuclideSocketTransport;
+    this._transport = reliableSocketTransport;
     this._tagToSubject = new Map();
 
-    const observable = nuclideSocketTransport.onMessage();
+    const observable = reliableSocketTransport.onMessage();
     observable.subscribe({
       // Must use arrow function so that `this` is bound correctly.
       next: message => {
@@ -44,25 +51,16 @@ class BigDigClient {
       },
       complete() {
         this._logger.error('ConnectionWrapper completed()?');
-      }
-    });
+      } });
 
-    this._heartbeat = heartbeat;
-    this._heartbeat.onConnectionRestored(() => {
-      this._logger.warn('TODO(T25533063): Implement reconnect logic');
-    });
   }
 
   isClosed() {
     return this._transport.isClosed();
   }
 
-  // XXX: do we even need this now that we're using
-  // NuclideSocket and QueuedAckTransport?
   onClose(callback) {
-    return {
-      dispose: () => {}
-    };
+    return this._transport.onClose(callback);
   }
 
   close() {
@@ -83,25 +81,19 @@ class BigDigClient {
   }
 
   getHeartbeat() {
-    return this._heartbeat;
+    return this._transport.getHeartbeat();
   }
 
   getAddress() {
     return this._transport.getAddress();
-  }
-
-  dispose() {
-    // TODO(mbolin)
-  }
-}
-exports.BigDigClient = BigDigClient; /**
-                                      * Copyright (c) 2017-present, Facebook, Inc.
-                                      * All rights reserved.
-                                      *
-                                      * This source code is licensed under the BSD-style license found in the
-                                      * LICENSE file in the root directory of this source tree. An additional grant
-                                      * of patent rights can be found in the PATENTS file in the same directory.
-                                      *
-                                      * 
-                                      * @format
-                                      */
+  }}exports.BigDigClient = BigDigClient; /**
+                                          * Copyright (c) 2017-present, Facebook, Inc.
+                                          * All rights reserved.
+                                          *
+                                          * This source code is licensed under the BSD-style license found in the
+                                          * LICENSE file in the root directory of this source tree. An additional grant
+                                          * of patent rights can be found in the PATENTS file in the same directory.
+                                          *
+                                          * 
+                                          * @format
+                                          */

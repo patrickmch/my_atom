@@ -1,13 +1,48 @@
-'use strict';
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-exports.convertBuckClangCompilationDatabase = convertBuckClangCompilationDatabase;
+'use strict';Object.defineProperty(exports, "__esModule", { value: true });exports.
 
 
-// Remove the warnings field from the buck value.
-function convertBuckClangCompilationDatabase(buckDb) {
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+convertBuckClangCompilationDatabase = convertBuckClangCompilationDatabase; // Remove the warnings field from the buck value.
+function convertBuckClangCompilationDatabase(buckDb)
+{
   if (buckDb != null) {
     const { file, flagsFile, libclangPath } = buckDb;
     return { file, flagsFile, libclangPath };

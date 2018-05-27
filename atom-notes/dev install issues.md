@@ -1,0 +1,10 @@
+- couldn’t get 235 to get a zero exit code
+  - After re-installing without the extra arguments I got this to pass. I'm not sure what else might be failing now though.
+- venvs is not a directory need to use virtualenvs
+- line 296: no alias for djrs has been set up yet
+- cannot get get tests to run (more generally cannot get nexus to run)
+  - I haven't tried this again since successfully running Nexus.
+  - I should have gone 
+- brew tap homebrew/versions was deprecated
+- can’t install redirects line 434 as var directory doesn’t exist
+- can’t use elastic search (445)

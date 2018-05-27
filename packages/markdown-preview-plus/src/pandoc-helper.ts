@@ -2,8 +2,7 @@ import _ = require('lodash')
 import CP = require('child_process')
 import fs = require('fs')
 import path = require('path')
-
-const atomConfig = () => atom.config.get('markdown-preview-plus')!
+import { atomConfig } from './util'
 
 /**
  * Sets local mathjaxPath if available
@@ -15,17 +14,14 @@ const getMathJaxPath = (function() {
       return cached
     }
     try {
-      return (cached = require.resolve('MathJax'))
+      return (cached = require.resolve('mathjax'))
     } catch (e) {
       return ''
     }
   }
 })()
 
-export function findFileRecursive(
-  filePath: string,
-  fileName: string,
-): string | false {
+function findFileRecursive(filePath: string, fileName: string): string | false {
   const bibFile = path.join(filePath, '../', fileName)
   if (fs.existsSync(bibFile)) {
     return bibFile
@@ -39,6 +35,7 @@ export function findFileRecursive(
   }
 }
 
+// exported for tests
 export interface Args {
   from: string
   to: 'html'
@@ -48,34 +45,30 @@ export interface Args {
   csl?: string
 }
 
-export function setPandocOptions(
-  filePath: string | undefined,
-  renderMath: boolean,
-) {
+function setPandocOptions(filePath: string | undefined, renderMath: boolean) {
   // see https://github.com/atom-community/markdown-preview-plus/issues/316
   const opts: CP.ExecFileOptions = { maxBuffer: Infinity }
   if (filePath !== undefined) {
     opts.cwd = path.dirname(filePath)
   }
   const mathjaxPath = getMathJaxPath()
+  const config = atomConfig().pandocConfig
   const args: Args = {
-    from: atomConfig().pandocMarkdownFlavor,
+    from: config.pandocMarkdownFlavor,
     to: 'html',
     mathjax: renderMath ? mathjaxPath : undefined,
-    filter: atomConfig().pandocFilters,
+    filter: config.pandocFilters,
   }
-  if (atomConfig().pandocBibliography) {
+  if (config.pandocBibliography) {
     args.filter.push('pandoc-citeproc')
-    let bibFile =
-      filePath && findFileRecursive(filePath, atomConfig().pandocBIBFile)
+    let bibFile = filePath && findFileRecursive(filePath, config.pandocBIBFile)
     if (!bibFile) {
-      bibFile = atomConfig().pandocBIBFileFallback
+      bibFile = config.pandocBIBFileFallback
     }
     args.bibliography = bibFile ? bibFile : undefined
-    let cslFile =
-      filePath && findFileRecursive(filePath, atomConfig().pandocCSLFile)
+    let cslFile = filePath && findFileRecursive(filePath, config.pandocCSLFile)
     if (!cslFile) {
-      cslFile = atomConfig().pandocCSLFileFallback
+      cslFile = config.pandocCSLFileFallback
     }
     args.csl = cslFile ? cslFile : undefined
   }
@@ -88,9 +81,10 @@ export function setPandocOptions(
  * @param {string} Returned HTML
  * @return {array} with Arguments for callbackFunction (error set to null)
  */
-function handleError(error: string, html: string, renderMath: boolean) {
-  html = `<h1>Pandoc Error:</h1><pre>${error}</pre><hr>${html}`
-  return handleSuccess(html, renderMath)
+function handleError(error: string, html: string, renderMath: boolean): never {
+  const err = new Error(error) as Error & { html: string }
+  err.html = handleSuccess(html, renderMath)
+  throw err
 }
 
 /**
@@ -98,7 +92,7 @@ function handleError(error: string, html: string, renderMath: boolean) {
  * @param {string} HTML to be adjusted
  * @return {string} HTML with adjusted math environments
  */
-function handleMath(html: string) {
+function handleMath(html: string): string {
   const doc = document.createElement('div')
   doc.innerHTML = html
   doc.querySelectorAll('.math').forEach(function(elem) {
@@ -128,14 +122,14 @@ function removeReferences(html: string) {
 
 /**
  * Handle successful response from Pandoc
- * @param {string} Returned HTML
- * @return {array} with Arguments for callbackFunction (error set to null)
+ * @param Returned HTML
+ * @return Possibly modified returned HTML
  */
-function handleSuccess(html: string, renderMath: boolean) {
+function handleSuccess(html: string, renderMath: boolean): string {
   if (renderMath) {
     html = handleMath(html)
   }
-  if (atomConfig().pandocRemoveReferences) {
+  if (atomConfig().pandocConfig.pandocRemoveReferences) {
     html = removeReferences(html)
   }
   return html
@@ -160,16 +154,15 @@ function handleResponse(error: string, html: string, renderMath: boolean) {
  * @param {boolean} whether to render the math with mathjax
  * @param {function} callbackFunction
  */
-export async function renderPandoc<T>(
+export async function renderPandoc(
   text: string,
   filePath: string | undefined,
   renderMath: boolean,
-  cb: (err: Error | null, result: string) => T,
-): Promise<T> {
+): Promise<string> {
   const { args, opts } = setPandocOptions(filePath, renderMath)
-  return new Promise<T>((resolve, reject) => {
+  return new Promise<string>((resolve, reject) => {
     const cp = CP.execFile(
-      atomConfig().pandocPath,
+      atomConfig().pandocConfig.pandocPath,
       getArguments(args),
       opts,
       function(error, stdout, stderr) {
@@ -180,8 +173,12 @@ export async function renderPandoc<T>(
           })
           reject(error)
         }
-        const result = handleResponse(stderr || '', stdout || '', renderMath)
-        resolve(cb(null, result))
+        try {
+          const result = handleResponse(stderr || '', stdout || '', renderMath)
+          resolve(result)
+        } catch (e) {
+          reject(e)
+        }
       },
     )
     cp.stdin.write(text)
@@ -189,7 +186,7 @@ export async function renderPandoc<T>(
   })
 }
 
-export function getArguments(iargs: Args) {
+function getArguments(iargs: Args) {
   const args = _.reduce(
     iargs,
     function(res: string[], val, key) {
@@ -206,14 +203,17 @@ export function getArguments(iargs: Args) {
     [],
   )
   const res: string[] = []
-  for (const val of [
-    ...args,
-    ...atom.config.get('markdown-preview-plus.pandocArguments')!,
-  ]) {
+  for (const val of [...args, ...atomConfig().pandocConfig.pandocArguments]) {
     const newval = val.replace(/^(--[\w\-]+)\s(.+)$/i, '$1=$2')
     if (newval.substr(0, 1) === '-') {
       res.push(newval)
     }
   }
   return res
+}
+
+export const testing = {
+  setPandocOptions,
+  getArguments,
+  findFileRecursive,
 }

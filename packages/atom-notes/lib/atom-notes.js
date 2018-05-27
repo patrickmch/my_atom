@@ -18,6 +18,7 @@ export default {
    * @param {SerializedIndex} state A previously serialized document storage index to load.
    */
   activate (state) {
+    console.info('Activating atom-notes')
     this.store = null
     this.ready = undefined
     this.doSerialize = true
@@ -26,6 +27,27 @@ export default {
       makeReady(this, state)
     } else {
       makeReady(this)
+    }
+  },
+
+  /**
+  * Handle URI calls to `atom://atom-notes`. See:
+  * <https://flight-manual.atom.io/hacking-atom/sections/handling-uris/>
+  *
+  * Specifically `atom://atom-notes/toggle` will toggle the atom-notes view in
+  * the front-most, most recently active or a new, Atom window; will start
+  * atom if necessary.
+  *
+  * @param {urlObject} parsedUri URI parsed with Node's url.parse(uri, true)
+  */
+  handleURI (parsedUri) {
+    if (parsedUri.pathname === '/toggle') {
+      this.getNotesView().toggle()
+    } if (parsedUri.pathname === '/toggle/preview') {
+      this.getNotesView().toggle({preview: true})
+    } else {
+      atom.notifications.addError(
+        'Only the URI `atom://atom-notes/toggle` is currently supported')
     }
   },
 
@@ -43,7 +65,7 @@ export default {
       try {
         data = JSON.stringify(this.store.index)
       } catch (e) {
-        console.error('atom-notes: serilization failutre', e)
+        console.error('atom-notes: serialization failure', e)
       }
       const maxSerializedDataLength = 133169152
       if (data && data.length < maxSerializedDataLength) {
@@ -144,6 +166,7 @@ function makeReady (self, state = null) {
         const td = Math.round(performance.now() - t0)
         console.log(`atom-notes: ready in ${td}ms`)
       })
+      store.initialize()
       resolve(store)
     })
     self.storePromise.then(store => (self.store = store))
@@ -163,8 +186,15 @@ function handleEvents (self) {
 
   // user commands
   self.subs.add(
-    atom.commands.add('atom-workspace', 'atom-notes:toggle', () => self.getNotesView().toggle()),
-    atom.commands.add('atom-workspace', 'atom-notes:interlink', () => openInterlink())
+    atom.commands.add('atom-workspace', 'atom-notes:toggle', () => {
+      self.getNotesView().toggle()
+    }),
+    atom.commands.add('atom-workspace', 'atom-notes:toggle-preview', () => {
+      self.getNotesView().toggle({preview: true})
+    }),
+    atom.commands.add('atom-workspace', 'atom-notes:interlink', () => {
+      openInterlink()
+    })
   )
 
   // window::beforeunload
@@ -174,7 +204,7 @@ function handleEvents (self) {
   }))
 
   // window::blur
-  let handleBlur = (event) => {
+  let handleBlur = event => {
     if (event.target === window) {
       autosaveAll()
     } else if (
@@ -191,9 +221,12 @@ function handleEvents (self) {
 
   // atom events
   self.subs.add(
-    atom.workspace.onWillDestroyPaneItem((paneItem) => {
-      if (!autodelete(paneItem.item)) autosave(paneItem.item)
-      // TODO: Invalidate the select list search results?
+    atom.workspace.onWillDestroyPaneItem(paneItem => {
+      autodelete(paneItem.item).then(deleted => {
+        if (!deleted) {
+          autosave(paneItem.item)
+        }
+      })
     })
   )
 }
@@ -251,7 +284,7 @@ async function autodelete (paneItem) {
     dismissable: true
   })
 
-  return new Promise((resolve) => {
+  return new Promise(resolve => {
     setTimeout(() => {
       try {
         fs.unlinkSync(filePath)

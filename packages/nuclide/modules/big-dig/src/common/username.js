@@ -1,19 +1,23 @@
-'use strict';
+'use strict';Object.defineProperty(exports, "__esModule", { value: true });exports.
 
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-exports.getUsername = getUsername;
-function getUsername() {
+
+
+
+
+
+
+
+
+
+
+
+
+getUsername = getUsername;function getUsername() {
   // It is slightly more robust to get the uid and look it up in /etc/whateveritis.
   const { env } = process;
   // flowlint-next-line sketchy-null-string:off
-  const username = env.LOGNAME || env.USER || env.LNAME || env.USERNAME;
-
-  if (!(username != null)) {
-    throw new Error('Invariant violation: "username != null"');
-  }
-
+  const username = env.LOGNAME || env.USER || env.LNAME || env.USERNAME;if (!(
+  username != null)) {throw new Error('Invariant violation: "username != null"');}
   return username;
 } /**
    * Copyright (c) 2017-present, Facebook, Inc.
@@ -23,6 +27,6 @@ function getUsername() {
    * LICENSE file in the root directory of this source tree. An additional grant
    * of patent rights can be found in the PATENTS file in the same directory.
    *
-   * 
+   *  strict
    * @format
    */

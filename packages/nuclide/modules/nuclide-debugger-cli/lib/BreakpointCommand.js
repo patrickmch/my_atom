@@ -1,56 +1,72 @@
-'use strict';
+'use strict';Object.defineProperty(exports, "__esModule", { value: true });var _asyncToGenerator = _interopRequireDefault(require('async-to-generator'));var _BreakpointDeleteCommand;
 
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
 
-var _asyncToGenerator = _interopRequireDefault(require('async-to-generator'));
 
-var _BreakpointDeleteCommand;
 
-function _load_BreakpointDeleteCommand() {
-  return _BreakpointDeleteCommand = _interopRequireDefault(require('./BreakpointDeleteCommand'));
-}
 
-var _BreakpointDisableCommand;
 
-function _load_BreakpointDisableCommand() {
-  return _BreakpointDisableCommand = _interopRequireDefault(require('./BreakpointDisableCommand'));
-}
 
-var _BreakpointEnableCommand;
 
-function _load_BreakpointEnableCommand() {
-  return _BreakpointEnableCommand = _interopRequireDefault(require('./BreakpointEnableCommand'));
-}
 
-var _BreakpointListCommand;
 
-function _load_BreakpointListCommand() {
-  return _BreakpointListCommand = _interopRequireDefault(require('./BreakpointListCommand'));
-}
 
-var _CommandDispatcher;
 
-function _load_CommandDispatcher() {
-  return _CommandDispatcher = _interopRequireDefault(require('./CommandDispatcher'));
-}
 
-var _HelpCommand;
 
-function _load_HelpCommand() {
-  return _HelpCommand = _interopRequireDefault(require('./HelpCommand'));
-}
 
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+function _load_BreakpointDeleteCommand() {return _BreakpointDeleteCommand = _interopRequireDefault(require('./BreakpointDeleteCommand'));}var _BreakpointDisableCommand;
+function _load_BreakpointDisableCommand() {return _BreakpointDisableCommand = _interopRequireDefault(require('./BreakpointDisableCommand'));}var _BreakpointEnableCommand;
+function _load_BreakpointEnableCommand() {return _BreakpointEnableCommand = _interopRequireDefault(require('./BreakpointEnableCommand'));}var _BreakpointListCommand;
+function _load_BreakpointListCommand() {return _BreakpointListCommand = _interopRequireDefault(require('./BreakpointListCommand'));}var _CommandDispatcher;
+function _load_CommandDispatcher() {return _CommandDispatcher = _interopRequireDefault(require('./CommandDispatcher'));}var _HelpCommand;
+function _load_HelpCommand() {return _HelpCommand = _interopRequireDefault(require('./HelpCommand'));}function _interopRequireDefault(obj) {return obj && obj.__esModule ? obj : { default: obj };}
 
 class BreakpointCommand {
 
-  constructor(con, debug) {
-    this.name = 'breakpoint';
-    this.helpText = 'Sets a breakpoint on the target.';
-    this.detailedHelpText = `
-breakpoint [subcommand | [source-file:]line]
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  constructor(con, debug) {this.name = 'breakpoint';this.helpText = 'Sets a breakpoint on the target.';this.detailedHelpText = `
+breakpoint [subcommand | [source-file:]line] | function-name()
 
 Sets a breakpoint, or operates on existing breakpoints.
 
@@ -80,57 +96,25 @@ The breakpoint command has several subcommands:
 * 'enable' will re-enable an existing breakpoint
 * 'help' will give detailed information about the subcommands
 * 'list' will list all existing breakpoints
-  `;
-
-    this._console = con;
-    this._debugger = debug;
-    this._dispatcher = new (_CommandDispatcher || _load_CommandDispatcher()).default();
-
-    this._dispatcher.registerCommand(new (_BreakpointDeleteCommand || _load_BreakpointDeleteCommand()).default(debug));
-    this._dispatcher.registerCommand(new (_BreakpointDisableCommand || _load_BreakpointDisableCommand()).default(debug));
-    this._dispatcher.registerCommand(new (_BreakpointEnableCommand || _load_BreakpointEnableCommand()).default(debug));
-    this._dispatcher.registerCommand(new (_BreakpointListCommand || _load_BreakpointListCommand()).default(con, debug));
-    this._dispatcher.registerCommand(new (_HelpCommand || _load_HelpCommand()).default(con, this._dispatcher));
-  }
-
-  // $TODO this will need more thorough help which will require extending the
+  `;this._console = con;this._debugger = debug;this._dispatcher = new (_CommandDispatcher || _load_CommandDispatcher()).default(new Map());this._dispatcher.registerCommand(new (_BreakpointDeleteCommand || _load_BreakpointDeleteCommand()).default(debug));this._dispatcher.registerCommand(new (_BreakpointDisableCommand || _load_BreakpointDisableCommand()).default(debug));this._dispatcher.registerCommand(new (_BreakpointEnableCommand || _load_BreakpointEnableCommand()).default(debug));this._dispatcher.registerCommand(new (_BreakpointListCommand || _load_BreakpointListCommand()).default(con, debug));this._dispatcher.registerCommand(new (_HelpCommand || _load_HelpCommand()).default(con, this._dispatcher));} // $TODO this will need more thorough help which will require extending the
   // help system to support subcommands
-
-
-  execute(args) {
-    var _this = this;
-
-    return (0, _asyncToGenerator.default)(function* () {
-      let result;
-
-      const breakpointSpec = args[0];
-      if (breakpointSpec == null) {
-        result = yield _this._setBreakpointHere();
-      } else {
-        const linePattern = /^(\d+)$/;
-        const lineMatch = breakpointSpec.match(linePattern);
-        if (lineMatch != null) {
-          result = yield _this._setBreakpointHere(parseInt(lineMatch[1], 10));
-        } else {
-          const sourceBreakPattern = /^(.+):(\d+)$/;
-          const sourceMatch = breakpointSpec.match(sourceBreakPattern);
-          if (sourceMatch != null) {
-            const [, path, line] = sourceMatch;
-            result = yield _this._debugger.setSourceBreakpoint(path, parseInt(line, 10));
-          }
-        }
+  execute(args) {var _this = this;return (0, _asyncToGenerator.default)(function* () {const result = yield _this._trySettingBreakpoint(args);if (result != null) {_this._displayBreakpointResult(result);return;}yield _this._dispatcher.executeTokenizedLine(args);})();}_trySettingBreakpoint(args) {var _this2 = this;return (0, _asyncToGenerator.default)(function* () {const breakpointSpec = args[0];if (breakpointSpec == null) {return _this2._setBreakpointHere();}const linePattern = /^(\d+)$/;const lineMatch = breakpointSpec.match(linePattern);if (lineMatch != null) {return _this2._setBreakpointHere(parseInt(lineMatch[1], 10));
       }
 
-      if (result != null) {
-        _this._displayBreakpointResult(result);
-        return;
+      const sourceBreakPattern = /^(.+):(\d+)$/;
+      const sourceMatch = breakpointSpec.match(sourceBreakPattern);
+      if (sourceMatch != null) {
+        const [, path, line] = sourceMatch;
+        return _this2._debugger.setSourceBreakpoint(path, parseInt(line, 10));
       }
 
-      // $TODO function breakpoints - not implementing yet because none of the
-      // supported adapters support them
+      const functionBreakpointPattern = /^(.+)\(\)/;
+      const functionMatch = breakpointSpec.match(functionBreakpointPattern);
+      if (functionMatch != null) {
+        return _this2._debugger.setFunctionBreakpoint(functionMatch[1]);
+      }
 
-      yield _this._dispatcher.executeTokenizedLine(args);
-    })();
+      return null;})();
   }
 
   _displayBreakpointResult(result) {
@@ -140,32 +124,31 @@ The breakpoint command has several subcommands:
     }
   }
 
-  _setBreakpointHere(line) {
-    var _this2 = this;
-
-    return (0, _asyncToGenerator.default)(function* () {
-      const frame = yield _this2._debugger.getCurrentStackFrame();
+  _setBreakpointHere(line) {var _this3 = this;return (0, _asyncToGenerator.default)(function* () {
+      const frame = yield _this3._debugger.getCurrentStackFrame();
       if (frame == null) {
         throw new Error('Cannot set breakpoint here, no current stack frame.');
       }
 
       if (frame.source == null || frame.source.path == null) {
-        throw new Error('Cannot set breakpoint here, current stack frame has no source.');
+        throw new Error(
+        'Cannot set breakpoint here, current stack frame has no source.');
+
       }
 
-      const result = yield _this2._debugger.setSourceBreakpoint(frame.source.path, line == null ? frame.line : line);
-      return result;
-    })();
-  }
-}
-exports.default = BreakpointCommand; /**
-                                      * Copyright (c) 2017-present, Facebook, Inc.
-                                      * All rights reserved.
-                                      *
-                                      * This source code is licensed under the BSD-style license found in the
-                                      * LICENSE file in the root directory of this source tree. An additional grant
-                                      * of patent rights can be found in the PATENTS file in the same directory.
-                                      *
-                                      * 
-                                      * @format
-                                      */
+      const result = yield _this3._debugger.setSourceBreakpoint(
+      frame.source.path,
+      line == null ? frame.line : line);
+
+      return result;})();
+  }}exports.default = BreakpointCommand; /**
+                                          * Copyright (c) 2017-present, Facebook, Inc.
+                                          * All rights reserved.
+                                          *
+                                          * This source code is licensed under the BSD-style license found in the
+                                          * LICENSE file in the root directory of this source tree. An additional grant
+                                          * of patent rights can be found in the PATENTS file in the same directory.
+                                          *
+                                          *  strict-local
+                                          * @format
+                                          */

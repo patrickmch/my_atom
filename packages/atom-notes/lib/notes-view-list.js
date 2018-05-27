@@ -2,6 +2,7 @@
 
 import * as fp from 'fuzzaldrin-plus'
 import * as TimSort from 'timsort'
+import path from 'path'
 
 import * as NotesFs from './notes-fs'
 import SelectListView from './select-list-view'
@@ -24,7 +25,14 @@ let autocompleteTimeout
   * @typedef Options
   * @type {Object}
   * @property {function()} [didHide] - Callback to call whenever this view is hidden.
+  * @property {Boolean} [preview] - Set to true if document should open in markdown preview
   */
+
+function getMarkdownPreviewUriPrefix () {
+  if (atom.packages.getActivePackage('markdown-preview-plus')) return 'markdown-preview-plus://file'
+  if (atom.packages.getActivePackage('markdown-preview')) return 'markdown-preview://'
+  return null
+}
 
 export default class NotesViewList {
   /** Builds a new notes query and list interface element.
@@ -59,11 +67,11 @@ export default class NotesViewList {
       loadingMessage: 'Loading notes...',
       emptyMessage: 'No matching notes',
       initialSelectionIndex: undefined,
-      elementForItem: (item) => this.elementForItem(item),
+      elementForItem: item => this.elementForItem(item),
       filter: (items, query) => this.filter(items, query),
-      filterQuery: (query) => this.filterQuery(query),
-      didChangeQuery: (query) => this.didChangeQuery(query),
-      didConfirmSelection: (item) => this.didConfirmSelection(item),
+      filterQuery: query => this.filterQuery(query),
+      didChangeQuery: query => this.didChangeQuery(query),
+      didConfirmSelection: item => this.didConfirmSelection(item),
       didConfirmEmptySelection: () => this.didConfirmEmptySelection(),
       didCancelSelection: () => this.didCancelSelection()
     })
@@ -158,7 +166,7 @@ export default class NotesViewList {
                         best.title.toLowerCase().startsWith(q.toLowerCase()))
       if (complete) {
         let newQuery = q + best.title.slice(q.length)
-        this.selectListView.setQuery(newQuery, {doDidChangeQuery: false})
+        this.selectListView.update({query: newQuery, doDidChangeQuery: false})
         this.selectListView.refs.queryEditor.selectLeft(newQuery.length - q.length)
         this.lastAutocompleteQuery = q
       } else {
@@ -232,7 +240,14 @@ export default class NotesViewList {
    */
   didConfirmSelection (item) {
     this.didHide()
-    atom.workspace.open(item.filePath)
+    const markdownPreviewUriPrefix = getMarkdownPreviewUriPrefix()
+    const ext = path.extname(item.filePath)
+    const isMarkdown = ['.markdown', '.md'].includes(ext)
+    if (this.openInPreview && isMarkdown && markdownPreviewUriPrefix) {
+      atom.workspace.open(`${markdownPreviewUriPrefix}${encodeURI(item.filePath)}`)
+    } else {
+      atom.workspace.open(item.filePath)
+    }
   }
 
   /**
@@ -272,7 +287,7 @@ export default class NotesViewList {
     if (selectedText !== '') {
       let query = this.selectListView.getQuery()
       query = query.slice(0, query.length - selectedText.length)
-      this.selectListView.setQuery(query, {doDidChangeQuery: false})
+      this.selectListView.update({query, doDidChangeQuery: false})
       return
     }
 

@@ -1,94 +1,90 @@
-'use strict';
+'use strict';Object.defineProperty(exports, "__esModule", { value: true });exports.
 
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-exports.getNPMHyperclickProvider = getNPMHyperclickProvider;
-exports.getPackageUrlForRange = getPackageUrlForRange;
 
-var _semver;
 
-function _load_semver() {
-  return _semver = _interopRequireDefault(require('semver'));
-}
 
-var _nuclideUri;
 
-function _load_nuclideUri() {
-  return _nuclideUri = _interopRequireDefault(require('nuclide-commons/nuclideUri'));
-}
 
-var _electron = require('electron');
 
-var _parsing;
 
-function _load_parsing() {
-  return _parsing = require('./parsing');
-}
 
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-const DEPENDENCY_PROPERTIES = new Set(['dependencies', 'devDependencies', 'optionalDependencies']); /**
-                                                                                                     * Copyright (c) 2015-present, Facebook, Inc.
-                                                                                                     * All rights reserved.
-                                                                                                     *
-                                                                                                     * This source code is licensed under the license found in the LICENSE file in
-                                                                                                     * the root directory of this source tree.
-                                                                                                     *
-                                                                                                     * 
-                                                                                                     * @format
-                                                                                                     */
 
-function getNPMHyperclickProvider() {
-  return npmHyperclickProvider;
-}
 
-const npmHyperclickProvider = {
-  priority: 1,
-  providerName: 'npm-package-json',
-  getSuggestionForWord,
-  // Capture just text in quotes
-  wordRegExp: /"[^"]*"/g
-};
 
-function getSuggestionForWord(textEditor, text, range) {
-  if (text === '' || !isPackageJson(textEditor)) {
-    return Promise.resolve(null);
-  }
 
-  const packageUrl = getPackageUrlForRange(textEditor.getText(), text, range);
 
-  if (packageUrl == null) {
-    return Promise.resolve(null);
-  }
 
-  const suggestion = {
-    range,
-    callback: () => {
-      _electron.shell.openExternal(packageUrl);
-    }
-  };
-  return Promise.resolve(suggestion);
-}
 
-// Exported for testing. We could derive the token from the json text and the range, but since
+
+
+
+
+
+
+
+getNPMHyperclickProvider = getNPMHyperclickProvider;exports.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+getPackageUrlForRange = getPackageUrlForRange;var _semver;function _load_semver() {return _semver = _interopRequireDefault(require('semver'));}var _nuclideUri;function _load_nuclideUri() {return _nuclideUri = _interopRequireDefault(require('../../../modules/nuclide-commons/nuclideUri'));}var _electron = require('electron');var _parsing;function _load_parsing() {return _parsing = require('./parsing');}function _interopRequireDefault(obj) {return obj && obj.__esModule ? obj : { default: obj };}const DEPENDENCY_PROPERTIES = new Set(['dependencies', 'devDependencies', 'optionalDependencies']); /**
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      * Copyright (c) 2015-present, Facebook, Inc.
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      * All rights reserved.
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      *
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      * This source code is licensed under the license found in the LICENSE file in
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      * the root directory of this source tree.
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      *
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      * 
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      * @format
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      */function getNPMHyperclickProvider() {return npmHyperclickProvider;}const npmHyperclickProvider = { priority: 1, providerName: 'npm-package-json', getSuggestionForWord, // Capture just text in quotes
+  wordRegExp: /"[^"]*"/g };function getSuggestionForWord(textEditor, text, range) {if (text === '' || !isPackageJson(textEditor)) {return Promise.resolve(null);}const packageUrl = getPackageUrlForRange(textEditor.getText(), text, range);if (packageUrl == null) {return Promise.resolve(null);}const suggestion = { range, callback: () => {_electron.shell.openExternal(packageUrl);} };return Promise.resolve(suggestion);} // Exported for testing. We could derive the token from the json text and the range, but since
 // hyperclick provides it we may as well use it.
-function getPackageUrlForRange(json, token, range) {
-  const version = getDependencyVersion(json, range);
-  if (version == null) {
-    return null;
-  }
-
-  // Strip off the quotes
-  const packageName = token.substring(1, token.length - 1);
-
-  return getPackageUrl(packageName, version);
+function getPackageUrlForRange(json, token, range) {const version = getDependencyVersion(json, range);if (version == null) {return null;} // Strip off the quotes
+  const packageName = token.substring(1, token.length - 1);return getPackageUrl(packageName, version);
 }
 
 function isPackageJson(textEditor) {
   const scopeName = textEditor.getGrammar().scopeName;
   const filePath = textEditor.getPath();
-  return scopeName === 'source.json' && filePath != null && (_nuclideUri || _load_nuclideUri()).default.basename(filePath) === 'package.json';
+  return (
+    scopeName === 'source.json' &&
+    filePath != null &&
+    (_nuclideUri || _load_nuclideUri()).default.basename(filePath) === 'package.json');
+
 }
 
 function getPackageUrl(packageName, version) {
@@ -124,7 +120,12 @@ function getDependencyVersion(json, range) {
   }
   const pathToNode = getPathToNodeForRange(ast, range);
 
-  if (pathToNode != null && pathToNode.length === 2 && DEPENDENCY_PROPERTIES.has(pathToNode[0].key.value) && isValidVersion(pathToNode[1].value)) {
+  if (
+  pathToNode != null &&
+  pathToNode.length === 2 &&
+  DEPENDENCY_PROPERTIES.has(pathToNode[0].key.value) &&
+  isValidVersion(pathToNode[1].value))
+  {
     const valueNode = pathToNode[1].value;
     if (isValidVersion(valueNode)) {
       return valueNode.value;
@@ -140,7 +141,10 @@ function isValidVersion(valueASTNode) {
 }
 
 // return an array of property AST nodes
-function getPathToNodeForRange(objectExpression, range) {
+function getPathToNodeForRange(
+objectExpression,
+range)
+{
   const properties = objectExpression.properties;
   if (properties == null) {
     return null;

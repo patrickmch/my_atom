@@ -1,14 +1,18 @@
 'use strict';
 
+
+
+
+
+
+
+
+
+
 var _https = _interopRequireDefault(require('https'));
-
 var _http = _interopRequireDefault(require('http'));
-
 var _fs = _interopRequireDefault(require('fs'));
-
-var _url = _interopRequireDefault(require('url'));
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+var _url = _interopRequireDefault(require('url'));function _interopRequireDefault(obj) {return obj && obj.__esModule ? obj : { default: obj };}
 
 // Set the initial version by reading from the file.
 /**
@@ -18,16 +22,9 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
  * This source code is licensed under the license found in the LICENSE file in
  * the root directory of this source tree.
  *
- * 
+ *  strict
  * @format
- */
-
-const json = JSON.parse(_fs.default.readFileSync(require.resolve('./package.json'), 'utf8'));
-const version = /^(\d+)\.(\d+)\.(\d+)(?:-([a-z0-9.-]+))?$/.exec(json.version)[2];
-
-function processArgs() {
-  const args = process.argv.slice(2);
-  const processedArgs = {};
+ */const json = JSON.parse(_fs.default.readFileSync(require.resolve('./package.json'), 'utf8'));const version = /^(\d+)\.(\d+)\.(\d+)(?:-([a-z0-9.-]+))?$/.exec(json.version)[2];function processArgs() {const args = process.argv.slice(2);const processedArgs = {};
 
   args.forEach((argument, index) => {
     if (index % 2 !== 0) {
@@ -45,8 +42,8 @@ function startServer(args) {
       cert: _fs.default.readFileSync(args.cert),
       ca: _fs.default.readFileSync(args.ca),
       requestCert: true,
-      rejectUnauthorized: true
-    };
+      rejectUnauthorized: true };
+
 
     _webServer = _https.default.createServer(webServerOptions, handleRequest);
     // eslint-disable-next-line no-console
@@ -74,8 +71,8 @@ function handleRequest(request, response) {
       response.writeHead(500);
       response.write('This mock server does not understand that command');
       response.end();
-      break;
-  }
+      break;}
+
 }
 
 function handleVersion(request, response) {

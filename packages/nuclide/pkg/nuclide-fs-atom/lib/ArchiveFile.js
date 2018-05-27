@@ -1,33 +1,27 @@
-'use strict';
+'use strict';Object.defineProperty(exports, "__esModule", { value: true });exports.ArchiveFile = undefined;var _nuclideUri;
 
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-exports.ArchiveFile = undefined;
 
-var _nuclideUri;
 
-function _load_nuclideUri() {
-  return _nuclideUri = _interopRequireDefault(require('nuclide-commons/nuclideUri'));
-}
 
-var _UniversalDisposable;
 
-function _load_UniversalDisposable() {
-  return _UniversalDisposable = _interopRequireDefault(require('nuclide-commons/UniversalDisposable'));
-}
 
-var _common;
 
-function _load_common() {
-  return _common = require('./common');
-}
 
-var _stream = _interopRequireDefault(require('stream'));
 
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+
+
+
+
+function _load_nuclideUri() {return _nuclideUri = _interopRequireDefault(require('../../../modules/nuclide-commons/nuclideUri'));}var _UniversalDisposable;
+function _load_UniversalDisposable() {return _UniversalDisposable = _interopRequireDefault(require('../../../modules/nuclide-commons/UniversalDisposable'));}var _common;
+function _load_common() {return _common = require('./common');}
+var _stream = _interopRequireDefault(require('stream'));function _interopRequireDefault(obj) {return obj && obj.__esModule ? obj : { default: obj };}
 
 class ArchiveFile {
+
+
+
 
   constructor(path, fs) {
     this._fs = fs;
@@ -100,18 +94,25 @@ class ArchiveFile {
           started = true;
           const disposer = new (_UniversalDisposable || _load_UniversalDisposable()).default();
           const inner = createStream();
-          disposer.add(inner.subscribe(buffer => {
+          disposer.add(
+          inner.subscribe(
+          buffer => {
             stream.push(buffer);
-          }, err => {
+          },
+          err => {
             stream.emit('error', err);
             disposer.dispose();
-          }, () => {
+          },
+          () => {
             stream.push(null);
             disposer.dispose();
-          }), inner.connect());
+          }),
+
+          inner.connect());
+
         }
-      }
-    });
+      } });
+
     return stream;
   }
 
@@ -121,7 +122,9 @@ class ArchiveFile {
 
   read(flushCache) {
     const encoding = this._encoding;
-    return this._fs.readFile(this._path).then(buffer => buffer.toString(encoding));
+    return this._fs.
+    readFile(this._path).
+    then(buffer => buffer.toString(encoding));
   }
 
   write(text) {
@@ -130,15 +133,13 @@ class ArchiveFile {
 
   writeSync(text) {
     (0, (_common || _load_common()).rejectWriteSync)();
-  }
-}
-exports.ArchiveFile = ArchiveFile; /**
-                                    * Copyright (c) 2015-present, Facebook, Inc.
-                                    * All rights reserved.
-                                    *
-                                    * This source code is licensed under the license found in the LICENSE file in
-                                    * the root directory of this source tree.
-                                    *
-                                    * 
-                                    * @format
-                                    */
+  }}exports.ArchiveFile = ArchiveFile; /**
+                                        * Copyright (c) 2015-present, Facebook, Inc.
+                                        * All rights reserved.
+                                        *
+                                        * This source code is licensed under the license found in the LICENSE file in
+                                        * the root directory of this source tree.
+                                        *
+                                        * 
+                                        * @format
+                                        */

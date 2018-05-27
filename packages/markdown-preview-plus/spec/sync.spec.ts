@@ -2,12 +2,13 @@ import * as path from 'path'
 import * as temp from 'temp'
 import * as cson from 'season'
 import * as markdownIt from '../lib/markdown-it-helper'
-import mathjaxHelper = require('../lib/mathjax-helper')
 import { MarkdownPreviewView } from '../lib/markdown-preview-view'
 import * as sinon from 'sinon'
-import { waitsFor, expectPreviewInSplitPane } from './util'
+import { waitsFor, expectPreviewInSplitPane, previewFragment } from './util'
 import { expect } from 'chai'
 import { Token } from 'markdown-it'
+import * as previewUtil from '../lib/markdown-preview-view/util'
+import {} from 'electron'
 
 temp.track()
 
@@ -31,11 +32,11 @@ describe('Syncronization of source and preview', function() {
     const configDirPath = temp.mkdirSync('atom-config-dir-')
     stub = sinon.stub(atom, 'getConfigDirPath').returns(configDirPath)
 
-    mathjaxHelper.testing.resetMathJax()
-
-    atom.config.set('markdown-preview-plus.enableLatexRenderingByDefault', true)
+    atom.config.set(
+      'markdown-preview-plus.mathConfig.enableLatexRenderingByDefault',
+      true,
+    )
     const editor = await atom.workspace.open(path.join(fixturesPath, 'sync.md'))
-    const spy = sinon.spy(mathjaxHelper, 'mathProcessor')
     atom.commands.dispatch(
       atom.views.getView(editor),
       'markdown-preview-plus:toggle',
@@ -44,36 +45,22 @@ describe('Syncronization of source and preview', function() {
     preview = await expectPreviewInSplitPane()
 
     await waitsFor.msg(
-      'mathjaxHelper.mathProcessor to be called',
-      () => spy.called,
+      'MathJax to finish processing',
+      async () =>
+        (await previewFragment(preview)).querySelector(
+          '.MathJax_SVG_Display',
+        ) != null,
     )
-    spy.restore()
-
-    await waitsFor.msg(
-      'MathJax to load',
-      () => typeof MathJax !== 'undefined' && MathJax !== null,
-    )
-
-    await waitsForQueuedMathJax()
   })
 
   afterEach(async function() {
     stub.restore()
-    mathjaxHelper.testing.resetMathJax()
-
     atom.config.unset('markdown-preview-plus')
     for (const item of atom.workspace.getPaneItems()) {
-      await atom.workspace.paneForItem(item)!.destroyItem(item, true)
+      const pane = atom.workspace.paneForItem(item)
+      if (pane) await pane.destroyItem(item, true)
     }
   })
-
-  async function waitsForQueuedMathJax() {
-    let done: boolean = false
-
-    const callback = () => (done = true)
-    MathJax.Hub.Queue([callback])
-    await waitsFor.msg('queued MathJax operations to complete', () => done)
-  }
 
   function findInPreview(token: MyToken) {
     let el = preview.element.querySelector('.update-preview')
@@ -101,8 +88,10 @@ describe('Syncronization of source and preview', function() {
     })
 
     it('identifies the correct HTMLElement path', () => {
+      const elementPaths = previewUtil.buildLineMap(tokens)
       for (const sourceLine of sourceMap) {
-        const elementPath = preview.getPathToToken(tokens, sourceLine.line)
+        if (sourceLine.path.length === 0) continue
+        const elementPath = elementPaths[sourceLine.line]
         elementPath.forEach((_x, i) => {
           expect(elementPath[i].tag).to.equal(sourceLine.path[i].tag)
           expect(elementPath[i].index).to.equal(sourceLine.path[i].index)
@@ -116,10 +105,14 @@ describe('Syncronization of source and preview', function() {
         if (element == null) {
           continue
         }
-        const syncElement = preview.syncPreview(
-          atom.workspace.getActiveTextEditor()!.getText(),
-          sourceLine.line,
+        const editor = atom.workspace.getActiveTextEditor()!
+        editor.setCursorBufferPosition([sourceLine.line, 0])
+        const spy = sinon.spy<any>(preview, 'syncPreview')
+        atom.commands.dispatch(
+          atom.views.getView(editor),
+          'markdown-preview-plus:sync-preview',
         )
+        const syncElement = spy.lastCall.returnValue
         if (syncElement == null) {
           continue
         }
@@ -139,10 +132,14 @@ describe('Syncronization of source and preview', function() {
         if (!element) {
           continue
         }
-        const syncLine = preview.syncSource(
-          atom.workspace.getActiveTextEditor()!.getText(),
-          element as HTMLElement,
+        atom.commands.dispatch(
+          preview.element,
+          'markdown-preview-plus:sync-source',
         )
+        const syncLine = atom.workspace
+          .getActiveTextEditor()!
+          .getLastCursor()
+          .getBufferRow()
         if (syncLine) {
           expect(syncLine).to.equal(sourceElement.line)
         }

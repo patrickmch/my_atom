@@ -196,6 +196,28 @@ module.exports = _client => {
       });
     }
 
+    deleteProject(arg0) {
+      return Promise.all([_client.marshalArguments(Array.from(arguments), [{
+        name: "project",
+        type: {
+          kind: "named",
+          name: "CqueryProject"
+        }
+      }]), _client.marshal(this, {
+        kind: "named",
+        location: {
+          type: "source",
+          fileName: "main.js",
+          line: 52
+        },
+        name: "CqueryLanguageService"
+      })]).then(([args, id]) => _client.callRemoteMethod(id, "deleteProject", "promise", args)).then(value => {
+        return _client.unmarshal(value, {
+          kind: "void"
+        });
+      });
+    }
+
     getDiagnostics(arg0) {
       return Promise.all([_client.marshalArguments(Array.from(arguments), [{
         name: "fileVersion",
@@ -367,6 +389,27 @@ module.exports = _client => {
       });
     }
 
+    onToggleCoverage(arg0) {
+      return Promise.all([_client.marshalArguments(Array.from(arguments), [{
+        name: "set",
+        type: {
+          kind: "boolean"
+        }
+      }]), _client.marshal(this, {
+        kind: "named",
+        location: {
+          type: "source",
+          fileName: "main.js",
+          line: 52
+        },
+        name: "CqueryLanguageService"
+      })]).then(([args, id]) => _client.callRemoteMethod(id, "onToggleCoverage", "promise", args)).then(value => {
+        return _client.unmarshal(value, {
+          kind: "void"
+        });
+      });
+    }
+
     getOutline(arg0) {
       return Promise.all([_client.marshalArguments(Array.from(arguments), [{
         name: "fileVersion",
@@ -461,6 +504,38 @@ module.exports = _client => {
           type: {
             kind: "named",
             name: "TypeHint"
+          }
+        });
+      });
+    }
+
+    signatureHelp(arg0, arg1) {
+      return Promise.all([_client.marshalArguments(Array.from(arguments), [{
+        name: "fileVersion",
+        type: {
+          kind: "named",
+          name: "FileVersion"
+        }
+      }, {
+        name: "position",
+        type: {
+          kind: "named",
+          name: "atom$Point"
+        }
+      }]), _client.marshal(this, {
+        kind: "named",
+        location: {
+          type: "source",
+          fileName: "main.js",
+          line: 52
+        },
+        name: "CqueryLanguageService"
+      })]).then(([args, id]) => _client.callRemoteMethod(id, "signatureHelp", "promise", args)).then(value => {
+        return _client.unmarshal(value, {
+          kind: "nullable",
+          type: {
+            kind: "named",
+            name: "SignatureHelp"
           }
         });
       });
@@ -659,38 +734,6 @@ module.exports = _client => {
           type: {
             kind: "named",
             name: "AdditionalLogFile"
-          }
-        });
-      });
-    }
-
-    getEvaluationExpression(arg0, arg1) {
-      return Promise.all([_client.marshalArguments(Array.from(arguments), [{
-        name: "fileVersion",
-        type: {
-          kind: "named",
-          name: "FileVersion"
-        }
-      }, {
-        name: "position",
-        type: {
-          kind: "named",
-          name: "atom$Point"
-        }
-      }]), _client.marshal(this, {
-        kind: "named",
-        location: {
-          type: "source",
-          fileName: "main.js",
-          line: 52
-        },
-        name: "CqueryLanguageService"
-      })]).then(([args, id]) => _client.callRemoteMethod(id, "getEvaluationExpression", "promise", args)).then(value => {
-        return _client.unmarshal(value, {
-          kind: "nullable",
-          type: {
-            kind: "named",
-            name: "NuclideEvaluationExpression"
           }
         });
       });
@@ -1654,7 +1697,7 @@ Object.defineProperty(module.exports, "defs", {
       location: {
         type: "source",
         fileName: "LanguageService.js",
-        line: 94
+        line: 100
       },
       name: "FileDiagnosticMessage",
       definition: {
@@ -1742,7 +1785,7 @@ Object.defineProperty(module.exports, "defs", {
       location: {
         type: "source",
         fileName: "LanguageService.js",
-        line: 111
+        line: 123
       },
       name: "FileDiagnosticMap",
       definition: {
@@ -2319,6 +2362,15 @@ Object.defineProperty(module.exports, "defs", {
           },
           optional: true
         }, {
+          name: "descriptionMarkdown",
+          type: {
+            kind: "nullable",
+            type: {
+              kind: "string"
+            }
+          },
+          optional: true
+        }, {
           name: "descriptionMoreURL",
           type: {
             kind: "nullable",
@@ -2355,6 +2407,13 @@ Object.defineProperty(module.exports, "defs", {
             }
           },
           optional: true
+        }, {
+          name: "remoteUri",
+          type: {
+            kind: "named",
+            name: "NuclideUri"
+          },
+          optional: true
         }]
       }
     },
@@ -2363,7 +2422,7 @@ Object.defineProperty(module.exports, "defs", {
       location: {
         type: "source",
         fileName: "LanguageService.js",
-        line: 67
+        line: 73
       },
       name: "AutocompleteResult",
       definition: {
@@ -2392,7 +2451,7 @@ Object.defineProperty(module.exports, "defs", {
       location: {
         type: "source",
         fileName: "LanguageService.js",
-        line: 79
+        line: 85
       },
       name: "AutocompleteRequest",
       definition: {
@@ -2479,7 +2538,7 @@ Object.defineProperty(module.exports, "defs", {
       location: {
         type: "source",
         fileName: "types.js",
-        line: 36
+        line: 37
       },
       name: "DefinitionQueryResult",
       definition: {
@@ -3097,12 +3156,107 @@ Object.defineProperty(module.exports, "defs", {
         }]
       }
     },
+    SignatureParameter: {
+      kind: "alias",
+      location: {
+        type: "source",
+        fileName: "types.js",
+        line: 56
+      },
+      name: "SignatureParameter",
+      definition: {
+        kind: "object",
+        fields: [{
+          name: "label",
+          type: {
+            kind: "string"
+          },
+          optional: false
+        }, {
+          name: "documentation",
+          type: {
+            kind: "string"
+          },
+          optional: true
+        }]
+      }
+    },
+    Signature: {
+      kind: "alias",
+      location: {
+        type: "source",
+        fileName: "types.js",
+        line: 50
+      },
+      name: "Signature",
+      definition: {
+        kind: "object",
+        fields: [{
+          name: "label",
+          type: {
+            kind: "string"
+          },
+          optional: false
+        }, {
+          name: "documentation",
+          type: {
+            kind: "string"
+          },
+          optional: true
+        }, {
+          name: "parameters",
+          type: {
+            kind: "array",
+            type: {
+              kind: "named",
+              name: "SignatureParameter"
+            }
+          },
+          optional: true
+        }]
+      }
+    },
+    SignatureHelp: {
+      kind: "alias",
+      location: {
+        type: "source",
+        fileName: "types.js",
+        line: 44
+      },
+      name: "SignatureHelp",
+      definition: {
+        kind: "object",
+        fields: [{
+          name: "signatures",
+          type: {
+            kind: "array",
+            type: {
+              kind: "named",
+              name: "Signature"
+            }
+          },
+          optional: false
+        }, {
+          name: "activeSignature",
+          type: {
+            kind: "number"
+          },
+          optional: true
+        }, {
+          name: "activeParameter",
+          type: {
+            kind: "number"
+          },
+          optional: true
+        }]
+      }
+    },
     FormatOptions: {
       kind: "alias",
       location: {
         type: "source",
         fileName: "LanguageService.js",
-        line: 72
+        line: 78
       },
       name: "FormatOptions",
       definition: {
@@ -3157,32 +3311,6 @@ Object.defineProperty(module.exports, "defs", {
       name: "DeadlineRequest",
       definition: {
         kind: "number"
-      }
-    },
-    NuclideEvaluationExpression: {
-      kind: "alias",
-      location: {
-        type: "source",
-        fileName: "types.js",
-        line: 57
-      },
-      name: "NuclideEvaluationExpression",
-      definition: {
-        kind: "object",
-        fields: [{
-          name: "range",
-          type: {
-            kind: "named",
-            name: "atom$Range"
-          },
-          optional: false
-        }, {
-          name: "expression",
-          type: {
-            kind: "string"
-          },
-          optional: false
-        }]
       }
     },
     SymbolResult: {
@@ -3349,11 +3477,32 @@ Object.defineProperty(module.exports, "defs", {
             }
           }
         },
+        deleteProject: {
+          location: {
+            type: "source",
+            fileName: "main.js",
+            line: 63
+          },
+          kind: "function",
+          argumentTypes: [{
+            name: "project",
+            type: {
+              kind: "named",
+              name: "CqueryProject"
+            }
+          }],
+          returnType: {
+            kind: "promise",
+            type: {
+              kind: "void"
+            }
+          }
+        },
         getDiagnostics: {
           location: {
             type: "source",
             fileName: "main.js",
-            line: 65
+            line: 66
           },
           kind: "function",
           argumentTypes: [{
@@ -3378,7 +3527,7 @@ Object.defineProperty(module.exports, "defs", {
           location: {
             type: "source",
             fileName: "main.js",
-            line: 67
+            line: 68
           },
           kind: "function",
           argumentTypes: [],
@@ -3394,7 +3543,7 @@ Object.defineProperty(module.exports, "defs", {
           location: {
             type: "source",
             fileName: "main.js",
-            line: 69
+            line: 70
           },
           kind: "function",
           argumentTypes: [{
@@ -3431,7 +3580,7 @@ Object.defineProperty(module.exports, "defs", {
           location: {
             type: "source",
             fileName: "main.js",
-            line: 75
+            line: 76
           },
           kind: "function",
           argumentTypes: [{
@@ -3462,7 +3611,7 @@ Object.defineProperty(module.exports, "defs", {
           location: {
             type: "source",
             fileName: "main.js",
-            line: 80
+            line: 81
           },
           kind: "function",
           argumentTypes: [{
@@ -3493,7 +3642,7 @@ Object.defineProperty(module.exports, "defs", {
           location: {
             type: "source",
             fileName: "main.js",
-            line: 85
+            line: 86
           },
           kind: "function",
           argumentTypes: [{
@@ -3514,11 +3663,31 @@ Object.defineProperty(module.exports, "defs", {
             }
           }
         },
+        onToggleCoverage: {
+          location: {
+            type: "source",
+            fileName: "main.js",
+            line: 88
+          },
+          kind: "function",
+          argumentTypes: [{
+            name: "set",
+            type: {
+              kind: "boolean"
+            }
+          }],
+          returnType: {
+            kind: "promise",
+            type: {
+              kind: "void"
+            }
+          }
+        },
         getOutline: {
           location: {
             type: "source",
             fileName: "main.js",
-            line: 87
+            line: 90
           },
           kind: "function",
           argumentTypes: [{
@@ -3543,7 +3712,7 @@ Object.defineProperty(module.exports, "defs", {
           location: {
             type: "source",
             fileName: "main.js",
-            line: 89
+            line: 92
           },
           kind: "function",
           argumentTypes: [{
@@ -3583,7 +3752,7 @@ Object.defineProperty(module.exports, "defs", {
           location: {
             type: "source",
             fileName: "main.js",
-            line: 95
+            line: 98
           },
           kind: "function",
           argumentTypes: [{
@@ -3610,11 +3779,42 @@ Object.defineProperty(module.exports, "defs", {
             }
           }
         },
+        signatureHelp: {
+          location: {
+            type: "source",
+            fileName: "main.js",
+            line: 100
+          },
+          kind: "function",
+          argumentTypes: [{
+            name: "fileVersion",
+            type: {
+              kind: "named",
+              name: "FileVersion"
+            }
+          }, {
+            name: "position",
+            type: {
+              kind: "named",
+              name: "atom$Point"
+            }
+          }],
+          returnType: {
+            kind: "promise",
+            type: {
+              kind: "nullable",
+              type: {
+                kind: "named",
+                name: "SignatureHelp"
+              }
+            }
+          }
+        },
         highlight: {
           location: {
             type: "source",
             fileName: "main.js",
-            line: 97
+            line: 105
           },
           kind: "function",
           argumentTypes: [{
@@ -3648,7 +3848,7 @@ Object.defineProperty(module.exports, "defs", {
           location: {
             type: "source",
             fileName: "main.js",
-            line: 102
+            line: 110
           },
           kind: "function",
           argumentTypes: [{
@@ -3688,7 +3888,7 @@ Object.defineProperty(module.exports, "defs", {
           location: {
             type: "source",
             fileName: "main.js",
-            line: 108
+            line: 116
           },
           kind: "function",
           argumentTypes: [{
@@ -3737,7 +3937,7 @@ Object.defineProperty(module.exports, "defs", {
           location: {
             type: "source",
             fileName: "main.js",
-            line: 117
+            line: 125
           },
           kind: "function",
           argumentTypes: [{
@@ -3782,7 +3982,7 @@ Object.defineProperty(module.exports, "defs", {
           location: {
             type: "source",
             fileName: "main.js",
-            line: 124
+            line: 132
           },
           kind: "function",
           argumentTypes: [{
@@ -3803,42 +4003,11 @@ Object.defineProperty(module.exports, "defs", {
             }
           }
         },
-        getEvaluationExpression: {
-          location: {
-            type: "source",
-            fileName: "main.js",
-            line: 128
-          },
-          kind: "function",
-          argumentTypes: [{
-            name: "fileVersion",
-            type: {
-              kind: "named",
-              name: "FileVersion"
-            }
-          }, {
-            name: "position",
-            type: {
-              kind: "named",
-              name: "atom$Point"
-            }
-          }],
-          returnType: {
-            kind: "promise",
-            type: {
-              kind: "nullable",
-              type: {
-                kind: "named",
-                name: "NuclideEvaluationExpression"
-              }
-            }
-          }
-        },
         supportsSymbolSearch: {
           location: {
             type: "source",
             fileName: "main.js",
-            line: 133
+            line: 136
           },
           kind: "function",
           argumentTypes: [{
@@ -3862,7 +4031,7 @@ Object.defineProperty(module.exports, "defs", {
           location: {
             type: "source",
             fileName: "main.js",
-            line: 135
+            line: 138
           },
           kind: "function",
           argumentTypes: [{
@@ -3898,7 +4067,7 @@ Object.defineProperty(module.exports, "defs", {
           location: {
             type: "source",
             fileName: "main.js",
-            line: 140
+            line: 143
           },
           kind: "function",
           argumentTypes: [{
@@ -3923,7 +4092,7 @@ Object.defineProperty(module.exports, "defs", {
           location: {
             type: "source",
             fileName: "main.js",
-            line: 142
+            line: 145
           },
           kind: "function",
           argumentTypes: [{
@@ -3944,7 +4113,7 @@ Object.defineProperty(module.exports, "defs", {
           location: {
             type: "source",
             fileName: "main.js",
-            line: 144
+            line: 147
           },
           kind: "function",
           argumentTypes: [{
@@ -3975,7 +4144,7 @@ Object.defineProperty(module.exports, "defs", {
           location: {
             type: "source",
             fileName: "main.js",
-            line: 149
+            line: 152
           },
           kind: "function",
           argumentTypes: [{
@@ -4012,7 +4181,7 @@ Object.defineProperty(module.exports, "defs", {
           location: {
             type: "source",
             fileName: "main.js",
-            line: 155
+            line: 158
           },
           kind: "function",
           argumentTypes: [],
@@ -4028,13 +4197,13 @@ Object.defineProperty(module.exports, "defs", {
       location: {
         type: "source",
         fileName: "main.js",
-        line: 158
+        line: 161
       },
       type: {
         location: {
           type: "source",
           fileName: "main.js",
-          line: 158
+          line: 161
         },
         kind: "function",
         argumentTypes: [{
@@ -4408,13 +4577,13 @@ Object.defineProperty(module.exports, "defs", {
       location: {
         type: "source",
         fileName: "main.js",
-        line: 190
+        line: 192
       },
       type: {
         location: {
           type: "source",
           fileName: "main.js",
-          line: 190
+          line: 192
         },
         kind: "function",
         argumentTypes: [{

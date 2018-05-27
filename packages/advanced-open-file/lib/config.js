@@ -45,5 +45,14 @@ export let config = {
                       details.`,
         type: 'boolean',
         default: false,
+    },
+    ignoredPatterns: {
+      title: 'Ignore patterns',
+      description: 'Array of glob patterns to hide matching filenames.',
+      type: 'array',
+      default: ['*.pyc', '*.pyo'],
+      items: {
+          type: 'string',
+      },
     }
 };

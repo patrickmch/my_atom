@@ -1,36 +1,39 @@
-'use strict';
+'use strict';Object.defineProperty(exports, "__esModule", { value: true });var _idx;
 
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
 
-var _idx;
 
-function _load_idx() {
-  return _idx = _interopRequireDefault(require('idx'));
-}
 
-var _collection;
 
-function _load_collection() {
-  return _collection = require('nuclide-commons/collection');
-}
 
-var _VSPOptionsData;
 
-function _load_VSPOptionsData() {
-  return _VSPOptionsData = _interopRequireDefault(require('./VSPOptionsData'));
-}
 
-var _yargs;
 
-function _load_yargs() {
-  return _yargs = _interopRequireDefault(require('yargs'));
-}
 
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-class VSPOptionsParser {
+
+
+
+
+
+
+
+
+function _load_idx() {return _idx = _interopRequireDefault(require('idx'));}var _collection;
+
+function _load_collection() {return _collection = require('../../nuclide-commons/collection');}var _VSPOptionsData;
+function _load_VSPOptionsData() {return _VSPOptionsData = _interopRequireDefault(require('./VSPOptionsData'));}var _yargs;
+function _load_yargs() {return _yargs = _interopRequireDefault(require('yargs'));}function _interopRequireDefault(obj) {return obj && obj.__esModule ? obj : { default: obj };} /**
+                                                                                                                                                                                 * Copyright (c) 2017-present, Facebook, Inc.
+                                                                                                                                                                                 * All rights reserved.
+                                                                                                                                                                                 *
+                                                                                                                                                                                 * This source code is licensed under the BSD-style license found in the
+                                                                                                                                                                                 * LICENSE file in the root directory of this source tree. An additional grant
+                                                                                                                                                                                 * of patent rights can be found in the PATENTS file in the same directory.
+                                                                                                                                                                                 *
+                                                                                                                                                                                 * 
+                                                                                                                                                                                 * @format
+                                                                                                                                                                                 */class VSPOptionsParser {
+
 
   constructor(packagePath) {
     this._optionsData = new (_VSPOptionsData || _load_VSPOptionsData()).default(packagePath);
@@ -40,12 +43,22 @@ class VSPOptionsParser {
     return this._optionsData;
   }
 
-  showCommandLineHelp(type, action, exclude, customArguments) {
+  showCommandLineHelp(
+  type,
+  action,
+  exclude,
+  customArguments)
+  {
     const custom = customArguments == null ? new Map() : customArguments;
 
-    const properties = this._optionsData.adapterPropertiesForAction(type, action);
+    const properties =
 
-    const optionKeys = Array.from(properties.keys()).filter(_ => !exclude.has(_)).sort();
+
+    this._optionsData.adapterPropertiesForAction(type, action);
+
+    const optionKeys = Array.from(properties.keys()).
+    filter(_ => !exclude.has(_)).
+    sort();
 
     for (const optionKey of optionKeys) {
       const property = properties.get(optionKey);
@@ -55,7 +68,11 @@ class VSPOptionsParser {
     }
   }
 
-  _printHelpFor(optionKey, property, customArguments) {
+  _printHelpFor(
+  optionKey,
+  property,
+  customArguments)
+  {
     const description = property.description;
     if (description != null && description !== '') {
       let spec = '';
@@ -67,9 +84,7 @@ class VSPOptionsParser {
         spec = validValues.map(_ => `'${_.toString()}'`).join('|');
       } else if (custom != null) {
         spec = custom.typeDescription;
-      } else if (type != null) {
-        var _ref, _ref2;
-
+      } else if (type != null) {var _ref, _ref2;
         if (!Array.isArray(type)) {
           type = [type];
         }
@@ -110,27 +125,47 @@ class VSPOptionsParser {
         return 'json';
       case 'array':
         const innerType = itemType == null ? 'arg' : itemType;
-        return `${innerType} ${innerType} ...`;
-    }
+        return `${innerType} ${innerType} ...`;}
+
 
     return type;
   }
 
-  parseCommandLine(type, action, exclude, includeDefaults, customArguments) {
-    const propertyMap = this._optionsData.adapterPropertiesForAction(type, action);
+  parseCommandLine(
+  type,
+  action,
+  exclude,
+  includeDefaults,
+  customArguments)
+  {
+    const propertyMap = this._optionsData.adapterPropertiesForAction(
+    type,
+    action);
 
-    let args = (0, (_collection || _load_collection()).mapFilter)(propertyMap, (name, prop) => prop.default != null && name in includeDefaults);
+
+    let args = (0, (_collection || _load_collection()).mapFilter)(
+    propertyMap,
+    (name, prop) => prop.default != null && name in includeDefaults);
+
     args = (0, (_collection || _load_collection()).mapTransform)(args, (prop, name) => [name, prop.default]);
 
     const parser = this._yargsFromPropertyMap(propertyMap, customArguments);
 
-    this._applyCommandLineToArgs(args, parser.argv, propertyMap, customArguments);
+    this._applyCommandLineToArgs(
+    args,
+    parser.argv,
+    propertyMap,
+    customArguments);
+
 
     return args;
   }
 
   // $TODO better flow typing for yargs
-  _yargsFromPropertyMap(propertyMap, customArguments) {
+  _yargsFromPropertyMap(
+  propertyMap,
+  customArguments)
+  {
     let parser = (_yargs || _load_yargs()).default;
 
     for (const [name, prop] of propertyMap) {
@@ -172,7 +207,12 @@ class VSPOptionsParser {
     return parser;
   }
 
-  _applyCommandLineToArgs(args, commandLine, propertyMap, customArguments) {
+  _applyCommandLineToArgs(
+  args,
+  commandLine,
+  propertyMap,
+  customArguments)
+  {
     for (const [name, prop] of propertyMap) {
       const value = commandLine[name];
       if (value == null) {
@@ -193,11 +233,8 @@ class VSPOptionsParser {
         continue;
       }
 
-      const type = prop.type;
-
-      if (!(type != null)) {
-        throw new Error('Invariant violation: "type != null"');
-      }
+      const type = prop.type;if (!(
+      type != null)) {throw new Error('Invariant violation: "type != null"');}
 
       switch (type) {
         case 'number':
@@ -224,19 +261,7 @@ class VSPOptionsParser {
           break;
 
         default:
-          args.set(name, value);
-      }
+          args.set(name, value);}
+
     }
-  }
-}
-exports.default = VSPOptionsParser; /**
-                                     * Copyright (c) 2017-present, Facebook, Inc.
-                                     * All rights reserved.
-                                     *
-                                     * This source code is licensed under the BSD-style license found in the
-                                     * LICENSE file in the root directory of this source tree. An additional grant
-                                     * of patent rights can be found in the PATENTS file in the same directory.
-                                     *
-                                     * 
-                                     * @format
-                                     */
+  }}exports.default = VSPOptionsParser;

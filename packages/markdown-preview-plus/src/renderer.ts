@@ -4,103 +4,91 @@ import pandocHelper = require('./pandoc-helper')
 import markdownIt = require('./markdown-it-helper') // Defer until used
 import { scopeForFenceName } from './extension-helper'
 import imageWatcher = require('./image-watch-helper')
-import { Grammar, TextEditorElement } from 'atom'
-import { isFileSync } from './util'
+import { Grammar, ConfigValues } from 'atom'
+import { isFileSync, atomConfig } from './util'
+import { getMedia } from './util-common'
 
 const { resourcePath } = atom.getLoadSettings()
 const packagePath = path.dirname(__dirname)
 
-export async function toDOMFragment<T>(
+export type RenderMode = 'normal' | 'copy' | 'save'
+
+export async function render(
   text: string,
-  filePath: string | undefined,
-  _grammar: any,
-  renderLaTeX: boolean,
-  callback: (error: Error | null, domFragment?: Node) => T,
-): Promise<T> {
-  return render(text, filePath, renderLaTeX, false, function(
-    error: Error | null,
-    html?: string,
-  ) {
-    if (error !== null) {
-      return callback(error)
-    }
-
-    const template = document.createElement('template')
-    template.innerHTML = html!
-    const domFragment = template.content.cloneNode(true)
-
-    return callback(null, domFragment)
-  })
-}
-
-export async function toHTML(
-  text: string | null,
   filePath: string | undefined,
   grammar: Grammar | undefined,
   renderLaTeX: boolean,
-  copyHTMLFlag: boolean,
-  callback: (error: Error | null, html: string) => void,
-): Promise<void> {
-  if (text === null) {
-    text = ''
-  }
-  return render(text, filePath, renderLaTeX, copyHTMLFlag, function(
-    error,
-    html,
-  ) {
-    let defaultCodeLanguage: string | undefined
-    if (error !== null) {
-      callback(error, '')
-    }
-    // Default code blocks to be coffee in Literate CoffeeScript files
-    if ((grammar && grammar.scopeName) === 'source.litcoffee') {
-      defaultCodeLanguage = 'coffee'
-    }
-    if (
-      !atom.config.get('markdown-preview-plus.enablePandoc') ||
-      !atom.config.get('markdown-preview-plus.useNativePandocCodeStyles')
-    ) {
-      html = tokenizeCodeBlocks(html, defaultCodeLanguage)
-    }
-    callback(null, html)
-  })
-}
-
-async function render<T>(
-  text: string,
-  filePath: string | undefined,
-  renderLaTeX: boolean,
-  copyHTMLFlag: boolean,
-  callback: (error: Error | null, html: string) => T,
-): Promise<T> {
+  mode: RenderMode,
+  savePath?: string,
+): Promise<HTMLDocument> {
   // Remove the <!doctype> since otherwise marked will escape it
   // https://github.com/chjj/marked/issues/354
   text = text.replace(/^\s*<!doctype(\s+.*)?>\s*/i, '')
 
-  const callbackFunction = async function(error: Error | null, html: string) {
-    if (error !== null) {
-      callback(error, '')
+  let html
+  let error
+  if (atomConfig().renderer === 'pandoc') {
+    try {
+      html = await pandocHelper.renderPandoc(text, filePath, renderLaTeX)
+    } catch (err) {
+      const e = err as Error & { html?: string }
+      if (e.html === undefined) throw e
+      error = e.message as string
+      html = e.html as string
     }
-    html = sanitize(html)
-    html = await resolveImagePaths(html, filePath, copyHTMLFlag)
-    return callback(null, html.trim())
-  }
-
-  if (atom.config.get('markdown-preview-plus.enablePandoc')) {
-    return pandocHelper.renderPandoc(
-      text,
-      filePath,
-      renderLaTeX,
-      callbackFunction,
-    )
   } else {
-    return callbackFunction(null, markdownIt.render(text, renderLaTeX))
+    html = markdownIt.render(text, renderLaTeX)
   }
+  const parser = new DOMParser()
+  const doc = parser.parseFromString(html, 'text/html')
+  sanitize(doc)
+  if (mode === 'normal') {
+    await resolveImagePaths(doc, filePath, {
+      version: true,
+      relativize: false,
+    })
+  } else {
+    let behaviour: ConfigValues['markdown-preview-plus.saveConfig.mediaOnSaveAsHTMLBehaviour']
+    switch (mode) {
+      case 'save':
+        behaviour = atomConfig().saveConfig.mediaOnSaveAsHTMLBehaviour
+        break
+      case 'copy':
+        behaviour = atomConfig().saveConfig.mediaOnCopyAsHTMLBehaviour
+        break
+      default:
+        throw invalidMode(mode)
+    }
+    await handleImages({ doc, filePath, savePath, behaviour })
+  }
+  let defaultCodeLanguage: string = 'text'
+  // Default code blocks to be coffee in Literate CoffeeScript files
+  if ((grammar && grammar.scopeName) === 'source.litcoffee') {
+    defaultCodeLanguage = 'coffee'
+  }
+  if (
+    !(
+      atomConfig().renderer === 'pandoc' &&
+      atomConfig().pandocConfig.useNativePandocCodeStyles
+    )
+  ) {
+    highlightCodeBlocks(doc, defaultCodeLanguage, mode !== 'normal')
+  }
+  if (error) {
+    const errd = doc.createElement('div')
+    const msgel = doc.createElement('code')
+    msgel.innerText = error
+    errd.innerHTML = `<h1>Pandoc Error:</h1>${msgel.outerHTML}<hr>`
+    doc.body.insertBefore(errd, doc.body.firstElementChild)
+  }
+  return doc
 }
 
-function sanitize(html: string) {
-  const doc = document.createElement('div')
-  doc.innerHTML = html
+function invalidMode(mode: never) {
+  return new Error(`Invalid render mode ${mode}`)
+}
+
+function sanitize(doc: HTMLDocument) {
   // Do not remove MathJax script delimited blocks
   doc.querySelectorAll("script:not([type^='math/tex'])").forEach((elem) => {
     elem.remove()
@@ -134,30 +122,53 @@ function sanitize(html: string) {
       elem.removeAttribute(attribute)
     }),
   )
-  return doc.innerHTML
+}
+
+async function handleImages(opts: {
+  behaviour: 'relativized' | 'absolutized' | 'untouched'
+  doc: HTMLDocument
+  filePath?: string
+  savePath?: string
+}) {
+  const relativize = opts.behaviour === 'relativized'
+  switch (opts.behaviour) {
+    case 'relativized':
+    case 'absolutized':
+      await resolveImagePaths(
+        opts.doc,
+        opts.filePath,
+        {
+          version: false,
+          relativize,
+        },
+        opts.savePath,
+      )
+      break
+    case 'untouched':
+    /* noop */
+  }
 }
 
 async function resolveImagePaths(
-  html: string,
+  doc: HTMLDocument,
   filePath: string | undefined,
-  copyHTMLFlag: boolean,
+  options: Record<'version' | 'relativize', boolean>,
+  savePath?: string,
 ) {
   const [rootDirectory] = atom.project.relativizePath(filePath || '')
-  const doc = document.createElement('div')
-  doc.innerHTML = html
+  const media = getMedia(doc)
   await Promise.all(
-    Array.from(doc.querySelectorAll('img')).map(async function(img) {
+    Array.from(media).map(async function(img) {
       let src = img.getAttribute('src')
       if (src) {
-        if (!atom.config.get('markdown-preview-plus.enablePandoc')) {
-          src = markdownIt.decode(src)
+        if (atomConfig().renderer !== 'pandoc') {
+          src = decodeURI(src)
         }
 
         if (src.match(/^(https?|atom|data):/)) {
           return
         }
-        // @ts-ignore
-        if (src.startsWith(process.resourcesPath as string)) {
+        if (process.resourcesPath && src.startsWith(process.resourcesPath)) {
           return
         }
         if (src.startsWith(resourcePath)) {
@@ -181,8 +192,16 @@ async function resolveImagePaths(
           src = path.resolve(path.dirname(filePath), src)
         }
 
+        if (
+          options.relativize &&
+          (filePath !== undefined || savePath !== undefined)
+        ) {
+          const fp = savePath !== undefined ? savePath : filePath!
+          src = path.relative(path.dirname(fp), src)
+        }
+
         // Use most recent version of image
-        if (!copyHTMLFlag) {
+        if (options.version) {
           const v = await imageWatcher.getVersion(src, filePath)
           if (v) {
             src = `${src}?v=${v}`
@@ -194,13 +213,12 @@ async function resolveImagePaths(
       return
     }),
   )
-
-  return doc.innerHTML
 }
 
-export function convertCodeBlocksToAtomEditors(
-  domFragment: Element,
-  defaultLanguage: string = 'text',
+function highlightCodeBlocks(
+  domFragment: Document,
+  defaultLanguage: string,
+  copyHTML: boolean,
 ) {
   const fontFamily = atom.config.get('editor.fontFamily')
   if (fontFamily) {
@@ -221,67 +239,18 @@ export function convertCodeBlocksToAtomEditors(
       ? cbClass.replace(/^(lang-|sourceCode )/, '')
       : defaultLanguage
 
-    const editorElement = document.createElement(
-      'atom-text-editor',
-    ) as TextEditorElement
-    editorElement.setAttributeNode(document.createAttribute('gutter-hidden'))
-    editorElement.removeAttribute('tabindex') // make read-only
-
-    preElement.parentElement!.replaceChild(editorElement, preElement)
-
-    const editor = editorElement.getModel()
-    // remove the default selection of a line in each editor
-    if (editor.cursorLineDecorations != null) {
-      for (const cursorLineDecoration of editor.cursorLineDecorations) {
-        cursorLineDecoration.destroy()
-      }
-    }
-
-    editor.setText(codeBlock.textContent!.replace(/\n$/, ''))
-    const grammar = atom.grammars.grammarForScopeName(
-      scopeForFenceName(fenceName),
-    )
-    if (grammar) {
-      editor.setGrammar(grammar)
-      editorElement.dataset.grammar = grammar.scopeName.replace(/\./g, ' ')
-    }
+    const addClass = copyHTML ? 'editor-colors ' : ''
+    preElement.outerHTML = highlight({
+      fileContents: codeBlock.textContent!.replace(/\n$/, ''),
+      scopeName: scopeForFenceName(fenceName),
+      nbsp: false,
+      lineDivs: copyHTML ? false : true,
+      editorDiv: true,
+      editorDivTag: copyHTML ? 'pre' : 'atom-text-editor',
+      // The `editor` class messes things up as `.editor` has absolutely positioned lines
+      editorDivClass: fenceName ? `${addClass}lang-${fenceName}` : addClass,
+    })
   }
 
   return domFragment
-}
-
-function tokenizeCodeBlocks(html: string, defaultLanguage: string = 'text') {
-  const doc = document.createElement('div')
-  doc.innerHTML = html
-
-  const fontFamily = atom.config.get('editor.fontFamily')
-  if (fontFamily) {
-    doc
-      .querySelectorAll('code')
-      .forEach((code) => (code.style.fontFamily = fontFamily || null))
-  }
-
-  doc.querySelectorAll('pre').forEach(function(preElement) {
-    const codeBlock = preElement.firstElementChild as HTMLElement
-    const fenceName =
-      codeBlock.className.replace(/^(lang-|sourceCode )/, '') || defaultLanguage
-
-    // tslint:disable-next-line:no-unsafe-any // TODO: tslint bug?
-    const highlightedHtml: string = highlight({
-      fileContents: codeBlock.innerText,
-      scopeName: scopeForFenceName(fenceName),
-      nbsp: false,
-      lineDivs: false,
-      editorDiv: true,
-      editorDivTag: 'pre',
-      // The `editor` class messes things up as `.editor` has absolutely positioned lines
-      editorDivClass: fenceName
-        ? `editor-colors lang-${fenceName}`
-        : 'editor-colors',
-    })
-
-    preElement.outerHTML = highlightedHtml
-  })
-
-  return doc.innerHTML
 }

@@ -1,20 +1,100 @@
-'use strict';
+'use strict';Object.defineProperty(exports, "__esModule", { value: true });exports.createMultiLspLanguageService = undefined;var _asyncToGenerator = _interopRequireDefault(require('async-to-generator'));
 
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-exports.createMultiLspLanguageService = undefined;
 
-var _asyncToGenerator = _interopRequireDefault(require('async-to-generator'));
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 /**
- * Creates a language service capable of connecting to an LSP server.
- * Note that spawnOptions and initializationOptions must both be RPC-able.
- *
- * TODO: Document all of the fields below.
- */
-let createMultiLspLanguageService = exports.createMultiLspLanguageService = (() => {
-  var _ref = (0, _asyncToGenerator.default)(function* (languageServerName, command, args, params) {
+                                                                                                                                                                                                             * Creates a language service capable of connecting to an LSP server.
+                                                                                                                                                                                                             * Note that spawnOptions and initializationOptions must both be RPC-able.
+                                                                                                                                                                                                             */let createMultiLspLanguageService = exports.createMultiLspLanguageService = (() => {var _ref = (0, _asyncToGenerator.default)(
+  function* (
+  languageServerName,
+  command,
+  args,
+  params)
+  {
     const logger = (0, (_log4js || _load_log4js()).getLogger)(params.logCategory);
     logger.setLevel(params.logLevel);
 
@@ -27,11 +107,8 @@ let createMultiLspLanguageService = exports.createMultiLspLanguageService = (() 
 
     const result = new (_nuclideLanguageServiceRpc || _load_nuclideLanguageServiceRpc()).MultiProjectLanguageService();
 
-    const fileCache = params.fileNotifier;
-
-    if (!(fileCache instanceof (_main || _load_main()).FileCache)) {
-      throw new Error('Invariant violation: "fileCache instanceof FileCache"');
-    }
+    const fileCache = params.fileNotifier;if (!(
+    fileCache instanceof (_main || _load_main()).FileCache)) {throw new Error('Invariant violation: "fileCache instanceof FileCache"');}
 
     // This MultiProjectLanguageService stores LspLanguageServices, lazily
     // created upon demand, one per project root. Demand is usually "when the
@@ -45,13 +122,27 @@ let createMultiLspLanguageService = exports.createMultiLspLanguageService = (() 
     //   restarted, but we can still respond to those LanguageServiceRequests
     //   that don't require an LspConnection).
 
-    const languageServiceFactory = (() => {
-      var _ref2 = (0, _asyncToGenerator.default)(function* (projectDir) {
-        yield result.hasObservedDiagnostics();
+    const languageServiceFactory = (() => {var _ref2 = (0, _asyncToGenerator.default)(function* (projectDir) {
+        if (params.waitForDiagnostics !== false) {
+          yield result.hasObservedDiagnostics();
+        }
         // We're awaiting until AtomLanguageService has observed diagnostics (to
         // prevent race condition: see below).
 
-        const lsp = new (_LspLanguageService || _load_LspLanguageService()).LspLanguageService(logger, fileCache, (yield (0, (_nuclideLanguageServiceRpc || _load_nuclideLanguageServiceRpc()).forkHostServices)(params.host, logger)), languageServerName, command, args, params.spawnOptions, projectDir, params.fileExtensions, params.initializationOptions || {}, Number(params.additionalLogFilesRetentionPeriod), params.useOriginalEnvironment || false);
+        const lsp = new (_LspLanguageService || _load_LspLanguageService()).LspLanguageService(
+        logger,
+        fileCache, (
+        yield (0, (_nuclideLanguageServiceRpc || _load_nuclideLanguageServiceRpc()).forkHostServices)(params.host, logger)),
+        languageServerName,
+        command,
+        args,
+        params.spawnOptions,
+        projectDir,
+        params.fileExtensions,
+        params.initializationOptions || {},
+        Number(params.additionalLogFilesRetentionPeriod),
+        params.useOriginalEnvironment || false);
+
 
         lsp.start(); // Kick off 'Initializing'...
         return lsp;
@@ -62,59 +153,25 @@ let createMultiLspLanguageService = exports.createMultiLspLanguageService = (() 
         // We rely on the fact that LSP won't produce them before start() has
         // returned. As soon as we ourselves return, MultiProjectLanguageService
         // will hook up observeDiagnostics into the LSP process, so it'll be ready.
-      });
+      });return function languageServiceFactory(_x5) {return _ref2.apply(this, arguments);};})();
 
-      return function languageServiceFactory(_x5) {
-        return _ref2.apply(this, arguments);
-      };
-    })();
+    result.initialize(
+    logger,
+    fileCache,
+    params.host,
+    params.projectFileNames,
+    params.projectFileSearchStrategy,
+    params.fileExtensions,
+    languageServiceFactory);
 
-    result.initialize(logger, fileCache, params.host, params.projectFileNames, params.projectFileSearchStrategy, params.fileExtensions, languageServiceFactory);
     return result;
-  });
-
-  return function createMultiLspLanguageService(_x, _x2, _x3, _x4) {
-    return _ref.apply(this, arguments);
-  };
-})(); /**
-       * Copyright (c) 2015-present, Facebook, Inc.
-       * All rights reserved.
-       *
-       * This source code is licensed under the license found in the LICENSE file in
-       * the root directory of this source tree.
-       *
-       * 
-       * @format
-       */
-
-var _log4js;
-
-function _load_log4js() {
-  return _log4js = require('log4js');
-}
-
-var _which;
-
-function _load_which() {
-  return _which = _interopRequireDefault(require('nuclide-commons/which'));
-}
-
-var _LspLanguageService;
-
-function _load_LspLanguageService() {
-  return _LspLanguageService = require('./LspLanguageService');
-}
-
-var _main;
-
-function _load_main() {
-  return _main = require('../../nuclide-open-files-rpc/lib/main');
-}
-
-var _nuclideLanguageServiceRpc;
-
-function _load_nuclideLanguageServiceRpc() {
-  return _nuclideLanguageServiceRpc = require('../../nuclide-language-service-rpc');
-}
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+  });return function createMultiLspLanguageService(_x, _x2, _x3, _x4) {return _ref.apply(this, arguments);};})(); /**
+                                                                                                                   * Copyright (c) 2015-present, Facebook, Inc.
+                                                                                                                   * All rights reserved.
+                                                                                                                   *
+                                                                                                                   * This source code is licensed under the license found in the LICENSE file in
+                                                                                                                   * the root directory of this source tree.
+                                                                                                                   *
+                                                                                                                   * 
+                                                                                                                   * @format
+                                                                                                                   */var _log4js;function _load_log4js() {return _log4js = require('log4js');}var _which;function _load_which() {return _which = _interopRequireDefault(require('../../../modules/nuclide-commons/which'));}var _LspLanguageService;function _load_LspLanguageService() {return _LspLanguageService = require('./LspLanguageService');}var _main;function _load_main() {return _main = require('../../nuclide-open-files-rpc/lib/main');}var _nuclideLanguageServiceRpc;function _load_nuclideLanguageServiceRpc() {return _nuclideLanguageServiceRpc = require('../../nuclide-language-service-rpc');}function _interopRequireDefault(obj) {return obj && obj.__esModule ? obj : { default: obj };}

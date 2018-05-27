@@ -13,6 +13,7 @@ import {
     cachedProperty,
     defineImmutable,
     getProjectPath,
+    ignoredPatterns,
     preferredSeparatorFor
 } from './utils';
 
@@ -147,6 +148,7 @@ export class Path {
             }
         }
 
+        filenames = filenames.filter(isVisible)
         return filenames.map((fn) => new Path(this.directory + fn));
     }
 
@@ -238,4 +240,14 @@ function matchFragment(fragment, filename, caseSensitive=false) {
     }
 
     return filename.startsWith(fragment);
+}
+
+/**
+ * Return whether the filename is not hidden by the ignoredPatterns config.
+ */
+function isVisible(filename) {
+    for (const ignoredPattern of ignoredPatterns()) {
+        if (ignoredPattern.match(filename)) return false;
+    }
+    return true;
 }

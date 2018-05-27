@@ -1,37 +1,33 @@
-'use strict';
+'use strict';Object.defineProperty(exports, "__esModule", { value: true });var _string;
 
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
 
-var _string;
 
-function _load_string() {
-  return _string = require('nuclide-commons/string');
-}
 
-var _nuclideAnalytics;
 
-function _load_nuclideAnalytics() {
-  return _nuclideAnalytics = require('../../nuclide-analytics');
-}
 
-/**
- * Copyright (c) 2015-present, Facebook, Inc.
- * All rights reserved.
- *
- * This source code is licensed under the license found in the LICENSE file in
- * the root directory of this source tree.
- *
- * 
- * @format
- */
 
-const CONNECTION_EVENT = 'nuclide-remote-connection';
 
-class ConnectionTracker {
 
-  constructor(config) {
+
+function _load_string() {return _string = require('../../../modules/nuclide-commons/string');}var _passesGK;
+function _load_passesGK() {return _passesGK = require('../../commons-node/passesGK');}var _nuclideAnalytics;
+function _load_nuclideAnalytics() {return _nuclideAnalytics = require('../../nuclide-analytics');}
+
+
+
+
+
+
+const CONNECTION_EVENT = 'nuclide-remote-connection'; /**
+                                                       * Copyright (c) 2015-present, Facebook, Inc.
+                                                       * All rights reserved.
+                                                       *
+                                                       * This source code is licensed under the license found in the LICENSE file in
+                                                       * the root directory of this source tree.
+                                                       *
+                                                       *  strict-local
+                                                       * @format
+                                                       */class ConnectionTracker {constructor(config) {
     this._config = config;
     this._expired = false;
     this._connectionStartTime = Date.now();
@@ -55,14 +51,25 @@ class ConnectionTracker {
     this._trackConnectionResult(false, errorType, e);
   }
 
-  _trackConnectionResult(succeed, errorType, e) {
+  _trackConnectionResult(
+  succeed,
+  errorType,
+  e)
+  {
     if (this._expired) {
       return;
     }
 
-    const preYubikeyDuration = this._promptYubikeyTime > 0 ? this._promptYubikeyTime - this._connectionStartTime : 0;
-    const postYubikeyDuration = this._finishYubikeyTime > 0 ? Date.now() - this._finishYubikeyTime : 0;
-    const realDuration = preYubikeyDuration > 0 && postYubikeyDuration > 0 ? preYubikeyDuration + postYubikeyDuration : 0;
+    const preYubikeyDuration =
+    this._promptYubikeyTime > 0 ?
+    this._promptYubikeyTime - this._connectionStartTime :
+    0;
+    const postYubikeyDuration =
+    this._finishYubikeyTime > 0 ? Date.now() - this._finishYubikeyTime : 0;
+    const realDuration =
+    preYubikeyDuration > 0 && postYubikeyDuration > 0 ?
+    preYubikeyDuration + postYubikeyDuration :
+    0;
 
     (0, (_nuclideAnalytics || _load_nuclideAnalytics()).track)(CONNECTION_EVENT, {
       error: succeed ? '0' : '1',
@@ -77,10 +84,10 @@ class ConnectionTracker {
       username: this._config.username,
       remoteServerCommand: this._config.remoteServerCommand,
       cwd: this._config.cwd,
-      authMethod: this._config.authMethod
-    });
+      authMethod: this._config.authMethod,
+      // We already checked this GK to get here, so no need to await.
+      isBigDig: (0, (_passesGK || _load_passesGK()).isGkEnabled)('nuclide_big_dig') });
+
 
     this._expired = true;
-  }
-}
-exports.default = ConnectionTracker;
+  }}exports.default = ConnectionTracker;

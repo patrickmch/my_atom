@@ -2,39 +2,39 @@
   "_args": [
     [
       {
-        "raw": "/private/var/folders/dp/vj05cwss7pz9mjl62ccqzysm0000gp/T/d-118012-29587-1r9rhuu.tk512zw7b9/package.tgz",
+        "raw": "/private/var/folders/dp/vj05cwss7pz9mjl62ccqzysm0000gp/T/d-118414-61658-4mssp7.mdnoupu8fr/package.tgz",
         "scope": null,
         "escapedName": null,
         "name": null,
-        "rawSpec": "/private/var/folders/dp/vj05cwss7pz9mjl62ccqzysm0000gp/T/d-118012-29587-1r9rhuu.tk512zw7b9/package.tgz",
-        "spec": "/private/var/folders/dp/vj05cwss7pz9mjl62ccqzysm0000gp/T/d-118012-29587-1r9rhuu.tk512zw7b9/package.tgz",
+        "rawSpec": "/private/var/folders/dp/vj05cwss7pz9mjl62ccqzysm0000gp/T/d-118414-61658-4mssp7.mdnoupu8fr/package.tgz",
+        "spec": "/private/var/folders/dp/vj05cwss7pz9mjl62ccqzysm0000gp/T/d-118414-61658-4mssp7.mdnoupu8fr/package.tgz",
         "type": "local"
       },
-      "/private/var/folders/dp/vj05cwss7pz9mjl62ccqzysm0000gp/T/apm-install-dir-118012-29587-1snex8y.0ckwsfko6r"
+      "/private/var/folders/dp/vj05cwss7pz9mjl62ccqzysm0000gp/T/apm-install-dir-118414-61658-npiph6.2zirkep14i"
     ]
   ],
-  "_from": "../d-118012-29587-1r9rhuu.tk512zw7b9/package.tgz",
+  "_from": "../d-118414-61658-4mssp7.mdnoupu8fr/package.tgz",
   "_id": "quick-file-actions@0.2.2",
   "_inCache": true,
   "_location": "/quick-file-actions",
   "_phantomChildren": {},
   "_requested": {
-    "raw": "/private/var/folders/dp/vj05cwss7pz9mjl62ccqzysm0000gp/T/d-118012-29587-1r9rhuu.tk512zw7b9/package.tgz",
+    "raw": "/private/var/folders/dp/vj05cwss7pz9mjl62ccqzysm0000gp/T/d-118414-61658-4mssp7.mdnoupu8fr/package.tgz",
     "scope": null,
     "escapedName": null,
     "name": null,
-    "rawSpec": "/private/var/folders/dp/vj05cwss7pz9mjl62ccqzysm0000gp/T/d-118012-29587-1r9rhuu.tk512zw7b9/package.tgz",
-    "spec": "/private/var/folders/dp/vj05cwss7pz9mjl62ccqzysm0000gp/T/d-118012-29587-1r9rhuu.tk512zw7b9/package.tgz",
+    "rawSpec": "/private/var/folders/dp/vj05cwss7pz9mjl62ccqzysm0000gp/T/d-118414-61658-4mssp7.mdnoupu8fr/package.tgz",
+    "spec": "/private/var/folders/dp/vj05cwss7pz9mjl62ccqzysm0000gp/T/d-118414-61658-4mssp7.mdnoupu8fr/package.tgz",
     "type": "local"
   },
   "_requiredBy": [
     "#USER"
   ],
-  "_resolved": "file:../d-118012-29587-1r9rhuu.tk512zw7b9/package.tgz",
+  "_resolved": "file:../d-118414-61658-4mssp7.mdnoupu8fr/package.tgz",
   "_shasum": "b0beb0001224e83b57790a5fbd15f9b75af9a2dd",
   "_shrinkwrap": null,
-  "_spec": "/private/var/folders/dp/vj05cwss7pz9mjl62ccqzysm0000gp/T/d-118012-29587-1r9rhuu.tk512zw7b9/package.tgz",
-  "_where": "/private/var/folders/dp/vj05cwss7pz9mjl62ccqzysm0000gp/T/apm-install-dir-118012-29587-1snex8y.0ckwsfko6r",
+  "_spec": "/private/var/folders/dp/vj05cwss7pz9mjl62ccqzysm0000gp/T/d-118414-61658-4mssp7.mdnoupu8fr/package.tgz",
+  "_where": "/private/var/folders/dp/vj05cwss7pz9mjl62ccqzysm0000gp/T/apm-install-dir-118414-61658-npiph6.2zirkep14i",
   "activationCommands": {
     "atom-workspace": [
       "quick-file-actions:move",

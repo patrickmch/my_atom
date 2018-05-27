@@ -1,14 +1,32 @@
-'use strict';
+'use strict';Object.defineProperty(exports, "__esModule", { value: true });exports.getGeneratedFileTypes = exports.invalidateFileTypeCache = exports.getGeneratedFileType = undefined;var _asyncToGenerator = _interopRequireDefault(require('async-to-generator'));let getGeneratedFileType = exports.getGeneratedFileType = (() => {var _ref = (0, _asyncToGenerator.default)(
 
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-exports.getGeneratedFileTypes = exports.invalidateFileTypeCache = exports.getGeneratedFileType = undefined;
 
-var _asyncToGenerator = _interopRequireDefault(require('async-to-generator'));
 
-let getGeneratedFileType = exports.getGeneratedFileType = (() => {
-  var _ref = (0, _asyncToGenerator.default)(function* (filePath, forceUpdate = false) {
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  function* (
+  filePath,
+  forceUpdate = false)
+  {
     if (!forceUpdate) {
       const cachedType = cache.get(filePath);
 
@@ -33,28 +51,23 @@ let getGeneratedFileType = exports.getGeneratedFileType = (() => {
 
     cache.set(filePath, tag);
     return tag;
-  });
+  });return function getGeneratedFileType(_x) {return _ref.apply(this, arguments);};})();let invalidateFileTypeCache = exports.invalidateFileTypeCache = (() => {var _ref2 = (0, _asyncToGenerator.default)(
 
-  return function getGeneratedFileType(_x) {
-    return _ref.apply(this, arguments);
-  };
-})();
-
-let invalidateFileTypeCache = exports.invalidateFileTypeCache = (() => {
-  var _ref2 = (0, _asyncToGenerator.default)(function* (filePath) {
+  function* (
+  filePath)
+  {
     cache.del(filePath);
-  });
+  });return function invalidateFileTypeCache(_x2) {return _ref2.apply(this, arguments);};})();let getGeneratedFileTypes = exports.getGeneratedFileTypes = (() => {var _ref3 = (0, _asyncToGenerator.default)(
 
-  return function invalidateFileTypeCache(_x2) {
-    return _ref2.apply(this, arguments);
-  };
-})();
-
-let getGeneratedFileTypes = exports.getGeneratedFileTypes = (() => {
-  var _ref3 = (0, _asyncToGenerator.default)(function* (dirPath) {
+  function* (
+  dirPath)
+  {
     const fileTypes = new Map();
     const uncheckedFiles = [];
-    if (!(_nuclideUri || _load_nuclideUri()).default.isInArchive(dirPath) && !(_nuclideUri || _load_nuclideUri()).default.hasKnownArchiveExtension(dirPath)) {
+    if (
+    !(_nuclideUri || _load_nuclideUri()).default.isInArchive(dirPath) &&
+    !(_nuclideUri || _load_nuclideUri()).default.hasKnownArchiveExtension(dirPath))
+    {
       const files = yield (_fsPromise || _load_fsPromise()).default.readdir(dirPath);
       for (const file of files) {
         const filePath = (_nuclideUri || _load_nuclideUri()).default.join(dirPath, file);
@@ -92,49 +105,10 @@ let getGeneratedFileTypes = exports.getGeneratedFileTypes = (() => {
     }
 
     return fileTypes;
-  });
-
-  return function getGeneratedFileTypes(_x3) {
-    return _ref3.apply(this, arguments);
-  };
-})();
+  });return function getGeneratedFileTypes(_x3) {return _ref3.apply(this, arguments);};})();
 
 // 1000 entries should allow for a good number of open directories
-
-
-var _nuclideUri;
-
-function _load_nuclideUri() {
-  return _nuclideUri = _interopRequireDefault(require('nuclide-commons/nuclideUri'));
-}
-
-var _lruCache;
-
-function _load_lruCache() {
-  return _lruCache = _interopRequireDefault(require('lru-cache'));
-}
-
-var _process;
-
-function _load_process() {
-  return _process = require('nuclide-commons/process');
-}
-
-var _fsPromise;
-
-function _load_fsPromise() {
-  return _fsPromise = _interopRequireDefault(require('nuclide-commons/fsPromise'));
-}
-
-var _config;
-
-function _load_config() {
-  return _config = require('./config');
-}
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-// assumes that filenames do not contain ':'
+var _nuclideUri;function _load_nuclideUri() {return _nuclideUri = _interopRequireDefault(require('../../../modules/nuclide-commons/nuclideUri'));}var _lruCache;function _load_lruCache() {return _lruCache = _interopRequireDefault(require('lru-cache'));}var _process;function _load_process() {return _process = require('../../../modules/nuclide-commons/process');}var _fsPromise;function _load_fsPromise() {return _fsPromise = _interopRequireDefault(require('../../../modules/nuclide-commons/fsPromise'));}var _config;function _load_config() {return _config = require('./config');}function _interopRequireDefault(obj) {return obj && obj.__esModule ? obj : { default: obj };} // assumes that filenames do not contain ':'
 const GREP_PARSE_PATTERN = /^([^:]*):(.*)$/; /**
                                               * Copyright (c) 2015-present, Facebook, Inc.
                                               * All rights reserved.
@@ -144,22 +118,13 @@ const GREP_PARSE_PATTERN = /^([^:]*):(.*)$/; /**
                                               *
                                               * 
                                               * @format
-                                              */
-
-const cache = new (_lruCache || _load_lruCache()).default({ max: 1000 });
-
-function getTagPattern(forWindows) {
-  if ((_config || _load_config()).config.generatedTag == null) {
-    return (_config || _load_config()).config.partialGeneratedTag;
-  }
-  if ((_config || _load_config()).config.partialGeneratedTag == null) {
-    return (_config || _load_config()).config.generatedTag;
-  }
-  const separator = forWindows ? ' ' : '\\|';
-  return (_config || _load_config()).config.generatedTag + separator + (_config || _load_config()).config.partialGeneratedTag;
+                                              */const cache = new (_lruCache || _load_lruCache()).default({ max: 1000 });function getTagPattern(forWindows) {if ((_config || _load_config()).config.generatedTag == null) {return (_config || _load_config()).config.partialGeneratedTag;}if ((_config || _load_config()).config.partialGeneratedTag == null) {return (_config || _load_config()).config.generatedTag;}const separator = forWindows ? ' ' : '\\|';return (_config || _load_config()).config.generatedTag + separator + (_config || _load_config()).config.partialGeneratedTag;
 }
 
-function findTaggedFiles(dirPath, filenames) {
+function findTaggedFiles(
+dirPath,
+filenames)
+{
   let command;
   let baseArgs;
   let pattern;
@@ -183,9 +148,10 @@ function findTaggedFiles(dirPath, filenames) {
     cwd: dirPath,
     isExitError: ({ exitCode, signal }) => {
       return signal != null && (exitCode == null || exitCode > 1);
-    }
-  };
-  return (0, (_process || _load_process()).runCommand)(command, args, options).map(stdout => {
+    } };
+
+  return (0, (_process || _load_process()).runCommand)(command, args, options).
+  map(stdout => {
     const fileTags = new Map();
     for (const line of stdout.split('\n')) {
       const match = line.match(GREP_PARSE_PATTERN);
@@ -194,13 +160,17 @@ function findTaggedFiles(dirPath, filenames) {
         const matchedLine = match[2].trim();
         if (matchedLine.includes((_config || _load_config()).config.generatedTag)) {
           fileTags.set(filename, 'generated');
-        } else if (matchedLine.includes((_config || _load_config()).config.partialGeneratedTag) && fileTags.get(filename) !== 'generated') {
+        } else if (
+        matchedLine.includes((_config || _load_config()).config.partialGeneratedTag) &&
+        fileTags.get(filename) !== 'generated')
+        {
           fileTags.set(filename, 'partial');
         }
       }
     }
     return fileTags;
-  }).toPromise();
+  }).
+  toPromise();
 }
 
 function matchesGeneratedPaths(filePath) {

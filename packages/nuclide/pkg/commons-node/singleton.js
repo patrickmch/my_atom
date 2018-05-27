@@ -1,18 +1,13 @@
-'use strict';
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-/**
- * Copyright (c) 2015-present, Facebook, Inc.
- * All rights reserved.
- *
- * This source code is licensed under the license found in the LICENSE file in
- * the root directory of this source tree.
- *
- * 
- * @format
- */
+'use strict';Object.defineProperty(exports, "__esModule", { value: true }); /**
+                                                                             * Copyright (c) 2015-present, Facebook, Inc.
+                                                                             * All rights reserved.
+                                                                             *
+                                                                             * This source code is licensed under the license found in the LICENSE file in
+                                                                             * the root directory of this source tree.
+                                                                             *
+                                                                             * 
+                                                                             * @format
+                                                                             */
 
 const GLOBAL_MAP_NAME = '__NUCLIDE_SINGLETONS__';
 
@@ -25,10 +20,10 @@ function getMap() {
 }
 
 /**
- * Creates a per-global singleton value.
- * constructor will be called exactly once, future invocations will
- * return the result of the constructor call.
- */
+   * Creates a per-global singleton value.
+   * constructor will be called exactly once, future invocations will
+   * return the result of the constructor call.
+   */
 function get(field, constructor) {
   const map = getMap();
   if (!map.has(field)) {
@@ -48,10 +43,9 @@ function clear(field) {
 function reset(field, constructor) {
   clear(field);
   return get(field, constructor);
-}
+}exports.default =
 
-exports.default = {
+{
   get,
   clear,
-  reset
-};
+  reset };

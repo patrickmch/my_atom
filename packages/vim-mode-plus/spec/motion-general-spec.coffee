@@ -211,6 +211,96 @@ describe "Motion general", ->
           ensure 'v', cursor: [2, 4], selectedText: 'd'
           ensure 'k k', cursor: [0, 3], selectedText: "defg\n\nabcd"
 
+    describe "the j, k keybinding in hardTab text", ->
+      beforeEach ->
+        jasmine.attachToDOM(atom.workspace.getElement())
+
+        waitsForPromise ->
+          atom.packages.activatePackage('language-go')
+
+        getVimState (state, vimEditor) ->
+          {editor, editorElement} = state
+          {set, ensure} = vimEditor
+
+        runs ->
+          set
+            grammar: 'source.go'
+            textC: """
+            packa|ge main
+
+            import "fmt"
+
+            func main() {
+            \tif 7%2 == 0 {
+            \t\tfmt.Println("7 is even")
+            \t} else {
+            \t\tfmt.Println("7 is odd")
+            \t}
+            }\n
+            """
+
+      it "[tabLength = 2] move up/down bufferRow wise with aware of tabLength", ->
+        editor.update(tabLength: 2)
+
+        ensure 'j', cursor: [1, 0], cursorScreen: [1, 0]
+        ensure 'j', cursor: [2, 5], cursorScreen: [2, 5]
+        ensure 'j', cursor: [3, 0], cursorScreen: [3, 0]
+        ensure 'j', cursor: [4, 5], cursorScreen: [4, 5]
+        ensure 'j', cursor: [5, 4], cursorScreen: [5, 5]
+        ensure 'j', cursor: [6, 3], cursorScreen: [6, 5]
+        ensure 'j', cursor: [7, 4], cursorScreen: [7, 5]
+        ensure 'j', cursor: [8, 3], cursorScreen: [8, 5]
+        ensure 'j', cursor: [9, 1], cursorScreen: [9, 2]
+        ensure 'j', cursor: [10, 0], cursorScreen: [10, 0]
+        ensure 'k', cursor: [9, 1], cursorScreen: [9, 2]
+        ensure 'k', cursor: [8, 3], cursorScreen: [8, 5]
+        ensure 'k', cursor: [7, 4], cursorScreen: [7, 5]
+        ensure 'k', cursor: [6, 3], cursorScreen: [6, 5]
+        ensure 'k', cursor: [5, 4], cursorScreen: [5, 5]
+        ensure 'k', cursor: [4, 5], cursorScreen: [4, 5]
+        ensure 'k', cursor: [3, 0], cursorScreen: [3, 0]
+        ensure 'k', cursor: [2, 5], cursorScreen: [2, 5]
+        ensure 'k', cursor: [1, 0], cursorScreen: [1, 0]
+        ensure 'k', cursor: [0, 5], cursorScreen: [0, 5]
+
+      it "[tabLength = 4] move up/down bufferRow wise with aware of tabLength", ->
+        editor.update(tabLength: 4)
+
+        ensure 'j', cursor: [1, 0], cursorScreen: [1, 0]
+        ensure 'j', cursor: [2, 5], cursorScreen: [2, 5]
+        ensure 'j', cursor: [3, 0], cursorScreen: [3, 0]
+        ensure 'j', cursor: [4, 5], cursorScreen: [4, 5]
+        ensure 'j', cursor: [5, 2], cursorScreen: [5, 5]
+        ensure 'j', cursor: [6, 1], cursorScreen: [6, 4]
+        ensure 'j', cursor: [7, 2], cursorScreen: [7, 5]
+        ensure 'j', cursor: [8, 1], cursorScreen: [8, 4]
+        ensure 'j', cursor: [9, 1], cursorScreen: [9, 4]
+        ensure 'j', cursor: [10, 0], cursorScreen: [10, 0]
+        ensure 'k', cursor: [9, 1], cursorScreen: [9, 4]
+        ensure 'k', cursor: [8, 1], cursorScreen: [8, 4]
+        ensure 'k', cursor: [7, 2], cursorScreen: [7, 5]
+        ensure 'k', cursor: [6, 1], cursorScreen: [6, 4]
+        ensure 'k', cursor: [5, 2], cursorScreen: [5, 5]
+        ensure 'k', cursor: [4, 5], cursorScreen: [4, 5]
+        ensure 'k', cursor: [3, 0], cursorScreen: [3, 0]
+        ensure 'k', cursor: [2, 5], cursorScreen: [2, 5]
+        ensure 'k', cursor: [1, 0], cursorScreen: [1, 0]
+        ensure 'k', cursor: [0, 5], cursorScreen: [0, 5]
+
+      it "[tabLength = 8] move up/down bufferRow wise with aware of tabLength", ->
+        editor.update(tabLength: 8)
+        set cursor: [5, 9]
+
+        ensure 'j', cursor: [6, 2], cursorScreen: [6, 16]
+        ensure 'j', cursor: [7, 8], cursorScreen: [7, 15]
+        ensure 'j', cursor: [8, 2], cursorScreen: [8, 16]
+        ensure 'j', cursor: [9, 1], cursorScreen: [9, 8]
+        ensure 'j', cursor: [10, 0], cursorScreen: [10, 0]
+        ensure 'k', cursor: [9, 1], cursorScreen: [9, 8]
+        ensure 'k', cursor: [8, 2], cursorScreen: [8, 16]
+        ensure 'k', cursor: [7, 8], cursorScreen: [7, 15]
+        ensure 'k', cursor: [6, 2], cursorScreen: [6, 16]
+
     describe "gj gk in softwrap", ->
       [text] = []
 
@@ -544,7 +634,7 @@ describe "Motion general", ->
         set           textC: "abc|  \ndef"
         ensure 'c w', textC: "abc|\ndef"
 
-      it "[at trailing whitespace] eat new line when count is specified", ->
+      xit "[at trailing whitespace] eat new line when count is specified", -> # TODO re-enable after atom/atom#16983 comes in to STABLE
         set             textC: "|\n\n\n\n\nline6\n"
         ensure '5 c w', textC: "|\nline6\n"
 
@@ -590,7 +680,7 @@ describe "Motion general", ->
         set           textC: "abc|  \ndef\n"
         ensure 'c W', textC: "abc|\ndef\n"
 
-      it "can eat new line when count is specified", ->
+      xit "can eat new line when count is specified", ->  # TODO re-enable after atom/atom#16983 comes in to STABLE
         set             textC: "|\n\n\n\n\nline6\n"
         ensure '5 c W', textC: "|\nline6\n"
 
@@ -691,7 +781,7 @@ describe "Motion general", ->
         ensure 'g e', textC: "1234 5678 wor|d-word"
         ensure 'g e', textC: "1234 567|8 word-word"
 
-      it "handles newlines like vim", ->
+      xit "handles newlines like vim", -> # TODO re-enable after atom/atom#16983 comes in to STABLE
         set           textC: "1234\n\n\n\n56|78"
         ensure "g e", textC: "1234\n\n\n|\n5678"
         ensure "g e", textC: "1234\n\n|\n\n5678"
@@ -1081,7 +1171,6 @@ describe "Motion general", ->
       scrollbarStyle = document.createElement('style')
       scrollbarStyle.textContent = '::-webkit-scrollbar { -webkit-appearance: none }'
       jasmine.attachToDOM(scrollbarStyle)
-
 
       set text_: """
       _123456789B123456789C123456789
@@ -1874,7 +1963,7 @@ describe "Motion general", ->
         ensure '] [', cursor: [20, 6]
         ensure '] [', cursor: [22, 6]
 
-    describe "MoveToPrevisFoldEnd", ->
+    describe "MoveToPreviousFoldEnd", ->
       beforeEach ->
         set cursor: [30, 0]
       it "move to first char of previous fold end row", ->
@@ -1891,6 +1980,104 @@ describe "Motion general", ->
         ensure '] ]', cursor: [23, 8]
         ensure '] ]', cursor: [25, 4]
         ensure '] ]', cursor: [28, 2]
+
+  describe 'MoveTo(Previous|Next)Fold(Start|End)WithSameIndent', ->
+    beforeEach ->
+      waitsForPromise ->
+        atom.packages.activatePackage('language-javascript')
+      getVimState (state, vim) ->
+        {editor, editorElement} = state
+        {set, ensure} = vim
+
+      runs ->
+        set
+          grammar: "source.js"
+          text: """
+          class TestA {
+            methA() {
+              if (true) {
+                null
+              }
+            }
+          }
+
+          class TestB {
+            methB() {
+              if (true) {
+                null
+              }
+            }
+          }\n
+          """
+
+        atom.keymaps.add "test",
+          'atom-text-editor.vim-mode-plus:not(.insert-mode)':
+            '[ [': 'vim-mode-plus:move-to-previous-fold-start-with-same-indent'
+            '] [': 'vim-mode-plus:move-to-next-fold-start-with-same-indent'
+            '[ ]': 'vim-mode-plus:move-to-previous-fold-end-with-same-indent'
+            '] ]': 'vim-mode-plus:move-to-next-fold-end-with-same-indent'
+
+    afterEach ->
+      atom.packages.deactivatePackage('language-javascript')
+
+    describe "MoveToPreviousFoldStartWithSameIndent", ->
+      it "[from largetst fold] move to first char of previous fold start row", ->
+        set cursor: [14, 0]
+        ensure '[ [', cursor: [8, 0]
+        ensure '[ [', cursor: [0, 0]
+        ensure '[ [', cursor: [0, 0]
+      it "[from outer fold] move to first char of previous fold start row", ->
+        set cursor: [7, 0] # blank row
+        ensure '[ [', cursor: [0, 0]
+        ensure '[ [', cursor: [0, 0]
+      it "[from one level deeper fold] move to first char of previous fold start row", ->
+        set cursor: [9, 0]
+        ensure '[ [', cursor: [1, 2]
+        ensure '[ [', cursor: [1, 2]
+
+    describe "MoveToNextFoldStartWithSameIndent", ->
+      it "[from largetst fold] move to first char of next fold start row", ->
+        set cursor: [0, 0]
+        ensure '] [', cursor: [8, 0]
+        ensure '] [', cursor: [8, 0]
+      it "[from outer fold] move to first char of next fold start row", ->
+        set cursor: [7, 0] # blank row
+        ensure '] [', cursor: [8, 0]
+        ensure '] [', cursor: [8, 0]
+      it "[from one level deeper fold] move to first char of next fold start row", ->
+        set cursor: [1, 0]
+        ensure '] [', cursor: [9, 2]
+        ensure '] [', cursor: [9, 2]
+
+    describe "MoveToPreviousFoldEndWithSameIndent", ->
+      it "[from largetst fold] move to first char of previous fold end row", ->
+        set cursor: [14, 0]
+        ensure '[ ]', cursor: [6, 0]
+        ensure '[ ]', cursor: [6, 0]
+      it "[from outer fold] move to first char of previous fold end row", ->
+        set cursor: [7, 0] # blank row
+        ensure '[ ]', cursor: [6, 0]
+        ensure '[ ]', cursor: [6, 0]
+      it "[from one level deeper fold] move to first char of previous fold end row", ->
+        set cursor: [13, 0]
+        ensure '[ ]', cursor: [5, 2]
+        ensure '[ ]', cursor: [5, 2]
+
+    describe "MoveToNextFoldEndWithSameIndent", ->
+      it "[from largetst fold] move to first char of next fold end row", ->
+        set cursor: [0, 0]
+        ensure '] ]', cursor: [6, 0]
+        ensure '] ]', cursor: [14, 0]
+        ensure '] ]', cursor: [14, 0]
+      it "[from outer fold] move to first char of next fold end row", ->
+        set cursor: [7, 0] # blank row
+        ensure '] ]', cursor: [14, 0]
+        ensure '] ]', cursor: [14, 0]
+      it "[from one level deeper fold] move to first char of next fold end row", ->
+        set cursor: [1, 0] # blank row
+        ensure '] ]', cursor: [5, 2]
+        ensure '] ]', cursor: [13, 2]
+        ensure '] ]', cursor: [13, 2]
 
   describe 'MoveTo(Previous|Next)String', ->
     beforeEach ->

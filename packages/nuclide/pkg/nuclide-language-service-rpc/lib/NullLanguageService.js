@@ -1,25 +1,45 @@
-'use strict';
+'use strict';Object.defineProperty(exports, "__esModule", { value: true });exports.NullLanguageService = undefined;
 
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-exports.NullLanguageService = undefined;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 var _rxjsBundlesRxMinJs = require('rxjs/bundles/Rx.min.js');
 
 // An implementation of LanguageService which always returns no results.
 // Useful for implementing aggregate language services.
-/**
- * Copyright (c) 2015-present, Facebook, Inc.
- * All rights reserved.
- *
- * This source code is licensed under the license found in the LICENSE file in
- * the root directory of this source tree.
- *
- * 
- * @format
- */
-
 class NullLanguageService {
   getDiagnostics(fileVersion) {
     return Promise.resolve(null);
@@ -29,15 +49,33 @@ class NullLanguageService {
     return _rxjsBundlesRxMinJs.Observable.empty().publish();
   }
 
-  getAutocompleteSuggestions(fileVersion, position, request) {
+  getAutocompleteSuggestions(
+  fileVersion,
+  position,
+  request)
+  {
     return Promise.resolve(null);
   }
 
-  getDefinition(fileVersion, position) {
+  resolveAutocompleteSuggestion(suggestion) {
     return Promise.resolve(null);
   }
 
-  findReferences(fileVersion, position) {
+  getDefinition(
+  fileVersion,
+  position)
+  {
+    return Promise.resolve(null);
+  }
+
+  onToggleCoverage(set) {
+    return Promise.resolve(undefined);
+  }
+
+  findReferences(
+  fileVersion,
+  position)
+  {
     return _rxjsBundlesRxMinJs.Observable.of(null).publish();
   }
 
@@ -49,11 +87,28 @@ class NullLanguageService {
     return Promise.resolve(null);
   }
 
-  getAdditionalLogFiles(deadline) {
+  getCodeLens(fileVersion) {
+    return Promise.resolve(null);
+  }
+
+  resolveCodeLens(
+  filePath,
+  codeLens)
+  {
+    return Promise.resolve(null);
+  }
+
+  getAdditionalLogFiles(
+  deadline)
+  {
     return Promise.resolve([]);
   }
 
-  getCodeActions(fileVersion, range, diagnostics) {
+  getCodeActions(
+  fileVersion,
+  range,
+  diagnostics)
+  {
     return Promise.resolve([]);
   }
 
@@ -61,23 +116,45 @@ class NullLanguageService {
     return Promise.resolve(null);
   }
 
-  highlight(fileVersion, position) {
+  highlight(
+  fileVersion,
+  position)
+  {
     return Promise.resolve(null);
   }
 
-  formatSource(fileVersion, range, options) {
+  formatSource(
+  fileVersion,
+  range,
+  options)
+  {
     return Promise.resolve(null);
   }
 
-  formatEntireFile(fileVersion, range, options) {
+  formatEntireFile(
+  fileVersion,
+  range,
+  options)
+
+
+
+  {
     return Promise.resolve(null);
   }
 
-  formatAtPosition(fileVersion, position, triggerCharacter, options) {
+  formatAtPosition(
+  fileVersion,
+  position,
+  triggerCharacter,
+  options)
+  {
     return Promise.resolve(null);
   }
 
-  getEvaluationExpression(fileVersion, position) {
+  signatureHelp(
+  fileVersion,
+  position)
+  {
     return Promise.resolve(null);
   }
 
@@ -85,7 +162,10 @@ class NullLanguageService {
     return Promise.resolve(false);
   }
 
-  symbolSearch(query, directories) {
+  symbolSearch(
+  query,
+  directories)
+  {
     return Promise.resolve(null);
   }
 
@@ -97,17 +177,32 @@ class NullLanguageService {
     return Promise.resolve(false);
   }
 
-  getExpandedSelectionRange(fileVersion, currentSelection) {
+  getExpandedSelectionRange(
+  fileVersion,
+  currentSelection)
+  {
     return Promise.resolve(null);
   }
 
-  getCollapsedSelectionRange(fileVersion, currentSelection, originalCursorPosition) {
+  getCollapsedSelectionRange(
+  fileVersion,
+  currentSelection,
+  originalCursorPosition)
+  {
     return Promise.resolve(null);
   }
 
-  dispose() {}
-}
+  dispose() {}}exports.NullLanguageService = NullLanguageService;
 
-exports.NullLanguageService = NullLanguageService; // Assert that NullLanguageService satisifes the LanguageService interface:
 
-null;
+// Assert that NullLanguageService satisifes the LanguageService interface:
+/**
+ * Copyright (c) 2015-present, Facebook, Inc.
+ * All rights reserved.
+ *
+ * This source code is licensed under the license found in the LICENSE file in
+ * the root directory of this source tree.
+ *
+ * 
+ * @format
+ */null;

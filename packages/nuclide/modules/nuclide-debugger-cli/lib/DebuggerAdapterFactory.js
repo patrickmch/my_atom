@@ -1,72 +1,62 @@
-'use strict';
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-
-var _nuclideUri;
-
-function _load_nuclideUri() {
-  return _nuclideUri = _interopRequireDefault(require('nuclide-commons/nuclideUri'));
-}
-
-var _collection;
-
-function _load_collection() {
-  return _collection = require('nuclide-commons/collection');
-}
-
-var _constants;
-
-function _load_constants() {
-  return _constants = require('nuclide-debugger-common/constants');
-}
-
-var _main;
-
-function _load_main() {
-  return _main = require('nuclide-debugger-vsps/main');
-}
-
-var _VSPOptionsParser;
-
-function _load_VSPOptionsParser() {
-  return _VSPOptionsParser = _interopRequireDefault(require('./VSPOptionsParser'));
-}
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-class DebuggerAdapterFactory {
-  constructor() {
-    this._vspServersByTargetType = new Map([[(_constants || _load_constants()).VsAdapterTypes.PYTHON, {
-      key: 'python',
-      type: 'python',
-      customArguments: new Map()
-    }], [(_constants || _load_constants()).VsAdapterTypes.NODE, {
-      key: 'node',
-      type: 'node2',
-      customArguments: new Map([['sourceMapPathOverrides', {
-        typeDescription: 'source-pattern replace-pattern ...',
-        parseType: 'array',
-        parser: _parseNodeSourceMapPathOverrides
-      }]])
-    }], [(_constants || _load_constants()).VsAdapterTypes.OCAML, {
-      key: 'ocaml',
-      type: 'ocaml',
-      customArguments: new Map()
-    }]]);
-    this._targetTypeByFileExtension = new Map([['.py', (_constants || _load_constants()).VsAdapterTypes.PYTHON], ['.js', (_constants || _load_constants()).VsAdapterTypes.NODE]]);
-    this._excludeOptions = new Set(['args', 'console', 'diagnosticLogging', 'externalConsole', 'noDebug', 'outputCapture', 'program', 'restart', 'trace', 'verboseDiagnosticLogging']);
-    this._includeOptions = new Set(['address', 'port']);
-  }
-
-  // These are options which are either managed by the debugger or don't
-  // make sense to expose via the command line (such as being for debugging
-  // the adapter itself.)
+'use strict';Object.defineProperty(exports, "__esModule", { value: true });var _nuclideUri;
 
 
-  // These are options that we want to include the defaults for explicitly,
-  // if they exist
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+function _load_nuclideUri() {return _nuclideUri = _interopRequireDefault(require('../../nuclide-commons/nuclideUri'));}var _collection;
+function _load_collection() {return _collection = require('../../nuclide-commons/collection');}var _debuggerRegistry;
+function _load_debuggerRegistry() {return _debuggerRegistry = require('../../nuclide-debugger-common/debugger-registry');}var _VSPOptionsParser;
+
+
+
+function _load_VSPOptionsParser() {return _VSPOptionsParser = _interopRequireDefault(require('./VSPOptionsParser'));}var _HHVMDebugAdapter;
+
+function _load_HHVMDebugAdapter() {return _HHVMDebugAdapter = _interopRequireDefault(require('./adapters/HHVMDebugAdapter'));}var _NativeGdbDebugAdapter;
+function _load_NativeGdbDebugAdapter() {return _NativeGdbDebugAdapter = _interopRequireDefault(require('./adapters/NativeGdbDebugAdapter'));}var _NodeDebugAdapter;
+function _load_NodeDebugAdapter() {return _NodeDebugAdapter = _interopRequireDefault(require('./adapters/NodeDebugAdapter'));}var _OCamlDebugAdapter;
+function _load_OCamlDebugAdapter() {return _OCamlDebugAdapter = _interopRequireDefault(require('./adapters/OCamlDebugAdapter'));}var _PythonDebugAdapter;
+function _load_PythonDebugAdapter() {return _PythonDebugAdapter = _interopRequireDefault(require('./adapters/PythonDebugAdapter'));}function _interopRequireDefault(obj) {return obj && obj.__esModule ? obj : { default: obj };} /**
+                                                                                                                                                                                                                                   * Copyright (c) 2017-present, Facebook, Inc.
+                                                                                                                                                                                                                                   * All rights reserved.
+                                                                                                                                                                                                                                   *
+                                                                                                                                                                                                                                   * This source code is licensed under the BSD-style license found in the
+                                                                                                                                                                                                                                   * LICENSE file in the root directory of this source tree. An additional grant
+                                                                                                                                                                                                                                   * of patent rights can be found in the PATENTS file in the same directory.
+                                                                                                                                                                                                                                   *
+                                                                                                                                                                                                                                   *  strict-local
+                                                                                                                                                                                                                                   * @format
+                                                                                                                                                                                                                                   */
+
+
+
+
+
+
+class DebuggerAdapterFactory {constructor() {this.
+    _debugAdapters = [
+    new (_HHVMDebugAdapter || _load_HHVMDebugAdapter()).default(),
+    new (_NativeGdbDebugAdapter || _load_NativeGdbDebugAdapter()).default(),
+    new (_NodeDebugAdapter || _load_NodeDebugAdapter()).default(),
+    new (_OCamlDebugAdapter || _load_OCamlDebugAdapter()).default(),
+    new (_PythonDebugAdapter || _load_PythonDebugAdapter()).default()];}
 
 
   adapterFromArguments(args) {
@@ -89,47 +79,40 @@ class DebuggerAdapterFactory {
   }
 
   showContextSensitiveHelp(args) {
-    const targetType = this._typeFromCommandLine(args);
-    if (targetType == null) {
+    const adapter = this._adapterFromCommandLine(args);
+    if (adapter == null) {
       return;
     }
 
-    const adapter = this._vspServersByTargetType.get(targetType);
-
-    if (!(adapter != null)) {
-      throw new Error('Adapter server table not properly populated in DebuggerAdapterFactory');
-    }
-
-    const root = (0, (_main || _load_main()).getAdapterPackageRoot)(adapter.key);
+    const root = (0, (_debuggerRegistry || _load_debuggerRegistry()).getAdapterPackageRoot)(adapter.key);
     const optionsParser = new (_VSPOptionsParser || _load_VSPOptionsParser()).default(root);
     const action = args.attach ? 'attach' : 'launch';
 
-    optionsParser.showCommandLineHelp(adapter.type, action, this._excludeOptions, adapter.customArguments);
+    optionsParser.showCommandLineHelp(
+    adapter.type,
+    action,
+    adapter.excludedOptions,
+    adapter.customArguments);
+
   }
 
   _parseAttachArguments(args) {
-    const targetType = this._typeFromCommandLine(args);
+    const adapter = this._adapterFromCommandLine(args);
 
-    if (targetType == null) {
-      const error = 'Could not determine target type. Please use --type to specify it explicitly.';
-      throw Error(error);
+    if (adapter == null) {
+      throw Error(
+      'Debugger type not specified; please use "--type" to specify it.');
+
     }
 
-    const adapter = this._vspServersByTargetType.get(targetType);
-
-    if (!(adapter != null)) {
-      throw new Error('Adapter server table not properly populated in DebuggerAdapterFactory');
-    }
-
-    const root = (0, (_main || _load_main()).getAdapterPackageRoot)(adapter.key);
-    const parser = new (_VSPOptionsParser || _load_VSPOptionsParser()).default(root);
-    const commandLineArgs = parser.parseCommandLine(adapter.type, 'attach', this._excludeOptions, this._includeOptions, adapter.customArguments);
+    const commandLineArgs = adapter.parseArguments(args);
 
     return {
       action: 'attach',
-      adapterInfo: (0, (_main || _load_main()).getAdapterExecutable)(adapter.key),
-      attachArgs: (0, (_collection || _load_collection()).objectFromMap)(commandLineArgs)
-    };
+      type: adapter.key,
+      adapterInfo: (0, (_debuggerRegistry || _load_debuggerRegistry()).getAdapterExecutable)(adapter.key),
+      attachArgs: (0, (_collection || _load_collection()).objectFromMap)(commandLineArgs) };
+
   }
 
   _parseLaunchArguments(args) {
@@ -137,92 +120,60 @@ class DebuggerAdapterFactory {
     const program = launchArgs[0];
 
     if (program == null) {
-      throw new Error('--attach not specified and no program to debug specified on the command line.');
+      throw new Error(
+      '--attach not specified and no program to debug specified on the command line.');
+
     }
 
-    let targetType = this._typeFromCommandLine(args);
-    if (targetType == null) {
-      targetType = this._typeFromProgramName(program);
+    const adapter =
+    this._adapterFromCommandLine(args) ||
+    this._adapterFromProgramName(program);
+
+    if (adapter == null) {
+      throw new Error(
+      'Could not determine the type of program being debugged. Please specifiy with the "--type" option.');
+
     }
 
-    if (targetType == null) {
-      const error = `Could not determine target type from filename "${program}".` + ' Please use --type to specify it explicitly.';
-      throw Error(error);
-    }
-
-    const adapter = this._vspServersByTargetType.get(targetType);
-
-    if (!(adapter != null)) {
-      throw new Error('Adapter server table not properly populated in DebuggerAdapterFactory');
-    }
-
-    const root = (0, (_main || _load_main()).getAdapterPackageRoot)(adapter.key);
-    const parser = new (_VSPOptionsParser || _load_VSPOptionsParser()).default(root);
-    const commandLineArgs = parser.parseCommandLine(adapter.type, 'launch', this._excludeOptions, this._includeOptions, adapter.customArguments);
-
-    // Overrides
-    commandLineArgs.set('args', launchArgs.splice(1));
-    commandLineArgs.set('program', (_nuclideUri || _load_nuclideUri()).default.resolve(program));
-    commandLineArgs.set('noDebug', false);
-    commandLineArgs.set('cwd', (_nuclideUri || _load_nuclideUri()).default.resolve('.'));
-
-    // $TODO refactor this code to not be so hacky about adapter specific
-    // arguments
-    if (targetType === (_constants || _load_constants()).VsAdapterTypes.NODE && args.usenode != null) {
-      commandLineArgs.set('runtimeExecutable', args.usenode);
-    }
+    const commandLineArgs = adapter.parseArguments(args);
 
     return {
       action: 'launch',
-      adapterInfo: (0, (_main || _load_main()).getAdapterExecutable)(adapter.key),
-      launchArgs: (0, (_collection || _load_collection()).objectFromMap)(commandLineArgs)
-    };
+      type: adapter.key,
+      adapterInfo: (0, (_debuggerRegistry || _load_debuggerRegistry()).getAdapterExecutable)(adapter.key),
+      launchArgs: (0, (_collection || _load_collection()).objectFromMap)(commandLineArgs) };
+
   }
 
-  _typeFromCommandLine(args) {
+  _adapterFromCommandLine(args) {
     const type = args.type;
     if (type != null) {
-      if (!this._vspServersByTargetType.get(type)) {
-        const valid = Array.from(this._vspServersByTargetType.keys()).join('", "');
-        const error = `Invalid target type "${type}"; valid types are "${valid}".`;
-        throw new Error(error);
+      const adapter = this._debugAdapters.find(a => a.key === type);
+
+      if (adapter == null) {
+        const validAdapters = this._debugAdapters.map(a => a.key).join('", "');
+        throw new Error(
+        `Invalid target type "${type}"; valid types are "${validAdapters}".`);
+
       }
 
-      return type;
+      return adapter;
     }
 
     return null;
   }
 
-  _typeFromProgramName(program) {
+  _adapterFromProgramName(program) {
     const programUri = (_nuclideUri || _load_nuclideUri()).default.parsePath(program);
-    return this._targetTypeByFileExtension.get(programUri.ext);
-  }
-}
+    const ext = programUri.ext;
 
-exports.default = DebuggerAdapterFactory; /**
-                                           * Copyright (c) 2017-present, Facebook, Inc.
-                                           * All rights reserved.
-                                           *
-                                           * This source code is licensed under the BSD-style license found in the
-                                           * LICENSE file in the root directory of this source tree. An additional grant
-                                           * of patent rights can be found in the PATENTS file in the same directory.
-                                           *
-                                           * 
-                                           * @format
-                                           */
+    const adapters = this._debugAdapters.filter(a => a.extensions.has(ext));
 
-function _parseNodeSourceMapPathOverrides(entries) {
-  if (entries.length % 2 !== 0) {
-    throw new Error('Source map path overrides must be a list of pattern pairs.');
-  }
+    if (adapters.length > 1) {
+      throw new Error(
+      `Multiple debuggers can debug programs with extension ${ext}. Please explicitly specify one with '--type'`);
 
-  const result = {};
+    }
 
-  while (entries.length !== 0) {
-    result[entries[0]] = entries[1];
-    entries.splice(0, 2);
-  }
-
-  return result;
-}
+    return adapters[0];
+  }}exports.default = DebuggerAdapterFactory;

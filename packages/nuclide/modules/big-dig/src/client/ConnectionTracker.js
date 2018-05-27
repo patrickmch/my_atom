@@ -1,8 +1,18 @@
-'use strict';
+'use strict';Object.defineProperty(exports, "__esModule", { value: true });
 
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 const CONNECTION_EVENT = 'nuclide-remote-connection'; /**
@@ -15,12 +25,7 @@ const CONNECTION_EVENT = 'nuclide-remote-connection'; /**
                                                        *
                                                        * 
                                                        * @format
-                                                       */
-
-class ConnectionTracker {
-
-  constructor(config) {
-    this._config = config;
+                                                       */class ConnectionTracker {constructor(config) {this._config = config;
     this._expired = false;
     this._connectionStartTime = Date.now();
     this._promptYubikeyTime = 0;
@@ -43,19 +48,32 @@ class ConnectionTracker {
     this._trackConnectionResult(false, errorType, e);
   }
 
-  _trackConnectionResult(succeed, errorType, e) {
+  _trackConnectionResult(
+  succeed,
+  errorType,
+  e)
+  {
     if (this._expired) {
       return;
     }
 
-    const preYubikeyDuration = this._promptYubikeyTime > 0 ? this._promptYubikeyTime - this._connectionStartTime : 0;
-    const postYubikeyDuration = this._finishYubikeyTime > 0 ? Date.now() - this._finishYubikeyTime : 0;
-    const realDuration = preYubikeyDuration > 0 && postYubikeyDuration > 0 ? preYubikeyDuration + postYubikeyDuration : 0;
+    const preYubikeyDuration =
+    this._promptYubikeyTime > 0 ?
+    this._promptYubikeyTime - this._connectionStartTime :
+    0;
+    const postYubikeyDuration =
+    this._finishYubikeyTime > 0 ? Date.now() - this._finishYubikeyTime : 0;
+    const realDuration =
+    preYubikeyDuration > 0 && postYubikeyDuration > 0 ?
+    preYubikeyDuration + postYubikeyDuration :
+    0;
 
     track(CONNECTION_EVENT, {
       error: succeed ? '0' : '1',
       errorType: errorType || '',
-      exception: e ? `name: ${e.name}, message: ${e.message}, stack: ${e.stack}.` : '',
+      exception: e ?
+      `name: ${e.name}, message: ${e.message}, stack: ${e.stack}.` :
+      '',
       duration: (Date.now() - this._connectionStartTime).toString(),
       preYubikeyDuration: preYubikeyDuration.toString(),
       postYubikeyDuration: postYubikeyDuration.toString(),
@@ -64,12 +82,11 @@ class ConnectionTracker {
       sshPort: this._config.sshPort.toString(),
       username: this._config.username,
       remoteServer: this._config.remoteServer,
-      authMethod: this._config.authMethod
-    });
+      authMethod: this._config.authMethod });
+
 
     this._expired = true;
-  }
-}
+  }}exports.default = ConnectionTracker;
 
-exports.default = ConnectionTracker;
+
 function track(eventName, metaData) {}

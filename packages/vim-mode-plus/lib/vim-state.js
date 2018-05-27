@@ -243,6 +243,11 @@ module.exports = class VimState {
       this.resetNormalMode()
       this.reset()
       if (this.editorElement.component) this.editorElement.component.setInputEnabled(true)
+
+      // Disable `readOnly` state of which possibly be changed by `autoDisableInputMethodWhenLeavingInsertMode`.
+      if (this.editor.component.getHiddenInput().readOnly) {
+        this.editor.component.getHiddenInput().readOnly = false
+      }
       this.editorElement.classList.remove('vim-mode-plus', 'normal-mode')
     }
     this.emitter.emit('did-destroy')
@@ -464,6 +469,10 @@ module.exports = class VimState {
     if (newMode === 'normal') this.activateNormalMode()
     else if (newMode === 'insert') this.editorElement.component.setInputEnabled(true)
     else if (newMode === 'visual') this.modeDeactivator = this.activateVisualMode(newSubmode)
+
+    if (this.getConfig('autoDisableInputMethodWhenLeavingInsertMode')) {
+      this.editor.component.getHiddenInput().readOnly = newMode !== 'insert'
+    }
 
     this.editorElement.classList.remove(`${this.mode}-mode`)
     this.editorElement.classList.remove(this.submode)
