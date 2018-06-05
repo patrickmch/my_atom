@@ -1,0 +1,38 @@
+diff --git a/nols_website/wmi/templates/dataentry/fragments/login_modal.html b/nols_website/wmi/templates/dataentry/fragments/login_modal.html
+index 8bb8e67b0..b7bae02c8 100644
+--- a/nols_website/wmi/templates/dataentry/fragments/login_modal.html
++++ b/nols_website/wmi/templates/dataentry/fragments/login_modal.html
+@@ -1,31 +1,32 @@
+ <div id="log-in-modal" class="reveal fade" data-overlay="false" data-reveal tabindex="-1" role="dialog" aria-hidden="true">
+     <div class="modal-dialog">
+         <div class="modal-content">
+             <button type="button" class="close" data-close aria-hidden="true">&times;</button>
+             <form action="{% url "login" %}?next={% if event %}{% url "get_started"  event.wmi_course_id %}{% else %}{% url "rollcall_home" %}{% endif %}"
+                   method="post"
+                   class="form-horizontal modal-form">
+               <div class="modal-body container-fluid  content_container-fluid row">
+                 <div class="modal-header">
+                     <h3 class="modal-title" id="log-in-modal-header">Login to nols.edu</h3>
+                 </div>
+                   <div class="column small-12">
++                    <p class="form-instructions"> </p>
+                     {% with auth_form as form %}
+-                      {% include 'dataentry/bs_responsive_form_layout.html' %}
++                      {% include 'bs_responsive_form_layout.html' %}
+                     {% endwith %}
+                   </div>
+                 <div class="small-12 medium-8 column" id="login-modal-buttons">
+                   <button type="button" class="button button--hollow" data-close><span>Cancel</span></button>
+                   <input class="button " type="submit" value="Login"/>
+                 </div>
+                 <div class="forgot-pass-container column controls small-12">
+                   <a href="{% url "django.contrib.auth.views.password_reset" %}">
+                       Forgot your username or password?
+                   </a>
+                 </div>
+               </div>
+             </form>
+ 
+         </div>
+     </div>
+ </div>

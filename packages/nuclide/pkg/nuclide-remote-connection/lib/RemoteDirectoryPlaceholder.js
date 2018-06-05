@@ -1,31 +1,35 @@
-'use strict';Object.defineProperty(exports, "__esModule", { value: true });var _asyncToGenerator = _interopRequireDefault(require('async-to-generator'));var _nuclideUri;
+'use strict';
 
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
 
+var _nuclideUri;
 
+function _load_nuclideUri() {
+  return _nuclideUri = _interopRequireDefault(require('../../../modules/nuclide-commons/nuclideUri'));
+}
 
+var _UniversalDisposable;
 
+function _load_UniversalDisposable() {
+  return _UniversalDisposable = _interopRequireDefault(require('../../../modules/nuclide-commons/UniversalDisposable'));
+}
 
+var _stream = _interopRequireDefault(require('stream'));
 
-
-
-
-function _load_nuclideUri() {return _nuclideUri = _interopRequireDefault(require('../../../modules/nuclide-commons/nuclideUri'));}var _UniversalDisposable;
-function _load_UniversalDisposable() {return _UniversalDisposable = _interopRequireDefault(require('../../../modules/nuclide-commons/UniversalDisposable'));}
-var _stream = _interopRequireDefault(require('stream'));function _interopRequireDefault(obj) {return obj && obj.__esModule ? obj : { default: obj };}
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 /**
-                                                                                                                                                       * A Directory object that returns the bare minimum that's required by Atom.
-                                                                                                                                                       * It always exists, to satisfy Atom's existence checks.
-                                                                                                                                                       * Should be removed ASAP once the remote connection is restored.
-                                                                                                                                                       */
+ * A Directory object that returns the bare minimum that's required by Atom.
+ * It always exists, to satisfy Atom's existence checks.
+ * Should be removed ASAP once the remote connection is restored.
+ */
 class RemoteDirectoryPlaceholder {
 
+  constructor(uri) {
+    this.symlink = false;
 
-
-
-
-
-  constructor(uri) {this.symlink = false;
     this._uri = uri;
     const { hostname, path } = (_nuclideUri || _load_nuclideUri()).default.parse(uri);
     this._hostname = hostname;
@@ -103,13 +107,7 @@ class RemoteDirectoryPlaceholder {
     return new RemoteDirectoryPlaceholder((_nuclideUri || _load_nuclideUri()).default.join(this._uri, dirname));
   }
 
-  getEntries(
-  callback)
-
-
-
-
-  {
+  getEntries(callback) {
     callback(null, []);
   }
 
@@ -118,22 +116,32 @@ class RemoteDirectoryPlaceholder {
       return false;
     }
     return (_nuclideUri || _load_nuclideUri()).default.contains(this._uri, path);
-  }}exports.default = RemoteDirectoryPlaceholder;
+  }
+}
 
-
+exports.default = RemoteDirectoryPlaceholder; /**
+                                               * In contrast to the directory placeholders, the file placeholders never exist.
+                                               * Atom's Git integration, for example, checks for the existence of .git files.
+                                               */
 /**
-                                                   * In contrast to the directory placeholders, the file placeholders never exist.
-                                                   * Atom's Git integration, for example, checks for the existence of .git files.
-                                                   */ /**
-                                                       * Copyright (c) 2015-present, Facebook, Inc.
-                                                       * All rights reserved.
-                                                       *
-                                                       * This source code is licensed under the license found in the LICENSE file in
-                                                       * the root directory of this source tree.
-                                                       *
-                                                       * 
-                                                       * @format
-                                                       */class RemoteFilePlaceholder {constructor(uri) {this._uri = uri;}onDidChange(callback) {return new (_UniversalDisposable || _load_UniversalDisposable()).default();
+ * Copyright (c) 2015-present, Facebook, Inc.
+ * All rights reserved.
+ *
+ * This source code is licensed under the license found in the LICENSE file in
+ * the root directory of this source tree.
+ *
+ * 
+ * @format
+ */
+
+class RemoteFilePlaceholder {
+
+  constructor(uri) {
+    this._uri = uri;
+  }
+
+  onDidChange(callback) {
+    return new (_UniversalDisposable || _load_UniversalDisposable()).default();
   }
 
   onDidRename(callback) {
@@ -168,8 +176,8 @@ class RemoteDirectoryPlaceholder {
     return '';
   }
 
-  getDigest() {return (0, _asyncToGenerator.default)(function* () {
-      return Promise.resolve('');})();
+  async getDigest() {
+    return Promise.resolve('');
   }
 
   setEncoding(encoding) {}
@@ -234,11 +242,12 @@ class RemoteDirectoryPlaceholder {
     const stream = new _stream.default.Readable({
       read(size) {
         stream.push(null);
-      } });
-
+      }
+    });
     return stream;
   }
 
   createWriteStream() {
     throw Error('Cannot write to a RemoteFilePlaceholder');
-  }}
+  }
+}

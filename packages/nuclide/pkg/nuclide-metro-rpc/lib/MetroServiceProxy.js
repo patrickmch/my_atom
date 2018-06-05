@@ -1,20 +1,16 @@
 "use strict";
 
-let Observable;
-
 module.exports = _client => {
   const remoteModule = {};
 
   remoteModule.getStartCommand = function (arg0) {
-    return _client.marshalArguments(Array.from(arguments), [{
+    return _client.callRemoteFunction("MetroService/getStartCommand", "promise", _client.marshalArguments(Array.from(arguments), [{
       name: "projectRoot",
       type: {
         kind: "named",
         name: "NuclideUri"
       }
-    }]).then(args => {
-      return _client.callRemoteFunction("MetroService/getStartCommand", "promise", args);
-    }).then(value => {
+    }])).then(value => {
       return _client.unmarshal(value, {
         kind: "nullable",
         type: {
@@ -25,8 +21,8 @@ module.exports = _client => {
     });
   };
 
-  remoteModule.startMetro = function (arg0, arg1) {
-    return Observable.fromPromise(_client.marshalArguments(Array.from(arguments), [{
+  remoteModule.startMetro = function (arg0, arg1, arg2) {
+    return _client.callRemoteFunction("MetroService/startMetro", "observable", _client.marshalArguments(Array.from(arguments), [{
       name: "projectRoot",
       type: {
         kind: "named",
@@ -40,9 +36,15 @@ module.exports = _client => {
           kind: "string"
         }
       }
-    }])).switchMap(args => {
-      return _client.callRemoteFunction("MetroService/startMetro", "observable", args);
-    }).concatMap(value => {
+    }, {
+      name: "port",
+      type: {
+        kind: "nullable",
+        type: {
+          kind: "number"
+        }
+      }
+    }])).map(value => {
       return _client.unmarshal(value, {
         kind: "named",
         name: "MetroEvent"
@@ -50,18 +52,24 @@ module.exports = _client => {
     }).publish();
   };
 
-  remoteModule.reloadApp = function () {
-    return _client.marshalArguments(Array.from(arguments), []).then(args => {
-      return _client.callRemoteFunction("MetroService/reloadApp", "promise", args);
-    }).then(value => {
+  remoteModule.reloadApp = function (arg0) {
+    return _client.callRemoteFunction("MetroService/reloadApp", "promise", _client.marshalArguments(Array.from(arguments), [{
+      name: "port",
+      type: {
+        kind: "nullable",
+        type: {
+          kind: "number"
+        }
+      }
+    }])).then(value => {
       return _client.unmarshal(value, {
         kind: "void"
       });
     });
   };
 
-  remoteModule.buildBundle = function (arg0, arg1) {
-    return _client.marshalArguments(Array.from(arguments), [{
+  remoteModule.buildBundle = function (arg0, arg1, arg2) {
+    return _client.callRemoteFunction("MetroService/buildBundle", "promise", _client.marshalArguments(Array.from(arguments), [{
       name: "bundleName",
       type: {
         kind: "string"
@@ -78,17 +86,23 @@ module.exports = _client => {
           value: "android"
         }]
       }
-    }]).then(args => {
-      return _client.callRemoteFunction("MetroService/buildBundle", "promise", args);
-    }).then(value => {
+    }, {
+      name: "port",
+      type: {
+        kind: "nullable",
+        type: {
+          kind: "number"
+        }
+      }
+    }])).then(value => {
       return _client.unmarshal(value, {
         kind: "void"
       });
     });
   };
 
-  remoteModule.buildSourceMaps = function (arg0, arg1) {
-    return _client.marshalArguments(Array.from(arguments), [{
+  remoteModule.buildSourceMaps = function (arg0, arg1, arg2) {
+    return _client.callRemoteFunction("MetroService/buildSourceMaps", "promise", _client.marshalArguments(Array.from(arguments), [{
       name: "bundleName",
       type: {
         kind: "string"
@@ -105,9 +119,15 @@ module.exports = _client => {
           value: "android"
         }]
       }
-    }]).then(args => {
-      return _client.callRemoteFunction("MetroService/buildSourceMaps", "promise", args);
-    }).then(value => {
+    }, {
+      name: "port",
+      type: {
+        kind: "nullable",
+        type: {
+          kind: "number"
+        }
+      }
+    }])).then(value => {
       return _client.unmarshal(value, {
         kind: "void"
       });
@@ -117,11 +137,6 @@ module.exports = _client => {
   return remoteModule;
 };
 
-Object.defineProperty(module.exports, "inject", {
-  value: function () {
-    Observable = arguments[0];
-  }
-});
 Object.defineProperty(module.exports, "defs", {
   value: {
     Object: {
@@ -422,6 +437,14 @@ Object.defineProperty(module.exports, "defs", {
               kind: "string"
             }
           }
+        }, {
+          name: "port",
+          type: {
+            kind: "nullable",
+            type: {
+              kind: "number"
+            }
+          }
         }],
         returnType: {
           kind: "observable",
@@ -438,16 +461,24 @@ Object.defineProperty(module.exports, "defs", {
       location: {
         type: "source",
         fileName: "MetroService.js",
-        line: 103
+        line: 104
       },
       type: {
         location: {
           type: "source",
           fileName: "MetroService.js",
-          line: 103
+          line: 104
         },
         kind: "function",
-        argumentTypes: [],
+        argumentTypes: [{
+          name: "port",
+          type: {
+            kind: "nullable",
+            type: {
+              kind: "number"
+            }
+          }
+        }],
         returnType: {
           kind: "promise",
           type: {
@@ -462,13 +493,13 @@ Object.defineProperty(module.exports, "defs", {
       location: {
         type: "source",
         fileName: "MetroService.js",
-        line: 123
+        line: 124
       },
       type: {
         location: {
           type: "source",
           fileName: "MetroService.js",
-          line: 123
+          line: 124
         },
         kind: "function",
         argumentTypes: [{
@@ -487,6 +518,14 @@ Object.defineProperty(module.exports, "defs", {
               kind: "string-literal",
               value: "android"
             }]
+          }
+        }, {
+          name: "port",
+          type: {
+            kind: "nullable",
+            type: {
+              kind: "number"
+            }
           }
         }],
         returnType: {
@@ -503,13 +542,13 @@ Object.defineProperty(module.exports, "defs", {
       location: {
         type: "source",
         fileName: "MetroService.js",
-        line: 131
+        line: 133
       },
       type: {
         location: {
           type: "source",
           fileName: "MetroService.js",
-          line: 131
+          line: 133
         },
         kind: "function",
         argumentTypes: [{
@@ -528,6 +567,14 @@ Object.defineProperty(module.exports, "defs", {
               kind: "string-literal",
               value: "android"
             }]
+          }
+        }, {
+          name: "port",
+          type: {
+            kind: "nullable",
+            type: {
+              kind: "number"
+            }
           }
         }],
         returnType: {

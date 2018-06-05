@@ -1,22 +1,5 @@
 'use strict';
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 // eslint-disable-next-line nuclide-internal/no-commonjs
 require('jasmine-node');
 
@@ -32,10 +15,15 @@ require('jasmine-node');
  *
  * 
  * @format
- */ /**
-     * A port of Atom's focused specs.
-     * https://github.com/atom/jasmine-focused/blob/c922330/src/jasmine-focused.coffee
-     */const jasmine = global.jasmine;
+ */
+
+/**
+ * A port of Atom's focused specs.
+ * https://github.com/atom/jasmine-focused/blob/c922330/src/jasmine-focused.coffee
+ */
+
+const jasmine = global.jasmine;
+
 function setGlobalFocusPriority(priority) {
   const env = jasmine.getEnv();
   // flowlint-next-line sketchy-null-number:off
@@ -50,8 +38,12 @@ function setGlobalFocusPriority(priority) {
 function fdescribe(description, specDefinitions, priority_) {
   const priority = priority_ != null ? priority_ : 1;
   setGlobalFocusPriority(priority);
-  const suite = describe(description, specDefinitions);if (!(
-  suite != null)) {throw new Error('Invariant violation: "suite != null"');}
+  const suite = describe(description, specDefinitions);
+
+  if (!(suite != null)) {
+    throw new Error('Invariant violation: "suite != null"');
+  }
+
   suite.focusPriority = priority;
   return suite;
 }
@@ -70,8 +62,12 @@ global.fffdescribe = fffdescribe;
 function fit(description, definition, priority_) {
   const priority = priority_ != null ? priority_ : 1;
   setGlobalFocusPriority(priority);
-  const spec = it(description, definition);if (!(
-  spec != null)) {throw new Error('Invariant violation: "spec != null"');}
+  const spec = it(description, definition);
+
+  if (!(spec != null)) {
+    throw new Error('Invariant violation: "spec != null"');
+  }
+
   spec.focusPriority = priority;
   return spec;
 }
@@ -98,8 +94,11 @@ jasmine.getEnv().specFilter = function (spec) {
     return true;
   } else if (!parent) {
     return false;
-  } else {if (!(
-    typeof env.specFilter === 'function')) {throw new Error('Invariant violation: "typeof env.specFilter === \'function\'"');}
+  } else {
+    if (!(typeof env.specFilter === 'function')) {
+      throw new Error('Invariant violation: "typeof env.specFilter === \'function\'"');
+    }
+
     return env.specFilter(parent);
   }
 };

@@ -46,3 +46,8 @@
   'insert pdb trace':
     'prefix': 'pdb'
     'body': 'import pdb; pdb.set_trace()'
+
+'.source.javascrip':
+  'debugger':
+    'prefix': 'deb'
+    'body': 'debugger;'

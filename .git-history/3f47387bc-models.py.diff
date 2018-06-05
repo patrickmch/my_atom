@@ -1,0 +1,2363 @@
+diff --git a/nols_website/core/models.py b/nols_website/core/models.py
+index 2318b0a4d..97c32753f 100644
+--- a/nols_website/core/models.py
++++ b/nols_website/core/models.py
+@@ -1,2351 +1,2355 @@
+ from abc import abstractmethod
+ from datetime import datetime, date, timedelta, MINYEAR
+ 
+ import json
+ import logging
+ import re
+ 
+ from cached_property import cached_property
+ from django.conf import settings
+ from django.contrib.auth.forms import default_token_generator
+ from django.contrib.auth.models import AbstractUser
+ from django.contrib.contenttypes.models import ContentType
+ from django.core.cache import cache
+ from django.core.exceptions import ValidationError
+ from django.core.urlresolvers import reverse
+ from django.db import models, connection
+ from django.db.models import Q, Sum
+ from django.apps import apps
+ from django.template.loader import render_to_string
+ from django.utils.encoding import force_bytes
+ from django.utils.formats import number_format
+ from django.utils.html import format_html
+ from django.utils.http import urlsafe_base64_encode
+ 
+ from .uneditable_model import UneditableModel, UpdatelessQuerySet, UpdatelessManager
+ from admissions.constants import CSR_STATUS, COURSE_STATUS, VERBOSE_CSR_STATUS, OTHER_POLICIES
+ from core import formhelp
+ from core.constants import NAME_CHANGE, BLANK_CHOICES, NAME_PREFIX, STATUS
+ from core.nmc import da
+ from core.utils import nols_business_days_elapsed, get_person_pronoun, \
+     x_years_before_date, is_semester_ish
+ from core.where_am_i import WhereAmI
+ from nols_email.constants import TEMPLATE
+ from nols_email.utils import send_html_email
+ from nols.app.common.constants import PROVINCE_CHOICES_MAP
+ from nols.model.core.entity.interaction import Interaction
+ from nols.util.class_utils import property_factory
+ from nols.util.django.admin.decorators import allow_tags
+ from website import api_utils
+ from website.cms_api import CmsApi
+ import nolspro
+ 
+ 
+ log = logging.getLogger(__name__)
+ STATUS_CHOICES = (('S', 'Started'), ('E', 'Enrolled'),
+                   ('A', 'Applied'), ('V', 'Voided'))
+ 
+ 
+ class InvalidStatusError(Exception):
+     pass
+ 
+ 
+ class NoBirthDateNoAge(Exception):
+     pass
+ 
+ 
+ class NolsPerson(models.Model):
+     person_id = models.IntegerField(primary_key=True, db_column='personid')
+     citizenship = models.CharField(db_column='citizenship', max_length=50)
+     dupcheck = models.DateTimeField()
+     sex = models.CharField(max_length=1, default='U')
+ 
+     def age_at_specific_date(self, specific_date):
+         if not self.birth_date:
+             raise NoBirthDateNoAge("No birth_date for NolsPerson {id}"
+                                    .format(id=self.person_id))
+         born = self.birth_date
+         age = specific_date.year - born.year - \
+               ((specific_date.month, specific_date.day) < (born.month, born.day))
+         return age
+ 
+     @property
+     def birth_date(self):
+         return self.entity.birth_date
+ 
+     @property
+     def name(self):
+         return self.entity.name
+ 
+     @cached_property
+     def entity(self):
+         _entity = da.entity.get_entity(self.person_id)
+         _entity.formatted_name = _entity.name.format("PF(K)I.L,S")
+         return _entity
+ 
+     @property
+     def nexus_link(self):
+         return u'http://{domain}/nexus/#people/{id}'.format(domain=settings.NEXUS_SERVER,
+                                                             id=self.entity.id)
+ 
+     def __unicode__(self):
+         return 'Person id: %s Dupcheck: %s' % (
+             str(self.person_id),
+             self.dupcheck.strftime('%Y-%m-%d %H:%M:%S')
+             if self.dupcheck is not None else '')
+ 
+     class Meta:
+         managed = False
+ 
+ 
+ class User(AbstractUser):
+     nols_person = models.ForeignKey(NolsPerson, db_column='entity_id',
+                                     null=True, blank=True, editable=False)
+     was_connected = models.BooleanField(default=False)
+     date_activation_resent = models.DateTimeField(null=True, blank=True)
+ 
+     def save(self, *args, **kwargs):
+         entity = getattr(self, '_entity', None)
+         if entity:
+             del self._entity
+             da.entity.save_entity(entity)
+         super(User, self).save(*args, **kwargs)
+ 
+     #noinspection PyMethodParameters
+     @property_factory
+     def entity_id():
+         "Entity id linked by this user"
+         def fget(self):
+             # Need to check for attr first, on __init__ it might not exist yet.
+             if hasattr(self, 'nols_person_id'):
+                 return self.nols_person_id
+             else:
+                 return None
+ 
+         def fset(self, value):
+             self.nols_person_id = value
+         return locals()
+ 
+     @property
+     def entity(self):
+         "Load entity object from stored entity_id"
+ 
+         entity = getattr(self, "_entity", None)
+         if not entity or not entity.is_valid_instance:
+             entity = da.entity.get_entity(entity_id=self.entity_id)
+             if entity:
+                 entity.formatted_name = entity.name.format("PF(K)I.L,S")
+                 # Ensure that the appropriate user fields match the entity name
+                 # when we load the entity object from NOLSDB
+                 user_updated = False
+                 for user_attr_name, entity_name_attr_name in (
+                         ('first_name', 'preferred'),
+                         ('last_name', 'last'),
+                         ):
+                     user_attr = getattr(self, '_' + user_attr_name)
+                     entity_name_attr = getattr(entity.name,
+                                                entity_name_attr_name)
+                     log.debug(u"attr: {0}, user:{1}, entity:{2}"
+                               .format(user_attr_name,
+                                       user_attr, entity_name_attr))
+                     if user_attr != entity_name_attr:
+                         setattr(self, '_' + user_attr_name, entity_name_attr)
+                         user_updated = True
+                         log.debug("Updating name?")
+                 if user_updated:
+                     self.save()
+ 
+                 self._entity = entity
+         return entity
+ 
+     # We have some issues with name properties:
+     # 1) We're using the django.contrib.auth User model to serve
+     #    names for the time being
+     # 2) When getting .first_name we can possibly bypass the _entity objects
+     #    so we force his loading (if necessary) with 'force_load = self.entity'
+     # 3) Be sure that we assign entity first (which triggers a user.save)
+     #    before assigning the name value to user
+ 
+     #noinspection PyMethodParameters
+     @property_factory
+     def first_name():
+         "First name, with appropriate User manipulation"
+         def fget(self):
+             self.entity
+             return getattr(self, '_first_name')
+ 
+         def fset(self, value):
+             if self.entity_id:
+                 self.entity.name.first = value
+             return setattr(self, '_first_name', value)
+         return locals()
+ 
+     #noinspection PyMethodParameters
+     @property_factory
+     def last_name():
+         "Last name, with appropriate User manipulation"
+         def fget(self):
+             self.entity
+             return getattr(self, '_last_name')
+ 
+         def fset(self, value):
+             if self.entity_id:
+                 self.entity.name.last = value
+             return setattr(self, '_last_name', value)
+         return locals()
+ 
+     @property
+     def name(self):
+         return ', '.join([self.last_name, self.first_name])
+ 
+     @property
+     def is_graduate(self):
+         """Does this person have the Graduate classification."""
+         if not self.entity_id:
+             return False
+ 
+         classifications = api_utils.get_person_classifications(self.entity_id)
+         for c in classifications:
+             if 'Graduate' == c.type:
+                 return True
+         return False
+ 
+     def _create_entity(self, gender):
+         """Create a person in NOLS DB"""
+         pers = da.entity.get_new_person()
+         pers.name.first = self.first_name
+         pers.name.last = self.last_name
+         if gender:
+             pers.gender = gender
+         else:
+             pers.gender = 'Unknown'
+ 
+         pers_id = da.entity.save_entity(pers)
+ 
+         # Re-query because save_entity invalidates the instance
+         pers = da.entity.get_entity(entity_id=pers_id)
+ 
+         email = da.entity.get_new_email_address(pers.id)
+         email.email_address = self.email
+         email.status = 'Current'
+         da.entity.save_email_address(email)
+ 
+         return pers
+ 
+     @staticmethod
+     def _find_matching_entities(entities, first_name, last_name,
+                                 birth_date, gender):
+         matching_entities = []
+ 
+         for entity in entities:
+             if not entity.is_person:
+                 continue
+ 
+             if first_name.lower() not in (
+                     entity.name.first.lower(),
+                     entity.name.preferred.lower(),
+                     ):
+                 continue
+ 
+             if last_name.lower() != entity.name.last.lower():
+                 continue
+ 
+             if (gender and entity.gender[0].upper() != "U"
+                     and gender[0].upper() != entity.gender[0].upper()):
+                 continue
+ 
+             # Birth date match is required.
+             if (birth_date and entity.birth_date
+                     and birth_date == entity.birth_date):
+                 matching_entities.append(entity)
+ 
+         return matching_entities
+ 
+     def connect(self, create, birth_date, gender=None):
+         "Connect this user to a person in the NOLS database."
+ 
+         if self.entity_id:
+             # Connection already made
+             log.debug("Connection already made")
+             return False
+ 
+         email = self.email
+         first_name = self.first_name
+         last_name = self.last_name
+ 
+         # Try searching by email first
+         entities = da.entity.get_entities(email=email)
+ 
+         # Only connect to individuals (not organizations)
+         entities = [entity for entity in entities if entity.is_person]
+ 
+         matching_entities = self._find_matching_entities(entities,
+                                                          first_name, last_name,
+                                                          birth_date, gender)
+ 
+ # Security vulnerability.
+ # Someone who knows an existing person's name and birthdate could create an
+ # account that is automatically connected to the existing person, thus exposing
+ # the existing person's data to someone that is not them.
+ #
+ #        # If we didn't get any matches, do a wider search based on first
+ #        # and last name.
+ #        if not matching_entities:
+ #            entities = da.entity.get_entities(first_name=first_name,
+ #                last_name=last_name)
+ #            matching_entities = self._find_matching_entities(entities,
+ #                first_name, last_name, birth_date, gender)
+ 
+         # Be conservative. Only connect to an existing person if there is
+         # exactly one match.
+         if len(matching_entities) == 1:
+             con_entity = matching_entities[0]
+ 
+             # Make sure that the email in our Django user also exists, and is
+             # marked as 'Current', in the NOLS database.
+             existing_email = con_entity.find_email_address(email)
+             if existing_email:
+                 if existing_email.status != 'Current':
+                     existing_email.status = 'Current'
+                     da.entity.save_email_address(existing_email)
+             else:
+                 new_email = da.entity.get_new_email_address(con_entity.id)
+                 new_email.email_address = email
+                 new_email.status = 'Current'
+                 da.entity.save_email_address(new_email)
+ 
+             self.entity_id = con_entity.id
+             self.was_connected = True
+             self.save()
+ 
+             self.entity.current_interaction_id = Interaction\
+                        .ID.PORTAL_ACCOUNT_CONNECTED
+             self.entity.update_extra_fields()
+ 
+         elif create:
+             self.entity_id = self._create_entity(gender).id
+             self.save()
+ 
+             self.entity.current_interaction_id = Interaction\
+                        .ID.PORTAL_ACCOUNT_CREATED_IN_CORE
+             self.entity.current_interaction_details = 'Username: %s'\
+                                                       % self.username
+             self.entity.update_extra_fields()
+ 
+         return self.was_connected
+ 
+     def might_have_active_app(self):
+         csrs = CourseStatusRecordTab.objects.filter(application__person__emailtab__email=self.email,
+                                                     current=True,
+                                                     enrolled_or_waitlisted=True,
+                                                     upcoming=True)
+         return csrs.exists()
+ 
+     # TODO why is this in model
+     def send_password_reset_email(self, site_name, domain, protocol, email=None):
+         send_to_email = email if email else self.email
+         login_url = "%s://%s%s" % (protocol, domain, reverse('login'))
+         reset_url = "%s://%s%s" % (protocol,
+                                    domain,
+                                    reverse('password_reset_confirm',
+                                            args=(urlsafe_base64_encode(force_bytes(self.pk)),
+                                                  default_token_generator.make_token(self))))
+         global_merge_vars = {
+             'ACCOUNT': True,
+             'USERNAME': self.username,
+             'STUDENT_FIRST_NAME': self.first_name,
+             'SITE_NAME': site_name,
+             'RESET_URL': reset_url,
+             'LOGIN_URL': login_url
+         }
+         log.info('sending password reset email to %s', send_to_email)
+         send_html_email(TEMPLATE.PASSWORD_RESET,
+                         recipients=[send_to_email],
+                         global_merge_vars=global_merge_vars,
+                         nols_person=self.nols_person)
+ 
+     def has_any_perms(self, perms):
+         for permission in perms:
+             if self.has_perm("{model}.{codename}".format(model=permission.content_type.model,
+                                                          codename=permission.codename)):
+                 return True
+         return False
+ 
+ 
+ #Set the last_name max_length to 75, to fit what's in the DB
+ for i, field in enumerate(User._meta.fields):
+     if field.get_attname() == 'last_name':
+         User._meta.fields[i].max_length = 75
+         break
+ 
+ 
+ class Department(models.Model):
+     app_label = models.CharField(max_length=20, primary_key=True)
+     name = models.CharField(max_length=40)
+ 
+     def __unicode__(self):
+         return self.name
+ 
+ 
+ class NameChangeRequest(models.Model):
+     user = models.ForeignKey('User')
+     prefix = models.CharField(choices=BLANK_CHOICES + NAME_PREFIX.CHOICES,
+                               max_length=3, null=True, blank=True)
+     first_name = models.CharField(max_length=30)
+     preferred_name = models.CharField(max_length=30, null=True, blank=True)
+     middle_name = models.CharField(max_length=20, null=True, blank=True)
+     last_name = models.CharField(max_length=75)
+     suffix = models.CharField(max_length=6, null=True, blank=True)
+     reason = models.CharField(choices=NAME_CHANGE.CHOICES, max_length=20)
+     status = models.CharField(choices=STATUS.CHOICES, max_length=10, default='Pending')
+     declination_reason = models.TextField(null=True, blank=True)
+ 
+     def __unicode__(self):
+         name_str = u'{pre} ({pref}) {first} {middle} {last} {suf}'.format(pre=self.prefix,
+                                                                           first=self.first_name,
+                                                                           pref=self.preferred_name,
+                                                                           middle=self.middle_name,
+                                                                           last=self.last_name,
+                                                                           suf=self.suffix)
+ 
+         return name_str.strip().replace('  ', ' ') if self.preferred_name \
+             else name_str.replace('()', '').strip().replace('  ', ' ')
+ 
+     @property
+     def new_name(self):
+         return self.__unicode__()
+ 
+     @property
+     def old_name(self):
+         name = self.user.entity.name
+         name_str = u'{pre} ({pref}) {first} {middle} {last} {suf}'.format(pre=name.prefix,
+                                                                           first=name.first,
+                                                                           pref=name.preferred,
+                                                                           middle=name.middle,
+                                                                           last=name.last,
+                                                                           suf=name.suffix)
+ 
+         return name_str.strip().replace('  ', ' ') if name.preferred \
+             else name_str.replace('()', '').strip().replace('  ', ' ')
+ 
+     @property
+     def person_nexus_link(self):
+         link = format_html(
+             u'<a href="http://{domain}/nexus/#people/{id}" target="_blank">Person ({id})</a>'.format(
+                 domain=settings.NEXUS_SERVER,
+                 id=self.user.entity.id
+             )
+         )
+         return link
+ 
+ 
+ class Application(models.Model):
+     group = models.PositiveIntegerField()
+     option = models.CharField(max_length=4)
+     applicant = models.ForeignKey('User')
+     department = models.ForeignKey(Department)
+     course_type = models.ForeignKey(ContentType)
+     course_id = models.PositiveIntegerField()
+     payment = models.CharField(max_length=100, null=True, blank=True)
+     started = models.DateTimeField(default=datetime.now)
+     received = models.DateTimeField(blank=True, null=True)
+     processed = models.DateTimeField(blank=True, null=True)
+     status = models.CharField(max_length=9, choices=STATUS_CHOICES,
+                               default='S')
+ 
+     ENROLL_TYPE = None
+ 
+     def __unicode__(self):
+         return ' - '.join([self.applicant.name, str(self.course.name)])
+ 
+     def save(self, *args, **kwargs):
+         self.department = Department.objects.get(pk=self.course_type.app_label)
+         super(Application, self).save(*args, **kwargs)
+ 
+     @property
+     def best_phone_number(self):
+         core_number = self.applicant.entity.get_preferred_phone_number()
+         if core_number is not None:
+             return core_number.full_number
+         else:
+             return None
+ 
+     @property
+     def course(self):
+         course_type = ContentType.objects\
+                                  .get(app_label=self.course_type.app_label,
+                                       model='course')
+         return course_type.get_object_for_this_type(id=self.course_id)
+ 
+     @property
+     def course_name(self):
+         return self.course.name
+ 
+     @property
+     def is_enrollable(self):
+         return all((
+             self.ENROLL_TYPE,
+             self.status == 'A',
+             ))
+ 
+     @allow_tags
+     def enroll_link(self):
+         if self.is_enrollable and self.applicant.nols_person.dupcheck:
+             return u'<a href="enroll/%s/%s/">Enroll</a>' % (
+                 self.ENROLL_TYPE, str(self.group))
+         elif self.is_enrollable and not self.applicant.nols_person.dupcheck:
+             return 'Needs Dup Check'
+         else:
+             return ''
+ 
+     def mark(self, status):
+         assert status in dict(STATUS_CHOICES)
+         if status == 'A':
+             self.received = datetime.now()
+         if status == 'E':
+             self.processed = datetime.now()
+         self.status = status
+ 
+     @staticmethod
+     def next_group_id():
+         # requires core_application_group_seq
+         curs = connection.cursor()
+         if settings.DATABASES['default']['ENGINE'].split('.')[-1] == 'oracle':
+             curs.execute("select core_application_group_seq.nextval from dual")
+         else:
+             raise Exception('what database are YOU using?')
+         return curs.fetchone()[0]
+ 
+ 
+ class Signal(models.Model):
+     name = models.CharField(max_length=20, primary_key=True)
+     value = models.CharField(max_length=20)
+ 
+ 
+ class TempAddress(models.Model):
+     type = models.CharField(max_length=20)
+     organization = models.CharField(max_length=75)
+     line_1 = models.CharField(max_length=75)
+     line_2 = models.CharField(max_length=75)
+     city = models.CharField(max_length=50)
+     state = models.CharField(max_length=50)
+     zip = models.CharField(max_length=10)
+     # zip_ext = models.CharField(max_length=20)
+     country = models.CharField(max_length=50)
+ 
+ 
+ class DataEntryEvent(models.Model):
+     """A subclassable generic event."""
+     slug = models.SlugField(
+         'short name',
+         max_length=92,
+         blank=True,
+         null=True,
+         unique=True,
+         help_text="""Enter only numbers, letters, spaces and dashes.""")
+     start_form = models.DateTimeField('show form')
+     stop_form = models.DateTimeField('close form')
+ 
+     def is_available(self):
+         now = datetime.now()
+         return self.start_form < now < self.stop_form
+     is_available.boolean = True
+     is_available.short_description = 'public form is available'
+ 
+     def has_opened(self):
+         now = datetime.now()
+         return self.start_form < now
+     has_opened.boolean = True
+ 
+     @abstractmethod
+     def validate_person_id(self, person_id):
+         """
+         Validate the person_id based on subclass needs. Return a list
+         with a boolean for whether or not the submission should be allowed,
+         and a message to be put in the template context.
+ 
+         @param person_id: NolsPerson.person_id
+         @return a list with two items. see above.
+         """
+         raise NotImplementedError
+ 
+     def __unicode__(self):
+         return self.slug
+ 
+ 
+ def person_exists_validator(person_id):
+     if not NolsPerson.objects.filter(person_id=person_id).exists():
+         raise ValidationError("%d is not a valid person_id" % person_id)
+ 
+ 
+ class PublicEntry(models.Model):
+     """
+     A record of each public entry.
+     """
+     person_id = models.IntegerField(help_text="NOLS Person Id", blank=True,
+                                     validators=[person_exists_validator])
+     dupe = models.BooleanField('possible duplicate', default=False)
+     spam = models.BooleanField(default=False)
+     creation_date = models.DateTimeField(auto_now_add=True)
+     created_by = models.CharField(max_length=255, editable=False, null=True)
+     modification_date = models.DateTimeField(auto_now=True)
+     modified_by = models.CharField(max_length=255, editable=False, null=True)
+     how_created = models.CharField(max_length=50, blank=True, null=True)
+ 
+     class Meta:
+         verbose_name = 'person record'
+ 
+     @property
+     def person(self):
+         return da.entity.get_entity(self.person_id)
+ 
+     def get_person_name(self):
+         submitter = self.person
+         # This works acceptably well for an organization as well as a person.
+         if submitter:
+             return submitter.name
+         else:
+             return None
+ 
+     def update_address(self, address_data):
+         assert self.person_id is not None,\
+             "Cannot update the address without a person id."
+         address = da.entity.get_new_address(self.person_id)
+         formhelp.populate_address_attrs(address_data, address)
+         is_new_address = not self.person\
+                                  .is_duplicate_address(address,
+                                                        std_before_cmp=True)
+         if is_new_address:
+             da.entity.save_address(address, use_orig_on_error=True)
+ 
+         return is_new_address
+ 
+     def add_new_email(self, email_data):
+         assert self.person_id is not None,\
+             "Cannot add an email without a person id."
+         # we only want to add an email address to a newly created person
+         assert len(da.entity.get_email_addresses_for_entity_id(self.person_id)) == 0,\
+             "This must be this entity's first email address."
+         email = da.entity.get_new_email_address(self.person_id)
+         formhelp.populate_email_attrs(email_data, email)
+         da.entity.save_email_address(email)
+ 
+     def update_phone(self, phone_data):
+         assert self.person_id is not None,\
+             "Cannot add a phone number without a person id."
+         phone = da.entity.get_new_phone_number(self.person_id)
+         formhelp.populate_phone_attrs(phone_data, phone)
+         is_new_phone = not self.person.is_duplicate_phone_number(phone)
+         if is_new_phone:
+             da.entity.save_phone_number(phone)
+ 
+         return is_new_phone
+ 
+     def save(self, *args, **kwargs):
+         if not self.pk:
+             self.created_by = settings.NOLS_DA_USER
+ 
+         self.modified_by = settings.NOLS_DA_USER
+         super(PublicEntry, self).save(*args, **kwargs)
+ 
+     def __unicode__(self):
+         name = self.get_person_name()
+         if name and self.person_id:
+             return "%s, %s (%d)" % (name.last, name.preferred, self.person_id)
+         else:
+             return "Entry with Person Id: %d" % (self.person_id)
+ 
+ 
+ #######################################
+ ####### READ ONLY CORE DB STUFF #######
+ #######################################
+ class AccountTabManager(UpdatelessManager):
+     def get_tpp_lines(self, *args, **kwargs):
+         return super(AccountTabManager, self).filter(*args, **kwargs).filter(
+             transaction_description__contains=self.model.DESCRIPTION['TPP'],
+         ).exclude(transaction_description__contains='Cancel').exclude(
+             transaction_description__contains='crease'
+         )
+ 
+     def get_tpp_cancel_lines(self, *args, **kwargs):
+         return super(AccountTabManager, self).filter(*args, **kwargs).filter(
+             transaction_description__contains='Protection',
+             transaction_description__startswith='Cancel'
+         )
+ 
+ 
+ class AccountTabViewableManager(AccountTabManager):
+     def filter(self, *args, **kwargs):
+         """
+         Jennifer Reed's rules to reduce the number of lines we show the customer.
+         Don't show transaction lines of $0 unless
+         if ref is D% and description contains enroll - show
+         if ref is D% and description contains cancel "course" or transfer "course"- show
+         if ref is B% and description contains enroll - show
+         if ref is AP% - show
+         if ref is ROA% - show
+ 
+         There was no easy way to get 'cancel "course"', so I excluded other cancel lines since
+         there were only two distinct varieties.
+         """
+         qs = super(AccountTabManager, self).filter(*args, **kwargs)
+         enroll = Q(transaction_description__icontains="enroll")
+         cancel = Q(transaction_description__icontains="cancel")
+         transfer = Q(transaction_description__icontains="transfer")
+         ref_d = Q(reference__startswith="D")
+         ref_b = Q(reference__startswith="B")
+         ref_ap = Q(reference__startswith="AP")
+         ref_roa = Q(reference__startswith="ROA")
+         zero_lines = qs.filter(amount=0).filter(
+             (ref_d & enroll) | (ref_d & cancel) | (ref_d & transfer) | (ref_b & enroll) | ref_ap | ref_roa
+         ).exclude(transaction_description="Cancel Equipment Deposit").exclude(
+             transaction_description__contains="Protection"
+         )
+         return qs.exclude(amount=0) | zero_lines
+ 
+ 
+ class AccountTab(UneditableModel):
+     STATUS_HOLD = 'Hold'
+     WEB_DECLINE_TPP = 'WEB_DECLINE_TPP'
+     COLLEGE_CREDIT = 'College Credit'
+     DESCRIPTION = {
+         'TPP': 'Tuition Protection',
+         WEB_DECLINE_TPP: 'Cancel %s Protection',
+         'CC': 'Optional %s' % COLLEGE_CREDIT,
+         'HC': 'High School Credit',
+         'EQUIP': 'Equipment Deposit',
+         'APPFEE': 'Non-Refundable Application Fee',
+         'WAIVE_EQUIP': 'Waive Equip. Dep. at Deissue'
+     }
+ 
+     FRIENDLY_DESCRIPTION = {
+         DESCRIPTION['TPP']: 'Tuition Protection Plan',
+         WEB_DECLINE_TPP: 'Cancel Tuition Protection Plan For %s'
+     }
+ 
+     _EXPLANATION = {
+         DESCRIPTION['EQUIP']: ("The equipment deposit will go toward anything "
+                                "{personed_noun} may rent or purchase from NOLS."
+                                " After the course a refund will be issued"
+                                " for any unused deposit or a bill will be "
+                                "sent for any rentals/purchases that"
+                                " exceed the deposit amount.")
+     }
+ 
+     id = models.AutoField(db_column='accountentryid', primary_key=True)
+     application = models.ForeignKey('ApplicationTab',
+                                     db_column='applicationid')
+     account_type = models.CharField(db_column='accounttype', max_length=30)
+     transaction_date = models.DateField(db_column='transactiondate', null=True)
+     creation_ts = models.DateTimeField(db_column='creationdate', null=True,
+                                        auto_created=True)
+     status = models.CharField(db_column='accountstatus', max_length=30)
+     amount = models.DecimalField(db_column='amount', max_digits=38,
+                                  decimal_places=2, null=True)
+     account_balance = models.DecimalField(max_digits=38, decimal_places=2,
+                                           null=True,
+                                           db_column='accountbalance')
+     transaction_description = models.CharField(db_column='transactiondescription',
+                                                max_length=35,
+                                                null=True)
+     modified_by = models.CharField(db_column='modifiedby', max_length=30)
+     reference = models.CharField(db_column='reference', max_length=8)
+ 
+     objects = AccountTabManager()
+     viewable_lines = AccountTabViewableManager()
+ 
+     class Meta:
+         db_table = 'ACCOUNTTAB'
+         managed = False
+         verbose_name = 'account line'
+ 
+     def status_is_hold(self):
+         return self.status == self.STATUS_HOLD
+ 
+     def cancelled_this_tpp(self, end_date=None):
+         if end_date is None:
+             end_date = date.today() + timedelta(days=1)
+ 
+         if self.tppoverride_set.exists():
+             return self.tppoverride_set.get().cancelled
+ 
+         # If we made a record that they cancelled this tpp line, then use that fact.
+         cancelled = hasattr(self, 'tpp_cancellation') and self.tpp_cancellation.exists()
+ 
+         # Otherwise go about your complicated business.
+         cancelled = cancelled or self in self.application.cancelled_tpp_lines(end_date=end_date)
+ 
+         return cancelled
+ 
+     def get_second_person_explanation(self):
+         return self._get_personed_explanation(2)
+ 
+     def get_third_person_explanation(self):
+         return self._get_personed_explanation(3)
+ 
+     def get_named_explanation(self):
+         return self._get_personed_explanation(3, use_name=True)
+ 
+     def _get_personed_explanation(self, grammatical_person, use_name=False):
+         description = unicode(self._EXPLANATION.get(self.transaction_description))
+         if use_name:
+             personed_noun = self.application.person.entity.name.format('N')
+             possessive_noun = u"'".join([self.application.person.entity.name.format('N'), u's'])
+         else:
+             personed_noun = get_person_pronoun(self.application.person.entity, 'nominative', grammatical_person)
+             possessive_noun = get_person_pronoun(self.application.person.entity, 'genitive', grammatical_person)
+         return description.format(personed_noun=personed_noun, possessive_noun=possessive_noun)
+ 
+     def has_explanation(self):
+         return bool(self._EXPLANATION.get(self.transaction_description))
+ 
+     def has_tpp_description(self):
+         has_tp = self.DESCRIPTION['TPP'] in self.transaction_description
+         no_cancel = 'Cancel' not in self.transaction_description
+         # exclude TPP rate increases and decreases
+         no_crease = 'crease' not in self.transaction_description
+         return has_tp and no_cancel and no_crease
+ 
+     def has_cancel_tpp_description(self):
+         start_matches = self.transaction_description[:6] == self.DESCRIPTION[self.WEB_DECLINE_TPP][:6]
+         protection = 'Protection' in self.transaction_description
+ 
+         return (start_matches and protection) or self._cancelled_online()
+ 
+     def _cancelled_online(self):
+         """
+         Is this line a credit line for cancelling TPP? We keep records on that kind of thing.
+         """
+         return hasattr(self, 'tpp_credit') and self.tpp_credit.exists()
+ 
+     def customer_friendly_description(self):
+         if self.has_cancel_tpp_description():
+             course_code = self.transaction_description.split(' ')[1]
+             # make sure the description follows the convention and course_code looks like a course
+             # code
+             if (2 <= len(course_code) <= 4) and course_code.isupper():
+                 friendly_description = self.FRIENDLY_DESCRIPTION[self.WEB_DECLINE_TPP] % course_code
+             else:
+                 friendly_description = self.transaction_description
+         else:
+             friendly_description = self.FRIENDLY_DESCRIPTION.get(self.transaction_description)
+ 
+         return friendly_description if friendly_description else self.transaction_description
+ 
+     def paid_this_tpp(self, end_date=None):
+         """
+         Decide if the student has paid for this TPP line.
+ 
+         Cycle through subsequent account lines, and if the balance ever reaches a level where it
+         looks like they paid for TPP then return True.
+         """
+         if end_date is None:
+             end_date = date.today() + timedelta(days=1)
+ 
+         if self.tppoverride_set.exists():
+             return self.tppoverride_set.get().paid
+ 
+         if self.cancelled_this_tpp(end_date=end_date):
+             return False
+ 
+         app_account_lines = AccountTab.objects.filter(
+             application=self.application,
+             transaction_date__lt=end_date
+         )
+         subsequent_account_lines = app_account_lines.filter(
+             application=self.application,
+             pk__gt=self.pk,
+         ).order_by('pk')
+         waive_equipment_deposit = app_account_lines.filter(
+             application=self.application,
+             transaction_description=self.DESCRIPTION['WAIVE_EQUIP'],
+         ).exists()
+         if waive_equipment_deposit:
+             equipment_deposit = app_account_lines.filter(
+                 application=self.application,
+                 transaction_description=self.DESCRIPTION['EQUIP'],
+             ).last().amount
+         else:
+             equipment_deposit = 0
+         academic_credit_balance = 0
+         for line in subsequent_account_lines:
+             subsequent_tpp_lines = subsequent_account_lines.filter(
+                 transaction_description=self.DESCRIPTION['TPP'],
+                 pk__gt=line.pk
+             )
+             subsequent_same_tpp_lines = subsequent_tpp_lines.filter(
+                 amount=self.amount
+             )
+             if line.transaction_description.startswith('Cancel %s' % self.status[:3]):
+                 break
+             # Sometimes finance doesn't add a new TPP line if the new TPP will be the same price as
+             # the old TPP after a transfer. Only if they haven't paid for it yet, of course.
+             if line.transaction_description.startswith('Transfer Off') and subsequent_tpp_lines.exists():
+                 # If there is a subsequent TPP line with the same amount, then break.
+                 if subsequent_same_tpp_lines.exists():
+                     break
+ 
+                 # Otherwise, check and see if there is another transfer between us and the
+                 # subsequent TPP line. If there is the keep going, otherwise, break.
+                 intermediate_transfer = subsequent_account_lines.filter(
+                     transaction_description__startswith='Transfer Off',
+                     pk__lt=subsequent_tpp_lines.first().pk,
+                     pk__gt=line.pk
+                 )
+                 if not intermediate_transfer.exists():
+                     break
+ 
+             if self.DESCRIPTION['HC'] in line.transaction_description or\
+                     self.COLLEGE_CREDIT in line.transaction_description:
+                 academic_credit_balance += line.amount
+             exclude_academic_credit = academic_credit_balance < self.amount
+             adjusted_balance = academic_credit_balance if exclude_academic_credit else 0
+             if waive_equipment_deposit:
+                 adjusted_balance += equipment_deposit
+ 
+             if line.account_balance - adjusted_balance <= 0 + CourseStatusRecordTab.TPP_PAID_PADDING:
+                 return True
+         else:
+             if self.account_balance <= 0 + CourseStatusRecordTab.TPP_PAID_PADDING:
+                 return True
+         return False
+ 
+     def __unicode__(self):
+         return unicode(self.id)
+ 
+ 
+ class FinAccountTab(UneditableModel):
+     id = models.AutoField(db_column='accountid', primary_key=True)
+     description = models.CharField(db_column='description', max_length=30)
+ 
+     def __unicode__(self):
+         return self.description
+ 
+     class Meta:
+         db_table = 'FINACCOUNTTAB'
+         managed = False
+ 
+ 
+ class FinCashTab(UneditableModel):
+     GROUP_NAMES = {
+         'APP_FEE': 'AdmissionsB',
+         'GENERAL_ADMISSIONS_PAYMENT': 'AdmissionsR',
+         'PRO': 'PTI',
+         'WRMC': 'RiskMgmt',
+         'LNT': 'LNT',
+         'WMI': 'WMI',
+         'GIFT': 'Donation',
+         'SEM_PAY': 'Seminars',
+         'ALUMNI': 'Reunion/Event',
+         'OTHER': 'Other',
+     }
+ 
+     PAYMENT_TYPE = {
+         'O': 'Online',
+         'AP': 'Auto Post',
+         'RO': 'Refund Online',
+         'RAP': 'Refund Auto Post',
+         'RE': 'Redeposit',
+         'CHECK': 'F Check',
+         'CC': 'CC',
+         'R': 'Refund',
+         'Stripe Check': 'Stripe Check',
+         'Stripe Credit': 'Stripe Credit',
+         'Refund Stripe Credit': 'Refund Stripe Credit',
+         'Refund Stripe Check': 'Refund Stripe Check',
+     }
+ 
+     id = models.AutoField(db_column='cashid', primary_key=True)
+     amount = models.DecimalField(db_column='amount', max_digits=13,
+                                  decimal_places=2, null=True)
+     type_of_payment = models.CharField(db_column='typeofpayment',
+                                        max_length=16, null=True)
+     group_name = models.CharField(db_column='groupname', max_length=25,
+                                   null=True)
+     application = models.ForeignKey('ApplicationTab', db_column='apid',
+                                     null=True)
+     posting_ts = models.DateTimeField(db_column='postingdate', null=True)
+     account = models.ForeignKey(FinAccountTab, db_column='debitaccount',
+                                 null=True)
+ 
+     class Meta:
+         db_table = 'FINCASHTAB'
+         managed = False
+ 
+ 
+ class FtrTab(UneditableModel):
+     DISPLAY_NUMBERS = {
+         'DAYS_POST_CREATION': 2,
+         'HOURS_POST_PRINT': 4
+     }
+     id = models.AutoField(db_column='ftrid', primary_key=True)
+     application = models.ForeignKey('ApplicationTab',
+                                     db_column='applicationid')
+     type = models.CharField(max_length=10, db_column='ftrtype', null=True)
+     printed_ts = models.DateTimeField(db_column='dateprint', null=True)
+     modified_by = models.CharField(db_column='modifiedby', max_length=30, null=True)
+     course = models.ForeignKey('CourseTab', db_column='courseid', null=True)
+     created_by = models.CharField(db_column='createdby', max_length=30, null=True)
+     created = models.DateTimeField(db_column='datecreate', null=True)
+ 
+     class Meta:
+         db_table = 'FTRTAB'
+         managed = False
+ 
+     def do_not_display(self):
+         """
+         Can we display the account statement to the student.
+         """
+         return self.display_status()[0]
+ 
+     def display_status(self):
+         """
+         The Admissions.Dashboard application uses this method to determine when it is safe to
+         display account balances to students. Finance prints FTR reports each morning and makes
+         balance adjustments as needed, often for TPP, scholarships, and refunds in connection
+         with a transfer or cancellation. Waiting for DAYS_POST_CREATION and HOURS_POST_PRINT
+         allows time for Finance to get balances in good order so we don't show incorrect
+         amounts to students in their course dashboards.
+ 
+         According to Jennifer Reed on 11Dec15: FTR type 'B' means that a new application ID was
+         created (could be enroll or waitlist), and type 'D' is for things which modify an existing
+         app ID (e.g. transfer, cancel, refund, etc.).
+ 
+         This handles type B FTRs for Pro differently because Pro's old style (v1) applications
+         don't create an app ID at the time deposits are paid. Pro can connect the deposit ROA to
+         the app ID when they create a manual enrollment with Nexus, but Finance still has to post
+         the ROA before the correct balance will show up in a student's dashboard.
+         """
+         NOLS_PRO_BRANCH = 'PTI'
+         FTR_B = 'B'
+         FTR_D = 'D'
+         any_type_d = self.type == FTR_D
+         pro_type_b = self.type == FTR_B and self.course.branch.code == NOLS_PRO_BRANCH
+         by_webclient = self.created_by.lower() == settings.NOLS_DA_USER \
+             and self.modified_by.lower() == settings.NOLS_DA_USER
+         do_not_display = False
+         time_displayable = None
+         # Start of FTR delay override (for testing)
+         if WhereAmI().dangerous_stuff_allowed:
+             if nolspro.models.FTRDelayOverride.objects.exists():
+                 if nolspro.models.FTRDelayOverride.objects.first().switch_off_delay:
+                     # Globally disable FTR delays (always show account statement & balance)
+                     return do_not_display, time_displayable
+         # End of FTR delay override
+         if (any_type_d or pro_type_b) and not by_webclient:
+             if self.printed_ts is None:
+                 date_displayable = date.today() + timedelta(
+                     days=(self.DISPLAY_NUMBERS['DAYS_POST_CREATION'] - nols_business_days_elapsed(
+                         self.created.date(), date.today()))
+                 )
+                 time_displayable = datetime(date_displayable.year, date_displayable.month,
+                                             date_displayable.day)
+                 do_not_display = date_displayable >= date.today()
+ 
+             elif self.printed_ts + timedelta(hours=self.DISPLAY_NUMBERS['HOURS_POST_PRINT']) > \
+                     datetime.now():
+                 time_displayable = self.printed_ts + timedelta(
+                     hours=self.DISPLAY_NUMBERS['HOURS_POST_PRINT']
+                 )
+                 do_not_display = True
+ 
+         return do_not_display, time_displayable
+ 
+     def __unicode__(self):
+         return unicode(self.id)
+ 
+ 
+ class ApplicationTab(UneditableModel):
+     FORM_REJECTED = 'X'
+     FORM_CLEARED = 'O'
+     FORM_IN_REVIEW = '?'
+     FORM_CHOICES = ((FORM_REJECTED, 'Rejected'),
+                     (FORM_IN_REVIEW, 'In Review'),
+                     (FORM_CLEARED, 'Okay'))
+ 
+     DEPOSIT_AMOUNT = 500
+     id = models.AutoField(db_column='applicationid', primary_key=True)
+     person = models.ForeignKey('NolsPerson', null=False, db_column='personid')
+     creation_date = models.DateField(db_column='creationdate', verbose_name="Application Creation Date")
+ 
+     # Forms ... gah! These are duplicated in Nexus, changes here will have to be duplicated there
+     medical_form = models.CharField(db_column='medicalformreceived',
+                                     max_length=10, default='M',
+                                     choices=FORM_CHOICES)
+     insurance_form = models.CharField(db_column='insuranceform', max_length=1,
+                                       default='I', choices=FORM_CHOICES)
+     statement_of_standing = models.CharField(db_column='statementofstanding',
+                                              max_length=50, default='GS',
+                                              choices=FORM_CHOICES)
+     student_info = models.CharField(db_column='studentinfo', max_length=50,
+                                     default='SI', choices=FORM_CHOICES)
+     transcript = models.CharField(db_column='transcript', max_length=50,
+                                   default='T', choices=FORM_CHOICES)
+     release = models.CharField(db_column='releaseform', max_length=1,
+                                default='R', choices=FORM_CHOICES)
+     college_credit_registration = models.CharField(db_column='ccregistrationform',
+                                                    max_length=2, default='CR',
+                                                    choices=FORM_CHOICES)
+     photo_status = models.CharField(db_column='photo',
+                                     max_length=2, default='N',
+                                     choices=FORM_CHOICES)
+     emergency_contact = models.CharField(db_column='econtact_info', max_length=2,
+                                          default='EC', choices=FORM_CHOICES)
+     guardian_info = models.CharField(db_column='guardian_info', max_length=2,
+                                      default='PG', choices=FORM_CHOICES)
+     travel_info = models.CharField(db_column='travel_info', max_length=2,
+                                    default='TV', choices=FORM_CHOICES)
+     tuition_protection_decision = models.CharField(max_length=3)
+     tuition_protection_country = models.CharField(max_length=50)
+     tuition_protection_region = models.CharField(max_length=30)
+ 
+     class Meta:
+         db_table = 'APPLICATIONTAB'
+         managed = False
+ 
+     def account_displayable(self):
+         return self.display_status()['displayable']
+ 
+     def display_status(self):
+         ftrs = FtrTab.objects.filter(Q(type='D') | Q(type='B', course__branch__code='PTI'),
+                                      application=self)
+         status = {'displayable': True,
+                   'time_displayable': None}
+         for ftr in ftrs:
+             ftr_status = ftr.display_status()
+             if ftr_status[0]:
+                 status['displayable'] = False
+                 status['time_displayable'] = ftr_status[1]
+                 break
+ 
+         if status['displayable']:
+             last_line = AccountTab.objects.filter(application=self) \
+                 .order_by('-id').first()
+             status['displayable'] = not last_line.status_is_hold()
+ 
+         return status
+ 
+     def override_message(self):
+         """Convenience method to get a related financial override message, if applicable"""
+         if hasattr(self, 'financialoverride') and (self.financialoverride.message !=
+                                                    self.financialoverride.BLANK):
+             return self.financialoverride.get_message_display()
+         else:
+             return None
+ 
+     def balance_override(self):
+         """Convenience method to check for a related balance override"""
+         return hasattr(self, 'financialoverride') and self.financialoverride.balance_override
+ 
+     def account_balance(self, exclude_academic_credit=False):
+         if exclude_academic_credit:
+             # We try to exclude all of the lines that add or cancel academic credit.
+             balance = AccountTab.objects.filter(application=self).exclude(
+                 transaction_description__contains=AccountTab.COLLEGE_CREDIT)\
+                 .exclude(transaction_description__contains=AccountTab.DESCRIPTION['HC'])\
+                 .aggregate(Sum('amount'))['amount__sum']
+         else:
+             balance = AccountTab.objects.filter(application=self).aggregate(Sum('amount'))['amount__sum']
+         return balance
+ 
+     def academic_credit_balance(self):
+         hs_credit_lines = Q(transaction_description__contains=AccountTab.DESCRIPTION['HC'])
+         college_credit_lines = Q(transaction_description__contains=AccountTab.COLLEGE_CREDIT)
+         return AccountTab.objects.filter(hs_credit_lines | college_credit_lines, application=self)\
+             .aggregate(Sum('amount'))['amount__sum']
+ 
+     def get_current_csrs(self):
+         return CourseStatusRecordTab.objects.filter(application=self,
+                                                     current=True)\
+             .order_by('status')\
+             .select_related('course')
+ 
+     def get_active_csr(self):
+         # Return the enrolled csr if a student is enrolled and waitlisted
+         return self.get_current_csrs().first()
+ 
+     @staticmethod
+     def payment_policy(csr=None):
+         policy_title = 'Admissions Policy'
+         policy_label = 'I agree to the %s.' % policy_title
+         if csr and csr.course.is_pro_or_lnt:
+             policy_text = nolspro.models.ClientCourseDashboard.combined_policies(
+                 csr=csr)
+         else:
+             policy_text = render_to_string('policies/admissions/admissions.html', {})
+         return ((policy_label, policy_text),)
+ 
+     def update_forms(self):
+         # This is kind of dumb. Fetch it through a different framework to save
+         # Maybe we should just let django change things?
+         da_application = da.admissions.get_application(self.pk)
+         da_application.med_received                = self.get_medical_form_display()
+         da_application.insurance_form              = self.get_insurance_form_display()
+         da_application.statement_of_standing       = self.get_statement_of_standing_display()
+         da_application.student_info                = self.get_student_info_display()
+         da_application.transcript                  = self.get_transcript_display()
+         da_application.release_form                = self.get_release_display()
+         da_application.cc_reg_form                 = self.get_college_credit_registration_display()
+         da_application.photo                       = self.get_photo_status_display()
+         da_application.econtact_info               = self.get_emergency_contact_display()
+         da_application.guardian_info               = self.get_guardian_info_display()
+         da_application.travel_info                 = self.get_travel_info_display()
+         da_application.tuition_protection_decision = self.tuition_protection_decision
+         da_application.tuition_protection_country  = self.tuition_protection_country
+         da_application.tuition_protection_region   = self.tuition_protection_region
+         da.admissions.update_application_form_status(da_application)
+ 
+     def cancelled_tpp_lines(self, end_date=None):
+         if end_date is None:
+             end_date = date.today() + timedelta(days=1)
+ 
+         app_lines = AccountTab.objects.filter(
+             application=self,
+             transaction_date__lt=end_date
+         ).order_by('pk')
+ 
+         cancel_lines = [l for l in app_lines if l.has_cancel_tpp_description()]
+         if len(cancel_lines) == 0:
+             return []
+ 
+         tpp_lines = [l for l in app_lines if l.has_tpp_description()]
+         adjustment_lines = [l for l in app_lines if l.transaction_description.startswith(AccountTab.DESCRIPTION['TPP'])
+                             and l.transaction_description.endswith('crease')]
+ 
+         # Make each TPP line aware of the number of TPP lines before and after this TPP line that
+         # have the same amount. We'll need this information to try to discern if this TPP line
+         # has been cancelled or not.
+         for i in range(len(tpp_lines)):
+             tpp_lines[i].same_after = 0
+             if not hasattr(tpp_lines[i], 'same_before'):
+                 tpp_lines[i].same_before = 0
+             for j in range(i + 1, len(tpp_lines)):
+                 if not hasattr(tpp_lines[j], 'same_before'):
+                     tpp_lines[j].same_before = 0
+                 if tpp_lines[i].amount == tpp_lines[j].amount:
+                     tpp_lines[i].same_after += 1
+                     tpp_lines[j].same_before += 1
+ 
+         cancelled_tpp = []
+         for line in tpp_lines:
+             for cancel_line in cancel_lines:
+                 cancelled = False
+                 # skip the cancel lines before this TPP line
+                 if cancel_line.pk < line.pk:
+                     continue
+ 
+                 # Take tuition increases and decreases into account.
+                 adjustment_amount = sum([al.amount for al in adjustment_lines if (line.pk < al.pk < cancel_line.pk)])
+ 
+                 # Is this TPP line amount the additive inverse of this cancel line amount?
+                 if line.amount + adjustment_amount == - cancel_line.amount:
+                     # When a person has multiple TPP lines with the same amount, Finance references which
+                     # TPP line is being cancelled in the transaction description with text like:
+                     # "Cancel 1st AKX TPP", so we use this to try to sort it out.
+                     ordinal = re.compile(r'\s\d[a-zA-Z]+')
+                     has_ordinal = ordinal.search(cancel_line.transaction_description)
+                     if line.same_after > 0 and has_ordinal:
+                         if int(has_ordinal.group().strip()[0]) == line.same_before + 1:
+                             cancelled = True
+                     else:
+                         cancelled = True
+                 if cancelled:
+                     cancelled_tpp.append(line)
+                     cancel_lines.remove(cancel_line)
+                     break
+         return cancelled_tpp
+ 
+     def __unicode__(self):
+         return 'Application {id}'.format(id=self.id)
+ 
+     @property
+     def nexus_link(self):
+         return u'http://{domain}/nexus/#people/?app-id={id}'.format(domain=settings.NEXUS_SERVER,
+                                                                     id=self.id)
+ 
+     def create_tuition_protection_entry(self, csr, note):
+         course_id = csr.course.id
+ 
+         if csr.course.is_pro:
+             policy_id = OTHER_POLICIES.PRO_ENROLL_IN_TPP
+         else:
+             policy_id = OTHER_POLICIES.ENROLL_IN_TPP
+ 
+         da.accounting.create_tuition_protection_entry(self.id, course_id, policy_id, note)
+ 
+     @staticmethod
+     def tuition_protection_coverage_groups(as_json=True):
+         # NOTE: Currently Canada uses the same document as US_GROUP_1; while we have two documents,
+         # their contents should be identical.
+ 
+         groups = {
+             'insurable_canadian_provinces': {
+                 'link': 'https://www.nols.edu/tpp-can-group-1',
+                 'regions': [
+                     'Alberta', 'British Columbia', 'Manitoba', 'New Brunswick',
+                     'Newfoundland and Labrador', 'Nova Scotia', 'Northwest Territories', 'Nunavut',
+                     'Ontario', 'Prince Edward Island', 'Saskatchewan', 'Yukon'],
+             },
+             'us_group_1': {
+                 'link': 'https://www.nols.edu/tpp-us-group-1',
+                 'regions': [
+                     'Alabama', 'Arkansas', 'Arizona', 'Connecticut', 'Colorado',
+                     'District of Columbia', 'Delaware', 'Florida', 'Georgia', 'Hawaii', 'Iowa',
+                     'Idaho', 'Illinois', 'Kentucky', 'Louisiana', 'Maryland', 'Maine', 'Michigan',
+                     'Minnesota', 'Missouri', 'Mississippi', 'North Carolina', 'North Dakota',
+                     'Nebraska', 'New Jersey', 'New Mexico', 'Nevada', 'Ohio', 'Oklahoma',
+                     'Pennsylvania', 'Rhode Island', 'South Carolina', 'South Dakota', 'Tennessee',
+                     'Utah', 'Virginia', 'Vermont', 'Wisconsin', 'West Virginia', 'Wyoming'
+                 ],
+             },
+             'us_group_2': {
+                 'link': 'https://www.nols.edu/tpp-us-group-2',
+                 'regions': [
+                     'Alaska', 'California', 'Indiana', 'New Hampshire', 'New York'],
+             },
+             'kansas': {
+                 'link': 'https://www.nols.edu/tpp-kansas',
+                 'regions': ['Kansas'],
+             },
+             'massachusetts': {
+                 'link': 'https://www.nols.edu/tpp-massachusetts',
+                 'regions': ['Massachusetts'],
+             },
+             'montana': {
+                 'link': 'https://www.nols.edu/tpp-montana',
+                 'regions': ['Montana'],
+             },
+             'oregon': {
+                 'link': 'https://www.nols.edu/tpp-oregon',
+                 'regions': ['Oregon'],
+             },
+             'texas': {
+                 'link': 'https://www.nols.edu/tpp-texas',
+                 'regions': ['Texas'],
+             },
+             'washington': {
+                 'link': 'https://www.nols.edu/tpp-washington',
+                 'regions': ['Washington'],
+             },
+         }
+ 
+         return json.dumps(groups) if as_json else groups
+ 
+     def link_to_tuition_protection_document(self):
+         coverage_groups = self.tuition_protection_coverage_groups(as_json=False)
+         region_abbreviation = self.tuition_protection_region
+         region_list = list(PROVINCE_CHOICES_MAP['UNITED STATES']) + list(PROVINCE_CHOICES_MAP['CANADA'])
+ 
+         if region_abbreviation:
+             (region,) = [name for abbreviation, name in region_list if abbreviation == region_abbreviation]
+             group_details = [details for name, details in coverage_groups.iteritems()]
+             (link,) = [details['link'] for details in group_details if region in details['regions']]
+         else:
+             link = ''
+ 
+         return link
+ 
+     def record_tuition_protection_preferences(
+             self, decision=None, country=None, region=None, csr=None, user=None):
+ 
+         # save tuition protection information on ApplicationTab
+         self.tuition_protection_decision = decision
+         self.tuition_protection_country = country
+         self.tuition_protection_region = region
+         self.update_forms()
+ 
+         # create event log entry for tuition protection information
+         person = da.entity.get_entity(self.person.pk)
+         date = datetime.now().strftime('%d-%b-%Y %H:%M:%S')
+         message = u'{user} submitted their tuition protection preferences on {date} as an ' \
+                   u'authenticated user. \n\n Application ID: {appID} \n Course: {course} \n ' \
+                   u'Country: {country} \n Region: {region} \n Decision: {decision} \n Link: {link}'
+         message = message.format(
+             user=user, date=date, appID=self.id, course=csr.course, country=country, region=region,
+             decision=decision, link=self.link_to_tuition_protection_document())
+ 
+         if decision == 'Yes':
+             person.current_interaction_id = Interaction.ID.ENROLLED_IN_TPP
+         elif decision == 'No':
+             person.current_interaction_id = Interaction.ID.DECLINED_TPP
+         elif decision == 'DNQ':
+             person.current_interaction_id = Interaction.ID.DOES_NOT_QUALIFY_FOR_TPP
+ 
+         person.current_interaction_details = message
+         person.update_extra_fields()
+ 
+     def send_tuition_protection_email(self):
+         email_address = self.person.entity.get_preferred_email_address().email_address
+         global_merge_vars = {'TUITION_PROTECTION_URL': self.link_to_tuition_protection_document()}
+         send_html_email(TEMPLATE.TPP_DETAILS,
+                         recipients=[email_address],
+                         global_merge_vars=global_merge_vars,
+                         nols_person=self.person)
+ 
+     def cancel_and_cleanup_tpp_enrollment(self, csr, user, total_reset=False):
+         def clean_description(account_entry):
+             """ The tpp cancellation logic in core.models is relying on a
+                 specific format for the transaction description, and NOLS
+                 Pro account lines seem to have 'NOLSPRO' in the status which
+                 is causing part of the cancellation transaction description
+                 to get cut off."""
+ 
+             clean_status = account_entry.status.replace(' NOLSPRO', '')
+             description = AccountTab.DESCRIPTION['WEB_DECLINE_TPP'] % clean_status
+             max_length = AccountTab._meta.get_field('transaction_description').max_length
+ 
+             if len(description) > max_length:
+                 description = description[:max_length]
+ 
+             return description
+ 
+         self.tuition_protection_country = None
+         self.tuition_protection_region = None
+         if total_reset == True:
+             self.tuition_protection_decision = None
+         self.update_forms()
+ 
+         entries = {}
+         if csr.has_active_tpp():
+             tpp_entry = csr.relevant_tpp_line()
+ 
+             # create ftr
+             ftr_type = 'D'
+             note = u'Cancel TPP - {first} {last} ({username}) declined online for {course}'
+             note = note.format(first=user.first_name, last=user.last_name, username=user.username,
+                                course=tpp_entry.status)
+             if csr.course.is_pro:
+                 policy = da.accounting.get_policy(OTHER_POLICIES.PRO_CANCEL_TPP)
+             else:
+                 policy = da.accounting.get_policy(OTHER_POLICIES.CANCEL_TPP)
+ 
+             ftr = da.accounting.create_ftr(
+                 self,
+                 csr.course,
+                 policy,
+                 note,
+                 ftr_type)
+ 
+             # create credit entry
+             description = clean_description(tpp_entry)
+             transaction_date = datetime.now()
+             da.accounting.create_generic_account_entry(
+                 app_id=self.id,
+                 transaction_date=transaction_date,
+                 description=description,
+                 amount=(-tpp_entry.amount),
+                 account_status=tpp_entry.status,
+                 reference='ID%s' % str(ftr.ftr_id),
+                 balance=self.account_balance()
+             )
+ 
+             # retrieve credit entry
+             credit_line = AccountTab.objects.get(
+                 application_id=csr.application.id,
+                 transaction_description=description,
+                 amount=(-tpp_entry.amount),
+                 status=tpp_entry.status,
+                 reference='ID%s' % str(ftr.ftr_id)
+             )
+ 
+             entries = {
+                 'credit_line': credit_line,
+                 'tpp_line': tpp_entry,
+                 'ftr': ftr}
+ 
+         return entries
+ 
+ 
+ class CoursesQuerySet(UpdatelessQuerySet):
+     def upcoming(self):
+         return self.filter(course_date__gte=datetime.now())
+ 
+     def enrolling(self):
+         return self.filter(Q(status=COURSE_STATUS.ENROLLING) | Q(status=COURSE_STATUS.ENROLLING_EARLY),
+                            capacity__gt=0)
+ 
+     def filter_by_ao(self, ao_assigned):
+         aliases = [x.alias for x in ao_assigned.aliases.all()]
+         return self.filter(ao_assigned__in=aliases)
+ 
+ 
+ class CoursesManager(UpdatelessManager):
+     def get_queryset(self):
+         return CoursesQuerySet(self.model, using=self._db)
+ 
+ 
+ class CourseTab(UneditableModel):
+     # The date that we started storing end dates on courses in the database
+     START_END_DATES = date(year=1994, month=12, day=31)
+ 
+     ICRV = 'ICRV'
+     ICAP = 'ICAP'
+ 
+     id = models.AutoField(db_column='courseid', primary_key=True)
+     course_code = models.CharField(db_column='coursecode', max_length=4)
+     course_split = models.CharField(db_column='coursesplit', max_length=2)
+     course_date = models.DateField(db_column='coursedate')
+     course_title = models.CharField(db_column='coursedescription',
+                                     max_length=70)
+     course_type = models.CharField(db_column='coursetype', max_length=30)
+     fiscal_year = models.CharField(db_column='fiscalyear', max_length=5)
+     course_note = models.CharField(db_column='note', max_length=185, null=True, blank=True)
+     end_date = models.DateField(db_column='enddate', null=True)
+     branch = models.ForeignKey('BranchTab', db_column='branchid')
+     minimum_age = models.IntegerField(db_column='minimumage')
+     maximum_age = models.IntegerField(db_column='maximumage', null=True)
+     ao_assigned = models.CharField(db_column='aoassigned', max_length=20,
+                                    null=True)
+     status = models.CharField(db_column='status', max_length=32, default='Enrolling', null=False)
+     tuition_due_days = models.IntegerField(db_column='tuition_due_days_prior')
+     tuition = models.DecimalField(db_column='tuition', max_digits=38,
+                                   decimal_places=2)
+     app_fee = models.IntegerField(db_column='applicationfee')
+     capacity = models.IntegerField(db_column='capacity')
+     deposit = models.IntegerField()
+     deposit_due_days = models.IntegerField(db_column='deposit_due_days_after')
+     has_self_screen_med = models.CharField(default='N', max_length=3)
+ 
+     objects = CoursesManager()
+ 
+     class Meta:
+         db_table = 'COURSETAB'
+         managed = False
+         verbose_name = "course"
+ 
+     def tuition_protection_plan_cost(self):
+         return da.course.tuition_protection_plan_cost(self.id)
+ 
+     @property
+     def has_tpp(self):
+         _nmc_course = da.course.get_course(self.id)
+         return _nmc_course.has_tpp
+ 
+     @property
+     def has_emt_section(self):
+         return self.course_code == 'WMR'
+ 
+     def date_tuition_due(self):
+         if self.is_pro_or_lnt:
+             if hasattr(self, 'clientcoursedashboard'):
+                 if self.clientcoursedashboard.tuition_due_date:
+                     return self.clientcoursedashboard.tuition_due_date
+         days = self.tuition_due_days if self.tuition_due_days else 0
+         return self.course_date - timedelta(days=days)
+ 
+     def _get_cms_sessions_details(self):
+         if self.is_pro_or_lnt:
+             if hasattr(self, 'clientcoursedashboard'):
+                 return self.clientcoursedashboard.get_cms_session_details
+             else:
+                 return None
+         if self.is_ic_application():
+             return None
+         return CmsApi().get_session_details_from_api_by_courseid(self.id)
+ 
+     def is_icrv(self):
+         return self.course_code == self.ICRV
+ 
+     def is_ic_application(self):
+         return self.course_code in (self.ICRV, self.ICAP)
+ 
+     @property
+     def high_school_credit_cost(self):
+         return 150
+ 
+     @property
+     def college_credit_cost(self):
+         if self.course_date < date(2017, 12, 16):
+             return 70
+         else:
+             return 72
+ 
+     def get_group_name(self):
+         if self.is_pro:
+             group = FinCashTab.GROUP_NAMES['PRO']
+         elif self.is_lnt:
+             group = FinCashTab.GROUP_NAMES['LNT']
+         else:
+             group = FinCashTab.GROUP_NAMES['GENERAL_ADMISSIONS_PAYMENT']
+ 
+         return group
+ 
+     @property
+     def is_pro(self):
+         return self.branch.code == 'PTI'
+ 
+     @property
+     def is_lnt(self):
+         return self.branch.code == 'LNT'
+ 
+     @property
+     def is_pro_or_lnt(self):
+         return self.is_pro or self.is_lnt
+ 
+     @property
+     def pro_no_dashboard(self):
+         """Decide if this is a Pro courses for which we're not supposed to show dashboards.
+ 
+         For Pro, applications started off before we had dashboards, and the apps still (as of
+         Feb 2016) don't automatically enroll people. There are humans in the loop with
+         spreadsheets, email, and nexus. Pro has a variety of reasons to potentially want a course
+         to have applications without dashboards or dashboards without applications (e.g. paper
+         apps, transferring people through intermediate waitlist courses, and phasing in
+         dashboards course by course in Spring 2016).
+ 
+         This uses an inverted truth value (vs. how ClientCourse models the underlying setting)
+         because pro_no_dashboard() is meant to be used with QuerySet.exclude(). Said another way,
+         we're bridging a boundary here between substantially different contexts. In the scope of
+         all courses (i.e. CourseTab), hiding dashboards is an exceptional circumstance. However,
+         in the context of Pro courses during March of 2016, hidden dashboards will be the norm.
+         """
+         if self.is_pro_or_lnt:
+             if hasattr(self, 'clientcoursedashboard'):
+                 return not self.clientcoursedashboard.enable_dashboards
+             else:
+                 return True
+         else:
+             return False
+ 
+     @property
+     def has_gear_request(self):
+         return self.cms_session_details \
+                and self.cms_session_details.get('course') \
+                and self.cms_session_details['course'].get('gear_request')
+ 
+     @property
+     def cms_session_details(self):
+         return self._get_cms_sessions_details()
+ 
+     def is_instructor(self):
+         return 'Instructor' in self.course_title and self.course_code not in ('SWIS', 'WIS')
+ 
+     def is_semester(self):
+         return is_semester_ish(self.course_title)
+ 
+     @property
+     def firm_dates(self):
+         return self.status in [
+             COURSE_STATUS.ENROLLING,
+             COURSE_STATUS.IN_PROGRESS,
+             COURSE_STATUS.COMPLETED]
+ 
+     def has_academic_credit(self):
+         return self.high_school_credits is not None or self.college_credits is not None
+ 
+     @property
+     def has_deposit(self):
+         return self.deposit > 0
+ 
+     @property
+     def locations(self):
+         api_result = self._get_cms_sessions_details()
+         if api_result and 'course' in api_result and\
+            'locations' in api_result['course']:
+             return api_result['course']['locations']
+         else:
+             return []
+ 
+     @property
+     def high_school_credits(self):
+         api_result = self._get_cms_sessions_details()
+         if api_result and 'course' in api_result and\
+             ('high_school_credits' in api_result['course'] and
+              api_result['course']['high_school_credits']):
+             return api_result['course']['high_school_credits']
+         return None
+ 
+     @property
+     def college_credits(self):
+         api_result = self._get_cms_sessions_details()
+         if api_result and 'course' in api_result and\
+             ('college_credits' in api_result['course'] and
+              api_result['course']['college_credits']):
+             return api_result['course']['college_credits']
+         return None
+ 
+     def overlaps_dates(self, other):
+         if self.course_date == other.course_date:
+             return True
+         elif self.course_date < other.course_date:
+             starts_first = self
+             starts_second = other
+         else:
+             starts_first = other
+             starts_second = self
+ 
+         return starts_first.end_date > starts_second.course_date
+ 
+     def __unicode__(self):
+         """
+         Equivalent to COURSEINFO.COURSENAME in the Oracle packages.
+         """
+         split = '-'
+         course_date = ''
+         if self.course_split:
+             split = '-%s-' % self.course_split
+         if self.course_date:
+             course_date = self.course_date.strftime('%m/%d/%Y')
+         return '%s%s%s' % (self.course_code, split, course_date)
+ 
+     @property
+     def facebook_url(self):
+         """
+         The NOLS Creative department sets up facebook groups for each course code
+         and maintains a list of redirects via the CMS redirects tool.
+         """
+         return '/facebookgroup/{code}/'.format(code=self.course_code)
+ 
+     def get_form_type_categories(self, hidden=False):
+         """Get the types of courses this is. ie catalog, semester"""
+         types = []
+         if self.is_semester():
+             types.append('semester')
+         if self.has_emt_section:
+             types.append('emt')
+         if self.course_code == 'ICAP' or self.course_code == 'ICRV':
+             types.append('instructor_app')
+             if hidden:
+                 types.append('ic_app_reference')
+         elif self.course_code == 'DENR':
+             types.append('denali_review')
+         elif self.is_pro_or_lnt:
+             if self.capacity <= 0:
+                 types.append('nolspro_wl')
+                 if self.has_gear_request:
+                     types.append('has_gear_request')
+             elif self.has_gear_request:
+                 types.append('nolspro_gr')
+             else:
+                 types.append('nolspro')
+         elif self.is_instructor():
+             types.append('instructor')
+         else:
+             types.append('catalog')
+         if self.has_academic_credit():
+             types.append('has_academic_credit')
+ 
+         return types
+ 
+     @property
+     def space_available(self):
+         _nmc_course = da.course.get_course(self.id)
+         return _nmc_course.space_available
+ 
+     def get_reservation_for_entity(self, entity):
+         reservations = da.admissions.get_reservations_for_course_id(self.id, active_only=True)
+         matching_reservation = None
+         for reservation in reservations:
+             lowered_desc = reservation.description.lower()
+             if (entity.name.first.lower() in lowered_desc or
+                     entity.name.preferred.lower() in lowered_desc) and\
+                     entity.name.last.lower() in lowered_desc:
+                 #Then it's probably for this person.
+                 matching_reservation = reservation
+                 break
+ 
+         if not matching_reservation:
+             #let's try for gender
+             for reservation in reservations:
+                 lowered_desc = reservation.description if reservation.description.islower() else \
+                     reservation.description.lower()
+                 if (lowered_desc == 'male' and entity.gender == 'Male') or\
+                         (lowered_desc == 'female' and entity.gender == 'Female'):
+                     matching_reservation = reservation
+                     break
+ 
+         return matching_reservation
+ 
+     def space_available_for_entity(self, entity):
+         space_available = self.space_available
+         # When enrolling someone on a reservation, we need to check that space available is not
+         # negative. When we go to enroll, we will delete the reservation in order to make space on
+         # the course, but if space available is negative for some reason, deleting one reservation
+         # will not make space_available a positive number.
+         reservation_avail = bool(self.get_reservation_for_entity(entity) and space_available == 0)
+         return space_available > 0 or reservation_avail
+ 
+     @property
+     def nexus_link(self):
+         return u'http://{domain}/nexus/#course/{id}'.format(domain=settings.NEXUS_SERVER,
+                                                             id=self.id)
+ 
+     def check_catalog_course_age_limits(self, birthdate):
+         """
+         Determine if a person with the given birthdate meets the age requirements for catalog
+         courses (don't trust this to give useful answers for Pro, Alumni, etc!).
+         - If there's a maximum age, student must be <= maximum age at start of course
+         - For overseas courses, the student must be "18 before the course begins"
+         - Overseas means "Patagonia, India, Scandinavia, East Africa, New Zealand and Australia"
+         - For non-overseas courses, student must be >= minimum age by course end date
+         - To decide if people are too old, we need to consider when they would turn one year
+           *older* than the maximum age. (e.g. for a course with max=17, we need to know "What is
+           the birthdate of someone who will turn 18 on the first day of the course?")
+         """
+         if self.maximum_age is None:
+             max_age = None
+             # The date comparison logic is cleaner when we always have an earliest acceptable
+             # birthday, so when there's no max age limit, use 1 A.D.
+             tooOldBirthdate = date(MINYEAR,1,1)
+         else:
+             max_age = int(self.maximum_age)
+             tooOldBirthdate = x_years_before_date(max_age+1, self.course_date)
+ 
+         locations = set([x['slug'] for x in self.locations])
+         overseas = set(['nols-australia', 'nols-east-africa', 'nols-india',
+                         'nols-new-zealand', 'nols-patagonia', 'nols-scandinavia'])
+         if overseas.isdisjoint(locations):
+             # Non-overseas course
+             min_age = int(self.minimum_age)
+             if self.end_date is not None:
+                 tooYoungBirthdate = x_years_before_date(min_age, self.end_date)
+             else:
+                 # Supposedly current courses should have an end_date, but some of the tests
+                 # definitely don't include end dates in their test courses. To prevent
+                 # exceptions when end_date is missing, fall back to course_date.
+                 log.warning("{} has no end_date. Using course_date for age check".format(self))
+                 tooYoungBirthdate = x_years_before_date(min_age, self.course_date)
+             valid = (tooOldBirthdate < birthdate and birthdate <= tooYoungBirthdate)
+         else:
+             min_age = max(18, int(self.minimum_age))
+             tooYoungBirthdate = x_years_before_date(min_age, self.course_date)
+             valid = (tooOldBirthdate < birthdate and birthdate < tooYoungBirthdate)
+ 
+         return (valid, (min_age, max_age))
+ 
+     def has_started(self):
+         return date.today() >= self.course_date
+ 
+     def show_travel_info(self):
++        # Always for Custom Ed courses that operate from NOLS location
++        if self.is_pro and self.locations:
++            return True
++
+         # NOTE: We need to implement similar logic in Nexus (course.js) that offers
+         # Nexus users a travel-itinerary only download
+         base_condition = self.minimum_age <= 14
+         courses_with_travel_info = ['AHC2', 'ACE2']
+         courses_without_travel_info = ['AJWE']
+-        show_travel_info = (base_condition and \
+-                           self.course_code not in courses_without_travel_info) or \
+-                           self.course_code in courses_with_travel_info
++        show_travel_info = (
++            (base_condition and self.course_code not in courses_without_travel_info)
++            or self.course_code in courses_with_travel_info)
+ 
+         return show_travel_info
+ 
+ 
+ class SubPolicyTab(UneditableModel):
+     id = models.AutoField(db_column='subpolicyid', primary_key=True)
+     date_created = models.DateField(db_column='datecreated', null=True)
+     name = models.CharField(db_column='name', max_length=20)
+ 
+     class Meta:
+         db_table = 'SUBPOLICYTAB'
+         managed = False
+ 
+ 
+ class CourseStatusRecordTabQuerySet(UpdatelessQuerySet):
+     def viewable(self):
+         return self.filter(
+             Q(course__branch__type='Admissions') | (
+                 Q(course__branch__type='NolsPro') & Q(course__clientcoursedashboard__isnull=False)
+             )
+             ).exclude(
+                 Q(course__branch__name='Special') &
+                 ~Q(course__course_code=CourseTab.ICAP) &
+                 ~Q(course__course_code=CourseTab.ICRV)
+             ).exclude(course__ao_assigned__iexact='cancel')
+ 
+     def filter(self, *args, **kwargs):
+         viewable_by_user = kwargs.pop('viewable_by_user', None)
+         upcoming = kwargs.pop('upcoming', None)
+         current = kwargs.pop('current', None)
+         enrolled_or_waitlisted = kwargs.pop('enrolled_or_waitlisted', None)
+         if args or kwargs:
+             _qs = super(CourseStatusRecordTabQuerySet, self)\
+                 .filter(*args, **kwargs)
+         else:
+             _qs = self
+         if viewable_by_user is not None:
+             SharedUser = apps.get_model('dashboard', 'SharedUser')
+             shared_applications = list(SharedUser.objects
+                                        .filter(user=viewable_by_user)
+                                        .values_list('application__pk',
+                                                     flat=True)
+                                        .distinct())
+             if viewable_by_user.entity:
+                 _qs = _qs.filter(Q(application__person=viewable_by_user.entity_id) |
+                                  Q(application__pk__in=shared_applications))
+             else:
+                 _qs = _qs.filter(application__pk__in=shared_applications)
+ 
+             # Only show admissions courses
+             _qs = _qs.viewable()
+         if upcoming is not None:
+             _q = Q(course__course_date__gte=date.today())
+             if upcoming:
+                 _qs = _qs.filter(_q)
+             else:
+                 _qs = _qs.exclude(_q)
+         if current is not None:
+             _q = Q(Q(status=CSR_STATUS.SEPARATED) &
+                    Q(destination_id__isnull=False)) |\
+                 Q(destination_id__isnull=True)
+             if current:
+                 _qs = _qs.filter(_q)
+             else:
+                 _qs = _qs.exclude(_q)
+         if enrolled_or_waitlisted is not None:
+             # _q is like verbose_status__in=[ENROLLED, WAIT_LISTED]
+             _q = Q(Q(status=CSR_STATUS.ENROLLED) &
+                           Q(destination_id__isnull=True)) |\
+                 Q(status=CSR_STATUS.WAITLISTED)
+             if enrolled_or_waitlisted:
+                 _qs = _qs.filter(_q)
+             else:
+                 _qs = _qs.exclude(_q)
+ 
+         return _qs
+ 
+     def enrolled(self):
+         return self.filter(status=CSR_STATUS.ENROLLED, destination_id__isnull=True)
+ 
+     def filter_by_ao(self, ao_assigned):
+         aliases = [x.alias for x in ao_assigned.aliases.all()]
+         return self.filter(course__ao_assigned__in=aliases)
+ 
+     def filter_course_enrolling(self):
+         return self.filter(Q(course__status=COURSE_STATUS.ENROLLING) | Q(course__status=COURSE_STATUS.ENROLLING_EARLY),
+                            course__course_date__gte=datetime.now(),
+                            course__capacity__gt=0)
+ 
+     def filter_upcoming_current(self, *args, **kwargs):
+ 
+         qs = self.filter(*args, **kwargs)\
+                  .filter(upcoming=True, current=True, enrolled_or_waitlisted=True)\
+                  .order_by('course__course_date')
+         return qs
+ 
+ 
+ class CourseStatusRecordTabCurrentManager(UpdatelessManager):
+     def get_queryset(self):
+         return CourseStatusRecordTabQuerySet(self.model, using=self._db)
+ 
+ 
+ class CourseStatusRecordTab(UneditableModel):
+     TPP_PADDING = 1
+     TPP_PAID_PADDING = 65
+ 
+     id = models.AutoField(db_column='coursestatusrecordid', primary_key=True)
+     creator = models.CharField(db_column='creator', max_length=30)
+     choice_number = models.IntegerField(db_column='choicenumber')
+ 
+     course = models.ForeignKey('CourseTab', db_column='courseid')
+     application = models.ForeignKey('ApplicationTab',
+                                     db_column='applicationid')
+     status = models.CharField(max_length=20, db_column='status')
+     destination_id = models.IntegerField(null=True, db_column='destinationid')
+     status_change_date = models.DateField(db_column='statuschangedate')
+     creation_date = models.DateField(db_column='creationdate')
+ 
+     objects = CourseStatusRecordTabCurrentManager()
+ 
+     class Meta:
+         db_table = 'COURSESTATUSRECORDTAB'
+         managed = False
+ 
+     def date_deposit_due(self):
+         return min(self.admissions_change_date + timedelta(days=self.course.deposit_due_days),
+                    self.course.date_tuition_due())
+ 
+     @property
+     def age_at_start(self):
+         return self.application.person.age_at_specific_date(self.course.course_date)
+ 
+     @property
+     def days_to_course(self):
+         return (self.course.course_date - date.today()).days
+ 
+     @property
+     def days_to_deposit(self):
+         return (self.date_deposit_due() - date.today()).days
+ 
+     @property
+     def days_for_deposit(self):
+         return self.course.deposit_due_days
+ 
+     @property
+     def days_to_tuition(self):
+         return (self.course.date_tuition_due() - date.today()).days
+ 
+     def displayable_balance(self, decimal_pos=2):
+         """
+         If the balance can be displayed, this returns a formatted string of the form $x,xxx.xx.
+         Otherwise it returns the text 'Unavailable'.
+         """
+         if self.application.account_displayable() and\
+                 (not self.verbose_status == VERBOSE_CSR_STATUS.WAIT_LISTED):
+             balance_string = number_format(self.application.account_balance(),
+                                            decimal_pos=decimal_pos,
+                                            use_l10n=True,
+                                            force_grouping=True)
+ 
+             return '$%s' % balance_string
+         return 'Unavailable'
+ 
+     def displayable_balance_no_cents(self):
+         """Don't display the decimals (cents) on the formatted displayable balance."""
+         return self.displayable_balance(decimal_pos=0)
+ 
+     def relevant_tpp_line(self):
+         """Get the most recent TPP line associated with this csr"""
+         return AccountTab.objects.filter(
+             application=self.application,
+             transaction_description=AccountTab.DESCRIPTION['TPP']
+         ).order_by('-pk').first()
+ 
+     def is_current(self):
+         """Based on FLAMINGO.ADMISSIONS.IsAppEntryCurrent"""
+         # TODO CFL [copied comment out of package code, don't know what it means]
+         if self.status == CSR_STATUS.SEPARATED and \
+                         self.destination_id is not None:
+             return True
+         elif self.destination_id is None:
+             return True
+         else:
+             return False
+ 
+     def paid_this_tpp(self):
+         """
+         Has the applicant paid for tpp for the course associated with this CourseStatusRecordTab?
+         """
+         tpp_line = self.relevant_tpp_line()
+         if not self.has_active_tpp():
+             return False
+ 
+         exclude_academic_credit = self.application.academic_credit_balance() < tpp_line.amount
+         return self.application.account_balance(exclude_academic_credit) <= (0 + self.TPP_PADDING)
+ 
+     def parent_guardian_form_required(self):
+         """
+         The parent guardian form is only required for students that are younger than 25
+         """
+         try:
+             age = self.age_at_start
+         except NoBirthDateNoAge as e:
+             log.debug(e.message)
+             return True
+ 
+         return age < 25
+ 
+     def still_enrolled(self):
+         """
+         This doesn't mean what you think it means.
+ 
+         We enrolled them and they didn't cancel,
+         transfer or separate from the course yet. If they are still enrolled and the course
+         end date has passed, then we call them graduated.
+ 
+         We have to check that destination id is null because:
+         Admissions often creates a course with double the intended capacity, enrolls that and
+         then splits the course into two when the course date approaches. The records where
+         a person is moved from one course to another in this process have a destination id
+         of the new csr.
+         """
+         return self.status == CSR_STATUS.ENROLLED and\
+             self.destination_id is None
+ 
+     @property
+     def wait_listed(self):
+         return self.verbose_status == VERBOSE_CSR_STATUS.WAIT_LISTED
+ 
+     def need_passport_visa(self):
+         if self.course.is_pro:
+             course_locations = self.course.locations
+             need_passport = course_locations != ''
+             need_passport_checkbox = False
+         else:
+             course_locations = [x['slug'] for x in self.course.locations]
+             need_passport = 'nols-patagonia' in course_locations or\
+                             'nols-india' in course_locations
+ 
+             need_passport_checkbox = self.course.course_code in [
+                 'SKS', 'WAD', 'OEM', 'PNX', 'KIC', 'SNW', 'PNQ']
+             if not need_passport_checkbox:
+                 for location in ['nols-australia', 'nols-east-africa',
+                                  'nols-mexico', 'nols-new-zealand',
+                                  'nols-scandinavia', 'nols-yukon']:
+                     if location in course_locations:
+                         need_passport_checkbox = True
+                         break
+ 
+         need_visa = False
+ 
+         for location in ['nols-india', 'nols-australia', 'nols-east-africa']:
+             if location in course_locations:
+                 need_visa = True
+                 break
+ 
+         # Citizens don't need passport/visa
+         if (['nols-india'] == course_locations and
+             self.application.person.citizenship.upper() == 'INDIA') or\
+             (['nols-patagonia'] == course_locations and
+              self.application.person.citizenship.upper() == 'CHILE') or\
+             (['nols-autralia'] == course_locations and
+              self.application.person.citizenship.upper() == 'AUSTRALIA') or\
+             (['nols-mexico'] == course_locations and
+              self.application.person.citizenship.upper() == 'MEXICO') or\
+             (['nols-yukon'] == course_locations and
+              self.application.person.citizenship.upper() == 'CANADA') or\
+             (['nols-new-zealand'] == course_locations and
+              self.application.person.citizenship.upper() == 'NEW ZEALAND') or\
+             (['nols-east-africa'] == course_locations and
+              self.application.person.citizenship.upper() == 'TANZANIA, UNITED REPUBLIC OF'):
+             need_passport = False
+             need_visa = False
+             need_passport_checkbox = False
+ 
+         return (need_passport, need_passport_checkbox, need_visa)
+ 
+     @property
+     def verbose_status(self):
+         """Based on FLAMINGO.ROSTERINFO.GetCsrStatus"""
+         if self.status == CSR_STATUS.SEPARATED:
+             return VERBOSE_CSR_STATUS.SEPARATED
+         elif self.status == CSR_STATUS.WAITLISTED:
+             return VERBOSE_CSR_STATUS.WAIT_LISTED
+         elif self.status == CSR_STATUS.TRANSFERRED:
+             return VERBOSE_CSR_STATUS.TRANSFERRED
+         elif self.status == CSR_STATUS.DROPPED:
+             return VERBOSE_CSR_STATUS.DROPPED
+         elif self.status == CSR_STATUS.CANCELLED:
+             return VERBOSE_CSR_STATUS.CANCELLED
+         # handle pre 1995 courses with no end dates
+         elif self.still_enrolled() and self.course.course_date < self.course.START_END_DATES:
+             return VERBOSE_CSR_STATUS.COMPLETED
+         elif self.still_enrolled() and self.course.end_date is not None and\
+                         self.course.end_date < date.today():
+             return VERBOSE_CSR_STATUS.COMPLETED
+         elif self.still_enrolled() and self.course.course_date <= date.today():
+             return VERBOSE_CSR_STATUS.IN_PROGRESS
+         elif self.still_enrolled():
+             return VERBOSE_CSR_STATUS.ENROLLED
+         # My guess is that this only occurs when a course is split.
+         elif self.status == CSR_STATUS.ENROLLED:
+             return VERBOSE_CSR_STATUS.INACTIVE_ENROLL
+         else:
+             return VERBOSE_CSR_STATUS.UNKNOWN
+ 
+     @property
+     def application_status(self):
+         return VERBOSE_CSR_STATUS.RESERVED if self.verbose_status == VERBOSE_CSR_STATUS.ENROLLED\
+             else self.verbose_status
+ 
+     @cached_property
+     def percent_ready(self):
+         # Import done here to avoid circular imports
+         from admissions.dashboard.utils import get_readiness_from_csr
+         return get_readiness_from_csr(self)
+ 
+     @cached_property
+     def admissions_change_date(self):
+         '''
+         The date this application status changed.
+         Basically the beginning in the chain of status.
+         '''
+         cache_key = 'csr_admissions_change_date_{pk}'.format(pk=self.pk)
+ 
+         from_cache = cache.get(cache_key, None)
+         if from_cache:
+             return from_cache
+ 
+         # This could be really inefficient if the person did lots of transfers.
+         # Could be made more efficient with a custom recursive SQL select.
+         prior = self
+         trail = [self]
+         while True:
+             try:
+                 prior = CourseStatusRecordTab.objects\
+                                              .filter(Q(status=self.status) |
+                                                      Q(status=CSR_STATUS.TRANSFERRED))\
+                                              .exclude(pk__in=[csr.pk for csr in trail])\
+                                              .get(destination_id=prior.pk)
+             except CourseStatusRecordTab.DoesNotExist:
+                 break
+             else:
+                 trail.append(prior)
+ 
+         # Cache it for a week. If they're transferred, it goes to a new
+         # CourseStatusRecordTab (and a new cache key)
+         cache.set(cache_key, prior.status_change_date, 60 * 60 * 24 * 7)
+ 
+         return prior.status_change_date
+ 
+     @property
+     def is_published(self):
+         return self.course.cms_session_details is None \
+                or self.course.cms_session_details['is_published']
+ 
+     @property
+     def late_add(self):
+         if self.application_status != 'Spot Reserved':
+             return False
+ 
+         days = (self.course.course_date - self.creation_date).days
+         need_passport, need_passport_checkbox, need_visa = self.need_passport_visa()
+ 
+         return days < 30 or (days <= 45 and (self.course.is_semester() or need_passport or need_visa or
+                                              need_passport_checkbox))
+ 
+     def deposit_balance(self):
+         received = FinCashTab.objects.filter(application=self.application).aggregate(
+             Sum('amount')
+         )['amount__sum']
+ 
+         if received is None:
+             received = 0
+ 
+         # Wires don't get FinCashTab records, so make a special check for them. There may be other
+         # things that should be considered payments which we aren't counting. One example is
+         # credits transferred from a previous application.
+         wires = AccountTab.objects.filter(
+             application=self.application,
+             amount__lt=0,
+             transaction_description='Wire'
+         ).aggregate(Sum('amount'))['amount__sum']
+ 
+         if wires:
+             received += abs(wires)
+ 
+         return (self.course.deposit + self.course.app_fee) - received
+ 
+     def paid_deposit(self):
+         """
+         Return True if we have received payments of more than the deposit + app fee.
+         """
+         if hasattr(self.application, 'financialoverride') and self.application.financialoverride.deposit_override:
+             return True
+         else:
+             return self.deposit_balance() <= 0
+ 
+     def has_active_tpp(self):
+         tpp_line = self.relevant_tpp_line()
+         if tpp_line is None or tpp_line.cancelled_this_tpp():
+             has_tpp = False
+         else:
+             has_tpp = True
+ 
+         return has_tpp
+ 
+     def __unicode__(self):
+         return '%s - %s - %s' % (self.application, self.verbose_status, self.course)
+ 
+ 
+ class CertificationTab(UneditableModel):
+     id = models.AutoField(db_column='certificationid', primary_key=True)
+     person = models.ForeignKey('NolsPerson', db_column='personid')
+     certification = models.CharField(max_length=60, db_column='certification')
+     position = models.CharField(max_length=25, db_column='position')
+ 
+     class Meta:
+         db_table = 'CERTIFICATIONTAB'
+         managed = False
+ 
+     def __unicode__(self):
+         return u'%s - %s' % (self.certification, self.position)
+ 
+ 
+ class ContractTab(UneditableModel):
+     id = models.AutoField(db_column='contractid', primary_key=True)
+     person = models.ForeignKey('NolsPerson', db_column='personid')
+     course = models.ForeignKey(CourseTab, db_column='courseid')
+     start_date = models.DateField(db_column='startdate')
+     end_date = models.DateField(db_column='enddate')
+     status = models.CharField(max_length=20, db_column='status')
+ 
+     class Meta:
+         db_table = 'CONTRACTTAB'
+         managed = False
+ 
+     def __unicode__(self):
+         return u'Contract Id: %d' % self.id
+ 
+ 
+ class PersonNameTab(UneditableModel):
+     id = models.AutoField(db_column='nameid', primary_key=True)
+     person = models.ForeignKey('NolsPerson', db_column='personid')
+     first = models.CharField(max_length=30, null=True)
+     preferred = models.CharField(max_length=30, db_column='preferredfirstname', null=True)
+     last = models.CharField(max_length=75)
+     active = models.CharField(max_length=1, default='N', db_column='activename')
+ 
+     @property
+     def short_name(self):
+         return '%s %s' % (self.preferred if self.preferred else self.first, self.last)
+ 
+     class Meta:
+         db_table = 'PERSONNAMETAB'
+         managed = False
+ 
+     def __unicode__(self):
+         if self.preferred:
+             return u'%s (%s) %s' % (self.first, self.preferred, self.last)
+         return u'%s %s' % (self.first, self.last)
+ 
+ 
+ class EmailTab(UneditableModel):
+     id = models.AutoField(db_column='emailid', primary_key=True)
+     email = models.CharField(db_column='emailaddress', max_length=100)
+     person = models.ForeignKey(NolsPerson, db_column='personid')
+     status = models.CharField(db_column='emailstatus', max_length=10)
+ 
+     class Meta:
+         db_table = 'EMAILTAB'
+         managed = False
+ 
+     def __unicode__(self):
+         return self.email
+ 
+ 
+ class BranchTab(UneditableModel):
+     id = models.AutoField(db_column='branchid', primary_key=True)
+     code = models.CharField(db_column='branchcode', max_length=3)
+     name = models.CharField(db_column='branchname', max_length=30)
+     type = models.CharField(db_column='type', max_length=30)
+ 
+     class Meta:
+         db_table = 'BRANCHTAB'
+         managed = False
+ 
+     def __unicode__(self):
+         return self.name
+ 
+ 
+ class ApplicationValueTab(UneditableModel):
+     id = models.AutoField(db_column='value_id', primary_key=True)
+     grouping = models.CharField(db_column='grouping', max_length=60)
+     value = models.CharField(db_column='value', max_length=50)
+     ordering = models.IntegerField(db_column='ordering', null=True)
+     description = models.CharField(db_column='description', null=True,
+                                    max_length=200)
+ 
+     class Meta:
+         db_table = 'APPLICATION_VALUE_TAB'
+         managed = False
+         ordering = ['ordering']
+ 
+     @staticmethod
+     def ethnic_origin_choices():
+         qs = ApplicationValueTab.objects.filter(grouping='Ethnic Origin')
+         return tuple((v, v) for v in qs.values_list('value', flat=True))
+ 
+     def __unicode__(self):
+         return self.value
+ 
+ 
+ class WmiApplicationsTab(UneditableModel):
+     id = models.AutoField(db_column='wmiappid', primary_key=True)
+     person = models.ForeignKey(NolsPerson, db_column='nolspersonid')
+     status = models.CharField(db_column='enrollstatus', null=False,
+                               max_length=30)
+     creation_ts = models.DateTimeField(db_column='creationts', null=True,
+                                        auto_created=True)
+ 
+     class Meta:
+         db_table = 'wmiapplicationstab'
+         managed = False

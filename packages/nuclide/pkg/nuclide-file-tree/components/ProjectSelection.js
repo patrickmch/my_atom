@@ -1,47 +1,60 @@
-'use strict';Object.defineProperty(exports, "__esModule", { value: true });exports.ProjectSelection = undefined;
+'use strict';
 
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.ProjectSelection = undefined;
 
+var _react = _interopRequireWildcard(require('react'));
 
+var _UniversalDisposable;
 
+function _load_UniversalDisposable() {
+  return _UniversalDisposable = _interopRequireDefault(require('../../../modules/nuclide-commons/UniversalDisposable'));
+}
 
+var _FileTreeStore;
 
+function _load_FileTreeStore() {
+  return _FileTreeStore = require('../lib/FileTreeStore');
+}
 
+var _TruncatedButton;
 
+function _load_TruncatedButton() {
+  return _TruncatedButton = _interopRequireDefault(require('../../../modules/nuclide-commons-ui/TruncatedButton'));
+}
 
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-var _react = _interopRequireWildcard(require('react'));var _UniversalDisposable;
-function _load_UniversalDisposable() {return _UniversalDisposable = _interopRequireDefault(require('../../../modules/nuclide-commons/UniversalDisposable'));}var _FileTreeStore;
+function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
 
-function _load_FileTreeStore() {return _FileTreeStore = require('../lib/FileTreeStore');}var _TruncatedButton;
-function _load_TruncatedButton() {return _TruncatedButton = _interopRequireDefault(require('../../../modules/nuclide-commons-ui/TruncatedButton'));}function _interopRequireDefault(obj) {return obj && obj.__esModule ? obj : { default: obj };}function _interopRequireWildcard(obj) {if (obj && obj.__esModule) {return obj;} else {var newObj = {};if (obj != null) {for (var key in obj) {if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key];}}newObj.default = obj;return newObj;}} /**
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                   * Copyright (c) 2015-present, Facebook, Inc.
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                   * All rights reserved.
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                   *
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                   * This source code is licensed under the license found in the LICENSE file in
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                   * the root directory of this source tree.
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                   *
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                   * 
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                   * @format
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                   */
+/**
+ * Copyright (c) 2015-present, Facebook, Inc.
+ * All rights reserved.
+ *
+ * This source code is licensed under the license found in the LICENSE file in
+ * the root directory of this source tree.
+ *
+ * 
+ * @format
+ */
+
 class ProjectSelection extends _react.Component {
-
-
 
   constructor(props) {
     super(props);
     this._store = (_FileTreeStore || _load_FileTreeStore()).FileTreeStore.getInstance();
     this._disposables = new (_UniversalDisposable || _load_UniversalDisposable()).default();
     this.state = {
-      extraContent: this.calculateExtraContent() };
-
+      extraContent: this.calculateExtraContent()
+    };
   }
 
   componentDidMount() {
     this._processExternalUpdate();
 
-    this._disposables.add(
-    this._store.subscribe(this._processExternalUpdate.bind(this)));
-
+    this._disposables.add(this._store.subscribe(this._processExternalUpdate.bind(this)));
   }
 
   componentWillUnmount() {
@@ -62,8 +75,8 @@ class ProjectSelection extends _react.Component {
       return;
     }
     this.setState({
-      extraContent: this.calculateExtraContent() });
-
+      extraContent: this.calculateExtraContent()
+    });
     this.props.remeasureHeight();
   }
 
@@ -76,23 +89,25 @@ class ProjectSelection extends _react.Component {
   }
 
   render() {
-    return (
-      _react.createElement('div', { className: 'padded' },
-        _react.createElement((_TruncatedButton || _load_TruncatedButton()).default, {
-          onClick: () => this.runCommand('application:add-project-folder'),
-          icon: 'device-desktop',
-          label: 'Add Local Folder' }),
-
-        _react.createElement((_TruncatedButton || _load_TruncatedButton()).default, {
-          onClick: () => this.runCommand('nuclide-remote-projects:connect'),
-          icon: 'cloud-upload',
-          label: 'Add Remote Folder' }),
-
-        this.state.extraContent));
-
-
+    return _react.createElement(
+      'div',
+      { className: 'padded' },
+      _react.createElement((_TruncatedButton || _load_TruncatedButton()).default, {
+        onClick: () => this.runCommand('application:add-project-folder'),
+        icon: 'device-desktop',
+        label: 'Add Local Folder'
+      }),
+      _react.createElement((_TruncatedButton || _load_TruncatedButton()).default, {
+        onClick: () => this.runCommand('nuclide-remote-projects:connect'),
+        icon: 'cloud-upload',
+        label: 'Add Remote Folder'
+      }),
+      this.state.extraContent
+    );
   }
 
   runCommand(command) {
     atom.commands.dispatch(atom.views.getView(atom.workspace), command);
-  }}exports.ProjectSelection = ProjectSelection;
+  }
+}
+exports.ProjectSelection = ProjectSelection;

@@ -1,14 +1,10 @@
 "use strict";
 
-let Observable;
-
 module.exports = _client => {
   const remoteModule = {};
 
   remoteModule.getServerVersion = function () {
-    return _client.marshalArguments(Array.from(arguments), []).then(args => {
-      return _client.callRemoteFunction("InfoService/getServerVersion", "promise", args);
-    }).then(value => {
+    return _client.callRemoteFunction("InfoService/getServerVersion", "promise", _client.marshalArguments(Array.from(arguments), [])).then(value => {
       return _client.unmarshal(value, {
         kind: "string"
       });
@@ -16,14 +12,12 @@ module.exports = _client => {
   };
 
   remoteModule.closeConnection = function (arg0) {
-    return _client.marshalArguments(Array.from(arguments), [{
+    return _client.callRemoteFunction("InfoService/closeConnection", "promise", _client.marshalArguments(Array.from(arguments), [{
       name: "shutdownServer",
       type: {
         kind: "boolean"
       }
-    }]).then(args => {
-      return _client.callRemoteFunction("InfoService/closeConnection", "promise", args);
-    }).then(value => {
+    }])).then(value => {
       return _client.unmarshal(value, {
         kind: "void"
       });
@@ -33,11 +27,6 @@ module.exports = _client => {
   return remoteModule;
 };
 
-Object.defineProperty(module.exports, "inject", {
-  value: function () {
-    Observable = arguments[0];
-  }
-});
 Object.defineProperty(module.exports, "defs", {
   value: {
     Object: {

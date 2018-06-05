@@ -1,60 +1,63 @@
-'use strict';Object.defineProperty(exports, "__esModule", { value: true });exports.TreeRootComponent = undefined;
+'use strict';
 
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.TreeRootComponent = undefined;
 
+var _atom = require('atom');
 
+var _UniversalDisposable;
 
+function _load_UniversalDisposable() {
+  return _UniversalDisposable = _interopRequireDefault(require('../../modules/nuclide-commons/UniversalDisposable'));
+}
 
+var _LazyTreeNode;
 
+function _load_LazyTreeNode() {
+  return _LazyTreeNode = require('./LazyTreeNode');
+}
 
+var _TreeNodeComponent;
 
+function _load_TreeNodeComponent() {
+  return _TreeNodeComponent = require('./TreeNodeComponent');
+}
 
+var _treeNodeTraversals;
 
+function _load_treeNodeTraversals() {
+  return _treeNodeTraversals = require('./tree-node-traversals');
+}
 
-
-
-var _atom = require('atom');var _UniversalDisposable;
-function _load_UniversalDisposable() {return _UniversalDisposable = _interopRequireDefault(require('../../modules/nuclide-commons/UniversalDisposable'));}var _LazyTreeNode;
-function _load_LazyTreeNode() {return _LazyTreeNode = require('./LazyTreeNode');}var _TreeNodeComponent;
-function _load_TreeNodeComponent() {return _TreeNodeComponent = require('./TreeNodeComponent');}var _treeNodeTraversals;
-function _load_treeNodeTraversals() {return _treeNodeTraversals = require('./tree-node-traversals');}
 var _react = _interopRequireWildcard(require('react'));
-var _reactDom = _interopRequireDefault(require('react-dom'));var _scrollIntoView;
-function _load_scrollIntoView() {return _scrollIntoView = require('../../modules/nuclide-commons-ui/scrollIntoView');}function _interopRequireWildcard(obj) {if (obj && obj.__esModule) {return obj;} else {var newObj = {};if (obj != null) {for (var key in obj) {if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key];}}newObj.default = obj;return newObj;}}function _interopRequireDefault(obj) {return obj && obj.__esModule ? obj : { default: obj };}
 
+var _reactDom = _interopRequireDefault(require('react-dom'));
 
+var _scrollIntoView;
 
+function _load_scrollIntoView() {
+  return _scrollIntoView = require('../../modules/nuclide-commons-ui/scrollIntoView');
+}
 
+function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
 
-
-
-
-
-
-
-
-
-
-
-
-
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 /**
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     * Toggles the existence of a value in a set. If the value exists, deletes it.
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     * If the value does not exist, adds it.
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     *
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     * @param set The set whose value to toggle.
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     * @param value The value to toggle in the set.
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     * @param [forceHas] If defined, forces the existence of the value in the set
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     *     regardless of its current existence. If truthy, adds `value`, if falsy
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     *     deletes `value`.
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     * @returns `true` if the value was added to the set, otherwise `false`. If
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     *     `forceHas` is defined, the return value will be equal to `forceHas`.
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     */
-function toggleSetHas(
-set,
-value,
-forceHas)
-{
+ * Toggles the existence of a value in a set. If the value exists, deletes it.
+ * If the value does not exist, adds it.
+ *
+ * @param set The set whose value to toggle.
+ * @param value The value to toggle in the set.
+ * @param [forceHas] If defined, forces the existence of the value in the set
+ *     regardless of its current existence. If truthy, adds `value`, if falsy
+ *     deletes `value`.
+ * @returns `true` if the value was added to the set, otherwise `false`. If
+ *     `forceHas` is defined, the return value will be equal to `forceHas`.
+ */
+function toggleSetHas(set, value, forceHas) {
   let added;
 
   if (forceHas || forceHas === undefined && !set.has(value)) {
@@ -75,145 +78,27 @@ forceHas)
    *
    * 
    * @format
-   */ /* globals Element */
+   */
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+/* globals Element */
 
 /**
-                             * Generic tree component that operates on LazyTreeNodes.
-                             */
+ * Generic tree component that operates on LazyTreeNodes.
+ */
 class TreeRootComponent extends _react.Component {
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
   constructor(props) {
-    super(props);this.
+    super(props);
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-    _onClickNode = (event, node) => {
+    this._onClickNode = (event, node) => {
       if (event.metaKey) {
         this._toggleNodeSelected(node);
         return;
       }
 
       this.setState({
-        selectedKeys: new Set([node.getKey()]) });
-
+        selectedKeys: new Set([node.getKey()])
+      });
 
       if (!this._isNodeSelected(node) && node.isContainer()) {
         // User clicked on a new directory or the user isn't using the "Preview Tabs" feature of the
@@ -222,50 +107,128 @@ class TreeRootComponent extends _react.Component {
       }
 
       this._confirmNode(node);
-    };this.
+    };
 
-    _onClickNodeArrow = (event, node) => {
+    this._onClickNodeArrow = (event, node) => {
       this._toggleNodeExpanded(node);
-    };this.
+    };
 
-    _onDoubleClickNode = (
-    event,
-    node) =>
-    {
+    this._onDoubleClickNode = (event, node) => {
       // Double clicking a non-directory will keep the created tab open.
       if (!node.isContainer()) {
         this.props.onKeepSelection();
       }
-    };this.
+    };
 
-    _onMouseDown = (event, node) => {
+    this._onMouseDown = (event, node) => {
       // Select the node on right-click.
       if (event.button === 2 || event.button === 0 && event.ctrlKey === true) {
         if (!this._isNodeSelected(node)) {
           this.setState({ selectedKeys: new Set([node.getKey()]) });
         }
       }
-    };this._allKeys = null;this._emitter = null;this._isMounted = false;this._keyToNode = null;this._rejectDidUpdateListenerPromise = null;this._subscriptions = null;const rootKeys = this.props.initialRoots.map(root => root.getKey());this.state = { roots: this.props.initialRoots, // This is maintained as a set of strings for two reasons:
+    };
+
+    this._allKeys = null;
+    this._emitter = null;
+    this._isMounted = false;
+    this._keyToNode = null;
+    this._rejectDidUpdateListenerPromise = null;
+    this._subscriptions = null;
+
+    const rootKeys = this.props.initialRoots.map(root => root.getKey());
+    this.state = {
+      roots: this.props.initialRoots,
+      // This is maintained as a set of strings for two reasons:
       // (1) It is straightforward to serialize.
       // (2) If the LazyFileTreeNode for a path is re-created, this will still work.
-      expandedKeys: new Set(this.props.initialExpandedNodeKeys || rootKeys), selectedKeys: this.props.initialSelectedNodeKeys ? new Set(this.props.initialSelectedNodeKeys) : new Set(rootKeys.length === 0 ? [] : [rootKeys[0]]) };}componentDidMount() {this._isMounted = true;}componentDidUpdate(prevProps, prevState) {// If the Set of selected items is new, like when navigating the tree with
+      expandedKeys: new Set(this.props.initialExpandedNodeKeys || rootKeys),
+      selectedKeys: this.props.initialSelectedNodeKeys ? new Set(this.props.initialSelectedNodeKeys) : new Set(rootKeys.length === 0 ? [] : [rootKeys[0]])
+    };
+  }
+
+  componentDidMount() {
+    this._isMounted = true;
+  }
+
+  componentDidUpdate(prevProps, prevState) {
+    // If the Set of selected items is new, like when navigating the tree with
     // the arrow keys, scroll the first item into view. This addresses the
     // following scenario:
     // (1) Select a node in the tree
     // (2) Scroll the selected node out of the viewport
     // (3) Press the up or down arrow key to change the selected node
     // (4) The new node should scroll into view
-    if (!prevState || this.state.selectedKeys !== prevState.selectedKeys) {const firstSelectedDescendant = this._firstSelectedDescendant;if (firstSelectedDescendant !== undefined) {const el = _reactDom.default.findDOMNode(firstSelectedDescendant);if (el instanceof Element) {(0, (_scrollIntoView || _load_scrollIntoView()).scrollIntoViewIfNeeded)(el, false);}}}if (!this._emitter) {throw new Error('Invariant violation: "this._emitter"');}this._emitter.emit('did-update');}_deselectDescendants(root) {const selectedKeys = this.state.selectedKeys;(0, (_treeNodeTraversals || _load_treeNodeTraversals()).forEachCachedNode)(root, node => {// `forEachCachedNode` iterates over the root, but it should remain
-      // selected. Skip it.
-      if (node === root) {return;}selectedKeys.delete(node.getKey());});this.setState({ selectedKeys });}_isNodeExpanded(node) {return this.state.expandedKeys.has(node.getKey());}_isNodeSelected(node) {return this.state.selectedKeys.has(node.getKey());}_toggleNodeExpanded(node, forceExpanded) {const expandedKeys = this.state.expandedKeys;const keyAdded = toggleSetHas(expandedKeys, node.getKey(), forceExpanded); // If the node was collapsed, deselect its descendants so only nodes visible
-    // in the tree remain selected.
-    if (!keyAdded) {this._deselectDescendants(node);}this.setState({ expandedKeys });}_toggleNodeSelected(node, forceSelected) {const selectedKeys = this.state.selectedKeys;toggleSetHas(selectedKeys, node.getKey(), forceSelected);this.setState({ selectedKeys });}addContextMenuItemGroup(menuItemDefinitions) {let items = menuItemDefinitions.slice();items = items.map(definition => {definition.shouldDisplay = () => {if (this.state.roots.length === 0 && !definition.shouldDisplayIfTreeIsEmpty) {return false;}const shouldDisplayForSelectedNodes =
-        definition.shouldDisplayForSelectedNodes;
-        if (shouldDisplayForSelectedNodes) {
-          return shouldDisplayForSelectedNodes.call(
-          definition,
-          this.getSelectedNodes());
+    if (!prevState || this.state.selectedKeys !== prevState.selectedKeys) {
+      const firstSelectedDescendant = this._firstSelectedDescendant;
+      if (firstSelectedDescendant !== undefined) {
+        const el = _reactDom.default.findDOMNode(firstSelectedDescendant);
+        if (el instanceof Element) {
+          (0, (_scrollIntoView || _load_scrollIntoView()).scrollIntoViewIfNeeded)(el, false);
+        }
+      }
+    }
 
+    if (!this._emitter) {
+      throw new Error('Invariant violation: "this._emitter"');
+    }
+
+    this._emitter.emit('did-update');
+  }
+
+  _deselectDescendants(root) {
+    const selectedKeys = this.state.selectedKeys;
+
+    (0, (_treeNodeTraversals || _load_treeNodeTraversals()).forEachCachedNode)(root, node => {
+      // `forEachCachedNode` iterates over the root, but it should remain
+      // selected. Skip it.
+      if (node === root) {
+        return;
+      }
+
+      selectedKeys.delete(node.getKey());
+    });
+
+    this.setState({ selectedKeys });
+  }
+
+  _isNodeExpanded(node) {
+    return this.state.expandedKeys.has(node.getKey());
+  }
+
+  _isNodeSelected(node) {
+    return this.state.selectedKeys.has(node.getKey());
+  }
+
+  _toggleNodeExpanded(node, forceExpanded) {
+    const expandedKeys = this.state.expandedKeys;
+    const keyAdded = toggleSetHas(expandedKeys, node.getKey(), forceExpanded);
+
+    // If the node was collapsed, deselect its descendants so only nodes visible
+    // in the tree remain selected.
+    if (!keyAdded) {
+      this._deselectDescendants(node);
+    }
+
+    this.setState({ expandedKeys });
+  }
+
+  _toggleNodeSelected(node, forceSelected) {
+    const selectedKeys = this.state.selectedKeys;
+    toggleSetHas(selectedKeys, node.getKey(), forceSelected);
+    this.setState({ selectedKeys });
+  }
+
+  addContextMenuItemGroup(menuItemDefinitions) {
+    let items = menuItemDefinitions.slice();
+    items = items.map(definition => {
+      definition.shouldDisplay = () => {
+        if (this.state.roots.length === 0 && !definition.shouldDisplayIfTreeIsEmpty) {
+          return false;
+        }
+        const shouldDisplayForSelectedNodes = definition.shouldDisplayForSelectedNodes;
+        if (shouldDisplayForSelectedNodes) {
+          return shouldDisplayForSelectedNodes.call(definition, this.getSelectedNodes());
         }
         return true;
       };
@@ -312,9 +275,7 @@ class TreeRootComponent extends _react.Component {
           };
         }
 
-        const child =
-        _react.createElement((_TreeNodeComponent || _load_TreeNodeComponent()).TreeNodeComponent, Object.assign({},
-        item, {
+        const child = _react.createElement((_TreeNodeComponent || _load_TreeNodeComponent()).TreeNodeComponent, Object.assign({}, item, {
           isContainer: node.isContainer(),
           isExpanded: this._isNodeExpanded(node),
           isLoading: !node.isCacheValid(),
@@ -330,9 +291,8 @@ class TreeRootComponent extends _react.Component {
           path: node.getKey(),
           key: node.getKey()
           // eslint-disable-next-line nuclide-internal/jsx-simple-callback-refs
-          , ref: ref }));
-
-
+          , ref: ref
+        }));
         children.push(child);
         allKeys.push(node.getKey());
         keyToNode[node.getKey()] = node;
@@ -372,7 +332,11 @@ class TreeRootComponent extends _react.Component {
 
     this._allKeys = allKeys;
     this._keyToNode = keyToNode;
-    return _react.createElement('div', { className: 'nuclide-tree-root' }, children);
+    return _react.createElement(
+      'div',
+      { className: 'nuclide-tree-root' },
+      children
+    );
   }
 
   componentWillMount() {
@@ -386,8 +350,7 @@ class TreeRootComponent extends _react.Component {
     });
 
     const subscriptions = new (_UniversalDisposable || _load_UniversalDisposable()).default();
-    subscriptions.add(
-    atom.commands.add(this.props.eventHandlerSelector, {
+    subscriptions.add(atom.commands.add(this.props.eventHandlerSelector, {
       // Expand and collapse.
       'core:move-right': () => this._expandSelection(),
       'core:move-left': () => this._collapseSelection(),
@@ -396,9 +359,8 @@ class TreeRootComponent extends _react.Component {
       'core:move-up': () => this._moveSelectionUp(),
       'core:move-down': () => this._moveSelectionDown(),
 
-      'core:confirm': () => this._confirmSelection() }));
-
-
+      'core:confirm': () => this._confirmSelection()
+    }));
 
     this._allKeys = allKeys;
     this._emitter = new _atom.Emitter();
@@ -419,8 +381,8 @@ class TreeRootComponent extends _react.Component {
   serialize() {
     return {
       expandedNodeKeys: Array.from(this.state.expandedKeys),
-      selectedNodeKeys: Array.from(this.state.selectedKeys) };
-
+      selectedNodeKeys: Array.from(this.state.selectedKeys)
+    };
   }
 
   invalidateCachedNodes() {
@@ -432,8 +394,8 @@ class TreeRootComponent extends _react.Component {
   }
 
   /**
-     * Returns a Promise that's resolved when the roots are rendered.
-     */
+   * Returns a Promise that's resolved when the roots are rendered.
+   */
   setRoots(roots) {
     this.state.roots.forEach(root => {
       this.removeStateForSubtree(root);
@@ -447,24 +409,24 @@ class TreeRootComponent extends _react.Component {
     const promise = this._createDidUpdateListener(
     /* shouldResolve */() => {
       const rootsReady = this.state.roots === roots;
-      const childrenReady = this.state.roots.every(root =>
-      root.isCacheValid());
-
+      const childrenReady = this.state.roots.every(root => root.isCacheValid());
       return rootsReady && childrenReady;
     });
 
-
     this.setState({
       roots,
-      expandedKeys });
-
+      expandedKeys
+    });
 
     return promise;
   }
 
   _createDidUpdateListener(shouldResolve) {
-    return new Promise((resolve, reject) => {if (!
-      this._emitter) {throw new Error('Invariant violation: "this._emitter"');}
+    return new Promise((resolve, reject) => {
+      if (!this._emitter) {
+        throw new Error('Invariant violation: "this._emitter"');
+      }
+
       const didUpdateDisposable = this._emitter.on('did-update', () => {
         if (shouldResolve()) {
           resolve(undefined);
@@ -499,8 +461,8 @@ class TreeRootComponent extends _react.Component {
 
     this.setState({
       expandedKeys,
-      selectedKeys });
-
+      selectedKeys
+    });
   }
 
   getRootNodes() {
@@ -558,8 +520,8 @@ class TreeRootComponent extends _react.Component {
   }
 
   /**
-     * Selects a node by key if it's in the file tree; otherwise, do nothing.
-     */
+   * Selects a node by key if it's in the file tree; otherwise, do nothing.
+   */
   selectNodeKey(nodeKey) {
     if (!this.getNodeForKey(nodeKey)) {
       return Promise.reject(new Error());
@@ -569,7 +531,6 @@ class TreeRootComponent extends _react.Component {
     // up the changes from `setState`.
     const promise = this._createDidUpdateListener(
     /* shouldResolve */() => this.state.selectedKeys.has(nodeKey));
-
     this.setState({ selectedKeys: new Set([nodeKey]) });
     return promise;
   }
@@ -581,14 +542,14 @@ class TreeRootComponent extends _react.Component {
   }
 
   /**
-     * If this function is called multiple times in parallel, the later calls will
-     * cause the previous promises to reject even if they end up expanding the
-     * node key successfully.
-     *
-     * If we don't reject, then we might leak promises if a node key is expanded
-     * and collapsed in succession (the collapse could succeed first, causing
-     * the expand to never resolve).
-     */
+   * If this function is called multiple times in parallel, the later calls will
+   * cause the previous promises to reject even if they end up expanding the
+   * node key successfully.
+   *
+   * If we don't reject, then we might leak promises if a node key is expanded
+   * and collapsed in succession (the collapse could succeed first, causing
+   * the expand to never resolve).
+   */
   expandNodeKey(nodeKey) {
     const node = this.getNodeForKey(nodeKey);
 
@@ -597,11 +558,9 @@ class TreeRootComponent extends _react.Component {
       /* shouldResolve */() => {
         const isExpanded = this.state.expandedKeys.has(nodeKey);
         const nodeNow = this.getNodeForKey(nodeKey);
-        const isDoneFetching =
-        nodeNow && nodeNow.isContainer() && nodeNow.isCacheValid();
+        const isDoneFetching = nodeNow && nodeNow.isContainer() && nodeNow.isCacheValid();
         return Boolean(isExpanded && isDoneFetching);
       });
-
       this._toggleNodeExpanded(node, true /* forceExpanded */);
       return promise;
     }
@@ -615,7 +574,6 @@ class TreeRootComponent extends _react.Component {
     if (node && node.isContainer()) {
       const promise = this._createDidUpdateListener(
       /* shouldResolve */() => !this.state.expandedKeys.has(nodeKey));
-
       this._toggleNodeExpanded(node, false /* forceExpanded */);
       return promise;
     }
@@ -702,4 +660,13 @@ class TreeRootComponent extends _react.Component {
     } else {
       this.props.onConfirmSelection(node);
     }
-  }}exports.TreeRootComponent = TreeRootComponent;TreeRootComponent.defaultProps = { elementToRenderWhenEmpty: null, onConfirmSelection(node) {}, rowClassNameForNode(node) {return '';} };
+  }
+}
+exports.TreeRootComponent = TreeRootComponent;
+TreeRootComponent.defaultProps = {
+  elementToRenderWhenEmpty: null,
+  onConfirmSelection(node) {},
+  rowClassNameForNode(node) {
+    return '';
+  }
+};

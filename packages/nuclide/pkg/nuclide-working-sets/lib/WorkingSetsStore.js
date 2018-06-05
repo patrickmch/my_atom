@@ -1,40 +1,60 @@
-'use strict';Object.defineProperty(exports, "__esModule", { value: true });exports.WorkingSetsStore = undefined;
+'use strict';
 
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.WorkingSetsStore = undefined;
 
+var _atom = require('atom');
 
+var _nuclideWorkingSetsCommon;
 
+function _load_nuclideWorkingSetsCommon() {
+  return _nuclideWorkingSetsCommon = require('../../nuclide-working-sets-common');
+}
 
+var _collection;
 
+function _load_collection() {
+  return _collection = require('../../../modules/nuclide-commons/collection');
+}
 
+var _nuclideAnalytics;
 
+function _load_nuclideAnalytics() {
+  return _nuclideAnalytics = require('../../nuclide-analytics');
+}
 
+var _log4js;
 
-var _atom = require('atom');var _nuclideWorkingSetsCommon;
-function _load_nuclideWorkingSetsCommon() {return _nuclideWorkingSetsCommon = require('../../nuclide-working-sets-common');}var _collection;
-function _load_collection() {return _collection = require('../../../modules/nuclide-commons/collection');}var _nuclideAnalytics;
-function _load_nuclideAnalytics() {return _nuclideAnalytics = require('../../nuclide-analytics');}var _log4js;
-function _load_log4js() {return _log4js = require('log4js');}var _nuclideUri;
-function _load_nuclideUri() {return _nuclideUri = _interopRequireDefault(require('../../../modules/nuclide-commons/nuclideUri'));}function _interopRequireDefault(obj) {return obj && obj.__esModule ? obj : { default: obj };} /**
-                                                                                                                                                                                                                                 * Copyright (c) 2015-present, Facebook, Inc.
-                                                                                                                                                                                                                                 * All rights reserved.
-                                                                                                                                                                                                                                 *
-                                                                                                                                                                                                                                 * This source code is licensed under the license found in the LICENSE file in
-                                                                                                                                                                                                                                 * the root directory of this source tree.
-                                                                                                                                                                                                                                 *
-                                                                                                                                                                                                                                 * 
-                                                                                                                                                                                                                                 * @format
-                                                                                                                                                                                                                                 */const NEW_WORKING_SET_EVENT = 'new-working-set';
+function _load_log4js() {
+  return _log4js = require('log4js');
+}
+
+var _nuclideUri;
+
+function _load_nuclideUri() {
+  return _nuclideUri = _interopRequireDefault(require('../../../modules/nuclide-commons/nuclideUri'));
+}
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+/**
+ * Copyright (c) 2015-present, Facebook, Inc.
+ * All rights reserved.
+ *
+ * This source code is licensed under the license found in the LICENSE file in
+ * the root directory of this source tree.
+ *
+ * 
+ * @format
+ */
+
+const NEW_WORKING_SET_EVENT = 'new-working-set';
 const NEW_DEFINITIONS_EVENT = 'new-definitions';
 const SAVE_DEFINITIONS_EVENT = 'save-definitions';
 
 class WorkingSetsStore {
-
-
-
-
-
-
-
 
   constructor() {
     this._emitter = new _atom.Emitter();
@@ -66,15 +86,11 @@ class WorkingSetsStore {
     return this._emitter.on(NEW_WORKING_SET_EVENT, callback);
   }
 
-  subscribeToDefinitions(
-  callback)
-  {
+  subscribeToDefinitions(callback) {
     return this._emitter.on(NEW_DEFINITIONS_EVENT, callback);
   }
 
-  onSaveDefinitions(
-  callback)
-  {
+  onSaveDefinitions(callback) {
     return this._emitter.on(SAVE_DEFINITIONS_EVENT, callback);
   }
 
@@ -114,14 +130,8 @@ class WorkingSetsStore {
     this._saveDefinitions(definitions);
   }
 
-  _setDefinitions(
-  applicable,
-  notApplicable,
-  definitions)
-  {
-    const somethingHasChanged =
-    !(0, (_collection || _load_collection()).arrayEqual)(this._applicableDefinitions, applicable) ||
-    !(0, (_collection || _load_collection()).arrayEqual)(this._notApplicableDefinitions, notApplicable);
+  _setDefinitions(applicable, notApplicable, definitions) {
+    const somethingHasChanged = !(0, (_collection || _load_collection()).arrayEqual)(this._applicableDefinitions, applicable) || !(0, (_collection || _load_collection()).arrayEqual)(this._notApplicableDefinitions, notApplicable);
 
     if (somethingHasChanged) {
       this._applicableDefinitions = applicable;
@@ -138,9 +148,7 @@ class WorkingSetsStore {
     }
   }
 
-  _updateCurrentWorkingSet(
-  activeApplicable)
-  {
+  _updateCurrentWorkingSet(activeApplicable) {
     const combinedUris = [].concat(...activeApplicable.map(d => d.uris));
 
     const newWorkingSet = new (_nuclideWorkingSetsCommon || _load_nuclideWorkingSetsCommon()).WorkingSet(combinedUris);
@@ -161,45 +169,39 @@ class WorkingSetsStore {
     });
 
     const repos = atom.project.getRepositories().filter(Boolean);
-    const originURLs = repos.
-    map(repo => {
+    const originURLs = repos.map(repo => {
       const originURL = repo.getOriginURL();
       if (originURL == null) {
         return null;
       }
       const dir = repo.getProjectDirectory();
       return workingSet.containsDir(dir) ? originURL : null;
-    }).
-    filter(Boolean);
+    }).filter(Boolean);
 
     let newDefinitions;
     if (nameIndex < 0) {
       (0, (_nuclideAnalytics || _load_nuclideAnalytics()).track)('working-sets-create', {
         name,
         uris: workingSet.getUris().join(','),
-        originURLs: originURLs.join(',') });
-
+        originURLs: originURLs.join(',')
+      });
 
       newDefinitions = definitions.concat({
         name,
         uris: workingSet.getUris(),
         active: false,
-        originURLs });
-
+        originURLs
+      });
     } else {
       (0, (_nuclideAnalytics || _load_nuclideAnalytics()).track)('working-sets-update', {
         oldName: name,
         name: newName,
         uris: workingSet.getUris().join(','),
-        originURLs: originURLs.join(',') });
-
+        originURLs: originURLs.join(',')
+      });
 
       const active = definitions[nameIndex].active;
-      newDefinitions = [].concat(
-      definitions.slice(0, nameIndex),
-      { name: newName, uris: workingSet.getUris(), active, originURLs },
-      definitions.slice(nameIndex + 1));
-
+      newDefinitions = [].concat(definitions.slice(0, nameIndex), { name: newName, uris: workingSet.getUris(), active, originURLs }, definitions.slice(nameIndex + 1));
     }
 
     this._saveDefinitions(newDefinitions);
@@ -237,10 +239,9 @@ class WorkingSetsStore {
       this.deactivateAll();
     } else {
       const newDefinitions = this.getDefinitions().map(d => {
-        return Object.assign({},
-        d, {
-          active: d.active || this._lastSelected.indexOf(d.name) > -1 });
-
+        return Object.assign({}, d, {
+          active: d.active || this._lastSelected.indexOf(d.name) > -1
+        });
       });
       this._saveDefinitions(newDefinitions);
     }
@@ -249,12 +250,11 @@ class WorkingSetsStore {
   _saveDefinitions(definitions) {
     this.updateDefinitions(definitions);
     this._emitter.emit(SAVE_DEFINITIONS_EVENT, definitions);
-  }}exports.WorkingSetsStore = WorkingSetsStore;
+  }
+}
 
-
-function sortOutApplicability(
-definitions)
-{
+exports.WorkingSetsStore = WorkingSetsStore;
+function sortOutApplicability(definitions) {
   const applicable = [];
   const notApplicable = [];
 
@@ -272,10 +272,7 @@ definitions)
 function isApplicable(definition) {
   const originURLs = definition.originURLs;
   if (originURLs != null) {
-    const mountedOriginURLs = atom.project.
-    getRepositories().
-    filter(Boolean).
-    map(repo => repo.getOriginURL());
+    const mountedOriginURLs = atom.project.getRepositories().filter(Boolean).map(repo => repo.getOriginURL());
     originURLs.forEach(originURL => {
       if (mountedOriginURLs.some(url => url === originURL)) {
         return true;

@@ -1,26 +1,45 @@
-'use strict';Object.defineProperty(exports, "__esModule", { value: true });exports.default =
+'use strict';
 
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.default = createMessageStream;
 
+var _featureConfig;
 
+function _load_featureConfig() {
+  return _featureConfig = _interopRequireDefault(require('../../../modules/nuclide-commons-atom/feature-config'));
+}
 
+var _observable;
 
+function _load_observable() {
+  return _observable = require('../../../modules/nuclide-commons/observable');
+}
 
+var _UniversalDisposable;
 
+function _load_UniversalDisposable() {
+  return _UniversalDisposable = _interopRequireDefault(require('../../../modules/nuclide-commons/UniversalDisposable'));
+}
 
+var _createMessage;
 
+function _load_createMessage() {
+  return _createMessage = _interopRequireDefault(require('./createMessage'));
+}
 
+var _parseLogcatMetadata;
 
+function _load_parseLogcatMetadata() {
+  return _parseLogcatMetadata = _interopRequireDefault(require('./parseLogcatMetadata'));
+}
 
+var _rxjsBundlesRxMinJs = require('rxjs/bundles/Rx.min.js');
 
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-
-
-
-
-
-createMessageStream;var _featureConfig;function _load_featureConfig() {return _featureConfig = _interopRequireDefault(require('../../../modules/nuclide-commons-atom/feature-config'));}var _observable;function _load_observable() {return _observable = require('../../../modules/nuclide-commons/observable');}var _UniversalDisposable;function _load_UniversalDisposable() {return _UniversalDisposable = _interopRequireDefault(require('../../../modules/nuclide-commons/UniversalDisposable'));}var _createMessage;function _load_createMessage() {return _createMessage = _interopRequireDefault(require('./createMessage'));}var _parseLogcatMetadata;function _load_parseLogcatMetadata() {return _parseLogcatMetadata = _interopRequireDefault(require('./parseLogcatMetadata'));}var _rxjsBundlesRxMinJs = require('rxjs/bundles/Rx.min.js');function _interopRequireDefault(obj) {return obj && obj.__esModule ? obj : { default: obj };}function createMessageStream(
-line$)
-{
+function createMessageStream(line$) {
   // Separate the lines into groups, beginning with metadata lines.
   const messages = _rxjsBundlesRxMinJs.Observable.create(observer => {
     let buffer = [];
@@ -39,8 +58,8 @@ line$)
 
       observer.next({
         metadata: prevMetadata,
-        message: buffer.join('\n') });
-
+        message: buffer.join('\n')
+      });
       buffer = [];
       prevMetadata = null;
     };
@@ -77,12 +96,10 @@ line$)
       flush();
       observer.complete();
     }),
-
     // We know *for certain* that we have a complete entry once we see the metadata for the next
     // one. But what if the next one takes a long time to happen? After a certain point, we need
     // to just assume we have the complete entry and move on.
     sharedLine$.let((0, (_observable || _load_observable()).fastDebounce)(200)).subscribe(flush));
-
   }).map((_createMessage || _load_createMessage()).default);
 
   return filter(messages).share();
@@ -95,22 +112,22 @@ line$)
    *
    * 
    * @format
-   */function filter(messages) {const patterns = (_featureConfig || _load_featureConfig()).default.observeAsStream('nuclide-adb-logcat.whitelistedTags').map(source => {try {return new RegExp(source);
-    } catch (err) {
-      atom.notifications.addError(
-      'The nuclide-adb-logcat.whitelistedTags setting contains an invalid regular expression' +
-      ' string. Fix it in your Atom settings.');
+   */
 
-      return (/.*/);
+function filter(messages) {
+  const patterns = (_featureConfig || _load_featureConfig()).default.observeAsStream('nuclide-adb-logcat.whitelistedTags').map(source => {
+    try {
+      return new RegExp(source);
+    } catch (err) {
+      atom.notifications.addError('The nuclide-adb-logcat.whitelistedTags setting contains an invalid regular expression' + ' string. Fix it in your Atom settings.');
+      return (/.*/
+      );
     }
   });
 
-  return messages.
-  withLatestFrom(patterns).
-  filter(([message, pattern]) => {
+  return messages.withLatestFrom(patterns).filter(([message, pattern]) => {
     // Add an empty tag to untagged messages so they cfeaturean be matched by `.*` etc.
     const tags = message.tags == null ? [''] : message.tags;
     return tags.some(tag => pattern.test(tag));
-  }).
-  map(([message, pattern]) => message);
+  }).map(([message, pattern]) => message);
 }

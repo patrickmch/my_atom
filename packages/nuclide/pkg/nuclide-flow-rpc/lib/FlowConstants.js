@@ -1,16 +1,8 @@
-'use strict';Object.defineProperty(exports, "__esModule", { value: true });
+'use strict';
 
-
-
-
-
-
-
-
-
-
-
-
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
 const ServerStatus = exports.ServerStatus = Object.freeze({
   FAILED: 'failed',
   UNKNOWN: 'unknown',
@@ -18,8 +10,8 @@ const ServerStatus = exports.ServerStatus = Object.freeze({
   NOT_INSTALLED: 'not installed',
   BUSY: 'busy',
   INIT: 'init',
-  READY: 'ready' });
-
+  READY: 'ready'
+});
 
 // If we put this type on the definition, use sites will not see the individual properties in the
 // Server object for things like autocomplete. Worse, Flow will assume that *any* string key will
@@ -35,5 +27,9 @@ const ServerStatus = exports.ServerStatus = Object.freeze({
  *
  *  strict-local
  * @format
- */ServerStatus; // Controls how long the Flow version will be cached before it is considered invalid.
+ */
+
+ServerStatus;
+
+// Controls how long the Flow version will be cached before it is considered invalid.
 const VERSION_TIMEOUT_MS = exports.VERSION_TIMEOUT_MS = 10 * 60 * 1000; // 10 minutes in ms

@@ -1,33 +1,64 @@
-'use strict';var _asyncToGenerator = _interopRequireDefault(require('async-to-generator'));var _createPackage;
+'use strict';
 
+var _createPackage;
 
+function _load_createPackage() {
+  return _createPackage = _interopRequireDefault(require('../../../modules/nuclide-commons-atom/createPackage'));
+}
 
+var _nuclideDebuggerCommon;
 
+function _load_nuclideDebuggerCommon() {
+  return _nuclideDebuggerCommon = require('../../../modules/nuclide-debugger-common');
+}
 
+var _autogenUtils;
 
+function _load_autogenUtils() {
+  return _autogenUtils = require('../../../modules/nuclide-debugger-common/autogen-utils');
+}
 
+var _passesGK;
 
+function _load_passesGK() {
+  return _passesGK = _interopRequireDefault(require('../../commons-node/passesGK'));
+}
 
+var _AutoGenLaunchAttachProvider;
 
+function _load_AutoGenLaunchAttachProvider() {
+  return _AutoGenLaunchAttachProvider = _interopRequireDefault(require('../../../modules/nuclide-debugger-common/AutoGenLaunchAttachProvider'));
+}
 
+var _HhvmLaunchAttachProvider;
 
+function _load_HhvmLaunchAttachProvider() {
+  return _HhvmLaunchAttachProvider = _interopRequireDefault(require('./HhvmLaunchAttachProvider'));
+}
 
+var _UniversalDisposable;
 
+function _load_UniversalDisposable() {
+  return _UniversalDisposable = _interopRequireDefault(require('../../../modules/nuclide-commons/UniversalDisposable'));
+}
 
-function _load_createPackage() {return _createPackage = _interopRequireDefault(require('../../../modules/nuclide-commons-atom/createPackage'));}var _nuclideDebuggerCommon;
-function _load_nuclideDebuggerCommon() {return _nuclideDebuggerCommon = require('../../../modules/nuclide-debugger-common');}var _autogenUtils;
-function _load_autogenUtils() {return _autogenUtils = require('../../../modules/nuclide-debugger-common/autogen-utils');}var _passesGK;
-function _load_passesGK() {return _passesGK = _interopRequireDefault(require('../../commons-node/passesGK'));}var _AutoGenLaunchAttachProvider;
-function _load_AutoGenLaunchAttachProvider() {return _AutoGenLaunchAttachProvider = _interopRequireDefault(require('../../../modules/nuclide-debugger-common/AutoGenLaunchAttachProvider'));}var _HhvmLaunchAttachProvider;
-function _load_HhvmLaunchAttachProvider() {return _HhvmLaunchAttachProvider = _interopRequireDefault(require('./HhvmLaunchAttachProvider'));}var _UniversalDisposable;
-function _load_UniversalDisposable() {return _UniversalDisposable = _interopRequireDefault(require('../../../modules/nuclide-commons/UniversalDisposable'));}var _fsPromise;
-function _load_fsPromise() {return _fsPromise = _interopRequireDefault(require('../../../modules/nuclide-commons/fsPromise'));}var _utils;
-function _load_utils() {return _utils = require('./utils');}
+var _fsPromise;
 
-var _path = _interopRequireDefault(require('path'));function _interopRequireDefault(obj) {return obj && obj.__esModule ? obj : { default: obj };}
+function _load_fsPromise() {
+  return _fsPromise = _interopRequireDefault(require('../../../modules/nuclide-commons/fsPromise'));
+}
+
+var _utils;
+
+function _load_utils() {
+  return _utils = require('./utils');
+}
+
+var _path = _interopRequireDefault(require('path'));
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 class Activation {
-
 
   constructor() {
     this._subscriptions = new (_UniversalDisposable || _load_UniversalDisposable()).default();
@@ -41,58 +72,50 @@ class Activation {
   }
 
   _registerDebugProvider(provider) {
-    this._subscriptions.add(
-    atom.packages.serviceHub.provide('debugger.provider', '0.0.0', provider));
-
+    this._subscriptions.add(atom.packages.serviceHub.provide('debugger.provider', '0.0.0', provider));
   }
 
-  _registerPrepackDebugProvider(isOpenSource) {var _this = this;return (0, _asyncToGenerator.default)(function* () {
-      if ((yield (0, (_passesGK || _load_passesGK()).default)('nuclide_debugger_prepack')) || isOpenSource) {
-        _this._registerDebugProvider({
-          name: 'Prepack',
-          getLaunchAttachProvider: function (connection) {
-            return new (_AutoGenLaunchAttachProvider || _load_AutoGenLaunchAttachProvider()).default(
-            'Prepack',
-            connection,
-            (0, (_utils || _load_utils()).getPrepackAutoGenConfig)());
-
-          } });
-
-      }})();
+  async _registerPrepackDebugProvider(isOpenSource) {
+    if ((await (0, (_passesGK || _load_passesGK()).default)('nuclide_debugger_prepack')) || isOpenSource) {
+      this._registerDebugProvider({
+        name: 'Prepack',
+        getLaunchAttachProvider: connection => {
+          return new (_AutoGenLaunchAttachProvider || _load_AutoGenLaunchAttachProvider()).default('Prepack', connection, (0, (_utils || _load_utils()).getPrepackAutoGenConfig)());
+        }
+      });
+    }
   }
 
   _registerLLDBProvider() {
     this._registerDebugProvider({
       name: 'Native - LLDB (C/C++)',
       getLaunchAttachProvider: connection => {
-        return new (_AutoGenLaunchAttachProvider || _load_AutoGenLaunchAttachProvider()).default(
-        'Native - LLDB (C/C++)',
-        connection,
-        (0, (_autogenUtils || _load_autogenUtils()).getNativeAutoGenConfig)((_nuclideDebuggerCommon || _load_nuclideDebuggerCommon()).VsAdapterTypes.NATIVE_LLDB));
-
-      } });
-
+        return new (_AutoGenLaunchAttachProvider || _load_AutoGenLaunchAttachProvider()).default('Native - LLDB (C/C++)', connection, (0, (_autogenUtils || _load_autogenUtils()).getNativeAutoGenConfig)((_nuclideDebuggerCommon || _load_nuclideDebuggerCommon()).VsAdapterTypes.NATIVE_LLDB));
+      }
+    });
   }
 
-  _registerHHVMDebugProvider() {var _this2 = this;return (0, _asyncToGenerator.default)(function* () {
-      _this2._registerDebugProvider({
-        name: 'Hack / PHP',
-        getLaunchAttachProvider: function (connection) {
-          return new (_HhvmLaunchAttachProvider || _load_HhvmLaunchAttachProvider()).default('Hack / PHP', connection);
-        } });})();
-
+  async _registerHHVMDebugProvider() {
+    this._registerDebugProvider({
+      name: 'Hack / PHP',
+      getLaunchAttachProvider: connection => {
+        return new (_HhvmLaunchAttachProvider || _load_HhvmLaunchAttachProvider()).default('Hack / PHP', connection);
+      }
+    });
   }
 
   createDebuggerConfigurator() {
     return {
       resolveConfiguration: (_utils || _load_utils()).resolveConfiguration,
-      adapterType: (_nuclideDebuggerCommon || _load_nuclideDebuggerCommon()).VsAdapterTypes.NATIVE_LLDB };
-
+      adapterType: (_nuclideDebuggerCommon || _load_nuclideDebuggerCommon()).VsAdapterTypes.NATIVE_LLDB
+    };
   }
 
   dispose() {
     this._subscriptions.dispose();
-  }} // eslint-disable-next-line nuclide-internal/prefer-nuclide-uri
+  }
+}
+// eslint-disable-next-line nuclide-internal/prefer-nuclide-uri
 /**
  * Copyright (c) 2015-present, Facebook, Inc.
  * All rights reserved.
@@ -102,4 +125,6 @@ class Activation {
  *
  *  strict-local
  * @format
- */(0, (_createPackage || _load_createPackage()).default)(module.exports, Activation);
+ */
+
+(0, (_createPackage || _load_createPackage()).default)(module.exports, Activation);

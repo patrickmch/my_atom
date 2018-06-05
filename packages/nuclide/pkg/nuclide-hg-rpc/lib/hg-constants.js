@@ -1,25 +1,5 @@
 'use strict';
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 const StatusCodeId = Object.freeze({
   ADDED: 'A',
   CLEAN: 'C',
@@ -28,8 +8,8 @@ const StatusCodeId = Object.freeze({
   MISSING: '!', // (deleted by non-hg command, but still tracked)
   REMOVED: 'R',
   UNTRACKED: '?',
-  UNRESOLVED: 'U' });
-
+  UNRESOLVED: 'U'
+});
 
 // This is to work around flow's missing support of enums.
 /**
@@ -41,16 +21,25 @@ const StatusCodeId = Object.freeze({
  *
  *  strict-local
  * @format
- */StatusCodeId;const StatusCodeNumber = Object.freeze({ ADDED: 1, CLEAN: 2, IGNORED: 3, MODIFIED: 4, MISSING: 5, REMOVED: 6, UNTRACKED: 7,
-  UNRESOLVED: 8 });
+ */
 
+StatusCodeId;
+
+const StatusCodeNumber = Object.freeze({
+  ADDED: 1,
+  CLEAN: 2,
+  IGNORED: 3,
+  MODIFIED: 4,
+  MISSING: 5,
+  REMOVED: 6,
+  UNTRACKED: 7,
+  UNRESOLVED: 8
+});
 
 // This is to work around flow's missing support of enums.
 StatusCodeNumber;
 
-const StatusCodeIdToNumber =
-
-{
+const StatusCodeIdToNumber = {
   [StatusCodeId.ADDED]: StatusCodeNumber.ADDED,
   [StatusCodeId.CLEAN]: StatusCodeNumber.CLEAN,
   [StatusCodeId.IGNORED]: StatusCodeNumber.IGNORED,
@@ -58,15 +47,15 @@ const StatusCodeIdToNumber =
   [StatusCodeId.MISSING]: StatusCodeNumber.MISSING,
   [StatusCodeId.REMOVED]: StatusCodeNumber.REMOVED,
   [StatusCodeId.UNTRACKED]: StatusCodeNumber.UNTRACKED,
-  [StatusCodeId.UNRESOLVED]: StatusCodeNumber.UNRESOLVED };
-
+  [StatusCodeId.UNRESOLVED]: StatusCodeNumber.UNRESOLVED
+};
 
 const MergeConflictStatus = Object.freeze({
   BOTH_CHANGED: 'both changed',
   DELETED_IN_THEIRS: 'deleted in theirs',
   DELETED_IN_OURS: 'deleted in ours',
-  RESOLVED: 'resolved' });
-
+  RESOLVED: 'resolved'
+});
 
 // This is to work around flow's missing support of enums.
 MergeConflictStatus;
@@ -74,8 +63,8 @@ MergeConflictStatus;
 const AmendMode = Object.freeze({
   CLEAN: 'Clean',
   FIXUP: 'Fixup',
-  REBASE: 'Rebase' });
-
+  REBASE: 'Rebase'
+});
 
 // This is to work around flow's missing support of enums.
 AmendMode;
@@ -83,8 +72,8 @@ AmendMode;
 const CommitPhase = Object.freeze({
   PUBLIC: 'public',
   DRAFT: 'draft',
-  SECRET: 'secret' });
-
+  SECRET: 'secret'
+});
 
 // This is to work around flow's missing support of enums.
 CommitPhase;
@@ -95,16 +84,16 @@ const SuccessorType = Object.freeze({
   REBASE: 'rebase',
   SPLIT: 'split',
   FOLD: 'fold',
-  HISTEDIT: 'histedit' });
-
+  HISTEDIT: 'histedit'
+});
 
 // This is to work around flow's missing support of enums.
 SuccessorType;
 
 const MergeConflictFileStatus = Object.freeze({
   RESOLVED: 'R',
-  UNRESOLVED: 'U' });
-
+  UNRESOLVED: 'U'
+});
 
 MergeConflictFileStatus;
 
@@ -113,8 +102,8 @@ const PARENT_REVISION_EXPRESSION = '.^';
 const STACK_BASE_REVISION_EXPRESSION = 'ancestor(.,master)';
 
 const HisteditActions = Object.freeze({
-  PICK: 'pick' });
-
+  PICK: 'pick'
+});
 
 // This is to work around flow's missing support of enums.
 HisteditActions;
@@ -128,17 +117,9 @@ const LockFiles = Object.freeze({
   MERGE: '.hg/merge', // TODO(T25449730): actual state is in .hg/merge/state
   SHELVED: '.hg/shelvedstate',
   HISTEDIT: '.hg/histedit-state',
-  WLOCK: '.hg/wlock' });
-
-const LockFilesList = [
-LockFiles.GRAFT,
-LockFiles.UPDATE,
-LockFiles.REBASE,
-LockFiles.MERGE,
-LockFiles.SHELVED,
-LockFiles.HISTEDIT,
-LockFiles.WLOCK];
-
+  WLOCK: '.hg/wlock'
+});
+const LockFilesList = [LockFiles.GRAFT, LockFiles.UPDATE, LockFiles.REBASE, LockFiles.MERGE, LockFiles.SHELVED, LockFiles.HISTEDIT, LockFiles.WLOCK];
 
 // eslint-disable-next-line nuclide-internal/no-commonjs
 module.exports = {
@@ -155,4 +136,5 @@ module.exports = {
   SuccessorType,
   HisteditActions,
   LockFiles,
-  LockFilesList };
+  LockFilesList
+};

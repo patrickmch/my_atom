@@ -1,43 +1,54 @@
-'use strict';Object.defineProperty(exports, "__esModule", { value: true });var _nuclideRemoteConnection;
+'use strict';
 
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
 
+var _nuclideRemoteConnection;
 
+function _load_nuclideRemoteConnection() {
+  return _nuclideRemoteConnection = require('../../nuclide-remote-connection');
+}
 
+var _constants;
 
+function _load_constants() {
+  return _constants = require('../../nuclide-working-sets-common/lib/constants');
+}
 
+var _constants2;
 
+function _load_constants2() {
+  return _constants2 = require('./constants');
+}
 
+var _collection;
 
+function _load_collection() {
+  return _collection = require('../../../modules/nuclide-commons/collection');
+}
 
+var _nuclideUri;
 
+function _load_nuclideUri() {
+  return _nuclideUri = _interopRequireDefault(require('../../../modules/nuclide-commons/nuclideUri'));
+}
 
+var _featureConfig;
 
+function _load_featureConfig() {
+  return _featureConfig = _interopRequireDefault(require('../../../modules/nuclide-commons-atom/feature-config'));
+}
 
+var _rxjsBundlesRxMinJs = require('rxjs/bundles/Rx.min.js');
 
-function _load_nuclideRemoteConnection() {return _nuclideRemoteConnection = require('../../nuclide-remote-connection');}var _constants;
-function _load_constants() {return _constants = require('../../nuclide-working-sets-common/lib/constants');}var _constants2;
-function _load_constants2() {return _constants2 = require('./constants');}var _collection;
-
-function _load_collection() {return _collection = require('../../../modules/nuclide-commons/collection');}var _nuclideUri;
-function _load_nuclideUri() {return _nuclideUri = _interopRequireDefault(require('../../../modules/nuclide-commons/nuclideUri'));}var _featureConfig;
-function _load_featureConfig() {return _featureConfig = _interopRequireDefault(require('../../../modules/nuclide-commons-atom/feature-config'));}
-var _rxjsBundlesRxMinJs = require('rxjs/bundles/Rx.min.js');function _interopRequireDefault(obj) {return obj && obj.__esModule ? obj : { default: obj };}
-
-
-
-
-
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 class RemoteDirectorySearcher {
 
-
-
   // When constructed, RemoteDirectorySearcher must be passed a function that
   // it can use to get a 'CodeSearchService' for a given remote path.
-  constructor(
-  serviceProvider,
-  getWorkingSetsStore)
-  {
+  constructor(serviceProvider, getWorkingSetsStore) {
     this._serviceProvider = serviceProvider;
     this._getWorkingSetsStore = getWorkingSetsStore;
   }
@@ -46,43 +57,21 @@ class RemoteDirectorySearcher {
     return (_nuclideRemoteConnection || _load_nuclideRemoteConnection()).RemoteDirectory.isRemoteDirectory(directory);
   }
 
-  search(
-  directories,
-  regex,
-  options)
-  {
-    const config = (_featureConfig || _load_featureConfig()).default.get(
-    'nuclide-code-search');
-
+  search(directories, regex, options) {
+    const config = (_featureConfig || _load_featureConfig()).default.get('nuclide-code-search');
     // Track the files that we have seen updates for.
     const seenFiles = new Set();
 
     // Get the remote service that corresponds to each remote directory.
     const services = directories.map(dir => this._serviceProvider(dir));
 
-    const includePaths = directories.map(dir =>
-    this.processPaths(dir.getPath(), options.inclusions));
+    const includePaths = directories.map(dir => this.processPaths(dir.getPath(), options.inclusions));
 
-
-    const searchStreams =
-
-    includePaths.map(
-    (inclusion, index) =>
+    const searchStreams = includePaths.map((inclusion, index) =>
     // processPaths returns null if the inclusions are too strict for the
     // given directory, so we don't even want to start the search. This can
     // happen if we're searching in a working set that excludes the directory.
-    inclusion ?
-    services[index].
-    remoteAtomSearch(
-    directories[index].getPath(),
-    regex,
-    inclusion,
-    config.remoteUseVcsSearch,
-    config.remoteTool.length === 0 ? null : config.remoteTool).
-
-    refCount() :
-    _rxjsBundlesRxMinJs.Observable.empty());
-
+    inclusion ? services[index].remoteAtomSearch(directories[index].getPath(), regex, inclusion, config.remoteUseVcsSearch, config.remoteTool.length === 0 ? null : config.remoteTool).refCount() : _rxjsBundlesRxMinJs.Observable.empty());
 
     // Start the search in each directory, and merge the resulting streams.
     const searchStream = _rxjsBundlesRxMinJs.Observable.merge(...searchStreams);
@@ -91,8 +80,7 @@ class RemoteDirectorySearcher {
     const searchCompletion = new _rxjsBundlesRxMinJs.ReplaySubject();
     searchCompletion.next();
 
-    const subscription = searchStream.subscribe(
-    next => {
+    const subscription = searchStream.subscribe(next => {
       options.didMatch(next);
 
       // Call didSearchPaths with the number of unique files we have seen matches in. This is
@@ -100,15 +88,12 @@ class RemoteDirectorySearcher {
       // no matches were found. However, we currently have no way of obtaining this information.
       seenFiles.add(next.filePath);
       options.didSearchPaths(seenFiles.size);
-    },
-    error => {
+    }, error => {
       options.didError(error);
       searchCompletion.error(error);
-    },
-    () => {
+    }, () => {
       searchCompletion.complete();
     });
-
 
     // Return a promise that resolves on search completion.
     const completionPromise = searchCompletion.toPromise();
@@ -117,15 +102,15 @@ class RemoteDirectorySearcher {
       cancel() {
         // Cancel the subscription, which should also kill the grep process.
         subscription.unsubscribe();
-      } };
-
+      }
+    };
   }
 
   /**
-     * If a query's prefix matches the rootPath's basename, treat the query as a relative search.
-     * Based on https://github.com/atom/atom/blob/master/src/scan-handler.coffee.
-     * Returns null if we shouldn't search rootPath.
-     */
+   * If a query's prefix matches the rootPath's basename, treat the query as a relative search.
+   * Based on https://github.com/atom/atom/blob/master/src/scan-handler.coffee.
+   * Returns null if we shouldn't search rootPath.
+   */
   processPaths(rootPath, paths) {
     if (paths == null) {
       return [];
@@ -136,18 +121,11 @@ class RemoteDirectorySearcher {
       if (path === (_constants || _load_constants()).WORKING_SET_PATH_MARKER) {
         const workingSetsStore = this._getWorkingSetsStore();
         if (!workingSetsStore) {
-          (_constants2 || _load_constants2()).logger.error(
-          'workingSetsStore not found but trying to search in working sets');
-
+          (_constants2 || _load_constants2()).logger.error('workingSetsStore not found but trying to search in working sets');
           continue;
         }
 
-        const workingSetUris = (0, (_collection || _load_collection()).arrayFlatten)(
-        workingSetsStore.
-        getApplicableDefinitions().
-        filter(def => def.active).
-        map(def => def.uris))
-
+        const workingSetUris = (0, (_collection || _load_collection()).arrayFlatten)(workingSetsStore.getApplicableDefinitions().filter(def => def.active).map(def => def.uris))
         // A working set can contain paths outside of rootPath. Ignore these.
         .filter(uri => (_nuclideUri || _load_nuclideUri()).default.contains(rootPath, uri))
         // `processPaths` expects the second argument to be a relative path
@@ -157,11 +135,18 @@ class RemoteDirectorySearcher {
         if (workingSetUris.length === 0) {
           // Working set and rootPath are disjoint, we shouldn't search rootPath
           return null;
-        }if (!
+        }
 
-        !workingSetUris.includes((_constants || _load_constants()).WORKING_SET_PATH_MARKER)) {throw new Error('Invariant violation: "!workingSetUris.includes(WORKING_SET_PATH_MARKER)"');}
-        const processed = this.processPaths(rootPath, workingSetUris);if (!
-        processed) {throw new Error('Invariant violation: "processed"');}
+        if (!!workingSetUris.includes((_constants || _load_constants()).WORKING_SET_PATH_MARKER)) {
+          throw new Error('Invariant violation: "!workingSetUris.includes(WORKING_SET_PATH_MARKER)"');
+        }
+
+        const processed = this.processPaths(rootPath, workingSetUris);
+
+        if (!processed) {
+          throw new Error('Invariant violation: "processed"');
+        }
+
         results.push(...processed);
         continue;
       }
@@ -180,13 +165,15 @@ class RemoteDirectorySearcher {
       }
     }
     return results;
-  }}exports.default = RemoteDirectorySearcher; /**
-                                                * Copyright (c) 2015-present, Facebook, Inc.
-                                                * All rights reserved.
-                                                *
-                                                * This source code is licensed under the license found in the LICENSE file in
-                                                * the root directory of this source tree.
-                                                *
-                                                * 
-                                                * @format
-                                                */
+  }
+}
+exports.default = RemoteDirectorySearcher; /**
+                                            * Copyright (c) 2015-present, Facebook, Inc.
+                                            * All rights reserved.
+                                            *
+                                            * This source code is licensed under the license found in the LICENSE file in
+                                            * the root directory of this source tree.
+                                            *
+                                            * 
+                                            * @format
+                                            */

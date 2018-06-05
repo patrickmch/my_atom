@@ -1,12 +1,10 @@
 "use strict";
 
-let Observable;
-
 module.exports = _client => {
   const remoteModule = {};
 
   remoteModule.compile = function (arg0, arg1, arg2, arg3) {
-    return Observable.fromPromise(_client.marshalArguments(Array.from(arguments), [{
+    return _client.callRemoteFunction("ClangService/compile", "observable", _client.marshalArguments(Array.from(arguments), [{
       name: "src",
       type: {
         kind: "named",
@@ -35,9 +33,7 @@ module.exports = _client => {
           name: "ClangServerSettings"
         }
       }
-    }])).switchMap(args => {
-      return _client.callRemoteFunction("ClangService/compile", "observable", args);
-    }).concatMap(value => {
+    }])).map(value => {
       return _client.unmarshal(value, {
         kind: "nullable",
         type: {
@@ -49,7 +45,7 @@ module.exports = _client => {
   };
 
   remoteModule.getCompletions = function (arg0, arg1, arg2, arg3, arg4, arg5, arg6, arg7) {
-    return _client.marshalArguments(Array.from(arguments), [{
+    return _client.callRemoteFunction("ClangService/getCompletions", "promise", _client.marshalArguments(Array.from(arguments), [{
       name: "src",
       type: {
         kind: "named",
@@ -98,9 +94,7 @@ module.exports = _client => {
           name: "ClangServerSettings"
         }
       }
-    }]).then(args => {
-      return _client.callRemoteFunction("ClangService/getCompletions", "promise", args);
-    }).then(value => {
+    }])).then(value => {
       return _client.unmarshal(value, {
         kind: "nullable",
         type: {
@@ -115,7 +109,7 @@ module.exports = _client => {
   };
 
   remoteModule.getDeclaration = function (arg0, arg1, arg2, arg3, arg4, arg5) {
-    return _client.marshalArguments(Array.from(arguments), [{
+    return _client.callRemoteFunction("ClangService/getDeclaration", "promise", _client.marshalArguments(Array.from(arguments), [{
       name: "src",
       type: {
         kind: "named",
@@ -154,9 +148,7 @@ module.exports = _client => {
           name: "ClangServerSettings"
         }
       }
-    }]).then(args => {
-      return _client.callRemoteFunction("ClangService/getDeclaration", "promise", args);
-    }).then(value => {
+    }])).then(value => {
       return _client.unmarshal(value, {
         kind: "nullable",
         type: {
@@ -168,7 +160,7 @@ module.exports = _client => {
   };
 
   remoteModule.getDeclarationInfo = function (arg0, arg1, arg2, arg3, arg4, arg5) {
-    return _client.marshalArguments(Array.from(arguments), [{
+    return _client.callRemoteFunction("ClangService/getDeclarationInfo", "promise", _client.marshalArguments(Array.from(arguments), [{
       name: "src",
       type: {
         kind: "named",
@@ -207,9 +199,7 @@ module.exports = _client => {
           name: "ClangServerSettings"
         }
       }
-    }]).then(args => {
-      return _client.callRemoteFunction("ClangService/getDeclarationInfo", "promise", args);
-    }).then(value => {
+    }])).then(value => {
       return _client.unmarshal(value, {
         kind: "nullable",
         type: {
@@ -224,7 +214,7 @@ module.exports = _client => {
   };
 
   remoteModule.getRelatedSourceOrHeader = function (arg0, arg1) {
-    return _client.marshalArguments(Array.from(arguments), [{
+    return _client.callRemoteFunction("ClangService/getRelatedSourceOrHeader", "promise", _client.marshalArguments(Array.from(arguments), [{
       name: "src",
       type: {
         kind: "named",
@@ -239,9 +229,7 @@ module.exports = _client => {
           name: "ClangRequestSettings"
         }
       }
-    }]).then(args => {
-      return _client.callRemoteFunction("ClangService/getRelatedSourceOrHeader", "promise", args);
-    }).then(value => {
+    }])).then(value => {
       return _client.unmarshal(value, {
         kind: "nullable",
         type: {
@@ -253,7 +241,7 @@ module.exports = _client => {
   };
 
   remoteModule.getOutline = function (arg0, arg1, arg2, arg3) {
-    return _client.marshalArguments(Array.from(arguments), [{
+    return _client.callRemoteFunction("ClangService/getOutline", "promise", _client.marshalArguments(Array.from(arguments), [{
       name: "src",
       type: {
         kind: "named",
@@ -282,9 +270,7 @@ module.exports = _client => {
           name: "ClangServerSettings"
         }
       }
-    }]).then(args => {
-      return _client.callRemoteFunction("ClangService/getOutline", "promise", args);
-    }).then(value => {
+    }])).then(value => {
       return _client.unmarshal(value, {
         kind: "nullable",
         type: {
@@ -299,7 +285,7 @@ module.exports = _client => {
   };
 
   remoteModule.getLocalReferences = function (arg0, arg1, arg2, arg3, arg4, arg5) {
-    return _client.marshalArguments(Array.from(arguments), [{
+    return _client.callRemoteFunction("ClangService/getLocalReferences", "promise", _client.marshalArguments(Array.from(arguments), [{
       name: "src",
       type: {
         kind: "named",
@@ -338,9 +324,7 @@ module.exports = _client => {
           name: "ClangServerSettings"
         }
       }
-    }]).then(args => {
-      return _client.callRemoteFunction("ClangService/getLocalReferences", "promise", args);
-    }).then(value => {
+    }])).then(value => {
       return _client.unmarshal(value, {
         kind: "nullable",
         type: {
@@ -352,7 +336,7 @@ module.exports = _client => {
   };
 
   remoteModule.formatCode = function (arg0, arg1, arg2, arg3, arg4) {
-    return _client.marshalArguments(Array.from(arguments), [{
+    return _client.callRemoteFunction("ClangService/formatCode", "promise", _client.marshalArguments(Array.from(arguments), [{
       name: "src",
       type: {
         kind: "named",
@@ -384,9 +368,7 @@ module.exports = _client => {
           kind: "number"
         }
       }
-    }]).then(args => {
-      return _client.callRemoteFunction("ClangService/formatCode", "promise", args);
-    }).then(value => {
+    }])).then(value => {
       return _client.unmarshal(value, {
         kind: "object",
         fields: [{
@@ -407,7 +389,7 @@ module.exports = _client => {
   };
 
   remoteModule.loadFilesFromCompilationDatabaseAndCacheThem = function (arg0, arg1) {
-    return Observable.fromPromise(_client.marshalArguments(Array.from(arguments), [{
+    return _client.callRemoteFunction("ClangService/loadFilesFromCompilationDatabaseAndCacheThem", "observable", _client.marshalArguments(Array.from(arguments), [{
       name: "dbFile",
       type: {
         kind: "string"
@@ -420,9 +402,7 @@ module.exports = _client => {
           kind: "string"
         }
       }
-    }])).switchMap(args => {
-      return _client.callRemoteFunction("ClangService/loadFilesFromCompilationDatabaseAndCacheThem", "observable", args);
-    }).concatMap(value => {
+    }])).map(value => {
       return _client.unmarshal(value, {
         kind: "string"
       });
@@ -430,7 +410,7 @@ module.exports = _client => {
   };
 
   remoteModule.loadFlagsFromCompilationDatabaseAndCacheThem = function (arg0, arg1) {
-    return _client.marshalArguments(Array.from(arguments), [{
+    return _client.callRemoteFunction("ClangService/loadFlagsFromCompilationDatabaseAndCacheThem", "promise", _client.marshalArguments(Array.from(arguments), [{
       name: "dbFile",
       type: {
         kind: "string"
@@ -443,9 +423,7 @@ module.exports = _client => {
           kind: "string"
         }
       }
-    }]).then(args => {
-      return _client.callRemoteFunction("ClangService/loadFlagsFromCompilationDatabaseAndCacheThem", "promise", args);
-    }).then(value => {
+    }])).then(value => {
       return _client.unmarshal(value, {
         kind: "map",
         keyType: {
@@ -460,48 +438,35 @@ module.exports = _client => {
   };
 
   remoteModule.resetForSource = function (arg0) {
-    return _client.marshalArguments(Array.from(arguments), [{
+    return _client.callRemoteFunction("ClangService/resetForSource", "void", _client.marshalArguments(Array.from(arguments), [{
       name: "src",
       type: {
         kind: "named",
         name: "NuclideUri"
       }
-    }]).then(args => {
-      return _client.callRemoteFunction("ClangService/resetForSource", "void", args);
-    });
+    }]));
   };
 
   remoteModule.reset = function () {
-    return _client.marshalArguments(Array.from(arguments), []).then(args => {
-      return _client.callRemoteFunction("ClangService/reset", "void", args);
-    });
+    return _client.callRemoteFunction("ClangService/reset", "void", _client.marshalArguments(Array.from(arguments), []));
   };
 
   remoteModule.dispose = function () {
-    return _client.marshalArguments(Array.from(arguments), []).then(args => {
-      return _client.callRemoteFunction("ClangService/dispose", "void", args);
-    });
+    return _client.callRemoteFunction("ClangService/dispose", "void", _client.marshalArguments(Array.from(arguments), []));
   };
 
   remoteModule.setMemoryLimit = function (arg0) {
-    return _client.marshalArguments(Array.from(arguments), [{
+    return _client.callRemoteFunction("ClangService/setMemoryLimit", "void", _client.marshalArguments(Array.from(arguments), [{
       name: "percent",
       type: {
         kind: "number"
       }
-    }]).then(args => {
-      return _client.callRemoteFunction("ClangService/setMemoryLimit", "void", args);
-    });
+    }]));
   };
 
   return remoteModule;
 };
 
-Object.defineProperty(module.exports, "inject", {
-  value: function () {
-    Observable = arguments[0];
-  }
-});
 Object.defineProperty(module.exports, "defs", {
   value: {
     Object: {

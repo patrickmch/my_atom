@@ -1,31 +1,28 @@
-'use strict';Object.defineProperty(exports, "__esModule", { value: true });exports.
+'use strict';
 
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.pickConfigByUri = pickConfigByUri;
 
+var _featureConfig;
 
+function _load_featureConfig() {
+  return _featureConfig = _interopRequireDefault(require('../../../modules/nuclide-commons-atom/feature-config'));
+}
 
+var _nuclideUri;
 
+function _load_nuclideUri() {
+  return _nuclideUri = _interopRequireDefault(require('../../../modules/nuclide-commons/nuclideUri'));
+}
 
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-
-
-
-
-
-
-
-
-
-
-pickConfigByUri = pickConfigByUri;var _featureConfig;function _load_featureConfig() {return _featureConfig = _interopRequireDefault(require('../../../modules/nuclide-commons-atom/feature-config'));}var _nuclideUri;function _load_nuclideUri() {return _nuclideUri = _interopRequireDefault(require('../../../modules/nuclide-commons/nuclideUri'));}function _interopRequireDefault(obj) {return obj && obj.__esModule ? obj : { default: obj };}function pickConfigByUri(
-uri)
-{
-  const config = (_featureConfig || _load_featureConfig()).default.get(
-  'nuclide-code-search');
-
+function pickConfigByUri(uri) {
+  const config = (_featureConfig || _load_featureConfig()).default.get('nuclide-code-search');
   const tool = (_nuclideUri || _load_nuclideUri()).default.isRemote(uri) ? config.remoteTool : config.localTool;
-  const useVcsSearch = (_nuclideUri || _load_nuclideUri()).default.isRemote(uri) ?
-  config.remoteUseVcsSearch :
-  config.localUseVcsSearch;
+  const useVcsSearch = (_nuclideUri || _load_nuclideUri()).default.isRemote(uri) ? config.remoteUseVcsSearch : config.localUseVcsSearch;
   return { tool, useVcsSearch, maxResults: config.maxResults };
 } /**
    * Copyright (c) 2015-present, Facebook, Inc.

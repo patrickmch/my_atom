@@ -1,34 +1,38 @@
-'use strict';Object.defineProperty(exports, "__esModule", { value: true });exports.TizenBridge = undefined;var _Actions;
+'use strict';
 
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.TizenBridge = undefined;
 
+var _Actions;
 
+function _load_Actions() {
+  return _Actions = _interopRequireWildcard(require('../redux/Actions'));
+}
 
+var _nuclideRemoteConnection;
 
+function _load_nuclideRemoteConnection() {
+  return _nuclideRemoteConnection = require('../../../nuclide-remote-connection');
+}
 
+var _SdbDevicePoller;
 
+function _load_SdbDevicePoller() {
+  return _SdbDevicePoller = require('../../../nuclide-adb-sdb-base/lib/SdbDevicePoller');
+}
 
+var _rxjsBundlesRxMinJs = require('rxjs/bundles/Rx.min.js');
 
-
-
-
-
-
-
-
-
-
-function _load_Actions() {return _Actions = _interopRequireWildcard(require('../redux/Actions'));}var _nuclideRemoteConnection;
-function _load_nuclideRemoteConnection() {return _nuclideRemoteConnection = require('../../../nuclide-remote-connection');}var _SdbDevicePoller;
-function _load_SdbDevicePoller() {return _SdbDevicePoller = require('../../../nuclide-adb-sdb-base/lib/SdbDevicePoller');}
-var _rxjsBundlesRxMinJs = require('rxjs/bundles/Rx.min.js');function _interopRequireWildcard(obj) {if (obj && obj.__esModule) {return obj;} else {var newObj = {};if (obj != null) {for (var key in obj) {if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key];}}newObj.default = obj;return newObj;}}
+function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
 
 class TizenBridge {
 
+  constructor(store) {
+    this.debugBridge = 'sdb';
+    this.name = 'Tizen';
 
-
-
-
-  constructor(store) {this.debugBridge = 'sdb';this.name = 'Tizen';
     this._store = store;
   }
 
@@ -50,13 +54,15 @@ class TizenBridge {
 
   observeDevicesX(host) {
     return (0, (_SdbDevicePoller || _load_SdbDevicePoller()).observeTizenDevicesX)(host);
-  }}exports.TizenBridge = TizenBridge; /**
-                                        * Copyright (c) 2015-present, Facebook, Inc.
-                                        * All rights reserved.
-                                        *
-                                        * This source code is licensed under the license found in the LICENSE file in
-                                        * the root directory of this source tree.
-                                        *
-                                        *  strict-local
-                                        * @format
-                                        */
+  }
+}
+exports.TizenBridge = TizenBridge; /**
+                                    * Copyright (c) 2015-present, Facebook, Inc.
+                                    * All rights reserved.
+                                    *
+                                    * This source code is licensed under the license found in the LICENSE file in
+                                    * the root directory of this source tree.
+                                    *
+                                    *  strict-local
+                                    * @format
+                                    */

@@ -1,39 +1,37 @@
-'use strict';Object.defineProperty(exports, "__esModule", { value: true });exports.
+'use strict';
 
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.parseMessageText = parseMessageText;
+/**
+ * Copyright (c) 2015-present, Facebook, Inc.
+ * All rights reserved.
+ *
+ * This source code is licensed under the license found in the LICENSE file in
+ * the root directory of this source tree.
+ *
+ *  strict-local
+ * @format
+ */
 
+const TAG_RE = /\[([^[\]]*)]/g;
+const TAG_PATTERN = '\\[[^\\[\\]]*\\]'; // The same as TAG_RE but without capturing, for embedding.
+const DATETIME_PATTERN = '\\d{4}-\\d{2}-\\d{2} \\d+:\\d+:\\d+\\.\\d+';
+const PARTS_PATTERN = `${DATETIME_PATTERN}( (?:${TAG_PATTERN})+ ?)?([\\s\\S]*)`;
+const PARTS_RE = new RegExp(PARTS_PATTERN);
 
+function parseMessageText(raw) {
+  const messageMatch = raw.match(PARTS_RE);
 
+  if (messageMatch == null) {
+    return {
+      text: raw,
+      level: null,
+      tags: []
+    };
+  }
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-parseMessageText = parseMessageText; /**
-                                      * Copyright (c) 2015-present, Facebook, Inc.
-                                      * All rights reserved.
-                                      *
-                                      * This source code is licensed under the license found in the LICENSE file in
-                                      * the root directory of this source tree.
-                                      *
-                                      *  strict-local
-                                      * @format
-                                      */const TAG_RE = /\[([^[\]]*)]/g;const TAG_PATTERN = '\\[[^\\[\\]]*\\]'; // The same as TAG_RE but without capturing, for embedding.
-const DATETIME_PATTERN = '\\d{4}-\\d{2}-\\d{2} \\d+:\\d+:\\d+\\.\\d+';const PARTS_PATTERN = `${DATETIME_PATTERN}( (?:${TAG_PATTERN})+ ?)?([\\s\\S]*)`;const PARTS_RE = new RegExp(PARTS_PATTERN);function parseMessageText(raw) {const messageMatch = raw.match(PARTS_RE);if (messageMatch == null) {return { text: raw, level: null, tags: [] };}
   const [, tagsPart, text] = messageMatch;
   const tags = [];
   let level;
@@ -53,8 +51,8 @@ const DATETIME_PATTERN = '\\d{4}-\\d{2}-\\d{2} \\d+:\\d+:\\d+\\.\\d+';const PART
       default:
         if (tag !== '') {
           tags.push(tag);
-        }}
-
+        }
+    }
   }
 
   return { text, level, tags };

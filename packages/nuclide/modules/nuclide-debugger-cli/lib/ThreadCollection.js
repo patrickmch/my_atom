@@ -1,20 +1,18 @@
-'use strict';Object.defineProperty(exports, "__esModule", { value: true });var _Thread;
+'use strict';
 
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
 
+var _Thread;
 
+function _load_Thread() {
+  return _Thread = _interopRequireDefault(require('./Thread'));
+}
 
-
-
-
-
-
-
-
-function _load_Thread() {return _Thread = _interopRequireDefault(require('./Thread'));}function _interopRequireDefault(obj) {return obj && obj.__esModule ? obj : { default: obj };}
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 class ThreadCollection {
-
-
 
   constructor() {
     this._threads = new Map();
@@ -24,9 +22,7 @@ class ThreadCollection {
     const newIds = new Set(threads.map(_ => _.id()));
     const existingIds = [...this._threads.keys()];
 
-    existingIds.
-    filter(_ => !newIds.has(_)).
-    forEach(_ => this._threads.delete(_));
+    existingIds.filter(_ => !newIds.has(_)).forEach(_ => this._threads.delete(_));
 
     threads.forEach(_ => {
       const thread = this._threads.get(_.id());
@@ -37,10 +33,7 @@ class ThreadCollection {
       this._threads.set(_.id(), _);
     });
 
-    if (
-    this._focusThread != null &&
-    this.getThreadById(this._focusThread) == null)
-    {
+    if (this._focusThread != null && this.getThreadById(this._focusThread) == null) {
       this._focusThread = null;
     }
   }
@@ -93,16 +86,11 @@ class ThreadCollection {
   }
 
   allThreadsRunning() {
-    return [...this._threads.values()].reduce(
-    (x, y) => x && !y.isStopped,
-    true);
-
+    return [...this._threads.values()].reduce((x, y) => x && !y.isStopped, true);
   }
 
   firstStoppedThread() {
-    const stopped = [...this._threads.values()].
-    sort((a, b) => a.id() - b.id()).
-    find(_ => _.isStopped);
+    const stopped = [...this._threads.values()].sort((a, b) => a.id() - b.id()).find(_ => _.isStopped);
 
     if (stopped == null) {
       return null;
@@ -127,14 +115,16 @@ class ThreadCollection {
       return null;
     }
     return this._threads.get(this._focusThread);
-  }}exports.default = ThreadCollection; /**
-                                         * Copyright (c) 2017-present, Facebook, Inc.
-                                         * All rights reserved.
-                                         *
-                                         * This source code is licensed under the BSD-style license found in the
-                                         * LICENSE file in the root directory of this source tree. An additional grant
-                                         * of patent rights can be found in the PATENTS file in the same directory.
-                                         *
-                                         * 
-                                         * @format
-                                         */
+  }
+}
+exports.default = ThreadCollection; /**
+                                     * Copyright (c) 2017-present, Facebook, Inc.
+                                     * All rights reserved.
+                                     *
+                                     * This source code is licensed under the BSD-style license found in the
+                                     * LICENSE file in the root directory of this source tree. An additional grant
+                                     * of patent rights can be found in the PATENTS file in the same directory.
+                                     *
+                                     * 
+                                     * @format
+                                     */

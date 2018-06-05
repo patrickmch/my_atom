@@ -1,31 +1,47 @@
-'use strict';Object.defineProperty(exports, "__esModule", { value: true });exports.SocketServer = undefined;var _asyncToGenerator = _interopRequireDefault(require('async-to-generator'));
+'use strict';
 
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.SocketServer = undefined;
 
+var _net = _interopRequireDefault(require('net'));
 
+var _promise;
 
+function _load_promise() {
+  return _promise = require('../../../modules/nuclide-commons/promise');
+}
 
+var _RpcConnection;
 
+function _load_RpcConnection() {
+  return _RpcConnection = require('./RpcConnection');
+}
 
+var _SocketTransport;
 
+function _load_SocketTransport() {
+  return _SocketTransport = require('./SocketTransport');
+}
 
+var _ServiceRegistry;
 
+function _load_ServiceRegistry() {
+  return _ServiceRegistry = require('./ServiceRegistry');
+}
 
+var _eventKit;
 
-var _net = _interopRequireDefault(require('net'));var _promise;
-function _load_promise() {return _promise = require('../../../modules/nuclide-commons/promise');}var _RpcConnection;
-function _load_RpcConnection() {return _RpcConnection = require('./RpcConnection');}var _SocketTransport;
-function _load_SocketTransport() {return _SocketTransport = require('./SocketTransport');}var _ServiceRegistry;
-function _load_ServiceRegistry() {return _ServiceRegistry = require('./ServiceRegistry');}var _eventKit;
-function _load_eventKit() {return _eventKit = require('event-kit');}function _interopRequireDefault(obj) {return obj && obj.__esModule ? obj : { default: obj };}
+function _load_eventKit() {
+  return _eventKit = require('event-kit');
+}
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 // An RPC server which listens for connections on a localhost socket.
 // TODO: Consider extending with more socket listening options.
 class SocketServer {
-
-
-
-
-
 
   constructor(serviceRegistry) {
     this._emitter = new (_eventKit || _load_eventKit()).Emitter();
@@ -46,12 +62,9 @@ class SocketServer {
 
   _onConnection(socket) {
     const transport = new (_SocketTransport || _load_SocketTransport()).SocketTransport(socket);
-    const connection = (_RpcConnection || _load_RpcConnection()).RpcConnection.createServer(
-    this._serviceRegistry,
-    transport,
+    const connection = (_RpcConnection || _load_RpcConnection()).RpcConnection.createServer(this._serviceRegistry, transport,
     // Track calls with a sampling rate of 1/10.
     { trackSampleRate: 10 });
-
     transport.onClose(() => {
       this._connections.delete(connection);
     });
@@ -70,9 +83,9 @@ class SocketServer {
     return this._listening.promise;
   }
 
-  getAddress() {var _this = this;return (0, _asyncToGenerator.default)(function* () {
-      yield _this.untilListening();
-      return _this._server.address();})();
+  async getAddress() {
+    await this.untilListening();
+    return this._server.address();
   }
 
   // Close all open connections and shutdown the server.
@@ -84,13 +97,15 @@ class SocketServer {
     this._listening.reject(new Error('Closing SocketServer'));
     this._server.close();
     this._emitter.dispose();
-  }}exports.SocketServer = SocketServer; /**
-                                          * Copyright (c) 2015-present, Facebook, Inc.
-                                          * All rights reserved.
-                                          *
-                                          * This source code is licensed under the license found in the LICENSE file in
-                                          * the root directory of this source tree.
-                                          *
-                                          *  strict-local
-                                          * @format
-                                          */
+  }
+}
+exports.SocketServer = SocketServer; /**
+                                      * Copyright (c) 2015-present, Facebook, Inc.
+                                      * All rights reserved.
+                                      *
+                                      * This source code is licensed under the license found in the LICENSE file in
+                                      * the root directory of this source tree.
+                                      *
+                                      *  strict-local
+                                      * @format
+                                      */

@@ -1,30 +1,20 @@
-'use strict';Object.defineProperty(exports, "__esModule", { value: true });exports.
+'use strict';
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.forEachCachedNode = forEachCachedNode;
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-forEachCachedNode = forEachCachedNode; /**
-                                        * Call `callback` on every node in the subtree, including `rootNode`.
-                                        */function forEachCachedNode(rootNode, callback)
-{
+/**
+ * Call `callback` on every node in the subtree, including `rootNode`.
+ */
+function forEachCachedNode(rootNode, callback) {
   const stack = [rootNode];
   while (stack.length !== 0) {
     const node = stack.pop();
     callback(node);
-    (node.getCachedChildren() || []).forEach(childNode =>
-    stack.push(childNode));
-
+    (node.getCachedChildren() || []).forEach(childNode => stack.push(childNode));
   }
 } /**
    * Copyright (c) 2015-present, Facebook, Inc.

@@ -1,0 +1,39 @@
+diff --git a/nols_website/core/templates/core/account/phones.html b/nols_website/core/templates/core/account/phones.html
+index d875af5d0..6f965dd5e 100644
+--- a/nols_website/core/templates/core/account/phones.html
++++ b/nols_website/core/templates/core/account/phones.html
+@@ -1,19 +1,23 @@
+ {% extends "core/account/base.html" %}
+-
+ {% block account_content %}
++{% load static from staticfiles %}
++{% block extra_js %}
++  <script type="text/javascript" src="{% static "core/js/account.js" %}"></script>
++{% endblock %}
++
+ <h1 class="text-center account-info-title">Account Information: Phones</h1>
+ {% if phones %}
+-<div class="row account-info-page">
+-  <div class="column small-12 large-10 small-centered">
+-    {% include "core/fragments/phone_list.html" %}
+-    {% include 'core/fragments/bottom_row_buttons.html' with content='Phone'%}
++  <div class="row account-info-page">
++    <div class="column small-12 large-10 small-centered">
++      {% include "core/fragments/phone_list.html" %}
++      {% include 'core/fragments/bottom_row_buttons.html' with content='Phone'%}
++    </div>
+   </div>
+-</div>
+ {% else %}
+-<div class="row column account-info-bottom-row">
+-  <a class="button" href="{{ new_url }}{% if request.META.QUERY_STRING %}?{{ request.META.QUERY_STRING }}{% endif %}">
+-    <span>Add new phone</span>
+-  </a>
+-</div>
++  <div class="row column account-info-bottom-row">
++    <a class="button" href="{{ new_url }}{% if request.META.QUERY_STRING %}?{{ request.META.QUERY_STRING }}{% endif %}">
++      <span>Add new phone</span>
++    </a>
++  </div>
+ {% endif %}
+ {% endblock %}

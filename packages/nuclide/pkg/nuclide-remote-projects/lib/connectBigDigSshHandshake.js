@@ -1,41 +1,47 @@
-'use strict';Object.defineProperty(exports, "__esModule", { value: true });exports.default =
+'use strict';
 
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.default = connectBigDigSshHandshake;
 
+var _client;
 
+function _load_client() {
+  return _client = require('../../../modules/big-dig/src/client');
+}
 
+var _yargs;
 
+function _load_yargs() {
+  return _yargs = _interopRequireDefault(require('yargs'));
+}
 
+var _systemInfo;
 
+function _load_systemInfo() {
+  return _systemInfo = require('../../commons-node/system-info');
+}
 
+var _nuclideRemoteConnection;
 
+function _load_nuclideRemoteConnection() {
+  return _nuclideRemoteConnection = require('../../nuclide-remote-connection');
+}
 
+var _ServerConnection;
 
+function _load_ServerConnection() {
+  return _ServerConnection = require('../../nuclide-remote-connection/lib/ServerConnection');
+}
 
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-connectBigDigSshHandshake;var _client;function _load_client() {return _client = require('../../../modules/big-dig/src/client');}var _yargs;function _load_yargs() {return _yargs = _interopRequireDefault(require('yargs'));}var _systemInfo;function _load_systemInfo() {return _systemInfo = require('../../commons-node/system-info');}var _nuclideRemoteConnection;function _load_nuclideRemoteConnection() {return _nuclideRemoteConnection = require('../../nuclide-remote-connection');}var _ServerConnection;function _load_ServerConnection() {return _ServerConnection = require('../../nuclide-remote-connection/lib/ServerConnection');}function _interopRequireDefault(obj) {return obj && obj.__esModule ? obj : { default: obj };} /**
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                   * Adapts big-dig's SshHandshake to what Nuclide expects.
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                   * After the migration is complete, we should be able to refactor this away.
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                   */function connectBigDigSshHandshake(connectionConfig, delegate) {
+/**
+ * Adapts big-dig's SshHandshake to what Nuclide expects.
+ * After the migration is complete, we should be able to refactor this away.
+ */
+function connectBigDigSshHandshake(connectionConfig, delegate) {
   const sshHandshake = new (_client || _load_client()).SshHandshake({
     onKeyboardInteractive(name, instructions, instructionsLang, prompts) {
       const prompt = prompts[0];
@@ -43,66 +49,41 @@ connectBigDigSshHandshake;var _client;function _load_client() {return _client = 
         switch (prompt.kind) {
           case 'ssh':
           case 'private-key':
-            delegate.onKeyboardInteractive(
-            name,
-            instructions,
-            instructionsLang,
-            [{ prompt: prompt.prompt, echo: prompt.echo }],
-            resolve);
-
+            delegate.onKeyboardInteractive(name, instructions, instructionsLang, [{ prompt: prompt.prompt, echo: prompt.echo }], resolve);
             break;
           default:
             // No need to handle update/install for unmanaged startups.
-            throw Error('Unexpected prompt kind');}
-
+            throw Error('Unexpected prompt kind');
+        }
       });
     },
     onWillConnect(config) {
       delegate.onWillConnect(connectionConfig);
     },
-    onDidConnect(
-    remoteConfig,
-    config)
-    {
-      (_nuclideRemoteConnection || _load_nuclideRemoteConnection()).RemoteConnection.findOrCreate(Object.assign({},
-      remoteConfig, {
-        cwd: connectionConfig.cwd,
+    onDidConnect(remoteConfig, config) {
+      (_nuclideRemoteConnection || _load_nuclideRemoteConnection()).RemoteConnection.findOrCreate(Object.assign({}, remoteConfig, {
+        path: connectionConfig.cwd,
         displayTitle: connectionConfig.displayTitle,
-        version: (_ServerConnection || _load_ServerConnection()).BIG_DIG_VERSION })).
-      then(
-      connection => {
+        version: (_ServerConnection || _load_ServerConnection()).BIG_DIG_VERSION
+      })).then(connection => {
         delegate.onDidConnect(connection, connectionConfig);
-      },
-      err => {
-        delegate.onError(
-        err.code === 'CERT_NOT_YET_VALID' ?
-        (_nuclideRemoteConnection || _load_nuclideRemoteConnection()).SshHandshake.ErrorType.CERT_NOT_YET_VALID :
-        (_nuclideRemoteConnection || _load_nuclideRemoteConnection()).SshHandshake.ErrorType.SERVER_CANNOT_CONNECT,
-        err,
-        connectionConfig);
-
+      }, err => {
+        delegate.onError(err.code === 'CERT_NOT_YET_VALID' ? (_nuclideRemoteConnection || _load_nuclideRemoteConnection()).SshHandshake.ErrorType.CERT_NOT_YET_VALID : (_nuclideRemoteConnection || _load_nuclideRemoteConnection()).SshHandshake.ErrorType.SERVER_CANNOT_CONNECT, err, connectionConfig);
       });
-
     },
-    onError(
-    errorType,
-    error,
-    config)
-    {
-      const nuclideErrorType =
-      (_nuclideRemoteConnection || _load_nuclideRemoteConnection()).SshHandshake.ErrorType[errorType] ||
-      (_nuclideRemoteConnection || _load_nuclideRemoteConnection()).SshHandshake.ErrorType.UNKNOWN;
+    onError(errorType, error, config) {
+      const nuclideErrorType = (_nuclideRemoteConnection || _load_nuclideRemoteConnection()).SshHandshake.ErrorType[errorType] || (_nuclideRemoteConnection || _load_nuclideRemoteConnection()).SshHandshake.ErrorType.UNKNOWN;
       delegate.onError(nuclideErrorType, error, connectionConfig);
-    } });
-
+    }
+  });
   const {
     host,
     sshPort,
     username,
     pathToPrivateKey,
     authMethod,
-    password } =
-  connectionConfig;
+    password
+  } = connectionConfig;
   let { remoteServerCommand } = connectionConfig;
   // If the user does not specify --port or -p in the remoteServerCommand, then
   // we default to '9093-9090' as the port range. Currently, we do not give the
@@ -140,13 +121,13 @@ connectBigDigSshHandshake;var _client;function _load_client() {return _client = 
     username,
     pathToPrivateKey,
     remoteServer: {
-      command: remoteServerCommand },
-
+      command: remoteServerCommand
+    },
     remoteServerPorts,
     authMethod,
     password,
-    exclusive });
-
+    exclusive
+  });
   return sshHandshake;
 } /**
    * Copyright (c) 2015-present, Facebook, Inc.

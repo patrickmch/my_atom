@@ -1,12 +1,10 @@
 "use strict";
 
-let Observable;
-
 module.exports = _client => {
   const remoteModule = {};
 
   remoteModule.didOpenFile = function (arg0, arg1, arg2) {
-    return _client.marshalArguments(Array.from(arguments), [{
+    return _client.callRemoteFunction("didOpenFile", "void", _client.marshalArguments(Array.from(arguments), [{
       name: "filename",
       type: {
         kind: "named",
@@ -22,13 +20,11 @@ module.exports = _client => {
       type: {
         kind: "string"
       }
-    }]).then(args => {
-      return _client.callRemoteFunction("didOpenFile", "void", args);
-    });
+    }]));
   };
 
   remoteModule.didChangeFile = function (arg0, arg1, arg2) {
-    return _client.marshalArguments(Array.from(arguments), [{
+    return _client.callRemoteFunction("didChangeFile", "void", _client.marshalArguments(Array.from(arguments), [{
       name: "filename",
       type: {
         kind: "named",
@@ -48,25 +44,21 @@ module.exports = _client => {
           name: "TextEdit"
         }
       }
-    }]).then(args => {
-      return _client.callRemoteFunction("didChangeFile", "void", args);
-    });
+    }]));
   };
 
   remoteModule.didCloseFile = function (arg0) {
-    return _client.marshalArguments(Array.from(arguments), [{
+    return _client.callRemoteFunction("didCloseFile", "void", _client.marshalArguments(Array.from(arguments), [{
       name: "filename",
       type: {
         kind: "named",
         name: "NuclideUri"
       }
-    }]).then(args => {
-      return _client.callRemoteFunction("didCloseFile", "void", args);
-    });
+    }]));
   };
 
   remoteModule.didChangeWatchedFiles = function (arg0) {
-    return _client.marshalArguments(Array.from(arguments), [{
+    return _client.callRemoteFunction("didChangeWatchedFiles", "void", _client.marshalArguments(Array.from(arguments), [{
       name: "changes",
       type: {
         kind: "array",
@@ -75,13 +67,11 @@ module.exports = _client => {
           name: "FileEvent"
         }
       }
-    }]).then(args => {
-      return _client.callRemoteFunction("didChangeWatchedFiles", "void", args);
-    });
+    }]));
   };
 
   remoteModule.getCompletions = function (arg0, arg1) {
-    return _client.marshalArguments(Array.from(arguments), [{
+    return _client.callRemoteFunction("getCompletions", "promise", _client.marshalArguments(Array.from(arguments), [{
       name: "filename",
       type: {
         kind: "named",
@@ -93,9 +83,7 @@ module.exports = _client => {
         kind: "named",
         name: "Position"
       }
-    }]).then(args => {
-      return _client.callRemoteFunction("getCompletions", "promise", args);
-    }).then(value => {
+    }])).then(value => {
       return _client.unmarshal(value, {
         kind: "array",
         type: {
@@ -107,9 +95,7 @@ module.exports = _client => {
   };
 
   remoteModule.notifyDiagnostics = function () {
-    return Observable.fromPromise(_client.marshalArguments(Array.from(arguments), [])).switchMap(args => {
-      return _client.callRemoteFunction("notifyDiagnostics", "observable", args);
-    }).concatMap(value => {
+    return _client.callRemoteFunction("notifyDiagnostics", "observable", _client.marshalArguments(Array.from(arguments), [])).map(value => {
       return _client.unmarshal(value, {
         kind: "named",
         name: "HackDiagnosticsMessage"
@@ -118,19 +104,12 @@ module.exports = _client => {
   };
 
   remoteModule.disconnect = function () {
-    return _client.marshalArguments(Array.from(arguments), []).then(args => {
-      return _client.callRemoteFunction("disconnect", "void", args);
-    });
+    return _client.callRemoteFunction("disconnect", "void", _client.marshalArguments(Array.from(arguments), []));
   };
 
   return remoteModule;
 };
 
-Object.defineProperty(module.exports, "inject", {
-  value: function () {
-    Observable = arguments[0];
-  }
-});
 Object.defineProperty(module.exports, "defs", {
   value: {
     Object: {

@@ -1,32 +1,17 @@
-'use strict';Object.defineProperty(exports, "__esModule", { value: true });exports.
+'use strict';
 
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.providePythonPlatformGroup = providePythonPlatformGroup;
 
+var _rxjsBundlesRxMinJs = require('rxjs/bundles/Rx.min.js');
 
-
-
-
-
-
-
-
-
-
-
-
-
-providePythonPlatformGroup = providePythonPlatformGroup;var _rxjsBundlesRxMinJs = require('rxjs/bundles/Rx.min.js');function providePythonPlatformGroup(
-buckRoot,
-ruleType,
-buildTarget)
-{
+function providePythonPlatformGroup(buckRoot, ruleType, buildTarget) {
   try {
     // $FlowFB
     const fbPythonPlatform = require('./fb-pythonPlatform');
-    return fbPythonPlatform.providePythonPlatformGroup(
-    buckRoot,
-    ruleType,
-    buildTarget);
-
+    return fbPythonPlatform.providePythonPlatformGroup(buckRoot, ruleType, buildTarget);
   } catch (error) {
     return _rxjsBundlesRxMinJs.Observable.of(null);
   }

@@ -1,21 +1,19 @@
-'use strict';Object.defineProperty(exports, "__esModule", { value: true });exports.
+'use strict';
 
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.getBuiltinProviders = getBuiltinProviders;
 
+var _featureConfig;
 
+function _load_featureConfig() {
+  return _featureConfig = _interopRequireDefault(require('../../../modules/nuclide-commons-atom/feature-config'));
+}
 
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-
-
-
-
-
-
-
-
-
-
-
-getBuiltinProviders = getBuiltinProviders;var _featureConfig;function _load_featureConfig() {return _featureConfig = _interopRequireDefault(require('../../../modules/nuclide-commons-atom/feature-config'));}function _interopRequireDefault(obj) {return obj && obj.__esModule ? obj : { default: obj };}function getBuiltinProviders() {
+function getBuiltinProviders() {
   const providers = [];
   if ((_featureConfig || _load_featureConfig()).default.get('nuclide-distraction-free-mode.hideToolBar')) {
     providers.push(new ToolBarProvider());
@@ -32,14 +30,10 @@ getBuiltinProviders = getBuiltinProviders;var _featureConfig;function _load_feat
     providers.push(new DockProvider(atom.workspace.getLeftDock(), 'left-dock'));
   }
   if (atom.workspace.getRightDock != null) {
-    providers.push(
-    new DockProvider(atom.workspace.getRightDock(), 'right-dock'));
-
+    providers.push(new DockProvider(atom.workspace.getRightDock(), 'right-dock'));
   }
   if (atom.workspace.getBottomDock != null) {
-    providers.push(
-    new DockProvider(atom.workspace.getBottomDock(), 'bottom-dock'));
-
+    providers.push(new DockProvider(atom.workspace.getBottomDock(), 'bottom-dock'));
   }
 
   return providers;
@@ -52,15 +46,20 @@ getBuiltinProviders = getBuiltinProviders;var _featureConfig;function _load_feat
    *
    * 
    * @format
-   */class FindAndReplaceProvider {constructor(name) {this.name = name;}isVisible() {const paneElem = document.querySelector('.' + this.name);
+   */
+
+class FindAndReplaceProvider {
+  constructor(name) {
+    this.name = name;
+  }
+
+  isVisible() {
+    const paneElem = document.querySelector('.' + this.name);
     if (paneElem != null) {
       const paneContainer = paneElem.parentElement;
-      if (
-      paneContainer != null &&
+      if (paneContainer != null &&
       // $FlowFixMe(>=0.68.0) Flow suppress (T27187857)
-      paneContainer.style != null &&
-      paneContainer.style.display != null)
-      {
+      paneContainer.style != null && paneContainer.style.display != null) {
         const display = paneContainer.style.display;
         if (display !== 'none') {
           return true;
@@ -77,15 +76,11 @@ getBuiltinProviders = getBuiltinProviders;var _featureConfig;function _load_feat
     }
 
     const command = this.isVisible() ? 'toggle' : 'show';
-    atom.commands.dispatch(
-    atom.views.getView(atom.workspace),
-    this.name + ':' + command);
-
-  }}
-
+    atom.commands.dispatch(atom.views.getView(atom.workspace), this.name + ':' + command);
+  }
+}
 
 class ToolBarProvider {
-
   constructor() {
     this.name = 'tool-bar';
   }
@@ -96,12 +91,10 @@ class ToolBarProvider {
 
   toggle() {
     atom.config.set('tool-bar.visible', !this.isVisible());
-  }}
-
+  }
+}
 
 class StatusBarProvider {
-
-
   constructor() {
     this.name = 'status-bar';
     this._oldDisplay = null;
@@ -121,7 +114,10 @@ class StatusBarProvider {
       element.style.display = 'none';
     } else {
       // isVisible is false, so oldDisplay is non-null
-      if (!(this._oldDisplay != null)) {throw new Error('Invariant violation: "this._oldDisplay != null"');}
+      if (!(this._oldDisplay != null)) {
+        throw new Error('Invariant violation: "this._oldDisplay != null"');
+      }
+
       element.style.display = this._oldDisplay;
       this._oldDisplay = null;
     }
@@ -129,12 +125,10 @@ class StatusBarProvider {
 
   _getStatusBarElement() {
     return document.querySelector('status-bar');
-  }}
-
+  }
+}
 
 class DockProvider {
-
-
 
   constructor(dock, name) {
     this._dock = dock;
@@ -147,4 +141,5 @@ class DockProvider {
 
   toggle() {
     this._dock.toggle();
-  }}
+  }
+}

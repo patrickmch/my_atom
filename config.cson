@@ -28,6 +28,7 @@
       "linter"
       "markdown-preview"
       "image-view"
+      "python-tools"
     ]
     projectHome: "/Users/mchey/code"
     telemetryConsent: "limited"
@@ -35,8 +36,9 @@
       "atom-material-ui"
       "atom-material-syntax"
     ]
+  "cursor-history": {}
   editor:
-    fontSize: 10
+    fontSize: 9
     preferredLineLength: 120
     showInvisibles: true
   "exception-reporting":
@@ -44,6 +46,10 @@
   "git-diff": {}
   "ide-css":
     lessSupport: false
+  "ide-python":
+    pylsPlugins:
+      pycodestyle:
+        maxLineLength: 120
   "linter-ui-default":
     panelHeight: 300
   nuclide:

@@ -1,15 +1,15 @@
-'use strict';Object.defineProperty(exports, "__esModule", { value: true });exports.HistogramTracker = undefined;var _track;
+'use strict';
 
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.HistogramTracker = undefined;
 
+var _track;
 
-
-
-
-
-
-
-
-function _load_track() {return _track = require('./track');}
+function _load_track() {
+  return _track = require('./track');
+}
 
 const HISTOGRAM_TRACKER_KEY = 'performance-histogram'; /**
                                                         * Copyright (c) 2015-present, Facebook, Inc.
@@ -20,7 +20,14 @@ const HISTOGRAM_TRACKER_KEY = 'performance-histogram'; /**
                                                         *
                                                         *  strict-local
                                                         * @format
-                                                        */class Bucket {constructor() {this._count = 0;this._sum = 0;}
+                                                        */
+
+class Bucket {
+
+  constructor() {
+    this._count = 0;
+    this._sum = 0;
+  }
 
   addValue(value) {
     this._sum += value;
@@ -38,22 +45,12 @@ const HISTOGRAM_TRACKER_KEY = 'performance-histogram'; /**
   clear() {
     this._count = 0;
     this._sum = 0;
-  }}
-
+  }
+}
 
 class HistogramTracker {
 
-
-
-
-
-
-  constructor(
-  eventName,
-  maxValue,
-  numBuckets,
-  intervalSeconds = 60)
-  {
+  constructor(eventName, maxValue, numBuckets, intervalSeconds = 60) {
     this._eventName = eventName;
     this._maxValue = maxValue;
     this._bucketSize = maxValue / numBuckets;
@@ -73,10 +70,7 @@ class HistogramTracker {
   }
 
   track(value) {
-    const bucket = Math.min(
-    this._buckets.length - 1,
-    Math.floor(value / this._bucketSize));
-
+    const bucket = Math.min(this._buckets.length - 1, Math.floor(value / this._bucketSize));
     this._buckets[bucket].addValue(value);
     return this;
   }
@@ -88,8 +82,8 @@ class HistogramTracker {
         (0, (_track || _load_track()).track)(HISTOGRAM_TRACKER_KEY, {
           eventName: this._eventName,
           average: bucket.getAverage(),
-          samples: bucket.getCount() });
-
+          samples: bucket.getCount()
+        });
       }
     }
     this.clear();
@@ -99,4 +93,6 @@ class HistogramTracker {
     for (let i = 0; i < this._buckets.length; i++) {
       this._buckets[i].clear();
     }
-  }}exports.HistogramTracker = HistogramTracker;
+  }
+}
+exports.HistogramTracker = HistogramTracker;

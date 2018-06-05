@@ -1,26 +1,28 @@
 "use strict";
 
-let Observable;
-
 module.exports = _client => {
   const remoteModule = {};
-  remoteModule.IRemoteSocket = class {
+  remoteModule.Connection = class {
+    constructor() {
+      throw Error("constructors are not supported for remote objects");
+    }
+
     write(arg0) {
-      return Promise.all([_client.marshalArguments(Array.from(arguments), [{
+      return _client.callRemoteMethod(_client.marshal(this, {
+        kind: "named",
+        location: {
+          type: "source",
+          fileName: "Connection.js",
+          line: 23
+        },
+        name: "Connection"
+      }), "write", "void", _client.marshalArguments(Array.from(arguments), [{
         name: "msg",
         type: {
           kind: "named",
           name: "Buffer"
         }
-      }]), _client.marshal(this, {
-        kind: "named",
-        location: {
-          type: "source",
-          fileName: "types.js",
-          line: 31
-        },
-        name: "IRemoteSocket"
-      })]).then(([args, id]) => _client.callRemoteMethod(id, "write", "void", args));
+      }]));
     }
 
     dispose() {
@@ -28,39 +30,27 @@ module.exports = _client => {
     }
 
   };
-  remoteModule.Connection = class {
-    constructor(arg0, arg1) {
-      _client.createRemoteObject("Connection", this, [arg0, arg1], [{
-        name: "tunnelHost",
-        type: {
-          kind: "named",
-          name: "TunnelHost"
-        }
-      }, {
-        name: "remoteSocket",
-        type: {
-          kind: "named",
-          name: "IRemoteSocket"
-        }
-      }]);
+  remoteModule.IRemoteSocket = class {
+    constructor() {
+      throw Error("constructors are not supported for remote objects");
     }
 
     write(arg0) {
-      return Promise.all([_client.marshalArguments(Array.from(arguments), [{
+      return _client.callRemoteMethod(_client.marshal(this, {
+        kind: "named",
+        location: {
+          type: "source",
+          fileName: "types.js",
+          line: 20
+        },
+        name: "IRemoteSocket"
+      }), "write", "void", _client.marshalArguments(Array.from(arguments), [{
         name: "msg",
         type: {
           kind: "named",
           name: "Buffer"
         }
-      }]), _client.marshal(this, {
-        kind: "named",
-        location: {
-          type: "source",
-          fileName: "Connection.js",
-          line: 21
-        },
-        name: "Connection"
-      })]).then(([args, id]) => _client.callRemoteMethod(id, "write", "void", args));
+      }]));
     }
 
     dispose() {
@@ -70,11 +60,19 @@ module.exports = _client => {
   };
   remoteModule.ConnectionFactory = class {
     constructor() {
-      _client.createRemoteObject("ConnectionFactory", this, [], []);
+      throw Error("constructors are not supported for remote objects");
     }
 
     createConnection(arg0, arg1) {
-      return Promise.all([_client.marshalArguments(Array.from(arguments), [{
+      return _client.callRemoteMethod(_client.marshal(this, {
+        kind: "named",
+        location: {
+          type: "source",
+          fileName: "Connection.js",
+          line: 88
+        },
+        name: "ConnectionFactory"
+      }), "createConnection", "promise", _client.marshalArguments(Array.from(arguments), [{
         name: "tunnelHost",
         type: {
           kind: "named",
@@ -86,15 +84,7 @@ module.exports = _client => {
           kind: "named",
           name: "IRemoteSocket"
         }
-      }]), _client.marshal(this, {
-        kind: "named",
-        location: {
-          type: "source",
-          fileName: "Connection.js",
-          line: 86
-        },
-        name: "ConnectionFactory"
-      })]).then(([args, id]) => _client.callRemoteMethod(id, "createConnection", "promise", args)).then(value => {
+      }])).then(value => {
         return _client.unmarshal(value, {
           kind: "named",
           name: "Connection"
@@ -109,9 +99,7 @@ module.exports = _client => {
   };
 
   remoteModule.getConnectionFactory = function () {
-    return _client.marshalArguments(Array.from(arguments), []).then(args => {
-      return _client.callRemoteFunction("SocketService/getConnectionFactory", "promise", args);
-    }).then(value => {
+    return _client.callRemoteFunction("SocketService/getConnectionFactory", "promise", _client.marshalArguments(Array.from(arguments), [])).then(value => {
       return _client.unmarshal(value, {
         kind: "named",
         name: "ConnectionFactory"
@@ -120,7 +108,7 @@ module.exports = _client => {
   };
 
   remoteModule.createTunnel = function (arg0, arg1) {
-    return Observable.fromPromise(_client.marshalArguments(Array.from(arguments), [{
+    return _client.callRemoteFunction("SocketService/createTunnel", "observable", _client.marshalArguments(Array.from(arguments), [{
       name: "t",
       type: {
         kind: "named",
@@ -132,9 +120,7 @@ module.exports = _client => {
         kind: "named",
         name: "ConnectionFactory"
       }
-    }])).switchMap(args => {
-      return _client.callRemoteFunction("SocketService/createTunnel", "observable", args);
-    }).concatMap(value => {
+    }])).map(value => {
       return _client.unmarshal(value, {
         kind: "named",
         name: "SocketEvent"
@@ -143,9 +129,7 @@ module.exports = _client => {
   };
 
   remoteModule.getAvailableServerPort = function () {
-    return _client.marshalArguments(Array.from(arguments), []).then(args => {
-      return _client.callRemoteFunction("SocketService/getAvailableServerPort", "promise", args);
-    }).then(value => {
+    return _client.callRemoteFunction("SocketService/getAvailableServerPort", "promise", _client.marshalArguments(Array.from(arguments), [])).then(value => {
       return _client.unmarshal(value, {
         kind: "number"
       });
@@ -155,11 +139,6 @@ module.exports = _client => {
   return remoteModule;
 };
 
-Object.defineProperty(module.exports, "inject", {
-  value: function () {
-    Observable = arguments[0];
-  }
-});
 Object.defineProperty(module.exports, "defs", {
   value: {
     Object: {
@@ -218,12 +197,54 @@ Object.defineProperty(module.exports, "defs", {
         type: "builtin"
       }
     },
+    Connection: {
+      kind: "interface",
+      name: "Connection",
+      location: {
+        type: "source",
+        fileName: "Connection.js",
+        line: 23
+      },
+      staticMethods: {},
+      instanceMethods: {
+        write: {
+          location: {
+            type: "source",
+            fileName: "Connection.js",
+            line: 76
+          },
+          kind: "function",
+          argumentTypes: [{
+            name: "msg",
+            type: {
+              kind: "named",
+              name: "Buffer"
+            }
+          }],
+          returnType: {
+            kind: "void"
+          }
+        },
+        dispose: {
+          location: {
+            type: "source",
+            fileName: "Connection.js",
+            line: 80
+          },
+          kind: "function",
+          argumentTypes: [],
+          returnType: {
+            kind: "void"
+          }
+        }
+      }
+    },
     TunnelHost: {
       kind: "alias",
       location: {
         type: "source",
         fileName: "types.js",
-        line: 12
+        line: 57
       },
       name: "TunnelHost",
       definition: {
@@ -262,16 +283,15 @@ Object.defineProperty(module.exports, "defs", {
       location: {
         type: "source",
         fileName: "types.js",
-        line: 31
+        line: 20
       },
-      constructorArgs: null,
       staticMethods: {},
       instanceMethods: {
         write: {
           location: {
             type: "source",
             fileName: "types.js",
-            line: 32
+            line: 21
           },
           kind: "function",
           argumentTypes: [{
@@ -289,62 +309,7 @@ Object.defineProperty(module.exports, "defs", {
           location: {
             type: "source",
             fileName: "types.js",
-            line: 33
-          },
-          kind: "function",
-          argumentTypes: [],
-          returnType: {
-            kind: "void"
-          }
-        }
-      }
-    },
-    Connection: {
-      kind: "interface",
-      name: "Connection",
-      location: {
-        type: "source",
-        fileName: "Connection.js",
-        line: 21
-      },
-      constructorArgs: [{
-        name: "tunnelHost",
-        type: {
-          kind: "named",
-          name: "TunnelHost"
-        }
-      }, {
-        name: "remoteSocket",
-        type: {
-          kind: "named",
-          name: "IRemoteSocket"
-        }
-      }],
-      staticMethods: {},
-      instanceMethods: {
-        write: {
-          location: {
-            type: "source",
-            fileName: "Connection.js",
-            line: 74
-          },
-          kind: "function",
-          argumentTypes: [{
-            name: "msg",
-            type: {
-              kind: "named",
-              name: "Buffer"
-            }
-          }],
-          returnType: {
-            kind: "void"
-          }
-        },
-        dispose: {
-          location: {
-            type: "source",
-            fileName: "Connection.js",
-            line: 78
+            line: 22
           },
           kind: "function",
           argumentTypes: [],
@@ -360,16 +325,15 @@ Object.defineProperty(module.exports, "defs", {
       location: {
         type: "source",
         fileName: "Connection.js",
-        line: 86
+        line: 88
       },
-      constructorArgs: [],
       staticMethods: {},
       instanceMethods: {
         createConnection: {
           location: {
             type: "source",
             fileName: "Connection.js",
-            line: 89
+            line: 91
           },
           kind: "function",
           argumentTypes: [{
@@ -397,7 +361,7 @@ Object.defineProperty(module.exports, "defs", {
           location: {
             type: "source",
             fileName: "Connection.js",
-            line: 96
+            line: 98
           },
           kind: "function",
           argumentTypes: [],
@@ -413,13 +377,13 @@ Object.defineProperty(module.exports, "defs", {
       location: {
         type: "source",
         fileName: "SocketService.js",
-        line: 24
+        line: 25
       },
       type: {
         location: {
           type: "source",
           fileName: "SocketService.js",
-          line: 24
+          line: 25
         },
         kind: "function",
         argumentTypes: [],
@@ -437,7 +401,7 @@ Object.defineProperty(module.exports, "defs", {
       location: {
         type: "source",
         fileName: "types.js",
-        line: 23
+        line: 12
       },
       name: "SocketEvent",
       definition: {
@@ -493,7 +457,7 @@ Object.defineProperty(module.exports, "defs", {
       location: {
         type: "source",
         fileName: "types.js",
-        line: 18
+        line: 63
       },
       name: "ResolvedTunnel",
       definition: {
@@ -521,13 +485,13 @@ Object.defineProperty(module.exports, "defs", {
       location: {
         type: "source",
         fileName: "SocketService.js",
-        line: 28
+        line: 29
       },
       type: {
         location: {
           type: "source",
           fileName: "SocketService.js",
-          line: 28
+          line: 29
         },
         kind: "function",
         argumentTypes: [{
@@ -558,13 +522,13 @@ Object.defineProperty(module.exports, "defs", {
       location: {
         type: "source",
         fileName: "SocketService.js",
-        line: 35
+        line: 36
       },
       type: {
         location: {
           type: "source",
           fileName: "SocketService.js",
-          line: 35
+          line: 36
         },
         kind: "function",
         argumentTypes: [],

@@ -1,33 +1,36 @@
-'use strict';Object.defineProperty(exports, "__esModule", { value: true });exports.TizenDeviceStopProcessProvider = undefined;var _asyncToGenerator = _interopRequireDefault(require('async-to-generator'));
+'use strict';
 
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.TizenDeviceStopProcessProvider = undefined;
 
+var _rxjsBundlesRxMinJs = require('rxjs/bundles/Rx.min.js');
 
+var _nuclideRemoteConnection;
 
+function _load_nuclideRemoteConnection() {
+  return _nuclideRemoteConnection = require('../../../nuclide-remote-connection');
+}
 
+/**
+ * Copyright (c) 2015-present, Facebook, Inc.
+ * All rights reserved.
+ *
+ * This source code is licensed under the license found in the LICENSE file in
+ * the root directory of this source tree.
+ *
+ *  strict-local
+ * @format
+ */
 
+class TizenDeviceStopProcessProvider {
+  getType() {
+    return 'Tizen';
+  }
 
-
-
-
-
-
-
-
-
-
-
-
-var _rxjsBundlesRxMinJs = require('rxjs/bundles/Rx.min.js');var _nuclideRemoteConnection;
-function _load_nuclideRemoteConnection() {return _nuclideRemoteConnection = require('../../../nuclide-remote-connection');}function _interopRequireDefault(obj) {return obj && obj.__esModule ? obj : { default: obj };} /**
-                                                                                                                                                                                                                          * Copyright (c) 2015-present, Facebook, Inc.
-                                                                                                                                                                                                                          * All rights reserved.
-                                                                                                                                                                                                                          *
-                                                                                                                                                                                                                          * This source code is licensed under the license found in the LICENSE file in
-                                                                                                                                                                                                                          * the root directory of this source tree.
-                                                                                                                                                                                                                          *
-                                                                                                                                                                                                                          *  strict-local
-                                                                                                                                                                                                                          * @format
-                                                                                                                                                                                                                          */class TizenDeviceStopProcessProvider {getType() {return 'Tizen';}getTaskType() {return 'KILL';
+  getTaskType() {
+    return 'KILL';
   }
 
   getName() {
@@ -38,18 +41,12 @@ function _load_nuclideRemoteConnection() {return _nuclideRemoteConnection = requ
     return true;
   }
 
-  getSupportedPIDs(
-  host,
-  device,
-  procs)
-  {
+  getSupportedPIDs(host, device, procs) {
     return _rxjsBundlesRxMinJs.Observable.of(new Set(procs.map(proc => proc.pid)));
   }
 
-  run(host, device, proc) {return (0, _asyncToGenerator.default)(function* () {
-      return (0, (_nuclideRemoteConnection || _load_nuclideRemoteConnection()).getSdbServiceByNuclideUri)(host).stopProcess(
-      device,
-      proc.name,
-      proc.pid);})();
-
-  }}exports.TizenDeviceStopProcessProvider = TizenDeviceStopProcessProvider;
+  async run(host, device, proc) {
+    return (0, (_nuclideRemoteConnection || _load_nuclideRemoteConnection()).getSdbServiceByNuclideUri)(host).stopProcess(device, proc.name, proc.pid);
+  }
+}
+exports.TizenDeviceStopProcessProvider = TizenDeviceStopProcessProvider;

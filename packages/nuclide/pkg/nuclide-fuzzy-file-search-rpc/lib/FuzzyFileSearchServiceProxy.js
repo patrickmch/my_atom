@@ -1,12 +1,10 @@
 "use strict";
 
-let Observable;
-
 module.exports = _client => {
   const remoteModule = {};
 
   remoteModule.queryFuzzyFile = function (arg0) {
-    return _client.marshalArguments(Array.from(arguments), [{
+    return _client.callRemoteFunction("FuzzyFileSearchService/queryFuzzyFile", "promise", _client.marshalArguments(Array.from(arguments), [{
       name: "config",
       type: {
         kind: "object",
@@ -53,9 +51,7 @@ module.exports = _client => {
           optional: false
         }]
       }
-    }]).then(args => {
-      return _client.callRemoteFunction("FuzzyFileSearchService/queryFuzzyFile", "promise", args);
-    }).then(value => {
+    }])).then(value => {
       return _client.unmarshal(value, {
         kind: "array",
         type: {
@@ -67,7 +63,7 @@ module.exports = _client => {
   };
 
   remoteModule.queryAllExistingFuzzyFile = function (arg0, arg1, arg2) {
-    return _client.marshalArguments(Array.from(arguments), [{
+    return _client.callRemoteFunction("FuzzyFileSearchService/queryAllExistingFuzzyFile", "promise", _client.marshalArguments(Array.from(arguments), [{
       name: "queryString",
       type: {
         kind: "string"
@@ -85,9 +81,7 @@ module.exports = _client => {
       type: {
         kind: "boolean"
       }
-    }]).then(args => {
-      return _client.callRemoteFunction("FuzzyFileSearchService/queryAllExistingFuzzyFile", "promise", args);
-    }).then(value => {
+    }])).then(value => {
       return _client.unmarshal(value, {
         kind: "array",
         type: {
@@ -99,15 +93,13 @@ module.exports = _client => {
   };
 
   remoteModule.isFuzzySearchAvailableFor = function (arg0) {
-    return _client.marshalArguments(Array.from(arguments), [{
+    return _client.callRemoteFunction("FuzzyFileSearchService/isFuzzySearchAvailableFor", "promise", _client.marshalArguments(Array.from(arguments), [{
       name: "rootDirectory",
       type: {
         kind: "named",
         name: "NuclideUri"
       }
-    }]).then(args => {
-      return _client.callRemoteFunction("FuzzyFileSearchService/isFuzzySearchAvailableFor", "promise", args);
-    }).then(value => {
+    }])).then(value => {
       return _client.unmarshal(value, {
         kind: "boolean"
       });
@@ -115,15 +107,13 @@ module.exports = _client => {
   };
 
   remoteModule.disposeFuzzySearch = function (arg0) {
-    return _client.marshalArguments(Array.from(arguments), [{
+    return _client.callRemoteFunction("FuzzyFileSearchService/disposeFuzzySearch", "promise", _client.marshalArguments(Array.from(arguments), [{
       name: "rootDirectory",
       type: {
         kind: "named",
         name: "NuclideUri"
       }
-    }]).then(args => {
-      return _client.callRemoteFunction("FuzzyFileSearchService/disposeFuzzySearch", "promise", args);
-    }).then(value => {
+    }])).then(value => {
       return _client.unmarshal(value, {
         kind: "void"
       });
@@ -133,11 +123,6 @@ module.exports = _client => {
   return remoteModule;
 };
 
-Object.defineProperty(module.exports, "inject", {
-  value: function () {
-    Observable = arguments[0];
-  }
-});
 Object.defineProperty(module.exports, "defs", {
   value: {
     Object: {

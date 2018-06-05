@@ -1,20 +1,25 @@
-'use strict';Object.defineProperty(exports, "__esModule", { value: true });exports.
+'use strict';
 
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.createEmptyAppState = createEmptyAppState;
 
+var _expected;
 
+function _load_expected() {
+  return _expected = require('../../../../modules/nuclide-commons/expected');
+}
 
+var _immutable;
 
+function _load_immutable() {
+  return _immutable = _interopRequireWildcard(require('immutable'));
+}
 
+function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
 
-
-
-
-
-
-
-
-
-createEmptyAppState = createEmptyAppState;var _expected;function _load_expected() {return _expected = require('../../../../modules/nuclide-commons/expected');}var _immutable;function _load_immutable() {return _immutable = _interopRequireWildcard(require('immutable'));}function _interopRequireWildcard(obj) {if (obj && obj.__esModule) {return obj;} else {var newObj = {};if (obj != null) {for (var key in obj) {if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key];}}newObj.default = obj;return newObj;}}function createEmptyAppState() {
+function createEmptyAppState() {
   return {
     hosts: [''],
     host: '',
@@ -31,8 +36,8 @@ createEmptyAppState = createEmptyAppState;var _expected;function _load_expected(
     supportedPidsPerTask: new Map(),
     deviceTypeTasks: [],
     isPollingDevices: false,
-    deviceTypeComponents: (_immutable || _load_immutable()).Map() };
-
+    deviceTypeComponents: (_immutable || _load_immutable()).Map()
+  };
 } /**
    * Copyright (c) 2015-present, Facebook, Inc.
    * All rights reserved.

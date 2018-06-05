@@ -1,23 +1,19 @@
-'use strict';Object.defineProperty(exports, "__esModule", { value: true });exports.ExportIndex = undefined;var _ExportMatcher;
+'use strict';
 
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.ExportIndex = undefined;
 
+var _ExportMatcher;
 
+function _load_ExportMatcher() {
+  return _ExportMatcher = _interopRequireDefault(require('./ExportMatcher'));
+}
 
-
-
-
-
-
-
-function _load_ExportMatcher() {return _ExportMatcher = _interopRequireDefault(require('./ExportMatcher'));}function _interopRequireDefault(obj) {return obj && obj.__esModule ? obj : { default: obj };}
-
-
-
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 class ExportIndex {
-
-
-
 
   constructor() {
     this.exportsForId = new Map();
@@ -63,12 +59,10 @@ class ExportIndex {
   }
 
   getIdsMatching(query, maxResults) {
-    return this.exportIdMatcher.
-    match(query, {
+    return this.exportIdMatcher.match(query, {
       caseSensitive: false,
-      maxResults }).
-
-    map(result => result.value);
+      maxResults
+    }).map(result => result.value);
   }
 
   setAll(file, exports) {
@@ -93,13 +87,15 @@ class ExportIndex {
     } else {
       this.exportsForFile.set(uri, new Set([newExport]));
     }
-  }}exports.ExportIndex = ExportIndex; /**
-                                        * Copyright (c) 2015-present, Facebook, Inc.
-                                        * All rights reserved.
-                                        *
-                                        * This source code is licensed under the license found in the LICENSE file in
-                                        * the root directory of this source tree.
-                                        *
-                                        * 
-                                        * @format
-                                        */
+  }
+}
+exports.ExportIndex = ExportIndex; /**
+                                    * Copyright (c) 2015-present, Facebook, Inc.
+                                    * All rights reserved.
+                                    *
+                                    * This source code is licensed under the license found in the LICENSE file in
+                                    * the root directory of this source tree.
+                                    *
+                                    * 
+                                    * @format
+                                    */

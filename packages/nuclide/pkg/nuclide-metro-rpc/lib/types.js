@@ -1,14 +1,8 @@
-'use strict';Object.defineProperty(exports, "__esModule", { value: true });
+'use strict';
 
-
-
-
-
-
-
-
-
-
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
 
 
 // startMetro error codes
@@ -21,4 +15,6 @@ const NO_METRO_PROJECT_ERROR = exports.NO_METRO_PROJECT_ERROR = 'NoMetroProjectE
                                                                                         *
                                                                                         * 
                                                                                         * @format
-                                                                                        */const METRO_PORT_BUSY_ERROR = exports.METRO_PORT_BUSY_ERROR = 'MetroPortBusyError';
+                                                                                        */
+
+const METRO_PORT_BUSY_ERROR = exports.METRO_PORT_BUSY_ERROR = 'MetroPortBusyError';

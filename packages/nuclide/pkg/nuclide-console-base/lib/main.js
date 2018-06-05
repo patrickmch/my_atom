@@ -1,38 +1,14 @@
-'use strict';Object.defineProperty(exports, "__esModule", { value: true });exports.
+'use strict';
 
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.changeConsoleVisibility = changeConsoleVisibility;
+exports.pipeProcessMessagesToConsole = pipeProcessMessagesToConsole;
 
+var _rxjsBundlesRxMinJs = require('rxjs/bundles/Rx.min.js');
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-changeConsoleVisibility = changeConsoleVisibility;exports.
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-pipeProcessMessagesToConsole = pipeProcessMessagesToConsole;var _rxjsBundlesRxMinJs = require('rxjs/bundles/Rx.min.js'); // This must match URI defined in ../../nuclide-console/lib/ui/ConsoleContainer
+// This must match URI defined in ../../nuclide-console/lib/ui/ConsoleContainer
 const CONSOLE_VIEW_URI = 'atom://nuclide/console'; /**
                                                     * Copyright (c) 2015-present, Facebook, Inc.
                                                     * All rights reserved.
@@ -42,8 +18,31 @@ const CONSOLE_VIEW_URI = 'atom://nuclide/console'; /**
                                                     *
                                                     * 
                                                     * @format
-                                                    */function changeConsoleVisibility(visible) {switch (visible) {case true: // eslint-disable-next-line nuclide-internal/atom-apis
-      atom.workspace.open(CONSOLE_VIEW_URI, { searchAllPanes: true });return;case false:atom.workspace.hide(CONSOLE_VIEW_URI);return;default:atom.workspace.toggle(CONSOLE_VIEW_URI);return;}}function pipeProcessMessagesToConsole(processName, progressUpdates, showNotificationOnCompletion, processMessage /* TODO(T17463635) */) {switch (processMessage.kind) {case 'stderr':progressUpdates.next({ text: processMessage.data, level: 'error' });break;case 'stdout':
+                                                    */
+
+function changeConsoleVisibility(visible) {
+  switch (visible) {
+    case true:
+      // eslint-disable-next-line nuclide-internal/atom-apis
+      atom.workspace.open(CONSOLE_VIEW_URI, { searchAllPanes: true });
+      return;
+    case false:
+      atom.workspace.hide(CONSOLE_VIEW_URI);
+      return;
+    default:
+      atom.workspace.toggle(CONSOLE_VIEW_URI);
+      return;
+  }
+}
+
+function pipeProcessMessagesToConsole(processName, progressUpdates, showNotificationOnCompletion, processMessage /* TODO(T17463635) */
+) {
+  switch (processMessage.kind) {
+    case 'stderr':
+      progressUpdates.next({ text: processMessage.data, level: 'error' });
+      break;
+
+    case 'stdout':
       progressUpdates.next({ text: processMessage.data, level: 'info' });
       break;
 
@@ -51,33 +50,33 @@ const CONSOLE_VIEW_URI = 'atom://nuclide/console'; /**
       const { error } = processMessage;
       progressUpdates.next({
         text: error.message || String(error),
-        level: 'error' });
-
+        level: 'error'
+      });
       break;
 
     case 'exit':
       if (processMessage.exitCode === 0) {
         progressUpdates.next({
           text: `${processName} completed successfully`,
-          level: 'success' });
-
+          level: 'success'
+        });
         if (showNotificationOnCompletion) {
           atom.notifications.addSuccess('Operation completed successfully', {
-            detail: `${processName} finished` });
-
+            detail: `${processName} finished`
+          });
         }
       } else {
         progressUpdates.next({
           text: `${processName} exited with non zero code`,
-          level: 'error' });
-
+          level: 'error'
+        });
         if (showNotificationOnCompletion) {
           atom.notifications.addError('Operation Failed', {
-            detail: 'Check console for output' });
-
+            detail: 'Check console for output'
+          });
         }
         changeConsoleVisibility(true /* console visibility */);
       }
-      break;}
-
+      break;
+  }
 }

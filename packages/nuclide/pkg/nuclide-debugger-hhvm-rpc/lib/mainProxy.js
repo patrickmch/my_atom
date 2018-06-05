@@ -1,12 +1,10 @@
 "use strict";
 
-let Observable;
-
 module.exports = _client => {
   const remoteModule = {};
 
   remoteModule.getDebuggerArgs = function (arg0) {
-    return _client.marshalArguments(Array.from(arguments), [{
+    return _client.callRemoteFunction("HhvmDebuggerService/getDebuggerArgs", "promise", _client.marshalArguments(Array.from(arguments), [{
       name: "config",
       type: {
         kind: "union",
@@ -120,9 +118,7 @@ module.exports = _client => {
         }],
         discriminantField: "action"
       }
-    }]).then(args => {
-      return _client.callRemoteFunction("HhvmDebuggerService/getDebuggerArgs", "promise", args);
-    }).then(value => {
+    }])).then(value => {
       return _client.unmarshal(value, {
         kind: "named",
         name: "Object"
@@ -131,15 +127,13 @@ module.exports = _client => {
   };
 
   remoteModule.getLaunchArgs = function (arg0) {
-    return _client.marshalArguments(Array.from(arguments), [{
+    return _client.callRemoteFunction("HhvmDebuggerService/getLaunchArgs", "promise", _client.marshalArguments(Array.from(arguments), [{
       name: "config",
       type: {
         kind: "named",
         name: "HHVMLaunchConfig"
       }
-    }]).then(args => {
-      return _client.callRemoteFunction("HhvmDebuggerService/getLaunchArgs", "promise", args);
-    }).then(value => {
+    }])).then(value => {
       return _client.unmarshal(value, {
         kind: "named",
         name: "Object"
@@ -148,9 +142,7 @@ module.exports = _client => {
   };
 
   remoteModule.getHhvmStackTraces = function () {
-    return _client.marshalArguments(Array.from(arguments), []).then(args => {
-      return _client.callRemoteFunction("HhvmDebuggerService/getHhvmStackTraces", "promise", args);
-    }).then(value => {
+    return _client.callRemoteFunction("HhvmDebuggerService/getHhvmStackTraces", "promise", _client.marshalArguments(Array.from(arguments), [])).then(value => {
       return _client.unmarshal(value, {
         kind: "array",
         type: {
@@ -161,9 +153,7 @@ module.exports = _client => {
   };
 
   remoteModule.createLogFilePaste = function () {
-    return _client.marshalArguments(Array.from(arguments), []).then(args => {
-      return _client.callRemoteFunction("HhvmDebuggerService/createLogFilePaste", "promise", args);
-    }).then(value => {
+    return _client.callRemoteFunction("HhvmDebuggerService/createLogFilePaste", "promise", _client.marshalArguments(Array.from(arguments), [])).then(value => {
       return _client.unmarshal(value, {
         kind: "string"
       });
@@ -171,9 +161,7 @@ module.exports = _client => {
   };
 
   remoteModule.getAttachTargetList = function () {
-    return _client.marshalArguments(Array.from(arguments), []).then(args => {
-      return _client.callRemoteFunction("HhvmDebuggerService/getAttachTargetList", "promise", args);
-    }).then(value => {
+    return _client.callRemoteFunction("HhvmDebuggerService/getAttachTargetList", "promise", _client.marshalArguments(Array.from(arguments), [])).then(value => {
       return _client.unmarshal(value, {
         kind: "array",
         type: {
@@ -199,11 +187,6 @@ module.exports = _client => {
   return remoteModule;
 };
 
-Object.defineProperty(module.exports, "inject", {
-  value: function () {
-    Observable = arguments[0];
-  }
-});
 Object.defineProperty(module.exports, "defs", {
   value: {
     Object: {

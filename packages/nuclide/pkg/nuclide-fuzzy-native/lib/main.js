@@ -1,15 +1,10 @@
-'use strict';var _log4js;
+'use strict';
 
+var _log4js;
 
-
-
-
-
-
-
-
-
-function _load_log4js() {return _log4js = require('log4js');}
+function _load_log4js() {
+  return _log4js = require('log4js');
+}
 
 const logger = (0, (_log4js || _load_log4js()).getLogger)('nuclide-fuzzy-native');
 
@@ -24,6 +19,13 @@ const logger = (0, (_log4js || _load_log4js()).getLogger)('nuclide-fuzzy-native'
  *
  *  strict-local
  * @format
- */try {// eslint-disable-next-line nuclide-internal/no-commonjs
-  module.exports = require('nuclide-prebuilt-libs/fuzzy-native');} catch (e) {logger.error('Failed to load native fuzzy matching. Falling back to JS implementation', e); // eslint-disable-next-line nuclide-internal/no-commonjs
-  module.exports = require('./FallbackMatcher');}
+ */
+
+try {
+  // eslint-disable-next-line nuclide-internal/no-commonjs
+  module.exports = require('nuclide-prebuilt-libs/fuzzy-native');
+} catch (e) {
+  logger.error('Failed to load native fuzzy matching. Falling back to JS implementation', e);
+  // eslint-disable-next-line nuclide-internal/no-commonjs
+  module.exports = require('./FallbackMatcher');
+}

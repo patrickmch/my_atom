@@ -1,20 +1,30 @@
-'use strict';var _UniversalDisposable;
+'use strict';
 
+var _UniversalDisposable;
 
+function _load_UniversalDisposable() {
+  return _UniversalDisposable = _interopRequireDefault(require('../../../modules/nuclide-commons/UniversalDisposable'));
+}
 
+var _marked;
 
+function _load_marked() {
+  return _marked = _interopRequireDefault(require('marked'));
+}
 
+var _createPackage;
 
+function _load_createPackage() {
+  return _createPackage = _interopRequireDefault(require('../../../modules/nuclide-commons-atom/createPackage'));
+}
 
+var _dompurify;
 
+function _load_dompurify() {
+  return _dompurify = _interopRequireDefault(require('dompurify'));
+}
 
-
-
-
-function _load_UniversalDisposable() {return _UniversalDisposable = _interopRequireDefault(require('../../../modules/nuclide-commons/UniversalDisposable'));}var _marked;
-function _load_marked() {return _marked = _interopRequireDefault(require('marked'));}var _createPackage;
-function _load_createPackage() {return _createPackage = _interopRequireDefault(require('../../../modules/nuclide-commons-atom/createPackage'));}var _dompurify;
-function _load_dompurify() {return _dompurify = _interopRequireDefault(require('dompurify'));}function _interopRequireDefault(obj) {return obj && obj.__esModule ? obj : { default: obj };}
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 const domPurify = (0, (_dompurify || _load_dompurify()).default)(); /**
                                                                      * Copyright (c) 2015-present, Facebook, Inc.
@@ -25,27 +35,33 @@ const domPurify = (0, (_dompurify || _load_dompurify()).default)(); /**
                                                                      *
                                                                      * 
                                                                      * @format
-                                                                     */class Activation {constructor() {this._disposables = new (_UniversalDisposable || _load_UniversalDisposable()).default();}consumeConsoleService(createConsole) {
+                                                                     */
+
+class Activation {
+
+  constructor() {
+    this._disposables = new (_UniversalDisposable || _load_UniversalDisposable()).default();
+  }
+
+  consumeConsoleService(createConsole) {
     const consoleApi = createConsole({
       id: 'Atom',
-      name: 'Atom' });
-
-    const notificationDisposable = atom.notifications.onDidAddNotification(
-    notification => {
+      name: 'Atom'
+    });
+    const notificationDisposable = atom.notifications.onDidAddNotification(notification => {
       consoleApi.append({
         text: stripFormatting(notification.getMessage()),
-        level: getLevel(notification.getType()) });
-
+        level: getLevel(notification.getType())
+      });
     });
-
     this._disposables.add(consoleApi, notificationDisposable);
     return notificationDisposable;
   }
 
   dispose() {
     this._disposables.dispose();
-  }}
-
+  }
+}
 
 function getLevel(atomNotificationType) {
   switch (atomNotificationType) {
@@ -59,13 +75,13 @@ function getLevel(atomNotificationType) {
     case 'success':
       return 'success';
     default:
-      return 'log';}
-
+      return 'log';
+  }
 }
 
 /**
-   * Markdown and HTML can be used with Atom notifications, but not in the console.
-   */
+ * Markdown and HTML can be used with Atom notifications, but not in the console.
+ */
 function stripFormatting(raw) {
   return domPurify.sanitize((0, (_marked || _load_marked()).default)(raw), { ALLOWED_TAGS: [] });
 }

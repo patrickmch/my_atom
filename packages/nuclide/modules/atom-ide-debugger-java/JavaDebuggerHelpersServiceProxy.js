@@ -1,14 +1,10 @@
 "use strict";
 
-let Observable;
-
 module.exports = _client => {
   const remoteModule = {};
 
   remoteModule.getPortForJavaDebugger = function () {
-    return _client.marshalArguments(Array.from(arguments), []).then(args => {
-      return _client.callRemoteFunction("JavaDebuggerHelpersService/getPortForJavaDebugger", "promise", args);
-    }).then(value => {
+    return _client.callRemoteFunction("JavaDebuggerHelpersService/getPortForJavaDebugger", "promise", _client.marshalArguments(Array.from(arguments), [])).then(value => {
       return _client.unmarshal(value, {
         kind: "number"
       });
@@ -16,14 +12,12 @@ module.exports = _client => {
   };
 
   remoteModule.getJavaVSAdapterExecutableInfo = function (arg0) {
-    return _client.marshalArguments(Array.from(arguments), [{
+    return _client.callRemoteFunction("JavaDebuggerHelpersService/getJavaVSAdapterExecutableInfo", "promise", _client.marshalArguments(Array.from(arguments), [{
       name: "debug",
       type: {
         kind: "boolean"
       }
-    }]).then(args => {
-      return _client.callRemoteFunction("JavaDebuggerHelpersService/getJavaVSAdapterExecutableInfo", "promise", args);
-    }).then(value => {
+    }])).then(value => {
       return _client.unmarshal(value, {
         kind: "named",
         name: "VSAdapterExecutableInfo"
@@ -32,15 +26,13 @@ module.exports = _client => {
   };
 
   remoteModule.prepareForTerminalLaunch = function (arg0) {
-    return _client.marshalArguments(Array.from(arguments), [{
+    return _client.callRemoteFunction("JavaDebuggerHelpersService/prepareForTerminalLaunch", "promise", _client.marshalArguments(Array.from(arguments), [{
       name: "config",
       type: {
         kind: "named",
         name: "JavaLaunchTargetConfig"
       }
-    }]).then(args => {
-      return _client.callRemoteFunction("JavaDebuggerHelpersService/prepareForTerminalLaunch", "promise", args);
-    }).then(value => {
+    }])).then(value => {
       return _client.unmarshal(value, {
         kind: "named",
         name: "TerminalLaunchInfo"
@@ -49,14 +41,12 @@ module.exports = _client => {
   };
 
   remoteModule.javaDebugWaitForJdwpProcessStart = function (arg0) {
-    return _client.marshalArguments(Array.from(arguments), [{
+    return _client.callRemoteFunction("JavaDebuggerHelpersService/javaDebugWaitForJdwpProcessStart", "promise", _client.marshalArguments(Array.from(arguments), [{
       name: "jvmSuspendArgs",
       type: {
         kind: "string"
       }
-    }]).then(args => {
-      return _client.callRemoteFunction("JavaDebuggerHelpersService/javaDebugWaitForJdwpProcessStart", "promise", args);
-    }).then(value => {
+    }])).then(value => {
       return _client.unmarshal(value, {
         kind: "void"
       });
@@ -64,14 +54,12 @@ module.exports = _client => {
   };
 
   remoteModule.javaDebugWaitForJdwpProcessExit = function (arg0) {
-    return _client.marshalArguments(Array.from(arguments), [{
+    return _client.callRemoteFunction("JavaDebuggerHelpersService/javaDebugWaitForJdwpProcessExit", "promise", _client.marshalArguments(Array.from(arguments), [{
       name: "jvmSuspendArgs",
       type: {
         kind: "string"
       }
-    }]).then(args => {
-      return _client.callRemoteFunction("JavaDebuggerHelpersService/javaDebugWaitForJdwpProcessExit", "promise", args);
-    }).then(value => {
+    }])).then(value => {
       return _client.unmarshal(value, {
         kind: "void"
       });
@@ -81,11 +69,6 @@ module.exports = _client => {
   return remoteModule;
 };
 
-Object.defineProperty(module.exports, "inject", {
-  value: function () {
-    Observable = arguments[0];
-  }
-});
 Object.defineProperty(module.exports, "defs", {
   value: {
     Object: {
@@ -162,7 +145,7 @@ Object.defineProperty(module.exports, "defs", {
           },
           optional: false
         }, {
-          name: "commandLine",
+          name: "entryPointClass",
           type: {
             kind: "string"
           },
@@ -240,7 +223,7 @@ Object.defineProperty(module.exports, "defs", {
             },
             optional: false
           }, {
-            name: "commandLine",
+            name: "entryPointClass",
             type: {
               kind: "string"
             },
@@ -373,7 +356,7 @@ Object.defineProperty(module.exports, "defs", {
       location: {
         type: "source",
         fileName: "types.js",
-        line: 35
+        line: 38
       },
       name: "VSAdapterExecutableInfo",
       definition: {

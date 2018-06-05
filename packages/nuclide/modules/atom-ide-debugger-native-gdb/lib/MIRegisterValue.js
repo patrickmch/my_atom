@@ -1,35 +1,8 @@
-'use strict';Object.defineProperty(exports, "__esModule", { value: true });
+'use strict';
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
 class MIRegisterValue {
   toString() {
     return '';
@@ -53,17 +26,22 @@ class MIRegisterValue {
 
   valueAt(index) {
     return null;
-  }}exports.MIRegisterValue = MIRegisterValue; /**
-                                                * Copyright (c) 2017-present, Facebook, Inc.
-                                                * All rights reserved.
-                                                *
-                                                * This source code is licensed under the BSD-style license found in the
-                                                * LICENSE file in the root directory of this source tree. An additional grant
-                                                * of patent rights can be found in the PATENTS file in the same directory.
-                                                *
-                                                * 
-                                                * @format
-                                                */ // The MI documentation doesn't cover this, but gdb will return structured values
+  }
+}
+
+exports.MIRegisterValue = MIRegisterValue; /**
+                                            * Copyright (c) 2017-present, Facebook, Inc.
+                                            * All rights reserved.
+                                            *
+                                            * This source code is licensed under the BSD-style license found in the
+                                            * LICENSE file in the root directory of this source tree. An additional grant
+                                            * of patent rights can be found in the PATENTS file in the same directory.
+                                            *
+                                            * 
+                                            * @format
+                                            */
+
+// The MI documentation doesn't cover this, but gdb will return structured values
 // for registers which contain packed arrays of simple types (MMX et al.)
 // Furthermore, if the register can hold different widths of values, then
 // there is an intermediate node for each possible representation it can hold.
@@ -74,7 +52,25 @@ class MIRegisterValue {
 // named_list => '{' identifer '=' value ( ',' identifier '=' value ) * '}'
 // indexed_list => '{' value ( ',' value ) *  '}'
 //
-class MIRegisterSimpleValue extends MIRegisterValue {constructor(value) {super();this._value = value;}get value() {return this._value;}toString() {return this._value;}}exports.MIRegisterSimpleValue = MIRegisterSimpleValue;class MIRegisterNamedValues extends MIRegisterValue {
+
+class MIRegisterSimpleValue extends MIRegisterValue {
+
+  constructor(value) {
+    super();
+    this._value = value;
+  }
+
+  get value() {
+    return this._value;
+  }
+
+  toString() {
+    return this._value;
+  }
+}
+
+exports.MIRegisterSimpleValue = MIRegisterSimpleValue;
+class MIRegisterNamedValues extends MIRegisterValue {
 
   constructor(values) {
     super();
@@ -106,20 +102,18 @@ class MIRegisterSimpleValue extends MIRegisterValue {constructor(value) {super()
       return {
         name: entry[0],
         expressionSuffix: `.${entry[0]}`,
-        value: entry[1] };
-
+        value: entry[1]
+      };
     });
   }
 
   toString() {
-    return `{${[...this._values].
-    map(([k, v]) => `${k}:${v.toString()}`).
-    join(',')}}`;
-  }}exports.MIRegisterNamedValues = MIRegisterNamedValues;
+    return `{${[...this._values].map(([k, v]) => `${k}:${v.toString()}`).join(',')}}`;
+  }
+}
 
-
+exports.MIRegisterNamedValues = MIRegisterNamedValues;
 class MIRegisterIndexedValues extends MIRegisterValue {
-
 
   constructor(values) {
     super();
@@ -147,26 +141,27 @@ class MIRegisterIndexedValues extends MIRegisterValue {
       return {
         name: `${index}`,
         expressionSuffix: `[${index}]`,
-        value: entry };
-
+        value: entry
+      };
     });
   }
 
   toString() {
     return `[${this._values.map(_ => _.toString()).join(',')}]`;
-  }}exports.MIRegisterIndexedValues = MIRegisterIndexedValues;
+  }
+}
 
-
+exports.MIRegisterIndexedValues = MIRegisterIndexedValues;
 class MIRegisterValueParser {
 
+  constructor(expression) {
+    this._namePattern = /^\s*([a-zA-Z_][a-zA-Z_0-9]*)\s*=(.*)/;
 
-
-
-
-
-  constructor(expression) {this._namePattern = /^\s*([a-zA-Z_][a-zA-Z_0-9]*)\s*=(.*)/;
     this._originalExpression = expression;
-  } // matches name = something
+  }
+
+  // matches name = something
+
 
   parse() {
     this._expression = this._originalExpression;
@@ -187,8 +182,11 @@ class MIRegisterValueParser {
 
     if (this._expression[0] !== '{') {
       // expression value goes until the next ',', '}', or end of string.
-      const match = this._expression.match(/^([^,}]*)(.*)$/);if (!(
-      match != null)) {throw new Error('Invariant violation: "match != null"');}
+      const match = this._expression.match(/^([^,}]*)(.*)$/);
+
+      if (!(match != null)) {
+        throw new Error('Invariant violation: "match != null"');
+      }
 
       const [, value, rest] = match;
 
@@ -227,10 +225,7 @@ class MIRegisterValueParser {
   // gdb/MI will sometimes reformat an array if it contains multiple repeated
   // values. This is great for saving space in displayable output, but we want
   // the expansion to be available to be expanded in tree display.
-  _expandArrayInto(
-  value,
-  values)
-  {
+  _expandArrayInto(value, values) {
     if (value instanceof MIRegisterSimpleValue) {
       const repeatedValuePattern = /^(.*) <repeats (\d+) times>$/;
       const match = value.value.match(repeatedValuePattern);
@@ -282,4 +277,6 @@ class MIRegisterValueParser {
       }
     }
     throw new Error('Improperly formatted list in register value');
-  }}exports.MIRegisterValueParser = MIRegisterValueParser;
+  }
+}
+exports.MIRegisterValueParser = MIRegisterValueParser;

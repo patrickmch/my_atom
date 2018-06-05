@@ -1,41 +1,52 @@
-'use strict';Object.defineProperty(exports, "__esModule", { value: true });
+'use strict';
 
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
 
+var _atom = require('atom');
 
+var _nuclideAnalytics;
 
+function _load_nuclideAnalytics() {
+  return _nuclideAnalytics = require('../../nuclide-analytics');
+}
 
+var _observeLanguageTextEditors;
 
+function _load_observeLanguageTextEditors() {
+  return _observeLanguageTextEditors = _interopRequireDefault(require('../../commons-atom/observe-language-text-editors'));
+}
 
-
-
-
-var _atom = require('atom');var _nuclideAnalytics;
-
-function _load_nuclideAnalytics() {return _nuclideAnalytics = require('../../nuclide-analytics');}var _observeLanguageTextEditors;
-function _load_observeLanguageTextEditors() {return _observeLanguageTextEditors = _interopRequireDefault(require('../../commons-atom/observe-language-text-editors'));}function _interopRequireDefault(obj) {return obj && obj.__esModule ? obj : { default: obj };}
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 const GRAMMARS = ['source.objc', 'source.objcpp'];
 
 /**
-                                                    * This closes square brackets for Objective-C message calls.
-                                                    * Clients must call `disable()` once they're done with an instance.
-                                                    */ /**
-                                                        * Copyright (c) 2015-present, Facebook, Inc.
-                                                        * All rights reserved.
-                                                        *
-                                                        * This source code is licensed under the license found in the LICENSE file in
-                                                        * the root directory of this source tree.
-                                                        *
-                                                        *  strict-local
-                                                        * @format
-                                                        */class ObjectiveCBracketBalancer {enable() {// The feature is already enabled.
-    if (this._languageListener) {return;}
-    this._editingSubscriptionsMap = new Map();
-    this._languageListener = (0, (_observeLanguageTextEditors || _load_observeLanguageTextEditors()).default)(
-    GRAMMARS,
-    textEditor => this._enableInTextEditor(textEditor),
-    textEditor => this._disableInTextEditor(textEditor));
+ * This closes square brackets for Objective-C message calls.
+ * Clients must call `disable()` once they're done with an instance.
+ */
+/**
+ * Copyright (c) 2015-present, Facebook, Inc.
+ * All rights reserved.
+ *
+ * This source code is licensed under the license found in the LICENSE file in
+ * the root directory of this source tree.
+ *
+ *  strict-local
+ * @format
+ */
 
+class ObjectiveCBracketBalancer {
+
+  enable() {
+    // The feature is already enabled.
+    if (this._languageListener) {
+      return;
+    }
+
+    this._editingSubscriptionsMap = new Map();
+    this._languageListener = (0, (_observeLanguageTextEditors || _load_observeLanguageTextEditors()).default)(GRAMMARS, textEditor => this._enableInTextEditor(textEditor), textEditor => this._disableInTextEditor(textEditor));
   }
 
   disable() {
@@ -46,9 +57,7 @@ const GRAMMARS = ['source.objc', 'source.objcpp'];
     this._languageListener.dispose();
     this._languageListener = null;
 
-    this._editingSubscriptionsMap.forEach(subscription =>
-    subscription.dispose());
-
+    this._editingSubscriptionsMap.forEach(subscription => subscription.dispose());
     this._editingSubscriptionsMap.clear();
   }
 
@@ -58,10 +67,7 @@ const GRAMMARS = ['source.objc', 'source.objcpp'];
         const { range, text } = event;
         if (text === ']') {
           const buffer = textEditor.getBuffer();
-          const leftBracketInsertPosition = ObjectiveCBracketBalancer.getOpenBracketInsertPosition(
-          buffer,
-          range.start);
-
+          const leftBracketInsertPosition = ObjectiveCBracketBalancer.getOpenBracketInsertPosition(buffer, range.start);
           if (leftBracketInsertPosition) {
             buffer.insert(leftBracketInsertPosition, '[');
           }
@@ -79,17 +85,14 @@ const GRAMMARS = ['source.objc', 'source.objcpp'];
     }
   }
 
-  static getOpenBracketInsertPosition(
-  buffer,
-  closeBracketPosition)
-  {
+  static getOpenBracketInsertPosition(buffer, closeBracketPosition) {
     const startingLine = buffer.lineForRow(closeBracketPosition.row);
     let singleQuoteCount = 0;
     let doubleQuoteCount = 0;
     const characterCount = {
       '[': 0,
-      ']': 0 };
-
+      ']': 0
+    };
 
     // Iterate through the line, determining if we have balanced brackets.
     // We do not count brackets we encounter inside string/char literals.
@@ -108,10 +111,7 @@ const GRAMMARS = ['source.objc', 'source.objcpp'];
 
     const stringLiteralMatch = /@".*"\s.*]/.exec(startingLine);
     if (stringLiteralMatch) {
-      return _atom.Point.fromObject([
-      closeBracketPosition.row,
-      stringLiteralMatch.index]);
-
+      return _atom.Point.fromObject([closeBracketPosition.row, stringLiteralMatch.index]);
     } else if (characterCount['['] < characterCount[']']) {
       // Check if we're at the bottom of a multi-line method.
       const multiLineMethodRegex = /^[\s\w[]*:.*[^;{];?$/;
@@ -127,9 +127,7 @@ const GRAMMARS = ['source.objc', 'source.objcpp'];
 
       if (
       // eslint-disable-next-line eqeqeq
-      currentRowPlusOne !== null &&
-      currentRowPlusOne !== closeBracketPosition.row)
-      {
+      currentRowPlusOne !== null && currentRowPlusOne !== closeBracketPosition.row) {
         const targetLine = buffer.lineForRow(currentRowPlusOne);
         const targetMatch = /\S/.exec(targetLine);
 
@@ -159,4 +157,6 @@ const GRAMMARS = ['source.objc', 'source.objcpp'];
     } else {
       return null;
     }
-  }}exports.default = ObjectiveCBracketBalancer;
+  }
+}
+exports.default = ObjectiveCBracketBalancer;

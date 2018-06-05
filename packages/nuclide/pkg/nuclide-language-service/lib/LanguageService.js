@@ -1,71 +1,5 @@
 'use strict';
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 // This assertion ensures that Completion is a subtype of atom$AutocompleteSuggestion. If you are
 // getting errors here, you have probably just updated one without updating the other.
 /**
@@ -77,41 +11,20 @@
  *
  * 
  * @format
- */({}); // Subtype of atom$AutocompleteSuggestion.
+ */
 
+({});
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+// Subtype of atom$AutocompleteSuggestion.
 
 
 // A (RPC-able) subset of DiagnosticMessage.
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 // Ensure that this is actually a subset.
 null;
 
 // A (RPC-able) subset of DiagnosticProviderUpdate.
+
+
+// Messages in StatusData are interpreted as Markdown.

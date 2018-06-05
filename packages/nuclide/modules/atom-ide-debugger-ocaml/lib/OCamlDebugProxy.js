@@ -1,37 +1,41 @@
-'use strict';Object.defineProperty(exports, "__esModule", { value: true });exports.OCamlDebugProxy = exports.PROMPT = undefined;var _asyncToGenerator = _interopRequireDefault(require('async-to-generator'));
+'use strict';
 
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.OCamlDebugProxy = exports.PROMPT = undefined;
 
+var _child_process = _interopRequireDefault(require('child_process'));
 
+var _vscodeDebugadapter;
 
+function _load_vscodeDebugadapter() {
+  return _vscodeDebugadapter = require('vscode-debugadapter');
+}
 
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
+/**
+ * Copyright (c) 2017-present, Facebook, Inc.
+ * All rights reserved.
+ *
+ * This source code is licensed under the BSD-style license found in the
+ * LICENSE file in the root directory of this source tree. An additional grant
+ * of patent rights can be found in the PATENTS file in the same directory.
+ *
+ * 
+ * @format
+ */
 
+const PROMPT = exports.PROMPT = '(ocd) ';
 
-
-
-
-var _child_process = _interopRequireDefault(require('child_process'));var _vscodeDebugadapter;
-function _load_vscodeDebugadapter() {return _vscodeDebugadapter = require('vscode-debugadapter');}function _interopRequireDefault(obj) {return obj && obj.__esModule ? obj : { default: obj };} /**
-                                                                                                                                                                                                 * Copyright (c) 2017-present, Facebook, Inc.
-                                                                                                                                                                                                 * All rights reserved.
-                                                                                                                                                                                                 *
-                                                                                                                                                                                                 * This source code is licensed under the BSD-style license found in the
-                                                                                                                                                                                                 * LICENSE file in the root directory of this source tree. An additional grant
-                                                                                                                                                                                                 * of patent rights can be found in the PATENTS file in the same directory.
-                                                                                                                                                                                                 *
-                                                                                                                                                                                                 * 
-                                                                                                                                                                                                 * @format
-                                                                                                                                                                                                 */const PROMPT = exports.PROMPT = '(ocd) ';function stripPrompt(s) {return s.substr(0, s.length - PROMPT.length);}
+function stripPrompt(s) {
+  return s.substr(0, s.length - PROMPT.length);
+}
 
 class OCamlDebugProxy {
 
-
-
-  constructor(
-  command,
-  debuggerArguments,
-  programFinishedCallback)
-  {
+  constructor(command, debuggerArguments, programFinishedCallback) {
     this._programFinishedCallback = programFinishedCallback;
 
     (_vscodeDebugadapter || _load_vscodeDebugadapter()).logger.verbose(`Running "${command} ${debuggerArguments.join(' ')}"`);
@@ -48,8 +52,8 @@ class OCamlDebugProxy {
         (_vscodeDebugadapter || _load_vscodeDebugadapter()).logger.error(dataString);
         this._programFinishedCallback({
           kind: 'error',
-          message: `Invalid executable path ${command}` });
-
+          message: `Invalid executable path ${command}`
+        });
       }
     });
   }
@@ -73,13 +77,13 @@ class OCamlDebugProxy {
     this._debuggerProcess.kill();
   }
 
-  pause() {var _this = this;return (0, _asyncToGenerator.default)(function* () {
-      _this._debuggerProcess.kill('SIGINT');
-      yield _this.waitForPrompt();})();
+  async pause() {
+    this._debuggerProcess.kill('SIGINT');
+    await this.waitForPrompt();
   }
 
-  resume() {var _this2 = this;return (0, _asyncToGenerator.default)(function* () {
-      yield _this2.send('run');})();
+  async resume() {
+    await this.send('run');
   }
 
   send(command) {
@@ -99,4 +103,6 @@ class OCamlDebugProxy {
         resolve(data);
       });
     });
-  }}exports.OCamlDebugProxy = OCamlDebugProxy;
+  }
+}
+exports.OCamlDebugProxy = OCamlDebugProxy;

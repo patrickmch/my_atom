@@ -1,0 +1,81 @@
+diff --git a/nols_website/core/templates/core/fragments/address_list.html b/nols_website/core/templates/core/fragments/address_list.html
+index c891eeda0..48468bbe7 100644
+--- a/nols_website/core/templates/core/fragments/address_list.html
++++ b/nols_website/core/templates/core/fragments/address_list.html
+@@ -1,66 +1,66 @@
+ {% load l10n %}
+ <div class="account-info-add-entity-wrapper">
+  </div>
+ <table class="account_list">
+ 	<thead>
+-	<tr>
+-	  <th>Status</th>
+-	  <th>Type</th>
+-	  <th class="address-column">Address</th>
+-	  {% if request.REQUEST.context %}
+-  	  <th>Choose</th>
+-	  {% endif %}
+-	  <th>Change&nbsp;Status</th>
+-	  <th>Edit</th>
+-	</tr>
++  	<tr>
++  	  <th>Status</th>
++  	  <th>Type</th>
++  	  <th class="address-column">Address</th>
++  	  {% if request.REQUEST.context %}
++    	  <th>Choose</th>
++  	  {% endif %}
++  	  <th>Change&nbsp;Status</th>
++  	  <th>Edit</th>
++  	</tr>
+ 	</thead>
+ 
+ 	{% regroup addresses by status as address_status_list %}
+ 	{% for status_group in address_status_list %}
+ 
+   	{% with 'addresses' as contact_type %}
+      	{% with request.session.account_addresses_formers_visible as contact_formers_visible %}
+        	{% include "core/fragments/former_display.html" %}
+      	{% endwith %}
+    	{% endwith %}
+   	{% for address in status_group.list %}
+     	<tr>
+     		<td>{{ address.status }}</td>
+     		<td>{{ address.type|default:"&nbsp;" }}</td>
+     		<td>{{ address.display }}</td>
+     		{% if request.REQUEST.context %}
+     		<td>
+     			<form method="post" action="">
+     				<div>
+       				{% ifnotequal status_group.grouper "Former" %}
+         				<input type="hidden" name="address_to_choose" value="{{ address.id|unlocalize }}" />
+         				<input type="submit" value="Use this address" />
+       				{% else %}
+         				&nbsp;
+       				{% endifnotequal %}
+     				</div>
+             {% csrf_token %}
+     			</form>
+     		</td>
+     		{% endif %}
+     		<td>
+     			<form method="post" action="">
+     				<div>
+       				<input type="hidden" name="toggle_status" value="{{ address.id|unlocalize }}" />
+       				<input type="submit" value="Make {% if address.is_status_current %} Former {% else %} Current {% endif %}" />
+     				</div>
+             {% csrf_token %}
+     			</form>
+     		</td>
+     		<td>
+           <a href="{% url "edit_address"  address.id %}{% if request.META.QUERY_STRING %}?{{ request.META.QUERY_STRING }}{% endif %}">
+             <span>
+               Edit
+             </span>
+           </a>
+         </td>
+     	</tr>
+   	{% endfor %}
+ 	</tbody>
+ 	{% endfor %}
+ </table>

@@ -1,19 +1,11 @@
-'use strict';Object.defineProperty(exports, "__esModule", { value: true });exports.NuxStore = exports.NUX_SAVED_STORE = undefined;
+'use strict';
 
-
-
-
-
-
-
-
-
-
-
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.NuxStore = exports.NUX_SAVED_STORE = undefined;
 
 var _atom = require('atom');
-
-
 
 const NEW_NUX_EVENT = 'newNuxModel'; /**
                                       * Copyright (c) 2015-present, Facebook, Inc.
@@ -24,10 +16,20 @@ const NEW_NUX_EVENT = 'newNuxModel'; /**
                                       *
                                       * 
                                       * @format
-                                      */ /* global localStorage */const NUX_SAVED_STORE = exports.NUX_SAVED_STORE = 'nuclide-nux.saved-nux-data-store';class NuxStore {constructor() {
+                                      */
+
+/* global localStorage */
+
+const NUX_SAVED_STORE = exports.NUX_SAVED_STORE = 'nuclide-nux.saved-nux-data-store';
+
+class NuxStore {
+
+  constructor() {
     this._nuxMap = new Map();
     this._emitter = new _atom.Emitter();
-  } // Maps a Nux's unique ID to the boolean representing its viewed state
+  }
+  // Maps a Nux's unique ID to the boolean representing its viewed state
+
 
   dispose() {
     this._emitter.dispose();
@@ -46,14 +48,13 @@ const NEW_NUX_EVENT = 'newNuxModel'; /**
       NuxBackendCache = class {
         getNuxStatus() {
           return new Map();
-        }};
-
+        }
+      };
     }
 
     const nuclideNuxState = new Map(
     // $FlowIgnore: null is ok here
     JSON.parse(localStorage.getItem(NUX_SAVED_STORE)));
-
     const fbNuxState = new NuxBackendCache().getNuxStatus();
 
     // Merge the two maps. If a key exists in both input maps, the value from
@@ -62,8 +63,8 @@ const NEW_NUX_EVENT = 'newNuxModel'; /**
   }
 
   /*
-     * Try to add the NUX to the list of registered NUXes.
-     */
+   * Try to add the NUX to the list of registered NUXes.
+   */
   addNewNux(nux) {
     const nuxState = this._nuxMap.get(nux.id);
     // if `developmentMode` is set, the NUX will be shown during EVERY session.
@@ -84,8 +85,8 @@ const NEW_NUX_EVENT = 'newNuxModel'; /**
   }
 
   /**
-     * Register a change handler that is invoked whenever the store changes.
-     */
+   * Register a change handler that is invoked whenever the store changes.
+   */
   onNewNux(callback) {
     return this._emitter.on(NEW_NUX_EVENT, callback);
   }
@@ -96,4 +97,6 @@ const NEW_NUX_EVENT = 'newNuxModel'; /**
     }
     this._nuxMap.set(nuxModel.id, /* completed */true);
     this._saveNuxState();
-  }}exports.NuxStore = NuxStore;
+  }
+}
+exports.NuxStore = NuxStore;

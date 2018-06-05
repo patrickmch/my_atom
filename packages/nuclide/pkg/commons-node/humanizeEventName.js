@@ -1,13 +1,15 @@
-'use strict'; /**
-               * Copyright (c) 2015-present, Facebook, Inc.
-               * All rights reserved.
-               *
-               * This source code is licensed under the license found in the LICENSE file in
-               * the root directory of this source tree.
-               *
-               *  strict
-               * @format
-               */
+'use strict';
+
+/**
+ * Copyright (c) 2015-present, Facebook, Inc.
+ * All rights reserved.
+ *
+ * This source code is licensed under the license found in the LICENSE file in
+ * the root directory of this source tree.
+ *
+ *  strict
+ * @format
+ */
 
 // Adapted from https://github.com/atom/underscore-plus/blob/master/src/underscore-plus.coffee
 
@@ -20,12 +22,7 @@ function capitalize(word) {
 }
 
 function undasherize(string) {
-  return string ?
-  string.
-  split('-').
-  map(capitalize).
-  join(' ') :
-  '';
+  return string ? string.split('-').map(capitalize).join(' ') : '';
 }
 
 function humanizeEventName(eventName) {

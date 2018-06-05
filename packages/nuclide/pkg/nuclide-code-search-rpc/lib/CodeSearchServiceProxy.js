@@ -1,20 +1,16 @@
 "use strict";
 
-let Observable;
-
 module.exports = _client => {
   const remoteModule = {};
 
   remoteModule.isEligibleForDirectory = function (arg0) {
-    return _client.marshalArguments(Array.from(arguments), [{
+    return _client.callRemoteFunction("CodeSearchService/isEligibleForDirectory", "promise", _client.marshalArguments(Array.from(arguments), [{
       name: "rootDirectory",
       type: {
         kind: "named",
         name: "NuclideUri"
       }
-    }]).then(args => {
-      return _client.callRemoteFunction("CodeSearchService/isEligibleForDirectory", "promise", args);
-    }).then(value => {
+    }])).then(value => {
       return _client.unmarshal(value, {
         kind: "boolean"
       });
@@ -22,7 +18,7 @@ module.exports = _client => {
   };
 
   remoteModule.codeSearch = function (arg0, arg1, arg2, arg3, arg4) {
-    return Observable.fromPromise(_client.marshalArguments(Array.from(arguments), [{
+    return _client.callRemoteFunction("CodeSearchService/codeSearch", "observable", _client.marshalArguments(Array.from(arguments), [{
       name: "directory",
       type: {
         kind: "named",
@@ -53,9 +49,7 @@ module.exports = _client => {
       type: {
         kind: "number"
       }
-    }])).switchMap(args => {
-      return _client.callRemoteFunction("CodeSearchService/codeSearch", "observable", args);
-    }).concatMap(value => {
+    }])).map(value => {
       return _client.unmarshal(value, {
         kind: "named",
         name: "CodeSearchResult"
@@ -64,7 +58,7 @@ module.exports = _client => {
   };
 
   remoteModule.searchFiles = function (arg0, arg1, arg2, arg3, arg4, arg5) {
-    return Observable.fromPromise(_client.marshalArguments(Array.from(arguments), [{
+    return _client.callRemoteFunction("CodeSearchService/searchFiles", "observable", _client.marshalArguments(Array.from(arguments), [{
       name: "files",
       type: {
         kind: "array",
@@ -112,9 +106,7 @@ module.exports = _client => {
           kind: "number"
         }
       }
-    }])).switchMap(args => {
-      return _client.callRemoteFunction("CodeSearchService/searchFiles", "observable", args);
-    }).concatMap(value => {
+    }])).map(value => {
       return _client.unmarshal(value, {
         kind: "named",
         name: "CodeSearchResult"
@@ -123,7 +115,7 @@ module.exports = _client => {
   };
 
   remoteModule.remoteAtomSearch = function (arg0, arg1, arg2, arg3, arg4) {
-    return Observable.fromPromise(_client.marshalArguments(Array.from(arguments), [{
+    return _client.callRemoteFunction("CodeSearchService/remoteAtomSearch", "observable", _client.marshalArguments(Array.from(arguments), [{
       name: "directory",
       type: {
         kind: "named",
@@ -157,9 +149,7 @@ module.exports = _client => {
           name: "CodeSearchTool"
         }
       }
-    }])).switchMap(args => {
-      return _client.callRemoteFunction("CodeSearchService/remoteAtomSearch", "observable", args);
-    }).concatMap(value => {
+    }])).map(value => {
       return _client.unmarshal(value, {
         kind: "named",
         name: "search$FileResult"
@@ -170,11 +160,6 @@ module.exports = _client => {
   return remoteModule;
 };
 
-Object.defineProperty(module.exports, "inject", {
-  value: function () {
-    Observable = arguments[0];
-  }
-});
 Object.defineProperty(module.exports, "defs", {
   value: {
     Object: {

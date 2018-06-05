@@ -18,6 +18,11 @@ class Atom extends (_jestEnvironmentJsdom || _load_jestEnvironmentJsdom()).defau
   constructor(...args) {
     super(...args);
     this.global.atom = global.atom;
+  }
+
+  async setup() {
+    await super.setup();
+    await this.global.atom.reset();
   }} /**
       * Copyright (c) 2017-present, Facebook, Inc.
       * All rights reserved.

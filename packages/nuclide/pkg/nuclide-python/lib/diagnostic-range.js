@@ -1,41 +1,53 @@
-'use strict';Object.defineProperty(exports, "__esModule", { value: true });exports.
+'use strict';
 
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.getDiagnosticRange = getDiagnosticRange;
 
+var _atom = require('atom');
 
+var _range;
 
+function _load_range() {
+  return _range = require('../../../modules/nuclide-commons-atom/range');
+}
 
+var _log4js;
 
+function _load_log4js() {
+  return _log4js = require('log4js');
+}
 
+/**
+ * Copyright (c) 2015-present, Facebook, Inc.
+ * All rights reserved.
+ *
+ * This source code is licensed under the license found in the LICENSE file in
+ * the root directory of this source tree.
+ *
+ *  strict-local
+ * @format
+ */
 
+const logger = (0, (_log4js || _load_log4js()).getLogger)('nuclide-python');
 
-
-
-
-
-
-
-
-
-
-
-
-
-getDiagnosticRange = getDiagnosticRange;var _atom = require('atom');var _range;function _load_range() {return _range = require('../../../modules/nuclide-commons-atom/range');}var _log4js;function _load_log4js() {return _log4js = require('log4js');} /**
-                                                                                                                                                                                                                                                          * Copyright (c) 2015-present, Facebook, Inc.
-                                                                                                                                                                                                                                                          * All rights reserved.
-                                                                                                                                                                                                                                                          *
-                                                                                                                                                                                                                                                          * This source code is licensed under the license found in the LICENSE file in
-                                                                                                                                                                                                                                                          * the root directory of this source tree.
-                                                                                                                                                                                                                                                          *
-                                                                                                                                                                                                                                                          *  strict-local
-                                                                                                                                                                                                                                                          * @format
-                                                                                                                                                                                                                                                          */const logger = (0, (_log4js || _load_log4js()).getLogger)('nuclide-python'); // Computes an appropriate underline range using the diagnostic type information.
+// Computes an appropriate underline range using the diagnostic type information.
 // Range variants include underlining the entire line, entire trimmed line,
 // or a word or whitespace range within the line.
-function getDiagnosticRange(diagnostic, editor) {const buffer = editor.getBuffer(); // The diagnostic message's line index may be out of bounds if buffer contents
+function getDiagnosticRange(diagnostic, editor) {
+  const buffer = editor.getBuffer();
+
+  // The diagnostic message's line index may be out of bounds if buffer contents
   // have changed. To prevent an exception, we just use the last line of the buffer if
   // unsafeLine is out of bounds.
-  const { code, line: unsafeLine, column, message } = diagnostic;const lastRow = buffer.getLastRow();const line = unsafeLine <= lastRow ? unsafeLine : lastRow;const lineLength = buffer.lineLengthForRow(line);const trimmedRange = (0, (_range || _load_range()).trimRange)(editor, buffer.rangeForRow(line, false));const trimmedStartCol = trimmedRange.start.column;
+  const { code, line: unsafeLine, column, message } = diagnostic;
+  const lastRow = buffer.getLastRow();
+  const line = unsafeLine <= lastRow ? unsafeLine : lastRow;
+
+  const lineLength = buffer.lineLengthForRow(line);
+  const trimmedRange = (0, (_range || _load_range()).trimRange)(editor, buffer.rangeForRow(line, false));
+  const trimmedStartCol = trimmedRange.start.column;
   const trimmedEndCol = trimmedRange.end.column;
 
   try {
@@ -62,11 +74,7 @@ function getDiagnosticRange(diagnostic, editor) {const buffer = editor.getBuffer
           return new _atom.Range([line, column], [line, column + 1]);
         }
         // Extra whitespace - underline the offending whitespace
-        const whitespace = (0, (_range || _load_range()).wordAtPosition)(
-        editor,
-        new _atom.Point(line, column),
-        /\s+/g);
-
+        const whitespace = (0, (_range || _load_range()).wordAtPosition)(editor, new _atom.Point(line, column), /\s+/g);
         if (whitespace) {
           return whitespace.range;
         }
@@ -106,16 +114,11 @@ function getDiagnosticRange(diagnostic, editor) {const buffer = editor.getBuffer
         }
         break;
       default:
-        break;}
-
+        break;
+    }
   } catch (e) {
-    const diagnosticAsString = `${
-    diagnostic.file
-    }:${unsafeLine}:${column} - ${code}: ${message}`;
-    logger.error(
-    `Failed to find flake8 diagnostic range: ${diagnosticAsString}`,
-    e);
-
+    const diagnosticAsString = `${diagnostic.file}:${unsafeLine}:${column} - ${code}: ${message}`;
+    logger.error(`Failed to find flake8 diagnostic range: ${diagnosticAsString}`, e);
   }
 
   return new _atom.Range([line, trimmedStartCol], [line, trimmedEndCol]);

@@ -1,20 +1,16 @@
 "use strict";
 
-let Observable;
-
 module.exports = _client => {
   const remoteModule = {};
 
   remoteModule.getDefinitionPreview = function (arg0) {
-    return _client.marshalArguments(Array.from(arguments), [{
+    return _client.callRemoteFunction("DefinitionPreviewService/getDefinitionPreview", "promise", _client.marshalArguments(Array.from(arguments), [{
       name: "definition",
       type: {
         kind: "named",
         name: "Definition"
       }
-    }]).then(args => {
-      return _client.callRemoteFunction("DefinitionPreviewService/getDefinitionPreview", "promise", args);
-    }).then(value => {
+    }])).then(value => {
       return _client.unmarshal(value, {
         kind: "nullable",
         type: {
@@ -46,11 +42,6 @@ module.exports = _client => {
   return remoteModule;
 };
 
-Object.defineProperty(module.exports, "inject", {
-  value: function () {
-    Observable = arguments[0];
-  }
-});
 Object.defineProperty(module.exports, "defs", {
   value: {
     Object: {

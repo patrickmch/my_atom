@@ -1,20 +1,10 @@
-'use strict';Object.defineProperty(exports, "__esModule", { value: true });exports.
+'use strict';
 
-
-
-
-
-
-
-
-
-
-
-
-typeHintFromSnippet = typeHintFromSnippet;function typeHintFromSnippet(
-snippet,
-range)
-{
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.typeHintFromSnippet = typeHintFromSnippet;
+function typeHintFromSnippet(snippet, range) {
   return { hint: [{ type: 'snippet', value: snippet }], range };
 } /**
    * Copyright (c) 2015-present, Facebook, Inc.

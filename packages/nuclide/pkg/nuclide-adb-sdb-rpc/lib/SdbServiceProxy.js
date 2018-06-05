@@ -1,12 +1,10 @@
 "use strict";
 
-let Observable;
-
 module.exports = _client => {
   const remoteModule = {};
 
   remoteModule.registerSdbPath = function (arg0, arg1, arg2) {
-    return _client.marshalArguments(Array.from(arguments), [{
+    return _client.callRemoteFunction("SdbService/registerSdbPath", "promise", _client.marshalArguments(Array.from(arguments), [{
       name: "id",
       type: {
         kind: "string"
@@ -25,9 +23,7 @@ module.exports = _client => {
           kind: "number"
         }
       }
-    }]).then(args => {
-      return _client.callRemoteFunction("SdbService/registerSdbPath", "promise", args);
-    }).then(value => {
+    }])).then(value => {
       return _client.unmarshal(value, {
         kind: "void"
       });
@@ -35,9 +31,7 @@ module.exports = _client => {
   };
 
   remoteModule.getFullConfig = function () {
-    return _client.marshalArguments(Array.from(arguments), []).then(args => {
-      return _client.callRemoteFunction("SdbService/getFullConfig", "promise", args);
-    }).then(value => {
+    return _client.callRemoteFunction("SdbService/getFullConfig", "promise", _client.marshalArguments(Array.from(arguments), [])).then(value => {
       return _client.unmarshal(value, {
         kind: "named",
         name: "DebugBridgeFullConfig"
@@ -46,7 +40,7 @@ module.exports = _client => {
   };
 
   remoteModule.registerCustomPath = function (arg0) {
-    return _client.marshalArguments(Array.from(arguments), [{
+    return _client.callRemoteFunction("SdbService/registerCustomPath", "promise", _client.marshalArguments(Array.from(arguments), [{
       name: "path",
       type: {
         kind: "nullable",
@@ -54,9 +48,7 @@ module.exports = _client => {
           kind: "string"
         }
       }
-    }]).then(args => {
-      return _client.callRemoteFunction("SdbService/registerCustomPath", "promise", args);
-    }).then(value => {
+    }])).then(value => {
       return _client.unmarshal(value, {
         kind: "void"
       });
@@ -64,15 +56,13 @@ module.exports = _client => {
   };
 
   remoteModule.getDeviceInfo = function (arg0) {
-    return Observable.fromPromise(_client.marshalArguments(Array.from(arguments), [{
+    return _client.callRemoteFunction("SdbService/getDeviceInfo", "observable", _client.marshalArguments(Array.from(arguments), [{
       name: "device",
       type: {
         kind: "named",
         name: "DeviceId"
       }
-    }])).switchMap(args => {
-      return _client.callRemoteFunction("SdbService/getDeviceInfo", "observable", args);
-    }).concatMap(value => {
+    }])).map(value => {
       return _client.unmarshal(value, {
         kind: "map",
         keyType: {
@@ -86,9 +76,7 @@ module.exports = _client => {
   };
 
   remoteModule.getDeviceList = function () {
-    return Observable.fromPromise(_client.marshalArguments(Array.from(arguments), [])).switchMap(args => {
-      return _client.callRemoteFunction("SdbService/getDeviceList", "observable", args);
-    }).concatMap(value => {
+    return _client.callRemoteFunction("SdbService/getDeviceList", "observable", _client.marshalArguments(Array.from(arguments), [])).map(value => {
       return _client.unmarshal(value, {
         kind: "array",
         type: {
@@ -100,7 +88,7 @@ module.exports = _client => {
   };
 
   remoteModule.getPidFromPackageName = function (arg0, arg1) {
-    return _client.marshalArguments(Array.from(arguments), [{
+    return _client.callRemoteFunction("SdbService/getPidFromPackageName", "promise", _client.marshalArguments(Array.from(arguments), [{
       name: "device",
       type: {
         kind: "named",
@@ -111,9 +99,7 @@ module.exports = _client => {
       type: {
         kind: "string"
       }
-    }]).then(args => {
-      return _client.callRemoteFunction("SdbService/getPidFromPackageName", "promise", args);
-    }).then(value => {
+    }])).then(value => {
       return _client.unmarshal(value, {
         kind: "number"
       });
@@ -121,7 +107,7 @@ module.exports = _client => {
   };
 
   remoteModule.getFileContentsAtPath = function (arg0, arg1) {
-    return _client.marshalArguments(Array.from(arguments), [{
+    return _client.callRemoteFunction("SdbService/getFileContentsAtPath", "promise", _client.marshalArguments(Array.from(arguments), [{
       name: "device",
       type: {
         kind: "named",
@@ -132,9 +118,7 @@ module.exports = _client => {
       type: {
         kind: "string"
       }
-    }]).then(args => {
-      return _client.callRemoteFunction("SdbService/getFileContentsAtPath", "promise", args);
-    }).then(value => {
+    }])).then(value => {
       return _client.unmarshal(value, {
         kind: "string"
       });
@@ -142,7 +126,7 @@ module.exports = _client => {
   };
 
   remoteModule.installPackage = function (arg0, arg1) {
-    return Observable.fromPromise(_client.marshalArguments(Array.from(arguments), [{
+    return _client.callRemoteFunction("SdbService/installPackage", "observable", _client.marshalArguments(Array.from(arguments), [{
       name: "device",
       type: {
         kind: "named",
@@ -154,9 +138,7 @@ module.exports = _client => {
         kind: "named",
         name: "NuclideUri"
       }
-    }])).switchMap(args => {
-      return _client.callRemoteFunction("SdbService/installPackage", "observable", args);
-    }).concatMap(value => {
+    }])).map(value => {
       return _client.unmarshal(value, {
         kind: "named",
         name: "LegacyProcessMessage"
@@ -165,7 +147,7 @@ module.exports = _client => {
   };
 
   remoteModule.launchApp = function (arg0, arg1) {
-    return _client.marshalArguments(Array.from(arguments), [{
+    return _client.callRemoteFunction("SdbService/launchApp", "promise", _client.marshalArguments(Array.from(arguments), [{
       name: "device",
       type: {
         kind: "named",
@@ -176,9 +158,7 @@ module.exports = _client => {
       type: {
         kind: "string"
       }
-    }]).then(args => {
-      return _client.callRemoteFunction("SdbService/launchApp", "promise", args);
-    }).then(value => {
+    }])).then(value => {
       return _client.unmarshal(value, {
         kind: "string"
       });
@@ -186,7 +166,7 @@ module.exports = _client => {
   };
 
   remoteModule.stopProcess = function (arg0, arg1, arg2) {
-    return _client.marshalArguments(Array.from(arguments), [{
+    return _client.callRemoteFunction("SdbService/stopProcess", "promise", _client.marshalArguments(Array.from(arguments), [{
       name: "device",
       type: {
         kind: "named",
@@ -202,9 +182,7 @@ module.exports = _client => {
       type: {
         kind: "number"
       }
-    }]).then(args => {
-      return _client.callRemoteFunction("SdbService/stopProcess", "promise", args);
-    }).then(value => {
+    }])).then(value => {
       return _client.unmarshal(value, {
         kind: "void"
       });
@@ -212,7 +190,7 @@ module.exports = _client => {
   };
 
   remoteModule.uninstallPackage = function (arg0, arg1) {
-    return Observable.fromPromise(_client.marshalArguments(Array.from(arguments), [{
+    return _client.callRemoteFunction("SdbService/uninstallPackage", "observable", _client.marshalArguments(Array.from(arguments), [{
       name: "device",
       type: {
         kind: "named",
@@ -223,9 +201,7 @@ module.exports = _client => {
       type: {
         kind: "string"
       }
-    }])).switchMap(args => {
-      return _client.callRemoteFunction("SdbService/uninstallPackage", "observable", args);
-    }).concatMap(value => {
+    }])).map(value => {
       return _client.unmarshal(value, {
         kind: "named",
         name: "LegacyProcessMessage"
@@ -234,7 +210,7 @@ module.exports = _client => {
   };
 
   remoteModule.getProcesses = function (arg0, arg1) {
-    return Observable.fromPromise(_client.marshalArguments(Array.from(arguments), [{
+    return _client.callRemoteFunction("SdbService/getProcesses", "observable", _client.marshalArguments(Array.from(arguments), [{
       name: "device",
       type: {
         kind: "named",
@@ -245,9 +221,7 @@ module.exports = _client => {
       type: {
         kind: "number"
       }
-    }])).switchMap(args => {
-      return _client.callRemoteFunction("SdbService/getProcesses", "observable", args);
-    }).concatMap(value => {
+    }])).map(value => {
       return _client.unmarshal(value, {
         kind: "array",
         type: {
@@ -261,11 +235,6 @@ module.exports = _client => {
   return remoteModule;
 };
 
-Object.defineProperty(module.exports, "inject", {
-  value: function () {
-    Observable = arguments[0];
-  }
-});
 Object.defineProperty(module.exports, "defs", {
   value: {
     Object: {
@@ -372,7 +341,7 @@ Object.defineProperty(module.exports, "defs", {
       location: {
         type: "source",
         fileName: "types.js",
-        line: 44
+        line: 47
       },
       name: "DebugBridgeFullConfig",
       definition: {
@@ -469,7 +438,7 @@ Object.defineProperty(module.exports, "defs", {
       location: {
         type: "source",
         fileName: "types.js",
-        line: 23
+        line: 26
       },
       name: "DeviceId",
       definition: {
@@ -530,7 +499,7 @@ Object.defineProperty(module.exports, "defs", {
       location: {
         type: "source",
         fileName: "types.js",
-        line: 25
+        line: 28
       },
       name: "DeviceDescription",
       definition: {
@@ -1022,7 +991,7 @@ Object.defineProperty(module.exports, "defs", {
       location: {
         type: "source",
         fileName: "types.js",
-        line: 33
+        line: 36
       },
       name: "Process",
       definition: {

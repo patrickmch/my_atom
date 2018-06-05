@@ -1,51 +1,36 @@
-'use strict';Object.defineProperty(exports, "__esModule", { value: true });var _collection;
+'use strict';
 
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
 
+var _collection;
 
+function _load_collection() {
+  return _collection = require('../../../../modules/nuclide-commons/collection');
+}
 
+var _atom = require('atom');
 
+var _SwiftPMTaskRunnerDispatcher;
 
-
-
-
-
-
-
-
-function _load_collection() {return _collection = require('../../../../modules/nuclide-commons/collection');}
-var _atom = require('atom');var _SwiftPMTaskRunnerDispatcher;
-function _load_SwiftPMTaskRunnerDispatcher() {return _SwiftPMTaskRunnerDispatcher = require('./SwiftPMTaskRunnerDispatcher');}
+function _load_SwiftPMTaskRunnerDispatcher() {
+  return _SwiftPMTaskRunnerDispatcher = require('./SwiftPMTaskRunnerDispatcher');
+}
 
 class SwiftPMTaskRunnerStore {
 
-
-
-
-
-
-
-
-
-
-
-  constructor(
-  dispatcher,
-  initialState)
-  {
+  constructor(dispatcher, initialState) {
     this._dispatcher = dispatcher;
     this._emitter = new _atom.Emitter();
 
     if (initialState) {
-      this._configuration = initialState.configuration ?
-      initialState.configuration :
-      'debug';
+      this._configuration = initialState.configuration ? initialState.configuration : 'debug';
       this._buildPath = initialState.buildPath ? initialState.buildPath : '';
       this._Xcc = initialState.Xcc ? initialState.Xcc : '';
       this._Xlinker = initialState.Xlinker ? initialState.Xlinker : '';
       this._Xswiftc = initialState.Xswiftc ? initialState.Xswiftc : '';
-      this._compileCommands = initialState.compileCommands ?
-      new Map((0, (_collection || _load_collection()).objectEntries)(initialState.compileCommands)) :
-      new Map();
+      this._compileCommands = initialState.compileCommands ? new Map((0, (_collection || _load_collection()).objectEntries)(initialState.compileCommands)) : new Map();
     } else {
       this._configuration = 'debug';
       this._buildPath = '';
@@ -69,8 +54,8 @@ class SwiftPMTaskRunnerStore {
           break;
         case (_SwiftPMTaskRunnerDispatcher || _load_SwiftPMTaskRunnerDispatcher()).ActionTypes.UPDATE_COMPILE_COMMANDS:
           this._compileCommands = action.compileCommands;
-          break;}
-
+          break;
+      }
       this.emitChange();
     });
   }
@@ -86,8 +71,8 @@ class SwiftPMTaskRunnerStore {
       Xcc: this.getXcc(),
       Xlinker: this.getXlinker(),
       Xswiftc: this.getXswiftc(),
-      compileCommands: (0, (_collection || _load_collection()).objectFromMap)(this.getCompileCommands()) };
-
+      compileCommands: (0, (_collection || _load_collection()).objectFromMap)(this.getCompileCommands())
+    };
   }
 
   subscribe(callback) {
@@ -128,13 +113,15 @@ class SwiftPMTaskRunnerStore {
 
   getCompileCommands() {
     return this._compileCommands;
-  }}exports.default = SwiftPMTaskRunnerStore; /**
-                                               * Copyright (c) 2015-present, Facebook, Inc.
-                                               * All rights reserved.
-                                               *
-                                               * This source code is licensed under the license found in the LICENSE file in
-                                               * the root directory of this source tree.
-                                               *
-                                               *  strict-local
-                                               * @format
-                                               */
+  }
+}
+exports.default = SwiftPMTaskRunnerStore; /**
+                                           * Copyright (c) 2015-present, Facebook, Inc.
+                                           * All rights reserved.
+                                           *
+                                           * This source code is licensed under the license found in the LICENSE file in
+                                           * the root directory of this source tree.
+                                           *
+                                           *  strict-local
+                                           * @format
+                                           */

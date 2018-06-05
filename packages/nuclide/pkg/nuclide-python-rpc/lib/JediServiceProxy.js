@@ -1,12 +1,10 @@
 "use strict";
 
-let Observable;
-
 module.exports = _client => {
   const remoteModule = {};
 
   remoteModule.get_completions = function (arg0, arg1, arg2, arg3, arg4) {
-    return _client.marshalArguments(Array.from(arguments), [{
+    return _client.callRemoteFunction("get_completions", "promise", _client.marshalArguments(Array.from(arguments), [{
       name: "src",
       type: {
         kind: "named",
@@ -35,9 +33,7 @@ module.exports = _client => {
       type: {
         kind: "number"
       }
-    }]).then(args => {
-      return _client.callRemoteFunction("get_completions", "promise", args);
-    }).then(value => {
+    }])).then(value => {
       return _client.unmarshal(value, {
         kind: "nullable",
         type: {
@@ -52,7 +48,7 @@ module.exports = _client => {
   };
 
   remoteModule.get_definitions = function (arg0, arg1, arg2, arg3, arg4) {
-    return _client.marshalArguments(Array.from(arguments), [{
+    return _client.callRemoteFunction("get_definitions", "promise", _client.marshalArguments(Array.from(arguments), [{
       name: "src",
       type: {
         kind: "named",
@@ -81,9 +77,7 @@ module.exports = _client => {
       type: {
         kind: "number"
       }
-    }]).then(args => {
-      return _client.callRemoteFunction("get_definitions", "promise", args);
-    }).then(value => {
+    }])).then(value => {
       return _client.unmarshal(value, {
         kind: "nullable",
         type: {
@@ -98,7 +92,7 @@ module.exports = _client => {
   };
 
   remoteModule.get_references = function (arg0, arg1, arg2, arg3, arg4) {
-    return _client.marshalArguments(Array.from(arguments), [{
+    return _client.callRemoteFunction("get_references", "promise", _client.marshalArguments(Array.from(arguments), [{
       name: "src",
       type: {
         kind: "named",
@@ -127,9 +121,7 @@ module.exports = _client => {
       type: {
         kind: "number"
       }
-    }]).then(args => {
-      return _client.callRemoteFunction("get_references", "promise", args);
-    }).then(value => {
+    }])).then(value => {
       return _client.unmarshal(value, {
         kind: "nullable",
         type: {
@@ -144,7 +136,7 @@ module.exports = _client => {
   };
 
   remoteModule.get_hover = function (arg0, arg1, arg2, arg3, arg4, arg5) {
-    return _client.marshalArguments(Array.from(arguments), [{
+    return _client.callRemoteFunction("get_hover", "promise", _client.marshalArguments(Array.from(arguments), [{
       name: "src",
       type: {
         kind: "named",
@@ -178,9 +170,7 @@ module.exports = _client => {
       type: {
         kind: "number"
       }
-    }]).then(args => {
-      return _client.callRemoteFunction("get_hover", "promise", args);
-    }).then(value => {
+    }])).then(value => {
       return _client.unmarshal(value, {
         kind: "nullable",
         type: {
@@ -191,7 +181,7 @@ module.exports = _client => {
   };
 
   remoteModule.get_outline = function (arg0, arg1) {
-    return _client.marshalArguments(Array.from(arguments), [{
+    return _client.callRemoteFunction("get_outline", "promise", _client.marshalArguments(Array.from(arguments), [{
       name: "src",
       type: {
         kind: "named",
@@ -202,9 +192,7 @@ module.exports = _client => {
       type: {
         kind: "string"
       }
-    }]).then(args => {
-      return _client.callRemoteFunction("get_outline", "promise", args);
-    }).then(value => {
+    }])).then(value => {
       return _client.unmarshal(value, {
         kind: "nullable",
         type: {
@@ -219,7 +207,7 @@ module.exports = _client => {
   };
 
   remoteModule.get_signature_help = function (arg0, arg1, arg2, arg3, arg4) {
-    return _client.marshalArguments(Array.from(arguments), [{
+    return _client.callRemoteFunction("get_signature_help", "promise", _client.marshalArguments(Array.from(arguments), [{
       name: "src",
       type: {
         kind: "named",
@@ -248,9 +236,7 @@ module.exports = _client => {
       type: {
         kind: "number"
       }
-    }]).then(args => {
-      return _client.callRemoteFunction("get_signature_help", "promise", args);
-    }).then(value => {
+    }])).then(value => {
       return _client.unmarshal(value, {
         kind: "nullable",
         type: {
@@ -264,11 +250,6 @@ module.exports = _client => {
   return remoteModule;
 };
 
-Object.defineProperty(module.exports, "inject", {
-  value: function () {
-    Observable = arguments[0];
-  }
-});
 Object.defineProperty(module.exports, "defs", {
   value: {
     Object: {

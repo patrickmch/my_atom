@@ -1,49 +1,49 @@
-'use strict';Object.defineProperty(exports, "__esModule", { value: true });exports.
+'use strict';
 
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.astToOutline = astToOutline;
 
+var _simpleTextBuffer;
 
+function _load_simpleTextBuffer() {
+  return _simpleTextBuffer = require('simple-text-buffer');
+}
 
+var _collection;
 
+function _load_collection() {
+  return _collection = require('../../../modules/nuclide-commons/collection');
+}
 
+var _tokenizedText;
 
+function _load_tokenizedText() {
+  return _tokenizedText = require('../../../modules/nuclide-commons/tokenized-text');
+}
 
+/**
+ * Copyright (c) 2015-present, Facebook, Inc.
+ * All rights reserved.
+ *
+ * This source code is licensed under the license found in the LICENSE file in
+ * the root directory of this source tree.
+ *
+ * 
+ * @format
+ */
 
+function astToOutline(ast) {
+  return {
+    outlineTrees: itemsToTrees(ast.body)
+  };
+}
 
+function itemsToTrees(items) {
+  return (0, (_collection || _load_collection()).arrayCompact)(items.map(itemToTree));
+}
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-astToOutline = astToOutline;var _simpleTextBuffer;function _load_simpleTextBuffer() {return _simpleTextBuffer = require('simple-text-buffer');}var _collection;function _load_collection() {return _collection = require('../../../modules/nuclide-commons/collection');}var _tokenizedText;function _load_tokenizedText() {return _tokenizedText = require('../../../modules/nuclide-commons/tokenized-text');} /**
-                                                                                                                                                                                                                                                                                                                                                                                                                  * Copyright (c) 2015-present, Facebook, Inc.
-                                                                                                                                                                                                                                                                                                                                                                                                                  * All rights reserved.
-                                                                                                                                                                                                                                                                                                                                                                                                                  *
-                                                                                                                                                                                                                                                                                                                                                                                                                  * This source code is licensed under the license found in the LICENSE file in
-                                                                                                                                                                                                                                                                                                                                                                                                                  * the root directory of this source tree.
-                                                                                                                                                                                                                                                                                                                                                                                                                  *
-                                                                                                                                                                                                                                                                                                                                                                                                                  * 
-                                                                                                                                                                                                                                                                                                                                                                                                                  * @format
-                                                                                                                                                                                                                                                                                                                                                                                                                  */function astToOutline(ast) {return { outlineTrees: itemsToTrees(ast.body) };}function itemsToTrees(items) {return (0, (_collection || _load_collection()).arrayCompact)(items.map(itemToTree));}
 function itemToTree(item) {
   if (item == null) {
     return null;
@@ -52,11 +52,7 @@ function itemToTree(item) {
   switch (item.type) {
     case 'FunctionDeclaration':
     case 'ArrowFunctionExpression':
-      return functionOutline(
-      item.id != null ? item.id.name : '',
-      item.params,
-      extent);
-
+      return functionOutline(item.id != null ? item.id.name : '', item.params, extent);
     case 'ClassDeclaration':
     case 'ClassExpression':
       const tokenizedText = [(0, (_tokenizedText || _load_tokenizedText()).keyword)('class')];
@@ -69,38 +65,26 @@ function itemToTree(item) {
         kind: 'class',
         tokenizedText,
         representativeName,
-        children: itemsToTrees(item.body.body) },
-      extent);
-
+        children: itemsToTrees(item.body.body)
+      }, extent);
     case 'ClassProperty':
       let paramTokens = [];
       if (item.value && item.value.type === 'ArrowFunctionExpression') {
-        paramTokens = [
-        (0, (_tokenizedText || _load_tokenizedText()).plain)('('),
-        ...declarationsTokenizedText(item.value.params),
-        (0, (_tokenizedText || _load_tokenizedText()).plain)(')')];
-
+        paramTokens = [(0, (_tokenizedText || _load_tokenizedText()).plain)('('), ...declarationsTokenizedText(item.value.params), (0, (_tokenizedText || _load_tokenizedText()).plain)(')')];
       }
       return Object.assign({
         kind: 'property',
         tokenizedText: [(0, (_tokenizedText || _load_tokenizedText()).method)(item.key.name), (0, (_tokenizedText || _load_tokenizedText()).plain)('='), ...paramTokens],
         representativeName: item.key.name,
-        children: [] },
-      extent);
-
+        children: []
+      }, extent);
     case 'MethodDefinition':
       return Object.assign({
         kind: 'method',
-        tokenizedText: [
-        (0, (_tokenizedText || _load_tokenizedText()).method)(item.key.name),
-        (0, (_tokenizedText || _load_tokenizedText()).plain)('('),
-        ...declarationsTokenizedText(item.value.params),
-        (0, (_tokenizedText || _load_tokenizedText()).plain)(')')],
-
+        tokenizedText: [(0, (_tokenizedText || _load_tokenizedText()).method)(item.key.name), (0, (_tokenizedText || _load_tokenizedText()).plain)('('), ...declarationsTokenizedText(item.value.params), (0, (_tokenizedText || _load_tokenizedText()).plain)(')')],
         representativeName: item.key.name,
-        children: [] },
-      extent);
-
+        children: []
+      }, extent);
     case 'ExportDeclaration':
     case 'ExportNamedDeclaration':
     case 'DeclareExportDeclaration':
@@ -124,15 +108,11 @@ function itemToTree(item) {
     case 'InterfaceDeclaration':
       return declareInterfaceOutline(item, extent);
     default:
-      return null;}
-
+      return null;
+  }
 }
 
-function exportDeclaration(
-item,
-extent,
-isDefault)
-{
+function exportDeclaration(item, extent, isDefault) {
   const tree = itemToTree(item.declaration);
   if (tree == null) {
     return null;
@@ -142,32 +122,28 @@ isDefault)
     tokenizedText.push((0, (_tokenizedText || _load_tokenizedText()).keyword)('default'), (0, (_tokenizedText || _load_tokenizedText()).whitespace)(' '));
   }
   // Flow always has tokenizedText
-  if (!(tree.tokenizedText != null)) {throw new Error('Invariant violation: "tree.tokenizedText != null"');}
+
+  if (!(tree.tokenizedText != null)) {
+    throw new Error('Invariant violation: "tree.tokenizedText != null"');
+  }
+
   tokenizedText.push(...tree.tokenizedText);
   return Object.assign({
     kind: tree.kind,
     tokenizedText,
     representativeName: tree.representativeName,
-    children: tree.children },
-  extent);
-
+    children: tree.children
+  }, extent);
 }
 
-function declarationReducer(
-textElements,
-p,
-index,
-declarations)
-{
+function declarationReducer(textElements, p, index, declarations) {
   switch (p.type) {
     case 'Identifier':
       textElements.push((0, (_tokenizedText || _load_tokenizedText()).param)(p.name));
       break;
     case 'ObjectPattern':
       textElements.push((0, (_tokenizedText || _load_tokenizedText()).plain)('{'));
-      textElements.push(
-      ...declarationsTokenizedText(p.properties.map(obj => obj.key)));
-
+      textElements.push(...declarationsTokenizedText(p.properties.map(obj => obj.key)));
       textElements.push((0, (_tokenizedText || _load_tokenizedText()).plain)('}'));
       break;
     case 'ArrayPattern':
@@ -187,8 +163,8 @@ declarations)
       }
       break;
     default:
-      throw new Error(`encountered unexpected argument type ${p.type}`);}
-
+      throw new Error(`encountered unexpected argument type ${p.type}`);
+  }
   if (index < declarations.length - 1) {
     textElements.push((0, (_tokenizedText || _load_tokenizedText()).plain)(','));
     textElements.push((0, (_tokenizedText || _load_tokenizedText()).whitespace)(' '));
@@ -205,44 +181,32 @@ function getExtent(item) {
     startPosition: new (_simpleTextBuffer || _load_simpleTextBuffer()).Point(
     // It definitely makes sense that the lines we get are 1-based and the columns are
     // 0-based... convert to 0-based all around.
-    item.loc.start.line - 1,
-    item.loc.start.column),
-
-    endPosition: new (_simpleTextBuffer || _load_simpleTextBuffer()).Point(item.loc.end.line - 1, item.loc.end.column) };
-
+    item.loc.start.line - 1, item.loc.start.column),
+    endPosition: new (_simpleTextBuffer || _load_simpleTextBuffer()).Point(item.loc.end.line - 1, item.loc.end.column)
+  };
 }
 
-function functionOutline(
-name,
-params,
-extent)
-{
+function functionOutline(name, params, extent) {
   return Object.assign({
     kind: 'function',
-    tokenizedText: [
-    (0, (_tokenizedText || _load_tokenizedText()).keyword)('function'),
-    (0, (_tokenizedText || _load_tokenizedText()).whitespace)(' '),
-    (0, (_tokenizedText || _load_tokenizedText()).method)(name),
-    (0, (_tokenizedText || _load_tokenizedText()).plain)('('),
-    ...declarationsTokenizedText(params),
-    (0, (_tokenizedText || _load_tokenizedText()).plain)(')')],
-
+    tokenizedText: [(0, (_tokenizedText || _load_tokenizedText()).keyword)('function'), (0, (_tokenizedText || _load_tokenizedText()).whitespace)(' '), (0, (_tokenizedText || _load_tokenizedText()).method)(name), (0, (_tokenizedText || _load_tokenizedText()).plain)('('), ...declarationsTokenizedText(params), (0, (_tokenizedText || _load_tokenizedText()).plain)(')')],
     representativeName: name,
-    children: [] },
-  extent);
-
+    children: []
+  }, extent);
 }
 
-function typeAliasOutline(typeAliasExpression) {if (!(
-  typeAliasExpression.type === 'TypeAlias')) {throw new Error('Invariant violation: "typeAliasExpression.type === \'TypeAlias\'"');}
+function typeAliasOutline(typeAliasExpression) {
+  if (!(typeAliasExpression.type === 'TypeAlias')) {
+    throw new Error('Invariant violation: "typeAliasExpression.type === \'TypeAlias\'"');
+  }
+
   const name = typeAliasExpression.id.name;
   return Object.assign({
     kind: 'interface',
     tokenizedText: [(0, (_tokenizedText || _load_tokenizedText()).keyword)('type'), (0, (_tokenizedText || _load_tokenizedText()).whitespace)(' '), (0, (_tokenizedText || _load_tokenizedText()).type)(name)],
     representativeName: name,
-    children: [] },
-  getExtent(typeAliasExpression));
-
+    children: []
+  }, getExtent(typeAliasExpression));
 }
 
 function topLevelExpressionOutline(expressionStatement) {
@@ -252,12 +216,14 @@ function topLevelExpressionOutline(expressionStatement) {
     case 'AssignmentExpression':
       return moduleExportsOutline(expressionStatement.expression);
     default:
-      return null;}
-
+      return null;
+  }
 }
 
-function moduleExportsOutline(assignmentStatement) {if (!(
-  assignmentStatement.type === 'AssignmentExpression')) {throw new Error('Invariant violation: "assignmentStatement.type === \'AssignmentExpression\'"');}
+function moduleExportsOutline(assignmentStatement) {
+  if (!(assignmentStatement.type === 'AssignmentExpression')) {
+    throw new Error('Invariant violation: "assignmentStatement.type === \'AssignmentExpression\'"');
+  }
 
   const left = assignmentStatement.left;
   if (!isModuleExports(left)) {
@@ -274,26 +240,22 @@ function moduleExportsOutline(assignmentStatement) {if (!(
       return Object.assign({
         kind: 'module',
         tokenizedText: [(0, (_tokenizedText || _load_tokenizedText()).plain)('module.exports')],
-        children: (0, (_collection || _load_collection()).arrayCompact)(properties.map(moduleExportsPropertyOutline)) },
-      getExtent(assignmentStatement));
-
+        children: (0, (_collection || _load_collection()).arrayCompact)(properties.map(moduleExportsPropertyOutline))
+      }, getExtent(assignmentStatement));
     default:
-      return null;}
-
+      return null;
+  }
 }
 
 function isModuleExports(left) {
-  return (
-    left.type === 'MemberExpression' &&
-    left.object.type === 'Identifier' &&
-    left.object.name === 'module' &&
-    left.property.type === 'Identifier' &&
-    left.property.name === 'exports');
-
+  return left.type === 'MemberExpression' && left.object.type === 'Identifier' && left.object.name === 'module' && left.property.type === 'Identifier' && left.property.name === 'exports';
 }
 
-function moduleExportsPropertyOutline(property) {if (!(
-  property.type === 'Property')) {throw new Error('Invariant violation: "property.type === \'Property\'"');}
+function moduleExportsPropertyOutline(property) {
+  if (!(property.type === 'Property')) {
+    throw new Error('Invariant violation: "property.type === \'Property\'"');
+  }
+
   if (property.key.type !== 'Identifier') {
     return null;
   }
@@ -305,42 +267,28 @@ function moduleExportsPropertyOutline(property) {if (!(
       kind: 'method',
       tokenizedText: [(0, (_tokenizedText || _load_tokenizedText()).string)(propName)],
       representativeName: propName,
-      children: [] },
-    getExtent(property));
-
+      children: []
+    }, getExtent(property));
   }
 
-  if (
-  property.value.type === 'FunctionExpression' ||
-  property.value.type === 'ArrowFunctionExpression')
-  {
+  if (property.value.type === 'FunctionExpression' || property.value.type === 'ArrowFunctionExpression') {
     return Object.assign({
       kind: 'method',
-      tokenizedText: [
-      (0, (_tokenizedText || _load_tokenizedText()).method)(propName),
-      (0, (_tokenizedText || _load_tokenizedText()).plain)('('),
-      ...declarationsTokenizedText(property.value.params),
-      (0, (_tokenizedText || _load_tokenizedText()).plain)(')')],
-
+      tokenizedText: [(0, (_tokenizedText || _load_tokenizedText()).method)(propName), (0, (_tokenizedText || _load_tokenizedText()).plain)('('), ...declarationsTokenizedText(property.value.params), (0, (_tokenizedText || _load_tokenizedText()).plain)(')')],
       representativeName: propName,
-      children: [] },
-    getExtent(property));
-
+      children: []
+    }, getExtent(property));
   }
 
   return Object.assign({
     kind: 'field',
     tokenizedText: [(0, (_tokenizedText || _load_tokenizedText()).string)(propName), (0, (_tokenizedText || _load_tokenizedText()).plain)(':')],
     representativeName: propName,
-    children: [] },
-  getExtent(property));
-
+    children: []
+  }, getExtent(property));
 }
 
-function specOutline(
-expressionStatement,
-describeOnly = false)
-{
+function specOutline(expressionStatement, describeOnly = false) {
   const expression = expressionStatement.expression;
   if (expression.type !== 'CallExpression') {
     return null;
@@ -363,19 +311,14 @@ describeOnly = false)
   if (isIt(functionName)) {
     children = [];
   } else {
-    children = (0, (_collection || _load_collection()).arrayCompact)(
-    specBody.
-    filter(item => item.type === 'ExpressionStatement').
-    map(item => specOutline(item)));
-
+    children = (0, (_collection || _load_collection()).arrayCompact)(specBody.filter(item => item.type === 'ExpressionStatement').map(item => specOutline(item)));
   }
   return Object.assign({
     kind: 'function',
     tokenizedText: [(0, (_tokenizedText || _load_tokenizedText()).method)(functionName), (0, (_tokenizedText || _load_tokenizedText()).whitespace)(' '), (0, (_tokenizedText || _load_tokenizedText()).string)(description)],
     representativeName: description,
-    children },
-  getExtent(expressionStatement));
-
+    children
+  }, getExtent(expressionStatement));
 }
 
 // Return the function name as written as a string. Intended to stringify patterns like `describe`
@@ -385,16 +328,13 @@ function getFunctionName(callee) {
     case 'Identifier':
       return callee.name;
     case 'MemberExpression':
-      if (
-      callee.object.type !== 'Identifier' ||
-      callee.property.type !== 'Identifier')
-      {
+      if (callee.object.type !== 'Identifier' || callee.property.type !== 'Identifier') {
         return null;
       }
       return `${callee.object.name}.${callee.property.name}`;
     default:
-      return null;}
-
+      return null;
+  }
 }
 
 function isDescribe(functionName) {
@@ -422,8 +362,8 @@ function isDescribe(functionName) {
     case 'xtest.skip':
       return true;
     default:
-      return false;}
-
+      return false;
+  }
 }
 
 function isIt(functionName) {
@@ -437,8 +377,8 @@ function isIt(functionName) {
     case 'it.skip':
       return true;
     default:
-      return false;}
-
+      return false;
+  }
 }
 
 /** If the given AST Node is a string literal, return its literal value. Otherwise return null */
@@ -460,10 +400,7 @@ function getFunctionBody(fn) {
   if (fn == null) {
     return null;
   }
-  if (
-  fn.type !== 'ArrowFunctionExpression' &&
-  fn.type !== 'FunctionExpression')
-  {
+  if (fn.type !== 'ArrowFunctionExpression' && fn.type !== 'FunctionExpression') {
     return null;
   }
   return fn.body.body;
@@ -471,41 +408,24 @@ function getFunctionBody(fn) {
 
 function variableDeclarationOutline(declaration) {
   // If there are multiple var declarations in one line, just take the first.
-  return variableDeclaratorOutline(
-  declaration.declarations[0],
-  declaration.kind,
-  getExtent(declaration));
-
+  return variableDeclaratorOutline(declaration.declarations[0], declaration.kind, getExtent(declaration));
 }
 
-function variableDeclaratorOutline(
-declarator,
-kind,
-extent)
-{
-  if (
-  declarator.init != null && (
-  declarator.init.type === 'FunctionExpression' ||
-  declarator.init.type === 'ArrowFunctionExpression'))
-  {
+function variableDeclaratorOutline(declarator, kind, extent) {
+  if (declarator.init != null && (declarator.init.type === 'FunctionExpression' || declarator.init.type === 'ArrowFunctionExpression')) {
     return functionOutline(declarator.id.name, declarator.init.params, extent);
   }
 
   const { id } = declarator;
 
-  const tokenizedText = [
-  (0, (_tokenizedText || _load_tokenizedText()).keyword)(kind),
-  (0, (_tokenizedText || _load_tokenizedText()).whitespace)(' '),
-  ...declarationsTokenizedText([id])];
-
+  const tokenizedText = [(0, (_tokenizedText || _load_tokenizedText()).keyword)(kind), (0, (_tokenizedText || _load_tokenizedText()).whitespace)(' '), ...declarationsTokenizedText([id])];
   const representativeName = id.type === 'Identifier' ? id.name : undefined;
   return Object.assign({
     kind: kind === 'const' ? 'constant' : 'variable',
     tokenizedText,
     representativeName,
-    children: [] },
-  extent);
-
+    children: []
+  }, extent);
 }
 function declareClassOutline(item, extent) {
   const tokenizedText = [(0, (_tokenizedText || _load_tokenizedText()).keyword)('class')];
@@ -519,9 +439,8 @@ function declareClassOutline(item, extent) {
     kind: 'class',
     tokenizedText,
     representativeName,
-    children: (0, (_collection || _load_collection()).arrayCompact)(properties.map(declareClassPropertyOutline)) },
-  extent);
-
+    children: (0, (_collection || _load_collection()).arrayCompact)(properties.map(declareClassPropertyOutline))
+  }, extent);
 }
 function declareClassPropertyOutline(item) {
   if (item.key == null) {
@@ -538,12 +457,11 @@ function declareClassPropertyOutline(item) {
         kind: 'property',
         tokenizedText: [(0, (_tokenizedText || _load_tokenizedText()).method)(representativeName)],
         representativeName,
-        children: [] },
-      extent);
-
+        children: []
+      }, extent);
     default:
-      return null;}
-
+      return null;
+  }
 }
 
 function declareFunctionOutline(item, extent) {
@@ -561,18 +479,16 @@ function declareModuleOutline(item, extent) {
     kind: 'interface',
     tokenizedText,
     representativeName,
-    children: itemsToTrees(item.body.body) },
-  extent);
-
+    children: itemsToTrees(item.body.body)
+  }, extent);
 }
 function declareVariableOutline(item, extent) {
   return Object.assign({
     kind: 'variable',
     tokenizedText: [(0, (_tokenizedText || _load_tokenizedText()).keyword)('var'), (0, (_tokenizedText || _load_tokenizedText()).whitespace)(' '), (0, (_tokenizedText || _load_tokenizedText()).method)(item.id.name)],
     representativeName: item.id.name,
-    children: [] },
-  extent);
-
+    children: []
+  }, extent);
 }
 
 function declareInterfaceOutline(item, extent) {
@@ -586,7 +502,6 @@ function declareInterfaceOutline(item, extent) {
     kind: 'interface',
     tokenizedText,
     representativeName,
-    children: [] },
-  extent);
-
+    children: []
+  }, extent);
 }

@@ -1,14 +1,10 @@
 "use strict";
 
-let Observable;
-
 module.exports = _client => {
   const remoteModule = {};
 
   remoteModule.observeRemoteDebugCommands = function () {
-    return Observable.fromPromise(_client.marshalArguments(Array.from(arguments), [])).switchMap(args => {
-      return _client.callRemoteFunction("RemoteDebuggerCommandService/observeRemoteDebugCommands", "observable", args);
-    }).concatMap(value => {
+    return _client.callRemoteFunction("RemoteDebuggerCommandService/observeRemoteDebugCommands", "observable", _client.marshalArguments(Array.from(arguments), [])).map(value => {
       return _client.unmarshal(value, {
         kind: "named",
         name: "RemoteDebugCommandRequest"
@@ -17,9 +13,7 @@ module.exports = _client => {
   };
 
   remoteModule.observeAttachDebugTargets = function () {
-    return Observable.fromPromise(_client.marshalArguments(Array.from(arguments), [])).switchMap(args => {
-      return _client.callRemoteFunction("RemoteDebuggerCommandService/observeAttachDebugTargets", "observable", args);
-    }).concatMap(value => {
+    return _client.callRemoteFunction("RemoteDebuggerCommandService/observeAttachDebugTargets", "observable", _client.marshalArguments(Array.from(arguments), [])).map(value => {
       return _client.unmarshal(value, {
         kind: "array",
         type: {
@@ -33,11 +27,6 @@ module.exports = _client => {
   return remoteModule;
 };
 
-Object.defineProperty(module.exports, "inject", {
-  value: function () {
-    Observable = arguments[0];
-  }
-});
 Object.defineProperty(module.exports, "defs", {
   value: {
     Object: {

@@ -1,20 +1,22 @@
-'use strict'; /**
-               * Copyright (c) 2017-present, Facebook, Inc.
-               * All rights reserved.
-               *
-               * This source code is licensed under the BSD-style license found in the
-               * LICENSE file in the root directory of this source tree. An additional grant
-               * of patent rights can be found in the PATENTS file in the same directory.
-               *
-               * 
-               * @format
-               */
+'use strict';
 
 /**
-                   * Port of Atom's timer utils (https://fburl.com/104714454) which is useful for unittest.
-                   * Use fakeSetTimeout, fakeClearTimeout, fakeSetInterval and fakeClearInterval to mock Node.js's
-                   * Timer utils, and using advanceClock to advance the fake timer to trigger timed callback.
-                   */
+ * Copyright (c) 2017-present, Facebook, Inc.
+ * All rights reserved.
+ *
+ * This source code is licensed under the BSD-style license found in the
+ * LICENSE file in the root directory of this source tree. An additional grant
+ * of patent rights can be found in the PATENTS file in the same directory.
+ *
+ * 
+ * @format
+ */
+
+/**
+ * Port of Atom's timer utils (https://fburl.com/104714454) which is useful for unittest.
+ * Use fakeSetTimeout, fakeClearTimeout, fakeSetInterval and fakeClearInterval to mock Node.js's
+ * Timer utils, and using advanceClock to advance the fake timer to trigger timed callback.
+ */
 require('jasmine-node'); // eslint-disable-line nuclide-internal/no-commonjs
 
 let now = 0;
@@ -34,9 +36,7 @@ function resetTimeouts() {
 function fakeSetTimeout(callback, ms) {
   const id = ++timeoutCount;
   timeouts.push([id, now + ms, callback]);
-  timeouts.sort(
-  ([, strikeTime0], [, strikeTime1]) => strikeTime0 - strikeTime1);
-
+  timeouts.sort(([, strikeTime0], [, strikeTime1]) => strikeTime0 - strikeTime1);
   return id;
 }
 
@@ -71,8 +71,8 @@ function advanceClock(deltaMs) {
 }
 
 /**
-   * Allows tests to use the non-fake setTimeout and clearTimeout functions.
-   */
+ * Allows tests to use the non-fake setTimeout and clearTimeout functions.
+ */
 function useRealClock() {
   jasmine.unspy(global, 'setTimeout');
   jasmine.unspy(global, 'clearTimeout');
@@ -80,9 +80,9 @@ function useRealClock() {
 }
 
 /**
-   * Atom does this half-way mock.
-   * https://github.com/atom/atom/blob/v1.12.7/spec/spec-helper.coffee#L169-L174
-   */
+ * Atom does this half-way mock.
+ * https://github.com/atom/atom/blob/v1.12.7/spec/spec-helper.coffee#L169-L174
+ */
 function useMockClock() {
   spyOn(global, 'setInterval').andCallFake(fakeSetInterval);
   spyOn(global, 'clearInterval').andCallFake(fakeClearInterval);
@@ -101,10 +101,10 @@ jasmine.useMockClock = useMockClock;
 Object.defineProperty(global, 'now', { get: () => now });
 
 /**
-                                                           * This hook is a the first initialization code that happens before any jasmine test case is
-                                                           * executed. This allows to use the fake timing by default and is a direct port from Atom's
-                                                           * `spec-helper.coffee`
-                                                           */
+ * This hook is a the first initialization code that happens before any jasmine test case is
+ * executed. This allows to use the fake timing by default and is a direct port from Atom's
+ * `spec-helper.coffee`
+ */
 beforeEach(() => {
   resetTimeouts();
   spyOn(Date, 'now').andCallFake(() => now);

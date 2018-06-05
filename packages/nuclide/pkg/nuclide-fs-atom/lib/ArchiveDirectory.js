@@ -1,32 +1,47 @@
-'use strict';Object.defineProperty(exports, "__esModule", { value: true });exports.ArchiveDirectory = undefined;var _nuclideUri;
+'use strict';
 
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.ArchiveDirectory = undefined;
 
+var _nuclideUri;
 
+function _load_nuclideUri() {
+  return _nuclideUri = _interopRequireDefault(require('../../../modules/nuclide-commons/nuclideUri'));
+}
 
+var _UniversalDisposable;
 
+function _load_UniversalDisposable() {
+  return _UniversalDisposable = _interopRequireDefault(require('../../../modules/nuclide-commons/UniversalDisposable'));
+}
 
+var _common;
 
+function _load_common() {
+  return _common = require('./common');
+}
 
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
+/**
+ * Copyright (c) 2015-present, Facebook, Inc.
+ * All rights reserved.
+ *
+ * This source code is licensed under the license found in the LICENSE file in
+ * the root directory of this source tree.
+ *
+ *  strict-local
+ * @format
+ */
 
+class ArchiveDirectory {
 
-
-
-
-
-
-function _load_nuclideUri() {return _nuclideUri = _interopRequireDefault(require('../../../modules/nuclide-commons/nuclideUri'));}var _UniversalDisposable;
-function _load_UniversalDisposable() {return _UniversalDisposable = _interopRequireDefault(require('../../../modules/nuclide-commons/UniversalDisposable'));}var _common;
-function _load_common() {return _common = require('./common');}function _interopRequireDefault(obj) {return obj && obj.__esModule ? obj : { default: obj };} /**
-                                                                                                                                                              * Copyright (c) 2015-present, Facebook, Inc.
-                                                                                                                                                              * All rights reserved.
-                                                                                                                                                              *
-                                                                                                                                                              * This source code is licensed under the license found in the LICENSE file in
-                                                                                                                                                              * the root directory of this source tree.
-                                                                                                                                                              *
-                                                                                                                                                              *  strict-local
-                                                                                                                                                              * @format
-                                                                                                                                                              */class ArchiveDirectory {constructor(path, fs) {this._fs = fs;this._path = path;}
+  constructor(path, fs) {
+    this._fs = fs;
+    this._path = path;
+  }
 
   create(mode) {
     return (0, (_common || _load_common()).rejectWrite)();
@@ -82,29 +97,13 @@ function _load_common() {return _common = require('./common');}function _interop
     return this._fs.newArchiveDirectory(path);
   }
 
-  getEntries(
-  callback)
-
-
-
-  {
-    this._fs.
-    readdir(this._path).
-    then(entries =>
-    entries.map(x => (0, (_common || _load_common()).fromEntry)(this._fs, this._path, true, x))).
-
-    then(entries => callback(null, entries)).
-    catch(error => callback(error, null));
+  getEntries(callback) {
+    this._fs.readdir(this._path).then(entries => entries.map(x => (0, (_common || _load_common()).fromEntry)(this._fs, this._path, true, x))).then(entries => callback(null, entries)).catch(error => callback(error, null));
   }
 
   contains(path) {
-    const seps = [
-    (_nuclideUri || _load_nuclideUri()).default.ARCHIVE_SEPARATOR,
-    (_nuclideUri || _load_nuclideUri()).default.pathSeparatorFor(path)];
-
-    return (
-      path.startsWith(this._path) &&
-      path.length > this._path.length &&
-      seps.includes(path.charAt(this._path.length)));
-
-  }}exports.ArchiveDirectory = ArchiveDirectory;
+    const seps = [(_nuclideUri || _load_nuclideUri()).default.ARCHIVE_SEPARATOR, (_nuclideUri || _load_nuclideUri()).default.pathSeparatorFor(path)];
+    return path.startsWith(this._path) && path.length > this._path.length && seps.includes(path.charAt(this._path.length));
+  }
+}
+exports.ArchiveDirectory = ArchiveDirectory;

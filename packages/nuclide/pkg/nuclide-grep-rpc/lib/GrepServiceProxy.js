@@ -1,12 +1,10 @@
 "use strict";
 
-let Observable;
-
 module.exports = _client => {
   const remoteModule = {};
 
   remoteModule.grepReplace = function (arg0, arg1, arg2, arg3) {
-    return Observable.fromPromise(_client.marshalArguments(Array.from(arguments), [{
+    return _client.callRemoteFunction("GrepService/grepReplace", "observable", _client.marshalArguments(Array.from(arguments), [{
       name: "filePaths",
       type: {
         kind: "array",
@@ -34,9 +32,7 @@ module.exports = _client => {
           kind: "number"
         }
       }
-    }])).switchMap(args => {
-      return _client.callRemoteFunction("GrepService/grepReplace", "observable", args);
-    }).concatMap(value => {
+    }])).map(value => {
       return _client.unmarshal(value, {
         kind: "named",
         name: "search$ReplaceResult"
@@ -47,11 +43,6 @@ module.exports = _client => {
   return remoteModule;
 };
 
-Object.defineProperty(module.exports, "inject", {
-  value: function () {
-    Observable = arguments[0];
-  }
-});
 Object.defineProperty(module.exports, "defs", {
   value: {
     Object: {

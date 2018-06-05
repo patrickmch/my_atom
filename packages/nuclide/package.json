@@ -2,39 +2,39 @@
   "_args": [
     [
       {
-        "raw": "/private/var/folders/dp/vj05cwss7pz9mjl62ccqzysm0000gp/T/d-118417-87212-1xzmlr1.0hulahsemi/package.tgz",
+        "raw": "/private/var/folders/dp/vj05cwss7pz9mjl62ccqzysm0000gp/T/d-118431-35760-1jb9jqm.l7qyskmx6r/package.tgz",
         "scope": null,
         "escapedName": null,
         "name": null,
-        "rawSpec": "/private/var/folders/dp/vj05cwss7pz9mjl62ccqzysm0000gp/T/d-118417-87212-1xzmlr1.0hulahsemi/package.tgz",
-        "spec": "/private/var/folders/dp/vj05cwss7pz9mjl62ccqzysm0000gp/T/d-118417-87212-1xzmlr1.0hulahsemi/package.tgz",
+        "rawSpec": "/private/var/folders/dp/vj05cwss7pz9mjl62ccqzysm0000gp/T/d-118431-35760-1jb9jqm.l7qyskmx6r/package.tgz",
+        "spec": "/private/var/folders/dp/vj05cwss7pz9mjl62ccqzysm0000gp/T/d-118431-35760-1jb9jqm.l7qyskmx6r/package.tgz",
         "type": "local"
       },
-      "/private/var/folders/dp/vj05cwss7pz9mjl62ccqzysm0000gp/T/apm-install-dir-118417-87212-akoia2.3d4tv5cdi"
+      "/private/var/folders/dp/vj05cwss7pz9mjl62ccqzysm0000gp/T/apm-install-dir-118431-35760-mfh5ep.rn6oagu8fr"
     ]
   ],
-  "_from": "../d-118417-87212-1xzmlr1.0hulahsemi/package.tgz",
-  "_id": "nuclide@0.303.0",
+  "_from": "../d-118431-35760-1jb9jqm.l7qyskmx6r/package.tgz",
+  "_id": "nuclide@0.307.0",
   "_inCache": true,
   "_location": "/nuclide",
   "_phantomChildren": {},
   "_requested": {
-    "raw": "/private/var/folders/dp/vj05cwss7pz9mjl62ccqzysm0000gp/T/d-118417-87212-1xzmlr1.0hulahsemi/package.tgz",
+    "raw": "/private/var/folders/dp/vj05cwss7pz9mjl62ccqzysm0000gp/T/d-118431-35760-1jb9jqm.l7qyskmx6r/package.tgz",
     "scope": null,
     "escapedName": null,
     "name": null,
-    "rawSpec": "/private/var/folders/dp/vj05cwss7pz9mjl62ccqzysm0000gp/T/d-118417-87212-1xzmlr1.0hulahsemi/package.tgz",
-    "spec": "/private/var/folders/dp/vj05cwss7pz9mjl62ccqzysm0000gp/T/d-118417-87212-1xzmlr1.0hulahsemi/package.tgz",
+    "rawSpec": "/private/var/folders/dp/vj05cwss7pz9mjl62ccqzysm0000gp/T/d-118431-35760-1jb9jqm.l7qyskmx6r/package.tgz",
+    "spec": "/private/var/folders/dp/vj05cwss7pz9mjl62ccqzysm0000gp/T/d-118431-35760-1jb9jqm.l7qyskmx6r/package.tgz",
     "type": "local"
   },
   "_requiredBy": [
     "#USER"
   ],
-  "_resolved": "file:../d-118417-87212-1xzmlr1.0hulahsemi/package.tgz",
-  "_shasum": "487a0a8193a220de24e32326452e29eae82a9ef7",
+  "_resolved": "file:../d-118431-35760-1jb9jqm.l7qyskmx6r/package.tgz",
+  "_shasum": "585133df0ef6220f78623734d94874973a60b6ee",
   "_shrinkwrap": null,
-  "_spec": "/private/var/folders/dp/vj05cwss7pz9mjl62ccqzysm0000gp/T/d-118417-87212-1xzmlr1.0hulahsemi/package.tgz",
-  "_where": "/private/var/folders/dp/vj05cwss7pz9mjl62ccqzysm0000gp/T/apm-install-dir-118417-87212-akoia2.3d4tv5cdi",
+  "_spec": "/private/var/folders/dp/vj05cwss7pz9mjl62ccqzysm0000gp/T/d-118431-35760-1jb9jqm.l7qyskmx6r/package.tgz",
+  "_where": "/private/var/folders/dp/vj05cwss7pz9mjl62ccqzysm0000gp/T/apm-install-dir-118431-35760-mfh5ep.rn6oagu8fr",
   "atomTestRunner": "./lib/test-runner-entry.js",
   "bin": {
     "nuclide-start-server": "./pkg/nuclide-server/nuclide-start-server"
@@ -49,7 +49,6 @@
     "anser": "1.4.6",
     "ansi-to-react": "2.0.6",
     "arch": "2.1.0",
-    "async-to-generator": "1.1.0",
     "atom-package-deps": "4.6.0",
     "babylon": "7.0.0-beta.44",
     "big-integer": "1.6.17",
@@ -59,7 +58,7 @@
     "classnames": "2.2.5",
     "connect": "3.5.0",
     "core-js": "2.5.1",
-    "dedent": "0.6.0",
+    "dedent": "0.7.0",
     "deep-is": "0.1.3",
     "diff": "3.0.1",
     "diffparser": "1.1.0",
@@ -79,9 +78,9 @@
     "fuzzaldrin-plus": "0.4.1",
     "glob": "7.1.1",
     "globals": "9.18.0",
-    "graphql": "0.11.7",
-    "graphql-language-service": "1.0.15",
-    "graphql-language-service-utils": "1.0.15",
+    "graphql": "0.13.2",
+    "graphql-language-service": "1.1.2",
+    "graphql-language-service-utils": "1.1.0",
     "heap": "0.2.6",
     "idb": "2.1.1",
     "idb-keyval": "2.3.0",
@@ -91,7 +90,6 @@
     "invariant": "2.2.2",
     "inversify": "4.11.1",
     "jest": "23.0.0-charlie.1",
-    "jest-editor-support": "19.0.2",
     "js-yaml": "3.9.1",
     "json-stringify-safe": "5.0.1",
     "line-by-line": "0.1.5",
@@ -105,22 +103,23 @@
     "mkdirp": "0.5.1",
     "mv": "2.1.1",
     "node-fetch": "1.6.3",
-    "nuclide-prebuilt-libs": "0.4.2",
+    "nuclide-prebuilt-libs": "0.5.1",
     "nullthrows": "1.0.0",
+    "pathwatcher": "7.1.1",
     "plist": "2.0.1",
     "q": "1.4.1",
     "queue-fifo": "0.2.4",
-    "react": "16.2.0",
+    "react": "16.3.2",
     "react-devtools-core": "3.1.0",
-    "react-dom": "16.2.0",
+    "react-dom": "16.3.2",
     "react-redux": "5.0.6",
-    "react-relay": "1.4.1",
+    "react-relay": "1.6.0",
     "react-virtualized": "9.13.0",
     "read": "1.0.7",
     "redux": "3.6.0",
     "redux-logger": "3.0.6",
     "reflect-metadata": "0.1.12",
-    "relay-runtime": "1.4.1",
+    "relay-runtime": "1.6.0",
     "request": "2.79.0",
     "reselect": "3.0.1",
     "resolve-from": "2.0.0",
@@ -142,6 +141,7 @@
     "symbol-observable": "1.0.4",
     "tabbable": "1.1.0",
     "temp": "0.8.3",
+    "thrift": "^0.11.0",
     "through": "2.3.8",
     "tmp": "0.0.29",
     "toml": "2.3.3",
@@ -167,24 +167,6 @@
   "devDependencies": {
     "@babel/generator": "7.0.0-beta.44",
     "atom-grammar-test": "0.6.3",
-    "babel-core": "6.26.0",
-    "babel-eslint": "8.2.3",
-    "babel-plugin-idx": "1.4.0",
-    "babel-plugin-istanbul": "4.1.5",
-    "babel-plugin-lodash": "3.2.11",
-    "babel-plugin-module-resolver": "3.1.1",
-    "babel-plugin-relay": "1.4.1",
-    "babel-plugin-syntax-flow": "6.18.0",
-    "babel-plugin-transform-async-super": "1.0.0",
-    "babel-plugin-transform-async-to-module-method": "6.24.1",
-    "babel-plugin-transform-class-properties": "6.24.1",
-    "babel-plugin-transform-es2015-modules-commonjs": "6.26.0",
-    "babel-plugin-transform-flow-strip-types": "6.22.0",
-    "babel-plugin-transform-inline-imports-commonjs": "1.2.0",
-    "babel-plugin-transform-object-rest-spread": "6.26.0",
-    "babel-plugin-transform-react-display-name": "6.25.0",
-    "babel-plugin-transform-react-jsx": "6.24.1",
-    "babel-plugin-transform-strict-mode": "6.24.1",
     "eslint": "4.9.0",
     "eslint-plugin-dependencies": "2.4.0",
     "eslint-plugin-flowtype": "2.39.1",
@@ -193,7 +175,7 @@
     "eslint-plugin-prefer-object-spread": "1.2.1",
     "eslint-plugin-prettier": "2.3.1",
     "eslint-plugin-react": "7.4.0",
-    "flow-bin": "0.72.0",
+    "flow-bin": "0.73.0",
     "jasmine-node": "1.14.5",
     "jest-cli": "23.0.0-charlie.1",
     "jest-mock": "23.0.0-charlie.1",
@@ -203,13 +185,13 @@
     "node-ipc": "9.1.1",
     "nyc": "11.2.1",
     "prettier": "1.12.1",
-    "relay-compiler": "1.4.1",
+    "relay-compiler": "1.6.0",
     "sabor": "0.9.0",
     "touch": "1.0.0",
     "webfonts-generator": "0.3.5"
   },
   "engines": {
-    "atom": ">=1.26.1",
+    "atom": ">=1.27.0",
     "node": ">=7.9.0"
   },
   "homepage": "https://nuclide.io/",
@@ -236,7 +218,7 @@
   "name": "nuclide",
   "optionalDependencies": {},
   "package-deps": [
-    "file-icons",
+    "file-icons:2.1.21",
     "tool-bar",
     "highlight-selected",
     "language-babel",
@@ -263,7 +245,7 @@
   "scripts": {
     "fix-all": "eslint --fix .",
     "flow": "flow check --show-all-errors --max-warnings 0",
-    "jest": "jest",
+    "jest": "jest/build_atom_jest_runner.sh 1>/dev/null && jest",
     "lint": "eslint",
     "lint-all": "eslint .",
     "release-transpile": "./modules/nuclide-node-transpiler/bin/release-transpile.js",
@@ -273,23 +255,23 @@
     "method": "handleURI",
     "deferActivation": false
   },
-  "version": "0.303.0",
+  "version": "0.307.0",
   "warnings": [
     {
       "code": "ENOTSUP",
       "required": {
-        "atom": ">=1.26.1",
+        "atom": ">=1.27.0",
         "node": ">=7.9.0"
       },
-      "pkgid": "nuclide@0.303.0"
+      "pkgid": "nuclide@0.307.0"
     },
     {
       "code": "ENOTSUP",
       "required": {
-        "atom": ">=1.26.1",
+        "atom": ">=1.27.0",
         "node": ">=7.9.0"
       },
-      "pkgid": "nuclide@0.303.0"
+      "pkgid": "nuclide@0.307.0"
     }
   ],
   "workspaces": [

@@ -1,35 +1,45 @@
-'use strict';Object.defineProperty(exports, "__esModule", { value: true });exports.WebSocketTransport = undefined;
+'use strict';
 
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.WebSocketTransport = undefined;
 
+var _rxjsBundlesRxMinJs = require('rxjs/bundles/Rx.min.js');
 
+var _log4js;
 
+function _load_log4js() {
+  return _log4js = require('log4js');
+}
 
+var _eventKit;
 
+function _load_eventKit() {
+  return _eventKit = require('event-kit');
+}
 
+var _compression;
 
+function _load_compression() {
+  return _compression = require('./compression');
+}
 
+/**
+ * Copyright (c) 2017-present, Facebook, Inc.
+ * All rights reserved.
+ *
+ * This source code is licensed under the BSD-style license found in the
+ * LICENSE file in the root directory of this source tree. An additional grant
+ * of patent rights can be found in the PATENTS file in the same directory.
+ *
+ *  strict
+ * @format
+ */
 
-
-
-
-
-var _rxjsBundlesRxMinJs = require('rxjs/bundles/Rx.min.js');var _log4js;
-
-function _load_log4js() {return _log4js = require('log4js');}var _eventKit;
-function _load_eventKit() {return _eventKit = require('event-kit');}var _compression;
-function _load_compression() {return _compression = require('./compression');} /**
-                                                                                * Copyright (c) 2017-present, Facebook, Inc.
-                                                                                * All rights reserved.
-                                                                                *
-                                                                                * This source code is licensed under the BSD-style license found in the
-                                                                                * LICENSE file in the root directory of this source tree. An additional grant
-                                                                                * of patent rights can be found in the PATENTS file in the same directory.
-                                                                                *
-                                                                                *  strict
-                                                                                * @format
-                                                                                */const logger = (0, (_log4js || _load_log4js()).getLogger)('nuclide-server'); // Do not synchronously compress large payloads (risks blocking the event loop)
+const logger = (0, (_log4js || _load_log4js()).getLogger)('nuclide-server');
+// Do not synchronously compress large payloads (risks blocking the event loop)
 const MAX_SYNC_COMPRESS_LENGTH = 100000;
-
 
 // An unreliable transport for sending JSON formatted messages
 // over a WebSocket
@@ -40,18 +50,12 @@ const MAX_SYNC_COMPRESS_LENGTH = 100000;
 // onClose handlers will be called before close() returns.
 class WebSocketTransport {
 
-
-
-
-
-
   constructor(clientId, socket, options) {
     this.id = clientId;
     this._emitter = new (_eventKit || _load_eventKit()).Emitter();
     this._socket = socket;
     this._messages = new _rxjsBundlesRxMinJs.Subject();
-    this._syncCompression =
-    options == null || options.syncCompression !== false;
+    this._syncCompression = options == null || options.syncCompression !== false;
 
     logger.info('Client #%s connecting with a new socket!', this.id);
     socket.on('message', data => {
@@ -64,18 +68,15 @@ class WebSocketTransport {
     });
 
     socket.on('close', () => {
-      if (this._socket != null) {if (!(
-        this._socket === socket)) {throw new Error('Invariant violation: "this._socket === socket"');}
-        logger.info(
-        'Client #%s socket close received on open socket!',
-        this.id);
+      if (this._socket != null) {
+        if (!(this._socket === socket)) {
+          throw new Error('Invariant violation: "this._socket === socket"');
+        }
 
+        logger.info('Client #%s socket close received on open socket!', this.id);
         this._setClosed();
       } else {
-        logger.info(
-        'Client #%s received socket close on already closed socket!',
-        this.id);
-
+        logger.info('Client #%s received socket close on already closed socket!', this.id);
       }
     });
 
@@ -121,10 +122,7 @@ class WebSocketTransport {
   send(message) {
     const socket = this._socket;
     if (socket == null) {
-      logger.error(
-      'Attempt to send socket message after connection closed',
-      new Error());
-
+      logger.error('Attempt to send socket message after connection closed', new Error());
       return Promise.resolve(false);
     }
 
@@ -149,7 +147,11 @@ class WebSocketTransport {
   // The WS socket automatically responds to pings with pongs.
   ping(data) {
     if (this._socket != null) {
-      this._socket.ping(data);
+      try {
+        this._socket.ping(data);
+      } catch (e) {
+        logger.error('Attempted to ping on the socket and got an error:', e);
+      }
     } else {
       logger.error('Attempted to send socket ping after connection closed');
     }
@@ -178,4 +180,6 @@ class WebSocketTransport {
       this._socket = null;
       this._emitter.emit('close');
     }
-  }}exports.WebSocketTransport = WebSocketTransport;
+  }
+}
+exports.WebSocketTransport = WebSocketTransport;

@@ -1,33 +1,20 @@
-'use strict';Object.defineProperty(exports, "__esModule", { value: true });
+'use strict';
 
-
-
-
-
-
-
-
-
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
 
 var _rxjsBundlesRxMinJs = require('rxjs/bundles/Rx.min.js');
 
 /**
-                                                              * This class creates and caches observables by key.
-                                                              *
-                                                              * The factory is only called once the wrapper observable gets subscribed to,
-                                                              * and multiple subscribers to the same key share the same observable.
-                                                              *
-                                                              * Once all subscribers to a key have unsubscribed, the cached observable is cleared.
-                                                              */
+ * This class creates and caches observables by key.
+ *
+ * The factory is only called once the wrapper observable gets subscribed to,
+ * and multiple subscribers to the same key share the same observable.
+ *
+ * Once all subscribers to a key have unsubscribed, the cached observable is cleared.
+ */
 class SharedObservableCache {
-
-
-
-
-
-
-
-
 
   constructor(factory) {
     this._factory = factory;
@@ -40,8 +27,8 @@ class SharedObservableCache {
       if (cached == null) {
         cached = {
           refCount: 1,
-          observable: this._factory(key) };
-
+          observable: this._factory(key)
+        };
       } else {
         cached.refCount++;
       }
@@ -56,13 +43,15 @@ class SharedObservableCache {
         subscription.unsubscribe();
       };
     });
-  }}exports.default = SharedObservableCache; /**
-                                              * Copyright (c) 2015-present, Facebook, Inc.
-                                              * All rights reserved.
-                                              *
-                                              * This source code is licensed under the license found in the LICENSE file in
-                                              * the root directory of this source tree.
-                                              *
-                                              *  strict
-                                              * @format
-                                              */
+  }
+}
+exports.default = SharedObservableCache; /**
+                                          * Copyright (c) 2015-present, Facebook, Inc.
+                                          * All rights reserved.
+                                          *
+                                          * This source code is licensed under the license found in the LICENSE file in
+                                          * the root directory of this source tree.
+                                          *
+                                          *  strict
+                                          * @format
+                                          */

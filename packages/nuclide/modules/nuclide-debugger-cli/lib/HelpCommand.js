@@ -1,39 +1,27 @@
-'use strict';Object.defineProperty(exports, "__esModule", { value: true });var _asyncToGenerator = _interopRequireDefault(require('async-to-generator'));function _interopRequireDefault(obj) {return obj && obj.__esModule ? obj : { default: obj };}
+'use strict';
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
 class HelpCommand {
 
+  constructor(con, dispatcher) {
+    this.name = 'help';
+    this.helpText = 'Give help about the debugger command set.';
 
-
-
-
-  constructor(con, dispatcher) {this.name = 'help';this.helpText = 'Give help about the debugger command set.';
     this._console = con;
     this._dispatcher = dispatcher;
   }
 
-  execute(args) {var _this = this;return (0, _asyncToGenerator.default)(function* () {
-      const [command] = args;
+  async execute(args) {
+    const [command] = args;
 
-      if (command != null) {
-        _this._displayDetailedHelp(command);
-        return;
-      }
+    if (command != null) {
+      this._displayDetailedHelp(command);
+      return;
+    }
 
-      _this._displayHelp();})();
+    this._displayHelp();
   }
 
   _displayHelp() {
@@ -67,14 +55,16 @@ class HelpCommand {
     }
 
     this._console.outputLine(command.helpText);
-  }}exports.default = HelpCommand; /**
-                                    * Copyright (c) 2017-present, Facebook, Inc.
-                                    * All rights reserved.
-                                    *
-                                    * This source code is licensed under the BSD-style license found in the
-                                    * LICENSE file in the root directory of this source tree. An additional grant
-                                    * of patent rights can be found in the PATENTS file in the same directory.
-                                    *
-                                    *  strict
-                                    * @format
-                                    */
+  }
+}
+exports.default = HelpCommand; /**
+                                * Copyright (c) 2017-present, Facebook, Inc.
+                                * All rights reserved.
+                                *
+                                * This source code is licensed under the BSD-style license found in the
+                                * LICENSE file in the root directory of this source tree. An additional grant
+                                * of patent rights can be found in the PATENTS file in the same directory.
+                                *
+                                *  strict
+                                * @format
+                                */

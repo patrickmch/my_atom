@@ -1,38 +1,19 @@
-'use strict';Object.defineProperty(exports, "__esModule", { value: true });exports.
+'use strict';
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-parsePorts = parsePorts;function parsePorts(portsDescriptor) {
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.parsePorts = parsePorts;
+function parsePorts(portsDescriptor) {
   const ranges = [];
-  const descriptors = portsDescriptor.
-  split(',').
-  map(x => x.trim()).
-  filter(x => x !== '');
+  const descriptors = portsDescriptor.split(',').map(x => x.trim()).filter(x => x !== '');
   for (const descriptor of descriptors) {
     let range = null;
     if (/^\d+$/.test(descriptor)) {
       range = {
         start: parseNonNegativeIntOrThrow(descriptor),
-        length: 1 };
-
+        length: 1
+      };
     } else {
       const match = descriptor.match(/^(\d+)-(\d+)$/);
       if (match != null) {
@@ -41,8 +22,8 @@ parsePorts = parsePorts;function parsePorts(portsDescriptor) {
         const delta = end - start;
         range = {
           start,
-          length: delta + (delta < 0 ? -1 : 1) };
-
+          length: delta + (delta < 0 ? -1 : 1)
+        };
       } else {
         throw Error(`Could not parse ports from: "${descriptor}".`);
       }
@@ -54,8 +35,8 @@ parsePorts = parsePorts;function parsePorts(portsDescriptor) {
 }
 
 /**
-   * Class that is an iterable for port numbers.
-   */
+ * Class that is an iterable for port numbers.
+ */
 // $FlowIssue https://github.com/facebook/flow/issues/2286
 /**
  * Copyright (c) 2017-present, Facebook, Inc.
@@ -67,15 +48,33 @@ parsePorts = parsePorts;function parsePorts(portsDescriptor) {
  *
  *  strict
  * @format
- */ /**
-     * Represents a range of ports by an initial integer paired with the number of
-     * elements in the range. If `length` is negative, then the range counts "down"
-     * from `start` instead of counting "up". `length` should never be zero.
-     */class Ports {constructor(ranges) {this._ranges = ranges;} // $FlowIssue https://github.com/facebook/flow/issues/2286
-  *[Symbol.iterator]() {for (const _ref of this._ranges) {const { start, length } = _ref;const delta = length < 0 ? -1 : 1;let offset = 0;while (offset !== length) {yield start + offset;offset += delta;}
-    }
-  }}
+ */
 
+/**
+ * Represents a range of ports by an initial integer paired with the number of
+ * elements in the range. If `length` is negative, then the range counts "down"
+ * from `start` instead of counting "up". `length` should never be zero.
+ */
+class Ports {
+
+  constructor(ranges) {
+    this._ranges = ranges;
+  }
+
+  // $FlowIssue https://github.com/facebook/flow/issues/2286
+  *[Symbol.iterator]() {
+    for (const _ref of this._ranges) {
+      const { start, length } = _ref;
+
+      const delta = length < 0 ? -1 : 1;
+      let offset = 0;
+      while (offset !== length) {
+        yield start + offset;
+        offset += delta;
+      }
+    }
+  }
+}
 
 function parseNonNegativeIntOrThrow(str) {
   const value = parseInt(str, 10);

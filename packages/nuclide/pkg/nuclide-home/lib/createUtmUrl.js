@@ -1,21 +1,20 @@
-"use strict";Object.defineProperty(exports, "__esModule", { value: true });exports.default =
+"use strict";
 
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.default = createUtmUrl;
+/**
+ * Copyright (c) 2015-present, Facebook, Inc.
+ * All rights reserved.
+ *
+ * This source code is licensed under the license found in the LICENSE file in
+ * the root directory of this source tree.
+ *
+ *  strict
+ * @format
+ */
 
-
-
-
-
-
-
-
-
-createUtmUrl; /**
-               * Copyright (c) 2015-present, Facebook, Inc.
-               * All rights reserved.
-               *
-               * This source code is licensed under the license found in the LICENSE file in
-               * the root directory of this source tree.
-               *
-               *  strict
-               * @format
-               */function createUtmUrl(url, campaign) {return `${url}/?utm_source=nuclide&utm_medium=app&utm_campaign=${campaign}`;}
+function createUtmUrl(url, campaign) {
+  return `${url}/?utm_source=nuclide&utm_medium=app&utm_campaign=${campaign}`;
+}

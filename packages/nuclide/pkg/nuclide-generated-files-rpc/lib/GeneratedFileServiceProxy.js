@@ -1,12 +1,10 @@
 "use strict";
 
-let Observable;
-
 module.exports = _client => {
   const remoteModule = {};
 
   remoteModule.getGeneratedFileType = function (arg0, arg1) {
-    return _client.marshalArguments(Array.from(arguments), [{
+    return _client.callRemoteFunction("GeneratedFileService/getGeneratedFileType", "promise", _client.marshalArguments(Array.from(arguments), [{
       name: "filePath",
       type: {
         kind: "named",
@@ -20,9 +18,7 @@ module.exports = _client => {
           kind: "boolean"
         }
       }
-    }]).then(args => {
-      return _client.callRemoteFunction("GeneratedFileService/getGeneratedFileType", "promise", args);
-    }).then(value => {
+    }])).then(value => {
       return _client.unmarshal(value, {
         kind: "named",
         name: "GeneratedFileType"
@@ -31,15 +27,13 @@ module.exports = _client => {
   };
 
   remoteModule.invalidateFileTypeCache = function (arg0) {
-    return _client.marshalArguments(Array.from(arguments), [{
+    return _client.callRemoteFunction("GeneratedFileService/invalidateFileTypeCache", "promise", _client.marshalArguments(Array.from(arguments), [{
       name: "filePath",
       type: {
         kind: "named",
         name: "NuclideUri"
       }
-    }]).then(args => {
-      return _client.callRemoteFunction("GeneratedFileService/invalidateFileTypeCache", "promise", args);
-    }).then(value => {
+    }])).then(value => {
       return _client.unmarshal(value, {
         kind: "void"
       });
@@ -47,15 +41,13 @@ module.exports = _client => {
   };
 
   remoteModule.getGeneratedFileTypes = function (arg0) {
-    return _client.marshalArguments(Array.from(arguments), [{
+    return _client.callRemoteFunction("GeneratedFileService/getGeneratedFileTypes", "promise", _client.marshalArguments(Array.from(arguments), [{
       name: "dirPath",
       type: {
         kind: "named",
         name: "NuclideUri"
       }
-    }]).then(args => {
-      return _client.callRemoteFunction("GeneratedFileService/getGeneratedFileTypes", "promise", args);
-    }).then(value => {
+    }])).then(value => {
       return _client.unmarshal(value, {
         kind: "map",
         keyType: {
@@ -73,11 +65,6 @@ module.exports = _client => {
   return remoteModule;
 };
 
-Object.defineProperty(module.exports, "inject", {
-  value: function () {
-    Observable = arguments[0];
-  }
-});
 Object.defineProperty(module.exports, "defs", {
   value: {
     Object: {

@@ -1,18 +1,8 @@
 'use strict';
 
+var _child_process = _interopRequireDefault(require('child_process'));
 
-
-
-
-
-
-
-
-
-
-
-
-var _child_process = _interopRequireDefault(require('child_process'));function _interopRequireDefault(obj) {return obj && obj.__esModule ? obj : { default: obj };}
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 process.on('message', message => {
   const { id, file, method, args } = message;
@@ -21,23 +11,29 @@ process.on('message', message => {
   const exports = require(file);
   const service = method != null ? exports[method] : exports;
 
-  const sendSuccessResponse = result => {if (!(
-    process.send != null)) {throw new Error('Invariant violation: "process.send != null"');}
+  const sendSuccessResponse = result => {
+    if (!(process.send != null)) {
+      throw new Error('Invariant violation: "process.send != null"');
+    }
+
     process.send({
       id,
-      result });
-
+      result
+    });
   };
 
-  const sendErrorResponse = err => {if (!(
-    process.send != null && err != null)) {throw new Error('Invariant violation: "process.send != null && err != null"');}
+  const sendErrorResponse = err => {
+    if (!(process.send != null && err != null)) {
+      throw new Error('Invariant violation: "process.send != null && err != null"');
+    }
+
     process.send({
       id,
       error: {
         message: err.message || err,
-        stack: err.stack || null } });
-
-
+        stack: err.stack || null
+      }
+    });
   };
 
   // Invoke the service.
@@ -65,9 +61,18 @@ process.on('message', message => {
      *
      *  strict-local
      * @format
-     */process.on('uncaughtException', err => {// eslint-disable-next-line no-console
-  console.error('uncaughtException:', err);process.exit(1);}); // Properly terminate if the parent server crashes.
-process.on('disconnect', () => {process.exit();});process.on('exit', () => {
+     */
+
+process.on('uncaughtException', err => {
+  // eslint-disable-next-line no-console
+  console.error('uncaughtException:', err);
+  process.exit(1);
+});
+// Properly terminate if the parent server crashes.
+process.on('disconnect', () => {
+  process.exit();
+});
+process.on('exit', () => {
   // Hack: kill all child processes.
   // $FlowIgnore: Private method.
   process._getActiveHandles().forEach(handle => {

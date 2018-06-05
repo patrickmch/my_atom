@@ -1,22 +1,14 @@
 "use strict";
 
-let Observable;
-
 module.exports = _client => {
   const remoteModule = {};
   remoteModule.VsRawAdapterSpawnerService = class {
     constructor() {
-      _client.createRemoteObject("VsRawAdapterSpawnerService", this, [], []);
+      throw Error("constructors are not supported for remote objects");
     }
 
     spawnAdapter(arg0) {
-      return Observable.fromPromise(Promise.all([_client.marshalArguments(Array.from(arguments), [{
-        name: "adapter",
-        type: {
-          kind: "named",
-          name: "VSAdapterExecutableInfo"
-        }
-      }]), _client.marshal(this, {
+      return _client.callRemoteMethod(_client.marshal(this, {
         kind: "named",
         location: {
           type: "source",
@@ -24,7 +16,13 @@ module.exports = _client => {
           line: 21
         },
         name: "VsRawAdapterSpawnerService"
-      })])).switchMap(([args, id]) => _client.callRemoteMethod(id, "spawnAdapter", "observable", args)).concatMap(value => {
+      }), "spawnAdapter", "observable", _client.marshalArguments(Array.from(arguments), [{
+        name: "adapter",
+        type: {
+          kind: "named",
+          name: "VSAdapterExecutableInfo"
+        }
+      }])).map(value => {
         return _client.unmarshal(value, {
           kind: "named",
           name: "ProcessMessage"
@@ -33,12 +31,7 @@ module.exports = _client => {
     }
 
     write(arg0) {
-      return Promise.all([_client.marshalArguments(Array.from(arguments), [{
-        name: "input",
-        type: {
-          kind: "string"
-        }
-      }]), _client.marshal(this, {
+      return _client.callRemoteMethod(_client.marshal(this, {
         kind: "named",
         location: {
           type: "source",
@@ -46,7 +39,12 @@ module.exports = _client => {
           line: 21
         },
         name: "VsRawAdapterSpawnerService"
-      })]).then(([args, id]) => _client.callRemoteMethod(id, "write", "promise", args)).then(value => {
+      }), "write", "promise", _client.marshalArguments(Array.from(arguments), [{
+        name: "input",
+        type: {
+          kind: "string"
+        }
+      }])).then(value => {
         return _client.unmarshal(value, {
           kind: "void"
         });
@@ -59,10 +57,17 @@ module.exports = _client => {
 
   };
 
+  remoteModule.createVsRawAdapterSpawnerService = function () {
+    return _client.callRemoteFunction("VSCodeDebuggerAdapterService/createVsRawAdapterSpawnerService", "promise", _client.marshalArguments(Array.from(arguments), [])).then(value => {
+      return _client.unmarshal(value, {
+        kind: "named",
+        name: "VsRawAdapterSpawnerService"
+      });
+    });
+  };
+
   remoteModule.getProcessTree = function () {
-    return _client.marshalArguments(Array.from(arguments), []).then(args => {
-      return _client.callRemoteFunction("VSCodeDebuggerAdapterService/getProcessTree", "promise", args);
-    }).then(value => {
+    return _client.callRemoteFunction("VSCodeDebuggerAdapterService/getProcessTree", "promise", _client.marshalArguments(Array.from(arguments), [])).then(value => {
       return _client.unmarshal(value, {
         kind: "array",
         type: {
@@ -74,15 +79,13 @@ module.exports = _client => {
   };
 
   remoteModule.getAdapterExecutableInfo = function (arg0) {
-    return _client.marshalArguments(Array.from(arguments), [{
+    return _client.callRemoteFunction("VSCodeDebuggerAdapterService/getAdapterExecutableInfo", "promise", _client.marshalArguments(Array.from(arguments), [{
       name: "adapterType",
       type: {
         kind: "named",
         name: "VsAdapterType"
       }
-    }]).then(args => {
-      return _client.callRemoteFunction("VSCodeDebuggerAdapterService/getAdapterExecutableInfo", "promise", args);
-    }).then(value => {
+    }])).then(value => {
       return _client.unmarshal(value, {
         kind: "named",
         name: "VSAdapterExecutableInfo"
@@ -93,11 +96,6 @@ module.exports = _client => {
   return remoteModule;
 };
 
-Object.defineProperty(module.exports, "inject", {
-  value: function () {
-    Observable = arguments[0];
-  }
-});
 Object.defineProperty(module.exports, "defs", {
   value: {
     Object: {
@@ -273,7 +271,7 @@ Object.defineProperty(module.exports, "defs", {
       location: {
         type: "source",
         fileName: "types.js",
-        line: 35
+        line: 38
       },
       name: "VSAdapterExecutableInfo",
       definition: {
@@ -304,7 +302,6 @@ Object.defineProperty(module.exports, "defs", {
         fileName: "VSCodeDebuggerAdapterService.js",
         line: 21
       },
-      constructorArgs: [],
       staticMethods: {},
       instanceMethods: {
         spawnAdapter: {
@@ -366,6 +363,31 @@ Object.defineProperty(module.exports, "defs", {
         }
       }
     },
+    createVsRawAdapterSpawnerService: {
+      kind: "function",
+      name: "createVsRawAdapterSpawnerService",
+      location: {
+        type: "source",
+        fileName: "VSCodeDebuggerAdapterService.js",
+        line: 37
+      },
+      type: {
+        location: {
+          type: "source",
+          fileName: "VSCodeDebuggerAdapterService.js",
+          line: 37
+        },
+        kind: "function",
+        argumentTypes: [],
+        returnType: {
+          kind: "promise",
+          type: {
+            kind: "named",
+            name: "VsRawAdapterSpawnerService"
+          }
+        }
+      }
+    },
     ProcessInfo: {
       kind: "alias",
       location: {
@@ -409,13 +431,13 @@ Object.defineProperty(module.exports, "defs", {
       location: {
         type: "source",
         fileName: "VSCodeDebuggerAdapterService.js",
-        line: 37
+        line: 43
       },
       type: {
         location: {
           type: "source",
           fileName: "VSCodeDebuggerAdapterService.js",
-          line: 37
+          line: 43
         },
         kind: "function",
         argumentTypes: [],
@@ -436,7 +458,7 @@ Object.defineProperty(module.exports, "defs", {
       location: {
         type: "source",
         fileName: "types.js",
-        line: 42
+        line: 45
       },
       name: "VsAdapterType",
       definition: {
@@ -453,6 +475,9 @@ Object.defineProperty(module.exports, "defs", {
         }, {
           kind: "string-literal",
           value: "java"
+        }, {
+          kind: "string-literal",
+          value: "java_android"
         }, {
           kind: "string-literal",
           value: "react-native"
@@ -480,13 +505,13 @@ Object.defineProperty(module.exports, "defs", {
       location: {
         type: "source",
         fileName: "VSCodeDebuggerAdapterService.js",
-        line: 41
+        line: 47
       },
       type: {
         location: {
           type: "source",
           fileName: "VSCodeDebuggerAdapterService.js",
-          line: 41
+          line: 47
         },
         kind: "function",
         argumentTypes: [{

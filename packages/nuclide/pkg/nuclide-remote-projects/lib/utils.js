@@ -1,31 +1,25 @@
-'use strict';Object.defineProperty(exports, "__esModule", { value: true });exports.
+'use strict';
 
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.getOpenFileEditorForRemoteProject = getOpenFileEditorForRemoteProject;
 
+var _nuclideUri;
 
+function _load_nuclideUri() {
+  return _nuclideUri = _interopRequireDefault(require('../../../modules/nuclide-commons/nuclideUri'));
+}
 
+var _RemoteTextEditorPlaceholder;
 
+function _load_RemoteTextEditorPlaceholder() {
+  return _RemoteTextEditorPlaceholder = require('./RemoteTextEditorPlaceholder');
+}
 
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-getOpenFileEditorForRemoteProject = getOpenFileEditorForRemoteProject;var _nuclideUri;function _load_nuclideUri() {return _nuclideUri = _interopRequireDefault(require('../../../modules/nuclide-commons/nuclideUri'));}var _RemoteTextEditorPlaceholder;function _load_RemoteTextEditorPlaceholder() {return _RemoteTextEditorPlaceholder = require('./RemoteTextEditorPlaceholder');}function _interopRequireDefault(obj) {return obj && obj.__esModule ? obj : { default: obj };}function* getOpenFileEditorForRemoteProject(
-connectionConfig)
-{
+function* getOpenFileEditorForRemoteProject(connectionConfig) {
   for (const pane of atom.workspace.getPanes()) {
     const paneItems = pane.getItems();
     for (const paneItem of paneItems) {
@@ -36,13 +30,16 @@ connectionConfig)
       const { hostname: fileHostname, path: filePath } = (_nuclideUri || _load_nuclideUri()).default.parse(uri);
       if (fileHostname === connectionConfig.host) {
         // flowlint-next-line sketchy-null-string:off
-        if (!fileHostname) {throw new Error('Invariant violation: "fileHostname"');}
+        if (!fileHostname) {
+          throw new Error('Invariant violation: "fileHostname"');
+        }
+
         yield {
           pane,
           editor: paneItem,
           uri,
-          filePath };
-
+          filePath
+        };
       }
     }
   }

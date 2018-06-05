@@ -1,0 +1,155 @@
+diff --git a/nols_website/wmi/static/wmi/css/wmi.scss b/nols_website/wmi/static/wmi/css/wmi.scss
+index fe3e9d7b7..5233e1c22 100644
+--- a/nols_website/wmi/static/wmi/css/wmi.scss
++++ b/nols_website/wmi/static/wmi/css/wmi.scss
+@@ -1,144 +1,150 @@
+ .course_tbl th {
+     text-align: left;
+     margin-top: 1em;
+ }
+ .course_tbl td {
+     font-size: .9em;
+     padding-right: 1em;
+     text-align: center;
+ }
+ .course_tbl th, .course_tbl td {
+     padding: 2px 4px;
+ }
+ .course_tbl th.course_head {
+     font-weight: bold;
+ }
+ .course_tbl td.course_notes {
+     text-align: left;
+     padding: 5px;
+ }
+ #pricing_options li {
+     list-style-type: none;
+ }
+ .course_tbl th {
+     font-weight: normal;
+ }
+ .course_tbl td {
+     text-align: center;
+ }
+ .course_tbl td.location_sponsor {
+     text-align: left;
+ }
+ .course_tbl .location {
+     font-weight: bold;
+ }
+ 
+ @media print {
+     #courselinks {
+     	display: none;
+     }
+ }
+ 
+ .wilderness-medicine-details {
+     $element-spacing: 20px;
+     h3 {
+         font-weight: bold;
+     }
+ 
+     .detail-summary-block {
+         ul {
+             list-style: none;
+             margin: 0;
+             padding: 0;
+             margin-bottom: $element-spacing;
+         }
+     }
+ 
+     .course-info-block, .apply-block {
+         ul{
+             margin-left: 0;
+             list-style-type: none;
+         }
+     }
+ 
+     .course-details-section {
+         p{
+             margin-bottom: $element-spacing;
+         }
+     }
+ }
+ 
+ .rollcall-roster-list {
+     position: relative;
+     left: 10%;
+ 
+     ul {
+         list-style-type: none;
+ 
+         li {
+             margin-top: 15px;
+         }
+     }
+ }
+ .rollcall-form {
+     .form-link-row, .row {
+         margin-bottom: 20px;
+     }
+ }
+ 
+ .rollcall-authenticated-form {
+     p.entity-info {
+         margin-bottom: 0;
+         background-color: $color-sand;
+         padding: 10px;
+     }
+ 
+     .person-data {
+         p:first-child {
+             padding-bottom: 0;
+         }
+         p:last-child {
+             padding-top: 0;
+         }
+     }
+ 
+     h2 {
+         margin-top: 25px;
+         margin-bottom: 0;
+     }
+     form input.rollcall--info-status[type="submit"]{
+         @extend .subtle;
+         background-color: $color-light !important;
+         cursor: pointer;
+         font-weight: bold;
+         &:hover {
+             text-decoration: underline;
+         }
+     }
+ 
+     .rollcall--former-title {
+         color: $mud;
+         font-weight: bold;
+     }
+     .button {
+         min-width: 250px;
+         text-align: center;
+         margin-left: 0;
+     }
+ 
+     i.fa-question.t-t {
+         position: relative;
+         top: -35px;
+         left: -15px;
+     }
+ }
+ 
+ .tpp_offered {
+     p {
+         margin-bottom: 0;
+     }
+ }
+ 
+ h2.wmi-balance-pay {
+     margin-top: 10%;
+ }
++.modal-body{
++  @include portal-inputs();
++}
++#login-modal-buttons{
++  margin-top: rem-calc(10);
++}

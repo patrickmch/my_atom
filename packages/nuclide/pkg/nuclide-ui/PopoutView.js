@@ -1,36 +1,31 @@
-'use strict';Object.defineProperty(exports, "__esModule", { value: true });exports.PopoutView = undefined;
+'use strict';
 
-
-
-
-
-
-
-
-
-
-
-
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.PopoutView = undefined;
 
 var _electron = require('electron');
+
 var _react = _interopRequireWildcard(require('react'));
-var _reactDom = _interopRequireDefault(require('react-dom'));var _renderReactRoot;
-function _load_renderReactRoot() {return _renderReactRoot = require('../../modules/nuclide-commons-ui/renderReactRoot');}var _UniversalDisposable;
-function _load_UniversalDisposable() {return _UniversalDisposable = _interopRequireDefault(require('../../modules/nuclide-commons/UniversalDisposable'));}function _interopRequireDefault(obj) {return obj && obj.__esModule ? obj : { default: obj };}function _interopRequireWildcard(obj) {if (obj && obj.__esModule) {return obj;} else {var newObj = {};if (obj != null) {for (var key in obj) {if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key];}}newObj.default = obj;return newObj;}}
 
+var _reactDom = _interopRequireDefault(require('react-dom'));
 
+var _renderReactRoot;
 
+function _load_renderReactRoot() {
+  return _renderReactRoot = require('../../modules/nuclide-commons-ui/renderReactRoot');
+}
 
+var _UniversalDisposable;
 
+function _load_UniversalDisposable() {
+  return _UniversalDisposable = _interopRequireDefault(require('../../modules/nuclide-commons/UniversalDisposable'));
+}
 
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-
-
-
-
-
-
-
+function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
 
 // Unique ID for each popout window instance so that the target of IPC
 // messages can be identified.
@@ -43,7 +38,14 @@ function _load_UniversalDisposable() {return _UniversalDisposable = _interopRequ
  *
  * 
  * @format
- */ /* global MutationObserver */let popoutWindowId = 1;class PopoutView extends _react.Component {
+ */
+
+/* global MutationObserver */
+
+let popoutWindowId = 1;
+
+class PopoutView extends _react.Component {
+
   constructor(props) {
     super(props);
 
@@ -56,25 +58,23 @@ function _load_UniversalDisposable() {return _UniversalDisposable = _interopRequ
     this._update = this._update.bind(this);
     this._ipcMessageHandler = this._ipcMessageHandler.bind(this);
 
-    this._popoutWindowId = 'nuclide-msg-' + popoutWindowId++;if (!(
-    _electron.ipcRenderer != null)) {throw new Error('Invariant violation: "ipcRenderer != null"');}
+    this._popoutWindowId = 'nuclide-msg-' + popoutWindowId++;
+
+    if (!(_electron.ipcRenderer != null)) {
+      throw new Error('Invariant violation: "ipcRenderer != null"');
+    }
+
     _electron.ipcRenderer.on(this._popoutWindowId, this._ipcMessageHandler);
 
-    this._disposables.add(
-    () => {
+    this._disposables.add(() => {
       this._destroyPopOutPane();
-    },
-    () => {
-      _electron.ipcRenderer.removeListener(
-      this._popoutWindowId,
-      this._ipcMessageHandler);
-
+    }, () => {
+      _electron.ipcRenderer.removeListener(this._popoutWindowId, this._ipcMessageHandler);
     });
 
-
     this.state = {
-      isPoppedOut: true };
-
+      isPoppedOut: true
+    };
   }
 
   dispose() {
@@ -83,8 +83,8 @@ function _load_UniversalDisposable() {return _UniversalDisposable = _interopRequ
 
   togglePopout(isPoppedOut) {
     this.setState({
-      isPoppedOut });
-
+      isPoppedOut
+    });
   }
 
   show() {
@@ -99,20 +99,24 @@ function _load_UniversalDisposable() {return _UniversalDisposable = _interopRequ
 
     const observer = new MutationObserver((mutations, obs) => {
       // TODO: be more efficient by computing delta and only updating what actually changed.
-      const container = _reactDom.default.findDOMNode(this);if (!(
-      container != null && container.innerHTML != null)) {throw new Error('Invariant violation: "container != null && container.innerHTML != null"');}
+      const container = _reactDom.default.findDOMNode(this);
 
-      this._callJsFunctionInPopoutWindow(
-      this._updateContent,
-      container.innerHTML);
+      if (!(container != null && container.innerHTML != null)) {
+        throw new Error('Invariant violation: "container != null && container.innerHTML != null"');
+      }
 
+      this._callJsFunctionInPopoutWindow(this._updateContent, container.innerHTML);
     });
-    const node = _reactDom.default.findDOMNode(this);if (!(
-    node != null)) {throw new Error('Invariant violation: "node != null"');}
+    const node = _reactDom.default.findDOMNode(this);
+
+    if (!(node != null)) {
+      throw new Error('Invariant violation: "node != null"');
+    }
+
     observer.observe(node, {
       childList: true,
-      subtree: true });
-
+      subtree: true
+    });
     this._disposables.add(() => observer.disconnect());
   }
 
@@ -123,8 +127,11 @@ function _load_UniversalDisposable() {return _UniversalDisposable = _interopRequ
   _update() {
     // Remove the current children.
     if (this._prepared && this._popoutPane != null) {
-      const container = _reactDom.default.findDOMNode(this);if (!(
-      container != null)) {throw new Error('Invariant violation: "container != null"');}
+      const container = _reactDom.default.findDOMNode(this);
+
+      if (!(container != null)) {
+        throw new Error('Invariant violation: "container != null"');
+      }
 
       while (container.lastChild != null) {
         container.removeChild(container.lastChild);
@@ -159,18 +166,18 @@ function _load_UniversalDisposable() {return _UniversalDisposable = _interopRequ
       }
     }
 
-    const display = this.state.isPoppedOut ?
-    'none' :
-    this.props.allowPopIn ?
-    'block' :
-    'none';
+    const display = this.state.isPoppedOut ? 'none' : this.props.allowPopIn ? 'block' : 'none';
 
-    return _react.createElement('div', { style: { display } }, this.props.children);
+    return _react.createElement(
+      'div',
+      { style: { display } },
+      this.props.children
+    );
   }
 
   /**
-     * Receives IPC messages from Electron for the child window.
-     */
+   * Receives IPC messages from Electron for the child window.
+   */
   _ipcMessageHandler(e, ipcArgs) {
     const messageType = ipcArgs[0];
     switch (messageType) {
@@ -178,20 +185,26 @@ function _load_UniversalDisposable() {return _UniversalDisposable = _interopRequ
         // This IPC event is sent by the child window when it is set up and ready.
         // Inject all the child nodes and show the window.
         this._prepareContainer();
-        this._update();if (!(
+        this._update();
 
-        this._popoutPane != null)) {throw new Error('Invariant violation: "this._popoutPane != null"');}
+        if (!(this._popoutPane != null)) {
+          throw new Error('Invariant violation: "this._popoutPane != null"');
+        }
+
         this._popoutPane.show();
-        break;}
-
+        break;
+    }
   }
 
   _createPopOutPane() {
     if (this._popoutPane != null) {
       this._destroyPopOutPane();
-    }if (!(
+    }
 
-    _electron.remote != null)) {throw new Error('Invariant violation: "remote != null"');}
+    if (!(_electron.remote != null)) {
+      throw new Error('Invariant violation: "remote != null"');
+    }
+
     this._popoutPane = new _electron.remote.BrowserWindow({
       titleBarStyle: 'hidden',
       toolbar: false,
@@ -200,35 +213,38 @@ function _load_UniversalDisposable() {return _UniversalDisposable = _interopRequ
       height: this.props.height,
       show: false,
       webPreferences: {
-        devTools: false } });if (!(
+        devTools: false
+      }
+    });
 
+    if (!(this._popoutPane != null)) {
+      throw new Error('Invariant violation: "this._popoutPane != null"');
+    }
 
+    this._popoutPane.setMenuBarVisibility(false);
 
-    this._popoutPane != null)) {throw new Error('Invariant violation: "this._popoutPane != null"');}
-    this._popoutPane.setMenuBarVisibility(false);if (!(
+    if (!(this._popoutPane != null)) {
+      throw new Error('Invariant violation: "this._popoutPane != null"');
+    }
 
-    this._popoutPane != null)) {throw new Error('Invariant violation: "this._popoutPane != null"');}
-    this._popoutPane.loadURL(document.URL);if (!(
+    this._popoutPane.loadURL(document.URL);
 
-    this._popoutPane != null)) {throw new Error('Invariant violation: "this._popoutPane != null"');}
+    if (!(this._popoutPane != null)) {
+      throw new Error('Invariant violation: "this._popoutPane != null"');
+    }
+
     this._popoutPane.on('closed', () => {
       this._destroyPopOutPane();
       this.togglePopout(false);
     });
 
-    this._wrapAndInjectFunctions([
-    this._addContainer,
-    this._updateContent,
-    this._sendToMainWindow,
-    this._addStyles,
-    this._notifyReady]);
-
+    this._wrapAndInjectFunctions([this._addContainer, this._updateContent, this._sendToMainWindow, this._addStyles, this._notifyReady]);
   }
 
   /**
-     * Adds a container to serve as our root element in the child window and injects
-     * all of the current Atom window's CSS styles into the child window.
-     */
+   * Adds a container to serve as our root element in the child window and injects
+   * all of the current Atom window's CSS styles into the child window.
+   */
   _prepareContainer() {
     this._callJsFunctionInPopoutWindow(this._addContainer);
 
@@ -244,8 +260,12 @@ function _load_UniversalDisposable() {return _UniversalDisposable = _interopRequ
   _destroyPopOutPane() {
     if (this._popoutPane != null) {
       try {
-        this._popoutPane.close();if (!(
-        this._popoutPane != null)) {throw new Error('Invariant violation: "this._popoutPane != null"');}
+        this._popoutPane.close();
+
+        if (!(this._popoutPane != null)) {
+          throw new Error('Invariant violation: "this._popoutPane != null"');
+        }
+
         this._popoutPane.destroy();
       } catch (_) {
         // It may not be possible to call close or destroy on the browser object
@@ -263,9 +283,9 @@ function _load_UniversalDisposable() {return _UniversalDisposable = _interopRequ
   }
 
   /**
-     * Marshals a function call and its arguments and invokes a corresponding JS
-     * routine in the child window.
-     */
+   * Marshals a function call and its arguments and invokes a corresponding JS
+   * routine in the child window.
+   */
   _callJsFunctionInPopoutWindow(func, ...args) {
     if (this._popoutPane != null) {
       try {
@@ -276,39 +296,50 @@ function _load_UniversalDisposable() {return _UniversalDisposable = _interopRequ
   }
 
   /**
-     * Injects JS from this script into the child window so we can conveniently call
-     * those routines in the child window's context without having to send every script
-     * as text and use executeJavaScript(). This lets us use executeJavaScript() to
-     * bootstrap and then rely on normal looking JS functions (with flow typing) for
-     * the rest of our operations.
-     */
+   * Injects JS from this script into the child window so we can conveniently call
+   * those routines in the child window's context without having to send every script
+   * as text and use executeJavaScript(). This lets us use executeJavaScript() to
+   * bootstrap and then rely on normal looking JS functions (with flow typing) for
+   * the rest of our operations.
+   */
   _wrapAndInjectFunctions(functions) {
     // Set up some globals in the remote window so it knows how to find the main window to communicate.
-    if (!(this._popoutPane != null)) {throw new Error('Invariant violation: "this._popoutPane != null"');}
-    this._popoutPane.webContents.executeJavaScript('window.nuclideIpc = {};');if (!(
+    if (!(this._popoutPane != null)) {
+      throw new Error('Invariant violation: "this._popoutPane != null"');
+    }
 
-    this._popoutPane != null)) {throw new Error('Invariant violation: "this._popoutPane != null"');}if (!(
-    _electron.remote != null)) {throw new Error('Invariant violation: "remote != null"');}
-    this._popoutPane.webContents.executeJavaScript(
-    `window.nuclideIpc.parentWindowId = ${_electron.remote.getCurrentWindow().id}`);if (!(
+    this._popoutPane.webContents.executeJavaScript('window.nuclideIpc = {};');
 
+    if (!(this._popoutPane != null)) {
+      throw new Error('Invariant violation: "this._popoutPane != null"');
+    }
 
-    this._popoutPane != null)) {throw new Error('Invariant violation: "this._popoutPane != null"');}
-    this._popoutPane.webContents.executeJavaScript(
-    `window.nuclideIpc.ipcId = '${this._popoutWindowId}'`);if (!(
+    if (!(_electron.remote != null)) {
+      throw new Error('Invariant violation: "remote != null"');
+    }
 
+    this._popoutPane.webContents.executeJavaScript(`window.nuclideIpc.parentWindowId = ${_electron.remote.getCurrentWindow().id}`);
 
-    this._popoutPane != null)) {throw new Error('Invariant violation: "this._popoutPane != null"');}
-    this._popoutPane.webContents.executeJavaScript(
-    'window.nuclideIpc.helperFuncs = {};');
+    if (!(this._popoutPane != null)) {
+      throw new Error('Invariant violation: "this._popoutPane != null"');
+    }
 
+    this._popoutPane.webContents.executeJavaScript(`window.nuclideIpc.ipcId = '${this._popoutWindowId}'`);
+
+    if (!(this._popoutPane != null)) {
+      throw new Error('Invariant violation: "this._popoutPane != null"');
+    }
+
+    this._popoutPane.webContents.executeJavaScript('window.nuclideIpc.helperFuncs = {};');
 
     // Hook up the IPC channel listener for the renderer.
-    if (!(this._popoutPane != null)) {throw new Error('Invariant violation: "this._popoutPane != null"');}
+
+    if (!(this._popoutPane != null)) {
+      throw new Error('Invariant violation: "this._popoutPane != null"');
+    }
+
     this._popoutPane.webContents.executeJavaScript(`
-      require('electron').ipcRenderer.on('${
-    this._popoutWindowId
-    }', function(e, ipcArgs) {
+      require('electron').ipcRenderer.on('${this._popoutWindowId}', function(e, ipcArgs) {
         try {
           if (ipcArgs != null) {
             const funcName = ipcArgs[0];
@@ -327,29 +358,35 @@ function _load_UniversalDisposable() {return _UniversalDisposable = _interopRequ
     for (const func of functions) {
       // Func.toString() gets the transpiled source of the JS routine we want. Convert it to
       // the correct form "function foo(args) {...}" and inject it into the child window.
-      const funcLambda = func.
-      toString().
-      replace(/\n/g, ' ').
-      replace(/^[^()]+(\([^)]*\))(.*)$/, 'function $1 $2; ');if (!(
-      this._popoutPane != null)) {throw new Error('Invariant violation: "this._popoutPane != null"');}
-      this._popoutPane.webContents.executeJavaScript(
-      `window.nuclideIpc.helperFuncs['${func.name}'] = ${funcLambda}`);
+      const funcLambda = func.toString().replace(/\n/g, ' ').replace(/^[^()]+(\([^)]*\))(.*)$/, 'function $1 $2; ');
 
+      if (!(this._popoutPane != null)) {
+        throw new Error('Invariant violation: "this._popoutPane != null"');
+      }
+
+      this._popoutPane.webContents.executeJavaScript(`window.nuclideIpc.helperFuncs['${func.name}'] = ${funcLambda}`);
     }
 
     // Have the child window correct its size, loading the Atom document URL overrides
     // the window size passed to the constructor of BrowserWindow.
-    if (!(this.props.width != null && this.props.height != null)) {throw new Error('Invariant violation: "this.props.width != null && this.props.height != null"');}if (!(
-    this._popoutPane != null)) {throw new Error('Invariant violation: "this._popoutPane != null"');}
-    this._popoutPane.webContents.executeJavaScript(
-    `window.resizeTo(${this.props.width}, ${this.props.height})`);
 
+    if (!(this.props.width != null && this.props.height != null)) {
+      throw new Error('Invariant violation: "this.props.width != null && this.props.height != null"');
+    }
+
+    if (!(this._popoutPane != null)) {
+      throw new Error('Invariant violation: "this._popoutPane != null"');
+    }
+
+    this._popoutPane.webContents.executeJavaScript(`window.resizeTo(${this.props.width}, ${this.props.height})`);
 
     // Have the child window signal via IPC that its finished initializing.
-    if (!(this._popoutPane != null)) {throw new Error('Invariant violation: "this._popoutPane != null"');}
-    this._popoutPane.webContents.executeJavaScript(
-    "window.nuclideIpc.helperFuncs['_notifyReady']();");
 
+    if (!(this._popoutPane != null)) {
+      throw new Error('Invariant violation: "this._popoutPane != null"');
+    }
+
+    this._popoutPane.webContents.executeJavaScript("window.nuclideIpc.helperFuncs['_notifyReady']();");
   }
 
   // ////////////////////////////////////////
@@ -372,9 +409,9 @@ function _load_UniversalDisposable() {return _UniversalDisposable = _interopRequ
   }
 
   /**
-     * Replaces the contents of the container in the child window wiht the specified
-     * innerHTML.
-     */
+   * Replaces the contents of the container in the child window wiht the specified
+   * innerHTML.
+   */
   _updateContent(content) {
     const elem = document.getElementById('nuclide-popout-container-root');
     if (elem != null) {
@@ -383,25 +420,23 @@ function _load_UniversalDisposable() {return _UniversalDisposable = _interopRequ
   }
 
   /**
-     * Sends a notification to the parent window that the child window has loaded
-     * and finished initializing its IPC globals.
-     */
+   * Sends a notification to the parent window that the child window has loaded
+   * and finished initializing its IPC globals.
+   */
   _notifyReady() {
     window.nuclideIpc.helperFuncs._sendToMainWindow('child-window-ready');
   }
 
   /**
-     * Helper routine to send an event to the main window from the child window.
-     */
+   * Helper routine to send an event to the main window from the child window.
+   */
   _sendToMainWindow(eventName, ...args) {
     const ipcId = window.nuclideIpc.ipcId;
     if (window.nuclideIpc.mainWindowWebContents == null) {
       const rem = require('electron').remote;
       if (rem != null) {
         const { webContents } = rem;
-        window.nuclideIpc.mainWindowWebContents = webContents.fromId(
-        window.nuclideIpc.parentWindowId);
-
+        window.nuclideIpc.mainWindowWebContents = webContents.fromId(window.nuclideIpc.parentWindowId);
       }
     }
 
@@ -411,12 +446,14 @@ function _load_UniversalDisposable() {return _UniversalDisposable = _interopRequ
   }
 
   /**
-     * Adds the specified CSS to the child window's style sheets.
-     */
+   * Adds the specified CSS to the child window's style sheets.
+   */
   _addStyles(styles) {
     const styleElement = document.createElement('style');
     styleElement.innerHTML = styles;
     if (document.head != null) {
       document.head.appendChild(styleElement);
     }
-  }}exports.PopoutView = PopoutView;
+  }
+}
+exports.PopoutView = PopoutView;

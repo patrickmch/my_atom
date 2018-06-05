@@ -8,9 +8,10 @@
   'ctrl-alt-cmd-j': 'window:toggle-dev-tools'
   'cmd-q': 'unset!'
   'cmd-q cmd-q': 'application:quit'
-  'shift-space': 'nuclide-quick-open:find-anything-via-omni-search'
+  'ctrl-/': 'nuclide-quick-open:find-anything-via-omni-search'
 
 'atom-text-editor':
+  # 'alt-cmd-enter': 'python-tools:goto-definition'
   'ctrl-enter': 'editor:newline-above'
   'shift-cmd-enter': 'hey-pane:toggle-focus-of-active-pane'
   'ctrl-k': 'unset!'
@@ -19,14 +20,16 @@
   'shift-cmd-alt-t': 'markdown-writer:toggle-task'
   'shift-cmd-alt-x': 'markdown-writer:toggle-taskdone'
 
-  # cursor
-  'alt-,': 'last-cursor-position:previous'
-  'alt-.': 'last-cursor-position:next'
-
   # emmet
   'ctrl-:': 'emmet:remove-tag'
-  'ctrl-w': 'emmet:wrap-with-abbreviation'
+  'alt-w': 'emmet:wrap-with-abbreviation'
   'ctrl-space': 'emmet:expand-abbreviation-with-tab'
+
+  # cursor
+  'ctrl-.': 'cursor-history:next-within-editor'
+  'ctrl-,': 'cursor-history:prev-within-editor'
+  'ctrl-<': 'nuclide-navigation-stack:navigate-backwards'
+  'ctrl->': 'nuclide-navigation-stack:navigate-forwards'
 
   # custom
   'shift-cmd-space': 'custom:insert-space-keep-cursor-place'
@@ -41,6 +44,7 @@
 ##############################################################################################
 
 'atom-text-editor.vim-mode-plus:not(.visual-mode)':
+
   # key bindings for multi-cursor-plus
   'alt-x': 'multi-cursor-plus:mark'
   'ctrl-alt-k': 'multi-cursor-plus:move-up'
@@ -64,15 +68,13 @@
   'alt-k': 'vim-mode-plus-user:move-selected-text-up'
   'alt-j': 'vim-mode-plus-user:move-selected-text-down'
 
-'atom-text-editor:not(.mini).jumpy-jump-mode':
-  'escape': 'jumpy:clear'
-
-'atom-text-editor:not(.mini).vim-mode-plus:not(.insert-mode):not(.jumpy-jump-mode), .tree-view':
-  'ctrl-f': 'jumpy:toggle'
+'atom-text-editor.vim-mode-plus.normal-mode, atom-text-editor.vim-mode-plus.visual-mode':
+  '[': 'editor:outdent-selected-rows'
+  ']': 'editor:indent-selected-rows'
 
 'atom-text-editor.vim-mode-plus.normal-mode':
-  'shift-j': 'keystroke 1 0 j'
-  'shift-k': 'keystroke 1 0 k'
+  'shift-j': 'keystroke 5 j'
+  'shift-k': 'keystroke 5 k'
 
   'm m': 'bookmarks:toggle-bookmark'
   '\'':  'bookmarks:jump-to-next-bookmark'
@@ -93,6 +95,7 @@
   'ctrl-alt-shift-cmd-j': 'window:focus-pane-below'
   'ctrl-alt-shift-cmd-l': 'window:focus-pane-on-right'
   'ctrl-alt-shift-cmd-h': 'window:focus-pane-on-left'
+
 
   'space left':'window:move-active-item-to-pane-on-left'
   'space right':'window:move-active-item-to-pane-on-right'
@@ -124,6 +127,7 @@
   'space g l': 'git-plus:log'
   'space g v': 'git-plus:stash-save'
   'space g a': 'git-plus:add-all'
+  'space g h': 'git-history:show-file-history'
 
   'space s': 'settings-view:install-packages-and-themes'
 
@@ -135,7 +139,6 @@
   'space r m': 'quick-file-actions:delete'
   'space m v': 'quick-file-actions:move'
   'space c p': 'quick-file-actions:copy'
-  'shift-space': 'nuclide-quick-open:find-anything-via-omni-search'
 
   'space 1': 'window:reload'
 
@@ -156,8 +159,6 @@
   'd X': 'keystroke v ctrl-h x'
   '>': 'editor:delete-to-end-of-word'
   '<': 'editor:delete-to-beginning-of-word'
-  '[': 'editor:outdent-selected-rows'
-  ']': 'editor:indent-selected-rows'
   'g -':   'vim-mode-plus:dash-case'
   'g _': 'vim-mode-plus:snake-case'
   'ctrl-z': 'vim-mode-plus:upper-case-first'

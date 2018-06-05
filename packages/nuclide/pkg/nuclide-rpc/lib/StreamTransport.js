@@ -1,33 +1,27 @@
-'use strict';Object.defineProperty(exports, "__esModule", { value: true });exports.StreamTransport = undefined;var _observable;
+'use strict';
 
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.StreamTransport = undefined;
 
+var _observable;
 
+function _load_observable() {
+  return _observable = require('../../../modules/nuclide-commons/observable');
+}
 
+var _stream;
 
-
-
-
-
-
-
-function _load_observable() {return _observable = require('../../../modules/nuclide-commons/observable');}var _stream;
-function _load_stream() {return _stream = require('../../../modules/nuclide-commons/stream');}
-
-
+function _load_stream() {
+  return _stream = require('../../../modules/nuclide-commons/stream');
+}
 
 class StreamTransport {
 
-
-
-
-
-  constructor(
-  output,
-  input,
-  messageLogger = (direction, message) => {
+  constructor(output, input, messageLogger = (direction, message) => {
     return;
-  })
-  {
+  }) {
     this._isClosed = false;
     this._messageLogger = messageLogger;
     this._output = output;
@@ -37,10 +31,11 @@ class StreamTransport {
   }
 
   send(message) {
-    this._messageLogger('send', message);if (!(
+    this._messageLogger('send', message);
 
-    message.indexOf('\n') === -1)) {throw new Error(
-      'StreamTransport.send - unexpected newline in JSON message');}
+    if (!(message.indexOf('\n') === -1)) {
+      throw new Error('StreamTransport.send - unexpected newline in JSON message');
+    }
 
     this._output.write(message + '\n');
   }
@@ -55,13 +50,15 @@ class StreamTransport {
 
   isClosed() {
     return this._isClosed;
-  }}exports.StreamTransport = StreamTransport; /**
-                                                * Copyright (c) 2015-present, Facebook, Inc.
-                                                * All rights reserved.
-                                                *
-                                                * This source code is licensed under the license found in the LICENSE file in
-                                                * the root directory of this source tree.
-                                                *
-                                                *  strict-local
-                                                * @format
-                                                */
+  }
+}
+exports.StreamTransport = StreamTransport; /**
+                                            * Copyright (c) 2015-present, Facebook, Inc.
+                                            * All rights reserved.
+                                            *
+                                            * This source code is licensed under the license found in the LICENSE file in
+                                            * the root directory of this source tree.
+                                            *
+                                            *  strict-local
+                                            * @format
+                                            */

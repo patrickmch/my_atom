@@ -1,30 +1,25 @@
-'use strict';Object.defineProperty(exports, "__esModule", { value: true });exports.PathsObserver = undefined;var _nuclideUri;
+'use strict';
 
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.PathsObserver = undefined;
 
+var _nuclideUri;
 
+function _load_nuclideUri() {
+  return _nuclideUri = _interopRequireDefault(require('../../../modules/nuclide-commons/nuclideUri'));
+}
 
-
-
-
-
-
-
-function _load_nuclideUri() {return _nuclideUri = _interopRequireDefault(require('../../../modules/nuclide-commons/nuclideUri'));}function _interopRequireDefault(obj) {return obj && obj.__esModule ? obj : { default: obj };}
-
-
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 class PathsObserver {
-
-
-
 
   constructor(workingSetsStore) {
     this._prevPaths = atom.project.getPaths();
     this._workingSetsStore = workingSetsStore;
 
-    this._disposable = atom.project.onDidChangePaths(
-    this._didChangePaths.bind(this));
-
+    this._disposable = atom.project.onDidChangePaths(this._didChangePaths.bind(this));
   }
 
   dispose() {
@@ -32,9 +27,7 @@ class PathsObserver {
   }
 
   _didChangePaths(_paths) {
-    const paths = _paths.filter(
-    p => (_nuclideUri || _load_nuclideUri()).default.isRemote(p) || (_nuclideUri || _load_nuclideUri()).default.isAbsolute(p));
-
+    const paths = _paths.filter(p => (_nuclideUri || _load_nuclideUri()).default.isRemote(p) || (_nuclideUri || _load_nuclideUri()).default.isAbsolute(p));
     this._workingSetsStore.updateApplicability();
 
     const prevPaths = this._prevPaths;
@@ -55,13 +48,15 @@ class PathsObserver {
     if (pathChangeWasHidden) {
       this._workingSetsStore.deactivateAll();
     }
-  }}exports.PathsObserver = PathsObserver; /**
-                                            * Copyright (c) 2015-present, Facebook, Inc.
-                                            * All rights reserved.
-                                            *
-                                            * This source code is licensed under the license found in the LICENSE file in
-                                            * the root directory of this source tree.
-                                            *
-                                            * 
-                                            * @format
-                                            */
+  }
+}
+exports.PathsObserver = PathsObserver; /**
+                                        * Copyright (c) 2015-present, Facebook, Inc.
+                                        * All rights reserved.
+                                        *
+                                        * This source code is licensed under the license found in the LICENSE file in
+                                        * the root directory of this source tree.
+                                        *
+                                        * 
+                                        * @format
+                                        */

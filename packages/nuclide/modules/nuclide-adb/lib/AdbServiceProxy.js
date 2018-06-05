@@ -1,12 +1,10 @@
 "use strict";
 
-let Observable;
-
 module.exports = _client => {
   const remoteModule = {};
 
   remoteModule.registerAdbPath = function (arg0, arg1, arg2) {
-    return _client.marshalArguments(Array.from(arguments), [{
+    return _client.callRemoteFunction("AdbService/registerAdbPath", "promise", _client.marshalArguments(Array.from(arguments), [{
       name: "id",
       type: {
         kind: "string"
@@ -25,9 +23,7 @@ module.exports = _client => {
           kind: "number"
         }
       }
-    }]).then(args => {
-      return _client.callRemoteFunction("AdbService/registerAdbPath", "promise", args);
-    }).then(value => {
+    }])).then(value => {
       return _client.unmarshal(value, {
         kind: "void"
       });
@@ -35,9 +31,7 @@ module.exports = _client => {
   };
 
   remoteModule.getFullConfig = function () {
-    return _client.marshalArguments(Array.from(arguments), []).then(args => {
-      return _client.callRemoteFunction("AdbService/getFullConfig", "promise", args);
-    }).then(value => {
+    return _client.callRemoteFunction("AdbService/getFullConfig", "promise", _client.marshalArguments(Array.from(arguments), [])).then(value => {
       return _client.unmarshal(value, {
         kind: "named",
         name: "DebugBridgeFullConfig"
@@ -46,7 +40,7 @@ module.exports = _client => {
   };
 
   remoteModule.registerCustomPath = function (arg0) {
-    return _client.marshalArguments(Array.from(arguments), [{
+    return _client.callRemoteFunction("AdbService/registerCustomPath", "promise", _client.marshalArguments(Array.from(arguments), [{
       name: "path",
       type: {
         kind: "nullable",
@@ -54,9 +48,7 @@ module.exports = _client => {
           kind: "string"
         }
       }
-    }]).then(args => {
-      return _client.callRemoteFunction("AdbService/registerCustomPath", "promise", args);
-    }).then(value => {
+    }])).then(value => {
       return _client.unmarshal(value, {
         kind: "void"
       });
@@ -64,15 +56,13 @@ module.exports = _client => {
   };
 
   remoteModule.getDeviceInfo = function (arg0) {
-    return Observable.fromPromise(_client.marshalArguments(Array.from(arguments), [{
+    return _client.callRemoteFunction("AdbService/getDeviceInfo", "observable", _client.marshalArguments(Array.from(arguments), [{
       name: "device",
       type: {
         kind: "named",
         name: "DeviceId"
       }
-    }])).switchMap(args => {
-      return _client.callRemoteFunction("AdbService/getDeviceInfo", "observable", args);
-    }).concatMap(value => {
+    }])).map(value => {
       return _client.unmarshal(value, {
         kind: "map",
         keyType: {
@@ -86,7 +76,7 @@ module.exports = _client => {
   };
 
   remoteModule.getProcesses = function (arg0, arg1) {
-    return Observable.fromPromise(_client.marshalArguments(Array.from(arguments), [{
+    return _client.callRemoteFunction("AdbService/getProcesses", "observable", _client.marshalArguments(Array.from(arguments), [{
       name: "device",
       type: {
         kind: "named",
@@ -97,9 +87,7 @@ module.exports = _client => {
       type: {
         kind: "number"
       }
-    }])).switchMap(args => {
-      return _client.callRemoteFunction("AdbService/getProcesses", "observable", args);
-    }).concatMap(value => {
+    }])).map(value => {
       return _client.unmarshal(value, {
         kind: "array",
         type: {
@@ -111,7 +99,7 @@ module.exports = _client => {
   };
 
   remoteModule.stopProcess = function (arg0, arg1, arg2) {
-    return _client.marshalArguments(Array.from(arguments), [{
+    return _client.callRemoteFunction("AdbService/stopProcess", "promise", _client.marshalArguments(Array.from(arguments), [{
       name: "device",
       type: {
         kind: "named",
@@ -127,9 +115,7 @@ module.exports = _client => {
       type: {
         kind: "number"
       }
-    }]).then(args => {
-      return _client.callRemoteFunction("AdbService/stopProcess", "promise", args);
-    }).then(value => {
+    }])).then(value => {
       return _client.unmarshal(value, {
         kind: "void"
       });
@@ -137,7 +123,7 @@ module.exports = _client => {
   };
 
   remoteModule.getDeviceList = function (arg0) {
-    return Observable.fromPromise(_client.marshalArguments(Array.from(arguments), [{
+    return _client.callRemoteFunction("AdbService/getDeviceList", "observable", _client.marshalArguments(Array.from(arguments), [{
       name: "options",
       type: {
         kind: "nullable",
@@ -146,9 +132,7 @@ module.exports = _client => {
           name: "getDevicesOptions"
         }
       }
-    }])).switchMap(args => {
-      return _client.callRemoteFunction("AdbService/getDeviceList", "observable", args);
-    }).concatMap(value => {
+    }])).map(value => {
       return _client.unmarshal(value, {
         kind: "array",
         type: {
@@ -160,7 +144,7 @@ module.exports = _client => {
   };
 
   remoteModule.getPidFromPackageName = function (arg0, arg1) {
-    return _client.marshalArguments(Array.from(arguments), [{
+    return _client.callRemoteFunction("AdbService/getPidFromPackageName", "promise", _client.marshalArguments(Array.from(arguments), [{
       name: "device",
       type: {
         kind: "named",
@@ -171,9 +155,7 @@ module.exports = _client => {
       type: {
         kind: "string"
       }
-    }]).then(args => {
-      return _client.callRemoteFunction("AdbService/getPidFromPackageName", "promise", args);
-    }).then(value => {
+    }])).then(value => {
       return _client.unmarshal(value, {
         kind: "number"
       });
@@ -181,7 +163,7 @@ module.exports = _client => {
   };
 
   remoteModule.installPackage = function (arg0, arg1) {
-    return Observable.fromPromise(_client.marshalArguments(Array.from(arguments), [{
+    return _client.callRemoteFunction("AdbService/installPackage", "observable", _client.marshalArguments(Array.from(arguments), [{
       name: "device",
       type: {
         kind: "named",
@@ -193,9 +175,7 @@ module.exports = _client => {
         kind: "named",
         name: "NuclideUri"
       }
-    }])).switchMap(args => {
-      return _client.callRemoteFunction("AdbService/installPackage", "observable", args);
-    }).concatMap(value => {
+    }])).map(value => {
       return _client.unmarshal(value, {
         kind: "named",
         name: "LegacyProcessMessage"
@@ -204,7 +184,7 @@ module.exports = _client => {
   };
 
   remoteModule.uninstallPackage = function (arg0, arg1) {
-    return Observable.fromPromise(_client.marshalArguments(Array.from(arguments), [{
+    return _client.callRemoteFunction("AdbService/uninstallPackage", "observable", _client.marshalArguments(Array.from(arguments), [{
       name: "device",
       type: {
         kind: "named",
@@ -215,9 +195,7 @@ module.exports = _client => {
       type: {
         kind: "string"
       }
-    }])).switchMap(args => {
-      return _client.callRemoteFunction("AdbService/uninstallPackage", "observable", args);
-    }).concatMap(value => {
+    }])).map(value => {
       return _client.unmarshal(value, {
         kind: "named",
         name: "LegacyProcessMessage"
@@ -226,7 +204,7 @@ module.exports = _client => {
   };
 
   remoteModule.forwardJdwpPortToPid = function (arg0, arg1, arg2) {
-    return _client.marshalArguments(Array.from(arguments), [{
+    return _client.callRemoteFunction("AdbService/forwardJdwpPortToPid", "promise", _client.marshalArguments(Array.from(arguments), [{
       name: "device",
       type: {
         kind: "named",
@@ -242,9 +220,7 @@ module.exports = _client => {
       type: {
         kind: "number"
       }
-    }]).then(args => {
-      return _client.callRemoteFunction("AdbService/forwardJdwpPortToPid", "promise", args);
-    }).then(value => {
+    }])).then(value => {
       return _client.unmarshal(value, {
         kind: "nullable",
         type: {
@@ -255,7 +231,7 @@ module.exports = _client => {
   };
 
   remoteModule.removeJdwpForwardSpec = function (arg0, arg1) {
-    return _client.marshalArguments(Array.from(arguments), [{
+    return _client.callRemoteFunction("AdbService/removeJdwpForwardSpec", "promise", _client.marshalArguments(Array.from(arguments), [{
       name: "device",
       type: {
         kind: "named",
@@ -269,9 +245,7 @@ module.exports = _client => {
           kind: "string"
         }
       }
-    }]).then(args => {
-      return _client.callRemoteFunction("AdbService/removeJdwpForwardSpec", "promise", args);
-    }).then(value => {
+    }])).then(value => {
       return _client.unmarshal(value, {
         kind: "string"
       });
@@ -279,7 +253,7 @@ module.exports = _client => {
   };
 
   remoteModule.launchActivity = function (arg0, arg1, arg2, arg3, arg4, arg5) {
-    return _client.marshalArguments(Array.from(arguments), [{
+    return _client.callRemoteFunction("AdbService/launchActivity", "promise", _client.marshalArguments(Array.from(arguments), [{
       name: "device",
       type: {
         kind: "named",
@@ -322,9 +296,7 @@ module.exports = _client => {
           }
         }
       }
-    }]).then(args => {
-      return _client.callRemoteFunction("AdbService/launchActivity", "promise", args);
-    }).then(value => {
+    }])).then(value => {
       return _client.unmarshal(value, {
         kind: "string"
       });
@@ -332,7 +304,7 @@ module.exports = _client => {
   };
 
   remoteModule.launchMainActivity = function (arg0, arg1, arg2) {
-    return _client.marshalArguments(Array.from(arguments), [{
+    return _client.callRemoteFunction("AdbService/launchMainActivity", "promise", _client.marshalArguments(Array.from(arguments), [{
       name: "device",
       type: {
         kind: "named",
@@ -348,9 +320,7 @@ module.exports = _client => {
       type: {
         kind: "boolean"
       }
-    }]).then(args => {
-      return _client.callRemoteFunction("AdbService/launchMainActivity", "promise", args);
-    }).then(value => {
+    }])).then(value => {
       return _client.unmarshal(value, {
         kind: "string"
       });
@@ -358,7 +328,7 @@ module.exports = _client => {
   };
 
   remoteModule.launchService = function (arg0, arg1, arg2, arg3) {
-    return _client.marshalArguments(Array.from(arguments), [{
+    return _client.callRemoteFunction("AdbService/launchService", "promise", _client.marshalArguments(Array.from(arguments), [{
       name: "device",
       type: {
         kind: "named",
@@ -379,9 +349,7 @@ module.exports = _client => {
       type: {
         kind: "boolean"
       }
-    }]).then(args => {
-      return _client.callRemoteFunction("AdbService/launchService", "promise", args);
-    }).then(value => {
+    }])).then(value => {
       return _client.unmarshal(value, {
         kind: "string"
       });
@@ -389,7 +357,7 @@ module.exports = _client => {
   };
 
   remoteModule.activityExists = function (arg0, arg1, arg2) {
-    return _client.marshalArguments(Array.from(arguments), [{
+    return _client.callRemoteFunction("AdbService/activityExists", "promise", _client.marshalArguments(Array.from(arguments), [{
       name: "device",
       type: {
         kind: "named",
@@ -405,9 +373,7 @@ module.exports = _client => {
       type: {
         kind: "string"
       }
-    }]).then(args => {
-      return _client.callRemoteFunction("AdbService/activityExists", "promise", args);
-    }).then(value => {
+    }])).then(value => {
       return _client.unmarshal(value, {
         kind: "boolean"
       });
@@ -415,15 +381,13 @@ module.exports = _client => {
   };
 
   remoteModule.getAllAvailablePackages = function (arg0) {
-    return _client.marshalArguments(Array.from(arguments), [{
+    return _client.callRemoteFunction("AdbService/getAllAvailablePackages", "promise", _client.marshalArguments(Array.from(arguments), [{
       name: "device",
       type: {
         kind: "named",
         name: "DeviceId"
       }
-    }]).then(args => {
-      return _client.callRemoteFunction("AdbService/getAllAvailablePackages", "promise", args);
-    }).then(value => {
+    }])).then(value => {
       return _client.unmarshal(value, {
         kind: "array",
         type: {
@@ -434,15 +398,13 @@ module.exports = _client => {
   };
 
   remoteModule.getJavaProcesses = function (arg0) {
-    return Observable.fromPromise(_client.marshalArguments(Array.from(arguments), [{
+    return _client.callRemoteFunction("AdbService/getJavaProcesses", "observable", _client.marshalArguments(Array.from(arguments), [{
       name: "device",
       type: {
         kind: "named",
         name: "DeviceId"
       }
-    }])).switchMap(args => {
-      return _client.callRemoteFunction("AdbService/getJavaProcesses", "observable", args);
-    }).concatMap(value => {
+    }])).map(value => {
       return _client.unmarshal(value, {
         kind: "array",
         type: {
@@ -454,7 +416,7 @@ module.exports = _client => {
   };
 
   remoteModule.dumpsysPackage = function (arg0, arg1) {
-    return _client.marshalArguments(Array.from(arguments), [{
+    return _client.callRemoteFunction("AdbService/dumpsysPackage", "promise", _client.marshalArguments(Array.from(arguments), [{
       name: "device",
       type: {
         kind: "named",
@@ -465,9 +427,7 @@ module.exports = _client => {
       type: {
         kind: "string"
       }
-    }]).then(args => {
-      return _client.callRemoteFunction("AdbService/dumpsysPackage", "promise", args);
-    }).then(value => {
+    }])).then(value => {
       return _client.unmarshal(value, {
         kind: "nullable",
         type: {
@@ -478,7 +438,7 @@ module.exports = _client => {
   };
 
   remoteModule.touchFile = function (arg0, arg1) {
-    return _client.marshalArguments(Array.from(arguments), [{
+    return _client.callRemoteFunction("AdbService/touchFile", "promise", _client.marshalArguments(Array.from(arguments), [{
       name: "device",
       type: {
         kind: "named",
@@ -489,9 +449,7 @@ module.exports = _client => {
       type: {
         kind: "string"
       }
-    }]).then(args => {
-      return _client.callRemoteFunction("AdbService/touchFile", "promise", args);
-    }).then(value => {
+    }])).then(value => {
       return _client.unmarshal(value, {
         kind: "string"
       });
@@ -499,7 +457,7 @@ module.exports = _client => {
   };
 
   remoteModule.removeFile = function (arg0, arg1) {
-    return _client.marshalArguments(Array.from(arguments), [{
+    return _client.callRemoteFunction("AdbService/removeFile", "promise", _client.marshalArguments(Array.from(arguments), [{
       name: "device",
       type: {
         kind: "named",
@@ -510,9 +468,7 @@ module.exports = _client => {
       type: {
         kind: "string"
       }
-    }]).then(args => {
-      return _client.callRemoteFunction("AdbService/removeFile", "promise", args);
-    }).then(value => {
+    }])).then(value => {
       return _client.unmarshal(value, {
         kind: "string"
       });
@@ -520,15 +476,13 @@ module.exports = _client => {
   };
 
   remoteModule.getInstalledPackages = function (arg0) {
-    return _client.marshalArguments(Array.from(arguments), [{
+    return _client.callRemoteFunction("AdbService/getInstalledPackages", "promise", _client.marshalArguments(Array.from(arguments), [{
       name: "device",
       type: {
         kind: "named",
         name: "DeviceId"
       }
-    }]).then(args => {
-      return _client.callRemoteFunction("AdbService/getInstalledPackages", "promise", args);
-    }).then(value => {
+    }])).then(value => {
       return _client.unmarshal(value, {
         kind: "array",
         type: {
@@ -539,31 +493,25 @@ module.exports = _client => {
   };
 
   remoteModule.addAdbPort = function (arg0) {
-    return _client.marshalArguments(Array.from(arguments), [{
+    return _client.callRemoteFunction("AdbService/addAdbPort", "void", _client.marshalArguments(Array.from(arguments), [{
       name: "port",
       type: {
         kind: "number"
       }
-    }]).then(args => {
-      return _client.callRemoteFunction("AdbService/addAdbPort", "void", args);
-    });
+    }]));
   };
 
   remoteModule.removeAdbPort = function (arg0) {
-    return _client.marshalArguments(Array.from(arguments), [{
+    return _client.callRemoteFunction("AdbService/removeAdbPort", "void", _client.marshalArguments(Array.from(arguments), [{
       name: "port",
       type: {
         kind: "number"
       }
-    }]).then(args => {
-      return _client.callRemoteFunction("AdbService/removeAdbPort", "void", args);
-    });
+    }]));
   };
 
   remoteModule.getAdbPorts = function () {
-    return _client.marshalArguments(Array.from(arguments), []).then(args => {
-      return _client.callRemoteFunction("AdbService/getAdbPorts", "promise", args);
-    }).then(value => {
+    return _client.callRemoteFunction("AdbService/getAdbPorts", "promise", _client.marshalArguments(Array.from(arguments), [])).then(value => {
       return _client.unmarshal(value, {
         kind: "array",
         type: {
@@ -574,9 +522,7 @@ module.exports = _client => {
   };
 
   remoteModule.killServer = function () {
-    return _client.marshalArguments(Array.from(arguments), []).then(args => {
-      return _client.callRemoteFunction("AdbService/killServer", "promise", args);
-    }).then(value => {
+    return _client.callRemoteFunction("AdbService/killServer", "promise", _client.marshalArguments(Array.from(arguments), [])).then(value => {
       return _client.unmarshal(value, {
         kind: "void"
       });
@@ -584,7 +530,7 @@ module.exports = _client => {
   };
 
   remoteModule.getApkManifest = function (arg0, arg1) {
-    return _client.marshalArguments(Array.from(arguments), [{
+    return _client.callRemoteFunction("AdbService/getApkManifest", "promise", _client.marshalArguments(Array.from(arguments), [{
       name: "apkPath",
       type: {
         kind: "string"
@@ -597,9 +543,7 @@ module.exports = _client => {
           kind: "string"
         }
       }
-    }]).then(args => {
-      return _client.callRemoteFunction("AdbService/getApkManifest", "promise", args);
-    }).then(value => {
+    }])).then(value => {
       return _client.unmarshal(value, {
         kind: "string"
       });
@@ -607,11 +551,43 @@ module.exports = _client => {
   };
 
   remoteModule.getVersion = function () {
-    return _client.marshalArguments(Array.from(arguments), []).then(args => {
-      return _client.callRemoteFunction("AdbService/getVersion", "promise", args);
-    }).then(value => {
+    return _client.callRemoteFunction("AdbService/getVersion", "promise", _client.marshalArguments(Array.from(arguments), [])).then(value => {
       return _client.unmarshal(value, {
         kind: "string"
+      });
+    });
+  };
+
+  remoteModule.checkMuxStatus = function () {
+    return _client.callRemoteFunction("AdbService/checkMuxStatus", "promise", _client.marshalArguments(Array.from(arguments), [])).then(value => {
+      return _client.unmarshal(value, {
+        kind: "boolean"
+      });
+    });
+  };
+
+  remoteModule.checkInMuxPort = function (arg0) {
+    return _client.callRemoteFunction("AdbService/checkInMuxPort", "promise", _client.marshalArguments(Array.from(arguments), [{
+      name: "port",
+      type: {
+        kind: "number"
+      }
+    }])).then(value => {
+      return _client.unmarshal(value, {
+        kind: "void"
+      });
+    });
+  };
+
+  remoteModule.checkOutMuxPort = function (arg0) {
+    return _client.callRemoteFunction("AdbService/checkOutMuxPort", "promise", _client.marshalArguments(Array.from(arguments), [{
+      name: "port",
+      type: {
+        kind: "number"
+      }
+    }])).then(value => {
+      return _client.unmarshal(value, {
+        kind: "void"
       });
     });
   };
@@ -619,11 +595,6 @@ module.exports = _client => {
   return remoteModule;
 };
 
-Object.defineProperty(module.exports, "inject", {
-  value: function () {
-    Observable = arguments[0];
-  }
-});
 Object.defineProperty(module.exports, "defs", {
   value: {
     Object: {
@@ -730,7 +701,7 @@ Object.defineProperty(module.exports, "defs", {
       location: {
         type: "source",
         fileName: "types.js",
-        line: 44
+        line: 47
       },
       name: "DebugBridgeFullConfig",
       definition: {
@@ -827,7 +798,7 @@ Object.defineProperty(module.exports, "defs", {
       location: {
         type: "source",
         fileName: "types.js",
-        line: 23
+        line: 26
       },
       name: "DeviceId",
       definition: {
@@ -888,7 +859,7 @@ Object.defineProperty(module.exports, "defs", {
       location: {
         type: "source",
         fileName: "types.js",
-        line: 33
+        line: 36
       },
       name: "Process",
       definition: {
@@ -1022,7 +993,7 @@ Object.defineProperty(module.exports, "defs", {
       location: {
         type: "source",
         fileName: "types.js",
-        line: 25
+        line: 28
       },
       name: "DeviceDescription",
       definition: {
@@ -1738,7 +1709,7 @@ Object.defineProperty(module.exports, "defs", {
       location: {
         type: "source",
         fileName: "types.js",
-        line: 13
+        line: 16
       },
       name: "SimpleProcess",
       definition: {
@@ -1769,7 +1740,7 @@ Object.defineProperty(module.exports, "defs", {
       location: {
         type: "source",
         fileName: "types.js",
-        line: 19
+        line: 22
       },
       name: "AndroidJavaProcess",
       definition: {
@@ -2112,6 +2083,88 @@ Object.defineProperty(module.exports, "defs", {
           kind: "promise",
           type: {
             kind: "string"
+          }
+        }
+      }
+    },
+    checkMuxStatus: {
+      kind: "function",
+      name: "checkMuxStatus",
+      location: {
+        type: "source",
+        fileName: "AdbService.js",
+        line: 246
+      },
+      type: {
+        location: {
+          type: "source",
+          fileName: "AdbService.js",
+          line: 246
+        },
+        kind: "function",
+        argumentTypes: [],
+        returnType: {
+          kind: "promise",
+          type: {
+            kind: "boolean"
+          }
+        }
+      }
+    },
+    checkInMuxPort: {
+      kind: "function",
+      name: "checkInMuxPort",
+      location: {
+        type: "source",
+        fileName: "AdbService.js",
+        line: 257
+      },
+      type: {
+        location: {
+          type: "source",
+          fileName: "AdbService.js",
+          line: 257
+        },
+        kind: "function",
+        argumentTypes: [{
+          name: "port",
+          type: {
+            kind: "number"
+          }
+        }],
+        returnType: {
+          kind: "promise",
+          type: {
+            kind: "void"
+          }
+        }
+      }
+    },
+    checkOutMuxPort: {
+      kind: "function",
+      name: "checkOutMuxPort",
+      location: {
+        type: "source",
+        fileName: "AdbService.js",
+        line: 263
+      },
+      type: {
+        location: {
+          type: "source",
+          fileName: "AdbService.js",
+          line: 263
+        },
+        kind: "function",
+        argumentTypes: [{
+          name: "port",
+          type: {
+            kind: "number"
+          }
+        }],
+        returnType: {
+          kind: "promise",
+          type: {
+            kind: "void"
           }
         }
       }

@@ -1,36 +1,41 @@
-'use strict';Object.defineProperty(exports, "__esModule", { value: true });var _asyncToGenerator = _interopRequireDefault(require('async-to-generator'));
+'use strict';
 
-
-
-
-
-
-
-
-
-
-
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
 
 var _atom = require('atom');
-var _rxjsBundlesRxMinJs = require('rxjs/bundles/Rx.min.js');var _HackLanguage;
 
+var _rxjsBundlesRxMinJs = require('rxjs/bundles/Rx.min.js');
 
-function _load_HackLanguage() {return _HackLanguage = require('../../nuclide-hack/lib/HackLanguage');}var _nuclideAnalytics;
-function _load_nuclideAnalytics() {return _nuclideAnalytics = require('../../nuclide-analytics');}var _nuclideUri;
-function _load_nuclideUri() {return _nuclideUri = _interopRequireDefault(require('../../../modules/nuclide-commons/nuclideUri'));}var _UniversalDisposable;
-function _load_UniversalDisposable() {return _UniversalDisposable = _interopRequireDefault(require('../../../modules/nuclide-commons/UniversalDisposable'));}function _interopRequireDefault(obj) {return obj && obj.__esModule ? obj : { default: obj };} // eslint-disable-next-line nuclide-internal/no-cross-atom-imports
+var _HackLanguage;
 
+function _load_HackLanguage() {
+  return _HackLanguage = require('../../nuclide-hack/lib/HackLanguage');
+}
+
+var _nuclideAnalytics;
+
+function _load_nuclideAnalytics() {
+  return _nuclideAnalytics = require('../../nuclide-analytics');
+}
+
+var _nuclideUri;
+
+function _load_nuclideUri() {
+  return _nuclideUri = _interopRequireDefault(require('../../../modules/nuclide-commons/nuclideUri'));
+}
+
+var _UniversalDisposable;
+
+function _load_UniversalDisposable() {
+  return _UniversalDisposable = _interopRequireDefault(require('../../../modules/nuclide-commons/UniversalDisposable'));
+}
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+// eslint-disable-next-line nuclide-internal/no-cross-atom-imports
 class ProjectStore {
-
-
-
-
-
-
-
-
-
-
 
   constructor() {
     this._emitter = new _atom.Emitter();
@@ -44,20 +49,14 @@ class ProjectStore {
     this._scriptArguments = '';
 
     const onDidChange = this._onDidChangeActivePaneItem.bind(this);
-    this._disposables = new (_UniversalDisposable || _load_UniversalDisposable()).default(
-    this._projectRoot.
-    do(() => {
+    this._disposables = new (_UniversalDisposable || _load_UniversalDisposable()).default(this._projectRoot.do(() => {
       // Set the project type to a "loading" state.
       this._isHHVMProject = null;
       this._emitter.emit('change');
-    }).
-    switchMap(root => this._isFileHHVMProject(root)).
-    subscribe(isHHVM => {
+    }).switchMap(root => this._isFileHHVMProject(root)).subscribe(isHHVM => {
       this._isHHVMProject = isHHVM;
       this._emitter.emit('change');
-    }),
-    atom.workspace.onDidStopChangingActivePaneItem(onDidChange));
-
+    }), atom.workspace.onDidStopChangingActivePaneItem(onDidChange));
     onDidChange();
   }
 
@@ -77,13 +76,9 @@ class ProjectStore {
   }
 
   _isFileHHVMProject(fileUri) {
-    return (0, (_nuclideAnalytics || _load_nuclideAnalytics()).trackTiming)('toolbar.isFileHHVMProject', (0, _asyncToGenerator.default)(function* () {
-      return (
-        fileUri != null &&
-        (_nuclideUri || _load_nuclideUri()).default.isRemote(fileUri) &&
-        (0, (_HackLanguage || _load_HackLanguage()).isFileInHackProject)(fileUri));
-
-    }));
+    return (0, (_nuclideAnalytics || _load_nuclideAnalytics()).trackTiming)('toolbar.isFileHHVMProject', async () => {
+      return fileUri != null && (_nuclideUri || _load_nuclideUri()).default.isRemote(fileUri) && (0, (_HackLanguage || _load_HackLanguage()).isFileInHackProject)(fileUri);
+    });
   }
 
   getLastScriptCommand(filePath) {
@@ -95,10 +90,7 @@ class ProjectStore {
   }
 
   updateLastScriptCommand(command) {
-    this._filePathsToScriptCommand.set(
-    (_nuclideUri || _load_nuclideUri()).default.getPath(this._currentFilePath),
-    command);
-
+    this._filePathsToScriptCommand.set((_nuclideUri || _load_nuclideUri()).default.getPath(this._currentFilePath), command);
   }
 
   onChange(callback) {
@@ -180,13 +172,15 @@ class ProjectStore {
 
   dispose() {
     this._disposables.dispose();
-  }}exports.default = ProjectStore; /**
-                                     * Copyright (c) 2015-present, Facebook, Inc.
-                                     * All rights reserved.
-                                     *
-                                     * This source code is licensed under the license found in the LICENSE file in
-                                     * the root directory of this source tree.
-                                     *
-                                     * 
-                                     * @format
-                                     */
+  }
+}
+exports.default = ProjectStore; /**
+                                 * Copyright (c) 2015-present, Facebook, Inc.
+                                 * All rights reserved.
+                                 *
+                                 * This source code is licensed under the license found in the LICENSE file in
+                                 * the root directory of this source tree.
+                                 *
+                                 * 
+                                 * @format
+                                 */

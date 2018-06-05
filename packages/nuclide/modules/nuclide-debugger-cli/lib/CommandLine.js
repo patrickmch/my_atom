@@ -1,64 +1,62 @@
-'use strict';Object.defineProperty(exports, "__esModule", { value: true });
+'use strict';
 
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
 
+var _readline = _interopRequireDefault(require('readline'));
 
+var _CommandDispatcher;
 
+function _load_CommandDispatcher() {
+  return _CommandDispatcher = _interopRequireDefault(require('./CommandDispatcher'));
+}
 
+var _rxjsBundlesRxMinJs = require('rxjs/bundles/Rx.min.js');
 
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
+/**
+ * Copyright (c) 2017-present, Facebook, Inc.
+ * All rights reserved.
+ *
+ * This source code is licensed under the BSD-style license found in the
+ * LICENSE file in the root directory of this source tree. An additional grant
+ * of patent rights can be found in the PATENTS file in the same directory.
+ *
+ *  strict
+ * @format
+ */
 
+const PROMPT = 'fbdbg> ';
 
+class CommandLine {
 
+  constructor(dispatcher) {
+    this._inputStopped = false;
+    this._shouldPrompt = false;
+    this._lastLine = '';
+    this._overridePrompt = null;
+    this._subscriptions = [];
 
-
-
-var _readline = _interopRequireDefault(require('readline'));var _CommandDispatcher;
-function _load_CommandDispatcher() {return _CommandDispatcher = _interopRequireDefault(require('./CommandDispatcher'));}
-var _rxjsBundlesRxMinJs = require('rxjs/bundles/Rx.min.js');function _interopRequireDefault(obj) {return obj && obj.__esModule ? obj : { default: obj };} /**
-                                                                                                                                                           * Copyright (c) 2017-present, Facebook, Inc.
-                                                                                                                                                           * All rights reserved.
-                                                                                                                                                           *
-                                                                                                                                                           * This source code is licensed under the BSD-style license found in the
-                                                                                                                                                           * LICENSE file in the root directory of this source tree. An additional grant
-                                                                                                                                                           * of patent rights can be found in the PATENTS file in the same directory.
-                                                                                                                                                           *
-                                                                                                                                                           *  strict
-                                                                                                                                                           * @format
-                                                                                                                                                           */const PROMPT = 'fbdbg> ';class CommandLine {
-
-
-
-
-
-  constructor(dispatcher) {this._inputStopped = false;this._shouldPrompt = false;this._lastLine = '';this._subscriptions = [];
     this._dispatcher = dispatcher;
     this._cli = _readline.default.createInterface({
       input: process.stdin,
-      output: process.stdout });
-
+      output: process.stdout
+    });
 
     this.setPrompt();
 
     this._interrupts = new _rxjsBundlesRxMinJs.Subject();
-    this._subscriptions.push(
-    _rxjsBundlesRxMinJs.Observable.fromEvent(this._cli, 'SIGINT').subscribe(this._interrupts));
-
+    this._subscriptions.push(_rxjsBundlesRxMinJs.Observable.fromEvent(this._cli, 'SIGINT').subscribe(this._interrupts));
 
     this._lines = new _rxjsBundlesRxMinJs.Subject();
-    this._subscriptions.push(
-    _rxjsBundlesRxMinJs.Observable.fromEvent(this._cli, 'line').
-    takeUntil(_rxjsBundlesRxMinJs.Observable.fromEvent(this._cli, 'close')).
-    subscribe(this._lines));
+    this._subscriptions.push(_rxjsBundlesRxMinJs.Observable.fromEvent(this._cli, 'line').takeUntil(_rxjsBundlesRxMinJs.Observable.fromEvent(this._cli, 'close')).subscribe(this._lines));
 
-
-    this._subscriptions.push(
-    this._lines.
-    filter(_ => !this._inputStopped).
-    switchMap(_ => {
+    this._subscriptions.push(this._lines.filter(_ => !this._inputStopped).switchMap(_ => {
       this._lastLine = _.trim() === '' ? this._lastLine : _.trim();
       return this._dispatcher.execute(this._lastLine);
-    }).
-    subscribe(_ => {
+    }).subscribe(_ => {
       if (_ != null) {
         this.outputLine(_.message);
       }
@@ -68,7 +66,6 @@ var _rxjsBundlesRxMinJs = require('rxjs/bundles/Rx.min.js');function _interopReq
         this._shouldPrompt = true;
       }
     }));
-
 
     this._shouldPrompt = true;
   }
@@ -86,7 +83,16 @@ var _rxjsBundlesRxMinJs = require('rxjs/bundles/Rx.min.js');function _interopReq
   }
 
   setPrompt(prompt) {
-    this._cli.setPrompt(prompt == null ? PROMPT : prompt);
+    this._overridePrompt = prompt;
+    this._updatePrompt();
+  }
+
+  _updatePrompt() {
+    if (this._inputStopped) {
+      this._cli.setPrompt('');
+    } else {
+      this._cli.setPrompt(this._overridePrompt != null ? this._overridePrompt : PROMPT);
+    }
   }
 
   // $TODO handle paging long output (more) if termcap allows us to know the screen height
@@ -112,10 +118,12 @@ var _rxjsBundlesRxMinJs = require('rxjs/bundles/Rx.min.js');function _interopReq
 
   stopInput() {
     this._inputStopped = true;
+    this._updatePrompt();
   }
 
   startInput() {
     this._inputStopped = false;
+    this._updatePrompt();
     if (this._shouldPrompt) {
       this._cli.prompt();
       this._shouldPrompt = false;
@@ -124,4 +132,6 @@ var _rxjsBundlesRxMinJs = require('rxjs/bundles/Rx.min.js');function _interopReq
 
   close() {
     this._cli.close();
-  }}exports.default = CommandLine;
+  }
+}
+exports.default = CommandLine;

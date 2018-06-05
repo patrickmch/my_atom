@@ -1,21 +1,12 @@
-'use strict';Object.defineProperty(exports, "__esModule", { value: true });exports.default =
+'use strict';
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.default = parseLogcatMetadata;
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-parseLogcatMetadata; // Example: [ 01-14 17:14:44.285   640:  656 E/KernelUidCpuTimeReader ]
+// Example: [ 01-14 17:14:44.285   640:  656 E/KernelUidCpuTimeReader ]
 // eslint-disable-next-line max-len
 const METADATA_REGEX = /^\[ (\d{2}-\d{2} \d{2}:\d{2}:\d{2}\.\d{3})\s+(\d+):(?:(0x[a-f0-9]+)|\s*(\d+))\s+(V|D|I|W|E|F|S)\/(.+) ]$/; /**
                                                                                                                                     * Copyright (c) 2015-present, Facebook, Inc.
@@ -26,9 +17,22 @@ const METADATA_REGEX = /^\[ (\d{2}-\d{2} \d{2}:\d{2}:\d{2}\.\d{3})\s+(\d+):(?:(0
                                                                                                                                     *
                                                                                                                                     * 
                                                                                                                                     * @format
-                                                                                                                                    */function parseLogcatMetadata(line) {const match = line.match(METADATA_REGEX);if (match == null) {return null;}const [, time, pid, hexTid, decTid, priority, tag] = match;return { time, pid: parseInt(pid, 10),
+                                                                                                                                    */
+
+function parseLogcatMetadata(line) {
+  const match = line.match(METADATA_REGEX);
+
+  if (match == null) {
+    return null;
+  }
+
+  const [, time, pid, hexTid, decTid, priority, tag] = match;
+
+  return {
+    time,
+    pid: parseInt(pid, 10),
     tid: hexTid == null ? parseInt(decTid, 10) : parseInt(hexTid, 16),
     priority: priority,
-    tag };
-
+    tag
+  };
 }

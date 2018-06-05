@@ -1,41 +1,33 @@
-'use strict';Object.defineProperty(exports, "__esModule", { value: true });exports.
+'use strict';
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.definitionsAreEqual = definitionsAreEqual;
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-definitionsAreEqual = definitionsAreEqual; /**
-                                            * Returns true if the 2 definitions are considered equal. They are considered equal if:
-                                            *    - they are both null
-                                            *    - they are both undefined
-                                            *    - they both refer to the same symbol, i.e. they are non-null/undefined and have the same:
-                                            *      - name
-                                            *      - path
-                                            *      - position (row & column)
-                                            *      - language
-                                            *      - project root
-                                            */function definitionsAreEqual(x, y) {if (x == null || y == null) {return x === y;}if (x.name !== y.name) {return false;}if (x.path !== y.path) {return false;}if (
-  x.position.row !== y.position.row ||
-  x.position.column !== y.position.column)
-  {
+/**
+ * Returns true if the 2 definitions are considered equal. They are considered equal if:
+ *    - they are both null
+ *    - they are both undefined
+ *    - they both refer to the same symbol, i.e. they are non-null/undefined and have the same:
+ *      - name
+ *      - path
+ *      - position (row & column)
+ *      - language
+ *      - project root
+ */
+function definitionsAreEqual(x, y) {
+  if (x == null || y == null) {
+    return x === y;
+  }
+  if (x.name !== y.name) {
+    return false;
+  }
+  if (x.path !== y.path) {
+    return false;
+  }
+  if (x.position.row !== y.position.row || x.position.column !== y.position.column) {
     return false;
   }
   if (x.language !== y.language) {

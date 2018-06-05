@@ -1,33 +1,36 @@
-'use strict';Object.defineProperty(exports, "__esModule", { value: true });exports.AndroidDeviceStopProcessProvider = undefined;var _asyncToGenerator = _interopRequireDefault(require('async-to-generator'));
+'use strict';
 
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.AndroidDeviceStopProcessProvider = undefined;
 
+var _rxjsBundlesRxMinJs = require('rxjs/bundles/Rx.min.js');
 
+var _utils;
 
+function _load_utils() {
+  return _utils = require('../../../../modules/nuclide-adb/lib/utils');
+}
 
+/**
+ * Copyright (c) 2015-present, Facebook, Inc.
+ * All rights reserved.
+ *
+ * This source code is licensed under the license found in the LICENSE file in
+ * the root directory of this source tree.
+ *
+ *  strict-local
+ * @format
+ */
 
+class AndroidDeviceStopProcessProvider {
+  getType() {
+    return 'Android';
+  }
 
-
-
-
-
-
-
-
-
-
-
-
-var _rxjsBundlesRxMinJs = require('rxjs/bundles/Rx.min.js');var _utils;
-function _load_utils() {return _utils = require('../../../../modules/nuclide-adb/lib/utils');}function _interopRequireDefault(obj) {return obj && obj.__esModule ? obj : { default: obj };} /**
-                                                                                                                                                                                             * Copyright (c) 2015-present, Facebook, Inc.
-                                                                                                                                                                                             * All rights reserved.
-                                                                                                                                                                                             *
-                                                                                                                                                                                             * This source code is licensed under the license found in the LICENSE file in
-                                                                                                                                                                                             * the root directory of this source tree.
-                                                                                                                                                                                             *
-                                                                                                                                                                                             *  strict-local
-                                                                                                                                                                                             * @format
-                                                                                                                                                                                             */class AndroidDeviceStopProcessProvider {getType() {return 'Android';}getTaskType() {return 'KILL';
+  getTaskType() {
+    return 'KILL';
   }
 
   getName() {
@@ -38,18 +41,12 @@ function _load_utils() {return _utils = require('../../../../modules/nuclide-adb
     return true;
   }
 
-  getSupportedPIDs(
-  host,
-  device,
-  procs)
-  {
+  getSupportedPIDs(host, device, procs) {
     return _rxjsBundlesRxMinJs.Observable.of(new Set(procs.map(proc => proc.pid)));
   }
 
-  run(host, device, proc) {return (0, _asyncToGenerator.default)(function* () {
-      return (0, (_utils || _load_utils()).getAdbServiceByNuclideUri)(host).stopProcess(
-      device,
-      proc.name,
-      proc.pid);})();
-
-  }}exports.AndroidDeviceStopProcessProvider = AndroidDeviceStopProcessProvider;
+  async run(host, device, proc) {
+    return (0, (_utils || _load_utils()).getAdbServiceByNuclideUri)(host).stopProcess(device, proc.name, proc.pid);
+  }
+}
+exports.AndroidDeviceStopProcessProvider = AndroidDeviceStopProcessProvider;

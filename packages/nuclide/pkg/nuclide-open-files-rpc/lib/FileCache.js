@@ -1,52 +1,63 @@
-'use strict';Object.defineProperty(exports, "__esModule", { value: true });exports.FileCache = undefined;var _asyncToGenerator = _interopRequireDefault(require('async-to-generator'));var _simpleTextBuffer;
+'use strict';
 
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.FileCache = undefined;
 
+var _simpleTextBuffer;
 
+function _load_simpleTextBuffer() {
+  return _simpleTextBuffer = _interopRequireDefault(require('simple-text-buffer'));
+}
 
+var _rxjsBundlesRxMinJs = require('rxjs/bundles/Rx.min.js');
 
+var _FileVersionNotifier;
 
+function _load_FileVersionNotifier() {
+  return _FileVersionNotifier = require('./FileVersionNotifier');
+}
 
+var _UniversalDisposable;
 
+function _load_UniversalDisposable() {
+  return _UniversalDisposable = _interopRequireDefault(require('../../../modules/nuclide-commons/UniversalDisposable'));
+}
 
+var _nuclideUri;
 
+function _load_nuclideUri() {
+  return _nuclideUri = _interopRequireDefault(require('../../../modules/nuclide-commons/nuclideUri'));
+}
 
+var _constants;
 
+function _load_constants() {
+  return _constants = require('./constants');
+}
 
-
-
-
-
-
-
-
-
-function _load_simpleTextBuffer() {return _simpleTextBuffer = _interopRequireDefault(require('simple-text-buffer'));}
-
-var _rxjsBundlesRxMinJs = require('rxjs/bundles/Rx.min.js');var _FileVersionNotifier;
-function _load_FileVersionNotifier() {return _FileVersionNotifier = require('./FileVersionNotifier');}var _UniversalDisposable;
-function _load_UniversalDisposable() {return _UniversalDisposable = _interopRequireDefault(require('../../../modules/nuclide-commons/UniversalDisposable'));}var _nuclideUri;
-function _load_nuclideUri() {return _nuclideUri = _interopRequireDefault(require('../../../modules/nuclide-commons/nuclideUri'));}var _constants;
-
-function _load_constants() {return _constants = require('./constants');}function _interopRequireDefault(obj) {return obj && obj.__esModule ? obj : { default: obj };}
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 /**
-                                                                                                                                                                       * NB: although it is possible to change the language ID after the file has
-                                                                                                                                                                       * already been opened, the file cache will not update to reflect that.
-                                                                                                                                                                       */ /**
-                                                                                                                                                                           * Copyright (c) 2015-present, Facebook, Inc.
-                                                                                                                                                                           * All rights reserved.
-                                                                                                                                                                           *
-                                                                                                                                                                           * This source code is licensed under the license found in the LICENSE file in
-                                                                                                                                                                           * the root directory of this source tree.
-                                                                                                                                                                           *
-                                                                                                                                                                           * 
-                                                                                                                                                                           * @format
-                                                                                                                                                                           */class FileCache {// Care! update() is the only way you're allowed to update _buffers or _requests
+ * NB: although it is possible to change the language ID after the file has
+ * already been opened, the file cache will not update to reflect that.
+ */
+/**
+ * Copyright (c) 2015-present, Facebook, Inc.
+ * All rights reserved.
+ *
+ * This source code is licensed under the license found in the LICENSE file in
+ * the root directory of this source tree.
+ *
+ * 
+ * @format
+ */
+
+class FileCache {
+  // Care! update() is the only way you're allowed to update _buffers or _requests
   // or to fire a _fileEvents.next() event. That's to ensure that the three things
   // stay in sync.
-
-
-
   constructor() {
     this._buffers = new Map();
     this._fileEvents = new _rxjsBundlesRxMinJs.Subject();
@@ -64,7 +75,10 @@ function _load_constants() {return _constants = require('./constants');}function
     // invariant: because the above two lines have updated both _buffers and _requests,
     // then getBufferAtVersion will necessarily return immediately and successfully.
     // And getBufferForFileEvent will also succeed.
-    if (!(event.kind !== 'edit' || this.getBufferForFileEvent(event))) {throw new Error('Invariant violation: "event.kind !== \'edit\' || this.getBufferForFileEvent(event)"');}
+
+    if (!(event.kind !== 'edit' || this.getBufferForFileEvent(event))) {
+      throw new Error('Invariant violation: "event.kind !== \'edit\' || this.getBufferForFileEvent(event)"');
+    }
 
     this._fileEvents.next(event);
   }
@@ -77,8 +91,11 @@ function _load_constants() {return _constants = require('./constants');}function
     const fileInfo = this._buffers.get(filePath);
     const buffer = fileInfo != null ? fileInfo.buffer : null;
     switch (event.kind) {
-      case (_constants || _load_constants()).FileEventKind.OPEN:if (!(
-        buffer == null)) {throw new Error('Invariant violation: "buffer == null"');}
+      case (_constants || _load_constants()).FileEventKind.OPEN:
+        if (!(buffer == null)) {
+          throw new Error('Invariant violation: "buffer == null"');
+        }
+
         this._open(filePath, event.contents, changeCount, event.languageId);
         break;
       case (_constants || _load_constants()).FileEventKind.CLOSE:
@@ -86,13 +103,26 @@ function _load_constants() {return _constants = require('./constants');}function
           this._close(filePath, buffer);
         }
         break;
-      case (_constants || _load_constants()).FileEventKind.EDIT:if (!(
-        buffer != null)) {throw new Error('Invariant violation: "buffer != null"');}if (!(
-        buffer.changeCount === changeCount - 1)) {throw new Error('Invariant violation: "buffer.changeCount === changeCount - 1"');}if (!(
-        buffer.getTextInRange(event.oldRange) === event.oldText)) {throw new Error('Invariant violation: "buffer.getTextInRange(event.oldRange) === event.oldText"');}
+      case (_constants || _load_constants()).FileEventKind.EDIT:
+        if (!(buffer != null)) {
+          throw new Error('Invariant violation: "buffer != null"');
+        }
+
+        if (!(buffer.changeCount === changeCount - 1)) {
+          throw new Error('Invariant violation: "buffer.changeCount === changeCount - 1"');
+        }
+
+        if (!(buffer.getTextInRange(event.oldRange) === event.oldText)) {
+          throw new Error('Invariant violation: "buffer.getTextInRange(event.oldRange) === event.oldText"');
+        }
+
         this.update(() => {
-          buffer.setTextInRange(event.oldRange, event.newText);if (!(
-          buffer.changeCount === changeCount)) {throw new Error('Invariant violation: "buffer.changeCount === changeCount"');}
+          buffer.setTextInRange(event.oldRange, event.newText);
+
+          if (!(buffer.changeCount === changeCount)) {
+            throw new Error('Invariant violation: "buffer.changeCount === changeCount"');
+          }
+
           return event;
         });
         break;
@@ -108,26 +138,16 @@ function _load_constants() {return _constants = require('./constants');}function
         break;
       default:
         event.kind;
-        throw new Error(`Unexpected FileEvent.kind: ${event.kind}`);}
-
+        throw new Error(`Unexpected FileEvent.kind: ${event.kind}`);
+    }
     return Promise.resolve(undefined);
   }
 
-  getTotalBufferSize() {var _this = this;return (0, _asyncToGenerator.default)(function* () {
-      const addLength = function (acc, { buffer }) {return acc + buffer.getText().length;};
-      return [..._this._buffers.values()].reduce(addLength, 0);})();
+  async onDirectoriesChanged(openDirectories) {
+    this._directoryEvents.next(openDirectories);
   }
 
-  onDirectoriesChanged(openDirectories) {var _this2 = this;return (0, _asyncToGenerator.default)(function* () {
-      _this2._directoryEvents.next(openDirectories);})();
-  }
-
-  _syncEdit(
-  filePath,
-  buffer,
-  contents,
-  changeCount)
-  {
+  _syncEdit(filePath, buffer, contents, changeCount) {
     // messages are out of order
     if (changeCount < buffer.changeCount) {
       return;
@@ -139,42 +159,25 @@ function _load_constants() {return _constants = require('./constants');}function
       buffer.setText(contents);
       const newRange = buffer.getRange();
       buffer.changeCount = changeCount;
-      return createEditEvent(
-      this.createFileVersion(filePath, changeCount),
-      oldRange,
-      oldText,
-      newRange,
-      buffer.getText());
-
+      return createEditEvent(this.createFileVersion(filePath, changeCount), oldRange, oldText, newRange, buffer.getText());
     });
   }
 
-  _open(
-  filePath,
-  contents,
-  changeCount,
-  languageId)
-  {
+  _open(filePath, contents, changeCount, languageId) {
     // We never call setPath on these TextBuffers as that will
     // start the TextBuffer attempting to sync with the file system.
     const newBuffer = new (_simpleTextBuffer || _load_simpleTextBuffer()).default(contents);
     newBuffer.changeCount = changeCount;
     this.update(() => {
       this._buffers.set(filePath, { buffer: newBuffer, languageId });
-      return createOpenEvent(
-      this.createFileVersion(filePath, changeCount),
-      contents,
-      languageId);
-
+      return createOpenEvent(this.createFileVersion(filePath, changeCount), contents, languageId);
     });
   }
 
   _close(filePath, buffer) {
     this.update(() => {
       this._buffers.delete(filePath);
-      return createCloseEvent(
-      this.createFileVersion(filePath, buffer.changeCount));
-
+      return createCloseEvent(this.createFileVersion(filePath, buffer.changeCount));
     });
     buffer.destroy();
   }
@@ -187,11 +190,14 @@ function _load_constants() {return _constants = require('./constants');}function
 
   dispose() {
     // The _close routine will delete elements from the _buffers map.
-
     for (const [filePath, { buffer }] of this._buffers.entries()) {
       this._close(filePath, buffer);
-    }if (!(
-    this._buffers.size === 0)) {throw new Error('Invariant violation: "this._buffers.size === 0"');}
+    }
+
+    if (!(this._buffers.size === 0)) {
+      throw new Error('Invariant violation: "this._buffers.size === 0"');
+    }
+
     this._resources.dispose();
     this._fileEvents.complete();
     this._directoryEvents.complete();
@@ -211,17 +217,13 @@ function _load_constants() {return _constants = require('./constants');}function
   // But if for whatever reason the stream of onFileEvent won't hit that precise version
   // then returns null. See comments in _requests.waitForBufferAtVersion for
   // the subtle scenarios where it might return null.
-  getBufferAtVersion(
-  fileVersion)
-  {var _this3 = this;return (0, _asyncToGenerator.default)(function* () {
-      // TODO: change this to return a string, like getBuffer() above.
-      if (!(yield _this3._requests.waitForBufferAtVersion(fileVersion))) {
-        return null;
-      }
-      const buffer = _this3.getBuffer(fileVersion.filePath);
-      return buffer != null && buffer.changeCount === fileVersion.version ?
-      buffer :
-      null;})();
+  async getBufferAtVersion(fileVersion) {
+    // TODO: change this to return a string, like getBuffer() above.
+    if (!(await this._requests.waitForBufferAtVersion(fileVersion))) {
+      return null;
+    }
+    const buffer = this.getBuffer(fileVersion.filePath);
+    return buffer != null && buffer.changeCount === fileVersion.version ? buffer : null;
   }
 
   // getBufferForFileEvent - this function may be called immediately when an edit or save
@@ -230,10 +232,18 @@ function _load_constants() {return _constants = require('./constants');}function
   // in which case it may throw.
   getBufferForFileEvent(fileEvent) {
     // TODO: change this to return a string, like getBuffer() above.
-    const fileVersion = fileEvent.fileVersion;if (!
-    this._requests.isBufferAtVersion(fileVersion)) {throw new Error('Invariant violation: "this._requests.isBufferAtVersion(fileVersion)"');}
-    const buffer = this.getBuffer(fileVersion.filePath);if (!(
-    buffer != null && buffer.changeCount === fileVersion.version)) {throw new Error('Invariant violation: "buffer != null && buffer.changeCount === fileVersion.version"');}
+    const fileVersion = fileEvent.fileVersion;
+
+    if (!this._requests.isBufferAtVersion(fileVersion)) {
+      throw new Error('Invariant violation: "this._requests.isBufferAtVersion(fileVersion)"');
+    }
+
+    const buffer = this.getBuffer(fileVersion.filePath);
+
+    if (!(buffer != null && buffer.changeCount === fileVersion.version)) {
+      throw new Error('Invariant violation: "buffer != null && buffer.changeCount === fileVersion.version"');
+    }
+
     return buffer;
   }
 
@@ -259,19 +269,17 @@ function _load_constants() {return _constants = require('./constants');}function
   }
 
   observeFileEvents() {
-    return _rxjsBundlesRxMinJs.Observable.from(
-    Array.from(this._buffers.entries()).map(
-    ([filePath, { buffer, languageId }]) => {if (!(
-      buffer != null)) {throw new Error('Invariant violation: "buffer != null"');}if (!(
-      languageId != null)) {throw new Error('Invariant violation: "languageId != null"');}
-      return createOpenEvent(
-      this.createFileVersion(filePath, buffer.changeCount),
-      buffer.getText(),
-      languageId);
+    return _rxjsBundlesRxMinJs.Observable.from(Array.from(this._buffers.entries()).map(([filePath, { buffer, languageId }]) => {
+      if (!(buffer != null)) {
+        throw new Error('Invariant violation: "buffer != null"');
+      }
 
-    })).
+      if (!(languageId != null)) {
+        throw new Error('Invariant violation: "languageId != null"');
+      }
 
-    concat(this._fileEvents);
+      return createOpenEvent(this.createFileVersion(filePath, buffer.changeCount), buffer.getText(), languageId);
+    })).concat(this._fileEvents);
   }
 
   observeDirectoryEvents() {
@@ -282,51 +290,42 @@ function _load_constants() {return _constants = require('./constants');}function
     return {
       notifier: this,
       filePath,
-      version };
+      version
+    };
+  }
+}
 
-  }}exports.FileCache = FileCache;
-
-
-function createOpenEvent(
-fileVersion,
-contents,
-languageId)
-{
+exports.FileCache = FileCache;
+function createOpenEvent(fileVersion, contents, languageId) {
   return {
     kind: (_constants || _load_constants()).FileEventKind.OPEN,
     fileVersion,
     contents,
-    languageId };
-
+    languageId
+  };
 }
 
 function createCloseEvent(fileVersion) {
   return {
     kind: (_constants || _load_constants()).FileEventKind.CLOSE,
-    fileVersion };
-
+    fileVersion
+  };
 }
 
 function createSaveEvent(fileVersion) {
   return {
     kind: (_constants || _load_constants()).FileEventKind.SAVE,
-    fileVersion };
-
+    fileVersion
+  };
 }
 
-function createEditEvent(
-fileVersion,
-oldRange,
-oldText,
-newRange,
-newText)
-{
+function createEditEvent(fileVersion, oldRange, oldText, newRange, newText) {
   return {
     kind: (_constants || _load_constants()).FileEventKind.EDIT,
     fileVersion,
     oldRange,
     oldText,
     newRange,
-    newText };
-
+    newText
+  };
 }

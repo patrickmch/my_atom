@@ -1,30 +1,22 @@
-'use strict';Object.defineProperty(exports, "__esModule", { value: true });exports.ActionTypes = undefined;var _Dispatcher;
+'use strict';
 
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.ActionTypes = undefined;
 
+var _Dispatcher;
 
+function _load_Dispatcher() {
+  return _Dispatcher = _interopRequireDefault(require('../../commons-node/Dispatcher'));
+}
 
-
-
-
-
-
-
-function _load_Dispatcher() {return _Dispatcher = _interopRequireDefault(require('../../commons-node/Dispatcher'));}function _interopRequireDefault(obj) {return obj && obj.__esModule ? obj : { default: obj };}
-
-
-
-
-
-
-
-
-
-
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 const ActionTypes = exports.ActionTypes = Object.freeze({
   ACTIVE_PROVIDER_CHANGED: 'ACTIVE_PROVIDER_CHANGED',
-  QUERY: 'QUERY' });
-
+  QUERY: 'QUERY'
+});
 
 // Flow hack: Every QuickSelectionAction actionType must be in ActionTypes.
 // $FlowFixMe(>=0.55.0) Flow suppress
@@ -37,4 +29,9 @@ const ActionTypes = exports.ActionTypes = Object.freeze({
  *
  *  strict
  * @format
- */'';class QuickSelectionDispatcher extends (_Dispatcher || _load_Dispatcher()).default {}exports.default = QuickSelectionDispatcher;
+ */
+
+'';
+
+class QuickSelectionDispatcher extends (_Dispatcher || _load_Dispatcher()).default {}
+exports.default = QuickSelectionDispatcher;

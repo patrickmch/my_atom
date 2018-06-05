@@ -1,25 +1,10 @@
-'use strict';Object.defineProperty(exports, "__esModule", { value: true });exports.default =
+'use strict';
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-waitsForPromise;function waitsForPromise(
-...args)
-{
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.default = waitsForPromise;
+function waitsForPromise(...args) {
   let shouldReject;
   let timeout;
   if (args.length > 1) {
@@ -33,42 +18,28 @@ waitsForPromise;function waitsForPromise(
   let finished = false;
 
   runs(() => {
-    const fn = args[args.length - 1];if (!(
-    typeof fn === 'function')) {throw new Error('Invariant violation: "typeof fn === \'function\'"');}
+    const fn = args[args.length - 1];
+
+    if (!(typeof fn === 'function')) {
+      throw new Error('Invariant violation: "typeof fn === \'function\'"');
+    }
+
     const promise = fn();
     if (shouldReject) {
-      promise.
-      then(
-      () => {
-        jasmine.
-        getEnv().
-        currentSpec.fail(
-        'Expected promise to be rejected, but it was resolved');
-
-      },
-      () => {
+      promise.then(() => {
+        jasmine.getEnv().currentSpec.fail('Expected promise to be rejected, but it was resolved');
+      }, () => {
         // Do nothing, it's expected.
-      }).
-
-      then(() => {
+      }).then(() => {
         finished = true;
       });
     } else {
-      promise.
-      then(
-      () => {
+      promise.then(() => {
         // Do nothing, it's expected.
-      },
-      error => {
+      }, error => {
         const text = error ? error.stack || error.toString() : 'undefined';
-        jasmine.
-        getEnv().
-        currentSpec.fail(
-        `Expected promise to be resolved, but it was rejected with ${text}`);
-
-      }).
-
-      then(() => {
+        jasmine.getEnv().currentSpec.fail(`Expected promise to be resolved, but it was rejected with ${text}`);
+      }).then(() => {
         finished = true;
       });
     }

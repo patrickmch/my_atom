@@ -1,24 +1,29 @@
-'use strict';Object.defineProperty(exports, "__esModule", { value: true });exports.FileVersionNotifier = undefined;var _constants;
+'use strict';
 
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.FileVersionNotifier = undefined;
 
+var _constants;
 
+function _load_constants() {
+  return _constants = require('./constants');
+}
 
+var _promise;
 
+function _load_promise() {
+  return _promise = require('../../../modules/nuclide-commons/promise');
+}
 
+var _collection;
 
-
-
-
-
-
-
-function _load_constants() {return _constants = require('./constants');}var _promise;
-function _load_promise() {return _promise = require('../../../modules/nuclide-commons/promise');}var _collection;
-function _load_collection() {return _collection = require('../../../modules/nuclide-commons/collection');}
+function _load_collection() {
+  return _collection = require('../../../modules/nuclide-commons/collection');
+}
 
 class FileVersionNotifier {
-
-
 
   constructor() {
     this._versions = new Map();
@@ -44,8 +49,8 @@ class FileVersionNotifier {
         break;
       default:
         event.kind;
-        throw new Error(`Unexpected LocalFileEvent.kind: ${event.kind}`);}
-
+        throw new Error(`Unexpected LocalFileEvent.kind: ${event.kind}`);
+    }
     this._checkRequests(filePath);
   }
 
@@ -107,33 +112,37 @@ class FileVersionNotifier {
     }
 
     const requests = Array.from(this._requests.get(filePath));
-    const resolves = requests.filter(
-    request => request.changeCount === currentVersion);
-
-    const rejects = requests.filter(
-    request => request.changeCount < currentVersion);
-
-    const remaining = requests.filter(
-    request => request.changeCount > currentVersion);
-
+    const resolves = requests.filter(request => request.changeCount === currentVersion);
+    const rejects = requests.filter(request => request.changeCount < currentVersion);
+    const remaining = requests.filter(request => request.changeCount > currentVersion);
     this._requests.set(filePath, remaining);
 
     resolves.forEach(request => request.resolve(true));
     rejects.forEach(request => request.resolve(false));
-  }}exports.FileVersionNotifier = FileVersionNotifier; /**
-                                                        * Copyright (c) 2015-present, Facebook, Inc.
-                                                        * All rights reserved.
-                                                        *
-                                                        * This source code is licensed under the license found in the LICENSE file in
-                                                        * the root directory of this source tree.
-                                                        *
-                                                        * 
-                                                        * @format
-                                                        */function createRejectError() {return new Error('File modified past requested change');}class Request extends (_promise || _load_promise()).Deferred {
+  }
+}
+
+exports.FileVersionNotifier = FileVersionNotifier; /**
+                                                    * Copyright (c) 2015-present, Facebook, Inc.
+                                                    * All rights reserved.
+                                                    *
+                                                    * This source code is licensed under the license found in the LICENSE file in
+                                                    * the root directory of this source tree.
+                                                    *
+                                                    * 
+                                                    * @format
+                                                    */
+
+function createRejectError() {
+  return new Error('File modified past requested change');
+}
+
+class Request extends (_promise || _load_promise()).Deferred {
 
   constructor(filePath, changeCount) {
     super();
 
     this.filePath = filePath;
     this.changeCount = changeCount;
-  }}
+  }
+}

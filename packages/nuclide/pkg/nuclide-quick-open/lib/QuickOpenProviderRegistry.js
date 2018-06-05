@@ -1,29 +1,20 @@
-'use strict';Object.defineProperty(exports, "__esModule", { value: true });
+'use strict';
 
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
 
+var _atom = require('atom');
 
+var _UniversalDisposable;
 
+function _load_UniversalDisposable() {
+  return _UniversalDisposable = _interopRequireDefault(require('../../../modules/nuclide-commons/UniversalDisposable'));
+}
 
-
-
-
-
-
-
-
-
-
-
-
-
-var _atom = require('atom');var _UniversalDisposable;
-function _load_UniversalDisposable() {return _UniversalDisposable = _interopRequireDefault(require('../../../modules/nuclide-commons/UniversalDisposable'));}function _interopRequireDefault(obj) {return obj && obj.__esModule ? obj : { default: obj };}
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 class QuickOpenProviderRegistry {
-
-
-
-
 
   constructor() {
     this._emitter = new _atom.Emitter();
@@ -33,10 +24,7 @@ class QuickOpenProviderRegistry {
   }
 
   getProviders() {
-    return [
-    ...this._globalProviders.values(),
-    ...this._directoryProviders.values()];
-
+    return [...this._globalProviders.values(), ...this._directoryProviders.values()];
   }
 
   getGlobalProviders() {
@@ -48,10 +36,7 @@ class QuickOpenProviderRegistry {
   }
 
   getProviderByName(serviceName) {
-    return (
-      this._globalProviders.get(serviceName) ||
-      this._directoryProviders.get(serviceName));
-
+    return this._globalProviders.get(serviceName) || this._directoryProviders.get(serviceName);
   }
 
   getGlobalProviderByName(serviceName) {
@@ -66,24 +51,18 @@ class QuickOpenProviderRegistry {
     return this._globalProviders.has(serviceName);
   }
 
-  observeProviders(
-  callback)
-  {
+  observeProviders(callback) {
     for (const provider of this.getProviders()) {
       callback(provider);
     }
     return this.onDidAddProvider(callback);
   }
 
-  onDidAddProvider(
-  callback)
-  {
+  onDidAddProvider(callback) {
     return this._emitter.on('did-add-provider', callback);
   }
 
-  onDidRemoveProvider(
-  callback)
-  {
+  onDidRemoveProvider(callback) {
     return this._emitter.on('did-remove-provider', callback);
   }
 
@@ -110,13 +89,15 @@ class QuickOpenProviderRegistry {
   dispose() {
     this._emitter.dispose();
     this._subscriptions.dispose();
-  }}exports.default = QuickOpenProviderRegistry; /**
-                                                  * Copyright (c) 2015-present, Facebook, Inc.
-                                                  * All rights reserved.
-                                                  *
-                                                  * This source code is licensed under the license found in the LICENSE file in
-                                                  * the root directory of this source tree.
-                                                  *
-                                                  * 
-                                                  * @format
-                                                  */
+  }
+}
+exports.default = QuickOpenProviderRegistry; /**
+                                              * Copyright (c) 2015-present, Facebook, Inc.
+                                              * All rights reserved.
+                                              *
+                                              * This source code is licensed under the license found in the LICENSE file in
+                                              * the root directory of this source tree.
+                                              *
+                                              * 
+                                              * @format
+                                              */

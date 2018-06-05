@@ -1,20 +1,16 @@
 "use strict";
 
-let Observable;
-
 module.exports = _client => {
   const remoteModule = {};
 
   remoteModule.watchFile = function (arg0) {
-    return Observable.fromPromise(_client.marshalArguments(Array.from(arguments), [{
+    return _client.callRemoteFunction("FileWatcherService/watchFile", "observable", _client.marshalArguments(Array.from(arguments), [{
       name: "filePath",
       type: {
         kind: "named",
         name: "NuclideUri"
       }
-    }])).switchMap(args => {
-      return _client.callRemoteFunction("FileWatcherService/watchFile", "observable", args);
-    }).concatMap(value => {
+    }])).map(value => {
       return _client.unmarshal(value, {
         kind: "named",
         name: "WatchResult"
@@ -23,7 +19,7 @@ module.exports = _client => {
   };
 
   remoteModule.watchWithNode = function (arg0, arg1) {
-    return Observable.fromPromise(_client.marshalArguments(Array.from(arguments), [{
+    return _client.callRemoteFunction("FileWatcherService/watchWithNode", "observable", _client.marshalArguments(Array.from(arguments), [{
       name: "watchedPath",
       type: {
         kind: "named",
@@ -37,9 +33,7 @@ module.exports = _client => {
           kind: "boolean"
         }
       }
-    }])).switchMap(args => {
-      return _client.callRemoteFunction("FileWatcherService/watchWithNode", "observable", args);
-    }).concatMap(value => {
+    }])).map(value => {
       return _client.unmarshal(value, {
         kind: "named",
         name: "WatchResult"
@@ -48,15 +42,13 @@ module.exports = _client => {
   };
 
   remoteModule.watchDirectory = function (arg0) {
-    return Observable.fromPromise(_client.marshalArguments(Array.from(arguments), [{
+    return _client.callRemoteFunction("FileWatcherService/watchDirectory", "observable", _client.marshalArguments(Array.from(arguments), [{
       name: "directoryPath",
       type: {
         kind: "named",
         name: "NuclideUri"
       }
-    }])).switchMap(args => {
-      return _client.callRemoteFunction("FileWatcherService/watchDirectory", "observable", args);
-    }).concatMap(value => {
+    }])).map(value => {
       return _client.unmarshal(value, {
         kind: "named",
         name: "WatchResult"
@@ -65,15 +57,13 @@ module.exports = _client => {
   };
 
   remoteModule.watchDirectoryRecursive = function (arg0) {
-    return Observable.fromPromise(_client.marshalArguments(Array.from(arguments), [{
+    return _client.callRemoteFunction("FileWatcherService/watchDirectoryRecursive", "observable", _client.marshalArguments(Array.from(arguments), [{
       name: "directoryPath",
       type: {
         kind: "named",
         name: "NuclideUri"
       }
-    }])).switchMap(args => {
-      return _client.callRemoteFunction("FileWatcherService/watchDirectoryRecursive", "observable", args);
-    }).concatMap(value => {
+    }])).map(value => {
       return _client.unmarshal(value, {
         kind: "string"
       });
@@ -83,11 +73,6 @@ module.exports = _client => {
   return remoteModule;
 };
 
-Object.defineProperty(module.exports, "inject", {
-  value: function () {
-    Observable = arguments[0];
-  }
-});
 Object.defineProperty(module.exports, "defs", {
   value: {
     Object: {

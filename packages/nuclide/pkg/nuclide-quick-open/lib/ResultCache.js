@@ -1,27 +1,20 @@
-'use strict';Object.defineProperty(exports, "__esModule", { value: true });var _debounce;
+'use strict';
 
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
 
+var _debounce;
 
+function _load_debounce() {
+  return _debounce = _interopRequireDefault(require('../../../modules/nuclide-commons/debounce'));
+}
 
-
-
-
-
-
-
-
-
-
-
-
-function _load_debounce() {return _debounce = _interopRequireDefault(require('../../../modules/nuclide-commons/debounce'));}function _interopRequireDefault(obj) {return obj && obj.__esModule ? obj : { default: obj };}
-
-
-
-
-
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 // Number of elements in the cache before periodic cleanup kicks in. Includes partial query strings.
+
+
 // TODO use maps
 /**
  * Copyright (c) 2015-present, Facebook, Inc.
@@ -32,45 +25,42 @@ function _load_debounce() {return _debounce = _interopRequireDefault(require('..
  *
  * 
  * @format
- */const MAX_CACHED_QUERIES = 100;const CACHE_CLEAN_DEBOUNCE_DELAY = 5000;class ResultCache {// List of most recently used query strings, used for pruning the result cache.
+ */
+
+const MAX_CACHED_QUERIES = 100;
+const CACHE_CLEAN_DEBOUNCE_DELAY = 5000;
+
+class ResultCache {
+  // List of most recently used query strings, used for pruning the result cache.
   // Makes use of `Map`'s insertion ordering, so values are irrelevant and always set to `null`.
-
-
   constructor(onResultsChanged) {
     this._lastCachedQuery = new Map();
     this._queryLruQueue = new Map();
     this._cachedResults = {};
     this._onResultsChanged = onResultsChanged;
-    this._debouncedCleanCache = (0, (_debounce || _load_debounce()).default)(
-    () => this._cleanCache(),
-    CACHE_CLEAN_DEBOUNCE_DELAY,
+    this._debouncedCleanCache = (0, (_debounce || _load_debounce()).default)(() => this._cleanCache(), CACHE_CLEAN_DEBOUNCE_DELAY,
     /* immediate */false);
-
   }
 
   // Return value indicates whether there was a change
+
   // Cache the last query with results for each provider.
   // Display cached results for the last completed query until new data arrives.
-  removeResultsForProvider(providerName) {if (this._cachedResults[providerName]) {delete this._cachedResults[providerName];
+  removeResultsForProvider(providerName) {
+    if (this._cachedResults[providerName]) {
+      delete this._cachedResults[providerName];
       this._onResultsChanged();
     }
     this._lastCachedQuery.delete(providerName);
   }
 
-  setCacheResult(
-  providerName,
-  directory,
-  query,
-  results,
-  loading = false,
-  error = null)
-  {
+  setCacheResult(providerName, directory, query, results, loading = false, error = null) {
     this._ensureCacheEntry(providerName, directory);
     this._cachedResults[providerName][directory][query] = {
       results,
       loading,
-      error };
-
+      error
+    };
     this._lastCachedQuery.set(providerName, query);
     // Refresh the usage for the current query.
     this._queryLruQueue.delete(query);
@@ -79,21 +69,12 @@ function _load_debounce() {return _debounce = _interopRequireDefault(require('..
   }
 
   // Sets the cache result directly without modifying the _lastCachedQuery or _queryLruQueue.
-  rawSetCacheResult(
-  providerName,
-  directory,
-  query,
-  result)
-  {
+  rawSetCacheResult(providerName, directory, query, result) {
     this._ensureCacheEntry(providerName, directory);
     this._cachedResults[providerName][directory][query] = result;
   }
 
-  getCacheResult(
-  providerName,
-  directory,
-  query)
-  {
+  getCacheResult(providerName, directory, query) {
     this._ensureCacheEntry(providerName, directory);
     return this._cachedResults[providerName][directory][query];
   }
@@ -121,9 +102,9 @@ function _load_debounce() {return _debounce = _interopRequireDefault(require('..
   }
 
   /**
-     * Release the oldest cached results once the cache is full. Return value indicates whether the
-     * cache was changed.
-     */
+   * Release the oldest cached results once the cache is full. Return value indicates whether the
+   * cache was changed.
+   */
   _cleanCache() {
     const queueSize = this._queryLruQueue.size;
     if (queueSize <= MAX_CACHED_QUERIES) {
@@ -134,8 +115,12 @@ function _load_debounce() {return _debounce = _interopRequireDefault(require('..
     const keyIterator = this._queryLruQueue.keys();
     const entriesToRemove = queueSize - MAX_CACHED_QUERIES;
     for (let i = 0; i < entriesToRemove; i++) {
-      const firstEntryKey = keyIterator.next().value;if (!(
-      firstEntryKey != null)) {throw new Error('Invariant violation: "firstEntryKey != null"');}
+      const firstEntryKey = keyIterator.next().value;
+
+      if (!(firstEntryKey != null)) {
+        throw new Error('Invariant violation: "firstEntryKey != null"');
+      }
+
       expiredQueries.push(firstEntryKey);
       this._queryLruQueue.delete(firstEntryKey);
     }
@@ -148,4 +133,6 @@ function _load_debounce() {return _debounce = _interopRequireDefault(require('..
       }
     }
     this._onResultsChanged();
-  }}exports.default = ResultCache;
+  }
+}
+exports.default = ResultCache;

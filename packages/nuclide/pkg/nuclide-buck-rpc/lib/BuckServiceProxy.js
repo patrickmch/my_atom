@@ -1,20 +1,16 @@
 "use strict";
 
-let Observable;
-
 module.exports = _client => {
   const remoteModule = {};
 
   remoteModule.getRootForPath = function (arg0) {
-    return _client.marshalArguments(Array.from(arguments), [{
+    return _client.callRemoteFunction("BuckService/getRootForPath", "promise", _client.marshalArguments(Array.from(arguments), [{
       name: "file",
       type: {
         kind: "named",
         name: "NuclideUri"
       }
-    }]).then(args => {
-      return _client.callRemoteFunction("BuckService/getRootForPath", "promise", args);
-    }).then(value => {
+    }])).then(value => {
       return _client.unmarshal(value, {
         kind: "nullable",
         type: {
@@ -26,7 +22,7 @@ module.exports = _client => {
   };
 
   remoteModule.getBuildFile = function (arg0, arg1) {
-    return _client.marshalArguments(Array.from(arguments), [{
+    return _client.callRemoteFunction("BuckService/getBuildFile", "promise", _client.marshalArguments(Array.from(arguments), [{
       name: "rootPath",
       type: {
         kind: "named",
@@ -37,9 +33,7 @@ module.exports = _client => {
       type: {
         kind: "string"
       }
-    }]).then(args => {
-      return _client.callRemoteFunction("BuckService/getBuildFile", "promise", args);
-    }).then(value => {
+    }])).then(value => {
       return _client.unmarshal(value, {
         kind: "nullable",
         type: {
@@ -50,7 +44,7 @@ module.exports = _client => {
   };
 
   remoteModule.getOwners = function (arg0, arg1, arg2, arg3) {
-    return _client.marshalArguments(Array.from(arguments), [{
+    return _client.callRemoteFunction("BuckService/getOwners", "promise", _client.marshalArguments(Array.from(arguments), [{
       name: "rootPath",
       type: {
         kind: "named",
@@ -78,9 +72,7 @@ module.exports = _client => {
           kind: "string"
         }
       }
-    }]).then(args => {
-      return _client.callRemoteFunction("BuckService/getOwners", "promise", args);
-    }).then(value => {
+    }])).then(value => {
       return _client.unmarshal(value, {
         kind: "array",
         type: {
@@ -91,7 +83,7 @@ module.exports = _client => {
   };
 
   remoteModule.getBuckConfig = function (arg0, arg1, arg2) {
-    return _client.marshalArguments(Array.from(arguments), [{
+    return _client.callRemoteFunction("BuckService/getBuckConfig", "promise", _client.marshalArguments(Array.from(arguments), [{
       name: "rootPath",
       type: {
         kind: "named",
@@ -107,9 +99,7 @@ module.exports = _client => {
       type: {
         kind: "string"
       }
-    }]).then(args => {
-      return _client.callRemoteFunction("BuckService/getBuckConfig", "promise", args);
-    }).then(value => {
+    }])).then(value => {
       return _client.unmarshal(value, {
         kind: "nullable",
         type: {
@@ -120,7 +110,7 @@ module.exports = _client => {
   };
 
   remoteModule.build = function (arg0, arg1, arg2) {
-    return _client.marshalArguments(Array.from(arguments), [{
+    return _client.callRemoteFunction("BuckService/build", "promise", _client.marshalArguments(Array.from(arguments), [{
       name: "rootPath",
       type: {
         kind: "named",
@@ -143,9 +133,7 @@ module.exports = _client => {
           name: "BaseBuckBuildOptions"
         }
       }
-    }]).then(args => {
-      return _client.callRemoteFunction("BuckService/build", "promise", args);
-    }).then(value => {
+    }])).then(value => {
       return _client.unmarshal(value, {
         kind: "any"
       });
@@ -153,7 +141,7 @@ module.exports = _client => {
   };
 
   remoteModule.install = function (arg0, arg1, arg2, arg3, arg4) {
-    return _client.marshalArguments(Array.from(arguments), [{
+    return _client.callRemoteFunction("BuckService/install", "promise", _client.marshalArguments(Array.from(arguments), [{
       name: "rootPath",
       type: {
         kind: "named",
@@ -185,9 +173,7 @@ module.exports = _client => {
       type: {
         kind: "boolean"
       }
-    }]).then(args => {
-      return _client.callRemoteFunction("BuckService/install", "promise", args);
-    }).then(value => {
+    }])).then(value => {
       return _client.unmarshal(value, {
         kind: "any"
       });
@@ -195,7 +181,7 @@ module.exports = _client => {
   };
 
   remoteModule.buildWithOutput = function (arg0, arg1, arg2) {
-    return Observable.fromPromise(_client.marshalArguments(Array.from(arguments), [{
+    return _client.callRemoteFunction("BuckService/buildWithOutput", "observable", _client.marshalArguments(Array.from(arguments), [{
       name: "rootPath",
       type: {
         kind: "named",
@@ -217,9 +203,7 @@ module.exports = _client => {
           kind: "string"
         }
       }
-    }])).switchMap(args => {
-      return _client.callRemoteFunction("BuckService/buildWithOutput", "observable", args);
-    }).concatMap(value => {
+    }])).map(value => {
       return _client.unmarshal(value, {
         kind: "named",
         name: "LegacyProcessMessage"
@@ -228,7 +212,7 @@ module.exports = _client => {
   };
 
   remoteModule.testWithOutput = function (arg0, arg1, arg2, arg3) {
-    return Observable.fromPromise(_client.marshalArguments(Array.from(arguments), [{
+    return _client.callRemoteFunction("BuckService/testWithOutput", "observable", _client.marshalArguments(Array.from(arguments), [{
       name: "rootPath",
       type: {
         kind: "named",
@@ -255,9 +239,7 @@ module.exports = _client => {
       type: {
         kind: "boolean"
       }
-    }])).switchMap(args => {
-      return _client.callRemoteFunction("BuckService/testWithOutput", "observable", args);
-    }).concatMap(value => {
+    }])).map(value => {
       return _client.unmarshal(value, {
         kind: "named",
         name: "LegacyProcessMessage"
@@ -266,7 +248,7 @@ module.exports = _client => {
   };
 
   remoteModule.installWithOutput = function (arg0, arg1, arg2, arg3, arg4, arg5) {
-    return Observable.fromPromise(_client.marshalArguments(Array.from(arguments), [{
+    return _client.callRemoteFunction("BuckService/installWithOutput", "observable", _client.marshalArguments(Array.from(arguments), [{
       name: "rootPath",
       type: {
         kind: "named",
@@ -306,9 +288,7 @@ module.exports = _client => {
       type: {
         kind: "boolean"
       }
-    }])).switchMap(args => {
-      return _client.callRemoteFunction("BuckService/installWithOutput", "observable", args);
-    }).concatMap(value => {
+    }])).map(value => {
       return _client.unmarshal(value, {
         kind: "named",
         name: "LegacyProcessMessage"
@@ -317,7 +297,7 @@ module.exports = _client => {
   };
 
   remoteModule.runWithOutput = function (arg0, arg1, arg2, arg3) {
-    return Observable.fromPromise(_client.marshalArguments(Array.from(arguments), [{
+    return _client.callRemoteFunction("BuckService/runWithOutput", "observable", _client.marshalArguments(Array.from(arguments), [{
       name: "rootPath",
       type: {
         kind: "named",
@@ -347,9 +327,7 @@ module.exports = _client => {
           kind: "string"
         }
       }
-    }])).switchMap(args => {
-      return _client.callRemoteFunction("BuckService/runWithOutput", "observable", args);
-    }).concatMap(value => {
+    }])).map(value => {
       return _client.unmarshal(value, {
         kind: "named",
         name: "LegacyProcessMessage"
@@ -358,15 +336,13 @@ module.exports = _client => {
   };
 
   remoteModule.listAliases = function (arg0) {
-    return _client.marshalArguments(Array.from(arguments), [{
+    return _client.callRemoteFunction("BuckService/listAliases", "promise", _client.marshalArguments(Array.from(arguments), [{
       name: "rootPath",
       type: {
         kind: "named",
         name: "NuclideUri"
       }
-    }]).then(args => {
-      return _client.callRemoteFunction("BuckService/listAliases", "promise", args);
-    }).then(value => {
+    }])).then(value => {
       return _client.unmarshal(value, {
         kind: "array",
         type: {
@@ -377,7 +353,7 @@ module.exports = _client => {
   };
 
   remoteModule.listFlavors = function (arg0, arg1, arg2) {
-    return _client.marshalArguments(Array.from(arguments), [{
+    return _client.callRemoteFunction("BuckService/listFlavors", "promise", _client.marshalArguments(Array.from(arguments), [{
       name: "rootPath",
       type: {
         kind: "named",
@@ -402,9 +378,7 @@ module.exports = _client => {
           }
         }
       }
-    }]).then(args => {
-      return _client.callRemoteFunction("BuckService/listFlavors", "promise", args);
-    }).then(value => {
+    }])).then(value => {
       return _client.unmarshal(value, {
         kind: "nullable",
         type: {
@@ -416,7 +390,7 @@ module.exports = _client => {
   };
 
   remoteModule.showOutput = function (arg0, arg1, arg2) {
-    return _client.marshalArguments(Array.from(arguments), [{
+    return _client.callRemoteFunction("BuckService/showOutput", "promise", _client.marshalArguments(Array.from(arguments), [{
       name: "rootPath",
       type: {
         kind: "named",
@@ -438,9 +412,7 @@ module.exports = _client => {
           }
         }
       }
-    }]).then(args => {
-      return _client.callRemoteFunction("BuckService/showOutput", "promise", args);
-    }).then(value => {
+    }])).then(value => {
       return _client.unmarshal(value, {
         kind: "array",
         type: {
@@ -452,7 +424,7 @@ module.exports = _client => {
   };
 
   remoteModule.buildRuleTypeFor = function (arg0, arg1) {
-    return _client.marshalArguments(Array.from(arguments), [{
+    return _client.callRemoteFunction("BuckService/buildRuleTypeFor", "promise", _client.marshalArguments(Array.from(arguments), [{
       name: "rootPath",
       type: {
         kind: "named",
@@ -463,9 +435,7 @@ module.exports = _client => {
       type: {
         kind: "string"
       }
-    }]).then(args => {
-      return _client.callRemoteFunction("BuckService/buildRuleTypeFor", "promise", args);
-    }).then(value => {
+    }])).then(value => {
       return _client.unmarshal(value, {
         kind: "nullable",
         type: {
@@ -477,15 +447,13 @@ module.exports = _client => {
   };
 
   remoteModule.clean = function (arg0) {
-    return _client.marshalArguments(Array.from(arguments), [{
+    return _client.callRemoteFunction("BuckService/clean", "promise", _client.marshalArguments(Array.from(arguments), [{
       name: "rootPath",
       type: {
         kind: "named",
         name: "NuclideUri"
       }
-    }]).then(args => {
-      return _client.callRemoteFunction("BuckService/clean", "promise", args);
-    }).then(value => {
+    }])).then(value => {
       return _client.unmarshal(value, {
         kind: "void"
       });
@@ -493,15 +461,13 @@ module.exports = _client => {
   };
 
   remoteModule.kill = function (arg0) {
-    return _client.marshalArguments(Array.from(arguments), [{
+    return _client.callRemoteFunction("BuckService/kill", "promise", _client.marshalArguments(Array.from(arguments), [{
       name: "rootPath",
       type: {
         kind: "named",
         name: "NuclideUri"
       }
-    }]).then(args => {
-      return _client.callRemoteFunction("BuckService/kill", "promise", args);
-    }).then(value => {
+    }])).then(value => {
       return _client.unmarshal(value, {
         kind: "void"
       });
@@ -509,15 +475,13 @@ module.exports = _client => {
   };
 
   remoteModule.getHTTPServerPort = function (arg0) {
-    return _client.marshalArguments(Array.from(arguments), [{
+    return _client.callRemoteFunction("BuckService/getHTTPServerPort", "promise", _client.marshalArguments(Array.from(arguments), [{
       name: "rootPath",
       type: {
         kind: "named",
         name: "NuclideUri"
       }
-    }]).then(args => {
-      return _client.callRemoteFunction("BuckService/getHTTPServerPort", "promise", args);
-    }).then(value => {
+    }])).then(value => {
       return _client.unmarshal(value, {
         kind: "number"
       });
@@ -525,7 +489,7 @@ module.exports = _client => {
   };
 
   remoteModule.query = function (arg0, arg1, arg2) {
-    return _client.marshalArguments(Array.from(arguments), [{
+    return _client.callRemoteFunction("BuckService/query", "promise", _client.marshalArguments(Array.from(arguments), [{
       name: "rootPath",
       type: {
         kind: "named",
@@ -544,9 +508,7 @@ module.exports = _client => {
           kind: "string"
         }
       }
-    }]).then(args => {
-      return _client.callRemoteFunction("BuckService/query", "promise", args);
-    }).then(value => {
+    }])).then(value => {
       return _client.unmarshal(value, {
         kind: "array",
         type: {
@@ -557,7 +519,7 @@ module.exports = _client => {
   };
 
   remoteModule.queryWithArgs = function (arg0, arg1, arg2) {
-    return _client.marshalArguments(Array.from(arguments), [{
+    return _client.callRemoteFunction("BuckService/queryWithArgs", "promise", _client.marshalArguments(Array.from(arguments), [{
       name: "rootPath",
       type: {
         kind: "named",
@@ -576,9 +538,7 @@ module.exports = _client => {
           kind: "string"
         }
       }
-    }]).then(args => {
-      return _client.callRemoteFunction("BuckService/queryWithArgs", "promise", args);
-    }).then(value => {
+    }])).then(value => {
       return _client.unmarshal(value, {
         kind: "object",
         fields: []
@@ -587,7 +547,7 @@ module.exports = _client => {
   };
 
   remoteModule.queryWithAttributes = function (arg0, arg1, arg2) {
-    return _client.marshalArguments(Array.from(arguments), [{
+    return _client.callRemoteFunction("BuckService/queryWithAttributes", "promise", _client.marshalArguments(Array.from(arguments), [{
       name: "rootPath",
       type: {
         kind: "named",
@@ -606,9 +566,7 @@ module.exports = _client => {
           kind: "string"
         }
       }
-    }]).then(args => {
-      return _client.callRemoteFunction("BuckService/queryWithAttributes", "promise", args);
-    }).then(value => {
+    }])).then(value => {
       return _client.unmarshal(value, {
         kind: "object",
         fields: []
@@ -617,7 +575,7 @@ module.exports = _client => {
   };
 
   remoteModule.getWebSocketStream = function (arg0, arg1) {
-    return Observable.fromPromise(_client.marshalArguments(Array.from(arguments), [{
+    return _client.callRemoteFunction("BuckService/getWebSocketStream", "observable", _client.marshalArguments(Array.from(arguments), [{
       name: "rootPath",
       type: {
         kind: "named",
@@ -628,9 +586,7 @@ module.exports = _client => {
       type: {
         kind: "number"
       }
-    }])).switchMap(args => {
-      return _client.callRemoteFunction("BuckService/getWebSocketStream", "observable", args);
-    }).concatMap(value => {
+    }])).map(value => {
       return _client.unmarshal(value, {
         kind: "named",
         name: "Object"
@@ -639,7 +595,7 @@ module.exports = _client => {
   };
 
   remoteModule.resetCompilationDatabaseForSource = function (arg0, arg1) {
-    return _client.marshalArguments(Array.from(arguments), [{
+    return _client.callRemoteFunction("BuckService/resetCompilationDatabaseForSource", "promise", _client.marshalArguments(Array.from(arguments), [{
       name: "src",
       type: {
         kind: "named",
@@ -651,9 +607,7 @@ module.exports = _client => {
         kind: "named",
         name: "CompilationDatabaseParams"
       }
-    }]).then(args => {
-      return _client.callRemoteFunction("BuckService/resetCompilationDatabaseForSource", "promise", args);
-    }).then(value => {
+    }])).then(value => {
       return _client.unmarshal(value, {
         kind: "void"
       });
@@ -661,15 +615,13 @@ module.exports = _client => {
   };
 
   remoteModule.resetCompilationDatabase = function (arg0) {
-    return _client.marshalArguments(Array.from(arguments), [{
+    return _client.callRemoteFunction("BuckService/resetCompilationDatabase", "promise", _client.marshalArguments(Array.from(arguments), [{
       name: "params",
       type: {
         kind: "named",
         name: "CompilationDatabaseParams"
       }
-    }]).then(args => {
-      return _client.callRemoteFunction("BuckService/resetCompilationDatabase", "promise", args);
-    }).then(value => {
+    }])).then(value => {
       return _client.unmarshal(value, {
         kind: "void"
       });
@@ -677,7 +629,7 @@ module.exports = _client => {
   };
 
   remoteModule.getCompilationDatabase = function (arg0, arg1) {
-    return Observable.fromPromise(_client.marshalArguments(Array.from(arguments), [{
+    return _client.callRemoteFunction("BuckService/getCompilationDatabase", "observable", _client.marshalArguments(Array.from(arguments), [{
       name: "src",
       type: {
         kind: "named",
@@ -689,9 +641,7 @@ module.exports = _client => {
         kind: "named",
         name: "CompilationDatabaseParams"
       }
-    }])).switchMap(args => {
-      return _client.callRemoteFunction("BuckService/getCompilationDatabase", "observable", args);
-    }).concatMap(value => {
+    }])).map(value => {
       return _client.unmarshal(value, {
         kind: "nullable",
         type: {
@@ -705,11 +655,6 @@ module.exports = _client => {
   return remoteModule;
 };
 
-Object.defineProperty(module.exports, "inject", {
-  value: function () {
-    Observable = arguments[0];
-  }
-});
 Object.defineProperty(module.exports, "defs", {
   value: {
     Object: {

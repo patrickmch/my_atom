@@ -1,0 +1,103 @@
+diff --git a/nols_website/nols_registration/templates/nols_registration/login.html b/nols_website/nols_registration/templates/nols_registration/login.html
+index 5e0ff21bc..ebfb6a1e9 100644
+--- a/nols_website/nols_registration/templates/nols_registration/login.html
++++ b/nols_website/nols_registration/templates/nols_registration/login.html
+@@ -1,97 +1,97 @@
+ {% extends "bootstrapped/base.html" %}
+ {% load static from staticfiles %}
+ 
+ {% block title %}{{ block.super }} - Login{% endblock %}
+ 
+ {% block extra_head %}
+ {{ block.super }}
+ <style>.form-horizontal .control-label {text-align: left;}</style>
+ {% endblock %}
+ 
+ {% block content %}
+ <div class="row title-row--plain">
+   <div class="column large-4 medium-6 small-8 small-centered">
+     <h1>Account Login</h1>
+   </div>
+ </div>
+ <div class="row">
+   <form method="POST" class="column large-4 medium-6 small-12 small-centered form-horizontal" id="id-login-form">
+     {% if axes_status == 'recaptcha' %}
+     <div id="captcha-message">
+       <h1>Attention</h1>
+       <p>
+         Either your username, or this ip address have had a lot of failed log-in
+         attempts recently. Here are some options:
+       </p>
+       <ol>
+         <li>
+           Use our <a href="{% url 'password_reset' %}">password reset option</a>!
+           It's quick, user friendly, and will give you a reminder of your
+           username.
+         </li>
+         <li>
+           You can try back in ten minutes, and hopefully things will have settled down.
+         </li>
+         <li>
+           Otherwise, you'll need to complete a captcha with each log-in attempt.
+         </li>
+       </ol>
+ 
+     </div>
+     {% endif %}
+ 
+     {% with label_columns=12 input_columns=12 right_errors=True %}
+     {% include "dataentry/bs_responsive_form_layout.html" %}
+     {% endwith %}
+     <div class="row">
+       <div class="column small-6 small-centered">
+         <input class="button" type="submit" value="Login"/>
+       </div>
+     </div>
+       <div class="column small-centered forgot-pass-container">
+-        <a href="{% url 'django.contrib.auth.views.password_reset' %}" class="forgot-pass-link text-center">
++        <a href="{% url 'django.contrib.auth.views.password_reset' %}">
+           Forgot your username or password?
+         </a>
+       </div>
+     <div class="row">
+       <div class="column small-centered">
+         <span>Don't have an account?</span>
+         <span>
+           <a href="{% url 'registration_register' %}?{{ request.META.QUERY_STRING }}">
+             Create an account now
+           </a>
+         </span>
+       </div>
+     </div>
+   </form>
+ </div>
+ <div class="clearfix"></div>
+ <div class="row">
+ </div>
+ <div class="clearfix"></div>
+ {% endblock %}
+ 
+ {% block foot_js %}
+ {{ block.super }}
+ {% if axes_status != 'recaptcha' %}
+   <script src="{% static "js/check_lockout.js" %}"></script>
+   <script>
+     $(document).ready(function() {
+     // check lockout
+     // requires checkCsrf from {% static "js/check_csrf.js" %}
+     var check_lockout_url = "{% url 'check_lockout' %}";
+     if(checkCsrf()){
+     checkUsernameLockout($("#login-form"), true, check_lockout_url);
+     }
+     $('#id_username').on('change', function(){
+     if(checkCsrf()){
+     checkUsernameLockout($("#login-form"), false, check_lockout_url);
+     }
+     });
+     $('#login-form').on('submit', function(){
+     $(this).find('input[type="submit"]').attr('disabled', 'disabled');
+     });
+    })
+  </script>
+ {% endif %}
+ {% endblock foot_js %}

@@ -1,28 +1,57 @@
-'use strict';Object.defineProperty(exports, "__esModule", { value: true });exports.ReliableSocket = undefined;var _asyncToGenerator = _interopRequireDefault(require('async-to-generator'));
+'use strict';
 
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.ReliableSocket = undefined;
 
+var _rxjsBundlesRxMinJs = require('rxjs/bundles/Rx.min.js');
 
+var _url = _interopRequireDefault(require('url'));
 
+var _ws;
 
+function _load_ws() {
+  return _ws = _interopRequireDefault(require('ws'));
+}
 
+var _uuid;
 
+function _load_uuid() {
+  return _uuid = _interopRequireDefault(require('uuid'));
+}
 
+var _eventKit;
 
+function _load_eventKit() {
+  return _eventKit = require('event-kit');
+}
 
+var _WebSocketTransport;
 
+function _load_WebSocketTransport() {
+  return _WebSocketTransport = require('./WebSocketTransport');
+}
 
+var _QueuedAckTransport;
 
+function _load_QueuedAckTransport() {
+  return _QueuedAckTransport = require('./QueuedAckTransport');
+}
 
+var _XhrConnectionHeartbeat;
 
-var _url = _interopRequireDefault(require('url'));var _ws;
-function _load_ws() {return _ws = _interopRequireDefault(require('ws'));}var _uuid;
-function _load_uuid() {return _uuid = _interopRequireDefault(require('uuid'));}var _eventKit;
-function _load_eventKit() {return _eventKit = require('event-kit');}var _WebSocketTransport;
-function _load_WebSocketTransport() {return _WebSocketTransport = require('./WebSocketTransport');}var _QueuedAckTransport;
-function _load_QueuedAckTransport() {return _QueuedAckTransport = require('./QueuedAckTransport');}var _XhrConnectionHeartbeat;
-function _load_XhrConnectionHeartbeat() {return _XhrConnectionHeartbeat = require('../client/XhrConnectionHeartbeat');}var _log4js;
+function _load_XhrConnectionHeartbeat() {
+  return _XhrConnectionHeartbeat = require('../client/XhrConnectionHeartbeat');
+}
 
-function _load_log4js() {return _log4js = require('log4js');}function _interopRequireDefault(obj) {return obj && obj.__esModule ? obj : { default: obj };}
+var _log4js;
+
+function _load_log4js() {
+  return _log4js = require('log4js');
+}
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 const logger = (0, (_log4js || _load_log4js()).getLogger)('nuclide-socket'); /**
                                                                               * Copyright (c) 2017-present, Facebook, Inc.
@@ -34,7 +63,15 @@ const logger = (0, (_log4js || _load_log4js()).getLogger)('nuclide-socket'); /**
                                                                               *
                                                                               *  strict-local
                                                                               * @format
-                                                                              */const PING_SEND_INTERVAL = 5000;const PING_WAIT_INTERVAL = 5000;const INITIAL_RECONNECT_TIME_MS = 10;const MAX_RECONNECT_TIME_MS = 5000; // The Nuclide Socket class does several things:
+                                                                              */
+
+const PING_SEND_INTERVAL = 5000;
+const PING_WAIT_INTERVAL = 5000;
+
+const INITIAL_RECONNECT_TIME_MS = 10;
+const MAX_RECONNECT_TIME_MS = 5000;
+
+// The Nuclide Socket class does several things:
 //   - Provides a transport mechanism for sending/receiving JSON messages
 //   - Provides a transport layer for xhr requests
 //   - monitors connection with a heartbeat (over xhr) and automatically attempts to reconnect
@@ -43,7 +80,7 @@ const logger = (0, (_log4js || _load_log4js()).getLogger)('nuclide-socket'); /**
 // Can be in one of the following states:
 //   - Connected - everything healthy
 //   - Disconnected - Was connected, but connection died. Will attempt to reconnect.
-//   - Closed - No longer connected. May not send/receive messages. Cannot be resurected.
+//   - Closed - No longer connected. May not send/receive messages. Cannot be resurrected.
 //
 // Publishes the following events:
 //   - status(boolean): on connect/disconnect
@@ -52,25 +89,12 @@ const logger = (0, (_log4js || _load_log4js()).getLogger)('nuclide-socket'); /**
 //   - message(message: Object): on receipt fo JSON message
 //   - heartbeat: On receipt of successful heartbeat
 //   - heartbeat.error({code, originalCode, message}): On failure of heartbeat
+//   - intransient-error: the server is reachable but refusing to respond to
+//     connections (i.e. ECONNREFUSED).
+//   - close: this socket has been closed by a call to `close()`.
 class ReliableSocket {
-
-
-
-
   // ID from a setTimeout() call.
-
-
-
-
-
-
-
-  constructor(
-  serverUri,
-  heartbeatChannel,
-  options,
-  protocolLogger)
-  {
+  constructor(serverUri, heartbeatChannel, options, protocolLogger) {
     this._emitter = new (_eventKit || _load_eventKit()).Emitter();
     this._serverUri = serverUri;
     this._options = options;
@@ -90,20 +114,18 @@ class ReliableSocket {
       }
     });
 
-    const { protocol, host, path } = _url.default.parse(serverUri);if (!(
-    host != null)) {throw new Error('Invariant violation: "host != null"');}
+    const { protocol, host, path } = _url.default.parse(serverUri);
+
+    if (!(host != null)) {
+      throw new Error('Invariant violation: "host != null"');
+    }
+
     const pathString = path != null ? path : '';
-    this._websocketUri = `ws${
-    protocol === 'https:' ? 's' : ''
-    }://${host}${pathString}`;
+    this._websocketUri = `ws${protocol === 'https:' ? 's' : ''}://${host}${pathString}`;
 
     logger.info(`websocket uri: ${this._websocketUri}`);
 
-    this._heartbeat = new (_XhrConnectionHeartbeat || _load_XhrConnectionHeartbeat()).XhrConnectionHeartbeat(
-    serverUri,
-    this._heartbeatChannel,
-    options);
-
+    this._heartbeat = new (_XhrConnectionHeartbeat || _load_XhrConnectionHeartbeat()).XhrConnectionHeartbeat(serverUri, this._heartbeatChannel, options);
     this._heartbeat.onConnectionRestored(() => {
       if (this.isDisconnected()) {
         this._scheduleReconnect();
@@ -122,9 +144,7 @@ class ReliableSocket {
   }
 
   isDisconnected() {
-    return (
-      this._transport != null && this._transport.getState() === 'disconnected');
-
+    return this._transport != null && this._transport.getState() === 'disconnected';
   }
 
   waitForConnect() {
@@ -138,15 +158,16 @@ class ReliableSocket {
     });
   }
 
-  _reconnect() {var _this = this;if (!
-    this.isDisconnected()) {throw new Error('Invariant violation: "this.isDisconnected()"');}
+  _reconnect() {
+    if (!this.isDisconnected()) {
+      throw new Error('Invariant violation: "this.isDisconnected()"');
+    }
 
-    const websocket = new (_ws || _load_ws()).default(this._websocketUri, Object.assign({},
-    this._options, {
+    const websocket = new (_ws || _load_ws()).default(this._websocketUri, Object.assign({}, this._options, {
       headers: {
-        client_id: this.id } }));
-
-
+        client_id: this.id
+      }
+    }));
 
     // Need to add this otherwise unhandled errors during startup will result
     // in uncaught exceptions. This is due to EventEmitter treating 'error'
@@ -166,42 +187,46 @@ class ReliableSocket {
     };
     websocket.on('error', onSocketError);
 
-    const onSocketOpen = (() => {var _ref = (0, _asyncToGenerator.default)(function* () {
-        if (_this.isDisconnected()) {
-          const ws = new (_WebSocketTransport || _load_WebSocketTransport()).WebSocketTransport(_this.id, websocket);
-          const pingId = (_uuid || _load_uuid()).default.v4();
-          ws.onClose(function () {
-            _this._clearPingTimer();
-          });
-          ws.onError(function (error) {
-            ws.close();
-          });
-          ws.onPong(function (data) {
-            if (pingId === data) {
-              _this._schedulePing(pingId, ws);
-            } else {
-              logger.error('pingId mismatch');
-            }
-          });
-          ws.onMessage().subscribe(function () {
-            _this._schedulePing(pingId, ws);
-          });
-          _this._schedulePing(pingId, ws);if (!(
-          _this._transport != null)) {throw new Error('Invariant violation: "this._transport != null"');}
-          _this._transport.reconnect(ws);
-          websocket.removeListener('error', onSocketError);
-          _this._emitter.emit('status', true);
-          if (_this._previouslyConnected) {
-            logger.info('WebSocket reconnected');
-            _this._emitter.emit('reconnect');
+    const onSocketOpen = async () => {
+      if (this.isDisconnected()) {
+        const ws = new (_WebSocketTransport || _load_WebSocketTransport()).WebSocketTransport(this.id, websocket);
+        const pingId = (_uuid || _load_uuid()).default.v4();
+        ws.onClose(() => {
+          this._clearPingTimer();
+        });
+        ws.onError(error => {
+          ws.close();
+        });
+        ws.onPong(data => {
+          if (pingId === data) {
+            this._schedulePing(pingId, ws);
           } else {
-            logger.info('WebSocket connected');
-            _this._emitter.emit('connect');
+            logger.error('pingId mismatch');
           }
-          _this._previouslyConnected = true;
-          _this._reconnectTime = INITIAL_RECONNECT_TIME_MS;
+        });
+        ws.onMessage().subscribe(() => {
+          this._schedulePing(pingId, ws);
+        });
+        this._schedulePing(pingId, ws);
+
+        if (!(this._transport != null)) {
+          throw new Error('Invariant violation: "this._transport != null"');
         }
-      });return function onSocketOpen() {return _ref.apply(this, arguments);};})();
+
+        this._transport.reconnect(ws);
+        websocket.removeListener('error', onSocketError);
+        this._emitter.emit('status', true);
+        if (this._previouslyConnected) {
+          logger.info('WebSocket reconnected');
+          this._emitter.emit('reconnect');
+        } else {
+          logger.info('WebSocket connected');
+          this._emitter.emit('connect');
+        }
+        this._previouslyConnected = true;
+        this._reconnectTime = INITIAL_RECONNECT_TIME_MS;
+      }
+    };
     websocket.on('open', onSocketOpen);
   }
 
@@ -247,8 +272,11 @@ class ReliableSocket {
     }
   }
 
-  send(message) {if (!(
-    this._transport != null)) {throw new Error('Invariant violation: "this._transport != null"');}
+  send(message) {
+    // "this.isClosed()" but flow understands it
+    if (this._transport == null) {
+      throw new Error(`Sending message to server ${this._serverUri} on closed socket ${this.id}: ${message}`);
+    }
     this._transport.send(message);
   }
 
@@ -290,8 +318,15 @@ class ReliableSocket {
     return this._transport == null;
   }
 
-  onMessage() {if (!(
-    this._transport != null)) {throw new Error('Invariant violation: "this._transport != null"');}
+  onMessage() {
+    if (this.isClosed()) {
+      return _rxjsBundlesRxMinJs.Observable.throw(`Socket ${this.id} to server ${this._serverUri} is closed`);
+    }
+
+    if (!(this._transport != null)) {
+      throw new Error('Invariant violation: "this._transport != null"');
+    }
+
     return this._transport.onMessage();
   }
 
@@ -312,18 +347,20 @@ class ReliableSocket {
   }
 
   /**
-     * Called if there is an intransient error. I.e. when we cannot recover from
-     * an error by attempting to reconnect. It is up to the listener to decide
-     * whether to close this socket.
-     */
+   * Called if there is an intransient error. I.e. when we cannot recover from
+   * an error by attempting to reconnect. It is up to the listener to decide
+   * whether to close this socket.
+   */
   onIntransientError(callback) {
     return this._emitter.on('intransient-error', callback);
   }
 
   /**
-     * Called just once if the state of this socket goes from opened to closed.
-     * E.g. this socket is closed via its `close` method.
-     */
+   * Called just once if the state of this socket goes from opened to closed.
+   * E.g. this socket is closed via its `close` method.
+   */
   onClose(callback) {
     return this._emitter.on('close', callback);
-  }}exports.ReliableSocket = ReliableSocket;
+  }
+}
+exports.ReliableSocket = ReliableSocket;

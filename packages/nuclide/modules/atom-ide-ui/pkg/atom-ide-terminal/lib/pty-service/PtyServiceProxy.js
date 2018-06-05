@@ -1,12 +1,22 @@
 "use strict";
 
-let Observable;
-
 module.exports = _client => {
   const remoteModule = {};
   remoteModule.Pty = class {
+    constructor() {
+      throw Error("constructors are not supported for remote objects");
+    }
+
     resize(arg0, arg1) {
-      return Promise.all([_client.marshalArguments(Array.from(arguments), [{
+      return _client.callRemoteMethod(_client.marshal(this, {
+        kind: "named",
+        location: {
+          type: "source",
+          fileName: "rpc-types.js",
+          line: 26
+        },
+        name: "Pty"
+      }), "resize", "void", _client.marshalArguments(Array.from(arguments), [{
         name: "columns",
         type: {
           kind: "number"
@@ -16,7 +26,11 @@ module.exports = _client => {
         type: {
           kind: "number"
         }
-      }]), _client.marshal(this, {
+      }]));
+    }
+
+    writeInput(arg0) {
+      return _client.callRemoteMethod(_client.marshal(this, {
         kind: "named",
         location: {
           type: "source",
@@ -24,24 +38,12 @@ module.exports = _client => {
           line: 26
         },
         name: "Pty"
-      })]).then(([args, id]) => _client.callRemoteMethod(id, "resize", "void", args));
-    }
-
-    writeInput(arg0) {
-      return Promise.all([_client.marshalArguments(Array.from(arguments), [{
+      }), "writeInput", "void", _client.marshalArguments(Array.from(arguments), [{
         name: "data",
         type: {
           kind: "string"
         }
-      }]), _client.marshal(this, {
-        kind: "named",
-        location: {
-          type: "source",
-          fileName: "rpc-types.js",
-          line: 26
-        },
-        name: "Pty"
-      })]).then(([args, id]) => _client.callRemoteMethod(id, "writeInput", "void", args));
+      }]));
     }
 
     dispose() {
@@ -50,13 +52,12 @@ module.exports = _client => {
 
   };
   remoteModule.PtyClient = class {
+    constructor() {
+      throw Error("constructors are not supported for remote objects");
+    }
+
     onOutput(arg0) {
-      return Promise.all([_client.marshalArguments(Array.from(arguments), [{
-        name: "data",
-        type: {
-          kind: "string"
-        }
-      }]), _client.marshal(this, {
+      return _client.callRemoteMethod(_client.marshal(this, {
         kind: "named",
         location: {
           type: "source",
@@ -64,11 +65,24 @@ module.exports = _client => {
           line: 20
         },
         name: "PtyClient"
-      })]).then(([args, id]) => _client.callRemoteMethod(id, "onOutput", "void", args));
+      }), "onOutput", "void", _client.marshalArguments(Array.from(arguments), [{
+        name: "data",
+        type: {
+          kind: "string"
+        }
+      }]));
     }
 
     onExit(arg0, arg1) {
-      return Promise.all([_client.marshalArguments(Array.from(arguments), [{
+      return _client.callRemoteMethod(_client.marshal(this, {
+        kind: "named",
+        location: {
+          type: "source",
+          fileName: "rpc-types.js",
+          line: 20
+        },
+        name: "PtyClient"
+      }), "onExit", "void", _client.marshalArguments(Array.from(arguments), [{
         name: "code",
         type: {
           kind: "number"
@@ -78,15 +92,7 @@ module.exports = _client => {
         type: {
           kind: "number"
         }
-      }]), _client.marshal(this, {
-        kind: "named",
-        location: {
-          type: "source",
-          fileName: "rpc-types.js",
-          line: 20
-        },
-        name: "PtyClient"
-      })]).then(([args, id]) => _client.callRemoteMethod(id, "onExit", "void", args));
+      }]));
     }
 
     dispose() {
@@ -96,7 +102,7 @@ module.exports = _client => {
   };
 
   remoteModule.spawn = function (arg0, arg1) {
-    return _client.marshalArguments(Array.from(arguments), [{
+    return _client.callRemoteFunction("PtyService/spawn", "promise", _client.marshalArguments(Array.from(arguments), [{
       name: "info",
       type: {
         kind: "named",
@@ -108,9 +114,7 @@ module.exports = _client => {
         kind: "named",
         name: "PtyClient"
       }
-    }]).then(args => {
-      return _client.callRemoteFunction("PtyService/spawn", "promise", args);
-    }).then(value => {
+    }])).then(value => {
       return _client.unmarshal(value, {
         kind: "named",
         name: "Pty"
@@ -119,15 +123,13 @@ module.exports = _client => {
   };
 
   remoteModule.useTitleAsPath = function (arg0) {
-    return _client.marshalArguments(Array.from(arguments), [{
+    return _client.callRemoteFunction("PtyService/useTitleAsPath", "promise", _client.marshalArguments(Array.from(arguments), [{
       name: "client",
       type: {
         kind: "named",
         name: "PtyClient"
       }
-    }]).then(args => {
-      return _client.callRemoteFunction("PtyService/useTitleAsPath", "promise", args);
-    }).then(value => {
+    }])).then(value => {
       return _client.unmarshal(value, {
         kind: "boolean"
       });
@@ -135,36 +137,20 @@ module.exports = _client => {
   };
 
   remoteModule.PtyImplementation = class {
-    constructor(arg0, arg1, arg2, arg3) {
-      _client.createRemoteObject("PtyImplementation", this, [arg0, arg1, arg2, arg3], [{
-        name: "info",
-        type: {
-          kind: "named",
-          name: "PtyInfo"
-        }
-      }, {
-        name: "client",
-        type: {
-          kind: "named",
-          name: "PtyClient"
-        }
-      }, {
-        name: "command",
-        type: {
-          kind: "named",
-          name: "Command"
-        }
-      }, {
-        name: "env",
-        type: {
-          kind: "named",
-          name: "Object"
-        }
-      }]);
+    constructor() {
+      throw Error("constructors are not supported for remote objects");
     }
 
     resize(arg0, arg1) {
-      return Promise.all([_client.marshalArguments(Array.from(arguments), [{
+      return _client.callRemoteMethod(_client.marshal(this, {
+        kind: "named",
+        location: {
+          type: "source",
+          fileName: "PtyService.js",
+          line: 151
+        },
+        name: "PtyImplementation"
+      }), "resize", "void", _client.marshalArguments(Array.from(arguments), [{
         name: "columns",
         type: {
           kind: "number"
@@ -174,7 +160,11 @@ module.exports = _client => {
         type: {
           kind: "number"
         }
-      }]), _client.marshal(this, {
+      }]));
+    }
+
+    writeInput(arg0) {
+      return _client.callRemoteMethod(_client.marshal(this, {
         kind: "named",
         location: {
           type: "source",
@@ -182,24 +172,12 @@ module.exports = _client => {
           line: 151
         },
         name: "PtyImplementation"
-      })]).then(([args, id]) => _client.callRemoteMethod(id, "resize", "void", args));
-    }
-
-    writeInput(arg0) {
-      return Promise.all([_client.marshalArguments(Array.from(arguments), [{
+      }), "writeInput", "void", _client.marshalArguments(Array.from(arguments), [{
         name: "data",
         type: {
           kind: "string"
         }
-      }]), _client.marshal(this, {
-        kind: "named",
-        location: {
-          type: "source",
-          fileName: "PtyService.js",
-          line: 151
-        },
-        name: "PtyImplementation"
-      })]).then(([args, id]) => _client.callRemoteMethod(id, "writeInput", "void", args));
+      }]));
     }
 
     dispose() {
@@ -210,11 +188,6 @@ module.exports = _client => {
   return remoteModule;
 };
 
-Object.defineProperty(module.exports, "inject", {
-  value: function () {
-    Observable = arguments[0];
-  }
-});
 Object.defineProperty(module.exports, "defs", {
   value: {
     Object: {
@@ -281,7 +254,6 @@ Object.defineProperty(module.exports, "defs", {
         fileName: "rpc-types.js",
         line: 26
       },
-      constructorArgs: null,
       staticMethods: {},
       instanceMethods: {
         resize: {
@@ -417,7 +389,6 @@ Object.defineProperty(module.exports, "defs", {
         fileName: "rpc-types.js",
         line: 20
       },
-      constructorArgs: null,
       staticMethods: {},
       instanceMethods: {
         onOutput: {
@@ -548,31 +519,6 @@ Object.defineProperty(module.exports, "defs", {
         fileName: "PtyService.js",
         line: 151
       },
-      constructorArgs: [{
-        name: "info",
-        type: {
-          kind: "named",
-          name: "PtyInfo"
-        }
-      }, {
-        name: "client",
-        type: {
-          kind: "named",
-          name: "PtyClient"
-        }
-      }, {
-        name: "command",
-        type: {
-          kind: "named",
-          name: "Command"
-        }
-      }, {
-        name: "env",
-        type: {
-          kind: "named",
-          name: "Object"
-        }
-      }],
       staticMethods: {},
       instanceMethods: {
         dispose: {

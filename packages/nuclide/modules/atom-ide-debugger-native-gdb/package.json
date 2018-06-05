@@ -22,14 +22,14 @@
     }
   },
   "dependencies": {
-    "async-to-generator": "1.1.0",
     "big-integer": "1.6.17",
     "nuclide-commons": "0.7.1-dev",
     "nuclide-commons-atom": "0.7.1-dev",
     "nuclide-debugger-common": "0.7.1-dev",
-    "nuclide-prebuilt-libs": "0.4.2",
+    "nuclide-prebuilt-libs": "0.5.1",
     "nullthrows": "1.0.0",
-    "react": "16.2.0",
+    "react": "16.3.2",
+    "rxjs": "5.5.5",
     "vscode-debugadapter": "1.24.0",
     "vscode-debugprotocol": "1.24.0",
     "yargs": "3.32.0"
@@ -77,9 +77,12 @@
                 "type": "string",
                 "description": "Absolute path of program to run"
               },
-              "arguments": {
-                "type": "string",
-                "description": "Arguments to pass in on the command line"
+              "args": {
+                "type": "array",
+                "description": "Arguments to pass in on the command line",
+                "items": {
+                  "type": "string"
+                }
               },
               "sourcePath": {
                 "type": "string",

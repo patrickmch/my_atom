@@ -1,20 +1,26 @@
-'use strict';Object.defineProperty(exports, "__esModule", { value: true });var _micromatch;
+'use strict';
 
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
 
+var _micromatch;
 
+function _load_micromatch() {
+  return _micromatch = _interopRequireDefault(require('micromatch'));
+}
 
+var _path = _interopRequireDefault(require('path'));
 
+var _collection;
 
+function _load_collection() {
+  return _collection = require('../../../modules/nuclide-commons/collection');
+}
 
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-
-
-
-
-function _load_micromatch() {return _micromatch = _interopRequireDefault(require('micromatch'));}
-
-var _path = _interopRequireDefault(require('path'));var _collection;
-function _load_collection() {return _collection = require('../../../modules/nuclide-commons/collection');}function _interopRequireDefault(obj) {return obj && obj.__esModule ? obj : { default: obj };} // eslint-disable-next-line nuclide-internal/prefer-nuclide-uri
+// eslint-disable-next-line nuclide-internal/prefer-nuclide-uri
 /**
  * Copyright (c) 2015-present, Facebook, Inc.
  * All rights reserved.
@@ -24,43 +30,34 @@ function _load_collection() {return _collection = require('../../../modules/nucl
  *
  * 
  * @format
- */class Projectionist {constructor(rules) {this.rules = rules;
+ */
+
+class Projectionist {
+
+  constructor(rules) {
+    this.rules = rules;
   }
 
   getAlternates(projectRelativePath) {
-    return mapProjections(
-    this.rules,
-    projectRelativePath,
-    (projection, matches) => {
+    return mapProjections(this.rules, projectRelativePath, (projection, matches) => {
       const alternate = projection.alternate;
       if (alternate == null) {
         return [];
       }
 
-      const alternates =
-      typeof alternate === 'string' ? [alternate] : alternate;
+      const alternates = typeof alternate === 'string' ? [alternate] : alternate;
 
-      return alternates.map(alt =>
-      replaceTargetsWithMatches(alt, matches, projectRelativePath));
-
+      return alternates.map(alt => replaceTargetsWithMatches(alt, matches, projectRelativePath));
     });
-
   }
 
   getType(projectRelativePath) {
-    return (0, (_collection || _load_collection()).arrayCompact)(
-    mapProjections(this.rules, projectRelativePath, projection => [
-    projection.type]))[
+    return (0, (_collection || _load_collection()).arrayCompact)(mapProjections(this.rules, projectRelativePath, projection => [projection.type]))[0];
+  }
+}
 
-    0];
-  }}exports.default = Projectionist;
-
-
-function mapProjections(
-rules,
-projectRelativePath,
-mapFn)
-{
+exports.default = Projectionist;
+function mapProjections(rules, projectRelativePath, mapFn) {
   const toFlatten = Object.keys(rules).map(pattern => {
     const value = rules[pattern];
     if (isProjection(value)) {
@@ -69,22 +66,17 @@ mapFn)
     } else {
       const projection = value;
 
-      const matches = (_micromatch || _load_micromatch()).default.capture(
-      normalizePattern(pattern),
-      projectRelativePath);
-
+      const matches = (_micromatch || _load_micromatch()).default.capture(normalizePattern(pattern), projectRelativePath);
 
       const matchesBaseName = (_micromatch || _load_micromatch()).default.isMatch(projectRelativePath, pattern, {
-        matchBase: true });
+        matchBase: true
+      });
 
-
-      if (
-      matches != null ||
+      if (matches != null ||
       // basename matches ('*.c' to glob any c file) are treated specially
       matchesBaseName ||
       // an exact prefix match is okay too
-      projectRelativePath.startsWith(pattern))
-      {
+      projectRelativePath.startsWith(pattern)) {
         return mapFn(projection, matches);
       }
     }
@@ -101,19 +93,12 @@ function isProjection(maybeProjection) {
 const keywordReplacements = {
   '{}': match => match,
   '{basename}': match => basenameWithoutExtension(match),
-  '{dirname}': match => match };
+  '{dirname}': match => match
+};
 
-
-function replaceTargetsWithMatches(
-stringWithTargets,
-matches,
-projectRelativePath)
-{
+function replaceTargetsWithMatches(stringWithTargets, matches, projectRelativePath) {
   if (matches == null) {
-    return _path.default.join(
-    _path.default.dirname(projectRelativePath),
-    stringWithTargets.replace('{}', basenameWithoutExtension));
-
+    return _path.default.join(_path.default.dirname(projectRelativePath), stringWithTargets.replace('{}', basenameWithoutExtension));
   }
 
   const targets = stringWithTargets.match(/({.*?})/g);
@@ -125,15 +110,9 @@ projectRelativePath)
   for (let i = 0; i < targets.length; i++) {
     const target = targets[i];
     if (i === targets.length - 1 && targets.length < matches.length) {
-      replaced = replaced.replace(
-      target,
-      keywordReplacements[target](_path.default.join(...matches.slice(i))));
-
+      replaced = replaced.replace(target, keywordReplacements[target](_path.default.join(...matches.slice(i))));
     } else {
-      replaced = replaced.replace(
-      target,
-      keywordReplacements[target](matches[i]));
-
+      replaced = replaced.replace(target, keywordReplacements[target](matches[i]));
     }
   }
   return replaced;
@@ -145,9 +124,7 @@ function normalizePattern(pattern) {
   if (lastStarIndex === -1) {
     return pattern;
   }
-  return (
-    pattern.slice(0, lastStarIndex) + '**/*' + pattern.slice(lastStarIndex + 1));
-
+  return pattern.slice(0, lastStarIndex) + '**/*' + pattern.slice(lastStarIndex + 1);
 }
 
 function basenameWithoutExtension(pathString) {

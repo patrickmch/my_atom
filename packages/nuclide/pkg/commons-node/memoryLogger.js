@@ -1,19 +1,19 @@
-'use strict';Object.defineProperty(exports, "__esModule", { value: true });exports.SnapshotLogger = exports.MemoryLogger = undefined;var _doubleEndedQueue;
+'use strict';
 
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.SnapshotLogger = exports.MemoryLogger = undefined;
 
+var _doubleEndedQueue;
 
+function _load_doubleEndedQueue() {
+  return _doubleEndedQueue = _interopRequireDefault(require('double-ended-queue'));
+}
 
+var _util = _interopRequireDefault(require('util'));
 
-
-
-
-
-
-function _load_doubleEndedQueue() {return _doubleEndedQueue = _interopRequireDefault(require('double-ended-queue'));}
-var _util = _interopRequireDefault(require('util'));function _interopRequireDefault(obj) {return obj && obj.__esModule ? obj : { default: obj };}
-
-
-
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 // Retain past five minutes
 /**
@@ -25,14 +25,18 @@ var _util = _interopRequireDefault(require('util'));function _interopRequireDefa
  *
  * 
  * @format
- */const DEFAULT_RETENTION_PERIOD_MS = 5 * 60 * 1000; // ...but only if it is less than 10 MB
-const DEFAULT_RETENTION_SIZE_LIMIT = 10 * 1000 * 1000;class MemoryLogger {
+ */
 
-  constructor(
-  underlyingLogger,
-  retentionPeriod = DEFAULT_RETENTION_PERIOD_MS,
-  sizeLimit = DEFAULT_RETENTION_SIZE_LIMIT)
-  {this._logs = new (_doubleEndedQueue || _load_doubleEndedQueue()).default();
+const DEFAULT_RETENTION_PERIOD_MS = 5 * 60 * 1000;
+
+// ...but only if it is less than 10 MB
+const DEFAULT_RETENTION_SIZE_LIMIT = 10 * 1000 * 1000;
+
+class MemoryLogger {
+
+  constructor(underlyingLogger, retentionPeriod = DEFAULT_RETENTION_PERIOD_MS, sizeLimit = DEFAULT_RETENTION_SIZE_LIMIT) {
+    this._logs = new (_doubleEndedQueue || _load_doubleEndedQueue()).default();
+
     this._underlyingLogger = underlyingLogger;
     this._retentionPeriod = retentionPeriod;
     this._sizeLimit = sizeLimit;
@@ -45,15 +49,14 @@ const DEFAULT_RETENTION_SIZE_LIMIT = 10 * 1000 * 1000;class MemoryLogger {
 
   dump(count) {
     let logs = this._logs.toArray();
-    if (count != null && count < this._logs.length) {if (!(
-      count > 0)) {throw new Error('Must provide a positive count');}
+    if (count != null && count < this._logs.length) {
+      if (!(count > 0)) {
+        throw new Error('Must provide a positive count');
+      }
+
       logs = logs.slice(logs.length - count);
     }
-    return logs.
-    map(
-    entry => `${formatTime(entry.time)} ${entry.level} - ${entry.text}\n`).
-
-    join('');
+    return logs.map(entry => `${formatTime(entry.time)} ${entry.level} - ${entry.text}\n`).join('');
   }
 
   getUnderlyingLogger() {
@@ -123,30 +126,23 @@ const DEFAULT_RETENTION_SIZE_LIMIT = 10 * 1000 * 1000;class MemoryLogger {
       if (front == null) {
         break;
       }
-      if (
-      time <= front.time + this._retentionPeriod &&
-      this._size <= this._sizeLimit)
-      {
+      if (time <= front.time + this._retentionPeriod && this._size <= this._sizeLimit) {
         break;
       }
       this._logs.shift();
       this._size -= front.level.length + front.text.length + 12;
     }
-  }}exports.MemoryLogger = MemoryLogger;
+  }
+}
 
-
+exports.MemoryLogger = MemoryLogger;
 class SnapshotLogger {
 
-
-
-
-
-
-
-  constructor(
-  retentionPeriod = 5 * 60 * 1000, // retain past five minutes
+  constructor(retentionPeriod = 5 * 60 * 1000, // retain past five minutes
   snapshotInterval = 30 * 1000) // snapshot no more than every 30s
-  {this._files = new Map();
+  {
+    this._files = new Map();
+
     this._retentionPeriod = retentionPeriod;
     this._snapshotInterval = snapshotInterval;
   }
@@ -160,21 +156,15 @@ class SnapshotLogger {
     for (const [filepath, snapshots] of this._files) {
       for (const snapshot of snapshots) {
         results.push({
-          title: `${filepath} ${formatTime(snapshot.time)},v${
-          snapshot.version
-          }`,
-          text: snapshot.text });
-
+          title: `${filepath} ${formatTime(snapshot.time)},v${snapshot.version}`,
+          text: snapshot.text
+        });
       }
     }
     return results;
   }
 
-  snapshot(
-  filepath,
-  version,
-  buffer)
-  {
+  snapshot(filepath, version, buffer) {
     if (this._retentionPeriod === 0) {
       return;
     }
@@ -186,10 +176,7 @@ class SnapshotLogger {
     let snapshots = this._files.get(filepath);
     if (snapshots != null && snapshots.length > 0) {
       const mostRecent = snapshots[snapshots.length - 1];
-      if (
-      mostRecent.time + this._snapshotInterval > time ||
-      mostRecent.version === version)
-      {
+      if (mostRecent.time + this._snapshotInterval > time || mostRecent.version === version) {
         return;
       }
     }
@@ -198,9 +185,7 @@ class SnapshotLogger {
       this._files.set(filepath, snapshots);
     }
     // Remove any old snapshots at the start of the array
-    const firstRemainingSnapshot = snapshots.findIndex(
-    snapshot => snapshot.time + this._retentionPeriod > time);
-
+    const firstRemainingSnapshot = snapshots.findIndex(snapshot => snapshot.time + this._retentionPeriod > time);
     if (firstRemainingSnapshot > 0) {
       snapshots.splice(0, firstRemainingSnapshot);
     }
@@ -210,13 +195,14 @@ class SnapshotLogger {
 
   close(filepath) {
     this._files.delete(filepath);
-  }}exports.SnapshotLogger = SnapshotLogger;
+  }
+}
 
+exports.SnapshotLogger = SnapshotLogger; /**
+                                          * Formats a UNIX timestamp in 24-hour US format.
+                                          * e.g. 16:01:19
+                                          */
 
-/**
-                                              * Formats a UNIX timestamp in 24-hour US format.
-                                              * e.g. 16:01:19
-                                              */
 function formatTime(time) {
   return new Date(time).toLocaleTimeString('en-US', { hour12: false });
 }

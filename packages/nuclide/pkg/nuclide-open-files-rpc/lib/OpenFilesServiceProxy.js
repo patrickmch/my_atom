@@ -1,18 +1,14 @@
 "use strict";
 
-let Observable;
-
 module.exports = _client => {
   const remoteModule = {};
   remoteModule.FileNotifier = class {
+    constructor() {
+      throw Error("constructors are not supported for remote objects");
+    }
+
     onFileEvent(arg0) {
-      return Promise.all([_client.marshalArguments(Array.from(arguments), [{
-        name: "event",
-        type: {
-          kind: "named",
-          name: "FileEvent"
-        }
-      }]), _client.marshal(this, {
+      return _client.callRemoteMethod(_client.marshal(this, {
         kind: "named",
         location: {
           type: "source",
@@ -20,7 +16,13 @@ module.exports = _client => {
           line: 62
         },
         name: "FileNotifier"
-      })]).then(([args, id]) => _client.callRemoteMethod(id, "onFileEvent", "promise", args)).then(value => {
+      }), "onFileEvent", "promise", _client.marshalArguments(Array.from(arguments), [{
+        name: "event",
+        type: {
+          kind: "named",
+          name: "FileEvent"
+        }
+      }])).then(value => {
         return _client.unmarshal(value, {
           kind: "void"
         });
@@ -28,7 +30,15 @@ module.exports = _client => {
     }
 
     onDirectoriesChanged(arg0) {
-      return Promise.all([_client.marshalArguments(Array.from(arguments), [{
+      return _client.callRemoteMethod(_client.marshal(this, {
+        kind: "named",
+        location: {
+          type: "source",
+          fileName: "rpc-types.js",
+          line: 62
+        },
+        name: "FileNotifier"
+      }), "onDirectoriesChanged", "promise", _client.marshalArguments(Array.from(arguments), [{
         name: "openDirectories",
         type: {
           kind: "set",
@@ -37,33 +47,9 @@ module.exports = _client => {
             name: "NuclideUri"
           }
         }
-      }]), _client.marshal(this, {
-        kind: "named",
-        location: {
-          type: "source",
-          fileName: "rpc-types.js",
-          line: 62
-        },
-        name: "FileNotifier"
-      })]).then(([args, id]) => _client.callRemoteMethod(id, "onDirectoriesChanged", "promise", args)).then(value => {
+      }])).then(value => {
         return _client.unmarshal(value, {
           kind: "void"
-        });
-      });
-    }
-
-    getTotalBufferSize() {
-      return Promise.all([_client.marshalArguments(Array.from(arguments), []), _client.marshal(this, {
-        kind: "named",
-        location: {
-          type: "source",
-          fileName: "rpc-types.js",
-          line: 62
-        },
-        name: "FileNotifier"
-      })]).then(([args, id]) => _client.callRemoteMethod(id, "getTotalBufferSize", "promise", args)).then(value => {
-        return _client.unmarshal(value, {
-          kind: "number"
         });
       });
     }
@@ -75,9 +61,7 @@ module.exports = _client => {
   };
 
   remoteModule.initialize = function () {
-    return _client.marshalArguments(Array.from(arguments), []).then(args => {
-      return _client.callRemoteFunction("OpenFilesService/initialize", "promise", args);
-    }).then(value => {
+    return _client.callRemoteFunction("OpenFilesService/initialize", "promise", _client.marshalArguments(Array.from(arguments), [])).then(value => {
       return _client.unmarshal(value, {
         kind: "named",
         name: "FileNotifier"
@@ -88,11 +72,6 @@ module.exports = _client => {
   return remoteModule;
 };
 
-Object.defineProperty(module.exports, "inject", {
-  value: function () {
-    Observable = arguments[0];
-  }
-});
 Object.defineProperty(module.exports, "defs", {
   value: {
     Object: {
@@ -156,7 +135,7 @@ Object.defineProperty(module.exports, "defs", {
       location: {
         type: "source",
         fileName: "rpc-types.js",
-        line: 69
+        line: 68
       },
       name: "FileVersion",
       definition: {
@@ -526,7 +505,6 @@ Object.defineProperty(module.exports, "defs", {
         fileName: "rpc-types.js",
         line: 62
       },
-      constructorArgs: null,
       staticMethods: {},
       instanceMethods: {
         onFileEvent: {
@@ -574,26 +552,11 @@ Object.defineProperty(module.exports, "defs", {
             }
           }
         },
-        getTotalBufferSize: {
-          location: {
-            type: "source",
-            fileName: "rpc-types.js",
-            line: 65
-          },
-          kind: "function",
-          argumentTypes: [],
-          returnType: {
-            kind: "promise",
-            type: {
-              kind: "number"
-            }
-          }
-        },
         dispose: {
           location: {
             type: "source",
             fileName: "rpc-types.js",
-            line: 66
+            line: 65
           },
           kind: "function",
           argumentTypes: [],

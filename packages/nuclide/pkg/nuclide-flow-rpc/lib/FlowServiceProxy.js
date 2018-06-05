@@ -1,25 +1,19 @@
 "use strict";
 
-let Observable;
-
 module.exports = _client => {
   const remoteModule = {};
 
   remoteModule.dispose = function () {
-    return _client.marshalArguments(Array.from(arguments), []).then(args => {
-      return _client.callRemoteFunction("FlowService/dispose", "void", args);
-    });
+    return _client.callRemoteFunction("FlowService/dispose", "void", _client.marshalArguments(Array.from(arguments), []));
   };
 
   remoteModule.FileNotifier = class {
+    constructor() {
+      throw Error("constructors are not supported for remote objects");
+    }
+
     onFileEvent(arg0) {
-      return Promise.all([_client.marshalArguments(Array.from(arguments), [{
-        name: "event",
-        type: {
-          kind: "named",
-          name: "FileEvent"
-        }
-      }]), _client.marshal(this, {
+      return _client.callRemoteMethod(_client.marshal(this, {
         kind: "named",
         location: {
           type: "source",
@@ -27,7 +21,13 @@ module.exports = _client => {
           line: 62
         },
         name: "FileNotifier"
-      })]).then(([args, id]) => _client.callRemoteMethod(id, "onFileEvent", "promise", args)).then(value => {
+      }), "onFileEvent", "promise", _client.marshalArguments(Array.from(arguments), [{
+        name: "event",
+        type: {
+          kind: "named",
+          name: "FileEvent"
+        }
+      }])).then(value => {
         return _client.unmarshal(value, {
           kind: "void"
         });
@@ -35,7 +35,15 @@ module.exports = _client => {
     }
 
     onDirectoriesChanged(arg0) {
-      return Promise.all([_client.marshalArguments(Array.from(arguments), [{
+      return _client.callRemoteMethod(_client.marshal(this, {
+        kind: "named",
+        location: {
+          type: "source",
+          fileName: "rpc-types.js",
+          line: 62
+        },
+        name: "FileNotifier"
+      }), "onDirectoriesChanged", "promise", _client.marshalArguments(Array.from(arguments), [{
         name: "openDirectories",
         type: {
           kind: "set",
@@ -44,33 +52,9 @@ module.exports = _client => {
             name: "NuclideUri"
           }
         }
-      }]), _client.marshal(this, {
-        kind: "named",
-        location: {
-          type: "source",
-          fileName: "rpc-types.js",
-          line: 62
-        },
-        name: "FileNotifier"
-      })]).then(([args, id]) => _client.callRemoteMethod(id, "onDirectoriesChanged", "promise", args)).then(value => {
+      }])).then(value => {
         return _client.unmarshal(value, {
           kind: "void"
-        });
-      });
-    }
-
-    getTotalBufferSize() {
-      return Promise.all([_client.marshalArguments(Array.from(arguments), []), _client.marshal(this, {
-        kind: "named",
-        location: {
-          type: "source",
-          fileName: "rpc-types.js",
-          line: 62
-        },
-        name: "FileNotifier"
-      })]).then(([args, id]) => _client.callRemoteMethod(id, "getTotalBufferSize", "promise", args)).then(value => {
-        return _client.unmarshal(value, {
-          kind: "number"
         });
       });
     }
@@ -81,8 +65,12 @@ module.exports = _client => {
 
   };
   remoteModule.CodeAction = class {
+    constructor() {
+      throw Error("constructors are not supported for remote objects");
+    }
+
     apply() {
-      return Promise.all([_client.marshalArguments(Array.from(arguments), []), _client.marshal(this, {
+      return _client.callRemoteMethod(_client.marshal(this, {
         kind: "named",
         location: {
           type: "source",
@@ -90,7 +78,7 @@ module.exports = _client => {
           line: 15
         },
         name: "CodeAction"
-      })]).then(([args, id]) => _client.callRemoteMethod(id, "apply", "promise", args)).then(value => {
+      }), "apply", "promise", _client.marshalArguments(Array.from(arguments), [])).then(value => {
         return _client.unmarshal(value, {
           kind: "void"
         });
@@ -98,7 +86,7 @@ module.exports = _client => {
     }
 
     getTitle() {
-      return Promise.all([_client.marshalArguments(Array.from(arguments), []), _client.marshal(this, {
+      return _client.callRemoteMethod(_client.marshal(this, {
         kind: "named",
         location: {
           type: "source",
@@ -106,7 +94,7 @@ module.exports = _client => {
           line: 15
         },
         name: "CodeAction"
-      })]).then(([args, id]) => _client.callRemoteMethod(id, "getTitle", "promise", args)).then(value => {
+      }), "getTitle", "promise", _client.marshalArguments(Array.from(arguments), [])).then(value => {
         return _client.unmarshal(value, {
           kind: "string"
         });
@@ -119,22 +107,26 @@ module.exports = _client => {
 
   };
   remoteModule.FlowLanguageServiceType = class {
+    constructor() {
+      throw Error("constructors are not supported for remote objects");
+    }
+
     getDiagnostics(arg0) {
-      return Promise.all([_client.marshalArguments(Array.from(arguments), [{
+      return _client.callRemoteMethod(_client.marshal(this, {
+        kind: "named",
+        location: {
+          type: "source",
+          fileName: "FlowService.js",
+          line: 215
+        },
+        name: "FlowLanguageServiceType"
+      }), "getDiagnostics", "promise", _client.marshalArguments(Array.from(arguments), [{
         name: "fileVersion",
         type: {
           kind: "named",
           name: "FileVersion"
         }
-      }]), _client.marshal(this, {
-        kind: "named",
-        location: {
-          type: "source",
-          fileName: "FlowService.js",
-          line: 187
-        },
-        name: "FlowLanguageServiceType"
-      })]).then(([args, id]) => _client.callRemoteMethod(id, "getDiagnostics", "promise", args)).then(value => {
+      }])).then(value => {
         return _client.unmarshal(value, {
           kind: "nullable",
           type: {
@@ -146,15 +138,15 @@ module.exports = _client => {
     }
 
     observeDiagnostics() {
-      return Observable.fromPromise(Promise.all([_client.marshalArguments(Array.from(arguments), []), _client.marshal(this, {
+      return _client.callRemoteMethod(_client.marshal(this, {
         kind: "named",
         location: {
           type: "source",
           fileName: "FlowService.js",
-          line: 187
+          line: 215
         },
         name: "FlowLanguageServiceType"
-      })])).switchMap(([args, id]) => _client.callRemoteMethod(id, "observeDiagnostics", "observable", args)).concatMap(value => {
+      }), "observeDiagnostics", "observable", _client.marshalArguments(Array.from(arguments), [])).map(value => {
         return _client.unmarshal(value, {
           kind: "named",
           name: "FileDiagnosticMap"
@@ -163,7 +155,15 @@ module.exports = _client => {
     }
 
     getAutocompleteSuggestions(arg0, arg1, arg2) {
-      return Promise.all([_client.marshalArguments(Array.from(arguments), [{
+      return _client.callRemoteMethod(_client.marshal(this, {
+        kind: "named",
+        location: {
+          type: "source",
+          fileName: "FlowService.js",
+          line: 215
+        },
+        name: "FlowLanguageServiceType"
+      }), "getAutocompleteSuggestions", "promise", _client.marshalArguments(Array.from(arguments), [{
         name: "fileVersion",
         type: {
           kind: "named",
@@ -181,15 +181,7 @@ module.exports = _client => {
           kind: "named",
           name: "AutocompleteRequest"
         }
-      }]), _client.marshal(this, {
-        kind: "named",
-        location: {
-          type: "source",
-          fileName: "FlowService.js",
-          line: 187
-        },
-        name: "FlowLanguageServiceType"
-      })]).then(([args, id]) => _client.callRemoteMethod(id, "getAutocompleteSuggestions", "promise", args)).then(value => {
+      }])).then(value => {
         return _client.unmarshal(value, {
           kind: "nullable",
           type: {
@@ -201,21 +193,21 @@ module.exports = _client => {
     }
 
     resolveAutocompleteSuggestion(arg0) {
-      return Promise.all([_client.marshalArguments(Array.from(arguments), [{
+      return _client.callRemoteMethod(_client.marshal(this, {
+        kind: "named",
+        location: {
+          type: "source",
+          fileName: "FlowService.js",
+          line: 215
+        },
+        name: "FlowLanguageServiceType"
+      }), "resolveAutocompleteSuggestion", "promise", _client.marshalArguments(Array.from(arguments), [{
         name: "suggestion",
         type: {
           kind: "named",
           name: "Completion"
         }
-      }]), _client.marshal(this, {
-        kind: "named",
-        location: {
-          type: "source",
-          fileName: "FlowService.js",
-          line: 187
-        },
-        name: "FlowLanguageServiceType"
-      })]).then(([args, id]) => _client.callRemoteMethod(id, "resolveAutocompleteSuggestion", "promise", args)).then(value => {
+      }])).then(value => {
         return _client.unmarshal(value, {
           kind: "nullable",
           type: {
@@ -227,7 +219,15 @@ module.exports = _client => {
     }
 
     getDefinition(arg0, arg1) {
-      return Promise.all([_client.marshalArguments(Array.from(arguments), [{
+      return _client.callRemoteMethod(_client.marshal(this, {
+        kind: "named",
+        location: {
+          type: "source",
+          fileName: "FlowService.js",
+          line: 215
+        },
+        name: "FlowLanguageServiceType"
+      }), "getDefinition", "promise", _client.marshalArguments(Array.from(arguments), [{
         name: "fileVersion",
         type: {
           kind: "named",
@@ -239,15 +239,7 @@ module.exports = _client => {
           kind: "named",
           name: "atom$Point"
         }
-      }]), _client.marshal(this, {
-        kind: "named",
-        location: {
-          type: "source",
-          fileName: "FlowService.js",
-          line: 187
-        },
-        name: "FlowLanguageServiceType"
-      })]).then(([args, id]) => _client.callRemoteMethod(id, "getDefinition", "promise", args)).then(value => {
+      }])).then(value => {
         return _client.unmarshal(value, {
           kind: "nullable",
           type: {
@@ -259,7 +251,15 @@ module.exports = _client => {
     }
 
     findReferences(arg0, arg1) {
-      return Observable.fromPromise(Promise.all([_client.marshalArguments(Array.from(arguments), [{
+      return _client.callRemoteMethod(_client.marshal(this, {
+        kind: "named",
+        location: {
+          type: "source",
+          fileName: "FlowService.js",
+          line: 215
+        },
+        name: "FlowLanguageServiceType"
+      }), "findReferences", "observable", _client.marshalArguments(Array.from(arguments), [{
         name: "fileVersion",
         type: {
           kind: "named",
@@ -271,15 +271,49 @@ module.exports = _client => {
           kind: "named",
           name: "atom$Point"
         }
-      }]), _client.marshal(this, {
+      }])).map(value => {
+        return _client.unmarshal(value, {
+          kind: "nullable",
+          type: {
+            kind: "named",
+            name: "FindReferencesReturn"
+          }
+        });
+      }).publish();
+    }
+
+    customFindReferences(arg0, arg1, arg2, arg3) {
+      return _client.callRemoteMethod(_client.marshal(this, {
         kind: "named",
         location: {
           type: "source",
           fileName: "FlowService.js",
-          line: 187
+          line: 215
         },
         name: "FlowLanguageServiceType"
-      })])).switchMap(([args, id]) => _client.callRemoteMethod(id, "findReferences", "observable", args)).concatMap(value => {
+      }), "customFindReferences", "observable", _client.marshalArguments(Array.from(arguments), [{
+        name: "fileVersion",
+        type: {
+          kind: "named",
+          name: "FileVersion"
+        }
+      }, {
+        name: "position",
+        type: {
+          kind: "named",
+          name: "atom$Point"
+        }
+      }, {
+        name: "global_",
+        type: {
+          kind: "boolean"
+        }
+      }, {
+        name: "multiHop",
+        type: {
+          kind: "boolean"
+        }
+      }])).map(value => {
         return _client.unmarshal(value, {
           kind: "nullable",
           type: {
@@ -291,21 +325,21 @@ module.exports = _client => {
     }
 
     getCoverage(arg0) {
-      return Promise.all([_client.marshalArguments(Array.from(arguments), [{
+      return _client.callRemoteMethod(_client.marshal(this, {
+        kind: "named",
+        location: {
+          type: "source",
+          fileName: "FlowService.js",
+          line: 215
+        },
+        name: "FlowLanguageServiceType"
+      }), "getCoverage", "promise", _client.marshalArguments(Array.from(arguments), [{
         name: "filePath",
         type: {
           kind: "named",
           name: "NuclideUri"
         }
-      }]), _client.marshal(this, {
-        kind: "named",
-        location: {
-          type: "source",
-          fileName: "FlowService.js",
-          line: 187
-        },
-        name: "FlowLanguageServiceType"
-      })]).then(([args, id]) => _client.callRemoteMethod(id, "getCoverage", "promise", args)).then(value => {
+      }])).then(value => {
         return _client.unmarshal(value, {
           kind: "nullable",
           type: {
@@ -317,21 +351,21 @@ module.exports = _client => {
     }
 
     getOutline(arg0) {
-      return Promise.all([_client.marshalArguments(Array.from(arguments), [{
+      return _client.callRemoteMethod(_client.marshal(this, {
+        kind: "named",
+        location: {
+          type: "source",
+          fileName: "FlowService.js",
+          line: 215
+        },
+        name: "FlowLanguageServiceType"
+      }), "getOutline", "promise", _client.marshalArguments(Array.from(arguments), [{
         name: "fileVersion",
         type: {
           kind: "named",
           name: "FileVersion"
         }
-      }]), _client.marshal(this, {
-        kind: "named",
-        location: {
-          type: "source",
-          fileName: "FlowService.js",
-          line: 187
-        },
-        name: "FlowLanguageServiceType"
-      })]).then(([args, id]) => _client.callRemoteMethod(id, "getOutline", "promise", args)).then(value => {
+      }])).then(value => {
         return _client.unmarshal(value, {
           kind: "nullable",
           type: {
@@ -343,20 +377,20 @@ module.exports = _client => {
     }
 
     onToggleCoverage(arg0) {
-      return Promise.all([_client.marshalArguments(Array.from(arguments), [{
-        name: "set",
-        type: {
-          kind: "boolean"
-        }
-      }]), _client.marshal(this, {
+      return _client.callRemoteMethod(_client.marshal(this, {
         kind: "named",
         location: {
           type: "source",
           fileName: "FlowService.js",
-          line: 187
+          line: 215
         },
         name: "FlowLanguageServiceType"
-      })]).then(([args, id]) => _client.callRemoteMethod(id, "onToggleCoverage", "promise", args)).then(value => {
+      }), "onToggleCoverage", "promise", _client.marshalArguments(Array.from(arguments), [{
+        name: "set",
+        type: {
+          kind: "boolean"
+        }
+      }])).then(value => {
         return _client.unmarshal(value, {
           kind: "void"
         });
@@ -364,21 +398,21 @@ module.exports = _client => {
     }
 
     getCodeLens(arg0) {
-      return Promise.all([_client.marshalArguments(Array.from(arguments), [{
+      return _client.callRemoteMethod(_client.marshal(this, {
+        kind: "named",
+        location: {
+          type: "source",
+          fileName: "FlowService.js",
+          line: 215
+        },
+        name: "FlowLanguageServiceType"
+      }), "getCodeLens", "promise", _client.marshalArguments(Array.from(arguments), [{
         name: "fileVersion",
         type: {
           kind: "named",
           name: "FileVersion"
         }
-      }]), _client.marshal(this, {
-        kind: "named",
-        location: {
-          type: "source",
-          fileName: "FlowService.js",
-          line: 187
-        },
-        name: "FlowLanguageServiceType"
-      })]).then(([args, id]) => _client.callRemoteMethod(id, "getCodeLens", "promise", args)).then(value => {
+      }])).then(value => {
         return _client.unmarshal(value, {
           kind: "nullable",
           type: {
@@ -393,7 +427,15 @@ module.exports = _client => {
     }
 
     resolveCodeLens(arg0, arg1) {
-      return Promise.all([_client.marshalArguments(Array.from(arguments), [{
+      return _client.callRemoteMethod(_client.marshal(this, {
+        kind: "named",
+        location: {
+          type: "source",
+          fileName: "FlowService.js",
+          line: 215
+        },
+        name: "FlowLanguageServiceType"
+      }), "resolveCodeLens", "promise", _client.marshalArguments(Array.from(arguments), [{
         name: "filePath",
         type: {
           kind: "named",
@@ -405,15 +447,7 @@ module.exports = _client => {
           kind: "named",
           name: "CodeLensData"
         }
-      }]), _client.marshal(this, {
-        kind: "named",
-        location: {
-          type: "source",
-          fileName: "FlowService.js",
-          line: 187
-        },
-        name: "FlowLanguageServiceType"
-      })]).then(([args, id]) => _client.callRemoteMethod(id, "resolveCodeLens", "promise", args)).then(value => {
+      }])).then(value => {
         return _client.unmarshal(value, {
           kind: "nullable",
           type: {
@@ -425,7 +459,15 @@ module.exports = _client => {
     }
 
     getCodeActions(arg0, arg1, arg2) {
-      return Promise.all([_client.marshalArguments(Array.from(arguments), [{
+      return _client.callRemoteMethod(_client.marshal(this, {
+        kind: "named",
+        location: {
+          type: "source",
+          fileName: "FlowService.js",
+          line: 215
+        },
+        name: "FlowLanguageServiceType"
+      }), "getCodeActions", "promise", _client.marshalArguments(Array.from(arguments), [{
         name: "fileVersion",
         type: {
           kind: "named",
@@ -446,15 +488,7 @@ module.exports = _client => {
             name: "FileDiagnosticMessage"
           }
         }
-      }]), _client.marshal(this, {
-        kind: "named",
-        location: {
-          type: "source",
-          fileName: "FlowService.js",
-          line: 187
-        },
-        name: "FlowLanguageServiceType"
-      })]).then(([args, id]) => _client.callRemoteMethod(id, "getCodeActions", "promise", args)).then(value => {
+      }])).then(value => {
         return _client.unmarshal(value, {
           kind: "array",
           type: {
@@ -466,21 +500,21 @@ module.exports = _client => {
     }
 
     getAdditionalLogFiles(arg0) {
-      return Promise.all([_client.marshalArguments(Array.from(arguments), [{
+      return _client.callRemoteMethod(_client.marshal(this, {
+        kind: "named",
+        location: {
+          type: "source",
+          fileName: "FlowService.js",
+          line: 215
+        },
+        name: "FlowLanguageServiceType"
+      }), "getAdditionalLogFiles", "promise", _client.marshalArguments(Array.from(arguments), [{
         name: "deadline",
         type: {
           kind: "named",
           name: "DeadlineRequest"
         }
-      }]), _client.marshal(this, {
-        kind: "named",
-        location: {
-          type: "source",
-          fileName: "FlowService.js",
-          line: 187
-        },
-        name: "FlowLanguageServiceType"
-      })]).then(([args, id]) => _client.callRemoteMethod(id, "getAdditionalLogFiles", "promise", args)).then(value => {
+      }])).then(value => {
         return _client.unmarshal(value, {
           kind: "array",
           type: {
@@ -492,7 +526,15 @@ module.exports = _client => {
     }
 
     typeHint(arg0, arg1) {
-      return Promise.all([_client.marshalArguments(Array.from(arguments), [{
+      return _client.callRemoteMethod(_client.marshal(this, {
+        kind: "named",
+        location: {
+          type: "source",
+          fileName: "FlowService.js",
+          line: 215
+        },
+        name: "FlowLanguageServiceType"
+      }), "typeHint", "promise", _client.marshalArguments(Array.from(arguments), [{
         name: "fileVersion",
         type: {
           kind: "named",
@@ -504,15 +546,7 @@ module.exports = _client => {
           kind: "named",
           name: "atom$Point"
         }
-      }]), _client.marshal(this, {
-        kind: "named",
-        location: {
-          type: "source",
-          fileName: "FlowService.js",
-          line: 187
-        },
-        name: "FlowLanguageServiceType"
-      })]).then(([args, id]) => _client.callRemoteMethod(id, "typeHint", "promise", args)).then(value => {
+      }])).then(value => {
         return _client.unmarshal(value, {
           kind: "nullable",
           type: {
@@ -524,7 +558,15 @@ module.exports = _client => {
     }
 
     highlight(arg0, arg1) {
-      return Promise.all([_client.marshalArguments(Array.from(arguments), [{
+      return _client.callRemoteMethod(_client.marshal(this, {
+        kind: "named",
+        location: {
+          type: "source",
+          fileName: "FlowService.js",
+          line: 215
+        },
+        name: "FlowLanguageServiceType"
+      }), "highlight", "promise", _client.marshalArguments(Array.from(arguments), [{
         name: "fileVersion",
         type: {
           kind: "named",
@@ -536,15 +578,7 @@ module.exports = _client => {
           kind: "named",
           name: "atom$Point"
         }
-      }]), _client.marshal(this, {
-        kind: "named",
-        location: {
-          type: "source",
-          fileName: "FlowService.js",
-          line: 187
-        },
-        name: "FlowLanguageServiceType"
-      })]).then(([args, id]) => _client.callRemoteMethod(id, "highlight", "promise", args)).then(value => {
+      }])).then(value => {
         return _client.unmarshal(value, {
           kind: "nullable",
           type: {
@@ -559,7 +593,15 @@ module.exports = _client => {
     }
 
     formatSource(arg0, arg1, arg2) {
-      return Promise.all([_client.marshalArguments(Array.from(arguments), [{
+      return _client.callRemoteMethod(_client.marshal(this, {
+        kind: "named",
+        location: {
+          type: "source",
+          fileName: "FlowService.js",
+          line: 215
+        },
+        name: "FlowLanguageServiceType"
+      }), "formatSource", "promise", _client.marshalArguments(Array.from(arguments), [{
         name: "fileVersion",
         type: {
           kind: "named",
@@ -577,15 +619,7 @@ module.exports = _client => {
           kind: "named",
           name: "FormatOptions"
         }
-      }]), _client.marshal(this, {
-        kind: "named",
-        location: {
-          type: "source",
-          fileName: "FlowService.js",
-          line: 187
-        },
-        name: "FlowLanguageServiceType"
-      })]).then(([args, id]) => _client.callRemoteMethod(id, "formatSource", "promise", args)).then(value => {
+      }])).then(value => {
         return _client.unmarshal(value, {
           kind: "nullable",
           type: {
@@ -600,7 +634,15 @@ module.exports = _client => {
     }
 
     formatEntireFile(arg0, arg1, arg2) {
-      return Promise.all([_client.marshalArguments(Array.from(arguments), [{
+      return _client.callRemoteMethod(_client.marshal(this, {
+        kind: "named",
+        location: {
+          type: "source",
+          fileName: "FlowService.js",
+          line: 215
+        },
+        name: "FlowLanguageServiceType"
+      }), "formatEntireFile", "promise", _client.marshalArguments(Array.from(arguments), [{
         name: "fileVersion",
         type: {
           kind: "named",
@@ -618,15 +660,7 @@ module.exports = _client => {
           kind: "named",
           name: "FormatOptions"
         }
-      }]), _client.marshal(this, {
-        kind: "named",
-        location: {
-          type: "source",
-          fileName: "FlowService.js",
-          line: 187
-        },
-        name: "FlowLanguageServiceType"
-      })]).then(([args, id]) => _client.callRemoteMethod(id, "formatEntireFile", "promise", args)).then(value => {
+      }])).then(value => {
         return _client.unmarshal(value, {
           kind: "nullable",
           type: {
@@ -650,7 +684,15 @@ module.exports = _client => {
     }
 
     formatAtPosition(arg0, arg1, arg2, arg3) {
-      return Promise.all([_client.marshalArguments(Array.from(arguments), [{
+      return _client.callRemoteMethod(_client.marshal(this, {
+        kind: "named",
+        location: {
+          type: "source",
+          fileName: "FlowService.js",
+          line: 215
+        },
+        name: "FlowLanguageServiceType"
+      }), "formatAtPosition", "promise", _client.marshalArguments(Array.from(arguments), [{
         name: "fileVersion",
         type: {
           kind: "named",
@@ -673,15 +715,7 @@ module.exports = _client => {
           kind: "named",
           name: "FormatOptions"
         }
-      }]), _client.marshal(this, {
-        kind: "named",
-        location: {
-          type: "source",
-          fileName: "FlowService.js",
-          line: 187
-        },
-        name: "FlowLanguageServiceType"
-      })]).then(([args, id]) => _client.callRemoteMethod(id, "formatAtPosition", "promise", args)).then(value => {
+      }])).then(value => {
         return _client.unmarshal(value, {
           kind: "nullable",
           type: {
@@ -696,7 +730,15 @@ module.exports = _client => {
     }
 
     signatureHelp(arg0, arg1) {
-      return Promise.all([_client.marshalArguments(Array.from(arguments), [{
+      return _client.callRemoteMethod(_client.marshal(this, {
+        kind: "named",
+        location: {
+          type: "source",
+          fileName: "FlowService.js",
+          line: 215
+        },
+        name: "FlowLanguageServiceType"
+      }), "signatureHelp", "promise", _client.marshalArguments(Array.from(arguments), [{
         name: "fileVersion",
         type: {
           kind: "named",
@@ -708,15 +750,7 @@ module.exports = _client => {
           kind: "named",
           name: "atom$Point"
         }
-      }]), _client.marshal(this, {
-        kind: "named",
-        location: {
-          type: "source",
-          fileName: "FlowService.js",
-          line: 187
-        },
-        name: "FlowLanguageServiceType"
-      })]).then(([args, id]) => _client.callRemoteMethod(id, "signatureHelp", "promise", args)).then(value => {
+      }])).then(value => {
         return _client.unmarshal(value, {
           kind: "nullable",
           type: {
@@ -728,7 +762,15 @@ module.exports = _client => {
     }
 
     supportsSymbolSearch(arg0) {
-      return Promise.all([_client.marshalArguments(Array.from(arguments), [{
+      return _client.callRemoteMethod(_client.marshal(this, {
+        kind: "named",
+        location: {
+          type: "source",
+          fileName: "FlowService.js",
+          line: 215
+        },
+        name: "FlowLanguageServiceType"
+      }), "supportsSymbolSearch", "promise", _client.marshalArguments(Array.from(arguments), [{
         name: "directories",
         type: {
           kind: "array",
@@ -737,15 +779,7 @@ module.exports = _client => {
             name: "NuclideUri"
           }
         }
-      }]), _client.marshal(this, {
-        kind: "named",
-        location: {
-          type: "source",
-          fileName: "FlowService.js",
-          line: 187
-        },
-        name: "FlowLanguageServiceType"
-      })]).then(([args, id]) => _client.callRemoteMethod(id, "supportsSymbolSearch", "promise", args)).then(value => {
+      }])).then(value => {
         return _client.unmarshal(value, {
           kind: "boolean"
         });
@@ -753,7 +787,15 @@ module.exports = _client => {
     }
 
     symbolSearch(arg0, arg1) {
-      return Promise.all([_client.marshalArguments(Array.from(arguments), [{
+      return _client.callRemoteMethod(_client.marshal(this, {
+        kind: "named",
+        location: {
+          type: "source",
+          fileName: "FlowService.js",
+          line: 215
+        },
+        name: "FlowLanguageServiceType"
+      }), "symbolSearch", "promise", _client.marshalArguments(Array.from(arguments), [{
         name: "query",
         type: {
           kind: "string"
@@ -767,15 +809,7 @@ module.exports = _client => {
             name: "NuclideUri"
           }
         }
-      }]), _client.marshal(this, {
-        kind: "named",
-        location: {
-          type: "source",
-          fileName: "FlowService.js",
-          line: 187
-        },
-        name: "FlowLanguageServiceType"
-      })]).then(([args, id]) => _client.callRemoteMethod(id, "symbolSearch", "promise", args)).then(value => {
+      }])).then(value => {
         return _client.unmarshal(value, {
           kind: "nullable",
           type: {
@@ -790,21 +824,21 @@ module.exports = _client => {
     }
 
     getProjectRoot(arg0) {
-      return Promise.all([_client.marshalArguments(Array.from(arguments), [{
+      return _client.callRemoteMethod(_client.marshal(this, {
+        kind: "named",
+        location: {
+          type: "source",
+          fileName: "FlowService.js",
+          line: 215
+        },
+        name: "FlowLanguageServiceType"
+      }), "getProjectRoot", "promise", _client.marshalArguments(Array.from(arguments), [{
         name: "fileUri",
         type: {
           kind: "named",
           name: "NuclideUri"
         }
-      }]), _client.marshal(this, {
-        kind: "named",
-        location: {
-          type: "source",
-          fileName: "FlowService.js",
-          line: 187
-        },
-        name: "FlowLanguageServiceType"
-      })]).then(([args, id]) => _client.callRemoteMethod(id, "getProjectRoot", "promise", args)).then(value => {
+      }])).then(value => {
         return _client.unmarshal(value, {
           kind: "nullable",
           type: {
@@ -816,21 +850,21 @@ module.exports = _client => {
     }
 
     isFileInProject(arg0) {
-      return Promise.all([_client.marshalArguments(Array.from(arguments), [{
+      return _client.callRemoteMethod(_client.marshal(this, {
+        kind: "named",
+        location: {
+          type: "source",
+          fileName: "FlowService.js",
+          line: 215
+        },
+        name: "FlowLanguageServiceType"
+      }), "isFileInProject", "promise", _client.marshalArguments(Array.from(arguments), [{
         name: "fileUri",
         type: {
           kind: "named",
           name: "NuclideUri"
         }
-      }]), _client.marshal(this, {
-        kind: "named",
-        location: {
-          type: "source",
-          fileName: "FlowService.js",
-          line: 187
-        },
-        name: "FlowLanguageServiceType"
-      })]).then(([args, id]) => _client.callRemoteMethod(id, "isFileInProject", "promise", args)).then(value => {
+      }])).then(value => {
         return _client.unmarshal(value, {
           kind: "boolean"
         });
@@ -838,15 +872,15 @@ module.exports = _client => {
     }
 
     getServerStatusUpdates() {
-      return Observable.fromPromise(Promise.all([_client.marshalArguments(Array.from(arguments), []), _client.marshal(this, {
+      return _client.callRemoteMethod(_client.marshal(this, {
         kind: "named",
         location: {
           type: "source",
           fileName: "FlowService.js",
-          line: 187
+          line: 215
         },
         name: "FlowLanguageServiceType"
-      })])).switchMap(([args, id]) => _client.callRemoteMethod(id, "getServerStatusUpdates", "observable", args)).concatMap(value => {
+      }), "getServerStatusUpdates", "observable", _client.marshalArguments(Array.from(arguments), [])).map(value => {
         return _client.unmarshal(value, {
           kind: "named",
           name: "ServerStatusUpdate"
@@ -855,15 +889,15 @@ module.exports = _client => {
     }
 
     allowServerRestart() {
-      return Promise.all([_client.marshalArguments(Array.from(arguments), []), _client.marshal(this, {
+      return _client.callRemoteMethod(_client.marshal(this, {
         kind: "named",
         location: {
           type: "source",
           fileName: "FlowService.js",
-          line: 187
+          line: 215
         },
         name: "FlowLanguageServiceType"
-      })]).then(([args, id]) => _client.callRemoteMethod(id, "allowServerRestart", "promise", args)).then(value => {
+      }), "allowServerRestart", "promise", _client.marshalArguments(Array.from(arguments), [])).then(value => {
         return _client.unmarshal(value, {
           kind: "void"
         });
@@ -871,7 +905,15 @@ module.exports = _client => {
     }
 
     getExpandedSelectionRange(arg0, arg1) {
-      return Promise.all([_client.marshalArguments(Array.from(arguments), [{
+      return _client.callRemoteMethod(_client.marshal(this, {
+        kind: "named",
+        location: {
+          type: "source",
+          fileName: "FlowService.js",
+          line: 215
+        },
+        name: "FlowLanguageServiceType"
+      }), "getExpandedSelectionRange", "promise", _client.marshalArguments(Array.from(arguments), [{
         name: "fileVersion",
         type: {
           kind: "named",
@@ -883,15 +925,7 @@ module.exports = _client => {
           kind: "named",
           name: "atom$Range"
         }
-      }]), _client.marshal(this, {
-        kind: "named",
-        location: {
-          type: "source",
-          fileName: "FlowService.js",
-          line: 187
-        },
-        name: "FlowLanguageServiceType"
-      })]).then(([args, id]) => _client.callRemoteMethod(id, "getExpandedSelectionRange", "promise", args)).then(value => {
+      }])).then(value => {
         return _client.unmarshal(value, {
           kind: "nullable",
           type: {
@@ -903,7 +937,15 @@ module.exports = _client => {
     }
 
     getCollapsedSelectionRange(arg0, arg1, arg2) {
-      return Promise.all([_client.marshalArguments(Array.from(arguments), [{
+      return _client.callRemoteMethod(_client.marshal(this, {
+        kind: "named",
+        location: {
+          type: "source",
+          fileName: "FlowService.js",
+          line: 215
+        },
+        name: "FlowLanguageServiceType"
+      }), "getCollapsedSelectionRange", "promise", _client.marshalArguments(Array.from(arguments), [{
         name: "fileVersion",
         type: {
           kind: "named",
@@ -921,15 +963,7 @@ module.exports = _client => {
           kind: "named",
           name: "atom$Point"
         }
-      }]), _client.marshal(this, {
-        kind: "named",
-        location: {
-          type: "source",
-          fileName: "FlowService.js",
-          line: 187
-        },
-        name: "FlowLanguageServiceType"
-      })]).then(([args, id]) => _client.callRemoteMethod(id, "getCollapsedSelectionRange", "promise", args)).then(value => {
+      }])).then(value => {
         return _client.unmarshal(value, {
           kind: "nullable",
           type: {
@@ -940,19 +974,73 @@ module.exports = _client => {
       });
     }
 
+    observeStatus(arg0) {
+      return _client.callRemoteMethod(_client.marshal(this, {
+        kind: "named",
+        location: {
+          type: "source",
+          fileName: "FlowService.js",
+          line: 215
+        },
+        name: "FlowLanguageServiceType"
+      }), "observeStatus", "observable", _client.marshalArguments(Array.from(arguments), [{
+        name: "fileVersion",
+        type: {
+          kind: "named",
+          name: "FileVersion"
+        }
+      }])).map(value => {
+        return _client.unmarshal(value, {
+          kind: "named",
+          name: "StatusData"
+        });
+      }).publish();
+    }
+
+    clickStatus(arg0, arg1, arg2) {
+      return _client.callRemoteMethod(_client.marshal(this, {
+        kind: "named",
+        location: {
+          type: "source",
+          fileName: "FlowService.js",
+          line: 215
+        },
+        name: "FlowLanguageServiceType"
+      }), "clickStatus", "promise", _client.marshalArguments(Array.from(arguments), [{
+        name: "fileVersion",
+        type: {
+          kind: "named",
+          name: "FileVersion"
+        }
+      }, {
+        name: "id",
+        type: {
+          kind: "string"
+        }
+      }, {
+        name: "button",
+        type: {
+          kind: "string"
+        }
+      }])).then(value => {
+        return _client.unmarshal(value, {
+          kind: "void"
+        });
+      });
+    }
+
     dispose() {
       return _client.disposeRemoteObject(this);
     }
 
   };
   remoteModule.Progress = class {
+    constructor() {
+      throw Error("constructors are not supported for remote objects");
+    }
+
     setTitle(arg0) {
-      return Promise.all([_client.marshalArguments(Array.from(arguments), [{
-        name: "title",
-        type: {
-          kind: "string"
-        }
-      }]), _client.marshal(this, {
+      return _client.callRemoteMethod(_client.marshal(this, {
         kind: "named",
         location: {
           type: "source",
@@ -960,7 +1048,12 @@ module.exports = _client => {
           line: 66
         },
         name: "Progress"
-      })]).then(([args, id]) => _client.callRemoteMethod(id, "setTitle", "void", args));
+      }), "setTitle", "void", _client.marshalArguments(Array.from(arguments), [{
+        name: "title",
+        type: {
+          kind: "string"
+        }
+      }]));
     }
 
     dispose() {
@@ -969,8 +1062,20 @@ module.exports = _client => {
 
   };
   remoteModule.HostServices = class {
+    constructor() {
+      throw Error("constructors are not supported for remote objects");
+    }
+
     consoleNotification(arg0, arg1, arg2) {
-      return Promise.all([_client.marshalArguments(Array.from(arguments), [{
+      return _client.callRemoteMethod(_client.marshal(this, {
+        kind: "named",
+        location: {
+          type: "source",
+          fileName: "rpc-types.js",
+          line: 20
+        },
+        name: "HostServices"
+      }), "consoleNotification", "void", _client.marshalArguments(Array.from(arguments), [{
         name: "source",
         type: {
           kind: "string"
@@ -986,7 +1091,11 @@ module.exports = _client => {
         type: {
           kind: "string"
         }
-      }]), _client.marshal(this, {
+      }]));
+    }
+
+    dialogNotification(arg0, arg1) {
+      return _client.callRemoteMethod(_client.marshal(this, {
         kind: "named",
         location: {
           type: "source",
@@ -994,11 +1103,7 @@ module.exports = _client => {
           line: 20
         },
         name: "HostServices"
-      })]).then(([args, id]) => _client.callRemoteMethod(id, "consoleNotification", "void", args));
-    }
-
-    dialogNotification(arg0, arg1) {
-      return Observable.fromPromise(Promise.all([_client.marshalArguments(Array.from(arguments), [{
+      }), "dialogNotification", "observable", _client.marshalArguments(Array.from(arguments), [{
         name: "level",
         type: {
           kind: "named",
@@ -1009,15 +1114,7 @@ module.exports = _client => {
         type: {
           kind: "string"
         }
-      }]), _client.marshal(this, {
-        kind: "named",
-        location: {
-          type: "source",
-          fileName: "rpc-types.js",
-          line: 20
-        },
-        name: "HostServices"
-      })])).switchMap(([args, id]) => _client.callRemoteMethod(id, "dialogNotification", "observable", args)).concatMap(value => {
+      }])).map(value => {
         return _client.unmarshal(value, {
           kind: "void"
         });
@@ -1025,7 +1122,15 @@ module.exports = _client => {
     }
 
     dialogRequest(arg0, arg1, arg2, arg3) {
-      return Observable.fromPromise(Promise.all([_client.marshalArguments(Array.from(arguments), [{
+      return _client.callRemoteMethod(_client.marshal(this, {
+        kind: "named",
+        location: {
+          type: "source",
+          fileName: "rpc-types.js",
+          line: 20
+        },
+        name: "HostServices"
+      }), "dialogRequest", "observable", _client.marshalArguments(Array.from(arguments), [{
         name: "level",
         type: {
           kind: "named",
@@ -1049,15 +1154,7 @@ module.exports = _client => {
         type: {
           kind: "string"
         }
-      }]), _client.marshal(this, {
-        kind: "named",
-        location: {
-          type: "source",
-          fileName: "rpc-types.js",
-          line: 20
-        },
-        name: "HostServices"
-      })])).switchMap(([args, id]) => _client.callRemoteMethod(id, "dialogRequest", "observable", args)).concatMap(value => {
+      }])).map(value => {
         return _client.unmarshal(value, {
           kind: "string"
         });
@@ -1065,7 +1162,15 @@ module.exports = _client => {
     }
 
     showProgress(arg0, arg1) {
-      return Promise.all([_client.marshalArguments(Array.from(arguments), [{
+      return _client.callRemoteMethod(_client.marshal(this, {
+        kind: "named",
+        location: {
+          type: "source",
+          fileName: "rpc-types.js",
+          line: 20
+        },
+        name: "HostServices"
+      }), "showProgress", "promise", _client.marshalArguments(Array.from(arguments), [{
         name: "title",
         type: {
           kind: "string"
@@ -1085,15 +1190,7 @@ module.exports = _client => {
             }]
           }
         }
-      }]), _client.marshal(this, {
-        kind: "named",
-        location: {
-          type: "source",
-          fileName: "rpc-types.js",
-          line: 20
-        },
-        name: "HostServices"
-      })]).then(([args, id]) => _client.callRemoteMethod(id, "showProgress", "promise", args)).then(value => {
+      }])).then(value => {
         return _client.unmarshal(value, {
           kind: "named",
           name: "Progress"
@@ -1102,7 +1199,15 @@ module.exports = _client => {
     }
 
     showActionRequired(arg0, arg1) {
-      return Observable.fromPromise(Promise.all([_client.marshalArguments(Array.from(arguments), [{
+      return _client.callRemoteMethod(_client.marshal(this, {
+        kind: "named",
+        location: {
+          type: "source",
+          fileName: "rpc-types.js",
+          line: 20
+        },
+        name: "HostServices"
+      }), "showActionRequired", "observable", _client.marshalArguments(Array.from(arguments), [{
         name: "title",
         type: {
           kind: "string"
@@ -1122,15 +1227,7 @@ module.exports = _client => {
             }]
           }
         }
-      }]), _client.marshal(this, {
-        kind: "named",
-        location: {
-          type: "source",
-          fileName: "rpc-types.js",
-          line: 20
-        },
-        name: "HostServices"
-      })])).switchMap(([args, id]) => _client.callRemoteMethod(id, "showActionRequired", "observable", args)).concatMap(value => {
+      }])).map(value => {
         return _client.unmarshal(value, {
           kind: "void"
         });
@@ -1138,13 +1235,7 @@ module.exports = _client => {
     }
 
     childRegister(arg0) {
-      return Promise.all([_client.marshalArguments(Array.from(arguments), [{
-        name: "child",
-        type: {
-          kind: "named",
-          name: "HostServices"
-        }
-      }]), _client.marshal(this, {
+      return _client.callRemoteMethod(_client.marshal(this, {
         kind: "named",
         location: {
           type: "source",
@@ -1152,7 +1243,13 @@ module.exports = _client => {
           line: 20
         },
         name: "HostServices"
-      })]).then(([args, id]) => _client.callRemoteMethod(id, "childRegister", "promise", args)).then(value => {
+      }), "childRegister", "promise", _client.marshalArguments(Array.from(arguments), [{
+        name: "child",
+        type: {
+          kind: "named",
+          name: "HostServices"
+        }
+      }])).then(value => {
         return _client.unmarshal(value, {
           kind: "named",
           name: "HostServices"
@@ -1161,7 +1258,15 @@ module.exports = _client => {
     }
 
     applyTextEditsForMultipleFiles(arg0) {
-      return Promise.all([_client.marshalArguments(Array.from(arguments), [{
+      return _client.callRemoteMethod(_client.marshal(this, {
+        kind: "named",
+        location: {
+          type: "source",
+          fileName: "rpc-types.js",
+          line: 20
+        },
+        name: "HostServices"
+      }), "applyTextEditsForMultipleFiles", "promise", _client.marshalArguments(Array.from(arguments), [{
         name: "changes",
         type: {
           kind: "map",
@@ -1177,15 +1282,7 @@ module.exports = _client => {
             }
           }
         }
-      }]), _client.marshal(this, {
-        kind: "named",
-        location: {
-          type: "source",
-          fileName: "rpc-types.js",
-          line: 20
-        },
-        name: "HostServices"
-      })]).then(([args, id]) => _client.callRemoteMethod(id, "applyTextEditsForMultipleFiles", "promise", args)).then(value => {
+      }])).then(value => {
         return _client.unmarshal(value, {
           kind: "boolean"
         });
@@ -1199,7 +1296,7 @@ module.exports = _client => {
   };
 
   remoteModule.initialize = function (arg0, arg1, arg2) {
-    return _client.marshalArguments(Array.from(arguments), [{
+    return _client.callRemoteFunction("FlowService/initialize", "promise", _client.marshalArguments(Array.from(arguments), [{
       name: "fileNotifier",
       type: {
         kind: "named",
@@ -1217,9 +1314,7 @@ module.exports = _client => {
         kind: "named",
         name: "FlowSettings"
       }
-    }]).then(args => {
-      return _client.callRemoteFunction("FlowService/initialize", "promise", args);
-    }).then(value => {
+    }])).then(value => {
       return _client.unmarshal(value, {
         kind: "named",
         name: "FlowLanguageServiceType"
@@ -1228,7 +1323,7 @@ module.exports = _client => {
   };
 
   remoteModule.flowGetAst = function (arg0, arg1) {
-    return _client.marshalArguments(Array.from(arguments), [{
+    return _client.callRemoteFunction("FlowService/flowGetAst", "promise", _client.marshalArguments(Array.from(arguments), [{
       name: "file",
       type: {
         kind: "nullable",
@@ -1242,9 +1337,7 @@ module.exports = _client => {
       type: {
         kind: "string"
       }
-    }]).then(args => {
-      return _client.callRemoteFunction("FlowService/flowGetAst", "promise", args);
-    }).then(value => {
+    }])).then(value => {
       return _client.unmarshal(value, {
         kind: "nullable",
         type: {
@@ -1257,11 +1350,6 @@ module.exports = _client => {
   return remoteModule;
 };
 
-Object.defineProperty(module.exports, "inject", {
-  value: function () {
-    Observable = arguments[0];
-  }
-});
 Object.defineProperty(module.exports, "defs", {
   value: {
     Object: {
@@ -1325,7 +1413,7 @@ Object.defineProperty(module.exports, "defs", {
       location: {
         type: "source",
         fileName: "FlowService.js",
-        line: 54
+        line: 56
       },
       name: "Loc",
       definition: {
@@ -1352,7 +1440,7 @@ Object.defineProperty(module.exports, "defs", {
       location: {
         type: "source",
         fileName: "FlowService.js",
-        line: 61
+        line: 63
       },
       name: "ServerStatusType",
       definition: {
@@ -1386,7 +1474,7 @@ Object.defineProperty(module.exports, "defs", {
       location: {
         type: "source",
         fileName: "FlowService.js",
-        line: 70
+        line: 72
       },
       name: "ServerStatusUpdate",
       definition: {
@@ -1413,7 +1501,7 @@ Object.defineProperty(module.exports, "defs", {
       location: {
         type: "source",
         fileName: "FlowService.js",
-        line: 75
+        line: 77
       },
       name: "FlowSettings",
       definition: {
@@ -1515,13 +1603,13 @@ Object.defineProperty(module.exports, "defs", {
       location: {
         type: "source",
         fileName: "FlowService.js",
-        line: 98
+        line: 100
       },
       type: {
         location: {
           type: "source",
           fileName: "FlowService.js",
-          line: 98
+          line: 100
         },
         kind: "function",
         argumentTypes: [],
@@ -2174,7 +2262,6 @@ Object.defineProperty(module.exports, "defs", {
         fileName: "rpc-types.js",
         line: 62
       },
-      constructorArgs: null,
       staticMethods: {},
       instanceMethods: {
         onFileEvent: {
@@ -2222,26 +2309,11 @@ Object.defineProperty(module.exports, "defs", {
             }
           }
         },
-        getTotalBufferSize: {
-          location: {
-            type: "source",
-            fileName: "rpc-types.js",
-            line: 65
-          },
-          kind: "function",
-          argumentTypes: [],
-          returnType: {
-            kind: "promise",
-            type: {
-              kind: "number"
-            }
-          }
-        },
         dispose: {
           location: {
             type: "source",
             fileName: "rpc-types.js",
-            line: 66
+            line: 65
           },
           kind: "function",
           argumentTypes: [],
@@ -2256,7 +2328,7 @@ Object.defineProperty(module.exports, "defs", {
       location: {
         type: "source",
         fileName: "rpc-types.js",
-        line: 69
+        line: 68
       },
       name: "FileVersion",
       definition: {
@@ -3143,7 +3215,6 @@ Object.defineProperty(module.exports, "defs", {
         fileName: "types.js",
         line: 15
       },
-      constructorArgs: null,
       staticMethods: {},
       instanceMethods: {
         apply: {
@@ -3468,22 +3539,114 @@ Object.defineProperty(module.exports, "defs", {
         }]
       }
     },
+    StatusData: {
+      kind: "alias",
+      location: {
+        type: "source",
+        fileName: "LanguageService.js",
+        line: 135
+      },
+      name: "StatusData",
+      definition: {
+        kind: "union",
+        types: [{
+          kind: "object",
+          fields: [{
+            name: "kind",
+            type: {
+              kind: "string-literal",
+              value: "null"
+            },
+            optional: false
+          }]
+        }, {
+          kind: "object",
+          fields: [{
+            name: "kind",
+            type: {
+              kind: "string-literal",
+              value: "green"
+            },
+            optional: false
+          }, {
+            name: "message",
+            type: {
+              kind: "string"
+            },
+            optional: false
+          }]
+        }, {
+          kind: "object",
+          fields: [{
+            name: "kind",
+            type: {
+              kind: "string-literal",
+              value: "yellow"
+            },
+            optional: false
+          }, {
+            name: "message",
+            type: {
+              kind: "string"
+            },
+            optional: false
+          }, {
+            name: "fraction",
+            type: {
+              kind: "number"
+            },
+            optional: true
+          }]
+        }, {
+          kind: "object",
+          fields: [{
+            name: "kind",
+            type: {
+              kind: "string-literal",
+              value: "red"
+            },
+            optional: false
+          }, {
+            name: "id",
+            type: {
+              kind: "string"
+            },
+            optional: true
+          }, {
+            name: "message",
+            type: {
+              kind: "string"
+            },
+            optional: false
+          }, {
+            name: "buttons",
+            type: {
+              kind: "array",
+              type: {
+                kind: "string"
+              }
+            },
+            optional: false
+          }]
+        }],
+        discriminantField: "kind"
+      }
+    },
     FlowLanguageServiceType: {
       kind: "interface",
       name: "FlowLanguageServiceType",
       location: {
         type: "source",
         fileName: "FlowService.js",
-        line: 187
+        line: 215
       },
-      constructorArgs: null,
       staticMethods: {},
       instanceMethods: {
         getDiagnostics: {
           location: {
             type: "source",
             fileName: "FlowService.js",
-            line: 188
+            line: 216
           },
           kind: "function",
           argumentTypes: [{
@@ -3508,7 +3671,7 @@ Object.defineProperty(module.exports, "defs", {
           location: {
             type: "source",
             fileName: "FlowService.js",
-            line: 190
+            line: 218
           },
           kind: "function",
           argumentTypes: [],
@@ -3524,7 +3687,7 @@ Object.defineProperty(module.exports, "defs", {
           location: {
             type: "source",
             fileName: "FlowService.js",
-            line: 192
+            line: 220
           },
           kind: "function",
           argumentTypes: [{
@@ -3561,7 +3724,7 @@ Object.defineProperty(module.exports, "defs", {
           location: {
             type: "source",
             fileName: "FlowService.js",
-            line: 198
+            line: 226
           },
           kind: "function",
           argumentTypes: [{
@@ -3586,7 +3749,7 @@ Object.defineProperty(module.exports, "defs", {
           location: {
             type: "source",
             fileName: "FlowService.js",
-            line: 200
+            line: 228
           },
           kind: "function",
           argumentTypes: [{
@@ -3617,7 +3780,7 @@ Object.defineProperty(module.exports, "defs", {
           location: {
             type: "source",
             fileName: "FlowService.js",
-            line: 205
+            line: 233
           },
           kind: "function",
           argumentTypes: [{
@@ -3644,11 +3807,52 @@ Object.defineProperty(module.exports, "defs", {
             }
           }
         },
+        customFindReferences: {
+          location: {
+            type: "source",
+            fileName: "FlowService.js",
+            line: 238
+          },
+          kind: "function",
+          argumentTypes: [{
+            name: "fileVersion",
+            type: {
+              kind: "named",
+              name: "FileVersion"
+            }
+          }, {
+            name: "position",
+            type: {
+              kind: "named",
+              name: "atom$Point"
+            }
+          }, {
+            name: "global_",
+            type: {
+              kind: "boolean"
+            }
+          }, {
+            name: "multiHop",
+            type: {
+              kind: "boolean"
+            }
+          }],
+          returnType: {
+            kind: "observable",
+            type: {
+              kind: "nullable",
+              type: {
+                kind: "named",
+                name: "FindReferencesReturn"
+              }
+            }
+          }
+        },
         getCoverage: {
           location: {
             type: "source",
             fileName: "FlowService.js",
-            line: 210
+            line: 245
           },
           kind: "function",
           argumentTypes: [{
@@ -3673,7 +3877,7 @@ Object.defineProperty(module.exports, "defs", {
           location: {
             type: "source",
             fileName: "FlowService.js",
-            line: 212
+            line: 247
           },
           kind: "function",
           argumentTypes: [{
@@ -3698,7 +3902,7 @@ Object.defineProperty(module.exports, "defs", {
           location: {
             type: "source",
             fileName: "FlowService.js",
-            line: 214
+            line: 249
           },
           kind: "function",
           argumentTypes: [{
@@ -3718,7 +3922,7 @@ Object.defineProperty(module.exports, "defs", {
           location: {
             type: "source",
             fileName: "FlowService.js",
-            line: 216
+            line: 251
           },
           kind: "function",
           argumentTypes: [{
@@ -3746,7 +3950,7 @@ Object.defineProperty(module.exports, "defs", {
           location: {
             type: "source",
             fileName: "FlowService.js",
-            line: 217
+            line: 252
           },
           kind: "function",
           argumentTypes: [{
@@ -3777,7 +3981,7 @@ Object.defineProperty(module.exports, "defs", {
           location: {
             type: "source",
             fileName: "FlowService.js",
-            line: 222
+            line: 257
           },
           kind: "function",
           argumentTypes: [{
@@ -3817,7 +4021,7 @@ Object.defineProperty(module.exports, "defs", {
           location: {
             type: "source",
             fileName: "FlowService.js",
-            line: 228
+            line: 263
           },
           kind: "function",
           argumentTypes: [{
@@ -3842,7 +4046,7 @@ Object.defineProperty(module.exports, "defs", {
           location: {
             type: "source",
             fileName: "FlowService.js",
-            line: 232
+            line: 267
           },
           kind: "function",
           argumentTypes: [{
@@ -3873,7 +4077,7 @@ Object.defineProperty(module.exports, "defs", {
           location: {
             type: "source",
             fileName: "FlowService.js",
-            line: 234
+            line: 269
           },
           kind: "function",
           argumentTypes: [{
@@ -3907,7 +4111,7 @@ Object.defineProperty(module.exports, "defs", {
           location: {
             type: "source",
             fileName: "FlowService.js",
-            line: 239
+            line: 274
           },
           kind: "function",
           argumentTypes: [{
@@ -3947,7 +4151,7 @@ Object.defineProperty(module.exports, "defs", {
           location: {
             type: "source",
             fileName: "FlowService.js",
-            line: 245
+            line: 280
           },
           kind: "function",
           argumentTypes: [{
@@ -3996,7 +4200,7 @@ Object.defineProperty(module.exports, "defs", {
           location: {
             type: "source",
             fileName: "FlowService.js",
-            line: 254
+            line: 289
           },
           kind: "function",
           argumentTypes: [{
@@ -4041,7 +4245,7 @@ Object.defineProperty(module.exports, "defs", {
           location: {
             type: "source",
             fileName: "FlowService.js",
-            line: 261
+            line: 296
           },
           kind: "function",
           argumentTypes: [{
@@ -4072,7 +4276,7 @@ Object.defineProperty(module.exports, "defs", {
           location: {
             type: "source",
             fileName: "FlowService.js",
-            line: 266
+            line: 301
           },
           kind: "function",
           argumentTypes: [{
@@ -4096,7 +4300,7 @@ Object.defineProperty(module.exports, "defs", {
           location: {
             type: "source",
             fileName: "FlowService.js",
-            line: 268
+            line: 303
           },
           kind: "function",
           argumentTypes: [{
@@ -4132,7 +4336,7 @@ Object.defineProperty(module.exports, "defs", {
           location: {
             type: "source",
             fileName: "FlowService.js",
-            line: 273
+            line: 308
           },
           kind: "function",
           argumentTypes: [{
@@ -4157,7 +4361,7 @@ Object.defineProperty(module.exports, "defs", {
           location: {
             type: "source",
             fileName: "FlowService.js",
-            line: 275
+            line: 310
           },
           kind: "function",
           argumentTypes: [{
@@ -4178,7 +4382,7 @@ Object.defineProperty(module.exports, "defs", {
           location: {
             type: "source",
             fileName: "FlowService.js",
-            line: 277
+            line: 312
           },
           kind: "function",
           argumentTypes: [],
@@ -4194,7 +4398,7 @@ Object.defineProperty(module.exports, "defs", {
           location: {
             type: "source",
             fileName: "FlowService.js",
-            line: 279
+            line: 314
           },
           kind: "function",
           argumentTypes: [],
@@ -4209,7 +4413,7 @@ Object.defineProperty(module.exports, "defs", {
           location: {
             type: "source",
             fileName: "FlowService.js",
-            line: 281
+            line: 316
           },
           kind: "function",
           argumentTypes: [{
@@ -4240,7 +4444,7 @@ Object.defineProperty(module.exports, "defs", {
           location: {
             type: "source",
             fileName: "FlowService.js",
-            line: 286
+            line: 321
           },
           kind: "function",
           argumentTypes: [{
@@ -4273,11 +4477,64 @@ Object.defineProperty(module.exports, "defs", {
             }
           }
         },
+        observeStatus: {
+          location: {
+            type: "source",
+            fileName: "FlowService.js",
+            line: 327
+          },
+          kind: "function",
+          argumentTypes: [{
+            name: "fileVersion",
+            type: {
+              kind: "named",
+              name: "FileVersion"
+            }
+          }],
+          returnType: {
+            kind: "observable",
+            type: {
+              kind: "named",
+              name: "StatusData"
+            }
+          }
+        },
+        clickStatus: {
+          location: {
+            type: "source",
+            fileName: "FlowService.js",
+            line: 329
+          },
+          kind: "function",
+          argumentTypes: [{
+            name: "fileVersion",
+            type: {
+              kind: "named",
+              name: "FileVersion"
+            }
+          }, {
+            name: "id",
+            type: {
+              kind: "string"
+            }
+          }, {
+            name: "button",
+            type: {
+              kind: "string"
+            }
+          }],
+          returnType: {
+            kind: "promise",
+            type: {
+              kind: "void"
+            }
+          }
+        },
         dispose: {
           location: {
             type: "source",
             fileName: "FlowService.js",
-            line: 292
+            line: 335
           },
           kind: "function",
           argumentTypes: [],
@@ -4320,7 +4577,6 @@ Object.defineProperty(module.exports, "defs", {
         fileName: "rpc-types.js",
         line: 66
       },
-      constructorArgs: null,
       staticMethods: {},
       instanceMethods: {
         setTitle: {
@@ -4362,7 +4618,6 @@ Object.defineProperty(module.exports, "defs", {
         fileName: "rpc-types.js",
         line: 20
       },
-      constructorArgs: null,
       staticMethods: {},
       instanceMethods: {
         consoleNotification: {
@@ -4602,13 +4857,13 @@ Object.defineProperty(module.exports, "defs", {
       location: {
         type: "source",
         fileName: "FlowService.js",
-        line: 105
+        line: 107
       },
       type: {
         location: {
           type: "source",
           fileName: "FlowService.js",
-          line: 105
+          line: 107
         },
         kind: "function",
         argumentTypes: [{
@@ -4645,13 +4900,13 @@ Object.defineProperty(module.exports, "defs", {
       location: {
         type: "source",
         fileName: "FlowService.js",
-        line: 295
+        line: 338
       },
       type: {
         location: {
           type: "source",
           fileName: "FlowService.js",
-          line: 295
+          line: 338
         },
         kind: "function",
         argumentTypes: [{

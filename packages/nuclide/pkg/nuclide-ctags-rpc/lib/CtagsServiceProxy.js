@@ -1,22 +1,14 @@
 "use strict";
 
-let Observable;
-
 module.exports = _client => {
   const remoteModule = {};
   remoteModule.CtagsService = class {
-    constructor(arg0) {
-      _client.createRemoteObject("CtagsService", this, [arg0], [{
-        name: "tagsPath",
-        type: {
-          kind: "named",
-          name: "NuclideUri"
-        }
-      }]);
+    constructor() {
+      throw Error("constructors are not supported for remote objects");
     }
 
     getTagsPath() {
-      return Promise.all([_client.marshalArguments(Array.from(arguments), []), _client.marshal(this, {
+      return _client.callRemoteMethod(_client.marshal(this, {
         kind: "named",
         location: {
           type: "source",
@@ -24,7 +16,7 @@ module.exports = _client => {
           line: 32
         },
         name: "CtagsService"
-      })]).then(([args, id]) => _client.callRemoteMethod(id, "getTagsPath", "promise", args)).then(value => {
+      }), "getTagsPath", "promise", _client.marshalArguments(Array.from(arguments), [])).then(value => {
         return _client.unmarshal(value, {
           kind: "named",
           name: "NuclideUri"
@@ -33,7 +25,15 @@ module.exports = _client => {
     }
 
     findTags(arg0, arg1) {
-      return Promise.all([_client.marshalArguments(Array.from(arguments), [{
+      return _client.callRemoteMethod(_client.marshal(this, {
+        kind: "named",
+        location: {
+          type: "source",
+          fileName: "CtagsService.js",
+          line: 32
+        },
+        name: "CtagsService"
+      }), "findTags", "promise", _client.marshalArguments(Array.from(arguments), [{
         name: "query",
         type: {
           kind: "string"
@@ -65,15 +65,7 @@ module.exports = _client => {
             }]
           }
         }
-      }]), _client.marshal(this, {
-        kind: "named",
-        location: {
-          type: "source",
-          fileName: "CtagsService.js",
-          line: 32
-        },
-        name: "CtagsService"
-      })]).then(([args, id]) => _client.callRemoteMethod(id, "findTags", "promise", args)).then(value => {
+      }])).then(value => {
         return _client.unmarshal(value, {
           kind: "array",
           type: {
@@ -91,15 +83,13 @@ module.exports = _client => {
   };
 
   remoteModule.getCtagsService = function (arg0) {
-    return _client.marshalArguments(Array.from(arguments), [{
+    return _client.callRemoteFunction("CtagsService/getCtagsService", "promise", _client.marshalArguments(Array.from(arguments), [{
       name: "uri",
       type: {
         kind: "named",
         name: "NuclideUri"
       }
-    }]).then(args => {
-      return _client.callRemoteFunction("CtagsService/getCtagsService", "promise", args);
-    }).then(value => {
+    }])).then(value => {
       return _client.unmarshal(value, {
         kind: "nullable",
         type: {
@@ -113,11 +103,6 @@ module.exports = _client => {
   return remoteModule;
 };
 
-Object.defineProperty(module.exports, "inject", {
-  value: function () {
-    Observable = arguments[0];
-  }
-});
 Object.defineProperty(module.exports, "defs", {
   value: {
     Object: {
@@ -240,13 +225,6 @@ Object.defineProperty(module.exports, "defs", {
         fileName: "CtagsService.js",
         line: 32
       },
-      constructorArgs: [{
-        name: "tagsPath",
-        type: {
-          kind: "named",
-          name: "NuclideUri"
-        }
-      }],
       staticMethods: {},
       instanceMethods: {
         getTagsPath: {

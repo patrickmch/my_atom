@@ -1,22 +1,8 @@
-'use strict';Object.defineProperty(exports, "__esModule", { value: true });
+'use strict';
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
 const RUNNABLE_RULE_TYPES = exports.RUNNABLE_RULE_TYPES = new Set(['apple_bundle']); /**
                                                                                       * Copyright (c) 2015-present, Facebook, Inc.
                                                                                       * All rights reserved.
@@ -26,4 +12,6 @@ const RUNNABLE_RULE_TYPES = exports.RUNNABLE_RULE_TYPES = new Set(['apple_bundle
                                                                                       *
                                                                                       *  strict
                                                                                       * @format
-                                                                                      */const SUPPORTED_RULE_TYPES = exports.SUPPORTED_RULE_TYPES = new Set([...RUNNABLE_RULE_TYPES, 'apple_library', 'apple_test']);
+                                                                                      */
+
+const SUPPORTED_RULE_TYPES = exports.SUPPORTED_RULE_TYPES = new Set([...RUNNABLE_RULE_TYPES, 'apple_library', 'apple_test']);

@@ -1,66 +1,27 @@
-'use strict';Object.defineProperty(exports, "__esModule", { value: true });exports.
+'use strict';
 
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.outlineFromHackIdeOutline = outlineFromHackIdeOutline;
 
+var _tokenizedText;
 
+function _load_tokenizedText() {
+  return _tokenizedText = require('../../../modules/nuclide-commons/tokenized-text');
+}
 
+var _HackHelpers;
 
+function _load_HackHelpers() {
+  return _HackHelpers = require('./HackHelpers');
+}
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-outlineFromHackIdeOutline = outlineFromHackIdeOutline;var _tokenizedText;function _load_tokenizedText() {return _tokenizedText = require('../../../modules/nuclide-commons/tokenized-text');}var _HackHelpers;function _load_HackHelpers() {return _HackHelpers = require('./HackHelpers');} // Note that all line/column values are 1-based.
-function outlineFromHackIdeOutline(hackOutline)
-{
+// Note that all line/column values are 1-based.
+function outlineFromHackIdeOutline(hackOutline) {
   return {
-    outlineTrees: hackOutline.map(outlineFromHackIdeItem) };
-
+    outlineTrees: hackOutline.map(outlineFromHackIdeItem)
+  };
 } /**
    * Copyright (c) 2015-present, Facebook, Inc.
    * All rights reserved.
@@ -70,7 +31,16 @@ function outlineFromHackIdeOutline(hackOutline)
    *
    *  strict-local
    * @format
-   */function outlineFromHackIdeItem(hackItem) {const tokenizedText = [];function addKeyword(value) {tokenizedText.push((0, (_tokenizedText || _load_tokenizedText()).keyword)(value));tokenizedText.push((0, (_tokenizedText || _load_tokenizedText()).whitespace)(' '));}
+   */
+
+function outlineFromHackIdeItem(hackItem) {
+  const tokenizedText = [];
+
+  function addKeyword(value) {
+    tokenizedText.push((0, (_tokenizedText || _load_tokenizedText()).keyword)(value));
+    tokenizedText.push((0, (_tokenizedText || _load_tokenizedText()).whitespace)(' '));
+  }
+
   function addModifiers(modifiers) {
     if (modifiers != null) {
       modifiers.forEach(addKeyword);
@@ -88,8 +58,8 @@ function outlineFromHackIdeOutline(hackOutline)
       break;
     default:
       addKeyword(hackItem.kind);
-      break;}
-
+      break;
+  }
 
   // name
   switch (hackItem.kind) {
@@ -100,8 +70,8 @@ function outlineFromHackIdeOutline(hackOutline)
       break;
     default:
       tokenizedText.push((0, (_tokenizedText || _load_tokenizedText()).method)(hackItem.name));
-      break;}
-
+      break;
+  }
 
   // params
   const params = hackItem.params;
@@ -123,17 +93,8 @@ function outlineFromHackIdeOutline(hackOutline)
   return {
     tokenizedText,
     representativeName: hackItem.name,
-    startPosition: (0, (_HackHelpers || _load_HackHelpers()).atomPointFromHack)(
-    hackItem.position.line,
-    hackItem.position.char_start),
-
-    endPosition: (0, (_HackHelpers || _load_HackHelpers()).atomPointFromHack)(
-    hackItem.span.line_end,
-    hackItem.span.char_end),
-
-    children:
-    hackItem.children == null ?
-    [] :
-    hackItem.children.map(outlineFromHackIdeItem) };
-
+    startPosition: (0, (_HackHelpers || _load_HackHelpers()).atomPointFromHack)(hackItem.position.line, hackItem.position.char_start),
+    endPosition: (0, (_HackHelpers || _load_HackHelpers()).atomPointFromHack)(hackItem.span.line_end, hackItem.span.char_end),
+    children: hackItem.children == null ? [] : hackItem.children.map(outlineFromHackIdeItem)
+  };
 }

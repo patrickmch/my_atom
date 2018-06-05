@@ -1,25 +1,31 @@
-'use strict';Object.defineProperty(exports, "__esModule", { value: true });exports.RemoteDirectory = undefined;var _asyncToGenerator = _interopRequireDefault(require('async-to-generator'));var _UniversalDisposable;
+'use strict';
 
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.RemoteDirectory = undefined;
 
+var _UniversalDisposable;
 
+function _load_UniversalDisposable() {
+  return _UniversalDisposable = _interopRequireDefault(require('../../../modules/nuclide-commons/UniversalDisposable'));
+}
 
+var _nuclideUri;
 
+function _load_nuclideUri() {
+  return _nuclideUri = _interopRequireDefault(require('../../../modules/nuclide-commons/nuclideUri'));
+}
 
+var _atom = require('atom');
 
+var _log4js;
 
+function _load_log4js() {
+  return _log4js = require('log4js');
+}
 
-
-
-function _load_UniversalDisposable() {return _UniversalDisposable = _interopRequireDefault(require('../../../modules/nuclide-commons/UniversalDisposable'));}var _nuclideUri;
-
-
-
-
-
-
-function _load_nuclideUri() {return _nuclideUri = _interopRequireDefault(require('../../../modules/nuclide-commons/nuclideUri'));}
-var _atom = require('atom');var _log4js;
-function _load_log4js() {return _log4js = require('log4js');}function _interopRequireDefault(obj) {return obj && obj.__esModule ? obj : { default: obj };}
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 const logger = (0, (_log4js || _load_log4js()).getLogger)('nuclide-remote-connection'); /**
                                                                                          * Copyright (c) 2015-present, Facebook, Inc.
@@ -30,49 +36,42 @@ const logger = (0, (_log4js || _load_log4js()).getLogger)('nuclide-remote-connec
                                                                                          *
                                                                                          * 
                                                                                          * @format
-                                                                                         */const MARKER_PROPERTY_FOR_REMOTE_DIRECTORY = '__nuclide_remote_directory__'; /* Mostly implements https://atom.io/docs/api/latest/Directory */class RemoteDirectory {static isRemoteDirectory(directory) {/* $FlowFixMe */
+                                                                                         */
+
+const MARKER_PROPERTY_FOR_REMOTE_DIRECTORY = '__nuclide_remote_directory__';
+
+/* Mostly implements https://atom.io/docs/api/latest/Directory */
+class RemoteDirectory {
+  static isRemoteDirectory(directory) {
+    /* $FlowFixMe */
     return directory[MARKER_PROPERTY_FOR_REMOTE_DIRECTORY] === true;
   }
 
-
-
-
-
-
-
-
-
-
-
-
-
   /**
-     * @param uri should be of the form "nuclide://example.com/path/to/directory".
-     */
-  constructor(
-  server,
-  uri,
-  symlink = false,
-  options)
-  {
+   * @param uri should be of the form "nuclide://example.com/path/to/directory".
+   */
+  constructor(server, uri, symlink = false, options) {
     Object.defineProperty(this, MARKER_PROPERTY_FOR_REMOTE_DIRECTORY, {
-      value: true });
-
+      value: true
+    });
     this._server = server;
     this._uri = uri;
     this._emitter = new _atom.Emitter();
     this._subscriptionCount = 0;
     this._symlink = symlink;
-    const { path: directoryPath, hostname } = (_nuclideUri || _load_nuclideUri()).default.parse(uri);if (!(
-    hostname != null)) {throw new Error('Invariant violation: "hostname != null"');}
+    const { path: directoryPath, hostname } = (_nuclideUri || _load_nuclideUri()).default.parse(uri);
+
+    if (!(hostname != null)) {
+      throw new Error('Invariant violation: "hostname != null"');
+    }
     /** In the example, this would be "nuclide://example.com". */
+
+
     this._host = hostname;
     /** In the example, this would be "/path/to/directory". */
     this._localPath = directoryPath;
     // A workaround before Atom 2.0: see ::getHgRepoInfo of main.js.
-    this._hgRepositoryDescription = options ?
-    options.hgRepositoryDescription :
-    null;
+    this._hgRepositoryDescription = options ? options.hgRepositoryDescription : null;
     this._isArchive = options != null && Boolean(options.isArchive);
     this._deleted = false;
   }
@@ -93,9 +92,9 @@ const logger = (0, (_log4js || _load_log4js()).getLogger)('nuclide-remote-connec
   }
 
   /**
-     * We may want to provide an implementation for this at some point.
-     * However, for the time being, we don't get any benefits from doing so.
-     */
+   * We may want to provide an implementation for this at some point.
+   * However, for the time being, we don't get any benefits from doing so.
+   */
   onDidChangeFiles(callback) {
     return new (_UniversalDisposable || _load_UniversalDisposable()).default();
   }
@@ -105,11 +104,7 @@ const logger = (0, (_log4js || _load_log4js()).getLogger)('nuclide-remote-connec
     try {
       this._subscribeToNativeChangeEvents();
     } catch (err) {
-      logger.error(
-      'Failed to subscribe RemoteDirectory:',
-      this._localPath,
-      err);
-
+      logger.error('Failed to subscribe RemoteDirectory:', this._localPath, err);
     }
   }
 
@@ -117,29 +112,23 @@ const logger = (0, (_log4js || _load_log4js()).getLogger)('nuclide-remote-connec
     if (this._watchSubscription) {
       return;
     }
-    const watchStream = (_nuclideUri || _load_nuclideUri()).default.isInArchive(this._uri) ?
-    this._server.getFileWatch((_nuclideUri || _load_nuclideUri()).default.ancestorOutsideArchive(this._uri)) :
-    this._server.getDirectoryWatch(this._uri);
-    this._watchSubscription = watchStream.subscribe(
-    watchUpdate => {
+    const watchStream = (_nuclideUri || _load_nuclideUri()).default.isInArchive(this._uri) ? this._server.getFileWatch((_nuclideUri || _load_nuclideUri()).default.ancestorOutsideArchive(this._uri)) : this._server.getDirectoryWatch(this._uri);
+    this._watchSubscription = watchStream.subscribe(watchUpdate => {
       logger.debug('watchDirectory update:', watchUpdate);
       switch (watchUpdate.type) {
         case 'change':
           return this._handleNativeChangeEvent();
         case 'delete':
-          return this._handleNativeDeleteEvent();}
-
-    },
-    error => {
+          return this._handleNativeDeleteEvent();
+      }
+    }, error => {
       logger.error('Failed to subscribe RemoteDirectory:', this._uri, error);
       this._watchSubscription = null;
-    },
-    () => {
+    }, () => {
       // Nothing needs to be done if the root directory watch has ended.
       logger.debug(`watchDirectory ended: ${this._uri}`);
       this._watchSubscription = null;
     });
-
   }
 
   _handleNativeChangeEvent() {
@@ -173,20 +162,14 @@ const logger = (0, (_log4js || _load_log4js()).getLogger)('nuclide-remote-connec
       try {
         this._watchSubscription.unsubscribe();
       } catch (error) {
-        logger.warn(
-        'RemoteDirectory failed to unsubscribe from native events:',
-        this._uri,
-        error.message);
-
+        logger.warn('RemoteDirectory failed to unsubscribe from native events:', this._uri, error.message);
       }
       this._watchSubscription = null;
     }
   }
 
   _joinLocalPath(name) {
-    return this._isArchive ?
-    (_nuclideUri || _load_nuclideUri()).default.archiveJoin(this._localPath, name) :
-    (_nuclideUri || _load_nuclideUri()).default.join(this._localPath, name);
+    return this._isArchive ? (_nuclideUri || _load_nuclideUri()).default.archiveJoin(this._localPath, name) : (_nuclideUri || _load_nuclideUri()).default.join(this._localPath, name);
   }
 
   isFile() {
@@ -250,42 +233,36 @@ const logger = (0, (_log4js || _load_log4js()).getLogger)('nuclide-remote-connec
     if (this.isRoot()) {
       return this;
     } else {
-      const uri = (_nuclideUri || _load_nuclideUri()).default.createRemoteUri(
-      this._host,
-      (_nuclideUri || _load_nuclideUri()).default.dirname(this._localPath));
-
+      const uri = (_nuclideUri || _load_nuclideUri()).default.createRemoteUri(this._host, (_nuclideUri || _load_nuclideUri()).default.dirname(this._localPath));
       return this._server.createDirectory(uri, this._hgRepositoryDescription);
     }
   }
 
   getFile(filename) {
-    const uri = (_nuclideUri || _load_nuclideUri()).default.createRemoteUri(
-    this._host,
-    this._joinLocalPath(filename));
-
+    const uri = (_nuclideUri || _load_nuclideUri()).default.createRemoteUri(this._host, this._joinLocalPath(filename));
     return this._server.createFile(uri);
   }
 
   getSubdirectory(dir) {
-    const uri = (_nuclideUri || _load_nuclideUri()).default.createRemoteUri(
-    this._host,
-    this._joinLocalPath(dir));
-
+    const uri = (_nuclideUri || _load_nuclideUri()).default.createRemoteUri(this._host, this._joinLocalPath(dir));
     return this._server.createDirectory(uri, this._hgRepositoryDescription);
   }
 
-  create() {var _this = this;return (0, _asyncToGenerator.default)(function* () {if (!
-      !_this._deleted) {throw new Error('RemoteDirectory has been deleted');}
-      const created = yield _this._getFileSystemService().mkdirp(_this._uri);
-      if (_this._subscriptionCount > 0) {
-        _this._subscribeToNativeChangeEvents();
-      }
-      return created;})();
+  async create() {
+    if (!!this._deleted) {
+      throw new Error('RemoteDirectory has been deleted');
+    }
+
+    const created = await this._getFileSystemService().mkdirp(this._uri);
+    if (this._subscriptionCount > 0) {
+      this._subscribeToNativeChangeEvents();
+    }
+    return created;
   }
 
-  delete() {var _this2 = this;return (0, _asyncToGenerator.default)(function* () {
-      yield _this2._getFileSystemService().rmdir(_this2._uri);
-      _this2._handleNativeDeleteEvent();})();
+  async delete() {
+    await this._getFileSystemService().rmdir(this._uri);
+    this._handleNativeDeleteEvent();
   }
 
   getEntriesSync() {
@@ -293,52 +270,35 @@ const logger = (0, (_log4js || _load_log4js()).getLogger)('nuclide-remote-connec
   }
 
   /*
-     * Calls `callback` with either an Array of entries or an Error if there was a problem fetching
-     * those entries.
-     *
-     * Note: Although this function is `async`, it never rejects. Check whether the `error` argument
-     * passed to `callback` is `null` to determine if there was an error.
-     */
-  getEntries(
-  callback)
+   * Calls `callback` with either an Array of entries or an Error if there was a problem fetching
+   * those entries.
+   *
+   * Note: Although this function is `async`, it never rejects. Check whether the `error` argument
+   * passed to `callback` is `null` to determine if there was an error.
+   */
+  async getEntries(callback) {
+    let entries;
+    try {
+      entries = await this._getFileSystemService().readdir(this._uri);
+    } catch (e) {
+      callback(e, null);
+      return;
+    }
 
-
-
-
-  {var _this3 = this;return (0, _asyncToGenerator.default)(function* () {
-      let entries;
-      try {
-        entries = yield _this3._getFileSystemService().readdir(_this3._uri);
-      } catch (e) {
-        callback(e, null);
-        return;
+    const directories = [];
+    const files = [];
+    entries.sort((a, b) => {
+      return a[0].toLowerCase().localeCompare(b[0].toLowerCase());
+    }).forEach(entry => {
+      const [name, isFile, symlink] = entry;
+      const uri = (_nuclideUri || _load_nuclideUri()).default.createRemoteUri(this._host, this._joinLocalPath(name));
+      if (isFile) {
+        files.push(this._server.createFile(uri, symlink));
+      } else {
+        directories.push(this._server.createDirectory(uri, this._hgRepositoryDescription, symlink));
       }
-
-      const directories = [];
-      const files = [];
-      entries.
-      sort(function (a, b) {
-        return a[0].toLowerCase().localeCompare(b[0].toLowerCase());
-      }).
-      forEach(function (entry) {
-        const [name, isFile, symlink] = entry;
-        const uri = (_nuclideUri || _load_nuclideUri()).default.createRemoteUri(
-        _this3._host,
-        _this3._joinLocalPath(name));
-
-        if (isFile) {
-          files.push(_this3._server.createFile(uri, symlink));
-        } else {
-          directories.push(
-          _this3._server.createDirectory(
-          uri,
-          _this3._hgRepositoryDescription,
-          symlink));
-
-
-        }
-      });
-      callback(null, directories.concat(files));})();
+    });
+    callback(null, directories.concat(files));
   }
 
   contains(pathToCheck) {
@@ -349,15 +309,15 @@ const logger = (0, (_log4js || _load_log4js()).getLogger)('nuclide-remote-connec
     return (_nuclideUri || _load_nuclideUri()).default.contains(this.getPath(), pathToCheck || '');
   }
 
-  off() {
-
-
-
-  } // This method is part of the EmitterMixin used by Atom's local Directory, but not documented
+  off() {}
+  // This method is part of the EmitterMixin used by Atom's local Directory, but not documented
   // as part of the API - https://atom.io/docs/api/latest/Directory,
   // However, it appears to be called in project.coffee by Atom.
+
+
   // A workaround before Atom 2.0: see ::getHgRepoInfo of main.js.
-  getHgRepositoryDescription() {return this._hgRepositoryDescription;
+  getHgRepositoryDescription() {
+    return this._hgRepositoryDescription;
   }
 
   isSymbolicLink() {
@@ -370,4 +330,6 @@ const logger = (0, (_log4js || _load_log4js()).getLogger)('nuclide-remote-connec
 
   _getService(serviceName) {
     return this._server.getService(serviceName);
-  }}exports.RemoteDirectory = RemoteDirectory;
+  }
+}
+exports.RemoteDirectory = RemoteDirectory;

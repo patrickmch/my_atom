@@ -1,28 +1,26 @@
-'use strict';Object.defineProperty(exports, "__esModule", { value: true });exports.NavigationStack = undefined;
+'use strict';
 
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.NavigationStack = undefined;
 
+var _rxjsBundlesRxMinJs = require('rxjs/bundles/Rx.min.js');
 
+/**
+ * Copyright (c) 2015-present, Facebook, Inc.
+ * All rights reserved.
+ *
+ * This source code is licensed under the license found in the LICENSE file in
+ * the root directory of this source tree.
+ *
+ *  strict-local
+ * @format
+ */
 
+const MAX_STACK_DEPTH = 100;
 
-
-
-
-
-
-
-
-
-
-var _rxjsBundlesRxMinJs = require('rxjs/bundles/Rx.min.js'); /**
-                                                              * Copyright (c) 2015-present, Facebook, Inc.
-                                                              * All rights reserved.
-                                                              *
-                                                              * This source code is licensed under the license found in the LICENSE file in
-                                                              * the root directory of this source tree.
-                                                              *
-                                                              *  strict-local
-                                                              * @format
-                                                              */const MAX_STACK_DEPTH = 100; // Provides a navigation stack abstraction, useful for going forward/backwards
+// Provides a navigation stack abstraction, useful for going forward/backwards
 // while browsing code.
 //
 // Stack entries include the file (as uri for closed files and as
@@ -47,7 +45,9 @@ var _rxjsBundlesRxMinJs = require('rxjs/bundles/Rx.min.js'); /**
 //
 // filter can be used to remove entries from the stack. This is done when
 // closing unnamed editors and when closing remote directories.
-class NavigationStack {constructor() {
+class NavigationStack {
+
+  constructor() {
     this._elements = [];
     this._index = -1;
     this._changes = new _rxjsBundlesRxMinJs.Subject();
@@ -65,8 +65,11 @@ class NavigationStack {constructor() {
     return !this.isEmpty();
   }
 
-  getCurrent() {if (!(
-    this._index >= 0 && this._index < this._elements.length)) {throw new Error('Invariant violation: "this._index >= 0 && this._index < this._elements.length"');}
+  getCurrent() {
+    if (!(this._index >= 0 && this._index < this._elements.length)) {
+      throw new Error('Invariant violation: "this._index >= 0 && this._index < this._elements.length"');
+    }
+
     return this._elements[this._index];
   }
 
@@ -85,8 +88,11 @@ class NavigationStack {constructor() {
 
     if (this._elements.length > MAX_STACK_DEPTH) {
       this._elements.splice(0, 1);
-    }if (!(
-    this._elements.length <= MAX_STACK_DEPTH)) {throw new Error('Invariant violation: "this._elements.length <= MAX_STACK_DEPTH"');}
+    }
+
+    if (!(this._elements.length <= MAX_STACK_DEPTH)) {
+      throw new Error('Invariant violation: "this._elements.length <= MAX_STACK_DEPTH"');
+    }
 
     this._index = this._elements.length - 1;
     this._hasChanged();
@@ -150,8 +156,8 @@ class NavigationStack {constructor() {
         this._elements[index] = {
           type: 'editor',
           editor,
-          bufferPosition: location.bufferPosition };
-
+          bufferPosition: location.bufferPosition
+        };
       }
     });
   }
@@ -160,17 +166,15 @@ class NavigationStack {constructor() {
   editorClosed(editor) {
     const uri = editor.getPath();
     if (uri === '' || uri == null) {
-      this.filter(
-      location => location.type !== 'editor' || editor !== location.editor);
-
+      this.filter(location => location.type !== 'editor' || editor !== location.editor);
     } else {
       this._elements.forEach((location, index) => {
         if (location.type === 'editor' && editor === location.editor) {
           this._elements[index] = {
             type: 'uri',
             uri,
-            bufferPosition: location.bufferPosition };
-
+            bufferPosition: location.bufferPosition
+          };
         }
       });
     }
@@ -204,4 +208,6 @@ class NavigationStack {constructor() {
 
   getIndex() {
     return this._index;
-  }}exports.NavigationStack = NavigationStack;
+  }
+}
+exports.NavigationStack = NavigationStack;

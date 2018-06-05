@@ -1,12 +1,14 @@
 "use strict";
 
-let Observable;
-
 module.exports = _client => {
   const remoteModule = {};
   remoteModule.MultiConnectionAtomCommands = class {
+    constructor() {
+      throw Error("constructors are not supported for remote objects");
+    }
+
     getConnectionCount() {
-      return Promise.all([_client.marshalArguments(Array.from(arguments), []), _client.marshal(this, {
+      return _client.callRemoteMethod(_client.marshal(this, {
         kind: "named",
         location: {
           type: "source",
@@ -14,7 +16,7 @@ module.exports = _client => {
           line: 87
         },
         name: "MultiConnectionAtomCommands"
-      })]).then(([args, id]) => _client.callRemoteMethod(id, "getConnectionCount", "promise", args)).then(value => {
+      }), "getConnectionCount", "promise", _client.marshalArguments(Array.from(arguments), [])).then(value => {
         return _client.unmarshal(value, {
           kind: "number"
         });
@@ -22,7 +24,15 @@ module.exports = _client => {
     }
 
     openFile(arg0, arg1, arg2, arg3) {
-      return Observable.fromPromise(Promise.all([_client.marshalArguments(Array.from(arguments), [{
+      return _client.callRemoteMethod(_client.marshal(this, {
+        kind: "named",
+        location: {
+          type: "source",
+          fileName: "rpc-types.js",
+          line: 87
+        },
+        name: "MultiConnectionAtomCommands"
+      }), "openFile", "observable", _client.marshalArguments(Array.from(arguments), [{
         name: "filePath",
         type: {
           kind: "named",
@@ -43,15 +53,7 @@ module.exports = _client => {
         type: {
           kind: "boolean"
         }
-      }]), _client.marshal(this, {
-        kind: "named",
-        location: {
-          type: "source",
-          fileName: "rpc-types.js",
-          line: 87
-        },
-        name: "MultiConnectionAtomCommands"
-      })])).switchMap(([args, id]) => _client.callRemoteMethod(id, "openFile", "observable", args)).concatMap(value => {
+      }])).map(value => {
         return _client.unmarshal(value, {
           kind: "named",
           name: "AtomFileEvent"
@@ -60,7 +62,15 @@ module.exports = _client => {
     }
 
     openRemoteFile(arg0, arg1, arg2, arg3) {
-      return Observable.fromPromise(Promise.all([_client.marshalArguments(Array.from(arguments), [{
+      return _client.callRemoteMethod(_client.marshal(this, {
+        kind: "named",
+        location: {
+          type: "source",
+          fileName: "rpc-types.js",
+          line: 87
+        },
+        name: "MultiConnectionAtomCommands"
+      }), "openRemoteFile", "observable", _client.marshalArguments(Array.from(arguments), [{
         name: "uri",
         type: {
           kind: "string"
@@ -80,15 +90,7 @@ module.exports = _client => {
         type: {
           kind: "boolean"
         }
-      }]), _client.marshal(this, {
-        kind: "named",
-        location: {
-          type: "source",
-          fileName: "rpc-types.js",
-          line: 87
-        },
-        name: "MultiConnectionAtomCommands"
-      })])).switchMap(([args, id]) => _client.callRemoteMethod(id, "openRemoteFile", "observable", args)).concatMap(value => {
+      }])).map(value => {
         return _client.unmarshal(value, {
           kind: "named",
           name: "AtomFileEvent"
@@ -97,7 +99,15 @@ module.exports = _client => {
     }
 
     addProject(arg0, arg1) {
-      return Promise.all([_client.marshalArguments(Array.from(arguments), [{
+      return _client.callRemoteMethod(_client.marshal(this, {
+        kind: "named",
+        location: {
+          type: "source",
+          fileName: "rpc-types.js",
+          line: 87
+        },
+        name: "MultiConnectionAtomCommands"
+      }), "addProject", "promise", _client.marshalArguments(Array.from(arguments), [{
         name: "projectPath",
         type: {
           kind: "named",
@@ -108,15 +118,7 @@ module.exports = _client => {
         type: {
           kind: "boolean"
         }
-      }]), _client.marshal(this, {
-        kind: "named",
-        location: {
-          type: "source",
-          fileName: "rpc-types.js",
-          line: 87
-        },
-        name: "MultiConnectionAtomCommands"
-      })]).then(([args, id]) => _client.callRemoteMethod(id, "addProject", "promise", args)).then(value => {
+      }])).then(value => {
         return _client.unmarshal(value, {
           kind: "void"
         });
@@ -124,7 +126,7 @@ module.exports = _client => {
     }
 
     getProjectStates() {
-      return Promise.all([_client.marshalArguments(Array.from(arguments), []), _client.marshal(this, {
+      return _client.callRemoteMethod(_client.marshal(this, {
         kind: "named",
         location: {
           type: "source",
@@ -132,7 +134,7 @@ module.exports = _client => {
           line: 87
         },
         name: "MultiConnectionAtomCommands"
-      })]).then(([args, id]) => _client.callRemoteMethod(id, "getProjectStates", "promise", args)).then(value => {
+      }), "getProjectStates", "promise", _client.marshalArguments(Array.from(arguments), [])).then(value => {
         return _client.unmarshal(value, {
           kind: "array",
           type: {
@@ -144,13 +146,7 @@ module.exports = _client => {
     }
 
     addNotification(arg0) {
-      return Promise.all([_client.marshalArguments(Array.from(arguments), [{
-        name: "notification",
-        type: {
-          kind: "named",
-          name: "AtomNotification"
-        }
-      }]), _client.marshal(this, {
+      return _client.callRemoteMethod(_client.marshal(this, {
         kind: "named",
         location: {
           type: "source",
@@ -158,7 +154,13 @@ module.exports = _client => {
           line: 87
         },
         name: "MultiConnectionAtomCommands"
-      })]).then(([args, id]) => _client.callRemoteMethod(id, "addNotification", "promise", args)).then(value => {
+      }), "addNotification", "promise", _client.marshalArguments(Array.from(arguments), [{
+        name: "notification",
+        type: {
+          kind: "named",
+          name: "AtomNotification"
+        }
+      }])).then(value => {
         return _client.unmarshal(value, {
           kind: "void"
         });
@@ -172,9 +174,7 @@ module.exports = _client => {
   };
 
   remoteModule.getAtomCommands = function () {
-    return _client.marshalArguments(Array.from(arguments), []).then(args => {
-      return _client.callRemoteFunction("CommandService/getAtomCommands", "promise", args);
-    }).then(value => {
+    return _client.callRemoteFunction("CommandService/getAtomCommands", "promise", _client.marshalArguments(Array.from(arguments), [])).then(value => {
       return _client.unmarshal(value, {
         kind: "named",
         name: "MultiConnectionAtomCommands"
@@ -183,9 +183,7 @@ module.exports = _client => {
   };
 
   remoteModule.getConnectionDetails = function () {
-    return _client.marshalArguments(Array.from(arguments), []).then(args => {
-      return _client.callRemoteFunction("CommandService/getConnectionDetails", "promise", args);
-    }).then(value => {
+    return _client.callRemoteFunction("CommandService/getConnectionDetails", "promise", _client.marshalArguments(Array.from(arguments), [])).then(value => {
       return _client.unmarshal(value, {
         kind: "nullable",
         type: {
@@ -199,11 +197,6 @@ module.exports = _client => {
   return remoteModule;
 };
 
-Object.defineProperty(module.exports, "inject", {
-  value: function () {
-    Observable = arguments[0];
-  }
-});
 Object.defineProperty(module.exports, "defs", {
   value: {
     Object: {
@@ -389,7 +382,6 @@ Object.defineProperty(module.exports, "defs", {
         fileName: "rpc-types.js",
         line: 87
       },
-      constructorArgs: null,
       staticMethods: {},
       instanceMethods: {
         getConnectionCount: {

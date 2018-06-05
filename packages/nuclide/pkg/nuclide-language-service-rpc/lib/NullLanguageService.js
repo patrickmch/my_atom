@@ -1,40 +1,9 @@
-'use strict';Object.defineProperty(exports, "__esModule", { value: true });exports.NullLanguageService = undefined;
+'use strict';
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.NullLanguageService = undefined;
 
 var _rxjsBundlesRxMinJs = require('rxjs/bundles/Rx.min.js');
 
@@ -49,11 +18,7 @@ class NullLanguageService {
     return _rxjsBundlesRxMinJs.Observable.empty().publish();
   }
 
-  getAutocompleteSuggestions(
-  fileVersion,
-  position,
-  request)
-  {
+  getAutocompleteSuggestions(fileVersion, position, request) {
     return Promise.resolve(null);
   }
 
@@ -61,10 +26,7 @@ class NullLanguageService {
     return Promise.resolve(null);
   }
 
-  getDefinition(
-  fileVersion,
-  position)
-  {
+  getDefinition(fileVersion, position) {
     return Promise.resolve(null);
   }
 
@@ -72,10 +34,7 @@ class NullLanguageService {
     return Promise.resolve(undefined);
   }
 
-  findReferences(
-  fileVersion,
-  position)
-  {
+  findReferences(fileVersion, position) {
     return _rxjsBundlesRxMinJs.Observable.of(null).publish();
   }
 
@@ -91,24 +50,15 @@ class NullLanguageService {
     return Promise.resolve(null);
   }
 
-  resolveCodeLens(
-  filePath,
-  codeLens)
-  {
+  resolveCodeLens(filePath, codeLens) {
     return Promise.resolve(null);
   }
 
-  getAdditionalLogFiles(
-  deadline)
-  {
+  getAdditionalLogFiles(deadline) {
     return Promise.resolve([]);
   }
 
-  getCodeActions(
-  fileVersion,
-  range,
-  diagnostics)
-  {
+  getCodeActions(fileVersion, range, diagnostics) {
     return Promise.resolve([]);
   }
 
@@ -116,45 +66,23 @@ class NullLanguageService {
     return Promise.resolve(null);
   }
 
-  highlight(
-  fileVersion,
-  position)
-  {
+  highlight(fileVersion, position) {
     return Promise.resolve(null);
   }
 
-  formatSource(
-  fileVersion,
-  range,
-  options)
-  {
+  formatSource(fileVersion, range, options) {
     return Promise.resolve(null);
   }
 
-  formatEntireFile(
-  fileVersion,
-  range,
-  options)
-
-
-
-  {
+  formatEntireFile(fileVersion, range, options) {
     return Promise.resolve(null);
   }
 
-  formatAtPosition(
-  fileVersion,
-  position,
-  triggerCharacter,
-  options)
-  {
+  formatAtPosition(fileVersion, position, triggerCharacter, options) {
     return Promise.resolve(null);
   }
 
-  signatureHelp(
-  fileVersion,
-  position)
-  {
+  signatureHelp(fileVersion, position) {
     return Promise.resolve(null);
   }
 
@@ -162,10 +90,7 @@ class NullLanguageService {
     return Promise.resolve(false);
   }
 
-  symbolSearch(
-  query,
-  directories)
-  {
+  symbolSearch(query, directories) {
     return Promise.resolve(null);
   }
 
@@ -177,25 +102,24 @@ class NullLanguageService {
     return Promise.resolve(false);
   }
 
-  getExpandedSelectionRange(
-  fileVersion,
-  currentSelection)
-  {
+  getExpandedSelectionRange(fileVersion, currentSelection) {
     return Promise.resolve(null);
   }
 
-  getCollapsedSelectionRange(
-  fileVersion,
-  currentSelection,
-  originalCursorPosition)
-  {
+  getCollapsedSelectionRange(fileVersion, currentSelection, originalCursorPosition) {
     return Promise.resolve(null);
   }
 
-  dispose() {}}exports.NullLanguageService = NullLanguageService;
+  observeStatus(fileVersion) {
+    return _rxjsBundlesRxMinJs.Observable.of({ kind: 'null' }).publish();
+  }
 
+  async clickStatus(fileVersion, id, button) {}
 
-// Assert that NullLanguageService satisifes the LanguageService interface:
+  dispose() {}
+}
+
+exports.NullLanguageService = NullLanguageService; // Assert that NullLanguageService satisifes the LanguageService interface:
 /**
  * Copyright (c) 2015-present, Facebook, Inc.
  * All rights reserved.
@@ -205,4 +129,6 @@ class NullLanguageService {
  *
  * 
  * @format
- */null;
+ */
+
+null;

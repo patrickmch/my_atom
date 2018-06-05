@@ -30,7 +30,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 public class JavaDebuggerServer extends CommandInterpreterBase {
-  private static final String UNKNOWN = "<UNKNOWN>";
+  private static final String UNKNOWN = "Unknown";
   private InputStream inputStream = System.in;
   private OutputStream outputStream = System.out;
   private int stackFrameSeq = 0;
@@ -153,14 +153,15 @@ public class JavaDebuggerServer extends CommandInterpreterBase {
   }
 
   private void handleLaunchRequest(JSONObject arguments, LaunchResponse response) {
+    JSONArray runArgsNullable = arguments.optJSONArray("runArgs");
+    JSONArray runArgs = runArgsNullable != null ? runArgsNullable : new JSONArray();
     try {
-      Utils.logInfo("arguments: " + arguments.toString(2));
       getContextManager()
           .getBootstrapDomain()
           .launch(
               arguments.getString("entryPointClass"),
               arguments.getString("classPath"),
-              new JSONArray() /* args */,
+              runArgs,
               "" /* sourcePath */);
       send(response);
       send(new InitializedEvent());
@@ -280,17 +281,17 @@ public class JavaDebuggerServer extends CommandInterpreterBase {
                           try {
                             relativePath = frame.location().sourcePath();
                           } catch (AbsentInformationException ex) {
-                            relativePath = UNKNOWN;
+                            relativePath = null;
                           }
                           try {
                             String path =
-                                relativePath.equals(UNKNOWN)
-                                    ? UNKNOWN
-                                    : getContextManager()
+                                relativePath != null
+                                    ? getContextManager()
                                         .getSourceLocator()
                                         .findSourceFile(relativePath)
                                         .map(file -> file.getAbsolutePath())
-                                        .orElse(relativePath);
+                                        .orElse(null)
+                                    : null;
                             Source frameSource = new Source(name, path);
                             int stackFrameId = getNextStackFrameId();
                             populateMapsForNewStackFrame(stackFrameId, stackFrameIndex, thread);

@@ -1,40 +1,45 @@
-'use strict';Object.defineProperty(exports, "__esModule", { value: true });exports.default =
+'use strict';
 
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.default = formatEnoentNotification;
 
+var _featureConfig;
 
+function _load_featureConfig() {
+  return _featureConfig = _interopRequireDefault(require('../../modules/nuclide-commons-atom/feature-config'));
+}
 
+var _string;
 
+function _load_string() {
+  return _string = require('../../modules/nuclide-commons/string');
+}
 
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
+/**
+ * Copyright (c) 2015-present, Facebook, Inc.
+ * All rights reserved.
+ *
+ * This source code is licensed under the license found in the LICENSE file in
+ * the root directory of this source tree.
+ *
+ * 
+ * @format
+ */
 
+const capitalize = str => str[0].toUpperCase() + str.substr(1);
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-formatEnoentNotification;var _featureConfig;function _load_featureConfig() {return _featureConfig = _interopRequireDefault(require('../../modules/nuclide-commons-atom/feature-config'));}var _string;function _load_string() {return _string = require('../../modules/nuclide-commons/string');}function _interopRequireDefault(obj) {return obj && obj.__esModule ? obj : { default: obj };} /**
-                                                                                                                                                                                                                                                                                                                                                                                                * Copyright (c) 2015-present, Facebook, Inc.
-                                                                                                                                                                                                                                                                                                                                                                                                * All rights reserved.
-                                                                                                                                                                                                                                                                                                                                                                                                *
-                                                                                                                                                                                                                                                                                                                                                                                                * This source code is licensed under the license found in the LICENSE file in
-                                                                                                                                                                                                                                                                                                                                                                                                * the root directory of this source tree.
-                                                                                                                                                                                                                                                                                                                                                                                                *
-                                                                                                                                                                                                                                                                                                                                                                                                * 
-                                                                                                                                                                                                                                                                                                                                                                                                * @format
-                                                                                                                                                                                                                                                                                                                                                                                                */const capitalize = str => str[0].toUpperCase() + str.substr(1);function formatEnoentNotification(options) {const { feature, toolName, pathSetting } = options;const schema = (_featureConfig || _load_featureConfig()).default.getSchema(pathSetting);const settingTitle = schema.title;const categoryTitle = capitalize(pathSetting.split('.').shift());const command = (_featureConfig || _load_featureConfig()).default.get(pathSetting);const capitalizedFeature = capitalize(feature);const description = `${capitalizedFeature} needs *${toolName}* but Nuclide couldn't find it at \`${command}\`.
+function formatEnoentNotification(options) {
+  const { feature, toolName, pathSetting } = options;
+  const schema = (_featureConfig || _load_featureConfig()).default.getSchema(pathSetting);
+  const settingTitle = schema.title;
+  const categoryTitle = capitalize(pathSetting.split('.').shift());
+  const command = (_featureConfig || _load_featureConfig()).default.get(pathSetting);
+  const capitalizedFeature = capitalize(feature);
+  const description = `${capitalizedFeature} needs *${toolName}* but Nuclide couldn't find it at \`${command}\`.
 
 **Troubleshooting Tips**
 1. Make sure that *${toolName}* is installed. Some Nuclide features require tools that aren't
@@ -50,7 +55,7 @@ formatEnoentNotification;var _featureConfig;function _load_featureConfig() {retu
     message: `Nuclide couldn't find *${toolName}*!`,
     meta: {
       dismissable: true,
-      description } };
-
-
+      description
+    }
+  };
 }
