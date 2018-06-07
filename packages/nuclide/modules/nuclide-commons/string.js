@@ -3,7 +3,7 @@
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.ELLIPSIS_CHAR = exports.URL_REGEX = undefined;
+exports.ZERO_WIDTH_SPACE = exports.ELLIPSIS_CHAR = exports.URL_REGEX = undefined;
 exports.stringifyError = stringifyError;
 exports.maybeToString = maybeToString;
 exports.relativeDate = relativeDate;
@@ -226,3 +226,4 @@ function escapeMarkdown(markdown) {
 const URL_REGEX = exports.URL_REGEX = /(https?:\/\/(?:www\.)?[-\w@:%.+~#=]{2,256}\.[a-z]{2,6}\b[-\w@:%+.~#?&/=!]*|www\.[-\w@:%.+~#=]{2,256}\.[a-z]{2,6}\b[-\w@:%+.~#?&/=!]*)/;
 
 const ELLIPSIS_CHAR = exports.ELLIPSIS_CHAR = '\u2026';
+const ZERO_WIDTH_SPACE = exports.ZERO_WIDTH_SPACE = '\u200B';

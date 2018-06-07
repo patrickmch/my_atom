@@ -13,21 +13,25 @@ function _load_log4js() {
   return _log4js = require('log4js');
 }
 
+var _Encoder;
+
+function _load_Encoder() {
+  return _Encoder = _interopRequireDefault(require('./Encoder'));
+}
+
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-/**
- * Copyright (c) 2017-present, Facebook, Inc.
- * All rights reserved.
- *
- * This source code is licensed under the BSD-style license found in the
- * LICENSE file in the root directory of this source tree. An additional grant
- * of patent rights can be found in the PATENTS file in the same directory.
- *
- * 
- * @format
- */
-
-const logger = (0, (_log4js || _load_log4js()).getLogger)('tunnel-socket-manager');
+const logger = (0, (_log4js || _load_log4js()).getLogger)('tunnel-socket-manager'); /**
+                                                                                     * Copyright (c) 2017-present, Facebook, Inc.
+                                                                                     * All rights reserved.
+                                                                                     *
+                                                                                     * This source code is licensed under the BSD-style license found in the
+                                                                                     * LICENSE file in the root directory of this source tree. An additional grant
+                                                                                     * of patent rights can be found in the PATENTS file in the same directory.
+                                                                                     *
+                                                                                     * 
+                                                                                     * @format
+                                                                                     */
 
 class SocketManager {
 
@@ -47,7 +51,6 @@ class SocketManager {
   }
 
   _handleMessage(message) {
-    logger.trace(`handling this message: ${JSON.stringify(message)}`);
     if (message.event === 'connection') {
       this._createConnection(message);
     } else if (message.event === 'data') {
@@ -65,7 +68,7 @@ class SocketManager {
     socket.on('data', data => {
       this._sendMessage({
         event: 'data',
-        arg: data.toString('base64'),
+        arg: data,
         clientId: message.clientId,
         tunnelId: this._tunnelId
       });
@@ -77,14 +80,14 @@ class SocketManager {
   _forwardData(message) {
     const socket = this._socketByClientId.get(message.clientId);
     if (socket != null) {
-      socket.write(Buffer.from(message.arg, 'base64'));
+      socket.write(message.arg);
     } else {
       logger.error('no socket found for this data: ', message);
     }
   }
 
   _sendMessage(msg) {
-    this._transport.send(JSON.stringify(msg));
+    this._transport.send((_Encoder || _load_Encoder()).default.encode(msg));
   }
 
   close() {

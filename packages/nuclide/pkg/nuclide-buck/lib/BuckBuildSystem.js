@@ -83,7 +83,7 @@ class BuckBuildSystem {
     });
   }
 
-  runSubcommand(buckRoot, subcommand, buildTarget, taskSettings, isDebug, udid, processEventCallback) {
+  runSubcommand(buckRoot, subcommand, buildTarget, taskSettings, isDebug, udid, processEventCallback, skipLaunchAfterInstall = false) {
     // Clear Buck diagnostics every time we run a buck command.
     this._diagnosticInvalidations.next({ scope: 'all' });
     const buckService = (0, (_nuclideRemoteConnection || _load_nuclideRemoteConnection()).getBuckServiceByNuclideUri)(buckRoot);
@@ -101,7 +101,7 @@ class BuckBuildSystem {
 
       const args = runArguments.length > 0 && (subcommand === 'run' || subcommand === 'install' || subcommand === 'test') ? buildArguments.concat(['--']).concat(runArguments) : buildArguments;
 
-      const processMessages = runBuckCommand(buckService, buckRoot, targetString, subcommand, args, isDebug, udid).share();
+      const processMessages = runBuckCommand(buckService, buckRoot, targetString, subcommand, args, isDebug, udid, skipLaunchAfterInstall).share();
       const processEvents = (0, (_BuckEventStream || _load_BuckEventStream()).getEventsFromProcess)(processMessages).share();
 
       let httpRecommendation;
@@ -190,7 +190,7 @@ class BuckBuildSystem {
 }
 
 exports.BuckBuildSystem = BuckBuildSystem;
-function runBuckCommand(buckService, buckRoot, buildTarget, subcommand, args, debug, simulator) {
+function runBuckCommand(buckService, buckRoot, buildTarget, subcommand, args, debug, simulator, skipLaunchAfterInstall = false) {
   // TODO(T17463635)
   if (debug) {
     // Stop any existing debugging sessions, as install hangs if an existing
@@ -200,7 +200,7 @@ function runBuckCommand(buckService, buckRoot, buildTarget, subcommand, args, de
 
   const targets = splitTargets(buildTarget);
   if (subcommand === 'install') {
-    return buckService.installWithOutput(buckRoot, targets, args, simulator, true, debug).refCount();
+    return buckService.installWithOutput(buckRoot, targets, args, simulator, !skipLaunchAfterInstall, debug).refCount();
   } else if (subcommand === 'build') {
     return buckService.buildWithOutput(buckRoot, targets, args).refCount();
   } else if (subcommand === 'test') {

@@ -66,6 +66,36 @@ module.exports = _client => {
     });
   };
 
+  remoteModule.getAndroidSDKVersionFromApk = function (arg0) {
+    return _client.callRemoteFunction("JavaDebuggerHelpersService/getAndroidSDKVersionFromApk", "promise", _client.marshalArguments(Array.from(arguments), [{
+      name: "apkPath",
+      type: {
+        kind: "string"
+      }
+    }])).then(value => {
+      return _client.unmarshal(value, {
+        kind: "string"
+      });
+    });
+  };
+
+  remoteModule.getSdkVersionSourcePath = function (arg0) {
+    return _client.callRemoteFunction("JavaDebuggerHelpersService/getSdkVersionSourcePath", "promise", _client.marshalArguments(Array.from(arguments), [{
+      name: "sdkVersion",
+      type: {
+        kind: "string"
+      }
+    }])).then(value => {
+      return _client.unmarshal(value, {
+        kind: "nullable",
+        type: {
+          kind: "named",
+          name: "NuclideUri"
+        }
+      });
+    });
+  };
+
   return remoteModule;
 };
 
@@ -333,13 +363,13 @@ Object.defineProperty(module.exports, "defs", {
       location: {
         type: "source",
         fileName: "JavaDebuggerHelpersService.js",
-        line: 52
+        line: 56
       },
       type: {
         location: {
           type: "source",
           fileName: "JavaDebuggerHelpersService.js",
-          line: 52
+          line: 56
         },
         kind: "function",
         argumentTypes: [],
@@ -385,13 +415,13 @@ Object.defineProperty(module.exports, "defs", {
       location: {
         type: "source",
         fileName: "JavaDebuggerHelpersService.js",
-        line: 56
+        line: 60
       },
       type: {
         location: {
           type: "source",
           fileName: "JavaDebuggerHelpersService.js",
-          line: 56
+          line: 60
         },
         kind: "function",
         argumentTypes: [{
@@ -415,13 +445,13 @@ Object.defineProperty(module.exports, "defs", {
       location: {
         type: "source",
         fileName: "JavaDebuggerHelpersService.js",
-        line: 65
+        line: 69
       },
       type: {
         location: {
           type: "source",
           fileName: "JavaDebuggerHelpersService.js",
-          line: 65
+          line: 69
         },
         kind: "function",
         argumentTypes: [{
@@ -446,13 +476,13 @@ Object.defineProperty(module.exports, "defs", {
       location: {
         type: "source",
         fileName: "JavaDebuggerHelpersService.js",
-        line: 93
+        line: 97
       },
       type: {
         location: {
           type: "source",
           fileName: "JavaDebuggerHelpersService.js",
-          line: 93
+          line: 97
         },
         kind: "function",
         argumentTypes: [{
@@ -475,13 +505,13 @@ Object.defineProperty(module.exports, "defs", {
       location: {
         type: "source",
         fileName: "JavaDebuggerHelpersService.js",
-        line: 113
+        line: 117
       },
       type: {
         location: {
           type: "source",
           fileName: "JavaDebuggerHelpersService.js",
-          line: 113
+          line: 117
         },
         kind: "function",
         argumentTypes: [{
@@ -494,6 +524,68 @@ Object.defineProperty(module.exports, "defs", {
           kind: "promise",
           type: {
             kind: "void"
+          }
+        }
+      }
+    },
+    getAndroidSDKVersionFromApk: {
+      kind: "function",
+      name: "getAndroidSDKVersionFromApk",
+      location: {
+        type: "source",
+        fileName: "JavaDebuggerHelpersService.js",
+        line: 231
+      },
+      type: {
+        location: {
+          type: "source",
+          fileName: "JavaDebuggerHelpersService.js",
+          line: 231
+        },
+        kind: "function",
+        argumentTypes: [{
+          name: "apkPath",
+          type: {
+            kind: "string"
+          }
+        }],
+        returnType: {
+          kind: "promise",
+          type: {
+            kind: "string"
+          }
+        }
+      }
+    },
+    getSdkVersionSourcePath: {
+      kind: "function",
+      name: "getSdkVersionSourcePath",
+      location: {
+        type: "source",
+        fileName: "JavaDebuggerHelpersService.js",
+        line: 273
+      },
+      type: {
+        location: {
+          type: "source",
+          fileName: "JavaDebuggerHelpersService.js",
+          line: 273
+        },
+        kind: "function",
+        argumentTypes: [{
+          name: "sdkVersion",
+          type: {
+            kind: "string"
+          }
+        }],
+        returnType: {
+          kind: "promise",
+          type: {
+            kind: "nullable",
+            type: {
+              kind: "named",
+              name: "NuclideUri"
+            }
           }
         }
       }

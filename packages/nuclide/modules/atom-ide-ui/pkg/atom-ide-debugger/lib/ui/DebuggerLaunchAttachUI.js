@@ -174,7 +174,9 @@ class DebuggerLaunchAttachUI extends _react.Component {
       name: debuggerType.debuggerName,
       tabContent: _react.createElement(
         'span',
-        { title: debuggerType.debuggerName },
+        {
+          title: debuggerType.debuggerName,
+          className: 'debugger-provider-tab' },
         debuggerType.debuggerName
       )
     })).sort((a, b) => a.name.localeCompare(b.name));
@@ -216,6 +218,7 @@ class DebuggerLaunchAttachUI extends _react.Component {
         _react.createElement((_Tabs || _load_Tabs()).default, {
           className: 'debugger-launch-attach-tabs',
           tabs: tabs,
+          growable: true,
           activeTabName: this.state.selectedProviderTab,
           triggeringEvent: 'onClick',
           onActiveTabChange: newTab => {

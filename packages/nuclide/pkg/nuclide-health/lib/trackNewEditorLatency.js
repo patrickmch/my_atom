@@ -42,21 +42,22 @@ function trackNewEditorLatency() {
   const switchEditorTracking = new (_nuclideAnalytics || _load_nuclideAnalytics()).HistogramTracker('switch-editor', HISTOGRAM_MAX, HISTOGRAM_BUCKETS, HISTOGRAM_INTERVAL_SEC);
   // Attempt to ensure that this is the first listener that fires.
   const unshift = true;
-  let addPaneItemStart = 0;
+  let pendingEditors = 0;
   const disposables = new (_UniversalDisposable || _load_UniversalDisposable()).default(openEditorTracking, switchEditorTracking);
   disposables.add(atom.workspace.getCenter().paneContainer.emitter.on('did-add-pane-item', ({ item }) => {
     if (item instanceof _atom.TextEditor) {
-      addPaneItemStart = performance.now();
+      const startTime = performance.now();
+      pendingEditors++;
       setImmediate(() => {
-        openEditorTracking.track(performance.now() - addPaneItemStart);
-        addPaneItemStart = 0;
+        openEditorTracking.track(performance.now() - startTime);
+        pendingEditors--;
       });
     }
   }, unshift), atom.workspace.getCenter().observePanes(pane => {
     // $FlowIgnore: emitter is private
     const paneDisposable = pane.emitter.on('did-change-active-item', item => {
       // Adding a new pane item also triggers 'did-change-active-item'.
-      if (addPaneItemStart === 0 && item instanceof _atom.TextEditor) {
+      if (pendingEditors === 0 && item instanceof _atom.TextEditor) {
         const startTime = performance.now();
         setImmediate(() => {
           switchEditorTracking.track(performance.now() - startTime);

@@ -32,7 +32,7 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
 class PanelComponentScroller extends _react.Component {
   render() {
     const style = this.props.overflowX == null ? null : { overflowX: this.props.overflowX };
-    const className = (0, (_classnames || _load_classnames()).default)('nuclide-ui-panel-component-scroller', {
+    const className = (0, (_classnames || _load_classnames()).default)(this.props.className, 'nuclide-ui-panel-component-scroller', {
       'nuclide-ui-panel-component-scroller--column': this.props.flexDirection === 'column'
     });
 

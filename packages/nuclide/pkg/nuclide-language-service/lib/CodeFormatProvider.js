@@ -45,7 +45,7 @@ class CodeFormatProvider {
     const disposable = new (_UniversalDisposable || _load_UniversalDisposable()).default(config.canFormatRanges ? atom.packages.serviceHub.provide('code-format.range', config.version, new RangeFormatProvider(name, grammarScopes, config.priority, config.analyticsEventName, connectionToLanguageService).provide()) : atom.packages.serviceHub.provide('code-format.file', config.version, new FileFormatProvider(name, grammarScopes, config.priority, config.analyticsEventName, connectionToLanguageService).provide()));
 
     if (config.canFormatAtPosition) {
-      disposable.add(atom.packages.serviceHub.provide('code-format.onType', config.version, new PositionFormatProvider(name, grammarScopes, config.priority, config.analyticsEventName, connectionToLanguageService).provide()));
+      disposable.add(atom.packages.serviceHub.provide('code-format.onType', config.version, new PositionFormatProvider(name, grammarScopes, config.priority, config.analyticsEventName, connectionToLanguageService, config.keepCursorPosition).provide()));
     }
 
     return disposable;
@@ -122,6 +122,12 @@ class FileFormatProvider extends CodeFormatProvider {
 }
 
 class PositionFormatProvider extends CodeFormatProvider {
+
+  constructor(name, grammarScopes, priority, analyticsEventName, connectionToLanguageService, keepCursorPosition = false) {
+    super(name, grammarScopes, priority, analyticsEventName, connectionToLanguageService);
+    this.keepCursorPosition = keepCursorPosition;
+  }
+
   formatAtPosition(editor, position, character) {
     return (0, (_nuclideAnalytics || _load_nuclideAnalytics()).trackTiming)(this._analyticsEventName, async () => {
       const fileVersion = await (0, (_nuclideOpenFiles || _load_nuclideOpenFiles()).getFileVersionOfEditor)(editor);
@@ -141,7 +147,8 @@ class PositionFormatProvider extends CodeFormatProvider {
     return {
       formatAtPosition: this.formatAtPosition.bind(this),
       grammarScopes: this.grammarScopes,
-      priority: this.priority
+      priority: this.priority,
+      keepCursorPosition: this.keepCursorPosition
     };
   }
 }

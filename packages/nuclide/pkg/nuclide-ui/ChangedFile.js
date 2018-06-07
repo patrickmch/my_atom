@@ -52,18 +52,17 @@ function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj;
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-/**
- * Copyright (c) 2015-present, Facebook, Inc.
- * All rights reserved.
- *
- * This source code is licensed under the license found in the LICENSE file in
- * the root directory of this source tree.
- *
- * 
- * @format
- */
+const ANALYTICS_SOURCE_KEY = 'inline'; /**
+                                        * Copyright (c) 2015-present, Facebook, Inc.
+                                        * All rights reserved.
+                                        *
+                                        * This source code is licensed under the license found in the LICENSE file in
+                                        * the root directory of this source tree.
+                                        *
+                                        * 
+                                        * @format
+                                        */
 
-const ANALYTICS_SOURCE_KEY = 'inline';
 const LF = '\u000A';
 class ChangedFile extends _react.Component {
   constructor(...args) {
@@ -75,11 +74,28 @@ class ChangedFile extends _react.Component {
   }
 
   _getFileClassname() {
-    const { commandPrefix, fileStatus, isHgPath, isSelected } = this.props;
-    return (0, (_classnames || _load_classnames()).default)('nuclide-changed-file', 'list-item', 'nuclide-path-with-terminal', {
+    const {
+      commandPrefix,
+      fileStatus,
+      generatedType,
+      isHgPath,
+      isSelected
+    } = this.props;
+    return (0, (_classnames || _load_classnames()).default)('nuclide-changed-file', 'list-item', 'nuclide-path-with-terminal', this._generatedClass(generatedType), {
       selected: isSelected,
       [`${commandPrefix}-file-entry`]: isHgPath
     }, (_nuclideVcsBase || _load_nuclideVcsBase()).FileChangeStatusToTextColor[fileStatus]);
+  }
+
+  _generatedClass(generatedType) {
+    switch (generatedType) {
+      case 'generated':
+        return 'generated-fully';
+      case 'partial':
+        return 'generated-partly';
+      default:
+        return null;
+    }
   }
 
   _renderAction(key, icon, tooltipTitle, onClick) {

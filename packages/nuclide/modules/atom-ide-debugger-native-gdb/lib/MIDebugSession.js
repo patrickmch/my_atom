@@ -108,6 +108,7 @@ class MIDebugSession extends (_vscodeDebugadapter || _load_vscodeDebugadapter())
   constructor() {
     const logfile = (_nuclideUri || _load_nuclideUri()).default.join(_os.default.tmpdir(), 'native-debugger-vsp.log');
     super(logfile);
+    this._steppingThread = 0;
     this._hasTarget = false;
     this._configurationDone = false;
 
@@ -250,6 +251,7 @@ class MIDebugSession extends (_vscodeDebugadapter || _load_vscodeDebugadapter())
 
   async disconnectRequest(response, request) {
     this._stepping = false;
+    this._steppingThread = 0;
     this._runWhenStopped(async () => {
       if (this._attachPID != null) {
         await this._client.sendCommand('target-detach');
@@ -475,16 +477,19 @@ class MIDebugSession extends (_vscodeDebugadapter || _load_vscodeDebugadapter())
 
   async nextRequest(response, args) {
     this._stepping = true;
+    this._steppingThread = args.threadId;
     return this._executeCommon('exec-next', args.threadId, response);
   }
 
   async stepInRequest(response, args) {
     this._stepping = true;
+    this._steppingThread = args.threadId;
     return this._executeCommon('exec-step', args.threadId, response);
   }
 
   async stepOutRequest(response, args) {
     this._stepping = true;
+    this._steppingThread = args.threadId;
     return this._executeCommon('exec-finish', args.threadId, response);
   }
 
@@ -683,10 +688,15 @@ class MIDebugSession extends (_vscodeDebugadapter || _load_vscodeDebugadapter())
 
     await this._processPauseQueue();
 
+    // if we're stepping and we get a signal in the stepping thread, then
+    // we shouldn't ignore the signal, even if exception breakpoints aren't
+    // enabled
+    const signalWhileStepping = this._stepping && stopped.reason === 'signal-received' && stopped['thread-id'] === this._steppingThread;
+
     // A received signal means one of two things: SIGINT sent to gdb to drop
     // into command mode (pausing the target), or an unexpected signal which
     // is an exception to break on.
-    if (!this._expectingPause && this._exceptionBreakpoints.shouldIgnoreBreakpoint(stopped)) {
+    if (!this._expectingPause && this._exceptionBreakpoints.shouldIgnoreBreakpoint(stopped) && !signalWhileStepping) {
       this._running = true;
       await this._client.sendCommand('exec-continue');
       // we are really running again. if any commands came in from the UI during
@@ -716,6 +726,7 @@ class MIDebugSession extends (_vscodeDebugadapter || _load_vscodeDebugadapter())
       reason = 'step';
       description = 'Execution stepped';
       this._stepping = false;
+      this._steppingThread = 0;
     } else if (stopped.reason === 'exited') {
       this._onTargetTerminated();
       return;

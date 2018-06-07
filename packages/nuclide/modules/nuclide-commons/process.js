@@ -242,6 +242,7 @@ function observeProcess(command, args, options) {
 function runCommandDetailed(command, args = [], options = {}, rest) {
   var _ref;
 
+  options.dontLogInNuclide = true;
   const maxBuffer = ((_ref = options) != null ? _ref.maxBuffer : _ref) || DEFAULT_MAX_BUFFER;
   return observeProcess(command, args, Object.assign({}, options, { maxBuffer })).catch(error => {
     // Catch ProcessExitErrors so that we can add stdout to them.

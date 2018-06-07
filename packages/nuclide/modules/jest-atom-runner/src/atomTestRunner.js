@@ -61,13 +61,19 @@ const ATOM_BUILTIN_MODULES = new Set(['atom', 'electron']); /**
     workerID });
 
 
-  global.atom = params.buildAtomEnvironment({
+  global.__buildAtomGlobal = () =>
+  params.buildAtomEnvironment({
     applicationDelegate: params.buildDefaultApplicationDelegate(),
     window,
     document: window.document,
     configDirPath: _os.default.tmpdir(),
     enablePersistence: true });
 
+
+  // We need to delete whatever is in `prepareStackTrace` to make source map work.
+  // Right now Atom is overwriting it without an ability to reassign, so the only
+  // option is to delete the whole thing. (https://fburl.com/cqp7mj01)
+  delete Error.prepareStackTrace;
 
   return new Promise((resolve, reject) => {
     connection.onMessage(message => {
@@ -84,8 +90,12 @@ const ATOM_BUILTIN_MODULES = new Set(['atom', 'electron']); /**
               getResolver(testData.config, testData.rawModuleMap)).
 
               catch(error => {
-                const testResult = (0, (_utils || _load_utils()).buildFailureTestResult)(testData.path, error);
-                console.error(error);
+                const testResult = (0, (_utils || _load_utils()).buildFailureTestResult)(
+                testData.path,
+                error,
+                testData.config,
+                testData.globalConfig);
+
                 return testResult;
               }).
               then(result => {

@@ -19,10 +19,11 @@ Object.defineProperty(exports, "__esModule", {
  * Async implementation of Jasmine's waitsFor()
  */
 exports.default = async function waitsFor(fn, message, timeout = 1000) {
+  const error = new Error(message != null ? message : 'Expected the function to start returning "true" but it never did');
   const startTime = Date.now();
   while (!Boolean(fn())) {
     if (Date.now() - startTime > timeout) {
-      throw new Error(message != null ? message : 'Expected the function to start returning "true" but it never did');
+      throw error;
     }
     // eslint-disable-next-line no-await-in-loop
     await new Promise(resolve => setTimeout(resolve, 50));

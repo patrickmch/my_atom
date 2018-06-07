@@ -64,9 +64,9 @@ const _adapters = new Map([['node', {
 }], ['prepack', {
   executable: {
     command: 'node',
-    args: [(_nuclideUri || _load_nuclideUri()).default.join(__dirname, 'VendorLib/vscode-prepack/adapter/DebugAdapter.js')]
+    args: [(_nuclideUri || _load_nuclideUri()).default.join(__dirname, '../nuclide-debugger-vsps/VendorLib/vscode-prepack/adapter/DebugAdapter.js')]
   },
-  root: (_nuclideUri || _load_nuclideUri()).default.join(__dirname, 'VendorLib/vscode-prepack')
+  root: (_nuclideUri || _load_nuclideUri()).default.join(__dirname, '../nuclide-debugger-vsps/VendorLib/vscode-prepack')
 }], ['ocaml', {
   executable: {
     command: 'node',

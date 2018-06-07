@@ -139,6 +139,15 @@ class HhvmToolbar extends _react.Component {
     const isDebugScript = store.getDebugMode() !== 'webserver';
     const isDisabled = !isDebugScript;
     const value = store.getDebugTarget();
+    const openFn = () => {
+      const browserUri = (this._debugTarget != null ? this._debugTarget.getText() : store.getDebugTarget()) || '';
+      const address = browserUri.trim().toLowerCase();
+      if (!address.startsWith('http://') && !address.startsWith('https://')) {
+        _electron.shell.openExternal('https://' + browserUri);
+      } else {
+        _electron.shell.openExternal(browserUri);
+      }
+    };
 
     return _react.createElement(
       'div',
@@ -160,14 +169,9 @@ class HhvmToolbar extends _react.Component {
           ref: input => {
             this._debugTarget = input;
           },
-          value: value
-          // Ugly hack: prevent people changing the value without disabling so
-          // that they can copy and paste.
-          , onDidChange: isDisabled ? () => {
-            if ((0, (_nullthrows || _load_nullthrows()).default)(this._debugTarget).getText() !== value) {
-              (0, (_nullthrows || _load_nullthrows()).default)(this._debugTarget).setText(value);
-            }
-          } : this._updateLastScriptCommand,
+          value: value,
+          onDidChange: isDisabled ? () => {} : this._updateLastScriptCommand,
+          onConfirm: openFn,
           size: 'sm'
         })
       ),
@@ -187,14 +191,11 @@ class HhvmToolbar extends _react.Component {
         { className: 'inline-block' },
         !isDebugScript ? _react.createElement(
           (_Button || _load_Button()).Button,
-          {
-            size: 'SMALL',
-            onClick: () => {
-              _electron.shell.openExternal('https://' + store.getDebugTarget());
-            } },
-          'Open'
+          { size: 'SMALL', onClick: openFn },
+          'Open In Browser'
         ) : _react.createElement((_Checkbox || _load_Checkbox()).Checkbox, {
           checked: this.state.stickyScript,
+          className: 'nuclide-hhvm-be-sticky-control',
           label: 'Sticky',
           onChange: isChecked => {
             this.props.projectStore.setStickyCommand((0, (_nullthrows || _load_nullthrows()).default)(this._debugTarget).getText(), isChecked);

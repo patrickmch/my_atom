@@ -8,6 +8,12 @@ exports.getJavaAndroidConfig = getJavaAndroidConfig;
 exports.getCustomControlButtonsForJavaSourcePaths = getCustomControlButtonsForJavaSourcePaths;
 exports.resolveConfiguration = resolveConfiguration;
 
+var _nuclideUri;
+
+function _load_nuclideUri() {
+  return _nuclideUri = _interopRequireDefault(require('../nuclide-commons/nuclideUri'));
+}
+
 var _rxjsBundlesRxMinJs = require('rxjs/bundles/Rx.min.js');
 
 var _UniversalDisposable;
@@ -42,19 +48,17 @@ function _load_AndroidJavaDebuggerHelpers() {
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-/**
- * Copyright (c) 2017-present, Facebook, Inc.
- * All rights reserved.
- *
- * This source code is licensed under the BSD-style license found in the
- * LICENSE file in the root directory of this source tree. An additional grant
- * of patent rights can be found in the PATENTS file in the same directory.
- *
- *  strict-local
- * @format
- */
-
-const NUCLIDE_DEBUGGER_DEV_GK = exports.NUCLIDE_DEBUGGER_DEV_GK = 'nuclide_debugger_dev';
+const NUCLIDE_DEBUGGER_DEV_GK = exports.NUCLIDE_DEBUGGER_DEV_GK = 'nuclide_debugger_dev'; /**
+                                                                                           * Copyright (c) 2017-present, Facebook, Inc.
+                                                                                           * All rights reserved.
+                                                                                           *
+                                                                                           * This source code is licensed under the BSD-style license found in the
+                                                                                           * LICENSE file in the root directory of this source tree. An additional grant
+                                                                                           * of patent rights can be found in the PATENTS file in the same directory.
+                                                                                           *
+                                                                                           *  strict-local
+                                                                                           * @format
+                                                                                           */
 
 function getJavaAndroidConfig() {
   const deviceAndPackage = {
@@ -162,6 +166,14 @@ async function resolveConfiguration(configuration) {
   const customDisposable = configuration.customDisposable || new (_UniversalDisposable || _load_UniversalDisposable()).default();
   customDisposable.add(subscriptions);
 
+  const sdkSourcePath = config.sdkVersion != null ? await (0, (_utils || _load_utils()).getJavaDebuggerHelpersServiceByNuclideUri)(targetUri).getSdkVersionSourcePath(config.sdkVersion) : null;
+  const sdkSourcePathResolved = sdkSourcePath != null ? (_nuclideUri || _load_nuclideUri()).default.getPath(sdkSourcePath) : sdkSourcePath;
+  const additionalSourcePaths = sdkSourcePathResolved != null ? [sdkSourcePathResolved] : [];
+
+  const onInitializeCallback = async session => {
+    customDisposable.add(...(0, (_utils || _load_utils()).getSourcePathClickSubscriptions)(targetUri, session, clickEvents, additionalSourcePaths));
+  };
+
   return Object.assign({}, configuration, {
     debugMode: attachPortTargetConfig.debugMode,
     adapterExecutable: await (0, (_utils || _load_utils()).getJavaDebuggerHelpersServiceByNuclideUri)(targetUri).getJavaVSAdapterExecutableInfo(false),
@@ -170,8 +182,6 @@ async function resolveConfiguration(configuration) {
     }),
     config: attachPortTargetConfig,
     customDisposable,
-    onInitializeCallback: session => {
-      customDisposable.add(...(0, (_utils || _load_utils()).getSourcePathClickSubscriptions)(targetUri, session, clickEvents));
-    }
+    onInitializeCallback
   });
 }

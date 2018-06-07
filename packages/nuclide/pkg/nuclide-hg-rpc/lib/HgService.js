@@ -58,6 +58,7 @@ exports.getFullHashForRevision = getFullHashForRevision;
 exports.fold = fold;
 exports.runCommand = runCommand;
 exports.observeExecution = observeExecution;
+exports.gitDiffStrings = gitDiffStrings;
 
 var _collection;
 
@@ -93,6 +94,12 @@ var _nuclideWatchmanHelpers;
 
 function _load_nuclideWatchmanHelpers() {
   return _nuclideWatchmanHelpers = require('../../../modules/nuclide-watchman-helpers');
+}
+
+var _gitDiff;
+
+function _load_gitDiff() {
+  return _gitDiff = require('./git-diff');
 }
 
 var _fs = _interopRequireDefault(require('fs'));
@@ -163,17 +170,18 @@ function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj;
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-const logger = (0, (_log4js || _load_log4js()).getLogger)('nuclide-hg-rpc'); /**
-                                                                              * Copyright (c) 2015-present, Facebook, Inc.
-                                                                              * All rights reserved.
-                                                                              *
-                                                                              * This source code is licensed under the license found in the LICENSE file in
-                                                                              * the root directory of this source tree.
-                                                                              *
-                                                                              * 
-                                                                              * @format
-                                                                              */
+/**
+ * Copyright (c) 2015-present, Facebook, Inc.
+ * All rights reserved.
+ *
+ * This source code is licensed under the license found in the LICENSE file in
+ * the root directory of this source tree.
+ *
+ * 
+ * @format
+ */
 
+const logger = (0, (_log4js || _load_log4js()).getLogger)('nuclide-hg-rpc');
 const DEFAULT_ARC_PROJECT_FORK_BASE = 'remote/master';
 const DEFAULT_FORK_BASE_NAME = 'default';
 
@@ -1357,4 +1365,10 @@ function observeExecution(workingDirectory, args) {
     cwd: workingDirectory
   };
   return (0, (_hgUtils || _load_hgUtils()).hgObserveExecution)(args, execOptions).publish();
+}
+
+// not really Hg functionality, but this was chosen to be the best current home
+// for this method as it spawns processes and should live in an remote service
+function gitDiffStrings(oldContents, newContents) {
+  return (0, (_gitDiff || _load_gitDiff()).gitDiffStrings)(oldContents, newContents).publish();
 }

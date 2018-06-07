@@ -10,6 +10,7 @@ exports.relativizePathWithDirectory = relativizePathWithDirectory;
 exports.getDirectoryForPath = getDirectoryForPath;
 exports.getFileForPath = getFileForPath;
 exports.observeProjectPaths = observeProjectPaths;
+exports.onDidChangeProjectPath = onDidChangeProjectPath;
 exports.onDidAddProjectPath = onDidAddProjectPath;
 exports.onDidRemoveProjectPath = onDidRemoveProjectPath;
 exports.observeRemovedHostnames = observeRemovedHostnames;
@@ -111,8 +112,34 @@ function getFileForPath(path) {
 }
 
 function observeProjectPaths(callback) {
-  getValidProjectPaths().forEach(callback);
-  return onDidAddProjectPath(callback);
+  getValidProjectPaths().forEach(existingPath => callback(existingPath, true));
+  return onDidChangeProjectPath(callback);
+}
+
+function onDidChangeProjectPath(callback) {
+  let projectPaths = getValidProjectPaths();
+  let changing = false;
+  return atom.project.onDidChangePaths(() => {
+    if (changing) {
+      throw new Error('Cannot update projects in the middle of an update');
+    }
+    changing = true;
+    const newProjectPaths = getValidProjectPaths();
+    // Check to see if the change was the addition of a project.
+    for (const newProjectPath of newProjectPaths) {
+      if (!projectPaths.includes(newProjectPath)) {
+        callback(newProjectPath, true);
+      }
+    }
+    // Check to see if the change was the deletion of a project.
+    for (const projectPath of projectPaths) {
+      if (!newProjectPaths.includes(projectPath)) {
+        callback(projectPath, false);
+      }
+    }
+    changing = false;
+    projectPaths = newProjectPaths;
+  });
 }
 
 function onDidAddProjectPath(callback) {

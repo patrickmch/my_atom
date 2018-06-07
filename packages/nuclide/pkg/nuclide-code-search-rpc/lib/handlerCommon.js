@@ -3,6 +3,7 @@
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
+exports.BUFFER_SIZE_LIMIT = undefined;
 exports.observeGrepLikeProcess = observeGrepLikeProcess;
 exports.mergeOutputToResults = mergeOutputToResults;
 
@@ -28,21 +29,9 @@ var _rxjsBundlesRxMinJs = require('rxjs/bundles/Rx.min.js');
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-// Grep and related tools (ack, rg) have exit code 1 with no results.
-function observeGrepLikeProcess(command, args, cwd) {
-  return (0, (_process || _load_process()).observeProcess)(command, args, {
-    cwd,
-    // An exit code of 0 or 1 is normal for grep-like tools.
-    isExitError: ({ exitCode, signal }) => {
-      return (
-        // flowlint-next-line sketchy-null-string:off
-        !signal && (exitCode == null || exitCode > 1)
-      );
-    }
-  });
-}
+const BUFFER_SIZE_LIMIT = exports.BUFFER_SIZE_LIMIT = 1000 * 1000 * 50; // 50 MB
 
-// Parse each line of output and construct code search results.
+// Grep and related tools (ack, rg) have exit code 1 with no results.
 /**
  * Copyright (c) 2015-present, Facebook, Inc.
  * All rights reserved.
@@ -54,6 +43,21 @@ function observeGrepLikeProcess(command, args, cwd) {
  * @format
  */
 
+function observeGrepLikeProcess(command, args, cwd) {
+  return (0, (_process || _load_process()).observeProcess)(command, args, {
+    cwd,
+    maxBuffer: BUFFER_SIZE_LIMIT,
+    // An exit code of 0 or 1 is normal for grep-like tools.
+    isExitError: ({ exitCode, signal }) => {
+      return (
+        // flowlint-next-line sketchy-null-string:off
+        !signal && (exitCode == null || exitCode > 1)
+      );
+    }
+  });
+}
+
+// Parse each line of output and construct code search results.
 function mergeOutputToResults(processOutput, parse, regex, leadingLines, trailingLines) {
   const parsedResults = processOutput.concatMap(parse).publish();
   return _rxjsBundlesRxMinJs.Observable.create(observer => {

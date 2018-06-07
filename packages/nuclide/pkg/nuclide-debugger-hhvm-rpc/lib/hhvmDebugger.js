@@ -107,6 +107,7 @@ class HHVMDebuggerWrapper {
           type: 'event',
           event: 'hhvmConnectionDied'
         });
+        process.exit(0);
       });
 
       socket.on('disconnect', () => {

@@ -55,6 +55,12 @@ function _load_Tree() {
   return _Tree = require('../../../modules/nuclide-commons-ui/Tree');
 }
 
+var _DragResizeContainer;
+
+function _load_DragResizeContainer() {
+  return _DragResizeContainer = require('../../../modules/nuclide-commons-ui/DragResizeContainer');
+}
+
 var _nuclideAnalytics;
 
 function _load_nuclideAnalytics() {
@@ -79,22 +85,27 @@ function _load_reselect() {
   return _reselect = require('reselect');
 }
 
+var _immutable;
+
+function _load_immutable() {
+  return _immutable = _interopRequireDefault(require('immutable'));
+}
+
 function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-/**
- * Copyright (c) 2015-present, Facebook, Inc.
- * All rights reserved.
- *
- * This source code is licensed under the license found in the LICENSE file in
- * the root directory of this source tree.
- *
- *  strict-local
- * @format
- */
+const getActions = (_FileTreeActions || _load_FileTreeActions()).default.getInstance; /**
+                                                                                       * Copyright (c) 2015-present, Facebook, Inc.
+                                                                                       * All rights reserved.
+                                                                                       *
+                                                                                       * This source code is licensed under the license found in the LICENSE file in
+                                                                                       * the root directory of this source tree.
+                                                                                       *
+                                                                                       *  strict-local
+                                                                                       * @format
+                                                                                       */
 
-const getActions = (_FileTreeActions || _load_FileTreeActions()).default.getInstance;
 const store = (_FileTreeStore || _load_FileTreeStore()).FileTreeStore.getInstance();
 
 class OpenFilesListComponent extends _react.PureComponent {
@@ -175,11 +186,13 @@ class OpenFilesListComponent extends _react.PureComponent {
     const entries = this.props.uris.map((uri, index) => {
       const isModified = this.props.modifiedUris.indexOf(uri) >= 0;
       const isSelected = uri === this.props.activeUri;
+      const generatedType = this.props.generatedTypes.get(uri);
       return {
         uri,
         name: displayPaths[index],
         isModified,
-        isSelected
+        isSelected,
+        generatedType
       };
     });
 
@@ -188,51 +201,66 @@ class OpenFilesListComponent extends _react.PureComponent {
     return entries;
   }
 
+  _generatedClass(generatedType) {
+    switch (generatedType) {
+      case 'generated':
+        return 'generated-fully';
+      case 'partial':
+        return 'generated-partly';
+      default:
+        return null;
+    }
+  }
+
   render() {
     const sortedEntries = this.propsToEntries();
 
     return _react.createElement(
-      'div',
-      { className: 'nuclide-file-tree-open-files' },
+      (_DragResizeContainer || _load_DragResizeContainer()).DragResizeContainer,
+      null,
       _react.createElement(
-        (_PanelComponentScroller || _load_PanelComponentScroller()).PanelComponentScroller,
-        null,
+        'div',
+        { className: 'nuclide-file-tree-open-files' },
         _react.createElement(
-          (_Tree || _load_Tree()).TreeList,
-          { showArrows: true, className: 'nuclide-file-tree-open-files-list' },
+          (_PanelComponentScroller || _load_PanelComponentScroller()).PanelComponentScroller,
+          null,
           _react.createElement(
-            (_Tree || _load_Tree()).NestedTreeItem,
-            { hasFlatChildren: true },
-            sortedEntries.map(e => {
-              const isHoveredUri = this.state.hoveredUri === e.uri;
-              return _react.createElement(
-                (_Tree || _load_Tree()).TreeItem,
-                {
-                  className: (0, (_classnames || _load_classnames()).default)('file', 'nuclide-path-with-terminal', {
-                    'text-highlight': isHoveredUri
+            (_Tree || _load_Tree()).TreeList,
+            { showArrows: true, className: 'nuclide-file-tree-open-files-list' },
+            _react.createElement(
+              (_Tree || _load_Tree()).NestedTreeItem,
+              { hasFlatChildren: true },
+              sortedEntries.map(e => {
+                const isHoveredUri = this.state.hoveredUri === e.uri;
+                return _react.createElement(
+                  (_Tree || _load_Tree()).TreeItem,
+                  {
+                    className: (0, (_classnames || _load_classnames()).default)('file', 'nuclide-path-with-terminal', this._generatedClass(e.generatedType), {
+                      'text-highlight': isHoveredUri
+                    }),
+                    selected: e.isSelected,
+                    key: e.uri,
+                    onConfirm: this._onConfirm.bind(this, e),
+                    onSelect: this._onSelect.bind(this, e),
+                    onMouseEnter: this._onListItemMouseEnter.bind(this, e),
+                    onMouseLeave: this._onListItemMouseLeave,
+                    onMouseDown: this._onMouseDown.bind(this, e),
+                    path: e.uri,
+                    name: e.name
+                    // eslint-disable-next-line nuclide-internal/jsx-simple-callback-refs
+                    , ref: e.isSelected ? this._handleSelectedRow : null },
+                  _react.createElement('span', {
+                    className: (0, (_classnames || _load_classnames()).default)('icon', {
+                      'icon-primitive-dot': e.isModified && !isHoveredUri,
+                      'icon-x': isHoveredUri || !e.isModified,
+                      'text-info': e.isModified
+                    }),
+                    onClick: this._onCloseClick.bind(this, e)
                   }),
-                  selected: e.isSelected,
-                  key: e.uri,
-                  onConfirm: this._onConfirm.bind(this, e),
-                  onSelect: this._onSelect.bind(this, e),
-                  onMouseEnter: this._onListItemMouseEnter.bind(this, e),
-                  onMouseLeave: this._onListItemMouseLeave,
-                  onMouseDown: this._onMouseDown.bind(this, e),
-                  path: e.uri,
-                  name: e.name
-                  // eslint-disable-next-line nuclide-internal/jsx-simple-callback-refs
-                  , ref: e.isSelected ? this._handleSelectedRow : null },
-                _react.createElement('span', {
-                  className: (0, (_classnames || _load_classnames()).default)('icon', {
-                    'icon-primitive-dot': e.isModified && !isHoveredUri,
-                    'icon-x': isHoveredUri || !e.isModified,
-                    'text-info': e.isModified
-                  }),
-                  onClick: this._onCloseClick.bind(this, e)
-                }),
-                _react.createElement((_PathWithFileIcon || _load_PathWithFileIcon()).default, { path: e.name })
-              );
-            })
+                  _react.createElement((_PathWithFileIcon || _load_PathWithFileIcon()).default, { path: e.name })
+                );
+              })
+            )
           )
         )
       )

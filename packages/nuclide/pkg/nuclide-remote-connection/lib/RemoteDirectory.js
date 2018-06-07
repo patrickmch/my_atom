@@ -279,7 +279,7 @@ class RemoteDirectory {
   async getEntries(callback) {
     let entries;
     try {
-      entries = await this._getFileSystemService().readdir(this._uri);
+      entries = await this._getFileSystemService().readdirSorted(this._uri);
     } catch (e) {
       callback(e, null);
       return;
@@ -287,9 +287,7 @@ class RemoteDirectory {
 
     const directories = [];
     const files = [];
-    entries.sort((a, b) => {
-      return a[0].toLowerCase().localeCompare(b[0].toLowerCase());
-    }).forEach(entry => {
+    entries.forEach(entry => {
       const [name, isFile, symlink] = entry;
       const uri = (_nuclideUri || _load_nuclideUri()).default.createRemoteUri(this._host, this._joinLocalPath(name));
       if (isFile) {

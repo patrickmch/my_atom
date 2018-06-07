@@ -8,7 +8,9 @@
   'ctrl-alt-cmd-j': 'window:toggle-dev-tools'
   'cmd-q': 'unset!'
   'cmd-q cmd-q': 'application:quit'
-  'ctrl-/': 'nuclide-quick-open:find-anything-via-omni-search'
+  'alt-cmd-/': 'nuclide-quick-open:find-anything-via-omni-search'
+  'ctrl-cmd-/': 'nuclide-code-search:toggle-provider'
+  'ctrl-/': 'nuclide-fuzzy-filename-provider:toggle-provider'
 
 'atom-text-editor':
   # 'alt-cmd-enter': 'python-tools:goto-definition'
@@ -115,19 +117,22 @@
 
   # space keys!
   'space p': 'clipboard-plus:toggle'
-  'space t f': 'nuclide-fuzzy-filename-provider:toggle-provider'
   'space m': 'application:open-your-keymap'
 
   'space g g': 'git-plus:menu'
-  'space g c': 'git-plus:add-all-and-commit'
+  'space g !': 'git-plus:add-all-and-commit'
+  'space g c': 'git-plus:commit'
+  'space g a': 'git-plus:add'
+  'space g *': 'git-plus:add-all'
   'space g p s': 'git-plus:push'
   'space g p l': 'git-plus:pull'
   'space g o': 'git-plus:checkout'
   'space g s': 'git-plus:status'
   'space g l': 'git-plus:log'
   'space g v': 'git-plus:stash-save'
-  'space g a': 'git-plus:add-all'
+  'space g d': 'git-plus:diff'
   'space g h': 'git-history:show-file-history'
+  'space g b': 'git-blame:toggle'
 
   'space s': 'settings-view:install-packages-and-themes'
 
@@ -142,7 +147,6 @@
 
   'space 1': 'window:reload'
 
-  'space b': 'git-blame:toggle'
 
   'shift-alt-j': 'vim-mode-plus:move-down-to-edge'
   'shift-alt-k': 'vim-mode-plus:move-up-to-edge'

@@ -17,9 +17,8 @@
 
 
 
-var _path = _interopRequireDefault(require('path'));function _interopRequireDefault(obj) {return obj && obj.__esModule ? obj : { default: obj };}
-
-const IPC_IDS_SEPARATOR = '_'; // server id and worker id merged into one string
+var _path = _interopRequireDefault(require('path'));var _jestMessageUtil;
+function _load_jestMessageUtil() {return _jestMessageUtil = require('jest-message-util');}function _interopRequireDefault(obj) {return obj && obj.__esModule ? obj : { default: obj };} // server id and worker id merged into one string
 /**
  * Copyright (c) 2017-present, Facebook, Inc.
  * All rights reserved.
@@ -30,7 +29,9 @@ const IPC_IDS_SEPARATOR = '_'; // server id and worker id merged into one string
  *
  * 
  * @format
- */ /* eslint-disable nuclide-internal/prefer-nuclide-uri */const rand = exports.rand = () => Math.floor(Math.random() * 10000000);const makeUniqServerId = exports.makeUniqServerId = () => `jest-atom-runner-ipc-server-${Date.now() + rand()}`;const makeUniqWorkerId = exports.makeUniqWorkerId = () => `jest-atom-runner-ipc-worker-${Date.now() + rand()}`;const mergeIPCIDs = exports.mergeIPCIDs = ({ serverID,
+ */ /* eslint-disable nuclide-internal/prefer-nuclide-uri */const IPC_IDS_SEPARATOR = '_';const rand = exports.rand = () => Math.floor(Math.random() * 10000000);const makeUniqServerId = exports.makeUniqServerId = () => `jest-atom-runner-ipc-server-${Date.now() + rand()}`;const makeUniqWorkerId = exports.makeUniqWorkerId = () => `jest-atom-runner-ipc-worker-${Date.now() + rand()}`;
+const mergeIPCIDs = exports.mergeIPCIDs = ({
+  serverID,
   workerID }) =>
 
 
@@ -99,12 +100,15 @@ const parseMessage = exports.parseMessage = message => {
 
 const buildFailureTestResult = exports.buildFailureTestResult = (
 testPath,
-err) =>
+err,
+config,
+globalConfig) =>
 {
+  const failureMessage = (0, (_jestMessageUtil || _load_jestMessageUtil()).formatExecError)(err, config, globalConfig);
   return {
     console: null,
     displayName: '',
-    failureMessage: null,
+    failureMessage,
     leaks: false,
     numFailingTests: 0,
     numPassingTests: 0,
@@ -124,7 +128,7 @@ err) =>
       updated: 0 },
 
     sourceMaps: {},
-    testExecError: err,
+    testExecError: failureMessage,
     testFilePath: testPath,
     testResults: [] };
 

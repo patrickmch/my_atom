@@ -7,6 +7,12 @@ exports.Proxy = undefined;
 
 var _net = _interopRequireDefault(require('net'));
 
+var _Encoder;
+
+function _load_Encoder() {
+  return _Encoder = _interopRequireDefault(require('./Encoder'));
+}
+
 var _log4js;
 
 function _load_log4js() {
@@ -15,19 +21,17 @@ function _load_log4js() {
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-/**
- * Copyright (c) 2017-present, Facebook, Inc.
- * All rights reserved.
- *
- * This source code is licensed under the BSD-style license found in the
- * LICENSE file in the root directory of this source tree. An additional grant
- * of patent rights can be found in the PATENTS file in the same directory.
- *
- *  strict-local
- * @format
- */
-
-const logger = (0, (_log4js || _load_log4js()).getLogger)('tunnel-proxy');
+const logger = (0, (_log4js || _load_log4js()).getLogger)('tunnel-proxy'); /**
+                                                                            * Copyright (c) 2017-present, Facebook, Inc.
+                                                                            * All rights reserved.
+                                                                            *
+                                                                            * This source code is licensed under the BSD-style license found in the
+                                                                            * LICENSE file in the root directory of this source tree. An additional grant
+                                                                            * of patent rights can be found in the PATENTS file in the same directory.
+                                                                            *
+                                                                            *  strict-local
+                                                                            * @format
+                                                                            */
 
 class Proxy {
 
@@ -62,7 +66,7 @@ class Proxy {
           logger.trace('socket data: ', arg);
           this._sendMessage({
             event: 'data',
-            arg: arg.toString('base64'),
+            arg,
             clientId
           });
         });
@@ -97,7 +101,6 @@ class Proxy {
   }
 
   receive(msg) {
-    logger.warn('in proxy, got message');
     const clientId = msg.clientId;
 
     if (!(clientId != null)) {
@@ -117,12 +120,12 @@ class Proxy {
     }
 
     if (msg.event === 'data') {
-      socket.write(Buffer.from(arg, 'base64'));
+      socket.write(arg);
     }
   }
 
   _sendMessage(msg) {
-    this._transport.send(JSON.stringify(Object.assign({ tunnelId: this._tunnelId }, msg)));
+    this._transport.send((_Encoder || _load_Encoder()).default.encode(Object.assign({ tunnelId: this._tunnelId }, msg)));
   }
 
   close() {

@@ -48,6 +48,7 @@ exports.getClangServiceByNuclideUri = getClangServiceByNuclideUri;
 exports.getCodeSearchServiceByNuclideUri = getCodeSearchServiceByNuclideUri;
 exports.getCtagsServiceByNuclideUri = getCtagsServiceByNuclideUri;
 exports.getDefinitionPreviewServiceByNuclideUri = getDefinitionPreviewServiceByNuclideUri;
+exports.getFbsimctlServiceByNuclideUri = getFbsimctlServiceByNuclideUri;
 exports.getFileSystemServiceByNuclideUri = getFileSystemServiceByNuclideUri;
 exports.getFileSystemServiceByConnection = getFileSystemServiceByConnection;
 exports.getFileWatcherServiceByNuclideUri = getFileWatcherServiceByNuclideUri;
@@ -171,6 +172,10 @@ function getCtagsServiceByNuclideUri(uri) {
 
 function getDefinitionPreviewServiceByNuclideUri(uri) {
   return (0, (_nullthrows || _load_nullthrows()).default)((0, (_serviceManager || _load_serviceManager()).getServiceByNuclideUri)('DefinitionPreviewService', uri));
+}
+
+function getFbsimctlServiceByNuclideUri(uri) {
+  return (0, (_nullthrows || _load_nullthrows()).default)((0, (_serviceManager || _load_serviceManager()).getServiceByNuclideUri)('FbsimctlService', uri));
 }
 
 function getFileSystemServiceByNuclideUri(uri) {

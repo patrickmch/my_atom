@@ -101,7 +101,10 @@ class BuckToolbarTargetSelector extends _react.Component {
     let cachedAliases = this._projectAliasesCache.get(buckRoot);
     if (cachedAliases == null) {
       const buckService = (0, (_nuclideBuckBase || _load_nuclideBuckBase()).getBuckService)(buckRoot);
-      cachedAliases = buckService == null ? Promise.resolve([]) : buckService.listAliases(buckRoot)
+      cachedAliases = buckService == null ? Promise.resolve([]) : buckService.listAliases(buckRoot).catch(e => {
+        atom.notifications.addError(`Error invoking Buck to list aliases:\n${e.toString()}`);
+        return [];
+      })
       // Sort in alphabetical order.
       .then(aliases => aliases.sort((a, b) => a.toLowerCase().localeCompare(b.toLowerCase())));
       this._projectAliasesCache.set(buckRoot, cachedAliases);

@@ -170,10 +170,10 @@ async function activateLsp() {
       definitionEventName: 'flow.get-definition'
     },
     autocomplete: {
+      disableForSelector: '.source.js .comment',
+      excludeLowerPriority: Boolean((_featureConfig || _load_featureConfig()).default.get('nuclide-flow.excludeOtherAutocomplete')),
+      suggestionPriority: Boolean((_featureConfig || _load_featureConfig()).default.get('nuclide-flow.flowAutocompleteResultsFirst')) ? 5 : 1,
       inclusionPriority: 1,
-      suggestionPriority: 3,
-      disableForSelector: null,
-      excludeLowerPriority: false,
       analytics: {
         eventName: 'nuclide-flow',
         shouldLogInsertedSuggestion: false
@@ -183,27 +183,59 @@ async function activateLsp() {
         updateFirstResults: (_nuclideLanguageService || _load_nuclideLanguageService()).updateAutocompleteFirstResults
       },
       supportsResolve: false
+    },
+    highlight: {
+      version: '0.1.0',
+      priority: 1,
+      analyticsEventName: 'flow.codehighlight'
+    },
+    outline: {
+      version: '0.1.0',
+      priority: 1,
+      analyticsEventName: 'flow.outline',
+      updateOnEdit: false // TODO(ljw): turn on once it's fast enough!
+    },
+    coverage: {
+      version: '0.0.0',
+      priority: 10,
+      analyticsEventName: 'flow.coverage',
+      icon: 'nuclicon-flow'
+    },
+    findReferences: (await shouldEnableFindRefs()) ? {
+      version: '0.1.0',
+      analyticsEventName: 'flow.find-references'
+      // TODO(nmote): support indirect-find-refs here
+    } : undefined,
+    status: {
+      version: '0.1.0',
+      priority: 1,
+      observeEventName: 'flow.status.observe',
+      clickEventName: 'flow.status.click',
+      icon: 'nuclicon-flow'
+      // TODO(hchau): bannerMarkdown: The flow language service provides autocomplete, hover, hyperclick for Flow.',
     }
   };
 
   const languageServiceFactory = async connection => {
     const [fileNotifier, host] = await Promise.all([(0, (_nuclideOpenFiles || _load_nuclideOpenFiles()).getNotifierByConnection)(connection), (0, (_nuclideLanguageService || _load_nuclideLanguageService()).getHostServices)()]);
     const service = (0, (_nuclideRemoteConnection || _load_nuclideRemoteConnection()).getVSCodeLanguageServiceByConnection)(connection);
-    const pathToFlow = (_featureConfig || _load_featureConfig()).default.get('nuclide-flow.pathToFlow');
-    const lspService = await service.createMultiLspLanguageService('flow', pathToFlow, ['lsp', '--from', 'nuclide'], {
+    const pathToFlow = String((_featureConfig || _load_featureConfig()).default.get('nuclide-flow.pathToFlow'));
+    // TODO(ljw) - Boolean(featureConfig.get('nuclide-flow.canUseFlowBin'))
+    // - that feature needs changes to the way LSP is initialized
+    const lazy = (0, (_passesGK2 || _load_passesGK2()).isGkEnabled)('nuclide_flow_lazy_mode_ide') ? ['--lazy-mode', 'ide'] : [];
+    const autostop = Boolean((_featureConfig || _load_featureConfig()).default.get('nuclide-flow.stopFlowOnExit')) ? ['--autostop'] : [];
+
+    const lspService = await service.createMultiLspLanguageService('flow', pathToFlow, ['lsp', '--from', 'nuclide', ...lazy, ...autostop], {
       fileNotifier,
       host,
       projectFileNames: ['.flowconfig'],
-      fileExtensions: ['.js'],
+      fileExtensions: ['.js', '.jsx'],
       logCategory: 'flow-language-server',
       logLevel: 'ALL',
-      additionalLogFilesRetentionPeriod: 5 * 60 * 1000 // 5 minutes
+      additionalLogFilesRetentionPeriod: 5 * 60 * 1000, // 5 minutes
+      waitForDiagnostics: true,
+      waitForStatus: true
     });
-    // TODO(ljw):
-    // stopFlowOnExit: Boolean(featureConfig.get('nuclide-flow.stopFlowOnExit')),
-    // '--lazy-mode ide': Boolean(featureConfig.get('nuclide-flow.lazyServer'))
-    //   and passesGK('nuclide_flow_lazy_mode_ide')
-    // canUseFlowBin: canUseFlowBin: Boolean(featureConfig.get('nuclide-flow.canUseFlowBin')),
     return lspService || new (_nuclideLanguageServiceRpc || _load_nuclideLanguageServiceRpc()).NullLanguageService();
   };
 
@@ -261,15 +293,11 @@ async function connectionToFlowService(connection) {
   const flowService = (0, (_nuclideRemoteConnection || _load_nuclideRemoteConnection()).getServiceByConnection)('FlowService', connection);
   const fileNotifier = await (0, (_nuclideOpenFiles || _load_nuclideOpenFiles()).getNotifierByConnection)(connection);
   const host = await (0, (_nuclideLanguageService || _load_nuclideLanguageService()).getHostServices)();
-  (0, (_log4js || _load_log4js()).getLogger)('nuclide-flow').info('Checking the nuclide_flow_lazy_mode_ide gk...');
-  const ideLazyMode = await (0, (_passesGK || _load_passesGK()).default)('nuclide_flow_lazy_mode_ide', 15 * 1000 // 15 second timeout
-  );
-  (0, (_log4js || _load_log4js()).getLogger)('nuclide-flow').info('ideLazyMode: %s', ideLazyMode);
+  const lazyMode = await (0, (_passesGK || _load_passesGK()).default)('nuclide_flow_lazy_mode_ide', 15000);
   const config = {
     functionSnippetShouldIncludeArguments: Boolean((_featureConfig || _load_featureConfig()).default.get('nuclide-flow.functionSnippetShouldIncludeArguments')),
     stopFlowOnExit: Boolean((_featureConfig || _load_featureConfig()).default.get('nuclide-flow.stopFlowOnExit')),
-    lazyServer: Boolean((_featureConfig || _load_featureConfig()).default.get('nuclide-flow.lazyServer')),
-    ideLazyMode,
+    lazyMode,
     canUseFlowBin: Boolean((_featureConfig || _load_featureConfig()).default.get('nuclide-flow.canUseFlowBin')),
     pathToFlow: (_featureConfig || _load_featureConfig()).default.get('nuclide-flow.pathToFlow')
   };
@@ -389,20 +417,17 @@ async function allowFlowServerRestart() {
 }
 
 async function getLanguageServiceConfig() {
-  const enableHighlight = (_featureConfig || _load_featureConfig()).default.get('nuclide-flow.enableReferencesHighlight');
   const excludeLowerPriority = Boolean((_featureConfig || _load_featureConfig()).default.get('nuclide-flow.excludeOtherAutocomplete'));
   const flowResultsFirst = Boolean((_featureConfig || _load_featureConfig()).default.get('nuclide-flow.flowAutocompleteResultsFirst'));
-  const enableTypeHints = Boolean((_featureConfig || _load_featureConfig()).default.get('nuclide-flow.enableTypeHints'));
   const enableFindRefs = await shouldEnableFindRefs();
   return {
     name: 'Flow',
     grammars: (_constants || _load_constants()).JS_GRAMMARS,
-    // flowlint-next-line sketchy-null-mixed:off
-    highlight: enableHighlight ? {
+    highlight: {
       version: '0.1.0',
       priority: 1,
       analyticsEventName: 'flow.codehighlight'
-    } : undefined,
+    },
     outline: {
       version: '0.1.0',
       priority: 1,
@@ -434,25 +459,20 @@ async function getLanguageServiceConfig() {
         shouldLogInsertedSuggestion: false
       },
       autocompleteCacherConfig: {
-        // TODO: update the ranges once Flow LSP starts returning TextEdits.
         updateResults: (_originalRequest, request, results) => (0, (_nuclideFlowCommon || _load_nuclideFlowCommon()).filterResultsByPrefix)(request.prefix, results),
         shouldFilter: (_nuclideFlowCommon || _load_nuclideFlowCommon()).shouldFilter
       },
       supportsResolve: false
     },
-    diagnostics: (await shouldUsePushDiagnostics()) ? {
+    diagnostics: {
       version: '0.2.0',
       analyticsEventName: 'flow.receive-push-diagnostics'
-    } : {
-      version: '0.1.0',
-      shouldRunOnTheFly: false,
-      analyticsEventName: 'flow.run-diagnostics'
     },
-    typeHint: enableTypeHints ? {
+    typeHint: {
       version: '0.0.0',
       priority: 1,
       analyticsEventName: 'nuclide-flow.typeHint'
-    } : undefined,
+    },
     findReferences: enableFindRefs ? {
       version: '0.1.0',
       analyticsEventName: 'flow.find-references'
@@ -460,21 +480,8 @@ async function getLanguageServiceConfig() {
   };
 }
 
-async function shouldUsePushDiagnostics() {
-  const settingEnabled = Boolean((_featureConfig || _load_featureConfig()).default.get('nuclide-flow.enablePushDiagnostics'));
-
-  (0, (_log4js || _load_log4js()).getLogger)('nuclide-flow').info('Checking the Flow persistent connection gk...');
-
-  // Wait 15 seconds for the gk check
-  const doesPassGK = await (0, (_passesGK || _load_passesGK()).default)('nuclide_flow_persistent_connection', 15 * 1000);
-  (0, (_log4js || _load_log4js()).getLogger)('nuclide-flow').info(`Got Flow persistent connection gk: ${String(doesPassGK)}`);
-  const result = settingEnabled || doesPassGK;
-  (0, (_log4js || _load_log4js()).getLogger)('nuclide-flow').info(`Enabling Flow persistent connection: ${String(result)}`);
-  return result;
-}
-
 async function shouldEnableFindRefs() {
-  return Boolean((_featureConfig || _load_featureConfig()).default.get('nuclide-flow.enableFindReferences')) || (0, (_passesGK || _load_passesGK()).default)('nuclide_flow_find_refs',
+  return (0, (_passesGK || _load_passesGK()).default)('nuclide_flow_find_refs',
   // Wait 15 seconds for the gk check
   15 * 1000);
 }

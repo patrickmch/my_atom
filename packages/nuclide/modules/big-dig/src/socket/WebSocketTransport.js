@@ -175,6 +175,7 @@ class WebSocketTransport {
 
   _setClosed() {
     if (this._socket != null) {
+      this._socket.removeAllListeners();
       // In certain (Error) conditions socket.close may not emit the on close
       // event synchronously.
       this._socket = null;

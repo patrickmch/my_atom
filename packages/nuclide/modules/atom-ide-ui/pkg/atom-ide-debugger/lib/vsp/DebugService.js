@@ -1098,7 +1098,7 @@ class DebugService {
         });
 
         if (onInitializeCallback != null) {
-          onInitializeCallback(newSession);
+          await onInitializeCallback(newSession);
         }
 
         this._model.setExceptionBreakpoints(newSession.getCapabilities().exceptionBreakpointFilters || []);

@@ -640,7 +640,8 @@ class Activation {
     const disposables = new (_UniversalDisposable || _load_UniversalDisposable()).default();
     const hostEl = document.createElement('div');
     const pane = atom.workspace.addModalPanel({
-      item: hostEl
+      item: hostEl,
+      className: 'debugger-config-dialog'
     });
 
     const parentEl = hostEl.parentElement;

@@ -12,6 +12,7 @@ exports.mkdirp = mkdirp;
 exports.chmod = chmod;
 exports.newFile = newFile;
 exports.readdir = readdir;
+exports.readdirSorted = readdirSorted;
 exports.realpath = realpath;
 exports.resolveRealPath = resolveRealPath;
 exports.rename = rename;
@@ -175,6 +176,15 @@ async function newFile(filePath) {
  */
 async function readdir(path) {
   return (_nuclideFs || _load_nuclideFs()).ROOT_FS.readdir(path);
+}
+
+/**
+ * Sorts the result of readdir() by alphabetical order (case-insensitive).
+ */
+async function readdirSorted(path) {
+  return (await (_nuclideFs || _load_nuclideFs()).ROOT_FS.readdir(path)).sort((a, b) => {
+    return a[0].toLowerCase().localeCompare(b[0].toLowerCase());
+  });
 }
 
 /**

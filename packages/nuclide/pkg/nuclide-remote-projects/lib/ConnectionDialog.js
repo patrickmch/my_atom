@@ -6,12 +6,6 @@ Object.defineProperty(exports, "__esModule", {
 
 var _rxjsBundlesRxMinJs = require('rxjs/bundles/Rx.min.js');
 
-var _passesGK;
-
-function _load_passesGK() {
-  return _passesGK = _interopRequireDefault(require('../../commons-node/passesGK'));
-}
-
 var _AuthenticationPrompt;
 
 function _load_AuthenticationPrompt() {
@@ -80,18 +74,17 @@ function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj;
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-/**
- * Copyright (c) 2015-present, Facebook, Inc.
- * All rights reserved.
- *
- * This source code is licensed under the license found in the LICENSE file in
- * the root directory of this source tree.
- *
- *  strict-local
- * @format
- */
+const logger = (0, (_log4js || _load_log4js()).getLogger)('nuclide-remote-projects'); /**
+                                                                                       * Copyright (c) 2015-present, Facebook, Inc.
+                                                                                       * All rights reserved.
+                                                                                       *
+                                                                                       * This source code is licensed under the license found in the LICENSE file in
+                                                                                       * the root directory of this source tree.
+                                                                                       *
+                                                                                       *  strict-local
+                                                                                       * @format
+                                                                                       */
 
-const logger = (0, (_log4js || _load_log4js()).getLogger)('nuclide-remote-projects');
 const { remote } = _electron.default;
 
 if (!(remote != null)) {
@@ -448,20 +441,13 @@ class ConnectionDialog extends _react.Component {
   }
 
   _connect(connectionConfig) {
-    return _rxjsBundlesRxMinJs.Observable.defer(() => Promise.all([(0, (_passesGK || _load_passesGK()).default)('nuclide_big_dig'), (_nuclideRemoteConnection || _load_nuclideRemoteConnection()).RemoteConnection.reconnect(connectionConfig.host, connectionConfig.cwd, connectionConfig.displayTitle)])).switchMap(([useBigDig, existingConnection]) => {
+    return _rxjsBundlesRxMinJs.Observable.defer(() => (_nuclideRemoteConnection || _load_nuclideRemoteConnection()).RemoteConnection.reconnect(connectionConfig.host, connectionConfig.cwd, connectionConfig.displayTitle)).switchMap(existingConnection => {
       if (existingConnection != null) {
         this._delegate.onWillConnect(connectionConfig); // required for the API
         this._delegate.onDidConnect(existingConnection, connectionConfig);
         return _rxjsBundlesRxMinJs.Observable.empty();
       }
-      let sshHandshake;
-      if (useBigDig) {
-        logger.info('using BigDig for the SshHandshake');
-        sshHandshake = (0, (_connectBigDigSshHandshake || _load_connectBigDigSshHandshake()).default)(connectionConfig, this._delegate);
-      } else {
-        sshHandshake = new (_nuclideRemoteConnection || _load_nuclideRemoteConnection()).SshHandshake(this._delegate);
-        sshHandshake.connect(connectionConfig);
-      }
+      const sshHandshake = (0, (_connectBigDigSshHandshake || _load_connectBigDigSshHandshake()).default)(connectionConfig, this._delegate);
       return _rxjsBundlesRxMinJs.Observable.create(() => {
         return () => sshHandshake.cancel();
       });

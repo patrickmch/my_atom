@@ -47,9 +47,11 @@ class Tabs extends _react.Component {
           Object.assign({
             className: (0, (_classnames || _load_classnames()).default)({
               tab: true,
-              active: this.props.activeTabName === tab.name
+              active: this.props.activeTabName === tab.name,
+              growable: this.props.growable
             }),
-            key: tab.name
+            key: tab.name,
+            title: tab.name
           }, handler),
           _react.createElement(
             'div',
@@ -90,5 +92,6 @@ exports.default = Tabs; /**
 
 Tabs.defaultProps = {
   closeable: false,
-  triggeringEvent: 'onClick'
+  triggeringEvent: 'onClick',
+  growable: false
 };

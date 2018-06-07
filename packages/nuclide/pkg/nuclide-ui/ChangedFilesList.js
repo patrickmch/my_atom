@@ -47,6 +47,17 @@ function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj;
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
+/**
+ * Copyright (c) 2015-present, Facebook, Inc.
+ * All rights reserved.
+ *
+ * This source code is licensed under the license found in the LICENSE file in
+ * the root directory of this source tree.
+ *
+ *  strict-local
+ * @format
+ */
+
 function isHgPath(path) {
   const repo = (0, (_nuclideVcsBase || _load_nuclideVcsBase()).repositoryForPath)(path);
   return repo != null && repo.getType() === 'hg';
@@ -60,17 +71,6 @@ function isHgPath(path) {
 // ['/a/b/c.js', '/a/d/c.js'] would return ['b/c.js', 'd/c.js']
 // ['/a/b/c.js', '/a/b/d.js'] would return ['c.js', 'd.js']
 // ['/a/b.js', '/c/a/b.js'] would return ['/a/b.js', 'c/a/b.js']
-/**
- * Copyright (c) 2015-present, Facebook, Inc.
- * All rights reserved.
- *
- * This source code is licensed under the license found in the LICENSE file in
- * the root directory of this source tree.
- *
- *  strict-local
- * @format
- */
-
 function computeDisplayPaths(filePaths, maxDepth = 5) {
   const displayPaths = filePaths.map(path => {
     const separator = (_nuclideUri || _load_nuclideUri()).default.pathSeparatorFor(path);
@@ -135,6 +135,7 @@ class ChangedFilesList extends _react.Component {
       enableFileExpansion,
       enableInlineActions,
       fileStatuses,
+      generatedTypes,
       onAddFile,
       onDeleteFile,
       onFileChecked,
@@ -155,10 +156,12 @@ class ChangedFilesList extends _react.Component {
     const filePaths = Array.from(fileStatuses.keys()).slice(0, filesToShow);
     const displayPaths = computeDisplayPaths(filePaths);
     const sizeLimitedFileChanges = filePaths.map((filePath, index) => {
+      const generatedType = generatedTypes != null ? generatedTypes.get(filePath) : null;
       return {
         filePath,
         displayPath: displayPaths[index],
-        fileStatus: (0, (_nullthrows || _load_nullthrows()).default)(fileStatuses.get(filePath))
+        fileStatus: (0, (_nullthrows || _load_nullthrows()).default)(fileStatuses.get(filePath)),
+        generatedType
       };
     }).sort((change1, change2) => (_nuclideUri || _load_nuclideUri()).default.basename(change1.filePath).localeCompare((_nuclideUri || _load_nuclideUri()).default.basename(change2.filePath)));
 
@@ -203,7 +206,7 @@ class ChangedFilesList extends _react.Component {
         _react.createElement(
           'ul',
           { className: 'list-tree has-flat-children' },
-          sizeLimitedFileChanges.map(({ displayPath, filePath, fileStatus }) => {
+          sizeLimitedFileChanges.map(({ displayPath, filePath, fileStatus, generatedType }) => {
             return _react.createElement((_ChangedFile || _load_ChangedFile()).default, {
               commandPrefix: commandPrefix,
               displayPath: displayPath,
@@ -211,6 +214,7 @@ class ChangedFilesList extends _react.Component {
               enableInlineActions: enableInlineActions,
               filePath: filePath,
               fileStatus: fileStatus,
+              generatedType: generatedType,
               isChecked: checkedFiles == null ? null : checkedFiles.has(filePath),
               isHgPath: isHgRoot,
               isSelected: selectedFile === filePath,

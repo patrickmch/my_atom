@@ -283,7 +283,7 @@ class RpcConnection {
    * @param args - The serialized arguments to invoke the remote method with.
    */
   callRemoteMethod(objectId, methodName, returnType, args) {
-    return this._sendMessageAndListenForResult((0, (_messages || _load_messages()).createCallObjectMessage)(this._getProtocol(), methodName, objectId, this._generateRequestId(), args), returnType, `Calling remote method ${methodName}.`);
+    return this._sendMessageAndListenForResult((0, (_messages || _load_messages()).createCallObjectMessage)(this._getProtocol(), methodName, objectId, this._generateRequestId(), args), returnType, `Calling remote method ${methodName}`);
   }
 
   /**

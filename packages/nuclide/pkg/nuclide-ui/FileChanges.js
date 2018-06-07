@@ -358,13 +358,15 @@ class FileChanges extends _react.Component {
       ')'
     );
 
+    // insert zero-width spaces so filenames are wrapped at '/'
+    const breakableFilename = fileName.replace(/\//g, '/' + (_string || _load_string()).ZERO_WIDTH_SPACE);
     const renderedFilename = fullPath != null ? _react.createElement(
       'a',
       {
         className: 'nuclide-ui-file-changes-name',
         onClick: this._handleFilenameClick },
-      fileName
-    ) : fileName;
+      breakableFilename
+    ) : breakableFilename;
 
     if (hideHeadline) {
       return hunks;

@@ -890,7 +890,13 @@ class Model {
   }
 
   getBreakpointAtLine(uri, line) {
-    return this._breakpoints.find(bp => bp.uri === uri && bp.line === line);
+    // Since we show calibrated breakpoints at their end line, prefer an end line
+    // match. If there is no such breakpoint, try a start line match.
+    let breakpoint = this._breakpoints.find(bp => bp.uri === uri && bp.endLine === line);
+    if (breakpoint == null) {
+      breakpoint = this._breakpoints.find(bp => bp.uri === uri && bp.line === line);
+    }
+    return breakpoint;
   }
 
   getBreakpointById(id) {
@@ -971,7 +977,7 @@ class Model {
 
       return first.line - second.line;
     });
-    this._breakpoints = (0, (_collection || _load_collection()).distinct)(this._breakpoints, bp => `${bp.uri}:${bp.line}:${bp.column}`);
+    this._breakpoints = (0, (_collection || _load_collection()).distinct)(this._breakpoints, bp => `${bp.uri}:${bp.endLine != null ? bp.endLine : bp.line}:${bp.column}`);
   }
 
   setEnablement(element, enable) {

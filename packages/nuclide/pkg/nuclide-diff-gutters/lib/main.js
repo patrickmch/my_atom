@@ -44,12 +44,6 @@ function _load_promise() {
 
 var _rxjsBundlesRxMinJs = require('rxjs/bundles/Rx.min.js');
 
-var _utils;
-
-function _load_utils() {
-  return _utils = require('../../nuclide-hg-repository-client/lib/utils');
-}
-
 var _nuclideHgRpc;
 
 function _load_nuclideHgRpc() {
@@ -60,6 +54,12 @@ var _hgDiffOutputParser;
 
 function _load_hgDiffOutputParser() {
   return _hgDiffOutputParser = require('../../nuclide-hg-rpc/lib/hg-diff-output-parser');
+}
+
+var _nuclideRemoteConnection;
+
+function _load_nuclideRemoteConnection() {
+  return _nuclideRemoteConnection = require('../../nuclide-remote-connection');
 }
 
 var _nuclideVcsBase;
@@ -76,12 +76,8 @@ function _load_nullthrows() {
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-// TODO: handle file renames
-// TODO: handle (ignore) large files (particularly generated)
-// TODO: re-implement git-diff so it is push-based. git-diff currently only polls
-// for changes on buffer updates, so if you commit and all previous changes are
-// now part of head, highlights won't update until you type
-
+// A limit on size of buffer to diff
+// Value based on the constant of the same name from atom's git-diff package
 /**
  * Copyright (c) 2015-present, Facebook, Inc.
  * All rights reserved.
@@ -93,9 +89,20 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
  * @format
  */
 
+const MAX_BUFFER_LENGTH_TO_DIFF = 2 * 1024 * 1024;
+
+// TODO: cache fileContentsAtHead for files on _localService as they change
+// less frequently than bufferContents and we can avoid sending it over IPC
+// every time
+// TODO: handle file renames
+// TODO: re-implement git-diff so it is push-based. git-diff currently only polls
+// for changes on buffer updates, so if you commit and all previous changes are
+// now part of head, highlights won't update until you type
+
 class Activation {
 
   constructor() {
+    this._localService = (0, (_nuclideRemoteConnection || _load_nuclideRemoteConnection()).getHgServiceByNuclideUri)('');
     this._disposed = new _rxjsBundlesRxMinJs.ReplaySubject(1);
 
     (_featureConfig || _load_featureConfig()).default.observeAsStream('nuclide-hg-repository.enableDiffStats').switchMap(enableDiffStats => {
@@ -211,7 +218,10 @@ class Activation {
             return _rxjsBundlesRxMinJs.Observable.empty();
           }
           const newContents = buffer.getText();
-          return (0, (_utils || _load_utils()).gitDiffStrings)(oldContents, newContents).map(diffOutput => (0, (_hgDiffOutputParser || _load_hgDiffOutputParser()).parseHgDiffUnifiedOutput)(diffOutput)).do(diffInfo => {
+          if (newContents.length > MAX_BUFFER_LENGTH_TO_DIFF) {
+            return _rxjsBundlesRxMinJs.Observable.empty();
+          }
+          return this._localService.gitDiffStrings(oldContents, newContents).refCount().map(diffOutput => (0, (_hgDiffOutputParser || _load_hgDiffOutputParser()).parseHgDiffUnifiedOutput)(diffOutput)).do(diffInfo => {
             repository.setDiffInfo(bufferPath, diffInfo);
           });
         }).takeUntil(bufferDestroyed);

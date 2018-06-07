@@ -98,15 +98,17 @@ class InputArea extends _react.Component {
         return;
       }
       if (event.which === ENTER_KEY_CODE) {
-        event.preventDefault();
-        event.stopImmediatePropagation();
+        if (!isAutocompleteOpen) {
+          event.preventDefault();
+          event.stopImmediatePropagation();
 
-        if (event.ctrlKey || event.altKey || event.shiftKey) {
-          editor.insertNewline();
-          return;
+          if (event.ctrlKey || event.altKey || event.shiftKey) {
+            editor.insertNewline();
+            return;
+          }
+
+          this._submit();
         }
-
-        this._submit();
       } else if (event.which === UP_KEY_CODE && (editor.getLineCount() <= 1 || editor.getCursorBufferPosition().row === 0)) {
         if (this.props.history.length === 0 || isAutocompleteOpen) {
           return;

@@ -1,0 +1,44 @@
+diff --git a/nols_website/admissions/dashboard/templates/admissions/dashboard/student_form_views/generic_upload_form.html b/nols_website/admissions/dashboard/templates/admissions/dashboard/student_form_views/generic_upload_form.html
+index 4827fc81a..b129e9d5e 100644
+--- a/nols_website/admissions/dashboard/templates/admissions/dashboard/student_form_views/generic_upload_form.html
++++ b/nols_website/admissions/dashboard/templates/admissions/dashboard/student_form_views/generic_upload_form.html
+@@ -1,35 +1,35 @@
+ {% load dashboard %}
+ <form method="POST" enctype="multipart/form-data" encoding="multipart/form-data" id="file-upload-form">
+   <div class="row">
+     <div class="column medium-12">
+-  	{% if forms.1 %}
+-  		{% with form=forms.1 %}
+-  			{% include 'dataentry/bs_responsive_form_layout.html' %}
++  	{% if forms.health_disclosure %}
++  		{% with form=forms.health_disclosure %}
++  			{% include 'bs_responsive_form_layout.html' %}
+   		{% endwith %}
+   	{% endif %}
+-    {% with form=forms.0 %}
++    {% with form=forms.upload_form %}
+   		{% include 'admissions/dashboard/student_form_views/generic_upload_form_middle.html' %}
+     {% endwith %}
+     <div class="form-divider"></div>
+ 
+     {% csrf_token %}
+ 
+     {{ validate_only_form.as_p }}
+     <a class="button button--hollow float-left disable_on_click" href="{% url 'dashboard:csr_detail' csr_id=csr.pk %}">
+       <span>
+         Back to Course Dashboard
+       </span>
+     </a>
+     <button type="submit" id="confirm-submit" data-loading-text="Uploading..." class="button disable_on_click">
+       <span>
+         Submit
+       </span>
+     </button>
+     <div class="form-space upload-progress"></div>
+     <div class="progress secondary upload-progress hide">
+       <div class="progress-meter" role="progressbar" style="width: 0%;">
+       </div>
+     </div>
+     </div>
+   </div>
+ </form>

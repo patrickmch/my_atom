@@ -36,21 +36,15 @@ function _load_analytics() {
   return _analytics = require('../nuclide-commons/analytics');
 }
 
+var _uuid;
+
+function _load_uuid() {
+  return _uuid = _interopRequireDefault(require('uuid'));
+}
+
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
-
-/**
- * Copyright (c) 2017-present, Facebook, Inc.
- * All rights reserved.
- *
- * This source code is licensed under the BSD-style license found in the
- * LICENSE file in the root directory of this source tree. An additional grant
- * of patent rights can be found in the PATENTS file in the same directory.
- *
- * 
- * @format
- */
 
 function raiseAdapterExitedEvent(exitCode) {
   return {
@@ -59,7 +53,17 @@ function raiseAdapterExitedEvent(exitCode) {
     event: 'adapter-exited',
     body: { exitCode }
   };
-}
+} /**
+   * Copyright (c) 2017-present, Facebook, Inc.
+   * All rights reserved.
+   *
+   * This source code is licensed under the BSD-style license found in the
+   * LICENSE file in the root directory of this source tree. An additional grant
+   * of patent rights can be found in the PATENTS file in the same directory.
+   *
+   * 
+   * @format
+   */
 
 /**
  * Use V8 JSON-RPC protocol to send & receive messages
@@ -73,7 +77,10 @@ class VsDebugSession extends (_V8Protocol || _load_V8Protocol()).default {
     this._logger = logger;
     this._readyForBreakpoints = false;
     this._spawner = spawner == null ? new (_VsAdapterSpawner || _load_VsAdapterSpawner()).default() : spawner;
-    this._adapterAnalyticsExtras = Object.assign({}, adapterAnalyticsExtras);
+    this._adapterAnalyticsExtras = Object.assign({}, adapterAnalyticsExtras, {
+      // $FlowFixMe flow doesn't consider uuid callable, but it is
+      debuggerSessionId: (0, (_uuid || _load_uuid()).default)()
+    });
 
     this._onDidInitialize = new _rxjsBundlesRxMinJs.Subject();
     this._onDidStop = new _rxjsBundlesRxMinJs.Subject();
@@ -164,10 +171,11 @@ class VsDebugSession extends (_V8Protocol || _load_V8Protocol()).default {
     const operation = () => {
       // Babel Bug: `super` isn't working with `async`
       return super.send(command, args).then(response => {
-        this._logger.info('Received response:', response);
+        const sanitizedResponse = this._sanitizeResponse(response);
+        this._logger.info('Received response:', sanitizedResponse);
         (0, (_analytics || _load_analytics()).track)('vs-debug-session:transaction', Object.assign({}, this._adapterAnalyticsExtras, {
           request: { command, arguments: args },
-          response
+          response: sanitizedResponse
         }));
         return response;
       }, errorResponse => {
@@ -188,6 +196,46 @@ class VsDebugSession extends (_V8Protocol || _load_V8Protocol()).default {
     };
 
     return (0, (_analytics || _load_analytics()).trackTiming)(`vs-debug-session:${command}`, operation, this._adapterAnalyticsExtras);
+  }
+
+  _sanitizeResponse(response) {
+    try {
+      if (response.command === 'variables') {
+        const varResponse = response;
+        const sanResponse = Object.assign({}, varResponse, {
+          body: Object.assign({}, varResponse.body, {
+            variables: varResponse.body.variables.map(v => Object.assign({}, v, {
+              value: '<elided>'
+            }))
+          })
+        });
+        // $FlowFixMe flow isn't recognizing that ...varResponse is filling in needed members
+        return sanResponse;
+      }
+      if (response.command === 'evaluate') {
+        const evalResponse = response;
+        const sanResponse = Object.assign({}, evalResponse, {
+          body: Object.assign({}, evalResponse.body, {
+            result: '<elided>'
+          })
+        });
+        // $FlowFixMe flow isn't recognizing that ...evalResponse is filling in needed members
+        return sanResponse;
+      }
+      return response;
+    } catch (e) {
+      // Don't let a malformed response prevent the response from bubbling up
+      // to the debugger
+      return {
+        type: 'response',
+        seq: response.seq,
+        request_seq: response.request_seq,
+        success: false,
+        command: response.command,
+        error: 'Error sanitizing response.',
+        message: e.message
+      };
+    }
   }
 
   onEvent(event) {

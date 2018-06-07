@@ -1,0 +1,1330 @@
+diff --git a/nols_website/admissions/dashboard/forms.py b/nols_website/admissions/dashboard/forms.py
+index 2c810a707..cd2a727e8 100644
+--- a/nols_website/admissions/dashboard/forms.py
++++ b/nols_website/admissions/dashboard/forms.py
+@@ -1,1322 +1,1322 @@
+ # -*- coding: utf-8 -*-
+ 
+ from django import forms
+ from django.core.exceptions import ValidationError
+ from django.core.validators import validate_email
+ from django.utils.formats import number_format
+ from django.utils.safestring import mark_safe
+ from django.forms.utils import ErrorDict
+ 
+ from nols.app.common.constants import PROVINCE_CHOICES_MAP
+ 
+ from admissions.constants import HEARD_ABOUT, HEARD_ABOUT_DETAILS_LABEL_MAP,\
+     TYPED_YES_NO_CHOICES, get_review_course_date
+ 
+ from admissions.dashboard.fields import RestrictedFileField, RestrictedImageField
+ from admissions.dashboard.models import AdmissionsOfficer
+ from admissions.dashboard.utils import PdfChecker
+ from admissions.forms_apply_open import ExistingAddressForm as BaseExistingAddressForm
+ from admissions.utils_apply_open_choices import get_course_definition_choices
+ 
+ from colorfield.widgets import ColorWidget
+ 
+ from core.constants import BLANK_CHOICES
+ from core.forms import PersonForm as CorePersonForm
+ from core import forms as core_forms
+ from core.models import ApplicationTab, CourseTab
+ 
+ import datetime
+ from dateutil.parser import parse
+ from decimal import Decimal
+ 
+ import logging
+ log = logging.getLogger(__name__)
+ 
+ 
+ class LenientTimeField(forms.TimeField):
+     """Clean user input to make strptime happy.
+ 
+     Currently we simply allow A.M. and P.M. in addition to AM and PM; even a careful user reading
+     the help text will likely not realize the periods are the issue.
+ 
+     We really should just use a more controlled date input to avoid mistakes like 1:35 without
+     the AM. But for now, this.
+     """
+ 
+     def to_python(self, value):
+         value = value.strip().upper()
+         value = value.replace('A.M.', 'AM')
+         value = value.replace('P.M.', 'PM')
+         return super(forms.TimeField, self).to_python(value)
+ 
+ 
+ class UploadFileForm(forms.Form):
+     file = RestrictedFileField(
+         error_messages={'required': "You must choose a file to upload."},
+         content_types=['application/pdf', 'image/png', 'image/tiff', 'image/jpeg'])
+ 
+ 
+ class UploadPhotoForm(forms.Form):
+     file = RestrictedImageField(
+         error_messages={'required': "You must choose a photo to upload."})
+ 
+ 
+ class NumberOfForms(forms.Form):
+     number = forms.IntegerField(widget=forms.HiddenInput, initial=1)
+ 
+ 
+ class HiddenBoolForm(forms.Form):
+     true = forms.BooleanField(widget=forms.HiddenInput, initial=False,
+                               required=False)
+ 
+ 
+ class HiddenIntegerForm(forms.Form):
+     integer = forms.IntegerField(widget=forms.HiddenInput, required=False)
+ 
+ 
+ class RequiredSwitchForm(forms.Form):
+     """
+     RequiredSwitchForm takes a kwarg in init, 'required'. If False, then
+     the form is not validated and nothing is required
+     """
+ 
+     def __init__(self, *args, **kwargs):
+         self.required = kwargs.pop('required', True)
+         super(RequiredSwitchForm, self).__init__(*args, **kwargs)
+ 
+     def full_clean(self):
+         if self.required:
+             super(RequiredSwitchForm, self).full_clean()
+         else:
+             self.cleaned_data = {}
+             for name, field in self.fields.items():
+                 value = field.widget.value_from_datadict(self.data, self.files,
+                                                          self.add_prefix(name))
+                 self.cleaned_data[name] = value
+                 self._errors = ErrorDict()
+ 
+ 
+ class AcademicProfessionalHistoryForm(RequiredSwitchForm):
+     name_of_school = forms.CharField(label='Name of School',
+                                      help_text='Current or most recent school attended',
+                                      max_length=60)
+     location = forms.CharField()
+     currently_enrolled = forms.TypedChoiceField(coerce=lambda x: x == 'True',
+                                                 choices=((True, 'Yes'), (False, 'No')),
+                                                 widget=forms.RadioSelect)
+     employer = forms.CharField(label='Most Recent Employer',
+                                max_length=50,
+                                required=False)
+     job_title = forms.CharField(label='Job Title',
+                                 max_length=40,
+                                 required=False)
+     industry = forms.CharField(required=False, max_length=50)
+     bad_things = forms.TypedChoiceField(coerce=lambda x: x == 'True',
+                                         label='Have you ever been suspended or put on probation from any school, arrested, or fired from a job',
+                                         choices=((True, 'Yes'), (False, 'No')),
+                                         widget=forms.RadioSelect)
+     bad_things_details = forms.CharField(label='Please give additional details  <span class="pseudo-help">(150 word max)</span>',
+                                          widget=forms.Textarea)
+ 
+     def __init__(self, *args, **kwargs):
+         super(AcademicProfessionalHistoryForm, self).__init__(*args, **kwargs)
+ 
+         if args:
+             data = args[0]
+         else:
+             data = {}
+ 
+         if self.add_prefix('bad_things') in data:
+             _bad_things = data.get(self.add_prefix('bad_things'))
+             log.debug(_bad_things)
+             if _bad_things is False or _bad_things == 'False':
+                 log.debug('Not requiring bad things')
+                 self.fields['bad_things_details'].required = False
+ 
+         self.fields['bad_things'].custom_template = 'dataentry/fragments/top_label_field.html'
+         self.fields['bad_things_details'].custom_template = 'dataentry/fragments/top_label_field.html'
+         self.fields['industry'].follow_div='<div class="clearfix"></div><div class="form-space"></div>'
+         self.fields['currently_enrolled'].follow_div='<div class="clearfix"></div><div class="form-space"></div>'
+ 
+ 
+ class ExtraCurricularForm(RequiredSwitchForm):
+     activity = forms.CharField(required=False)
+     positions = forms.CharField(label='Positions/Honors', required=False)
+     hours = forms.CharField(label='Hours/Week', required=False)
+ 
+ 
+ class StudentQuestionnaireForm(RequiredSwitchForm, CorePersonForm):
+     describe_activity = forms.CharField(label='Describe your activities of the past six months — education, employment, travel, etc. <span class="pseudo-help">(150 word max)</span>',
+                                        widget=forms.Textarea)
+     physical_fitness = forms.CharField(label=u'A NOLS course is a physically demanding endeavor. Please describe your regular physical activities or sports. Include the types, frequency, and duration of exercise you engage in. If you do not exercise regularly, use this space to tell us how you plan to prepare for your course. <span class="pseudo-help">(150 word max)</span>',
+                                        widget=forms.Textarea)
+ 
+     def __init__(self, *args, **kwargs):
+         self.required = kwargs.get('required', True)
+ 
+         kwargs['show_birth_date'] = False
+         kwargs['show_gender'] = False
+         kwargs['show_name'] = False
+         kwargs['show_height'] = True
+         kwargs['show_weight'] = True
+         kwargs['weight_required'] = True
+         kwargs['height_required'] = True
+         kwargs['show_ethnicity'] = False
+ 
+         super(StudentQuestionnaireForm, self).__init__(*args, **kwargs)
+         self.fields['describe_activity'].custom_template = 'dataentry/fragments/top_label_field.html'
+         self.fields['physical_fitness'].custom_template = 'dataentry/fragments/top_label_field.html'
+ 
+     def _word_count(self, value):
+         if len(value.split()) > 150:
+             raise ValidationError('150 word maximum')
+ 
+     def clean_describe_activity(self):
+         data = self.cleaned_data['describe_activity']
+         if self.required:
+             self._word_count(data)
+         return data
+ 
+     def clean_physical_fitness(self):
+         data = self.cleaned_data['physical_fitness']
+         if self.required:
+             self._word_count(data)
+         return data
+ 
+ 
+ class StudentInfoOtherForm(RequiredSwitchForm):
+     other_info = forms.CharField(label='Is there anything you would like your instructors to know about you prior to your course? <span class="pseudo-help">(150 word max)</span>',
+                                  widget=forms.Textarea,
+                                  required=False)
+     heard_about = forms.ChoiceField(label='How did you hear about NOLS?',
+                                     choices=BLANK_CHOICES +
+                                     HEARD_ABOUT.CHOICES)
+     heard_about_details = forms.CharField(required=False)
+ 
+     def __init__(self, *args, **kwargs):
+         self.required = kwargs.get('required', True)
+         initial = kwargs.get('initial', {})
+         super(StudentInfoOtherForm, self).__init__(*args, **kwargs)
+         if args:
+             data = args[0]
+         else:
+             data = {}
+ 
+         if 'heard_about' in initial or self.add_prefix('heard_about') in data:
+             _heard_about = data.get(self.add_prefix('heard_about'),
+                                     initial.get('heard_about'))
+             if _heard_about:
+                 label = HEARD_ABOUT_DETAILS_LABEL_MAP[_heard_about]
+                 self.fields['heard_about_details'].label = label
+ 
+         self.fields['other_info'].custom_template = 'dataentry/fragments/top_label_field.html'
+ 
+     def _word_count(self, value):
+         if len(value.split()) > 150:
+             raise ValidationError('150 word maximum')
+ 
+     def clean_other_info(self):
+         data = self.cleaned_data['other_info']
+         if self.required:
+             self._word_count(data)
+         return data
+ 
+ 
+-class HealthDisclosureField(forms.Form):
++class HealthDisclosureForm(forms.Form):
+     has_disclosed_all = forms.BooleanField(label="I hearby declare I have disclosed all health conditions",
+-                                           error_messages={"required": "You must confirm that you have disclosed all\
+-                                           health conditions."})
++                                           error_messages={"required": "You must confirm that you have disclosed all "
++                                                                       "health conditions."})
+ 
+ 
+ class ECGuardianForm(RequiredSwitchForm):
+     is_guardian = forms.BooleanField(label='This person is also my parent/guardian',
+                                      required=False)
+ 
+ 
+ class InsuranceInfoForm(RequiredSwitchForm):
+     company_name = forms.CharField(label='Insurance Company Name')
+     policy_number = forms.CharField(label='Policy Number/Member ID')
+     group_number = forms.CharField(required=False)
+     agreement_number = forms.CharField(required=False)
+     group_name = forms.CharField(help_text='Employer, union, or association through which the student is insured.',
+                                  required=False)
+ 
+ class TravelAndLogisticsForm(RequiredSwitchForm):
+     travel_and_logistics = forms.BooleanField(label='Yes, I have reviewed the Travel and Logistics Form.')
+     arrangements = forms.BooleanField(label='Yes, I have made travel arrangements.')
+ 
+     def __init__(self, include_visa=False,
+                  include_passport_checkbox=False,
+                  *args, **kwargs):
+         super(TravelAndLogisticsForm, self).__init__(*args, **kwargs)
+ 
+         if include_passport_checkbox:
+             self.fields['passport'] = forms.BooleanField(
+                 label='Yes, I have my passport')
+         if include_visa:
+             self.fields['visa'] = forms.BooleanField(
+                 label='Yes, I have acquired my travel visa.')
+ 
+ 
+ class TravelAndLogisticsPassportForm(RequiredSwitchForm):
+     passport_name = forms.CharField(label='Full Name')
+     passport_number = forms.CharField(label='Passport Number')
+     expiration_date = forms.DateField(label='Expiration Date',
+                                       help_text='mm/dd/yyyy')
+     place_of_issue = forms.CharField(label='Place of Issue')
+ 
+ 
+ class TravelAndLogisticsArrivalForm(RequiredSwitchForm):
+     arrival_first = forms.CharField(label='First name',
+                                     help_text='Who should we contact regarding student '
+                                               'arrival information?')
+     arrival_last = forms.CharField(label='Last name')
+     arrival_number = forms.CharField(label='Phone number',
+                                      max_length=20,
+                                      widget=forms.TextInput(attrs={'class': 'phone_number'}))
+     arrival_transport = forms.ChoiceField(label='Transportation',
+                                           choices=BLANK_CHOICES + (('driving', 'Driving'), ('flying', 'Flying')),
+                                           widget=forms.Select(attrs={"onChange": 'arrivalAction()'}))
+     arrival_date = forms.DateField()
+     arrival_time = LenientTimeField(help_text='Use AM/PM where applicable (e.g.&nbsp;1:15&nbsp;PM'
+                                               '&nbsp;or&nbsp;13:15)')
+     arrival_flight = forms.CharField(help_text='Airline & flight number (Delta 1234)',
+                                      required=False)
+     arrival_location = forms.CharField(help_text='Three letter airport code',
+                                        max_length=3,
+                                        required=False)
+     arrival_minor = forms.TypedChoiceField(label='Unaccompanied minor (optional airline service)',
+                                            help_text='Travelling as a registered unaccompanied '
+                                                  'minor is not required by NOLS and is not '
+                                                  'supported by all airlines. If you would '
+                                                  'like this extra service please check with '
+                                                  'your airline for availability and age '
+                                                  'restrictions. <br /><br />If you are '
+                                                  'traveling as a registered unaccompanied '
+                                                  'minor, please bring a copy of the receipt '
+                                                  'for your return trip fees.',
+                                            required=False,
+                                            coerce=lambda x: x == 'True',
+                                            choices=TYPED_YES_NO_CHOICES,
+                                            widget=forms.RadioSelect(attrs={"id": "id_arrival_minor"}))
+     arrival_shuttle = forms.TypedChoiceField(label='Arrival shuttle reservation',
+                                              help_text='Please review the travel and logistics'
+                                                        ' PDF and confirm you have made shuttle'
+                                                        ' arrangements if applicable.',
+                                              required=False,
+                                              coerce=lambda x: x == 'True',
+                                              choices=TYPED_YES_NO_CHOICES,
+                                              widget=forms.RadioSelect(attrs={"id": "id_arrival_shuttle"}))
+     arrival_response = forms.CharField(label='Other arrival info',
+                                        widget=forms.Textarea,
+                                        required=False)
+ 
+     def __init__(self, *args, **kwargs):
+         initial = kwargs.get('initial', {})
+         super(TravelAndLogisticsArrivalForm, self).__init__(*args, **kwargs)
+ 
+         if 'arrival_date' in initial and initial['arrival_date']:
+             try:
+                 initial['arrival_date'] = parse(initial['arrival_date']).date()
+             except:
+                 pass
+ 
+         if 'arrival_time' in initial and initial['arrival_time']:
+             try:
+                 initial['arrival_time'] = parse(initial['arrival_time']).time()
+             except:
+                 pass
+ 
+     def clean_arrival_first(self):
+         return self.cleaned_data['arrival_first'].strip()
+ 
+     def clean_arrival_last(self):
+         return self.cleaned_data['arrival_last'].strip()
+ 
+     def clean_arrival_number(self):
+         return self.cleaned_data['arrival_number'].strip()
+ 
+     def clean_arrival_flight(self):
+         return self.cleaned_data['arrival_flight'].strip()
+ 
+     def clean_arrival_location(self):
+         return self.cleaned_data['arrival_location'].strip()
+ 
+     def clean_arrival_date(self):
+         value = self.cleaned_data['arrival_date']
+         if value and value < datetime.date.today():
+             raise forms.ValidationError('Arrival date must be in the future.')
+         return value
+ 
+     def clean_arrival_response(self):
+         return self.cleaned_data['arrival_response'].strip()
+ 
+     def clean(self):
+         if 'arrival_transport' in self.cleaned_data \
+                 and self.cleaned_data['arrival_transport'] == 'flying':
+             if self.cleaned_data['arrival_flight'] == '':
+                 self._errors['arrival_flight'] = \
+                     self.error_class(['This field is required.'])
+             if self.cleaned_data['arrival_shuttle'] == '':
+                 self._errors['arrival_shuttle'] = \
+                     self.error_class(['This field is required.'])
+             if self.cleaned_data['arrival_minor'] == '':
+                 self._errors['arrival_minor'] = \
+                     self.error_class(['This field is required.'])
+ 
+         return self.cleaned_data
+ 
+ 
+ class TravelAndLogisticsDepartureForm(RequiredSwitchForm):
+     departure_first = forms.CharField(label='First name',
+                                       help_text='Who should we contact regarding student '
+                                                 'departure information?')
+     departure_last = forms.CharField(label='Last name')
+     departure_number = forms.CharField(label='Phone number',
+                                        max_length=20,
+                                        widget=forms.TextInput(attrs={'class': 'phone_number'}))
+     departure_transport = forms.ChoiceField(label='Transportation',
+                                             choices=BLANK_CHOICES + (('driving', 'Driving'), ('flying', 'Flying')),
+                                             widget=forms.Select(attrs={"onChange": 'departAction()'}))
+     departure_date = forms.DateField()
+     departure_time = LenientTimeField(help_text='Use AM/PM where applicable (e.g.&nbsp;1:15&nbsp;PM'
+                                                 '&nbsp;or&nbsp;13:15)')
+     departure_flight = forms.CharField(help_text='Airline & flight number',
+                                        required=False)
+     departure_location = forms.CharField(help_text='Three letter airport code',
+                                          max_length=3,
+                                          required=False)
+     departure_minor = forms.TypedChoiceField(label='Unaccompanied minor (optional airline service)',
+                                              required=False,
+                                              help_text='Travelling as a registered unaccompanied '
+                                                        'minor is not required by NOLS and is not '
+                                                        'supported by all airlines. If you would '
+                                                        'like this extra service please check with '
+                                                        'your airline for availability and age '
+                                                        'restrictions. <br /><br />If you are '
+                                                        'traveling as a registered unaccompanied '
+                                                        'minor, please bring a copy of the receipt '
+                                                        'for your return trip fees.',
+                                              coerce=lambda x: x == 'True',
+                                              choices=TYPED_YES_NO_CHOICES,
+                                              widget=forms.RadioSelect(attrs={"id": "id_departure_minor"}))
+     departure_shuttle = forms.TypedChoiceField(label='Departure shuttle reservation',
+                                                help_text='Please review the travel and logistics'
+                                                          ' PDF and confirm you have made shuttle'
+                                                          ' arrangements if applicable.',
+                                                required=False,
+                                                coerce=lambda x: x == 'True',
+                                                choices=TYPED_YES_NO_CHOICES,
+                                                widget=forms.RadioSelect(attrs={"id": "id_departure_shuttle"}))
+     baggage_fees = forms.TypedChoiceField(help_text='Have you pre-paid the baggage fees for the '
+                                                     'return flight? If fees are not prepaid, please '
+                                                     'bring cash to cover return baggage fees.',
+                                           required=False,
+                                           coerce=lambda x: x == 'True',
+                                           choices=TYPED_YES_NO_CHOICES,
+                                           widget=forms.RadioSelect(attrs={"id": "id_baggage_fees"}))
+     departure_response = forms.CharField(label='Other departure info',
+                                          widget=forms.Textarea,
+                                          required=False)
+ 
+     def __init__(self, *args, **kwargs):
+         initial = kwargs.get('initial', {})
+         super(TravelAndLogisticsDepartureForm, self).__init__(*args, **kwargs)
+ 
+         if 'departure_date' in initial and initial['departure_date']:
+             try:
+                 initial['departure_date'] = parse(initial['departure_date']).date()
+             except:
+                 pass
+ 
+         if 'departure_time' in initial and initial['departure_time']:
+             try:
+                 initial['departure_time'] = parse(initial['departure_time']).time()
+             except:
+                 pass
+ 
+     def clean_departure_first(self):
+         return self.cleaned_data['departure_first'].strip()
+ 
+     def clean_departure_last(self):
+         return self.cleaned_data['departure_last'].strip()
+ 
+     def clean_departure_number(self):
+         return self.cleaned_data['departure_number'].strip()
+ 
+     def clean_departure_flight(self):
+         return self.cleaned_data['departure_flight'].strip()
+ 
+     def clean_departure_location(self):
+         return self.cleaned_data['departure_location'].strip()
+ 
+     def clean_departure_date(self):
+         value = self.cleaned_data['departure_date']
+         if value and value < datetime.date.today():
+             raise forms.ValidationError('Departure date must be in the future.')
+         return value
+ 
+     def clean_departure_response(self):
+         return self.cleaned_data['departure_response'].strip()
+ 
+     def clean(self):
+         if 'departure_transport' in self.cleaned_data \
+                 and self.cleaned_data['departure_transport'] == 'flying':
+             if self.cleaned_data['departure_flight'] == '':
+                 self._errors['departure_flight'] = \
+                     self.error_class(['Enter your departure flight information.'])
+             if self.cleaned_data['departure_shuttle'] == '':
+                 self._errors['departure_shuttle'] = \
+                     self.error_class(['This field is required.'])
+             if self.cleaned_data['departure_minor'] == '':
+                 self._errors['departure_minor'] = \
+                     self.error_class(['This field is required.'])
+             if self.cleaned_data['baggage_fees'] == '':
+                 self._errors['baggage_fees'] = \
+                     self.error_class(['This field is required.'])
+ 
+         return self.cleaned_data
+ 
+ 
+ class GearPrepForm(RequiredSwitchForm):
+     prepared = forms.BooleanField(label='Yes, I have reviewed the Gear List.')
+ 
+ 
+ class GearRequestForm(RequiredSwitchForm):
+     reviewed = forms.BooleanField(label='Yes, I have reviewed the Gear list and filled'
+                                         ' out the Gear Request form.')
+ 
+ 
+ class CourseDescriptionForm(RequiredSwitchForm):
+     reviewed = forms.BooleanField(
+         label='Yes, I have reviewed the Course Description')
+ 
+ 
+ class EmtChecklistForm(RequiredSwitchForm):
+     reviewed = forms.BooleanField(
+         label='Yes, I have read the WEMT informational document')
+ 
+ class TuitionProtectionPlanForm(RequiredSwitchForm):
+     country = forms.ChoiceField(label = 'Select your country of residence.',
+                                 choices = (('empty', ''),
+                                            ('United States', 'United States'),
+                                            ('Canada', 'Canada'),
+                                            ('Other', 'Other')))
+ 
+     empty_tuple = ('empty', '')
+ 
+     provinces = list(PROVINCE_CHOICES_MAP['CANADA'])
+     provinces.insert(0, empty_tuple)
+     province = forms.ChoiceField(label = 'Select your province.', choices = provinces)
+ 
+     province_blacklist = ['QC']
+ 
+     states = list(PROVINCE_CHOICES_MAP['UNITED STATES'])
+     states.insert(0, empty_tuple)
+     states = states[0:52] # exclude affiliated US territories
+     state = forms.ChoiceField(label = 'Select your state.', choices = states)
+ 
+     decision = forms.ChoiceField(label = 'Would you like to enroll in the Tuition Protection Plan?',
+                                  choices = (('empty', ''),
+                                             ('Yes', 'Yes'),
+                                             ('No', 'No'),
+                                             ('Decide Later', 'Decide Later'),
+                                             ('DNQ', 'Does not qualify')))
+ 
+     def clean_decision(self):
+         data = self.cleaned_data.get('decision')
+         if data in ['Yes', 'No', 'DNQ']:
+             return data
+         else:
+             raise ValidationError('This field is required!')
+ 
+     def clean_country(self):
+         data = self.cleaned_data.get('country')
+         if data in ['United States', 'Canada', 'Other']:
+             return data
+ 
+     def clean_province(self):
+         data = self.cleaned_data.get('province')
+         if data in [abbreviation for abbreviation, name in self.provinces]:
+             return data
+ 
+     def clean_state(self):
+         data = self.cleaned_data.get('state')
+         if data in [abbreviation for abbreviation, name in self.states]:
+             return data
+ 
+     def clean(self):
+         cleaned_data = self.cleaned_data
+         decision = cleaned_data.get('decision')
+         country = cleaned_data.get('country')
+         state = cleaned_data.get('state')
+         province = cleaned_data.get('province')
+ 
+         if province != 'empty':
+             region = province
+         elif state != 'empty':
+             region = state
+         else:
+             region = None
+ 
+         cleaned_data['region'] = region
+ 
+         if decision == 'Yes':
+             # assert that country of residence is US or Canada
+             if country not in ['United States', 'Canada']:
+                 self._errors['country'] = self.error_class(['In order to enroll you must reside in the United States or Canada.'])
+                 raise ValidationError('There was a problem with the country you selected.')
+ 
+             # assert that one and only one of state or province exists
+             if [state, province].count('empty') != 1:
+                 self._errors['state'] = self.error_class(['State is required!'])
+                 self._errors['province'] = self.error_class(['Province is required!'])
+                 raise ValidationError('Please select either a state or a province.')
+ 
+             # assert that the state/province selection makes sense for the selected country
+             if country == 'United States' and state == 'empty':
+                 raise ValidationError('You cannot select a Canadian province if you reside in the United States')
+ 
+             if country == 'Canada' and province == 'empty':
+                 raise ValidationError('You cannot select an American state if you reside in Canada')
+ 
+             # prevent residents of Quebec from enrolling
+             if province in self.province_blacklist:
+                 self._errors['province'] = self.error_class(['Insurance is not available in the province you selected.'])
+                 raise ValidationError('Insurance is not available in the province you selected.')
+ 
+         if decision == 'No' or decision == 'DNQ':
+             cleaned_data['country'] = None
+             cleaned_data['region'] = None
+ 
+         return cleaned_data
+ 
+ class TuitionBalanceForm(forms.Form):
+     DEPOSIT = 1
+     BALANCE = 2
+     PARTIAL = 3
+ 
+     # how many dollars of wiggle room do we want when preventing people
+     # from paying all but tpp.
+     TPP_PADDING = 2
+ 
+     amount = forms.ChoiceField(widget=forms.RadioSelect)
+     partial_amount = forms.DecimalField(max_digits=7, decimal_places=2, required=False,
+                                         localize=True,
+                                         help_text='x,xxx.xx')
+ 
+     def __init__(self, *args, **kwargs):
+         self.csr = kwargs.pop('csr')
+         self.deposit = self.csr.deposit_balance()
+         super(TuitionBalanceForm, self).__init__(*args, **kwargs)
+         if self.csr.application.account_displayable():
+             self.balance = self.csr.application.account_balance()
+         else:
+             self.balance = 0
+ 
+         balance_string = number_format(self.balance, decimal_pos=2, use_l10n=True,
+                                        force_grouping=True)
+ 
+         choices = ((self.DEPOSIT, 'Pay non-refundable tuition deposit ($%0.2f)' % self.deposit),
+                    (self.BALANCE, 'Pay full balance ($%s)' % balance_string),
+                    (self.PARTIAL, 'Pay partial balance ($)'))
+ 
+         if self.balance <= 0:
+             self.fields['amount'].choices = (choices[2],)
+             self.fields['amount'].initial = self.PARTIAL
+         elif self.csr.paid_deposit() or self.balance < self.deposit\
+                 or self.csr.days_to_tuition < 0:
+             self.fields['amount'].choices = (choices[1], choices[2])
+             self.fields['amount'].initial = self.BALANCE
+         else:
+             self.fields['amount'].choices = choices
+             self.fields['amount'].initial = self.DEPOSIT
+ 
+     def clean_partial_amount(self):
+         data = self.cleaned_data.get('partial_amount')
+         if data is not None and data <= 0:
+             raise ValidationError('Please enter an amount greater than zero.')
+ 
+         return data
+ 
+     def clean(self):
+         cleaned_data = self.cleaned_data
+         if cleaned_data.get('amount') == '3' and not cleaned_data.get('partial_amount') and not \
+                 self._errors.get('partial_amount'):
+             self._errors['partial_amount'] = self.error_class(['This field is required.'])
+             raise ValidationError('You must enter a partial balance.')
+ 
+         return cleaned_data
+ 
+ 
+ class InviteForm(forms.Form):
+     email = forms.EmailField()
+ 
+ 
+ class WantAcademicCreditForm(RequiredSwitchForm):
+     want_credit = forms.TypedChoiceField(coerce=lambda x: x == 'True',
+                                          label='I want to receive academic credit',
+                                          choices=((True, 'Yes'), (False, 'No')),
+                                          widget=forms.RadioSelect)
+ 
+ 
+ class AcademicCreditKind(RequiredSwitchForm):
+     credit_kind = forms.ChoiceField(label='I would like to sign up for',
+                                     choices=BLANK_CHOICES +
+                                     (('College Credit',
+                                       'College Credit'),
+                                      ('High School Credit',
+                                       'High School Credit')))
+ 
+     def __init__(self, course=None, *args, **kwargs):
+         super(AcademicCreditKind, self).__init__(*args, **kwargs)
+ 
+         if course:
+             if course.high_school_credits and course.college_credits:
+                 pass
+             elif course.high_school_credits:
+                 self.fields['credit_kind'].choices = BLANK_CHOICES +\
+                     (('High School Credit',
+                       'High School Credit'),)
+             elif course.college_credits:
+                 self.fields['credit_kind'].choices = BLANK_CHOICES +\
+                     (('College Credit',
+                       'College Credit'),)
+             else:
+                 raise Exception('AcademicCreditKindForm initialized with course without academic credit')
+ 
+ 
+ class GenericCreditSelectionForm(RequiredSwitchForm):
+ 
+     def __init__(self, credits_list, *args, **kwargs):
+         is_hs_credit = kwargs.pop('is_hs_credit', None)
+         super(GenericCreditSelectionForm, self).__init__(*args, **kwargs)
+ 
+         for credit_type_dict in credits_list:
+             self.fields[str(credit_type_dict['id'])] = forms.BooleanField(
+                 required=False, initial=True)
+             if is_hs_credit:
+                 self.fields[str(credit_type_dict['id'])].widget = forms.HiddenInput()
+             self.fields[str(credit_type_dict['id'])].custom_template='admissions/dashboard/student_form_views/academic_credit_fragments/credit_selection_field.html'
+             self.fields[str(credit_type_dict['id'])].details = credit_type_dict
+ 
+     def clean(self):
+         if not any(self.cleaned_data.values()):
+             raise ValidationError('You must choose at least one credit subject')
+ 
+         for key in self.cleaned_data:
+             if self.cleaned_data[key]:
+                 self.cleaned_data[key] = self.fields[key].details
+ 
+         return self.cleaned_data
+ 
+ 
+ class HighSchoolCreditSelectionForm(GenericCreditSelectionForm):
+     def __init__(self, course, *args, **kwargs):
+         if course.high_school_credits is not None:
+             _credits_list = course.high_school_credits
+         else:
+             _credits_list = []
+         kwargs['is_hs_credit'] = True
+         super(HighSchoolCreditSelectionForm, self)\
+             .__init__(credits_list=_credits_list, *args, **kwargs)
+         high_school_credit_costs = course.high_school_credit_cost
+ 
+         for key in self.fields:
+             self.fields[key].details['cost'] = high_school_credit_costs * self.fields[key].details['hours']
+ 
+ 
+ class CollegeCreditSelectionForm(GenericCreditSelectionForm):
+     def __init__(self, course, *args, **kwargs):
+         if course.college_credits is not None:
+             _credits_list = course.college_credits
+         else:
+             _credits_list = []
+ 
+         super(CollegeCreditSelectionForm, self)\
+             .__init__(credits_list=_credits_list, *args, **kwargs)
+ 
+         college_credit_costs = course.college_credit_cost
+ 
+         for key in self.fields:
+             self.fields[key].details['cost'] = college_credit_costs * self.fields[key].details['hours']
+ 
+ 
+ class CollegeCreditTypeForm(RequiredSwitchForm):
+     U_OF_U = 'University of Utah'
+     credit_type_choices = ((' '.join([U_OF_U, 'Undergraduate']),
+                             ' '.join([U_OF_U, 'Undergraduate'])),
+                            (' '.join([U_OF_U, 'Graduate']),
+                             ' '.join([U_OF_U, 'Graduate Credit'])),
+                            ('Direct', 'Direct'))
+     college_credit_type = forms.ChoiceField(label='Type of college credit',
+                                             choices=BLANK_CHOICES + credit_type_choices)
+ 
+ 
+ class UofUUndergradForm(RequiredSwitchForm):
+     highschool_grad = forms.TypedChoiceField(coerce=lambda x: x == 'True',
+                                              label='I am a high school graduate (or equivalent)',
+                                              choices=((True, 'Yes'),
+                                                       (False, 'No')),
+                                              widget=forms.RadioSelect)
+     junior_year_complete = forms.TypedChoiceField(coerce=lambda x: x == 'True',
+                                                   label='I completed my Junior year of high school',
+                                                   choices=((True, 'Yes'),
+                                                            (False, 'No')),
+                                                   widget=forms.RadioSelect)
+     gpa = forms.DecimalField(label='Cumulative GPA',
+                              min_value=Decimal('3.2'),
+                              decimal_places=1)
+ 
+     def __init__(self, *args, **kwargs):
+         super(UofUUndergradForm, self).__init__(*args, **kwargs)
+ 
+         if args:
+             post_data = args[0]
+         elif 'data' in kwargs:
+             post_data = kwargs['data']
+         else:
+             post_data = None
+ 
+         if post_data:
+             grad = post_data.get(self.add_prefix('highschool_grad'), False)
+             if grad is True or grad == 'True':
+                 self.fields['junior_year_complete'].required = False
+                 self.fields['gpa'].required = False
+ 
+     def clean_junior_year_complete(self):
+         jr_complete = self.cleaned_data['junior_year_complete']
+         if not jr_complete and self.fields['junior_year_complete'].required:
+             raise ValidationError('You must complete your junior year of High'
+                                   ' School to receive University of Utah'
+                                   ' college credit')
+ 
+         return jr_complete
+ 
+     def clean_gpa(self):
+         gpa = self.cleaned_data['gpa']
+ 
+         if gpa and gpa < Decimal('3.2') and self.fields['gpa'].required:
+             raise ValidationError('High School students who have not '
+                                   'yet graduated must have at least a '
+                                   '3.2 GPA to receive University of'
+                                   ' Utah college credit')
+ 
+         if gpa and gpa > Decimal('5.0') and self.fields['gpa'].required:
+             raise ValidationError('Value must be less than or equal to 5.')
+ 
+         return gpa
+ 
+ 
+ class UofUGradForm(RequiredSwitchForm):
+     college_grad = forms.TypedChoiceField(coerce=lambda x: x == 'True',
+                                           label='I am a college graduate.',
+                                           choices=((True, 'Yes'),
+                                                    (False, 'No')),
+                                           widget=forms.RadioSelect)
+     in_grad_school = forms.TypedChoiceField(coerce=lambda x: x == 'True',
+                                             label='I am currently enrolled in grad school.',
+                                             choices=((True, 'Yes'),
+                                                      (False, 'No')),
+                                             widget=forms.RadioSelect)
+ 
+     def clean(self):
+         if 'college_grad' in self.cleaned_data and\
+            'in_grad_school' in self.cleaned_data:
+             if not self.cleaned_data['college_grad'] and\
+                not self.cleaned_data['in_grad_school']:
+                 raise ValidationError('University of Utah Graduate credit is '
+                                       'available to matriculated graduate'
+                                       ' students or college graduates only.')
+         return self.cleaned_data
+ 
+ 
+ DIRECT_SCHOOLS = ['Central Wyoming College, WY',
+                   'Western State Colorado University',
+                   'Brock University, Ontario',
+                   'College of the Atlantic, ME',
+                   'Ferris State University, MI',
+                   'Green Mountain College, VT',
+                   'Lindenwood University, MO',
+                   'Northland College, WI',
+                   'Plymouth State University, NH',
+                   'Radford University, VA',
+                   'Southern Utah University, Cedar City, UT',
+                   'State  University of New York College of Environmental Science and Forestry, Syracuse, NY',
+                   'State University of New York, Cortland, NY',
+                   'State University of New York, Plattsburgh, NY',
+                   'Sterling College, VT',
+                   'University of Baltimore, MD',
+                   'University of Montana, Dillon, MT',
+                   'University of Northern British Columbia, Prince George, BC',
+                   'University of Wyoming, Laramie, WY']
+ 
+ 
+ class DirectSchoolForm(RequiredSwitchForm):
+     school = forms.ChoiceField(label='School',
+                                choices=BLANK_CHOICES +
+                                tuple([(x, x) for x in DIRECT_SCHOOLS]))
+ 
+ 
+ class RelationshipTypeForm(RequiredSwitchForm, core_forms.RelationshipTypeForm):
+     pass
+ 
+ 
+ class EmailAddressForm(RequiredSwitchForm, core_forms.EmailAddressForm):
+     pass
+ 
+ 
+ class PersonForm(RequiredSwitchForm, core_forms.PersonForm):
+     pass
+ 
+ 
+ class AddressForm(RequiredSwitchForm, core_forms.AddressForm):
+     pass
+ 
+ 
+ class PhoneForm(RequiredSwitchForm, core_forms.PhoneForm):
+     pass
+ 
+ 
+ class ExistingAddressForm(RequiredSwitchForm, BaseExistingAddressForm):
+     pass
+ 
+ 
+ class InternalLinksForm(forms.Form):
+     app_id = forms.IntegerField()
+ 
+     def clean_app_id(self):
+         app_id = self.cleaned_data['app_id']
+         if not ApplicationTab.objects.filter(pk=app_id).exists():
+             raise ValidationError('Invalid App Id')
+         return app_id
+ 
+ 
+ class AskReferenceForm(RequiredSwitchForm):
+     ATTRS = {'class': 'form-control'}
+     name = forms.CharField(label='Name',
+                            widget=forms.TextInput(attrs=ATTRS),
+                            required=True)
+     email = forms.EmailField(label='Email',
+                              widget=forms.TextInput(attrs=ATTRS),
+                              required=True)
+ 
+ def _double_it(choice_string):
+     """Make a choice tuple."""
+     return (choice_string, choice_string)
+ 
+ 
+ class LetterOfRecommendationForm(RequiredSwitchForm):
+     # WARNING!
+     # Do not casually edit these choices. If you change them here, you also need to make sure
+     # the pdf template still works. It has logic which looks for these strings in order to
+     # reformat the answers into "X" marks in table cells (i.e. the format Pat & Asher want for
+     # reviewing references).
+     RATINGS = [
+         _double_it(''),
+         _double_it('n/a'),
+         _double_it('Does not meet expectations'),
+         _double_it('Inconsistent performance'),
+         _double_it('Meets expectations'),
+         _double_it('Exceeds expectations'),
+         _double_it('Outstanding'),
+         ]
+     OVERALL = [
+         _double_it(''),
+         _double_it('Marginal'),
+         _double_it('Average'),
+         _double_it('Good'),
+         _double_it('Very good'),
+         _double_it('Outstanding'),
+         ]
+     # Intro section
+     ATTRS = {'class': 'form-control'}
+     name = forms.CharField(
+         max_length=255, label='Your name', widget=forms.TextInput(attrs=ATTRS))
+     email = forms.EmailField(
+         max_length=255, label='Your email address', widget=forms.TextInput(attrs=ATTRS))
+     relationship_to_applicant = forms.CharField(
+         label='What is your relationship to the applicant?',
+         help_text='Character limit: 200',
+         widget=forms.Textarea(attrs=ATTRS),
+         max_length=200
+         )
+     how_long = forms.CharField(
+         label='How long have you known the applicant?',
+         help_text='Character limit: 100',
+         widget=forms.Textarea(attrs=ATTRS),
+         max_length=100
+         )
+     # Skill rating section (selects on form but formatted as table in the nexus pdf)
+     self_awareness = forms.ChoiceField(
+         choices=RATINGS, label='Self-awareness:',
+         widget=forms.Select(attrs=ATTRS),
+         help_text="Awareness of strengths and limitations and impact on others.")
+     rapport = forms.ChoiceField(
+         choices=RATINGS, label='Rapport & Relationship-building:',
+         widget=forms.Select(attrs=ATTRS),
+         help_text="Fosters genuine connections with students and co-workers in order to act as "
+             "a role model and effective educator.")
+     curiosity = forms.ChoiceField(
+         choices=RATINGS, label='Curiosity & Openness to learning:',
+         widget=forms.Select(attrs=ATTRS),
+         help_text="Asks questions, learns from mistakes, and role models lifelong learning.")
+     teaching = forms.ChoiceField(
+         choices=RATINGS, label='Teaching & Coaching:',
+         widget=forms.Select(attrs=ATTRS),
+         help_text="Teaches clear, engaging classes, and coaches students with patience and "
+             "flexibility.")
+     communication = forms.ChoiceField(
+         choices=RATINGS, label='Communication & Listening:',
+         widget=forms.Select(attrs=ATTRS),
+         help_text="Communicates in a variety of styles, and shows openness to different cultural "
+             "norms. Listens to others ideas and opinions.")
+     feedback = forms.ChoiceField(
+         choices=RATINGS, label='Ability to give and receive feedback:',
+         widget=forms.Select(attrs=ATTRS),
+         help_text="Gives growth-oriented feedback with honesty and professionalism; shows "
+             "openness to constructive feedback and works to apply this appropriately.")
+     diversity = forms.ChoiceField(
+         choices=RATINGS, label='Commitment to diversity and inclusion:',
+         widget=forms.Select(attrs=ATTRS),
+         help_text="Fosters an inclusive culture, acts as an ally to those in non-dominant "
+             "groups, committed to personal and professional development in a multicultural "
+             "school and society.")
+     humor = forms.ChoiceField(
+         choices=RATINGS, label='Humor and patience under stress:',
+         widget=forms.Select(attrs=ATTRS),
+         help_text="Acts as a role model for students during physically or mentally challenging "
+             "times.")
+     humility = forms.ChoiceField(
+         choices=RATINGS, label='Humility:',
+         widget=forms.Select(attrs=ATTRS),
+         help_text="Seeks feedback, shows vulnerability, shares mistakes, while maintaining a "
+             "strong sense of self.")
+     outdoor = forms.ChoiceField(
+         choices=RATINGS, label='Outdoor travel and living skills:',
+         widget=forms.Select(attrs=ATTRS),
+         help_text="Ability to live and travel in the backcountry for extended periods, through "
+             "challenging weather and conditions.")
+     # Overall comparison section (similar to skill section)
+     overall = forms.ChoiceField(
+         choices=OVERALL,
+         widget=forms.Select(attrs=ATTRS),
+         label='Overall ability and potential:',
+         help_text='How does the applicant compare to others with a similar level of training '
+             'and experience?'
+         )
+     # Final section
+     strengths = forms.CharField(
+         label="What are the applicant's most notable strengths?",
+         help_text='Feel free to use bullet points or paragraphs. Character limit: 700',
+         widget=forms.Textarea(attrs=ATTRS),
+         max_length=700
+         )
+     growth_areas = forms.CharField(
+         label="In what ways can this applicant improve? (Please include themes on leadership, " \
+         "teamwork, communication, teaching, etc...)",
+         help_text='Feel free to use bullet points or paragraphs. Character limit: 700',
+         widget=forms.Textarea(attrs=ATTRS),
+         max_length=700
+         )
+ 
+ 
+ class ICAppUpdateForm(RequiredSwitchForm):
+     is_update = forms.ChoiceField(choices=(('', ''),
+                                            ('Yes', 'Yes'),
+                                            ('No', 'No'),),
+                                   label="Have you applied before?",
+                                   required=False)
+ 
+     previous_application = forms.CharField(max_length=100,
+                                            label="What year did you previously apply?",
+                                            required=False)
+ 
+ 
+ class ICChoiceForm(RequiredSwitchForm):
+     ICs = CourseTab.objects.filter(course_title__icontains='Instructor')\
+                            .filter(branch__type='Admissions')\
+                            .enrolling()
+ 
+     course = forms.ChoiceField(choices=list(BLANK_CHOICES))
+     date = forms.ChoiceField(choices=BLANK_CHOICES)
+ 
+     def __init__(self, *args, **kwargs):
+         icap_start_date = kwargs.pop('start_date', None)
+ 
+         # We should have an ICAP start date. For the 2016 ICAP This will be 12/31/2016.
+         # However, we want to retrieve all IC courses after 12/31/2015. The 2016 IC
+         # courses all occur between 12/31/2015 - 12/31/2016. If an ICAP start date
+         # is not supplied all we can do is use today.
+         if icap_start_date:
+             start_date = get_review_course_date(icap_start_date.year - 1)
+         else:
+             start_date = datetime.date.today()
+ 
+         super(ICChoiceForm, self).__init__(*args, **kwargs)
+         self.fields['course'].choices = list(BLANK_CHOICES) + \
+                                         [(x['course_code'], x['course_title'])
+                                          for x in self.ICs.filter(course_date__gt=start_date)
+                                          .values('course_code',
+                                                  'course_title').distinct()]
+         if self.data:
+             course_choice = self.data.get(self.add_prefix('course'), None)
+         elif self.initial:
+             course_choice = self.initial.get('course', None)
+         else:
+             course_choice = None
+ 
+         if course_choice:
+             self.fields['date'].choices = list(BLANK_CHOICES) +\
+                 [(x['course_date'].strftime('%m/%d/%Y'), x['course_date'].strftime('%m/%d/%Y'))
+                  for x in self.ICs
+                  .filter(course_code=course_choice)
+                  .filter(course_date__gt=start_date)
+                  .values('course_date').distinct()]
+ 
+ 
+ class ICAppEmploymentEducationForm(RequiredSwitchForm):
+     current_occupation = forms.CharField(max_length=100, required=False)
+     title = forms.CharField(max_length=100, required=False)
+     employer = forms.CharField(max_length=100, required=False)
+     education_level = forms.ChoiceField(choices=(('', ''),
+                                                  ('H.S. Diploma', 'H.S. Diploma'),
+                                                  ('B.A./B.S.', 'B.A./B.S.'),
+                                                  ('M.A./M.S.', 'M.A./M.S.'),
+                                                  ('Ph.D.', 'Ph.D'),
+                                                  ('Other', 'Other')),
+                                         label="Highest level completed")
+     other_education = forms.CharField(max_length=100, required=False)
+     name_of_school = forms.CharField(required=False,
+                                      label='Name of School',
+                                      help_text='Current or most recent school attended',
+                                      max_length=60)
+     currently_enrolled = forms.TypedChoiceField(required=False,
+                                                 coerce=lambda x: x == 'True',
+                                                 choices=((True, 'Yes'), (False, 'No')),
+                                                 widget=forms.RadioSelect)
+ 
+ 
+ class ICApplicantForm(RequiredSwitchForm):
+     citizenships = forms.CharField(label='Citizenships',
+                                    help_text='Please list any country you hold a passport in')
+     valid_drivers_license = forms.TypedChoiceField(
+         label="Do you have a valid driver's license?",
+         coerce=lambda x: x == 'True',
+         choices=((True, 'Yes'), (False, 'No')),
+         widget=forms.RadioSelect)
+     drivers_license_number = forms.CharField(label="Driver's License Number")
+     drivers_license_state = forms.CharField(label="Driver's License State / Region")
+     drivers_license_class = forms.CharField(label="Driver's License Class",
+                                             max_length=5)
+     crime = forms.TypedChoiceField(
+         label='Have you ever been convicted of a crime?',
+         coerce=lambda x: x == 'True',
+         choices=((True, 'Yes'), (False, 'No')),
+         widget=forms.RadioSelect)
+     crime_details = forms.CharField(label='Please describe',
+                                     widget=forms.Textarea)
+     applied_for_course = forms.TypedChoiceField(
+         label='Have you applied for a NOLS course before?',
+         coerce=lambda x: x == 'True',
+         choices=((True, 'Yes'), (False, 'No')),
+         widget=forms.RadioSelect)
+     applied_for_course_detail = forms.CharField(label='Course(s)',
+                                                 help_text='If multiple, specify the most recent')
+     applied_for_course_date = forms.DateField(label='Date',
+                                               help_text='mm/dd/yyyy')
+     participated_in_course = forms.TypedChoiceField(
+         label='Have you participated in a NOLS course before?',
+         coerce=lambda x: x == 'True',
+         choices=((True, 'Yes'), (False, 'No')),
+         widget=forms.RadioSelect)
+     participated_in_course_detail = forms.CharField(label='Course(s)',
+                                                     help_text='If multiple, specify the most recent')
+     participated_in_course_date = forms.DateField(label='Date',
+                                                   help_text='mm/dd/yyyy')
+ 
+     def __init__(self, *args, **kwargs):
+         super(ICApplicantForm, self).__init__(*args, **kwargs)
+ 
+         mapping = {'valid_drivers_license': ['drivers_license_number',
+                                              'drivers_license_state',
+                                              'drivers_license_class'],
+                    'crime': ['crime_details'],
+                    'applied_for_course': ['applied_for_course_detail',
+                                           'applied_for_course_date'],
+                    'participated_in_course': ['participated_in_course_detail',
+                                               'participated_in_course_date'],
+                    }
+ 
+         for map_key, sub_reqs in mapping.items():
+ 
+             if self.data.get(self.add_prefix(map_key), False):
+                 for key in sub_reqs:
+                     self.fields[key].required = False
+ 
+ 
+ class ICQuestionnaire(RequiredSwitchForm):
+     """Form to handle serialized questionnaire data for IC apps.
+ 
+     See comment for ICTripLog for some background on doing it this way instead of
+     having all the questions here as form fields. The basic idea is that since this stuff
+     already gets squished into a model that only takes one json field, and since we need
+     interactive client side validation (primarily maxlength), there's not much point to
+     going through the motions of pretending like we're actually using Django's form
+     validation and ORM. We've already gone down the road of bypassing that stuff, so we
+     might as well embrace that decision, do a more thorough job of client side validation,
+     and save a bunch of typing here.
+ 
+     If you want to know what's going on with the form questions, check the form template.
+     """
+     blob_of_json = forms.CharField(initial="{}", widget=forms.HiddenInput())
+ 
+ 
+ class ICResume(RequiredSwitchForm):
+     """Form to handle serialized resume data for IC apps."""
+     blob_of_json = forms.CharField(initial="{}", widget=forms.HiddenInput())
+ 
+ 
+ class ICTripLog(RequiredSwitchForm):
+     """Form to handle serialized trip log data (gui looks like a spreadsheet).
+ 
+     Staffing wants to collect on the order of 200 pieces of input, arranged into
+     spreadsheet-like tables, to understand the trips which an IC applicant has taken.
+     The way we usually do server-side form validation in this project using bootstrap
+     "responsive" stuff with django's validation is entirely unsuitable for the
+     spreadsheet thing (e.g. where would you put the giant red message boxes?). So, I
+     need to come up with something new.
+ 
+     What I'm gonna do for per-cell validation is use client-side textarea character limits
+     combined with javascript to hijack the submit button and serialize/unserialize the
+     cells into one json string. I might also throw in some CSS stuff to mark cells that
+     are at/near the char limit, perhaps with explanatory text at the top of the table.
+     By using a regular django field to submit the json, I'll still get Django's CSRF
+     protection, and it will hopefully play nice with the existing plumbing for student
+     forms. The key benefit is that I can use client-side for loops to deal with the
+     table cells rather than a painfully long list of fields here and in the trip log view.
+     """
+     blob_of_json = forms.CharField(initial="{}", widget=forms.HiddenInput())
+ 
+ 
+ class ICRiverLogForm(forms.Form):
+     wants_river = forms.ChoiceField(
+         [('No', 'No'), ('Yes', 'Yes')],
+         widget=forms.RadioSelect()
+         )
+     river_log_file = forms.FileField(required=False)
+ 
+     def clean(self):
+         cleaned_data = super(ICRiverLogForm, self).clean()
+         wants_river = cleaned_data.get('wants_river')
+         river_log_file = cleaned_data.get('river_log_file')
+ 
+         if wants_river == 'No':
+             # They say they're not interested in the river course, so everything's cool.
+             return
+         elif wants_river == 'Yes':
+             # They say they are interested, but did they give us a good pdf?
+             if not river_log_file:
+                 # Hmm... no file? Client-side validation is supposed to prevent this.
+                 raise forms.ValidationError(
+                     "We didn't understand your last response. Please try again.")
+             elif river_log_file.content_type != 'application/pdf':
+                 # Browser claims it gave us something other than a pdf file. Weird.
+                 raise forms.ValidationError(
+                     "Sorry, that file did not appear to be a pdf. Please try again.")
+             elif river_log_file.size > 5242880:
+                 # This 5MB size limit is arbitrary. I picked it because it seemed about right
+                 # to me (should accommodate several pages from a word processor or spreadsheet).
+                 # If you want to change the file size, be sure to also update the help text and
+                 # javascript size check in the river log template.
+                 raise forms.ValidationError(
+                     "Sorry, that file was bigger than 5MB. Can you make it smaller?")
+             else:
+                 # This will attempt to open the file with PyPDF2. The idea is to screen out
+                 # files that definitely aren't usable pdfs. From what Steve tells me, the
+                 # majority of our serious pdf problems come at a later stage (e.g. PyPDF2 is
+                 # fine with the file, but Pillow can't convert it to an image in nexus).
+                 # That said, we still get a modest percentage of malformed pdfs, so this check
+                 # isn't entirely useless.
+                 try:
+                     PdfChecker.try_to_open_as_pdf(river_log_file)
+                 except PdfChecker.EncryptedPdfException:
+                     raise forms.ValidationError(
+                         "Sorry, that pdf appears to be encrypted. Please try again with a pdf "
+                         "that isn't encrypted.")
+                 except PdfChecker.PdfReadException:
+                     raise forms.ValidationError(
+                         "Sorry, we weren't able to open that pdf file. Adobe Acrobat, Preview "
+                         "(Mac only), and Google Drive can sometimes open documents which our "
+                         "software has difficulty with. It might work better if you use one of "
+                         "those programs to open your file and then export it as a new pdf.")
+         else:
+             # Hmm... why didn't we get a 'Yes' or 'No' to the wants_river question? Maybe
+             # something weird is going on with the client side jQuery validation.
+             raise forms.ValidationError(
+                 "We didn't understand your last response. Please try again.")
+ 
+ 
+ class ICScholarship(RequiredSwitchForm):
+     blob_of_json = forms.CharField(initial="{}", widget=forms.HiddenInput())
+ 
+ 
+ class DenaliQuestionnaireForm(RequiredSwitchForm):
+     prev_courses = forms.CharField(label=('List any previous NOLS courses you completed. '
+                                           '<span class="pseudo-help">(courses and dates)</span>'),
+                                    required=False,
+                                    widget=forms.Textarea)
+     occupation = forms.CharField(label=('Please state your occupation'),
+                                  required=False,
+                                  widget=forms.Textarea)
+     extended_trips = forms.CharField(label=('Describe or list any significant extended (3 nights) wilderness '
+                                             'travel/expeditioning experience you have gained beyond your previous '
+                                             'NOLS course(s). Please provide length of trip (# of days), location/environment, '
+                                             'skill-type (backpacking, sea kayaking, mountaineering, etc.).'),
+                                      required=False,
+                                      widget=forms.Textarea)
+     expectations = forms.CharField(label=('Provide a description of the work you believe will be required to attempt '
+                                          'the summit of Denali as an expedition.'),
+                                   required=False,
+                                   widget=forms.Textarea)
+     challenges = forms.CharField(label=('What do you foresee as some of the greatest challenges the expedition will face?'),
+                                  required=False,
+                                  widget=forms.Textarea)
+     goals = forms.CharField(label=('What are three personal goals you would like to accomplish while on the expedition?'),
+                             required=False,
+                             widget=forms.Textarea)
+     attributes = forms.CharField(label=('Tell us about personal attributes you believe would contribute to the overall '
+                                         'success of the expedition team while in the field?'),
+                                  required=False,
+                                  widget=forms.Textarea)
+     training = forms.CharField(label=('List details of what you would personally do to best prepare/train both mentally '
+                                       'and physically for an expedition of this level of commitment and difficulty?'),
+                                required=False,
+                                widget=forms.Textarea)
+     allergies = forms.CharField(label=('Do you have any food allergies or preferences. NOLS may not be able to accommodate '
+                                        'all preferences as the bulk of the food is cached in January.'),
+                                 required=False,
+                                 widget=forms.Textarea)
+ 
+ 
+     def __init__(self, *args, **kwargs):
+         super(DenaliQuestionnaireForm, self).__init__(*args, **kwargs)
+         for field in self.fields:
+             self.fields[field].custom_template = 'dataentry/fragments/top_label_field.html'
+ 
+ 
+ class StudentFormTypeForm(forms.ModelForm):
+     choices = [(choice[0], '{name} {code}'.format(code=choice[0], name=choice[1])) for choice in
+                get_course_definition_choices()]
+     course_code = forms.ChoiceField(choices=choices, required=False)
+ 
+ 
+ class AdmissionsOfficerForm(forms.ModelForm):
+     def __init__(self, *args, **kwargs):
+         super(AdmissionsOfficerForm, self).__init__(*args, **kwargs)
+         self.fields['color'].widget = ColorWidget(options={'opacity': False,
+                                                            'preventFocus': True})
+ 
+     class Meta:
+         model = AdmissionsOfficer
+         fields = '__all__'

@@ -37,6 +37,12 @@ function _load_OutlineViewProvider() {
   return _OutlineViewProvider = require('./OutlineViewProvider');
 }
 
+var _StatusProvider;
+
+function _load_StatusProvider() {
+  return _StatusProvider = require('./StatusProvider');
+}
+
 var _TypeCoverageProvider;
 
 function _load_TypeCoverageProvider() {
@@ -200,6 +206,11 @@ class AtomLanguageService {
     const syntacticSelection = this._config.syntacticSelection;
     if (syntacticSelection != null) {
       this._subscriptions.add((_SyntacticSelectionProvider || _load_SyntacticSelectionProvider()).SyntacticSelectionProvider.register(this._config.name, this._config.grammars, syntacticSelection, this._connectionToLanguageService));
+    }
+
+    const status = this._config.status;
+    if (status != null) {
+      this._subscriptions.add((_StatusProvider || _load_StatusProvider()).StatusProvider.register(this._config.name, this._config.grammars, status, this._connectionToLanguageService));
     }
 
     this._subscriptions.add((_AdditionalLogFileProvider || _load_AdditionalLogFileProvider()).LanguageAdditionalLogFilesProvider.register(this._config.name, this._connectionToLanguageService));

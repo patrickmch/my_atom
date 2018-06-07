@@ -81,7 +81,7 @@ function getNativeAutoGenConfig(vsAdapterType) {
     name: 'args',
     type: 'array',
     itemType: 'string',
-    description: 'Arguments to the executable',
+    description: '(Optional) Arguments to the executable',
     required: false,
     defaultValue: '',
     visible: true
@@ -90,7 +90,7 @@ function getNativeAutoGenConfig(vsAdapterType) {
     name: 'env',
     type: 'array',
     itemType: 'string',
-    description: 'Environment variables (e.g., SHELL=/bin/bash PATH=/bin)',
+    description: '(Optional) Environment variables (e.g. SHELL=/bin/bash PATH=/bin)',
     required: false,
     defaultValue: '',
     visible: true
@@ -98,7 +98,7 @@ function getNativeAutoGenConfig(vsAdapterType) {
   const sourcePath = {
     name: 'sourcePath',
     type: 'string',
-    description: 'Optional base path for sources',
+    description: '(Optional) base path for sources',
     required: false,
     defaultValue: '',
     visible: true

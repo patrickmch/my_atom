@@ -602,6 +602,13 @@ class FileTreeActions {
     });
   }
 
+  updateGeneratedStatus(filesToCheck) {
+    this._dispatcher.dispatch({
+      actionType: (_FileTreeDispatcher2 || _load_FileTreeDispatcher2()).ActionTypes.UPDATE_GENERATED_STATUS,
+      filesToCheck
+    });
+  }
+
   async _repositoryAdded(repo, rootKeysForRepository) {
     // We support HgRepositoryClient and GitRepositoryAsync objects.
 

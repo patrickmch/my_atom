@@ -60,6 +60,7 @@ class Dropdown extends _react.Component {
     return _temp = super(...args), this._handleDropdownClick = event => {
       this._menu = this._menuFromOptions(this.props.options);
       this._menu.popup({ x: event.clientX, y: event.clientY, async: true });
+      event.stopPropagation();
     }, _temp;
   }
 

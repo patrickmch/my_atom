@@ -17,6 +17,12 @@ function _load_process() {
   return _process = require('../../modules/nuclide-commons/process');
 }
 
+var _passesGK;
+
+function _load_passesGK() {
+  return _passesGK = _interopRequireDefault(require('./passesGK'));
+}
+
 var _keytar;
 
 function _load_keytar() {
@@ -27,7 +33,28 @@ function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj;
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
+/**
+ * Copyright (c) 2015-present, Facebook, Inc.
+ * All rights reserved.
+ *
+ * This source code is licensed under the license found in the LICENSE file in
+ * the root directory of this source tree.
+ *
+ * 
+ * @format
+ */
+
+async function shouldUseApmNode() {
+  return !(await (0, (_passesGK || _load_passesGK()).default)('nuclide_prebuilt_keytar'));
+}
+
 // KeyTar>=4.x APM>=1.18
+
+
+/**
+ * If we're running outside of Atom, attempt to use the prebuilt keytar libs.
+ * (May throw if prebuilt libs aren't available for the current platform!)
+ */
 const getPasswordScriptAsync = `
   var readline = require('readline');
   var keytar = require('keytar');
@@ -45,23 +72,6 @@ const getPasswordScriptAsync = `
 `;
 
 // KeyTar>=4.x APM>=1.18
-
-
-/**
- * If we're running outside of Atom, attempt to use the prebuilt keytar libs.
- * (May throw if prebuilt libs aren't available for the current platform!)
- */
-/**
- * Copyright (c) 2015-present, Facebook, Inc.
- * All rights reserved.
- *
- * This source code is licensed under the license found in the LICENSE file in
- * the root directory of this source tree.
- *
- * 
- * @format
- */
-
 const replacePasswordScriptAsync = `
   var readline = require('readline');
   var keytar = require('keytar');
@@ -128,7 +138,7 @@ exports.default = {
    * Rejects on keychain access failure.
    */
   async getPassword(service, account) {
-    if (typeof atom === 'object') {
+    if (typeof atom === 'object' && (await shouldUseApmNode())) {
       return JSON.parse((await runScriptInApmNode(getPasswordScriptAsync, service, account)));
     }
     return (_keytar || _load_keytar()).getPassword(service, account);
@@ -139,7 +149,7 @@ exports.default = {
    * Rejects on keychain access failure.
    */
   async replacePassword(service, account, password) {
-    if (typeof atom === 'object') {
+    if (typeof atom === 'object' && (await shouldUseApmNode())) {
       await runScriptInApmNode(replacePasswordScriptAsync, service, account, password);
       return;
     }
@@ -151,7 +161,7 @@ exports.default = {
    * Rejects on keychain access failure.
    */
   async deletePassword(service, account) {
-    if (typeof atom === 'object') {
+    if (typeof atom === 'object' && (await shouldUseApmNode())) {
       return JSON.parse((await runScriptInApmNode(deletePasswordScriptAsync, service, account)));
     }
     return (_keytar || _load_keytar()).deletePassword(service, account);

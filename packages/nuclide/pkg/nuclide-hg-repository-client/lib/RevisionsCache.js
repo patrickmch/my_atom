@@ -85,7 +85,9 @@ class RevisionsCache {
       (0, (_log4js || _load_log4js()).getLogger)('nuclide-hg-repository-client').error('RevisionsCache Error:', error);
       // Failed to fetch smartlog, timeout and return an empty array
       return _rxjsBundlesRxMinJs.Observable.of({ revisions: [], fromFilesystem: true });
-    })).distinctUntilChanged(isEqualRevisions).do(revisions => this._revisions.next(revisions)).share();
+    })).distinctUntilChanged(isEqualRevisions).do(revisions => this._revisions.next(revisions))
+    // $FlowFixMe
+    .shareReplay(1);
   }
 
   _fetchSmartlogRevisions() {

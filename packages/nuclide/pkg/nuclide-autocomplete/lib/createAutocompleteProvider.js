@@ -46,6 +46,7 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
  */
 
 const AUTOCOMPLETE_TIMEOUT = atom.inSpecMode() ? 3000 : 500;
+const E2E_SAMPLE_RATE = 10;
 
 const durationBySuggestion = new WeakMap();
 
@@ -81,8 +82,40 @@ function createAutocompleteProvider(provider) {
   return proxy;
 }
 
+const requestTrackers = new WeakMap();
+
+function _getRequestTracker(request, provider) {
+  // Kind of hacky.. but the bufferPosition is a unique object per request.
+  const key = request.bufferPosition;
+  const tracker = requestTrackers.get(key);
+  if (tracker != null) {
+    return tracker;
+  }
+  const startTime = (0, (_performanceNow || _load_performanceNow()).default)();
+  const newTracker = {
+    timeoutPromise: (0, (_promise || _load_promise()).sleep)(AUTOCOMPLETE_TIMEOUT).then(() => {
+      if (newTracker.pendingProviders) {
+        throw new (_promise || _load_promise()).TimedOutError(AUTOCOMPLETE_TIMEOUT);
+      }
+      const { slowestProvider, slowestProviderTime } = newTracker;
+      (0, (_nuclideAnalytics || _load_nuclideAnalytics()).trackSampled)('e2e-autocomplete', E2E_SAMPLE_RATE, {
+        path: request.editor.getPath(),
+        duration: Math.round(slowestProviderTime - startTime),
+        slowestProvider: slowestProvider.analytics.eventName
+      });
+    }),
+    slowestProvider: provider,
+    slowestProviderTime: startTime,
+    pendingProviders: 0
+  };
+  requestTrackers.set(key, newTracker);
+  return newTracker;
+}
+
 function getSuggestions(provider, eventNames, request) {
   const logObject = {};
+  const requestTracker = _getRequestTracker(request, provider);
+  requestTracker.pendingProviders++;
 
   return (0, (_nuclideAnalytics || _load_nuclideAnalytics()).trackTiming)(eventNames.onGetSuggestions, async () => {
     let result = null;
@@ -95,7 +128,7 @@ function getSuggestions(provider, eventNames, request) {
       }
     } else {
       try {
-        result = await (0, (_promise || _load_promise()).timeoutPromise)(Promise.resolve(provider.getSuggestions(request)), AUTOCOMPLETE_TIMEOUT);
+        result = await Promise.race([Promise.resolve(provider.getSuggestions(request)), requestTracker.timeoutPromise]);
       } catch (e) {
         if (e instanceof (_promise || _load_promise()).TimedOutError) {
           (0, (_nuclideAnalytics || _load_nuclideAnalytics()).track)(eventNames.timeoutOnGetSuggestions);
@@ -106,6 +139,9 @@ function getSuggestions(provider, eventNames, request) {
     }
     logObject.isEmpty = result == null || result.length === 0;
     const endTime = (0, (_performanceNow || _load_performanceNow()).default)();
+    requestTracker.slowestProvider = provider;
+    requestTracker.slowestProviderTime = endTime;
+    requestTracker.pendingProviders--;
     if (result) {
       result.forEach(suggestion => durationBySuggestion.set(suggestion, endTime - startTime));
     }

@@ -72,6 +72,12 @@ function _load_featureConfig() {
   return _featureConfig = _interopRequireDefault(require('../../../../../nuclide-commons-atom/feature-config'));
 }
 
+var _projects;
+
+function _load_projects() {
+  return _projects = require('../../../../../nuclide-commons-atom/projects');
+}
+
 function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
@@ -101,6 +107,18 @@ class BreakpointListComponent extends _react.Component {
     };
 
     this.state = this._computeState();
+    this._disposables = new (_UniversalDisposable || _load_UniversalDisposable()).default((0, (_projects || _load_projects()).observeProjectPaths)((projectPath, added) => {
+      const newProjects = this.state.activeProjects;
+      if (added) {
+        newProjects.push(projectPath);
+      } else {
+        const index = newProjects.indexOf(projectPath);
+        if (index >= 0) {
+          newProjects.splice(index, 1);
+        }
+      }
+      this.setState({ activeProjects: newProjects });
+    }));
   }
 
   _computeState() {
@@ -110,17 +128,26 @@ class BreakpointListComponent extends _react.Component {
 
     const exceptionBreakpointsCollapsed = Boolean((_featureConfig || _load_featureConfig()).default.get('debugger-exceptionBreakpointsCollapsed'));
 
+    let newActiveProjects = [];
+    if (this.state != null) {
+      const { activeProjects } = this.state;
+      if (activeProjects != null) {
+        newActiveProjects = activeProjects;
+      }
+    }
+
     return {
       supportsConditionalBreakpoints: focusedProcess != null && Boolean(focusedProcess.session.capabilities.supportsConditionalBreakpoints),
       breakpoints: model.getBreakpoints(),
       exceptionBreakpoints: model.getExceptionBreakpoints(),
-      exceptionBreakpointsCollapsed
+      exceptionBreakpointsCollapsed,
+      activeProjects: newActiveProjects
     };
   }
 
   componentDidMount() {
     const model = this.props.service.getModel();
-    this._disposables = new (_UniversalDisposable || _load_UniversalDisposable()).default(model.onDidChangeBreakpoints(() => {
+    this._disposables.add(model.onDidChangeBreakpoints(() => {
       this.setState(this._computeState());
     }));
   }
@@ -133,10 +160,11 @@ class BreakpointListComponent extends _react.Component {
 
   render() {
     const {
-      breakpoints,
       exceptionBreakpoints,
-      supportsConditionalBreakpoints
+      supportsConditionalBreakpoints,
+      activeProjects
     } = this.state;
+    const breakpoints = this.state.breakpoints.filter(breakpoint => activeProjects.some(projectPath => breakpoint.uri.startsWith(projectPath)));
     const { service } = this.props;
     const items = breakpoints.sort((breakpointA, breakpointB) => {
       const fileA = (_nuclideUri || _load_nuclideUri()).default.basename(breakpointA.uri);
@@ -242,7 +270,7 @@ class BreakpointListComponent extends _react.Component {
         content
       );
     });
-    const separator = breakpoints.length !== 0 && !this.state.exceptionBreakpointsCollapsed ? _react.createElement('hr', { className: 'nuclide-ui-hr debugger-breakpoint-separator' }) : null;
+    const separator = breakpoints.length !== 0 && !this.state.exceptionBreakpointsCollapsed && exceptionBreakpoints.length !== 0 ? _react.createElement('hr', { className: 'nuclide-ui-hr debugger-breakpoint-separator' }) : null;
     return _react.createElement(
       'div',
       null,

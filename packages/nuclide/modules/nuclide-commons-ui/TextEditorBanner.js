@@ -40,6 +40,27 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
 class TextEditorBanner {
 
   constructor(editor) {
+    this.render = reactElement => {
+      this.renderUnstyled(_react.createElement(
+        'div',
+        { className: 'nuclide-ui-text-editor-banner-element' },
+        reactElement
+      ));
+    };
+
+    this.renderUnstyled = reactElement => {
+      _reactDom.default.render(_react.createElement(
+        'div',
+        { className: 'nuclide-ui-text-editor-banner' },
+        reactElement,
+        _react.createElement('div', {
+          // eslint-disable-next-line nuclide-internal/jsx-simple-callback-refs
+          ref: ref => this._updateTextEditorElement(ref),
+          className: 'nuclide-ui-text-editor-banner-editor'
+        })
+      ), this._element);
+    };
+
     this._editor = editor;
     const editorElement = editor.getElement().firstChild;
     this._element = document.createElement('div');
@@ -90,23 +111,6 @@ class TextEditorBanner {
     // Fix for Hyperclicking a read-only file.
     // Restore the scroll position in the editor.
     this._editor.getElement().getModel().scrollToCursorPosition();
-  }
-
-  render(reactElement) {
-    _reactDom.default.render(_react.createElement(
-      'div',
-      { className: 'nuclide-ui-text-editor-banner' },
-      _react.createElement(
-        'div',
-        { className: 'nuclide-ui-text-editor-banner-element' },
-        reactElement
-      ),
-      _react.createElement('div', {
-        // eslint-disable-next-line nuclide-internal/jsx-simple-callback-refs
-        ref: ref => this._updateTextEditorElement(ref),
-        className: 'nuclide-ui-text-editor-banner-editor'
-      })
-    ), this._element);
   }
 
   hide() {

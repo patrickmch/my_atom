@@ -51,6 +51,7 @@
     "nuclide-infer-al",
     "nuclide-json",
     "nuclide-key-binding-hint-status",
+    "nuclide-language-status",
     "nuclide-move-item-to-available-pane",
     "nuclide-navigation-stack",
     "nuclide-navigation-stack-status-bar",
@@ -76,6 +77,7 @@
     "nuclide-url-hyperclick",
     "nuclide-vcs-base",
     "nuclide-vcs-log",
+    "nuclide-welcome-page",
     "nuclide-working-sets",
     "sample-datatip",
     "sample-diagnostics-tester",
@@ -126,11 +128,7 @@
     "nuclide-ios-simulator-logs",
     "nuclide-swift"
   ],
-  "java": [
-    "nuclide-buck",
-    "nuclide-buck-base",
-    "nuclide-debugger-java"
-  ],
+  "java": ["nuclide-buck", "nuclide-buck-base", "nuclide-debugger-java"],
   "javascript": [
     "nuclide-buck",
     "nuclide-buck-base",

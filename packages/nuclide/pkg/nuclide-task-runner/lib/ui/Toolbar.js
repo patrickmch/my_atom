@@ -83,7 +83,7 @@ class Toolbar extends _react.Component {
         const ExtraUi = this.props.extraUiComponent;
         const extraUi = ExtraUi ? _react.createElement(ExtraUi, { key: 'extraui' }) : null;
         const taskButtons = this._renderTaskButtons();
-        taskRunnerSpecificContent = [taskButtons, extraUi];
+        taskRunnerSpecificContent = [extraUi, taskButtons];
         dropdownVisibility = {};
       }
     }
@@ -125,7 +125,9 @@ class Toolbar extends _react.Component {
     const taskButtons = this._getButtonsForTasks();
     return _react.createElement(
       'span',
-      { className: 'inline-block', key: 'taskButtons' },
+      {
+        className: 'nuclide-task-button-container inline-block',
+        key: 'taskButtons' },
       _react.createElement(
         (_ButtonGroup || _load_ButtonGroup()).ButtonGroup,
         null,

@@ -1,0 +1,137 @@
+diff --git a/nols_website/wmi/templates/dataentry/dataentry_form.html b/nols_website/wmi/templates/dataentry/dataentry_form.html
+index cd8773e64..bafa30e74 100644
+--- a/nols_website/wmi/templates/dataentry/dataentry_form.html
++++ b/nols_website/wmi/templates/dataentry/dataentry_form.html
+@@ -1,131 +1,107 @@
+ {% extends 'dataentry/event_base.html' %}
+ {% load widget_tweaks %}
+ {% load static from staticfiles %}
+ 
+ {% block content %}
+ {{ block.super }}
+ <div class="row column medium-10 large-8 rollcall-form">
+     {% if disallow_post %}
+         <div data-closable class='callout alert'>
+             <button type="button" class="close" data-close data-dismiss="alert">&times;</button>
+             <strong>Whoa!</strong> It looks like your name is already on this roster. If you think this
+             is a mistake, please let your instructors know.
+         </div>
+         <h3 class="lead">
+             If you would like to edit your personal information please
+             <a href="#" data-open="log-in-modal">login</a> or
+             <a href="{% url "registration_register" %}">create an account</a> with NOLS.
+         </h3>
+ 
+     {% else %}
+         <p>Please fill out the form and submit below</p>
+         <form class="form-horizontal" action="{% url "submit"  event.wmi_course_id %}" method="Post">
+             {% if person_form.errors or extras_form.errors or email_form.errors or address_form.errors or phone_form.errors %}
+                 <div data-closable class="callout alert">
+                     <button type="button" class="close" data-close data-dismiss="alert" aria-hidden="true">&times;</button>
+                     <p class="errorlist">There is an error, please correct the appropriate field(s).<p>
+                     {{ person_form.non_field_errors }}
+                     {{ extras_form.non_field_errors }}
+                     {{ email_form.non_field_errors }}
+                     {{ address_form.non_field_errors }}
+                     {{ phone_form.non_field_errors }}
+                 </div>
+             {% endif %}
+ 
+             {% with "True" as hide_form_level_error_header %}
+                 <h3>Personal Information</h3>
+                 {% with person_form as form %}
+                     {% with readonly_inputs as readonly %}
+                         {% include "bs_responsive_form_layout.html" %}
+                     {% endwith %}
+                 {% endwith %}
+ 
+                 {% with extras_form as form %}
+                     {% include "bs_responsive_form_layout.html" %}
+                 {% endwith %}
+ 
+                 <h3>Email Address</h3>
+                 {% with email_form as form %}
+                     {% with readonly_inputs as readonly %}
+                         {% include "bs_responsive_form_layout.html" %}
+                     {% endwith %}
+                 {% endwith %}
+ 
+ 
+                 <h3>Address</h3>
+                 {% with address_form as form %}
+                     {% include "bs_responsive_form_layout.html" %}
+                 {% endwith %}
+                 <script src="{% static 'admissions/js/province_update.js' %}"></script>
+                 <script>
+                   $("#id_country").addClass('form-country-selection');
+                   main_update_provinces('{% url 'get_province_choices' %}');
+                 </script>
+                 <h3>Phone</h3>
+                 {% with form=phone_form form_name='phone_form' %}
+-                    {{ form.display_data }}
+-                    {% include "bs_responsive_form_layout.html" %}
+-                    <div class="form-group fieldwrapper{% if form.phone_number.errors or form.extension.errors %} error{% endif %}">
+-                        {% if form.phone_number.errors or form.extension.errors %}
+-                            <div class="row">
+-                                <div class="column medium-12">
+-                                    {{ form.phone_number.errors }} {{form.extension.errors }}
+-                                </div>
+-                            </div>
+-                        {% endif %}
+-                    <div class="row">
+-                        <label class="column medium-12 control-label" style="font-weight: bold;" for="id_{{ form.phone_number.name }}">
+-                            {% if form.phone_number.field.required %}* {% endif %}{{ form.phone_number.label }}
+-                        </label>
+-                        <div id="{{ form.phone_number.name }}-controls" class="column medium-12">
+-                            {% render_field form.phone_number class+="form-control" placeholder=form.phone_number.placeholder %}
+-                        </div>
+-                        <label class="column medium-12 control-label" style="font-weight: bold;" for="id_{{ form.extension.name }}">
+-                            {{ form.extension.label }}
+-                        </label>
+-                        <div id="id_{{ form.extension.name }}-controls" class="column medium-12">
+-                            {% render_field form.extension class+="form-control" %}
+-                        </div>
+-                    </div>
+-                    </div>
++                  {% include "admissions/open_apply/fragments/phone_number_extension.html" %}
+                 {% endwith %}
+ 
+                 {% with honeypot_form as form %}
+                     {% include "honeypot_form.html" %}
+                 {% endwith %}
+             {% endwith %}
+             <div class="row">
+                 <div class="column medium-12 column caboose">
+                     <input class="button float-left" type="submit" value="Submit" />
+                 </div>
+             </div>
+         </form>
+      {% endif %}
+ </div>
+ 
+ {% endblock content %}
+ 
+ {% block extra_js %}
+     {{ block.super }}
+     <script>
+         // TODO PreRelease delete this before release
+         $(document).keypress(function(e) {
+             var opt_a_webkit = e.which == 229 ? 1 : 0;
+             if(opt_a_webkit) {
+                 $('#id_type').val('School');
+                 $('#id_country').val('UNITED STATES');
+                 $('#id_line_1').val('284 Lincoln St');
+                 $('#id_city').val('Lander');
+                 $('#id_state_prov').val('WY');
+                 $('#id_zip_postal').val('82520');
+             }
+         })
+     </script>
+     {% if prompt_login %}
+     <script type="text/javascript">
+         $(document).ready(function(){
+             $('#log-in-modal').open('open');
+         })
+     </script>
+     {% endif %}
+ {% endblock extra_js %}

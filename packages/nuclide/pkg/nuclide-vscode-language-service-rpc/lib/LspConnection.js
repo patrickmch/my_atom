@@ -200,6 +200,10 @@ class LspConnection {
     this._jsonRpcConnection.onRequest({ method: 'window/showMessageRequest' }, callback);
   }
 
+  onShowStatusRequest(callback) {
+    this._jsonRpcConnection.onRequest({ method: 'window/showStatus' }, callback);
+  }
+
   onApplyEditRequest(callback) {
     this._jsonRpcConnection.onRequest({ method: 'workspace/applyEdit' }, callback);
   }

@@ -20,28 +20,16 @@ function _load_BuckTaskRunner() {
   return _BuckTaskRunner = require('../../nuclide-buck/lib/BuckTaskRunner');
 }
 
-var _utils;
-
-function _load_utils() {
-  return _utils = _interopRequireDefault(require('./utils'));
-}
-
-var _utils2;
-
-function _load_utils2() {
-  return _utils2 = require('./utils');
-}
-
 var _UniversalDisposable;
 
 function _load_UniversalDisposable() {
   return _UniversalDisposable = _interopRequireDefault(require('../../../modules/nuclide-commons/UniversalDisposable'));
 }
 
-var _utils3;
+var _utils;
 
-function _load_utils3() {
-  return _utils3 = require('../../nuclide-debugger-vsp/lib/utils');
+function _load_utils() {
+  return _utils = require('../../nuclide-debugger-vsp/lib/utils');
 }
 
 var _nuclideDebuggerCommon;
@@ -98,7 +86,6 @@ class Activation {
 
   constructor() {
     this._disposables = new (_UniversalDisposable || _load_UniversalDisposable()).default();
-    (_utils || _load_utils()).default.setLevel((0, (_utils2 || _load_utils2()).getConfig)().clientLogLevel);
     this.createNativeDebuggerService = this.createNativeDebuggerService.bind(this);
     this.provideLLDBPlatformGroup = this.provideLLDBPlatformGroup.bind(this);
   }
@@ -227,7 +214,7 @@ class Activation {
   }
 
   async _debugPidWithLLDB(pid, buckRoot) {
-    const attachInfo = await (0, (_utils3 || _load_utils3()).getNativeVSPAttachProcessInfo)((_nuclideDebuggerCommon || _load_nuclideDebuggerCommon()).VsAdapterTypes.NATIVE_LLDB, buckRoot, {
+    const attachInfo = await (0, (_utils || _load_utils()).getNativeVSPAttachProcessInfo)((_nuclideDebuggerCommon || _load_nuclideDebuggerCommon()).VsAdapterTypes.NATIVE_LLDB, buckRoot, {
       pid,
       sourcePath: (_nuclideUri || _load_nuclideUri()).default.getPath(buckRoot)
     });
@@ -268,7 +255,7 @@ class Activation {
       adapter = (_nuclideDebuggerCommon || _load_nuclideDebuggerCommon()).VsAdapterTypes.NATIVE_GDB;
     }
 
-    const info = await (0, (_utils3 || _load_utils3()).getNativeVSPLaunchProcessInfo)(adapter, (_nuclideUri || _load_nuclideUri()).default.join(buckRoot, relativeOutputPath), {
+    const info = await (0, (_utils || _load_utils()).getNativeVSPLaunchProcessInfo)(adapter, (_nuclideUri || _load_nuclideUri()).default.join(buckRoot, relativeOutputPath), {
       args: (runArguments.length ? runArguments : targetOutput.args) || [],
       cwd: remoteBuckRoot,
       env,

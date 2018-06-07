@@ -11,6 +11,12 @@ var _atom = require('atom');
 
 var _electron = require('electron');
 
+var _observePaneItemVisibility;
+
+function _load_observePaneItemVisibility() {
+  return _observePaneItemVisibility = _interopRequireDefault(require('../../../../nuclide-commons-atom/observePaneItemVisibility'));
+}
+
 var _projects;
 
 function _load_projects() {
@@ -37,6 +43,12 @@ var _fit;
 
 function _load_fit() {
   return _fit = _interopRequireWildcard(require('xterm/lib/addons/fit/fit'));
+}
+
+var _webLinks;
+
+function _load_webLinks() {
+  return _webLinks = _interopRequireWildcard(require('xterm/lib/addons/webLinks/webLinks'));
 }
 
 var _AtomServiceContainer;
@@ -134,10 +146,15 @@ const COLOR_CONFIGS = exports.COLOR_CONFIGS = Object.freeze({
      * @format
      */
 
+/* eslint-env browser */
+
 const PRESERVED_COMMANDS_CONFIG = 'atom-ide-terminal.preservedCommands';
 const SCROLLBACK_CONFIG = 'atom-ide-terminal.scrollback';
 const CURSOR_STYLE_CONFIG = 'atom-ide-terminal.cursorStyle';
 const CURSOR_BLINK_CONFIG = 'atom-ide-terminal.cursorBlink';
+const OPTION_IS_META_CONFIG = 'atom-ide-terminal.optionIsMeta';
+const TRANSPARENCY_CONFIG = 'atom-ide-terminal.allowTransparency';
+const CHAR_ATLAS_CONFIG = 'atom-ide-terminal.charAtlas';
 const FONT_FAMILY_CONFIG = 'atom-ide-terminal.fontFamily';
 const FONT_SCALE_CONFIG = 'atom-ide-terminal.fontScale';
 const LINE_HEIGHT_CONFIG = 'atom-ide-terminal.lineHeight';
@@ -157,11 +174,15 @@ class TerminalView {
       this._fitAndResize();
     };
 
+    // Load the addons on-demand the first time we create a terminal.
     if ((_xterm || _load_xterm()).Terminal.fit == null) {
       // The 'fit' add-on resizes the terminal based on the container size
       // and the font size such that the terminal fills the container.
-      // Load the addon on-demand the first time we create a terminal.
       (_xterm || _load_xterm()).Terminal.applyAddon(_fit || _load_fit());
+    }
+    if ((_xterm || _load_xterm()).Terminal.webLinksInit == null) {
+      // The 'webLinks' add-on linkifies http URL strings.
+      (_xterm || _load_xterm()).Terminal.applyAddon(_webLinks || _load_webLinks());
     }
 
     this._paneUri = paneUri;
@@ -206,19 +227,15 @@ class TerminalView {
       rows: 512,
       cursorBlink: (_featureConfig || _load_featureConfig()).default.get(CURSOR_BLINK_CONFIG),
       cursorStyle: (_featureConfig || _load_featureConfig()).default.get(CURSOR_STYLE_CONFIG),
-      scrollback: (_featureConfig || _load_featureConfig()).default.get(SCROLLBACK_CONFIG)
+      scrollback: (_featureConfig || _load_featureConfig()).default.get(SCROLLBACK_CONFIG),
+      macOptionIsMeta: (_featureConfig || _load_featureConfig()).default.get(OPTION_IS_META_CONFIG),
+      allowTransparency: (_featureConfig || _load_featureConfig()).default.get(TRANSPARENCY_CONFIG),
+      experimentalCharAtlas: (_featureConfig || _load_featureConfig()).default.get(CHAR_ATLAS_CONFIG)
     });
-    div.terminal = terminal;
-    terminal.open(this._div);
-    terminal.setHypertextLinkHandler(openLink);
     terminal.attachCustomKeyEventHandler(this._checkIfKeyBoundOrDivertToXTerm.bind(this));
-    this._subscriptions.add(() => terminal.destroy());
+    this._subscriptions.add(() => terminal.dispose());
+    terminal.webLinksInit(openLink);
     registerLinkHandlers(terminal, this._cwd);
-
-    if ((_featureConfig || _load_featureConfig()).default.get(DOCUMENTATION_MESSAGE_CONFIG)) {
-      const docsUrl = 'https://nuclide.io/docs/features/terminal';
-      terminal.writeln(`For more info check out the docs: ${docsUrl}`);
-    }
 
     this._subscriptions.add(atom.commands.add(div, 'core:copy', () => {
       document.execCommand('copy');
@@ -255,7 +272,18 @@ class TerminalView {
     this._div.focus = () => terminal.focus();
     this._div.blur = () => terminal.blur();
 
-    this._spawn(cwd).then(pty => this._onPtyFulfill(pty)).catch(error => this._onPtyFail(error));
+    // Terminal.open only works after its div has been attached to the DOM,
+    // which happens in getElement, not in this constructor. Therefore delay
+    // open and spawn until the div is visible, which means it is in the DOM.
+    this._subscriptions.add((0, (_observePaneItemVisibility || _load_observePaneItemVisibility()).default)(this).filter(Boolean).first().subscribe(() => {
+      terminal.open(this._div);
+      div.terminal = terminal;
+      if ((_featureConfig || _load_featureConfig()).default.get(DOCUMENTATION_MESSAGE_CONFIG)) {
+        const docsUrl = 'https://nuclide.io/docs/features/terminal';
+        terminal.writeln(`For more info check out the docs: ${docsUrl}`);
+      }
+      this._spawn(cwd).then(pty => this._onPtyFulfill(pty)).catch(error => this._onPtyFail(error));
+    }));
   }
 
   _spawn(cwd) {
@@ -705,23 +733,12 @@ function getTerminalColors() {
 
 function getTerminalTheme(div) {
   const style = window.getComputedStyle(div);
-  const foreground = convertRgbToHash(style.getPropertyValue('color'));
-  const background = convertRgbToHash(style.getPropertyValue('background-color'));
+  const foreground = style.getPropertyValue('color');
+  const background = style.getPropertyValue('background-color');
   // return type: https://git.io/vxooH
   return Object.assign({
     foreground,
     background,
     cursor: foreground
   }, getTerminalColors());
-}
-
-// Terminal only allows colors of the form '#rrggbb' or '#rgb' and falls back
-// to black otherwise. https://git.io/vNE8a  :-(
-const rgbRegex = / *rgb *\( *([0-9]+) *, *([0-9]+) *, *([0-9]+) *\) */;
-function convertRgbToHash(rgb) {
-  const matches = rgb.match(rgbRegex);
-  if (matches == null) {
-    return rgb;
-  }
-  return '#' + matches.slice(1, 4).map(Number).map(n => (n < 0x10 ? '0' : '') + n.toString(16)).join('');
 }

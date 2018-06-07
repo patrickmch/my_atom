@@ -78,7 +78,7 @@ function getOCamlAutoGenConfig() {
     name: 'environmentVariables',
     type: 'array',
     itemType: 'string',
-    description: 'Environment variables (e.g., SHELL=/bin/bash PATH=/bin)',
+    description: 'Environment variables (e.g. SHELL=/bin/bash PATH=/bin)',
     required: false,
     defaultValue: [],
     visible: true

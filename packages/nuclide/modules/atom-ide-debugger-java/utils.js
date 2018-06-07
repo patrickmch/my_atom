@@ -217,8 +217,8 @@ function getSourcePathClickSubscriptionsOnVspInstance(targetUri, vspInstance, cl
   }), clickEvents];
 }
 
-function getSourcePathClickSubscriptions(targetUri, debugSession, clickEvents) {
-  const defaultValues = getDefaultSourceSearchPaths(targetUri);
+function getSourcePathClickSubscriptions(targetUri, debugSession, clickEvents, additionalSourcePaths = []) {
+  const defaultValues = getDefaultSourceSearchPaths(targetUri).concat(additionalSourcePaths);
   return [getDialogValues(clickEvents).startWith(getSavedPathsFromConfig()).subscribe(userValues => {
     debugSession.custom('setSourcePath', {
       sourcePath: getSourcePathString(defaultValues.concat(userValues))
@@ -244,7 +244,7 @@ async function resolveConfiguration(configuration) {
     }),
     adapterExecutable: javaAdapterExecutable,
     customDisposable,
-    onInitializeCallback: session => {
+    onInitializeCallback: async session => {
       customDisposable.add(...getSourcePathClickSubscriptions(targetUri, session, clickEvents));
     }
   });

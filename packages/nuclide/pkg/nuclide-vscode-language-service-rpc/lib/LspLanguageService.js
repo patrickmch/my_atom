@@ -497,11 +497,11 @@ class LspLanguageService {
       });
       this._lspConnection.onShowMessageRequest(async (params, cancel) => {
         this._childOut.stdout = null;
-        if (params.target === 'status') {
-          return this._handleStatusRequest(params, cancel);
-        } else {
-          return this._handleShowMessageRequest(params, cancel);
-        }
+        return this._handleShowMessageRequest(params, cancel);
+      });
+      this._lspConnection.onShowStatusRequest(async (params, cancel) => {
+        this._childOut.stdout = null;
+        return this._handleStatusRequest(params, cancel);
       });
       this._lspConnection.onProgressNotification(params => {
         this._childOut.stdout = null;
@@ -1634,7 +1634,7 @@ class LspLanguageService {
 
     const convertUncovered = uncovered => ({
       range: (_convert || _load_convert()).lspRange_atomRange(uncovered.range),
-      message: uncovered.message
+      message: uncovered.message != null ? uncovered.message : response.defaultMessage
     });
     return {
       percentage: response.coveredPercent,

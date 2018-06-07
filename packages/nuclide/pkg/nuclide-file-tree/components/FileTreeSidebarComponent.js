@@ -16,6 +16,12 @@ function _load_observePaneItemVisibility() {
   return _observePaneItemVisibility = _interopRequireDefault(require('../../../modules/nuclide-commons-atom/observePaneItemVisibility'));
 }
 
+var _DragResizeContainer;
+
+function _load_DragResizeContainer() {
+  return _DragResizeContainer = require('../../../modules/nuclide-commons-ui/DragResizeContainer');
+}
+
 var _addTooltip;
 
 function _load_addTooltip() {
@@ -229,6 +235,7 @@ class FileTreeSidebarComponent extends _react.Component {
       const shouldRenderToolbar = !this._store.roots.isEmpty();
       const openFilesUris = this._store.getOpenFilesWorkingSet().getAbsoluteUris();
       const uncommittedFileChanges = this._store.getFileChanges();
+      const generatedOpenChangedFiles = this._store.getGeneratedOpenChangedFiles();
       const isCalculatingChanges = this._store.getIsCalculatingChanges();
       const title = this.getTitle();
       const path = this.getPath();
@@ -243,6 +250,7 @@ class FileTreeSidebarComponent extends _react.Component {
         shouldRenderToolbar,
         openFilesUris,
         uncommittedFileChanges,
+        generatedOpenChangedFiles,
         isCalculatingChanges,
         title,
         path,
@@ -320,6 +328,7 @@ class FileTreeSidebarComponent extends _react.Component {
       modifiedUris: [],
       activeUri: null,
       uncommittedFileChanges: (_immutable || _load_immutable()).default.Map(),
+      generatedOpenChangedFiles: (_immutable || _load_immutable()).default.Map(),
       isCalculatingChanges: false,
       path: 'No Current Working Directory',
       title: 'File Tree',
@@ -415,55 +424,51 @@ class FileTreeSidebarComponent extends _react.Component {
     return scrollerRects.let((_observable || _load_observable()).compact).subscribe(rect => this.setState({ scrollerHeight: rect.height, scrollerWidth: rect.width }));
   }
 
-  render() {
-    let toolbar;
-    const workingSetsStore = this.state.workingSetsStore;
-    if (this.state.shouldRenderToolbar && workingSetsStore != null) {
-      toolbar = _react.createElement(
-        'div',
-        { className: 'nuclide-file-tree-fixed' },
-        _react.createElement((_FileTreeSideBarFilterComponent || _load_FileTreeSideBarFilterComponent()).default, {
-          key: 'filter',
-          filter: this.state.filter,
-          found: this.state.filterFound
-        }),
-        this.state.foldersExpanded && _react.createElement((_FileTreeToolbarComponent || _load_FileTreeToolbarComponent()).FileTreeToolbarComponent, {
-          key: 'toolbar',
-          workingSetsStore: workingSetsStore
-        })
-      );
-    }
+  _renderToolbar(workingSetsStore) {
+    return _react.createElement(
+      'div',
+      { className: 'nuclide-file-tree-fixed' },
+      _react.createElement((_FileTreeSideBarFilterComponent || _load_FileTreeSideBarFilterComponent()).default, {
+        key: 'filter',
+        filter: this.state.filter,
+        found: this.state.filterFound
+      }),
+      this.state.foldersExpanded && _react.createElement((_FileTreeToolbarComponent || _load_FileTreeToolbarComponent()).FileTreeToolbarComponent, {
+        key: 'toolbar',
+        workingSetsStore: workingSetsStore
+      })
+    );
+  }
 
-    let uncommittedChangesSection;
-    let uncommittedChangesHeadline;
-    if (this.state.showUncommittedChanges) {
-      const uncommittedChangesList = _react.createElement(
-        'div',
-        { className: 'nuclide-file-tree-sidebar-uncommitted-changes' },
-        _react.createElement((_MultiRootChangedFilesView || _load_MultiRootChangedFilesView()).MultiRootChangedFilesView, {
-          analyticsSurface: 'file-tree-uncommitted-changes',
-          commandPrefix: 'file-tree-sidebar',
-          enableInlineActions: true,
-          fileStatuses: this._getFilteredUncommittedFileChanges(this.state),
-          selectedFile: this.state.activeUri,
-          hideEmptyFolders: true,
-          onFileChosen: this._onFileChosen,
-          openInDiffViewOption: true
-        })
-      );
+  _renderUncommittedChangesSection() {
+    const uncommittedChangesList = _react.createElement(
+      'div',
+      { className: 'nuclide-file-tree-sidebar-uncommitted-changes' },
+      _react.createElement((_MultiRootChangedFilesView || _load_MultiRootChangedFilesView()).MultiRootChangedFilesView, {
+        analyticsSurface: 'file-tree-uncommitted-changes',
+        commandPrefix: 'file-tree-sidebar',
+        enableInlineActions: true,
+        fileStatuses: this._getFilteredUncommittedFileChanges(this.state),
+        generatedTypes: this.state.generatedOpenChangedFiles,
+        selectedFile: this.state.activeUri,
+        hideEmptyFolders: true,
+        onFileChosen: this._onFileChosen,
+        openInDiffViewOption: true
+      })
+    );
 
-      const showDropdown = Array.from(this.state.uncommittedFileChanges.keys()).some(path => {
-        const repo = (0, (_nuclideVcsBase || _load_nuclideVcsBase()).repositoryForPath)(path);
-        return repo != null && repo.getType() === 'hg';
-      });
+    const showDropdown = Array.from(this.state.uncommittedFileChanges.keys()).some(path => {
+      const repo = (0, (_nuclideVcsBase || _load_nuclideVcsBase()).repositoryForPath)(path);
+      return repo != null && repo.getType() === 'hg';
+    });
 
-      const dropdownIcon = !showDropdown ? null : _react.createElement((_Icon || _load_Icon()).Icon, {
-        icon: 'triangle-down',
-        className: 'nuclide-file-tree-toolbar-fader nuclide-ui-dropdown-icon',
-        onClick: this._handleUncommittedChangesKindDownArrow
-      });
+    const dropdownIcon = !showDropdown ? null : _react.createElement((_Icon || _load_Icon()).Icon, {
+      icon: 'triangle-down',
+      className: 'nuclide-file-tree-toolbar-fader nuclide-ui-dropdown-icon',
+      onClick: this._handleUncommittedChangesKindDownArrow
+    });
 
-      const dropdownTooltip = `<div style="text-align: left;">
+    const dropdownTooltip = `<div style="text-align: left;">
 This section shows the file changes you've made:<br />
 <br />
 <b>UNCOMMITTED</b><br />
@@ -476,91 +481,98 @@ Just the changes that you've already amended/committed.<br />
 All the changes across your entire stacked diff.
 </div>`;
 
-      const calculatingChangesSpinner = !this.state.isCalculatingChanges ? null : _react.createElement(
-        'span',
-        { className: 'nuclide-file-tree-spinner' },
-        '\xA0',
-        _react.createElement((_LoadingSpinner || _load_LoadingSpinner()).LoadingSpinner, {
-          className: 'inline-block',
-          size: (_LoadingSpinner || _load_LoadingSpinner()).LoadingSpinnerSizes.EXTRA_SMALL
-        })
-      );
+    const calculatingChangesSpinner = !this.state.isCalculatingChanges ? null : _react.createElement(
+      'span',
+      { className: 'nuclide-file-tree-spinner' },
+      '\xA0',
+      _react.createElement((_LoadingSpinner || _load_LoadingSpinner()).LoadingSpinner, {
+        className: 'inline-block',
+        size: (_LoadingSpinner || _load_LoadingSpinner()).LoadingSpinnerSizes.EXTRA_SMALL
+      })
+    );
 
-      uncommittedChangesHeadline =
-      // eslint-disable-next-line nuclide-internal/jsx-simple-callback-refs
+    const uncommittedChangesHeadline =
+    // eslint-disable-next-line nuclide-internal/jsx-simple-callback-refs
+    _react.createElement(
+      'span',
+      { ref: (0, (_addTooltip || _load_addTooltip()).default)({ title: dropdownTooltip }) },
       _react.createElement(
         'span',
-        { ref: (0, (_addTooltip || _load_addTooltip()).default)({ title: dropdownTooltip }) },
-        _react.createElement(
-          'span',
-          { className: 'nuclide-dropdown-label-text-wrapper' },
-          this.state.showUncommittedChangesKind.toUpperCase()
-        ),
-        dropdownIcon,
-        calculatingChangesSpinner
-      );
+        { className: 'nuclide-dropdown-label-text-wrapper' },
+        this.state.showUncommittedChangesKind.toUpperCase()
+      ),
+      dropdownIcon,
+      calculatingChangesSpinner
+    );
 
-      uncommittedChangesSection = _react.createElement(
-        'div',
+    return _react.createElement(
+      'div',
+      {
+        className: 'nuclide-file-tree-uncommitted-changes-container',
+        'data-show-uncommitted-changes-kind': this.state.showUncommittedChangesKind },
+      _react.createElement(
+        (_Section || _load_Section()).Section,
         {
-          className: 'nuclide-file-tree-uncommitted-changes-container',
-          'data-show-uncommitted-changes-kind': this.state.showUncommittedChangesKind },
+          className: 'nuclide-file-tree-section-caption',
+          collapsable: true,
+          collapsed: !this.state.uncommittedChangesExpanded,
+          headline: uncommittedChangesHeadline,
+          onChange: this._handleUncommittedFilesExpandedChange,
+          size: 'small' },
         _react.createElement(
-          (_Section || _load_Section()).Section,
-          {
-            className: 'nuclide-file-tree-section-caption',
-            collapsable: true,
-            collapsed: !this.state.uncommittedChangesExpanded,
-            headline: uncommittedChangesHeadline,
-            onChange: this._handleUncommittedFilesExpandedChange,
-            size: 'small' },
+          (_DragResizeContainer || _load_DragResizeContainer()).DragResizeContainer,
+          null,
           _react.createElement(
             (_PanelComponentScroller || _load_PanelComponentScroller()).PanelComponentScroller,
-            null,
+            { className: 'nuclide-file-tree-sidebar-uncommitted-changes-container' },
             uncommittedChangesList
           )
         )
-      );
-    }
+      )
+    );
+  }
 
-    let openFilesSection = null;
-    let openFilesList = null;
-    if (this.state.showOpenFiles && this.state.openFilesUris.length > 0) {
-      if (this.state.openFilesExpanded) {
-        openFilesList = _react.createElement((_OpenFilesListComponent || _load_OpenFilesListComponent()).OpenFilesListComponent, {
-          uris: this.state.openFilesUris,
-          modifiedUris: this.state.modifiedUris,
-          activeUri: this.state.activeUri
-        });
-      }
-      openFilesSection = _react.createElement(
-        (_LockableHeightComponent || _load_LockableHeightComponent()).LockableHeight,
-        { isLocked: this.state.isFileTreeHovered },
-        _react.createElement(
-          (_Section || _load_Section()).Section,
-          {
-            className: 'nuclide-file-tree-section-caption nuclide-file-tree-open-files-section',
-            collapsable: true,
-            collapsed: !this.state.openFilesExpanded,
-            headline: 'OPEN FILES',
-            onChange: this._handleOpenFilesExpandedChange,
-            size: 'small' },
-          openFilesList
-        )
-      );
-    }
+  _renderOpenFilesSection() {
+    const openFilesList = this.state.openFilesExpanded ? _react.createElement((_OpenFilesListComponent || _load_OpenFilesListComponent()).OpenFilesListComponent, {
+      uris: this.state.openFilesUris,
+      modifiedUris: this.state.modifiedUris,
+      generatedTypes: this.state.generatedOpenChangedFiles,
+      activeUri: this.state.activeUri
+    }) : null;
+    return _react.createElement(
+      (_LockableHeightComponent || _load_LockableHeightComponent()).LockableHeight,
+      { isLocked: this.state.isFileTreeHovered },
+      _react.createElement(
+        (_Section || _load_Section()).Section,
+        {
+          className: 'nuclide-file-tree-section-caption nuclide-file-tree-open-files-section',
+          collapsable: true,
+          collapsed: !this.state.openFilesExpanded,
+          headline: 'OPEN FILES',
+          onChange: this._handleOpenFilesExpandedChange,
+          size: 'small' },
+        openFilesList
+      )
+    );
+  }
 
-    let foldersCaption;
-    if (uncommittedChangesSection != null || openFilesSection != null) {
-      foldersCaption = _react.createElement((_Section || _load_Section()).Section, {
-        className: 'nuclide-file-tree-section-caption',
-        headline: 'FOLDERS',
-        collapsable: true,
-        collapsed: !this.state.foldersExpanded,
-        onChange: this._handleFoldersExpandedChange,
-        size: 'small'
-      });
-    }
+  _renderFoldersCaption() {
+    return _react.createElement((_Section || _load_Section()).Section, {
+      className: 'nuclide-file-tree-section-caption',
+      headline: 'FOLDERS',
+      collapsable: true,
+      collapsed: !this.state.foldersExpanded,
+      onChange: this._handleFoldersExpandedChange,
+      size: 'small'
+    });
+  }
+
+  render() {
+    const workingSetsStore = this.state.workingSetsStore;
+    const toolbar = this.state.shouldRenderToolbar && workingSetsStore != null ? this._renderToolbar(workingSetsStore) : null;
+    const uncommittedChangesSection = this.state.showUncommittedChanges ? this._renderUncommittedChangesSection() : null;
+    const openFilesSection = this.state.showOpenFiles && this.state.openFilesUris.length > 0 ? this._renderOpenFilesSection() : null;
+    const foldersCaption = uncommittedChangesSection != null || openFilesSection != null ? this._renderFoldersCaption() : null;
 
     // Include `tabIndex` so this component can be focused by calling its native `focus` method.
     return _react.createElement(

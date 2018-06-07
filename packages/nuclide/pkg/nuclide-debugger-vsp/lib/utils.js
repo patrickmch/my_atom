@@ -42,14 +42,14 @@ function getPrepackAutoGenConfig() {
   const fileToPrepack = {
     name: 'sourceFile',
     type: 'string',
-    description: 'Input the file you want to Prepack',
+    description: 'Input the file you want to Prepack. Use absolute paths.',
     required: true,
     visible: true
   };
   const prepackRuntimePath = {
     name: 'prepackRuntime',
     type: 'string',
-    description: 'Prepack executable path (e.g. lib/prepack-cli.js). Will use default prepack command if not provided',
+    description: 'Prepack executable path (e.g. lib/prepack-cli.js). Use absolute paths.',
     required: false,
     visible: true
   };

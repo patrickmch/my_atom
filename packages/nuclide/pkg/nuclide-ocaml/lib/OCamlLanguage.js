@@ -49,6 +49,11 @@ async function createOCamlLanguageService(connection) {
 
   const logLevel = (0, (_rpcTypes || _load_rpcTypes()).parseLogLevel)((_featureConfig || _load_featureConfig()).default.get('nuclide-ocaml.logLevel'), 'DEBUG');
 
+  let ocpindent = (_featureConfig || _load_featureConfig()).default.get('nuclide-ocaml.pathToOcpIndent');
+  if (typeof ocpindent !== 'string' || ocpindent === '') {
+    ocpindent = null;
+  }
+
   const lspService = await service.createMultiLspLanguageService('ocaml', 'ocaml-language-server', ['--stdio'], {
     logCategory: 'OcamlService',
     logLevel,
@@ -71,6 +76,9 @@ async function createOCamlLanguageService(connection) {
       },
       format: {
         width: 80
+      },
+      path: ocpindent == null ? undefined : {
+        ocpindent
       }
     }
   });

@@ -132,6 +132,8 @@ function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj;
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 // Used to ensure the version we serialized is the same version we are deserializing.
+const VERSION = 1;
+// $FlowFixMe(>=0.53.0) Flow suppress
 /**
  * Copyright (c) 2015-present, Facebook, Inc.
  * All rights reserved.
@@ -143,8 +145,6 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
  * @format
  */
 
-const VERSION = 1;
-// $FlowFixMe(>=0.53.0) Flow suppress
 const DEFAULT_CONF = exports.DEFAULT_CONF = {
   vcsStatuses: (_immutable || _load_immutable()).Map(),
   workingSet: new (_nuclideWorkingSetsCommon || _load_nuclideWorkingSetsCommon()).WorkingSet(),
@@ -173,13 +173,14 @@ const actionTrackers = new Map();
  * dispatcher is a mechanism through which FileTreeActions interfaces with FileTreeStore.
  */
 class FileTreeStore {
-  // The configuration for the file-tree. Avoid direct writing.
+
   static getInstance() {
     if (!instance) {
       instance = new FileTreeStore();
     }
     return instance;
-  }
+  } // The configuration for the file-tree. Avoid direct writing.
+
 
   static dispose() {
     if (instance != null) {
@@ -196,6 +197,7 @@ class FileTreeStore {
     this._dispatcher.register(this._onDispatch.bind(this));
     this._logger = (0, (_log4js || _load_log4js()).getLogger)('nuclide-file-tree');
     this._fileChanges = (_immutable || _load_immutable()).Map();
+    this._generatedOpenChangedFiles = (_immutable || _load_immutable()).Map();
     this.reorderPreviewStatus = null;
 
     this._usePrefixNav = false;
@@ -496,6 +498,9 @@ class FileTreeStore {
       case (_FileTreeDispatcher2 || _load_FileTreeDispatcher2()).ActionTypes.SET_TARGET_NODE:
         this._setTargetNode(payload.rootKey, payload.nodeKey);
         break;
+      case (_FileTreeDispatcher2 || _load_FileTreeDispatcher2()).ActionTypes.UPDATE_GENERATED_STATUS:
+        this._updateGeneratedStatus(payload.filesToCheck);
+        break;
     }
 
     const end = performance.now();
@@ -687,6 +692,10 @@ class FileTreeStore {
     return this._fileChanges;
   }
 
+  getGeneratedOpenChangedFiles() {
+    return this._generatedOpenChangedFiles;
+  }
+
   getIsCalculatingChanges() {
     return this._isCalculatingChanges;
   }
@@ -724,6 +733,7 @@ class FileTreeStore {
     // in the terms used for status change, while uncommitted changes needs the HgStatusChange
     // codes the file tree doesn't.
     this._setFileChanges(rootKey, vcsStatuses);
+    this._updateGeneratedStatus(vcsStatuses.keys());
 
     // We can't build on the child-derived properties to maintain vcs statuses in the entire
     // tree, since the reported VCS status may be for a node that is not yet present in the
@@ -1191,6 +1201,25 @@ class FileTreeStore {
   */
   _setTargetNode(rootKey, nodeKey) {
     this._targetNodeKeys = { rootKey, nodeKey };
+  }
+
+  _updateGeneratedStatus(filesToCheck) {
+    const generatedPromises = new Map();
+    const addGeneratedPromise = file => {
+      if (!generatedPromises.has(file)) {
+        const promise = (0, (_nuclideRemoteConnection || _load_nuclideRemoteConnection()).awaitGeneratedFileServiceByNuclideUri)(file).then(gfs => gfs.getGeneratedFileType(file)).then(type => [file, type]);
+        generatedPromises.set(file, promise);
+      }
+    };
+    for (const file of filesToCheck) {
+      addGeneratedPromise(file);
+    }
+    Promise.all(Array.from(generatedPromises.values())).then(generatedOpenChangedFiles => {
+      this._generatedOpenChangedFiles = this._generatedOpenChangedFiles.merge(generatedOpenChangedFiles)
+      // just drop any non-generated files from the map
+      .filter(value => value !== 'manual');
+      this._emitChange();
+    });
   }
 
   /**
@@ -1901,6 +1930,7 @@ class FileTreeStore {
   }
 
   _setOpenFilesWorkingSet(openFilesWorkingSet) {
+    this._updateGeneratedStatus(openFilesWorkingSet.getAbsoluteUris());
     // Optimization: with an empty working set, we don't need a full tree refresh.
     if (this._conf.workingSet.isEmpty()) {
       this._conf.openFilesWorkingSet = openFilesWorkingSet;

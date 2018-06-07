@@ -121,7 +121,7 @@ class ScopesComponent extends _react.Component {
 
   componentDidMount() {
     const { viewModel } = this.props.service;
-    this._disposables.add(_rxjsBundlesRxMinJs.Observable.merge((0, (_event || _load_event()).observableFromSubscribeFunction)(viewModel.onDidFocusStackFrame.bind(viewModel)), (0, (_event || _load_event()).observableFromSubscribeFunction)(viewModel.onDidChangeExpressionContext.bind(viewModel))).debounceTime(100).switchMap(() => this._getScopes()).subscribe(scopes => {
+    this._disposables.add(_rxjsBundlesRxMinJs.Observable.merge((0, (_event || _load_event()).observableFromSubscribeFunction)(viewModel.onDidFocusStackFrame.bind(viewModel)), (0, (_event || _load_event()).observableFromSubscribeFunction)(viewModel.onDidChangeExpressionContext.bind(viewModel))).debounceTime(100).startWith(null).switchMap(() => this._getScopes()).subscribe(scopes => {
       this.setState({ scopes });
     }));
   }

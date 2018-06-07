@@ -3,7 +3,7 @@
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.Tunnel = exports.TunnelManager = undefined;
+exports.TunnelManager = undefined;
 
 var _SocketManager;
 
@@ -17,11 +17,25 @@ function _load_Proxy() {
   return _Proxy = require('./Proxy');
 }
 
+var _Tunnel;
+
+function _load_Tunnel() {
+  return _Tunnel = require('./Tunnel.js');
+}
+
+var _Encoder;
+
+function _load_Encoder() {
+  return _Encoder = _interopRequireDefault(require('./Encoder.js'));
+}
+
 var _log4js;
 
 function _load_log4js() {
   return _log4js = require('log4js');
 }
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 /**
  * A tunnel consists of two components: a Proxy to listen for connections,
@@ -51,7 +65,7 @@ class TunnelManager {
     this._isClosed = false;
 
     this._subscription = this._transport.onMessage().map(msg => {
-      return JSON.parse(msg);
+      return (_Encoder || _load_Encoder()).default.decode(msg);
     }).subscribe(msg => this._handleMessage(msg));
   }
 
@@ -61,8 +75,11 @@ class TunnelManager {
     }
 
     this._logger.info(`creating tunnel ${localPort}->${remotePort}`);
-    const tunnel = await Tunnel.createTunnel(localPort, remotePort, this._transport);
+    const tunnel = await (_Tunnel || _load_Tunnel()).Tunnel.createTunnel(localPort, remotePort, this._transport);
     this._idToTunnel.set(tunnel.getId(), tunnel);
+    tunnel.once('close', () => {
+      this._idToTunnel.delete(tunnel.getId());
+    });
     return tunnel;
   }
 
@@ -72,7 +89,11 @@ class TunnelManager {
     }
 
     this._logger.info(`creating reverse tunnel ${localPort}<-${remotePort}`);
-    const tunnel = await Tunnel.createReverseTunnel(localPort, remotePort, this._transport);
+    const tunnel = await (_Tunnel || _load_Tunnel()).Tunnel.createReverseTunnel(localPort, remotePort, this._transport);
+    this._idToTunnel.set(tunnel.getId(), tunnel);
+    tunnel.once('close', () => {
+      this._idToTunnel.delete(tunnel.getId());
+    });
     return tunnel;
   }
 
@@ -83,6 +104,10 @@ class TunnelManager {
     });
     this._idToTunnel.clear();
     this._isClosed = true;
+  }
+
+  get tunnels() {
+    return Array.from(this._idToTunnel.values());
   }
 
   async _handleMessage(msg /* TunnelMessage? */) {
@@ -118,7 +143,6 @@ class TunnelManager {
     }
   }
 }
-
 exports.TunnelManager = TunnelManager; /**
                                         * Copyright (c) 2017-present, Facebook, Inc.
                                         * All rights reserved.
@@ -130,84 +154,3 @@ exports.TunnelManager = TunnelManager; /**
                                         * 
                                         * @format
                                         */
-
-class Tunnel {
-
-  constructor(id, proxy, localPort, remotePort, transport) {
-    this._id = id;
-    this._proxy = proxy;
-    this._localPort = localPort;
-    this._remotePort = remotePort;
-    this._transport = transport;
-    this._logger = (0, (_log4js || _load_log4js()).getLogger)('tunnel');
-  }
-
-  static async createTunnel(localPort, remotePort, transport) {
-    const tunnelId = generateId();
-    const proxy = await (_Proxy || _load_Proxy()).Proxy.createProxy(tunnelId, localPort, remotePort, transport);
-    return new Tunnel(tunnelId, proxy, localPort, remotePort, transport);
-  }
-
-  static async createReverseTunnel(localPort, remotePort, transport) {
-    const tunnelId = generateId();
-
-    const socketManager = new (_SocketManager || _load_SocketManager()).SocketManager(tunnelId, localPort, transport);
-
-    transport.send(JSON.stringify({
-      event: 'createProxy',
-      tunnelId,
-      localPort,
-      remotePort
-    }));
-    return new ReverseTunnel(tunnelId, socketManager, localPort, remotePort, transport);
-  }
-
-  receive(msg) {
-    if (this._proxy != null) {
-      this._proxy.receive(msg);
-    }
-  }
-
-  getId() {
-    return this._id;
-  }
-
-  close() {
-    if (!this._proxy) {
-      throw new Error('Invariant violation: "this._proxy"');
-    }
-
-    this._proxy.close();
-  }
-}
-
-exports.Tunnel = Tunnel;
-class ReverseTunnel extends Tunnel {
-
-  constructor(id, socketManager, localPort, remotePort, transport) {
-    super(id, null, localPort, remotePort, transport);
-    this._socketManager = socketManager;
-  }
-
-  receive(msg) {
-    throw new Error('Tunnel.receive is not implemented for a reverse tunnel');
-  }
-
-  close() {
-    if (!this._socketManager) {
-      throw new Error('Invariant violation: "this._socketManager"');
-    }
-
-    this._socketManager.close();
-    this._transport.send(JSON.stringify({
-      event: 'closeProxy',
-      tunnelId: this._id
-    }));
-  }
-}
-
-// TODO: this should really be a UUID
-let nextId = 1;
-function generateId() {
-  return 'tunnel' + nextId++;
-}

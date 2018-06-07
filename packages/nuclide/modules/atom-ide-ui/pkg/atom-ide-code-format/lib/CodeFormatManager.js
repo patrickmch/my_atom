@@ -4,9 +4,37 @@ Object.defineProperty(exports, "__esModule", {
   value: true
 });
 
+var _config;
+
+function _load_config() {
+  return _config = require('./config');
+}
+
 var _atom = require('atom');
 
-var _rxjsBundlesRxMinJs = require('rxjs/bundles/Rx.min.js');
+var _log4js;
+
+function _load_log4js() {
+  return _log4js = require('log4js');
+}
+
+var _ProviderRegistry;
+
+function _load_ProviderRegistry() {
+  return _ProviderRegistry = _interopRequireDefault(require('../../../../nuclide-commons-atom/ProviderRegistry'));
+}
+
+var _textEdit;
+
+function _load_textEdit() {
+  return _textEdit = require('../../../../nuclide-commons-atom/text-edit');
+}
+
+var _textEditor;
+
+function _load_textEditor() {
+  return _textEditor = require('../../../../nuclide-commons-atom/text-editor');
+}
 
 var _event;
 
@@ -32,35 +60,7 @@ function _load_UniversalDisposable() {
   return _UniversalDisposable = _interopRequireDefault(require('../../../../nuclide-commons/UniversalDisposable'));
 }
 
-var _ProviderRegistry;
-
-function _load_ProviderRegistry() {
-  return _ProviderRegistry = _interopRequireDefault(require('../../../../nuclide-commons-atom/ProviderRegistry'));
-}
-
-var _textEditor;
-
-function _load_textEditor() {
-  return _textEditor = require('../../../../nuclide-commons-atom/text-editor');
-}
-
-var _textEdit;
-
-function _load_textEdit() {
-  return _textEdit = require('../../../../nuclide-commons-atom/text-edit');
-}
-
-var _config;
-
-function _load_config() {
-  return _config = require('./config');
-}
-
-var _log4js;
-
-function _load_log4js() {
-  return _log4js = require('log4js');
-}
+var _rxjsBundlesRxMinJs = require('rxjs/bundles/Rx.min.js');
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -263,6 +263,7 @@ class CodeFormatManager {
       }
 
       const contents = editor.getText();
+      const cursorPosition = editor.getCursorBufferPosition().copy();
 
       // The bracket-matching package basically overwrites
       //
@@ -287,6 +288,10 @@ class CodeFormatManager {
         // your actual code by undoing again.
         if (!(0, (_textEdit || _load_textEdit()).applyTextEditsToBuffer)(editor.getBuffer(), edits)) {
           throw new Error('Could not apply edits to text buffer.');
+        }
+      }).finally(() => {
+        if (provider.keepCursorPosition) {
+          editor.setCursorBufferPosition(cursorPosition);
         }
       });
     });
