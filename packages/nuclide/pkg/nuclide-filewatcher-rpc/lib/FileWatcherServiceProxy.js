@@ -163,13 +163,13 @@ Object.defineProperty(module.exports, "defs", {
       location: {
         type: "source",
         fileName: "FileWatcherService.js",
-        line: 48
+        line: 50
       },
       type: {
         location: {
           type: "source",
           fileName: "FileWatcherService.js",
-          line: 48
+          line: 50
         },
         kind: "function",
         argumentTypes: [{
@@ -194,13 +194,13 @@ Object.defineProperty(module.exports, "defs", {
       location: {
         type: "source",
         fileName: "FileWatcherService.js",
-        line: 54
+        line: 56
       },
       type: {
         location: {
           type: "source",
           fileName: "FileWatcherService.js",
-          line: 54
+          line: 56
         },
         kind: "function",
         argumentTypes: [{
@@ -233,13 +233,13 @@ Object.defineProperty(module.exports, "defs", {
       location: {
         type: "source",
         fileName: "FileWatcherService.js",
-        line: 83
+        line: 85
       },
       type: {
         location: {
           type: "source",
           fileName: "FileWatcherService.js",
-          line: 83
+          line: 85
         },
         kind: "function",
         argumentTypes: [{
@@ -264,13 +264,13 @@ Object.defineProperty(module.exports, "defs", {
       location: {
         type: "source",
         fileName: "FileWatcherService.js",
-        line: 124
+        line: 141
       },
       type: {
         location: {
           type: "source",
           fileName: "FileWatcherService.js",
-          line: 124
+          line: 141
         },
         kind: "function",
         argumentTypes: [{

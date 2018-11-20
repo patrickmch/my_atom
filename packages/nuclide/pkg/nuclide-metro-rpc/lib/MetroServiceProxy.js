@@ -21,7 +21,7 @@ module.exports = _client => {
     });
   };
 
-  remoteModule.startMetro = function (arg0, arg1, arg2) {
+  remoteModule.startMetro = function (arg0, arg1, arg2, arg3) {
     return _client.callRemoteFunction("MetroService/startMetro", "observable", _client.marshalArguments(Array.from(arguments), [{
       name: "projectRoot",
       type: {
@@ -42,6 +42,17 @@ module.exports = _client => {
         kind: "nullable",
         type: {
           kind: "number"
+        }
+      }
+    }, {
+      name: "extraArgs",
+      type: {
+        kind: "nullable",
+        type: {
+          kind: "array",
+          type: {
+            kind: "string"
+          }
         }
       }
     }])).map(value => {
@@ -200,7 +211,7 @@ Object.defineProperty(module.exports, "defs", {
       location: {
         type: "source",
         fileName: "types.js",
-        line: 21
+        line: 22
       },
       name: "MetroStartCommand",
       definition: {
@@ -283,12 +294,32 @@ Object.defineProperty(module.exports, "defs", {
         }]
       }
     },
+    RestartEvent: {
+      kind: "alias",
+      location: {
+        type: "source",
+        fileName: "types.js",
+        line: 19
+      },
+      name: "RestartEvent",
+      definition: {
+        kind: "object",
+        fields: [{
+          name: "type",
+          type: {
+            kind: "string-literal",
+            value: "restarting"
+          },
+          optional: false
+        }]
+      }
+    },
     Level: {
       kind: "alias",
       location: {
         type: "source",
         fileName: "process.js",
-        line: 694
+        line: 721
       },
       name: "Level",
       definition: {
@@ -319,7 +350,7 @@ Object.defineProperty(module.exports, "defs", {
       location: {
         type: "source",
         fileName: "process.js",
-        line: 695
+        line: 722
       },
       name: "Message",
       definition: {
@@ -345,7 +376,7 @@ Object.defineProperty(module.exports, "defs", {
       location: {
         type: "source",
         fileName: "process.js",
-        line: 697
+        line: 724
       },
       name: "MessageEvent",
       definition: {
@@ -372,7 +403,7 @@ Object.defineProperty(module.exports, "defs", {
       location: {
         type: "source",
         fileName: "types.js",
-        line: 19
+        line: 20
       },
       name: "MetroEvent",
       definition: {
@@ -384,6 +415,16 @@ Object.defineProperty(module.exports, "defs", {
             type: {
               kind: "string-literal",
               value: "ready"
+            },
+            optional: false
+          }]
+        }, {
+          kind: "object",
+          fields: [{
+            name: "type",
+            type: {
+              kind: "string-literal",
+              value: "restarting"
             },
             optional: false
           }]
@@ -445,6 +486,17 @@ Object.defineProperty(module.exports, "defs", {
               kind: "number"
             }
           }
+        }, {
+          name: "extraArgs",
+          type: {
+            kind: "nullable",
+            type: {
+              kind: "array",
+              type: {
+                kind: "string"
+              }
+            }
+          }
         }],
         returnType: {
           kind: "observable",
@@ -461,13 +513,13 @@ Object.defineProperty(module.exports, "defs", {
       location: {
         type: "source",
         fileName: "MetroService.js",
-        line: 104
+        line: 109
       },
       type: {
         location: {
           type: "source",
           fileName: "MetroService.js",
-          line: 104
+          line: 109
         },
         kind: "function",
         argumentTypes: [{
@@ -493,13 +545,13 @@ Object.defineProperty(module.exports, "defs", {
       location: {
         type: "source",
         fileName: "MetroService.js",
-        line: 124
+        line: 129
       },
       type: {
         location: {
           type: "source",
           fileName: "MetroService.js",
-          line: 124
+          line: 129
         },
         kind: "function",
         argumentTypes: [{
@@ -542,13 +594,13 @@ Object.defineProperty(module.exports, "defs", {
       location: {
         type: "source",
         fileName: "MetroService.js",
-        line: 133
+        line: 138
       },
       type: {
         location: {
           type: "source",
           fileName: "MetroService.js",
-          line: 133
+          line: 138
         },
         kind: "function",
         argumentTypes: [{

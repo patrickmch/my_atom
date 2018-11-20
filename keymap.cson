@@ -5,12 +5,14 @@
   'alt-space': 'choose-pane:start'
   'alt-cmd-h': 'pane:show-previous-item'
   'alt-cmd-l': 'pane:show-next-item'
+  'shift-ctrl-h': 'pane:move-item-left'
+  'shift-ctrl-l': 'pane:move-item-right'
+  'shift-cmd-s': 'grammar-selector:show'
   'ctrl-alt-cmd-j': 'window:toggle-dev-tools'
   'cmd-q': 'unset!'
   'cmd-q cmd-q': 'application:quit'
   'alt-cmd-/': 'nuclide-quick-open:find-anything-via-omni-search'
-  'ctrl-cmd-/': 'nuclide-code-search:toggle-provider'
-  'ctrl-/': 'nuclide-fuzzy-filename-provider:toggle-provider'
+  'alt-cmd-j': 'nuclide-fuzzy-filename-provider:toggle-provider'
 
 'atom-text-editor':
   # 'alt-cmd-enter': 'python-tools:goto-definition'
@@ -38,8 +40,8 @@
   'ctrl-alt-space': 'custom:insert-tab-keep-cursor-place'
   'alt-enter': 'custom:insert-newline-keep-cursor-place'
 
-  'ctrl-cmd-up': 'my:move-line-up'
-  'ctrl-cmd-down': 'my:move-line-down'
+
+  'ctrl-alt-shift-cmd-s': 'keystroke cmd-s escape'
 
 ##############################################################################################
 ##############################-------vim mode keybindings-------##############################
@@ -59,39 +61,41 @@
   'alt-k': 'multi-cursor:expandUp'
   'alt-j': 'multi-cursor:expandDown'
 
+  'ctrl-cmd-k': 'my:move-line-up'
+  'ctrl-cmd-j': 'my:move-line-down'
+  'cmd-ctrl-h': 'editor:outdent-selected-rows'
+  'cmd-ctrl-l': 'editor:indent-selected-rows'
+
 'atom-text-editor.vim-mode-plus.visual-mode':
-  'ctrl-t': 'vim-mode-plus-user:move-selected-text-toggle-overwrite'
 
   'shift-k': 'keystroke 5 k'
   'shift-j': 'keystroke 5 j'
 
-  'alt-h': 'vim-mode-plus-user:move-selected-text-left'
-  'alt-l': 'vim-mode-plus-user:move-selected-text-right'
-  'alt-k': 'vim-mode-plus-user:move-selected-text-up'
-  'alt-j': 'vim-mode-plus-user:move-selected-text-down'
+  'ctrl-cmd-k': 'vim-mode-plus-user:move-selected-text-up'
+  'ctrl-cmd-j': 'vim-mode-plus-user:move-selected-text-down'
+  'ctrl-cmd-h': 'vim-mode-plus-user:move-selected-text-left'
+  'ctrl-cmd-l': 'vim-mode-plus-user:move-selected-text-right'
 
-'atom-text-editor.vim-mode-plus.normal-mode, atom-text-editor.vim-mode-plus.visual-mode':
-  '[': 'editor:outdent-selected-rows'
-  ']': 'editor:indent-selected-rows'
+  'cmd-K': 'vim-mode-plus-user:duplicate-selected-text-up'
+  'cmd-J': 'vim-mode-plus-user:duplicate-selected-text-down'
+  'cmd-H': 'vim-mode-plus-user:duplicate-selected-text-left'
+  'cmd-L': 'vim-mode-plus-user:duplicate-selected-text-right'
+
 
 'atom-text-editor.vim-mode-plus.normal-mode':
   'shift-j': 'keystroke 5 j'
   'shift-k': 'keystroke 5 k'
 
-  'm m': 'bookmarks:toggle-bookmark'
-  '\'':  'bookmarks:jump-to-next-bookmark'
-  'm p': 'bookmarks:jump-to-previous-bookmark'
-  'm v': 'bookmarks:view-all'
-  'm c': 'bookmarks:clear-bookmarks'
   'alt-/': 'vim-mode-plus:toggle-case-and-move-right'
 
 'atom-text-editor.vim-mode-plus:not(.insert-mode)':
   'ctrl-n': 'vim-mode-plus:move-to-next-occurrence'
-
+  '(': 'vim-mode-plus-user:move-to-previous-symbol'
+  ')': 'vim-mode-plus-user:move-to-next-symbol'
   'cmd-j': 'vim-mode-plus:join'
   'Y': 'keystroke y i l'
   'cmd-enter': 'editor:newline-below'
-  'space escape': 'vim-mode-plus:undo'
+
   # pane splitting
   'ctrl-alt-shift-cmd-k': 'window:focus-pane-above'
   'ctrl-alt-shift-cmd-j': 'window:focus-pane-below'
@@ -130,9 +134,11 @@
   'space g s': 'git-plus:status'
   'space g l': 'git-plus:log'
   'space g v': 'git-plus:stash-save'
-  'space g d': 'git-plus:diff'
+  'space g d a': 'git-plus:diff-all'
+  'space g d d': 'git-plus:diff'
   'space g h': 'git-history:show-file-history'
   'space g b': 'git-blame:toggle'
+  'space g r': 'git-plus:run'
 
   'space s': 'settings-view:install-packages-and-themes'
 
@@ -150,8 +156,6 @@
 
   'shift-alt-j': 'vim-mode-plus:move-down-to-edge'
   'shift-alt-k': 'vim-mode-plus:move-up-to-edge'
-  'ctrl-cmd-k': 'my:move-line-up'
-  'ctrl-cmd-j': 'my:move-line-down'
 
   'alt-l': 'vim-mode-plus:move-to-next-word'
   'shift-l': 'vim-mode-plus:move-to-last-character-of-line'

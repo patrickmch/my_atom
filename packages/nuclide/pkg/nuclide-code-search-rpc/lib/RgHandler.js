@@ -1,22 +1,30 @@
-'use strict';
+"use strict";
 
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
 exports.search = search;
 
-var _rxjsBundlesRxMinJs = require('rxjs/bundles/Rx.min.js');
+var _rxjsCompatUmdMin = require("rxjs-compat/bundles/rxjs-compat.umd.min.js");
 
-var _handlerCommon;
+function _handlerCommon() {
+  const data = require("./handlerCommon");
 
-function _load_handlerCommon() {
-  return _handlerCommon = require('./handlerCommon');
+  _handlerCommon = function () {
+    return data;
+  };
+
+  return data;
 }
 
-var _parser;
+function _parser() {
+  const data = require("./parser");
 
-function _load_parser() {
-  return _parser = require('./parser');
+  _parser = function () {
+    return data;
+  };
+
+  return data;
 }
 
 /**
@@ -29,21 +37,26 @@ function _load_parser() {
  *  strict-local
  * @format
  */
-
 function search(params) {
-  const { regex, limit, leadingLines, trailingLines } = params;
+  const {
+    regex,
+    limit,
+    leadingLines,
+    trailingLines
+  } = params;
   const searchSources = params.recursive ? [params.directory] : params.files;
+
   if (searchSources.length === 0) {
-    return _rxjsBundlesRxMinJs.Observable.empty();
-  }
-  // Javascript escapes the slash when constructing the regexp,
+    return _rxjsCompatUmdMin.Observable.empty();
+  } // Javascript escapes the slash when constructing the regexp,
   // but Rust's regex library is picky about extra escapes:
   // see https://github.com/rust-lang/regex/issues/93#issuecomment-196022003
+
+
   const source = regex.source.split('\\/').join('/');
-  const output = (0, (_handlerCommon || _load_handlerCommon()).observeGrepLikeProcess)('rg', (regex.ignoreCase ? ['--ignore-case'] : []).concat(leadingLines != null ? ['-B', String(leadingLines)] : []).concat(trailingLines != null ? ['-A', String(trailingLines)] : []).concat([
-  // no colors, show line number, search hidden files, limit line length
+  const output = (0, _handlerCommon().observeGrepLikeProcess)('rg', (regex.ignoreCase ? ['--ignore-case'] : []).concat(leadingLines != null ? ['-B', String(leadingLines)] : []).concat(trailingLines != null ? ['-A', String(trailingLines)] : []).concat([// no colors, show line number, search hidden files, limit line length
   // one result per line, show filename with null byte
-  '--color', 'never', '--line-number', '--hidden', '--no-heading', '--max-columns', String((_handlerCommon || _load_handlerCommon()).BUFFER_SIZE_LIMIT), '-H', '-0', '-e', source]).concat(searchSources));
-  const results = (0, (_handlerCommon || _load_handlerCommon()).mergeOutputToResults)(output, event => (0, (_parser || _load_parser()).parseProcessLine)(event, 'rg'), regex, leadingLines || 0, trailingLines || 0);
+  '--color', 'never', '--line-number', '--hidden', '--no-heading', '--max-columns', String(_handlerCommon().BUFFER_SIZE_LIMIT), '-H', '-0', '-e', source]).concat(searchSources));
+  const results = (0, _handlerCommon().mergeOutputToResults)(output, event => (0, _parser().parseProcessLine)(event, 'rg'), regex, leadingLines || 0, trailingLines || 0);
   return limit != null ? results.take(limit) : results;
 }

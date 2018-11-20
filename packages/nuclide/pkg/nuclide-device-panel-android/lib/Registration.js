@@ -1,50 +1,78 @@
-'use strict';
+"use strict";
 
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
 exports.registerDevicePanelProviders = registerDevicePanelProviders;
 
-var _AdbDevicePoller;
+function _nuclideAdb() {
+  const data = require("../../../modules/nuclide-adb");
 
-function _load_AdbDevicePoller() {
-  return _AdbDevicePoller = require('../../../modules/nuclide-adb/lib/AdbDevicePoller');
+  _nuclideAdb = function () {
+    return data;
+  };
+
+  return data;
 }
 
-var _UniversalDisposable;
+function _UniversalDisposable() {
+  const data = _interopRequireDefault(require("../../../modules/nuclide-commons/UniversalDisposable"));
 
-function _load_UniversalDisposable() {
-  return _UniversalDisposable = _interopRequireDefault(require('../../../modules/nuclide-commons/UniversalDisposable'));
+  _UniversalDisposable = function () {
+    return data;
+  };
+
+  return data;
 }
 
-var _AndroidDeviceInfoProvider;
+function _AndroidDeviceInfoProvider() {
+  const data = require("./providers/AndroidDeviceInfoProvider");
 
-function _load_AndroidDeviceInfoProvider() {
-  return _AndroidDeviceInfoProvider = require('./providers/AndroidDeviceInfoProvider');
+  _AndroidDeviceInfoProvider = function () {
+    return data;
+  };
+
+  return data;
 }
 
-var _AndroidDeviceProcessesProvider;
+function _AndroidDeviceProcessesProvider() {
+  const data = require("./providers/AndroidDeviceProcessesProvider");
 
-function _load_AndroidDeviceProcessesProvider() {
-  return _AndroidDeviceProcessesProvider = require('./providers/AndroidDeviceProcessesProvider');
+  _AndroidDeviceProcessesProvider = function () {
+    return data;
+  };
+
+  return data;
 }
 
-var _AndroidDeviceStopProcessProvider;
+function _AndroidDeviceStopProcessProvider() {
+  const data = require("./providers/AndroidDeviceStopProcessProvider");
 
-function _load_AndroidDeviceStopProcessProvider() {
-  return _AndroidDeviceStopProcessProvider = require('./providers/AndroidDeviceStopProcessProvider');
+  _AndroidDeviceStopProcessProvider = function () {
+    return data;
+  };
+
+  return data;
 }
 
-var _AvdComponentProvider;
+function _AvdComponentProvider() {
+  const data = require("./providers/AvdComponentProvider");
 
-function _load_AvdComponentProvider() {
-  return _AvdComponentProvider = require('./providers/AvdComponentProvider');
+  _AvdComponentProvider = function () {
+    return data;
+  };
+
+  return data;
 }
 
-var _AdbTunnelingProvider;
+function _AdbTunnelingProvider() {
+  const data = require("./providers/AdbTunnelingProvider");
 
-function _load_AdbTunnelingProvider() {
-  return _AdbTunnelingProvider = require('./providers/AdbTunnelingProvider');
+  _AdbTunnelingProvider = function () {
+    return data;
+  };
+
+  return data;
 }
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
@@ -59,10 +87,12 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
  *  strict-local
  * @format
  */
-
 function registerDevicePanelProviders(api) {
-  return new (_UniversalDisposable || _load_UniversalDisposable()).default(api.registerListProvider({
+  return new (_UniversalDisposable().default)(api.registerListProvider({
     getType: () => 'Android',
-    observe: host => (0, (_AdbDevicePoller || _load_AdbDevicePoller()).observeAndroidDevicesX)(host)
-  }), api.registerInfoProvider(new (_AndroidDeviceInfoProvider || _load_AndroidDeviceInfoProvider()).AndroidDeviceInfoProvider()), api.registerProcessesProvider(new (_AndroidDeviceProcessesProvider || _load_AndroidDeviceProcessesProvider()).AndroidDeviceProcessesProvider()), api.registerProcessTaskProvider(new (_AndroidDeviceStopProcessProvider || _load_AndroidDeviceStopProcessProvider()).AndroidDeviceStopProcessProvider()), api.registerDeviceTypeComponentProvider(new (_AvdComponentProvider || _load_AvdComponentProvider()).AvdComponentProvider()), api.registerDeviceTypeComponentProvider(new (_AdbTunnelingProvider || _load_AdbTunnelingProvider()).AdbTunnelingProvider()));
+    observe: host => (0, _nuclideAdb().observeAndroidDevices)(host).map(expected => expected.map(devices => devices.map(d => ({
+      identifier: d.serial,
+      displayName: d.displayName
+    }))))
+  }), api.registerInfoProvider(new (_AndroidDeviceInfoProvider().AndroidDeviceInfoProvider)()), api.registerProcessesProvider(new (_AndroidDeviceProcessesProvider().AndroidDeviceProcessesProvider)()), api.registerProcessTaskProvider(new (_AndroidDeviceStopProcessProvider().AndroidDeviceStopProcessProvider)()), api.registerDeviceTypeComponentProvider(new (_AvdComponentProvider().AvdComponentProvider)()), api.registerDeviceTypeComponentProvider(new (_AdbTunnelingProvider().AdbTunnelingProvider)()));
 }

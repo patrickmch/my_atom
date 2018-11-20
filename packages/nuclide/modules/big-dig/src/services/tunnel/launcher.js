@@ -1,15 +1,23 @@
-'use strict';
+"use strict";
 
-var _TunnelManager;
+function _TunnelManager() {
+  const data = require("./TunnelManager");
 
-function _load_TunnelManager() {
-  return _TunnelManager = require('./TunnelManager');
+  _TunnelManager = function () {
+    return data;
+  };
+
+  return data;
 }
 
-var _log4js;
+function _log4js() {
+  const data = require("log4js");
 
-function _load_log4js() {
-  return _log4js = require('log4js');
+  _log4js = function () {
+    return data;
+  };
+
+  return data;
 }
 
 /**
@@ -23,21 +31,17 @@ function _load_log4js() {
  * 
  * @format
  */
+const logger = (0, _log4js().getLogger)('tunnel-service'); // eslint-disable-next-line nuclide-internal/no-commonjs
 
-const logger = (0, (_log4js || _load_log4js()).getLogger)('tunnel-service');
-
-// eslint-disable-next-line nuclide-internal/no-commonjs
-module.exports = function launch(launcherParams) {
-  const { server } = launcherParams;
+module.exports = function launch(server) {
   logger.info('adding tunnel subscriber!');
-
   server.addSubscriber('tunnel', {
     onConnection(transport) {
-      logger.info('connection made, creating TunnelManager');
-      // eslint-disable-next-line no-unused-vars
-      const tunnelManager = new (_TunnelManager || _load_TunnelManager()).TunnelManager(transport); // when do we close this?
-    }
-  });
+      logger.info('connection made, creating TunnelManager'); // eslint-disable-next-line no-unused-vars
 
+      const tunnelManager = new (_TunnelManager().TunnelManager)(transport); // when do we close this?
+    }
+
+  });
   return Promise.resolve();
 };

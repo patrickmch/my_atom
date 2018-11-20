@@ -1,15 +1,23 @@
-'use strict';
+"use strict";
 
-var _createPackage;
+function _createPackage() {
+  const data = _interopRequireDefault(require("../../../modules/nuclide-commons-atom/createPackage"));
 
-function _load_createPackage() {
-  return _createPackage = _interopRequireDefault(require('../../../modules/nuclide-commons-atom/createPackage'));
+  _createPackage = function () {
+    return data;
+  };
+
+  return data;
 }
 
-var _Activation;
+function _Activation() {
+  const data = _interopRequireDefault(require("./Activation"));
 
-function _load_Activation() {
-  return _Activation = _interopRequireDefault(require('./Activation'));
+  _Activation = function () {
+    return data;
+  };
+
+  return data;
 }
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
@@ -24,5 +32,4 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
  *  strict-local
  * @format
  */
-
-(0, (_createPackage || _load_createPackage()).default)(module.exports, (_Activation || _load_Activation()).default);
+(0, _createPackage().default)(module.exports, _Activation().default);

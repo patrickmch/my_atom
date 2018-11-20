@@ -1,6 +1,4 @@
-var babelPluginFlowReactPropTypes_proptype_Positioner = require('./Masonry').babelPluginFlowReactPropTypes_proptype_Positioner || require('prop-types').any;
 
-var babelPluginFlowReactPropTypes_proptype_CellMeasurerCache = require('./Masonry').babelPluginFlowReactPropTypes_proptype_CellMeasurerCache || require('prop-types').any;
 
 export default function createCellPositioner(_ref) {
   var cellMeasurerCache = _ref.cellMeasurerCache,
@@ -54,3 +52,5 @@ export default function createCellPositioner(_ref) {
 
   return cellPositioner;
 }
+import { bpfrpt_proptype_CellMeasurerCache } from './Masonry';
+import { bpfrpt_proptype_Positioner } from './Masonry';

@@ -1,23 +1,20 @@
-'use strict';
+"use strict";
 
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
+exports.default = void 0;
 
-exports.default = async function runCommand(args) {
-  const message = args.length === 0 ? 'Please pass me an arg!' : args.join(' ');
-  console.log(message);
-  return 0;
-}; /**
-    * Copyright (c) 2015-present, Facebook, Inc.
-    * All rights reserved.
-    *
-    * This source code is licensed under the license found in the LICENSE file in
-    * the root directory of this source tree.
-    *
-    *  strict-local
-    * @format
-    */
+/**
+ * Copyright (c) 2015-present, Facebook, Inc.
+ * All rights reserved.
+ *
+ * This source code is licensed under the license found in the LICENSE file in
+ * the root directory of this source tree.
+ *
+ *  strict-local
+ * @format
+ */
 
 /*
  * This is a simple way to see nuclide-atom-scripting in action:
@@ -37,3 +34,10 @@ exports.default = async function runCommand(args) {
  */
 
 /* eslint-disable no-console */
+var runCommand = async function runCommand(args) {
+  const message = args.length === 0 ? 'Please pass me an arg!' : args.join(' ');
+  console.log(message);
+  return 0;
+};
+
+exports.default = runCommand;

@@ -3,6 +3,8 @@
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
+exports.Settings = void 0;
+
 /**
  * Copyright (c) 2015-present, Facebook, Inc.
  * All rights reserved.
@@ -13,8 +15,7 @@ Object.defineProperty(exports, "__esModule", {
  *  strict
  * @format
  */
-
-const Settings = exports.Settings = {
+const Settings = {
   // If initializationOptions are not used or the whitelist is empty, this will
   // determine whether diagnostics + code actions are displayed.
   shouldProvideDiagnosticsDefault: true,
@@ -24,3 +25,4 @@ const Settings = exports.Settings = {
     shouldAddAllFilesAsDefaultExport: true
   }
 };
+exports.Settings = Settings;

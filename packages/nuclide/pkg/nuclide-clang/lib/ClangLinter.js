@@ -1,63 +1,93 @@
-'use strict';
+"use strict";
 
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
+exports.default = void 0;
 
-var _nuclideAnalytics;
+function _nuclideAnalytics() {
+  const data = require("../../../modules/nuclide-analytics");
 
-function _load_nuclideAnalytics() {
-  return _nuclideAnalytics = require('../../nuclide-analytics');
+  _nuclideAnalytics = function () {
+    return data;
+  };
+
+  return data;
 }
 
-var _utils;
+function _utils() {
+  const data = require("../../nuclide-clang-rpc/lib/utils");
 
-function _load_utils() {
-  return _utils = require('../../nuclide-clang-rpc/lib/utils');
+  _utils = function () {
+    return data;
+  };
+
+  return data;
 }
 
-var _constants;
+function _constants() {
+  const data = require("./constants");
 
-function _load_constants() {
-  return _constants = require('./constants');
+  _constants = function () {
+    return data;
+  };
+
+  return data;
 }
 
-var _libclang;
+function _libclang() {
+  const data = require("./libclang");
 
-function _load_libclang() {
-  return _libclang = require('./libclang');
+  _libclang = function () {
+    return data;
+  };
+
+  return data;
 }
 
-var _log4js;
+function _log4js() {
+  const data = require("log4js");
 
-function _load_log4js() {
-  return _log4js = require('log4js');
+  _log4js = function () {
+    return data;
+  };
+
+  return data;
 }
 
-var _featureConfig;
+function _featureConfig() {
+  const data = _interopRequireDefault(require("../../../modules/nuclide-commons-atom/feature-config"));
 
-function _load_featureConfig() {
-  return _featureConfig = _interopRequireDefault(require('../../../modules/nuclide-commons-atom/feature-config'));
+  _featureConfig = function () {
+    return data;
+  };
+
+  return data;
 }
 
-var _range;
+function _range() {
+  const data = require("../../../modules/nuclide-commons-atom/range");
 
-function _load_range() {
-  return _range = require('../../../modules/nuclide-commons-atom/range');
+  _range = function () {
+    return data;
+  };
+
+  return data;
 }
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-const IDENTIFIER_REGEX = /[a-z0-9_]+/gi; /**
-                                          * Copyright (c) 2015-present, Facebook, Inc.
-                                          * All rights reserved.
-                                          *
-                                          * This source code is licensed under the license found in the LICENSE file in
-                                          * the root directory of this source tree.
-                                          *
-                                          * 
-                                          * @format
-                                          */
+/**
+ * Copyright (c) 2015-present, Facebook, Inc.
+ * All rights reserved.
+ *
+ * This source code is licensed under the license found in the LICENSE file in
+ * the root directory of this source tree.
+ *
+ * 
+ * @format
+ */
+const IDENTIFIER_REGEX = /[a-z0-9_]+/gi;
 
 function isValidRange(clangRange) {
   // Some ranges are unbounded/invalid (end with -1) or empty.
@@ -67,41 +97,45 @@ function isValidRange(clangRange) {
 function getRangeFromPoint(editor, location) {
   if (location.row < 0) {
     return editor.getBuffer().rangeForRow(0);
-  }
-  // Attempt to match a C/C++ identifier at the given location.
-  const word = (0, (_range || _load_range()).wordAtPosition)(editor, location, IDENTIFIER_REGEX);
+  } // Attempt to match a C/C++ identifier at the given location.
+
+
+  const word = (0, _range().wordAtPosition)(editor, location, IDENTIFIER_REGEX);
+
   if (word != null) {
     return word.range;
   }
+
   return editor.getBuffer().rangeForRow(location.row);
 }
 
 class ClangLinter {
   static lint(textEditor) {
-    return (0, (_nuclideAnalytics || _load_nuclideAnalytics()).trackTiming)('nuclide-clang-atom.fetch-diagnostics', () => ClangLinter._lint(textEditor));
+    return (0, _nuclideAnalytics().trackTiming)('nuclide-clang-atom.fetch-diagnostics', () => ClangLinter._lint(textEditor));
   }
 
   static async _lint(textEditor) {
     const filePath = textEditor.getPath();
+
     if (filePath == null) {
       return [];
     }
 
     try {
-      const diagnostics = await (0, (_libclang || _load_libclang()).getDiagnostics)(textEditor);
-      // Editor may have been destroyed during the fetch.
+      const diagnostics = await (0, _libclang().getDiagnostics)(textEditor); // Editor may have been destroyed during the fetch.
+
       if (diagnostics == null || textEditor.isDestroyed()) {
         return [];
       }
 
-      (0, (_nuclideAnalytics || _load_nuclideAnalytics()).track)('nuclide-clang-atom.fetch-diagnostics', {
+      (0, _nuclideAnalytics().track)('nuclide-clang-atom.fetch-diagnostics', {
         filePath,
         count: String(diagnostics.diagnostics.length),
         accurateFlags: String(diagnostics.accurateFlags)
       });
       return ClangLinter._processDiagnostics(diagnostics, textEditor);
     } catch (error) {
-      (0, (_log4js || _load_log4js()).getLogger)('nuclide-clang').error(`ClangLinter: error linting ${filePath}`, error);
+      (0, _log4js().getLogger)('nuclide-clang').error(`ClangLinter: error linting ${filePath}`, error);
       return [];
     }
   }
@@ -112,10 +146,10 @@ class ClangLinter {
     const bufferPath = buffer.getPath();
 
     if (!(bufferPath != null)) {
-      throw new Error('Invariant violation: "bufferPath != null"');
+      throw new Error("Invariant violation: \"bufferPath != null\"");
     }
 
-    if (data.accurateFlags || (_featureConfig || _load_featureConfig()).default.get('nuclide-clang.defaultDiagnostics')) {
+    if (data.accurateFlags || _featureConfig().default.get('nuclide-clang.defaultDiagnostics')) {
       data.diagnostics.forEach(diagnostic => {
         // We show only warnings, errors and fatals (2, 3 and 4, respectively).
         if (diagnostic.severity < 2) {
@@ -123,17 +157,18 @@ class ClangLinter {
         }
 
         let range;
+
         if (diagnostic.ranges && isValidRange(diagnostic.ranges[0].range)) {
           // Use the first range from the diagnostic as the range for Linter.
           range = diagnostic.ranges[0].range;
         } else {
           range = getRangeFromPoint(editor, diagnostic.location.point);
-        }
+        } // flowlint-next-line sketchy-null-string:off
 
-        // flowlint-next-line sketchy-null-string:off
+
         const filePath = diagnostic.location.file || bufferPath;
-
         let trace;
+
         if (diagnostic.children != null) {
           trace = diagnostic.children.map(child => {
             return {
@@ -147,9 +182,11 @@ class ClangLinter {
         }
 
         let fix;
+
         if (diagnostic.fixits != null) {
           // TODO: support multiple fixits (if it's ever used at all)
           const fixit = diagnostic.fixits[0];
+
           if (fixit != null) {
             fix = {
               range: fixit.range.range,
@@ -171,12 +208,14 @@ class ClangLinter {
       result.push({
         type: 'Info',
         filePath: bufferPath,
-        text: (0, (_utils || _load_utils()).isHeaderFile)(bufferPath) ? (_constants || _load_constants()).HEADER_DEFAULT_FLAGS_WARNING : (_constants || _load_constants()).DEFAULT_FLAGS_WARNING,
+        text: (0, _utils().isHeaderFile)(bufferPath) ? _constants().HEADER_DEFAULT_FLAGS_WARNING : _constants().DEFAULT_FLAGS_WARNING,
         range: buffer.rangeForRow(0)
       });
     }
 
     return result;
   }
+
 }
+
 exports.default = ClangLinter;

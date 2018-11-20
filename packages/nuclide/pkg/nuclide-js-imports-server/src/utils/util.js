@@ -1,4 +1,4 @@
-'use strict';
+"use strict";
 
 Object.defineProperty(exports, "__esModule", {
   value: true
@@ -9,22 +9,16 @@ exports.compareForInsertion = compareForInsertion;
 exports.compareForSuggestion = compareForSuggestion;
 exports.getRequiredModule = getRequiredModule;
 
-var _simpleTextBuffer;
+function _simpleTextBuffer() {
+  const data = require("simple-text-buffer");
 
-function _load_simpleTextBuffer() {
-  return _simpleTextBuffer = require('simple-text-buffer');
+  _simpleTextBuffer = function () {
+    return data;
+  };
+
+  return data;
 }
 
-function babelLocationToAtomRange(location) {
-  return new (_simpleTextBuffer || _load_simpleTextBuffer()).Range(new (_simpleTextBuffer || _load_simpleTextBuffer()).Point(location.start.line - 1, location.start.col), new (_simpleTextBuffer || _load_simpleTextBuffer()).Point(location.end.line - 1, location.end.col));
-}
-
-/**
- * Sort in decreasing order of 'globality':
- * - Modules
- * - Relative paths in other directories (../*)
- * - Local paths (./*)
- */
 /**
  * Copyright (c) 2015-present, Facebook, Inc.
  * All rights reserved.
@@ -35,6 +29,16 @@ function babelLocationToAtomRange(location) {
  * 
  * @format
  */
+function babelLocationToAtomRange(location) {
+  return new (_simpleTextBuffer().Range)(new (_simpleTextBuffer().Point)(location.start.line - 1, location.start.col), new (_simpleTextBuffer().Point)(location.end.line - 1, location.end.col));
+}
+/**
+ * Sort in decreasing order of 'globality':
+ * - Modules
+ * - Relative paths in other directories (../*)
+ * - Local paths (./*)
+ */
+
 
 const MODULES_PRIORITY = -1;
 const RELATIVE_PRIORITY = 0;
@@ -44,9 +48,11 @@ function importPathToPriority(path) {
   if (path.startsWith('..')) {
     return RELATIVE_PRIORITY;
   }
+
   if (path.startsWith('.')) {
     return LOCAL_PRIORITY;
   }
+
   return MODULES_PRIORITY;
 }
 
@@ -57,37 +63,57 @@ function isLowerCase(s) {
 function compareForInsertion(path1, path2) {
   const p1 = importPathToPriority(path1);
   const p2 = importPathToPriority(path2);
+
   if (p1 !== p2) {
     // Typically the highest-priority imports are at the end.
     return p1 - p2;
   }
+
   if (p1 === MODULES_PRIORITY) {
     // Order uppercase modules before lowercased modules.
     // (Mostly a Facebook-friendly convention).
     const lc1 = isLowerCase(path1[0]);
     const lc2 = isLowerCase(path2[0]);
+
     if (lc1 !== lc2) {
       return Number(lc1) - Number(lc2);
     }
   }
+
   return path1.localeCompare(path2);
 }
 
 function compareForSuggestion(path1, path2) {
   const p1 = importPathToPriority(path1);
   const p2 = importPathToPriority(path2);
+
   if (p1 !== p2) {
     // Provide highest-priority matches first.
     return p2 - p1;
   }
-  // Prefer shorter paths.
+
+  const parts1 = path1.split('.', 2);
+  const parts2 = path2.split('.', 2);
+
+  if (parts1[0] === parts2[0]) {
+    // Prefer x.react over any other x.{suffix}.
+    const isReact1 = parts1[1] === 'react';
+    const isReact2 = parts2[1] === 'react';
+
+    if (isReact1 !== isReact2) {
+      return Number(isReact2) - Number(isReact1);
+    }
+  } // Prefer shorter paths.
+
+
   if (path1.length !== path2.length) {
     return path1.length - path2.length;
   }
-  return path1.localeCompare(path2);
-}
 
-// Check if an AST node is a require call, and returns the literal value.
+  return path1.localeCompare(path2);
+} // Check if an AST node is a require call, and returns the literal value.
+
+
 function getRequiredModule(node) {
   if (node.type === 'CallExpression' && node.callee.type === 'Identifier' && node.callee.name === 'require' && node.arguments[0] && node.arguments[0].type === 'StringLiteral') {
     return node.arguments[0].value;

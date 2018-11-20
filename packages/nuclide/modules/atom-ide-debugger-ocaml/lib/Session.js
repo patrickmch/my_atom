@@ -1,58 +1,74 @@
-'use strict';
+"use strict";
 
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.Session = undefined;
+exports.Session = void 0;
 
-var _OCamlDebugProxy;
+function _OCamlDebugProxy() {
+  const data = require("./OCamlDebugProxy");
 
-function _load_OCamlDebugProxy() {
-  return _OCamlDebugProxy = require('./OCamlDebugProxy');
+  _OCamlDebugProxy = function () {
+    return data;
+  };
+
+  return data;
 }
 
-var _nuclideUri;
+function _nuclideUri() {
+  const data = _interopRequireDefault(require("../../nuclide-commons/nuclideUri"));
 
-function _load_nuclideUri() {
-  return _nuclideUri = _interopRequireDefault(require('../../nuclide-commons/nuclideUri'));
+  _nuclideUri = function () {
+    return data;
+  };
+
+  return data;
 }
 
-var _url = _interopRequireDefault(require('url'));
+var _url = _interopRequireDefault(require("url"));
 
-var _vscodeDebugadapter;
+function _vscodeDebugadapter() {
+  const data = require("vscode-debugadapter");
 
-function _load_vscodeDebugadapter() {
-  return _vscodeDebugadapter = require('vscode-debugadapter');
+  _vscodeDebugadapter = function () {
+    return data;
+  };
+
+  return data;
 }
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
+/**
+ * Copyright (c) 2017-present, Facebook, Inc.
+ * All rights reserved.
+ *
+ * This source code is licensed under the BSD-style license found in the
+ * LICENSE file in the root directory of this source tree. An additional grant
+ * of patent rights can be found in the PATENTS file in the same directory.
+ *
+ * 
+ * @format
+ */
 function uriToModuleName(uri) {
   const pathname = uri.startsWith('file://') ? _url.default.parse(uri).pathname : uri;
 
   if (!(pathname != null && pathname !== '')) {
-    throw new Error('Invariant violation: "pathname != null && pathname !== \'\'"');
+    throw new Error("Invariant violation: \"pathname != null && pathname !== ''\"");
   }
 
-  const fileName = (_nuclideUri || _load_nuclideUri()).default.basename(pathname).replace(/\.[^.]+$/, '');
+  const fileName = _nuclideUri().default.basename(pathname).replace(/\.[^.]+$/, '');
+
   return fileName.charAt(0).toUpperCase() + fileName.substr(1);
-} /**
-   * Copyright (c) 2017-present, Facebook, Inc.
-   * All rights reserved.
-   *
-   * This source code is licensed under the BSD-style license found in the
-   * LICENSE file in the root directory of this source tree. An additional grant
-   * of patent rights can be found in the PATENTS file in the same directory.
-   *
-   * 
-   * @format
-   */
+}
 
 function extractList(text, prefix, keepLines, empty, f) {
   const i = text.indexOf(prefix);
+
   if (i < 0) {
     return empty;
   }
+
   const t = text.substr(i + prefix.length);
   const parts = keepLines ? t.split(/\r?\n/g) : t.replace(/[\s\r\n]+/g, ' ').split(' ');
   const list = parts.map(s => s.trim()).filter(s => s.length > 0);
@@ -60,7 +76,6 @@ function extractList(text, prefix, keepLines, empty, f) {
 }
 
 class Lock {
-
   constructor() {
     this._inner = Promise.resolve(0);
     this._expected = 0;
@@ -68,6 +83,7 @@ class Lock {
 
   async enter() {
     const curCount = await this._inner;
+
     if (curCount !== this._expected) {
       // Sometimes we get multiple Promises waiting on the same _inner, so if we
       // detect that we're stale start waiting again.
@@ -77,20 +93,22 @@ class Lock {
     let e;
     this._inner = new Promise(resolve => {
       this._expected++;
+
       e = () => resolve(this._expected);
     });
-    return { exitLock: () => e() };
+    return {
+      exitLock: () => e()
+    };
   }
+
 }
 
 class Session {
-
   constructor(debugProxy, modules, onBreakpointHit, onProgramExit) {
     this._debugProxy = debugProxy;
     this._modules = modules;
     this._onProgramExit = onProgramExit;
     this._onBreakpointHit = onBreakpointHit;
-
     this._shortNamesToPaths = new Map();
     this._breakpoints = new Map();
     this._paused = true;
@@ -101,8 +119,10 @@ class Session {
     const output = await this._send('backtrace');
     return extractList(output, 'Backtrace:', true, [], lines => {
       const frames = [];
+
       for (const line of lines) {
         const m = /#(\d+) ([^\s]+) ([^:]+):(\d+):(\d+)/.exec(line);
+
         if (m) {
           // We generally have a result for _shortNamesToPaths when running
           // locally, and generally don't when running remotely.
@@ -119,6 +139,7 @@ class Session {
           });
         }
       }
+
       return frames;
     });
   }
@@ -158,32 +179,43 @@ class Session {
         column: bp.column || 0,
         verified: false
       };
-    };
-
-    // The count of returned breakpoints must always equal the count of
+    }; // The count of returned breakpoints must always equal the count of
     // requested breakpoints, so instead of returning an empty list if something
     // goes wrong we just have to return a bunch of unverified breakpoints.
+
+
     if (uri == null || shortname == null) {
-      (_vscodeDebugadapter || _load_vscodeDebugadapter()).logger.error(`Could not set breakpoint: ${JSON.stringify({ uri, shortname })}.`);
+      _vscodeDebugadapter().logger.error(`Could not set breakpoint: ${JSON.stringify({
+        uri,
+        shortname
+      })}.`);
+
       return breakpoints.map(mapFailedBreakpoint);
     }
 
     const moduleName = uriToModuleName(uri);
+
     if (!this._modules.has(moduleName)) {
-      (_vscodeDebugadapter || _load_vscodeDebugadapter()).logger.error(`Could not set breakpoint: ${moduleName} is not part of the executable.`);
+      _vscodeDebugadapter().logger.error(`Could not set breakpoint: ${moduleName} is not part of the executable.`);
+
       return breakpoints.map(mapFailedBreakpoint);
     }
 
     const existingBreakpoints = this._breakpoints.get(uri);
+
     if (existingBreakpoints) {
       await Promise.all(existingBreakpoints.map(this.deleteBreakpoint.bind(this)));
     }
 
     this._shortNamesToPaths.set(shortname, uri);
+
     const breakpointsPromise = breakpoints.map(async bp => this._pauseAndLock(async () => {
       const result = await this._send(`break @${moduleName} ${bp.line}`);
-      (_vscodeDebugadapter || _load_vscodeDebugadapter()).logger.verbose(result);
+
+      _vscodeDebugadapter().logger.verbose(result);
+
       const m = /^Breakpoint (\d+) at \d+: file (.+), line (\d+), characters (\d+)-(\d+)$/m.exec(result);
+
       if (m) {
         return {
           id: Number(m[1]),
@@ -195,8 +227,8 @@ class Session {
 
       return mapFailedBreakpoint(bp);
     }));
-
     const breakpointsToReturn = await Promise.all(breakpointsPromise);
+
     this._breakpoints.set(uri, breakpointsToReturn);
 
     return breakpointsToReturn;
@@ -204,6 +236,7 @@ class Session {
 
   deleteBreakpoint(breakpoint) {
     const breakpointId = breakpoint.id;
+
     if (breakpointId != null) {
       return this._pauseAndLock(async () => {
         await this._send(`delete ${breakpointId}`);
@@ -217,10 +250,13 @@ class Session {
     if (this._paused) {
       return true;
     }
+
     if (this._disposeOnBreakListener) {
       this._disposeOnBreakListener();
+
       this._disposeOnBreakListener = null;
     }
+
     await this._debugProxy.pause();
     this._paused = true;
     return false;
@@ -230,9 +266,11 @@ class Session {
     this._paused = false;
     this._disposeOnBreakListener = this._debugProxy.attachOnPromptListener(output => {
       const lines = output.replace(/\r?\n/g, '\n').split('\n').filter(l => l.length > 0).reverse();
+
       const handleEvent = (breakpointId, error) => {
         this._runWithLock(() => {
           this._paused = true;
+
           if (breakpointId != null) {
             return this._onBreakpointHit(breakpointId);
           } else {
@@ -240,20 +278,26 @@ class Session {
           }
         });
       };
+
       for (const line of lines) {
         let m = /^Unhandled exception: (.+)$/.exec(line);
+
         if (m) {
           return handleEvent(undefined, m[1]);
         }
+
         if (line === 'Program end.') {
           return handleEvent(undefined, undefined);
         }
+
         m = /^Breakpoint: (\d+)/.exec(line);
+
         if (m) {
           return handleEvent(m[1], undefined);
         }
       }
     });
+
     this._debugProxy.resume();
   }
 
@@ -264,7 +308,10 @@ class Session {
   }
 
   async _runWithLock(f) {
-    const { exitLock } = await this._lock.enter();
+    const {
+      exitLock
+    } = await this._lock.enter();
+
     try {
       return await f();
     } finally {
@@ -275,6 +322,7 @@ class Session {
   async _pauseAndLock(f) {
     return this._runWithLock(async () => {
       const wasPaused = await this.pause();
+
       try {
         return await f();
       } finally {
@@ -287,17 +335,18 @@ class Session {
 
   static async _startOcamlDebug(startInfo, onProgramExit) {
     const debuggerArguments = [];
+
     for (const includeDir of startInfo.includeDirectories) {
       debuggerArguments.push('-I', includeDir);
     }
 
     if (startInfo.workingDirectory) {
       debuggerArguments.push('-cd', startInfo.workingDirectory);
-    }
-
-    // Path of the executable to debug is optional because there are some
+    } // Path of the executable to debug is optional because there are some
     // scripts in fbcode that execute ocamldebug with the correct arguments and
     // executable path, and we want to support executing those directly.
+
+
     if (startInfo.executablePath.trim().length > 0) {
       const executablePath = startInfo.executablePath;
       debuggerArguments.push(executablePath);
@@ -305,11 +354,9 @@ class Session {
 
     const command = startInfo.ocamldebugExecutable !== '' ? startInfo.ocamldebugExecutable : 'ocamldebug';
     debuggerArguments.push(...startInfo.arguments);
-
-    const ocamlDebug = new (_OCamlDebugProxy || _load_OCamlDebugProxy()).OCamlDebugProxy(command, debuggerArguments, result => {
+    const ocamlDebug = new (_OCamlDebugProxy().OCamlDebugProxy)(command, debuggerArguments, result => {
       onProgramExit(result.kind === 'finished' ? null : result.message);
     });
-
     await ocamlDebug.waitForPrompt();
     await ocamlDebug.send('goto 0');
     return ocamlDebug;
@@ -317,9 +364,10 @@ class Session {
 
   static async start(startInfo, onBreakpointHit, onProgramExit) {
     const ocamlDebug = await Session._startOcamlDebug(startInfo, onProgramExit);
-
     const modulesText = await ocamlDebug.send('info modules');
-    (_vscodeDebugadapter || _load_vscodeDebugadapter()).logger.verbose(`MODULES ${modulesText}`);
+
+    _vscodeDebugadapter().logger.verbose(`MODULES ${modulesText}`);
+
     return new Session(ocamlDebug, Session._extractModules(modulesText), onBreakpointHit, onProgramExit);
   }
 
@@ -333,5 +381,7 @@ class Session {
       return acc;
     }, new Set()));
   }
+
 }
+
 exports.Session = Session;

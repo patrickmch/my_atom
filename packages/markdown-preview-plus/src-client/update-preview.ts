@@ -24,43 +24,44 @@ import morph = require('morphdom')
 import MathJaxHelper = require('./mathjax-helper')
 
 export class UpdatePreview {
-  private cachedMJRenderer?: MathJaxRenderer
   constructor(private dom: HTMLElement) {
     /* no-op */
   }
 
-  public async update(
-    newDom: Element,
-    renderLaTeX: boolean,
-    mjrenderer: MathJaxRenderer,
-  ): Promise<void> {
-    const lastMJRenderer =
-      this.cachedMJRenderer === undefined ? mjrenderer : this.cachedMJRenderer
-    this.cachedMJRenderer = mjrenderer
-
+  public async update(newDom: Element, renderLaTeX: boolean): Promise<void> {
     for (const m of Array.from(newDom.querySelectorAll('span.math'))) {
       const mscr = m.firstElementChild as HTMLScriptElement | null
       if (!mscr || mscr.nodeName !== 'SCRIPT') continue
       m.isSameNode = function(target: Node) {
-        if (lastMJRenderer !== mjrenderer) return false
         if (target.nodeName !== 'SPAN') return false
         const el = target as HTMLSpanElement
         if (!el.classList.contains('math')) return false
         const scr = el.querySelector('script')
         if (!scr) return false
-        return mscr.innerHTML === scr.innerHTML
+        return mscr.innerHTML === scr.innerHTML && mscr.type === scr.type
       }
     }
 
     morph(this.dom, newDom, {
       childrenOnly: true,
-      onElUpdated: function(el) {
-        if (el.tagName === 'LI') el.innerHTML = el.innerHTML // force re-render
-      },
     })
 
+    // A very specific fix for #386 and #406
+    for (const li of this.dom.querySelectorAll('li')) {
+      if (
+        li.firstElementChild &&
+        li.firstElementChild === li.lastElementChild &&
+        li.firstElementChild.tagName === 'P' &&
+        li.firstChild &&
+        li.firstChild.nodeType === Node.TEXT_NODE &&
+        li.firstChild.textContent === '\n'
+      ) {
+        li.removeChild(li.firstChild)
+      }
+    }
+
     if (renderLaTeX) {
-      return MathJaxHelper.mathProcessor(this.dom, mjrenderer)
+      return MathJaxHelper.mathProcessor(this.dom)
     }
   }
 }

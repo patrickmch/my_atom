@@ -1,33 +1,49 @@
-'use strict';
+"use strict";
 
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.appender = undefined;
 exports.configure = configure;
+exports.appender = void 0;
 
-var _log4js;
+function _log4js() {
+  const data = require("log4js");
 
-function _load_log4js() {
-  return _log4js = require('log4js');
+  _log4js = function () {
+    return data;
+  };
+
+  return data;
 }
 
-var _process;
+function _process() {
+  const data = require("../../../modules/nuclide-commons/process");
 
-function _load_process() {
-  return _process = require('../../../modules/nuclide-commons/process');
+  _process = function () {
+    return data;
+  };
+
+  return data;
 }
 
-var _string;
+function _string() {
+  const data = require("../../../modules/nuclide-commons/string");
 
-function _load_string() {
-  return _string = require('../../../modules/nuclide-commons/string');
+  _string = function () {
+    return data;
+  };
+
+  return data;
 }
 
-var _nuclideAnalytics;
+function _nuclideAnalytics() {
+  const data = require("../../../modules/nuclide-analytics");
 
-function _load_nuclideAnalytics() {
-  return _nuclideAnalytics = require('../../nuclide-analytics');
+  _nuclideAnalytics = function () {
+    return data;
+  };
+
+  return data;
 }
 
 /**
@@ -40,16 +56,19 @@ function _load_nuclideAnalytics() {
  * 
  * @format
  */
-
 const SAMPLE_RATE = 10;
 
 function configure() {
-  return ({ data, level }) => {
-    if (level === (_log4js || _load_log4js()).levels.INFO) {
+  return ({
+    data,
+    level
+  }) => {
+    if (level === _log4js().levels.INFO) {
       const arg = data[0];
-      if (arg instanceof (_process || _load_process()).ProcessLoggingEvent) {
-        (0, (_nuclideAnalytics || _load_nuclideAnalytics()).trackSampled)('process-exit', SAMPLE_RATE, {
-          command: (0, (_string || _load_string()).shorten)(arg.command, 100, '...'),
+
+      if (arg instanceof _process().ProcessLoggingEvent) {
+        (0, _nuclideAnalytics().trackSampled)('process-exit', SAMPLE_RATE, {
+          command: (0, _string().shorten)(arg.command, 100, '...'),
           duration: arg.duration
         });
       }
@@ -57,4 +76,5 @@ function configure() {
   };
 }
 
-const appender = exports.appender = configure;
+const appender = configure;
+exports.appender = appender;

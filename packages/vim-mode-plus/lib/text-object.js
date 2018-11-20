@@ -449,7 +449,6 @@ class Indentation extends Paragraph {
 // Section: Comment
 // =========================
 class Comment extends TextObject {
-  Comment
   wise = 'linewise'
 
   getRange (selection) {
@@ -458,6 +457,57 @@ class Comment extends TextObject {
     if (rowRange) {
       return this.getBufferRangeForRowRange(rowRange)
     }
+  }
+}
+
+class BlockComment extends TextObject {
+  wise = 'characterwise'
+
+  getRange (selection) {
+    // Following one-column-right translation is necessary when cursor is "on" `/` char of beginning `/*`.
+    const from = this.editor.clipBufferPosition(this.getCursorPositionForSelection(selection).translate([0, 1]))
+
+    const range = this.getBlockCommentRangeForPoint(from)
+    if (range) {
+      range.start = this.getStartOfBlockComment(range.start)
+      range.end = this.getEndOfBlockComment(range.end)
+      const scanRange = range
+
+      if (this.isInner()) {
+        this.scanEditor('forward', /\s+/, {scanRange}, event => {
+          range.start = event.range.end
+          event.stop()
+        })
+        this.scanEditor('backward', /\s+/, {scanRange}, event => {
+          range.end = event.range.start
+          event.stop()
+        })
+      }
+      return range
+    }
+  }
+
+  getStartOfBlockComment (start) {
+    while (start.column === 0) {
+      const range = this.getBlockCommentRangeForPoint(start.translate([-1, Infinity]))
+      if (!range) break
+      start = range.start
+    }
+    return start
+  }
+
+  getEndOfBlockComment (end) {
+    while (this.utils.pointIsAtEndOfLine(this.editor, end)) {
+      const range = this.getBlockCommentRangeForPoint([end.row + 1, 0])
+      if (!range) break
+      end = range.end
+    }
+    return end
+  }
+
+  getBlockCommentRangeForPoint (point) {
+    const scope = 'comment.block'
+    return this.editor.bufferRangeForScopeAtPosition(scope, point)
   }
 }
 
@@ -483,19 +533,13 @@ class Fold extends TextObject {
   getRange (selection) {
     const {row} = this.getCursorPositionForSelection(selection)
     const selectedRange = selection.getBufferRange()
-
     const foldRanges = this.utils.getCodeFoldRanges(this.editor)
     const foldRangesContainsCursorRow = foldRanges.filter(range => range.start.row <= row && row <= range.end.row)
+    const useTreeSitter = this.utils.isUsingTreeSitter(selection.editor)
 
     for (let foldRange of foldRangesContainsCursorRow.reverse()) {
       if (this.isA()) {
-        let conjoined
-        while ((conjoined = foldRanges.find(range => range.end.row === foldRange.start.row))) {
-          foldRange = foldRange.union(conjoined)
-        }
-        while ((conjoined = foldRanges.find(range => range.start.row === foldRange.end.row))) {
-          foldRange = foldRange.union(conjoined)
-        }
+        foldRange = unionConjoinedFoldRange(foldRange, foldRanges, {useTreeSitter})
       } else {
         if (this.utils.doesRangeStartAndEndWithSameIndentLevel(this.editor, foldRange)) {
           foldRange.end.row -= 1
@@ -508,6 +552,30 @@ class Fold extends TextObject {
       }
     }
   }
+}
+
+function unionConjoinedFoldRange (foldRange, foldRanges, {useTreeSitter}) {
+  const index = foldRanges.findIndex(range => range === foldRange)
+
+  // Extend to downwards
+  for (let i = index + 1; i < foldRanges.length; i++) {
+    if (foldRange.end.column !== Infinity) break
+    const endRow = useTreeSitter ? foldRange.end.row + 1 : foldRange.end.row
+    if (foldRanges[i].start.isEqual([endRow, Infinity])) {
+      foldRange = foldRange.union(foldRanges[i])
+    }
+  }
+
+  // Extend to upwards
+  for (let i = index - 1; i >= 0; i--) {
+    if (foldRange.start.column !== Infinity) break
+    const startRow = useTreeSitter ? foldRange.start.row - 1 : foldRange.start.row
+    if (foldRanges[i].end.isEqual([startRow, Infinity])) {
+      foldRange = foldRange.union(foldRanges[i])
+    }
+  }
+
+  return foldRange
 }
 
 class Function extends TextObject {
@@ -532,7 +600,41 @@ class Function extends TextObject {
     return false
   }
 
+  getRangeWithTreeSitter (selection) {
+    const editor = this.editor
+    const cursorPosition = this.getCursorPositionForSelection(selection)
+    const firstCharacterPosition = this.utils.getFirstCharacterPositionForBufferRow(this.editor, cursorPosition.row)
+    const searchStartPoint = Point.max(firstCharacterPosition, cursorPosition)
+    const startNode = editor.languageMode.getSyntaxNodeAtPosition(searchStartPoint)
+
+    const node = this.utils.findParentNodeForFunctionType(editor, startNode)
+    if (node) {
+      let range = node.range
+
+      if (!this.isA()) {
+        const bodyNode = this.utils.findFunctionBodyNode(editor, node)
+        if (bodyNode) {
+          range = bodyNode.range
+        }
+
+        const endRowTranslation = this.utils.doesRangeStartAndEndWithSameIndentLevel(editor, range) ? -1 : 0
+        range = range.translate([1, 0], [endRowTranslation, 0])
+      }
+      if (range.end.column !== 0) {
+        // The 'preproc_function_def' type used in C and C++ header's "#define" returns linewise range.
+        // In this case, we shouldn't translate to linewise since it already contains ending newline.
+        range = this.utils.getBufferRangeForRowRange(editor, [range.start.row, range.end.row])
+      }
+      return range
+    }
+  }
+
   getRange (selection) {
+    const useTreeSitter = this.utils.isUsingTreeSitter(selection.editor)
+    if (useTreeSitter) {
+      return this.getRangeWithTreeSitter(selection)
+    }
+
     const editor = this.editor
     const cursorRow = this.getCursorPositionForSelection(selection).row
     const bodyStartRegex = this.getFunctionBodyStartRegex(editor.getGrammar())
@@ -897,6 +999,7 @@ module.exports = Object.assign(
   Paragraph.deriveClass(true),
   Indentation.deriveClass(true),
   Comment.deriveClass(true),
+  BlockComment.deriveClass(true),
   CommentOrParagraph.deriveClass(true),
   Fold.deriveClass(true),
   Function.deriveClass(true),

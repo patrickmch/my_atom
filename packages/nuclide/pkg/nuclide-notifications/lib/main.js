@@ -1,4 +1,4 @@
-'use strict';
+"use strict";
 
 Object.defineProperty(exports, "__esModule", {
   value: true
@@ -7,18 +7,36 @@ exports.activate = activate;
 exports.provideRaiseNativeNotification = provideRaiseNativeNotification;
 exports.deactivate = deactivate;
 
-var _electron = _interopRequireDefault(require('electron'));
+var _electron = _interopRequireDefault(require("electron"));
 
-var _UniversalDisposable;
+function _UniversalDisposable() {
+  const data = _interopRequireDefault(require("../../../modules/nuclide-commons/UniversalDisposable"));
 
-function _load_UniversalDisposable() {
-  return _UniversalDisposable = _interopRequireDefault(require('../../../modules/nuclide-commons/UniversalDisposable'));
+  _UniversalDisposable = function () {
+    return data;
+  };
+
+  return data;
 }
 
-var _featureConfig;
+function _featureConfig() {
+  const data = _interopRequireDefault(require("../../../modules/nuclide-commons-atom/feature-config"));
 
-function _load_featureConfig() {
-  return _featureConfig = _interopRequireDefault(require('../../../modules/nuclide-commons-atom/feature-config'));
+  _featureConfig = function () {
+    return data;
+  };
+
+  return data;
+}
+
+function _sanitizeHtml() {
+  const data = _interopRequireDefault(require("../../../modules/nuclide-commons/sanitizeHtml"));
+
+  _sanitizeHtml = function () {
+    return data;
+  };
+
+  return data;
 }
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
@@ -33,39 +51,47 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
  * 
  * @format
  */
-
-const { remote } = _electron.default;
+const {
+  remote
+} = _electron.default;
 
 if (!(remote != null)) {
-  throw new Error('Invariant violation: "remote != null"');
+  throw new Error("Invariant violation: \"remote != null\"");
 }
 
 let subscriptions = null;
 
 function activate(state) {
-  subscriptions = new (_UniversalDisposable || _load_UniversalDisposable()).default(
-  // Listen for Atom notifications:
+  subscriptions = new (_UniversalDisposable().default)( // Listen for Atom notifications:
   atom.notifications.onDidAddNotification(proxyToNativeNotification));
 }
 
 function proxyToNativeNotification(notification) {
-  const options = notification.getOptions();
+  const options = notification.getOptions(); // Don't proceed if user only wants 'nativeFriendly' proxied notifications and this isn't one.
 
-  // Don't proceed if user only wants 'nativeFriendly' proxied notifications and this isn't one.
-  if (!options.nativeFriendly && (_featureConfig || _load_featureConfig()).default.get('nuclide-notifications.onlyNativeFriendly')) {
+  if (!options.nativeFriendly && _featureConfig().default.get('nuclide-notifications.onlyNativeFriendly')) {
     return;
   }
 
-  raiseNativeNotification(`${upperCaseFirst(notification.getType())}: ${notification.getMessage()}`, options.detail, 0, false);
+  const sanitizedMessage = (0, _sanitizeHtml().default)(notification.getMessage(), {
+    condenseWhitespaces: true
+  }); // If the message is multiline, take the first line for the title. Titles can only be a single
+  // line and anything after the first line break will be ignored, at least on OSX.
+
+  const [title, ...body] = sanitizedMessage.split(/\n/g);
+  const sanitizedDescription = options.description == null ? '' : (0, _sanitizeHtml().default)(options.description, {
+    condenseWhitespaces: true
+  });
+  raiseNativeNotification(`${upperCaseFirst(notification.getType())}: ${title}`, [...body, ...sanitizedDescription.split(/\n/g)].filter(Boolean).join('\n'), 0, false);
 }
 
 function raiseNativeNotification(title, body, timeout, raiseIfAtomHasFocus = false) {
   const sendNotification = () => {
-    if (raiseIfAtomHasFocus === false && !(_featureConfig || _load_featureConfig()).default.get('nuclide-notifications.whenFocused') && remote.getCurrentWindow().isFocused()) {
+    if (raiseIfAtomHasFocus === false && !_featureConfig().default.get('nuclide-notifications.whenFocused') && remote.getCurrentWindow().isFocused()) {
       return;
-    }
+    } // eslint-disable-next-line no-new, no-undef
 
-    // eslint-disable-next-line no-new, no-undef
+
     new Notification(title, {
       body,
       icon: 'atom://nuclide/pkg/nuclide-notifications/notification.png',
@@ -80,16 +106,15 @@ function raiseNativeNotification(title, body, timeout, raiseIfAtomHasFocus = fal
     sendNotification();
   } else {
     const currentWindow = remote.getCurrentWindow();
+
     if (raiseIfAtomHasFocus !== false || !currentWindow.isFocused()) {
       const timeoutId = setTimeout(() => {
         sendNotification();
       }, timeout);
-
       currentWindow.once('focus', () => {
         clearTimeout(timeoutId);
       });
-
-      return new (_UniversalDisposable || _load_UniversalDisposable()).default(() => clearTimeout(timeoutId));
+      return new (_UniversalDisposable().default)(() => clearTimeout(timeoutId));
     }
   }
 

@@ -1,0 +1,134 @@
+diff --git a/nols_website/wmi/templates/dataentry/fragments/account_info.html b/nols_website/wmi/templates/dataentry/fragments/account_info.html
+index d02127470..77d7fb75d 100644
+--- a/nols_website/wmi/templates/dataentry/fragments/account_info.html
++++ b/nols_website/wmi/templates/dataentry/fragments/account_info.html
+@@ -1,71 +1,74 @@
+-
+-<div class="account-information column small-12 medium-4" id="account-information">
++<div id="account-information">
+   <h3>
+     Account Information
+   </h3>
+   <div class="panel-body">
+     {% with hide_personal_fieldset=True %}
+-    <div class="list-content">
+-      <div class="panel-heading">
+-        <strong>Personal</strong> (<a href="{% url 'edit_personal' %}">Edit</a>)
+-      </div>
+-      <div class="panel-body">
+-        {% include "core/fragments/personal_info_condensed_display.html" %}
+-      </div>
+-    </div>
+-    <div class="list-content">
+-      <div class="panel-heading">
+-        <strong>Addresses</strong> (<a href="{% url 'new_address' %}">Add</a>
+-        | <a href="{% url 'account_addresses' %}">Edit</a>)
+-      </div>
+-      <div class="panel-body">
+-        <ul>
+-          {% for address in user.entity.addresses %}
+-          {% if address.is_status_current %}
+-          <li>{{ address.display|prevent_orphans }}</li>
+-          {% endif %}
+-          {% endfor %}
+-        </ul>
++    <div class="row">
++        <div class="account-information column small-12 medium-4 list-content">
++            <div class="panel-heading">
++              <strong>Personal</strong> (<a href="{% url 'edit_personal' %}">Edit</a>)
++            </div>
++            <div class="panel-body">
++              {% include "core/fragments/personal_info_condensed_display.html" %}
++            </div>
++          </div>
++        <div class="account-information column small-12 medium-4 list-content">
++          <div class="panel-heading">
++            <strong>Addresses</strong> (<a href="{% url 'new_address' %}">Add</a>
++            | <a href="{% url 'account_addresses' %}">Edit</a>)
++          </div>
++          <div class="panel-body">
++            <ul>
++              {% for address in user.entity.addresses %}
++              {% if address.is_status_current %}
++              <li>{{ address.display|prevent_orphans }}</li>
++              {% endif %}
++              {% endfor %}
++            </ul>
++          </div>
++        </div>
+       </div>
+-    </div>
+ 
+-    <div class="list-content">
+-      <div class="panel-heading">
++    <div class="row">
++      <div class="account-information column small-12 medium-4 list-content">
++        <div class="panel-heading">
+ 
+-        <strong>Phone</strong> (<a href="{% url 'new_phone' %}">Add</a>
+-        | <a href="{% url 'account_phones' %}">Edit</a>)
+-      </div>
+-      <div class="panel-body">
++          <strong>Phone</strong> (<a href="{% url 'new_phone' %}">Add</a>
++          | <a href="{% url 'account_phones' %}">Edit</a>)
++        </div>
++        <div class="panel-body">
+ 
+-        <ul>
+-          {% for phone in user.entity.phone_numbers %}
+-          {% if phone.is_status_current %}
+-          <li>{{ phone.display }}</li>
+-          {% endif %}
+-          {% endfor %}
+-        </ul>
++          <ul>
++            {% for phone in user.entity.phone_numbers %}
++            {% if phone.is_status_current %}
++            <li>{{ phone.display }}</li>
++            {% endif %}
++            {% endfor %}
++          </ul>
++        </div>
+       </div>
+-    </div>
+ 
+-    <div class="list-content">
+-      <div class="panel-heading">
+-        <strong>Emails</strong> (<a href="{% url 'new_email' %}">Add</a>
+-        | <a href="{% url 'account_emails' %}">Edit</a>)
+-      </div>
+-      <div class="panel-body">
+-        <ul>
+-          {% if user.entity %}
+-          {% for email in user.entity.email_addresses %}
+-          {% ifequal email.status "Current" %}
+-          <li>{{ email.email_address }}</li>
+-          {% endifequal %}
+-          {% endfor %}
+-          {% else %}
+-          <li>{{ user.email }}</li>
+-          {% endif %}
+-        </ul>
++      <div class="account-information column small-12 medium-4 list-content">
++        <div class="panel-heading">
++          <strong>Emails</strong> (<a href="{% url 'new_email' %}">Add</a>
++          | <a href="{% url 'account_emails' %}">Edit</a>)
++        </div>
++        <div class="panel-body">
++          <ul>
++            {% if user.entity %}
++            {% for email in user.entity.email_addresses %}
++            {% ifequal email.status "Current" %}
++            <li>{{ email.email_address }}</li>
++            {% endifequal %}
++            {% endfor %}
++            {% else %}
++            <li>{{ user.email }}</li>
++            {% endif %}
++          </ul>
++        </div>
+       </div>
+     </div>
+     {% endwith %}
+   </div>
+ </div>

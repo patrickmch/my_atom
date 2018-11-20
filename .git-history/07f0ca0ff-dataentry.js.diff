@@ -1,0 +1,60 @@
+diff --git a/nols_website/wmi/static/wmi/js/dataentry.js b/nols_website/wmi/static/wmi/js/dataentry.js
+index 802c9418f..127eb44b2 100644
+--- a/nols_website/wmi/static/wmi/js/dataentry.js
++++ b/nols_website/wmi/static/wmi/js/dataentry.js
+@@ -1,52 +1,44 @@
+ $('.modal-form').each(function(){
+   var form = $(this)
+   form.submit(function(e) {
+       e.preventDefault();
+       var url = form.attr('data-form-url');
+       $.ajax({
+           type: "POST",
+           url: url,
+-          data: form.serialize().replace(/phoneform-/g, '')
++          data: form.serialize()
+       }).done(function(response) {
+         if (response.is_valid){
+           form.unbind('submit').submit();
+         } else {
+           showErrors(form, response);
+         }
+       });
+   });
+ });
+ 
+ function showErrors(form, response){
+-  var PREFIX = 'phoneform'
+-  var prefix = '';
+-  //------------------------------------
+-  //TODO need to tweak this if necessary
+-  //------------------------------------
+-  if(form.attr('id') == 'phone_form') {
+-      prefix = PREFIX + '-';
+-  }
+   form.find('.form-group').removeClass('error');
+   form.find('.errorlist').parent('div').remove();
+   form.find('.group-errors').remove();
+   if(typeof response == 'string') {
+       // display the authlockout page
+       $('html').replaceWith(response);
+   } else {
+       for(var field in response) {
+           if(field != '__all__') {
+-              var id = '#id_' + prefix + field;
++              var id = '#id_' + field;
+               var formGroup = $(id).parents('.form-group');
+               formGroup.addClass('error');
+               formGroup.prepend('<div class="row"><ul class="errorlist column medium-6 column medium-offset-3 fade"><li>'
+                   + response[field] + '</li></ul></div>')
+           } else {
+-              form.find('.form-instructions').after(
++              form.find('.error-container').append(
+                   '<div class="form-group error group-errors"><ul class="errorlist fade"><li>'
+                       + response[field] + '</li></ul></div> '
+               );
+           }
+       }
+   }
+   $('.errorlist.fade').addClass('in');
+ }

@@ -1,55 +1,76 @@
-'use strict';
+"use strict";
 
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.IpcClientTransport = exports.IpcServerTransport = undefined;
+exports.IpcClientTransport = exports.IpcServerTransport = void 0;
 
-var _fs = _interopRequireDefault(require('fs'));
+var _fs = _interopRequireDefault(require("fs"));
 
-var _log4js;
+function _log4js() {
+  const data = require("log4js");
 
-function _load_log4js() {
-  return _log4js = require('log4js');
+  _log4js = function () {
+    return data;
+  };
+
+  return data;
 }
 
-var _promise;
+function _promise() {
+  const data = require("../../../modules/nuclide-commons/promise");
 
-function _load_promise() {
-  return _promise = require('../../../modules/nuclide-commons/promise');
+  _promise = function () {
+    return data;
+  };
+
+  return data;
 }
 
-var _process;
+function _process() {
+  const data = require("../../../modules/nuclide-commons/process");
 
-function _load_process() {
-  return _process = require('../../../modules/nuclide-commons/process');
+  _process = function () {
+    return data;
+  };
+
+  return data;
 }
 
-var _rxjsBundlesRxMinJs = require('rxjs/bundles/Rx.min.js');
+var _rxjsCompatUmdMin = require("rxjs-compat/bundles/rxjs-compat.umd.min.js");
 
-var _nuclideRpc;
+function _nuclideRpc() {
+  const data = require("../../nuclide-rpc");
 
-function _load_nuclideRpc() {
-  return _nuclideRpc = require('../../nuclide-rpc');
+  _nuclideRpc = function () {
+    return data;
+  };
+
+  return data;
 }
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-const PIPE_FD = 3; /**
-                    * Copyright (c) 2015-present, Facebook, Inc.
-                    * All rights reserved.
-                    *
-                    * This source code is licensed under the license found in the LICENSE file in
-                    * the root directory of this source tree.
-                    *
-                    *  strict-local
-                    * @format
-                    */
+/**
+ * Copyright (c) 2015-present, Facebook, Inc.
+ * All rights reserved.
+ *
+ * This source code is licensed under the license found in the LICENSE file in
+ * the root directory of this source tree.
+ *
+ *  strict-local
+ * @format
+ */
+const PIPE_FD = 3;
+const NUCLIDE_E2E_TEST = 'NUCLIDE_E2E_TEST';
 
 class IpcServerTransport {
-
   constructor() {
-    this._transport = new (_nuclideRpc || _load_nuclideRpc()).StreamTransport(_fs.default.createWriteStream('', { fd: PIPE_FD }), _fs.default.createReadStream('', { fd: PIPE_FD }));
+    this._transport = new (_nuclideRpc().StreamTransport)(_fs.default.createWriteStream('', {
+      fd: PIPE_FD
+    }), _fs.default.createReadStream('', {
+      fd: PIPE_FD
+    }));
   }
 
   send(message) {
@@ -67,14 +88,22 @@ class IpcServerTransport {
   isClosed() {
     return this._transport.isClosed();
   }
+
 }
 
 exports.IpcServerTransport = IpcServerTransport;
-class IpcClientTransport {
 
+class IpcClientTransport {
   constructor(processStream) {
-    this._transport = new (_promise || _load_promise()).Deferred();
-    this._subscription = processStream.do(process => this._transport.resolve(new (_nuclideRpc || _load_nuclideRpc()).StreamTransport(process.stdio[PIPE_FD], process.stdio[PIPE_FD]))).switchMap(process => (0, (_process || _load_process()).getOutputStream)(process)).subscribe({
+    this._transport = new (_promise().Deferred)();
+    this._subscription = processStream.do(process => this._transport.resolve(new (_nuclideRpc().StreamTransport)(process.stdio[PIPE_FD], process.stdio[PIPE_FD]))).switchMap(process => (0, _process().getOutputStream)(process)).do(message => {
+      if (process.env[NUCLIDE_E2E_TEST] != null) {
+        if (message && (message.kind === 'stdout' || message.kind === 'stderr')) {
+          // eslint-disable-next-line no-console
+          console.log(`[IPC ${message.kind}]`, message.data);
+        }
+      }
+    }).subscribe({
       error: err => {
         this._handleError(err);
       }
@@ -83,37 +112,51 @@ class IpcClientTransport {
 
   _handleError(err) {
     this._transport.reject(err);
-    (0, (_log4js || _load_log4js()).getLogger)().fatal('Nuclide RPC process crashed', err);
+
+    (0, _log4js().getLogger)().fatal('Nuclide RPC process crashed', err);
     const buttons = [{
       text: 'Reload Atom',
       className: 'icon icon-zap',
+
       onDidClick() {
         atom.reload();
       }
+
     }];
+
     if (atom.packages.isPackageLoaded('fb-file-a-bug')) {
       buttons.push({
         text: 'File a bug',
         className: 'icon icon-nuclicon-bug',
+
         onDidClick() {
           atom.commands.dispatch(atom.workspace.getElement(), 'fb-file-a-bug:file');
         }
+
       });
     }
+
     let detail;
-    if (err instanceof (_process || _load_process()).ProcessExitError) {
-      let { stderr } = err;
+
+    if (err instanceof _process().ProcessExitError) {
+      let {
+        stderr
+      } = err;
+
       if (stderr != null) {
         const lines = stderr.split('\n');
         const startIndex = lines.findIndex(line => line.includes('chrome-devtools://'));
+
         if (startIndex !== -1) {
           stderr = lines.slice(startIndex + 1).join('\n');
         }
       }
+
       detail = `Exit code: ${String(err.exitCode)}\nstderr: ${stderr}`;
     } else {
       detail = String(err);
     }
+
     atom.notifications.addError('Local RPC process crashed!', {
       description: 'The local Nuclide RPC process crashed. Please reload Atom to continue.',
       detail,
@@ -133,11 +176,12 @@ class IpcClientTransport {
   }
 
   onMessage() {
-    return _rxjsBundlesRxMinJs.Observable.fromPromise(this._transport.promise).switchMap(transport => transport.onMessage());
+    return _rxjsCompatUmdMin.Observable.fromPromise(this._transport.promise).switchMap(transport => transport.onMessage());
   }
 
   close() {
     this._subscription.unsubscribe();
+
     this._transport.reject(Error('Transport closed'));
   }
 
@@ -145,5 +189,7 @@ class IpcClientTransport {
     // $FlowFixMe: Add to rxjs defs
     return this._subscription.closed;
   }
+
 }
+
 exports.IpcClientTransport = IpcClientTransport;

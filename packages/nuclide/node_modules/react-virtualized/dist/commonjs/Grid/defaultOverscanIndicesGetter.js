@@ -3,13 +3,13 @@
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
+exports.SCROLL_DIRECTION_VERTICAL = exports.SCROLL_DIRECTION_HORIZONTAL = exports.SCROLL_DIRECTION_FORWARD = exports.SCROLL_DIRECTION_BACKWARD = undefined;
 exports.default = defaultOverscanIndicesGetter;
 
-var babelPluginFlowReactPropTypes_proptype_OverscanIndices = require('./types').babelPluginFlowReactPropTypes_proptype_OverscanIndices || require('prop-types').any;
-
-var babelPluginFlowReactPropTypes_proptype_OverscanIndicesGetterParams = require('./types').babelPluginFlowReactPropTypes_proptype_OverscanIndicesGetterParams || require('prop-types').any;
+var _types = require('./types');
 
 var SCROLL_DIRECTION_BACKWARD = exports.SCROLL_DIRECTION_BACKWARD = -1;
+
 var SCROLL_DIRECTION_FORWARD = exports.SCROLL_DIRECTION_FORWARD = 1;
 
 var SCROLL_DIRECTION_HORIZONTAL = exports.SCROLL_DIRECTION_HORIZONTAL = 'horizontal';

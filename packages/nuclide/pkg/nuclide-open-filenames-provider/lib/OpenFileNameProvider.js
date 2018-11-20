@@ -1,36 +1,47 @@
-'use strict';
+"use strict";
 
-var _collection;
+function _collection() {
+  const data = require("../../../modules/nuclide-commons/collection");
 
-function _load_collection() {
-  return _collection = require('../../../modules/nuclide-commons/collection');
+  _collection = function () {
+    return data;
+  };
+
+  return data;
 }
 
-var _nuclideFuzzyNative;
+function _nuclideFuzzyNative() {
+  const data = require("../../../modules/nuclide-fuzzy-native");
 
-function _load_nuclideFuzzyNative() {
-  return _nuclideFuzzyNative = require('../../nuclide-fuzzy-native');
+  _nuclideFuzzyNative = function () {
+    return data;
+  };
+
+  return data;
 }
 
+/**
+ * Copyright (c) 2015-present, Facebook, Inc.
+ * All rights reserved.
+ *
+ * This source code is licensed under the license found in the LICENSE file in
+ * the root directory of this source tree.
+ *
+ *  strict-local
+ * @format
+ */
 // Returns paths of currently opened editor tabs.
 function getOpenTabsMatching(query) {
-  const matcher = new (_nuclideFuzzyNative || _load_nuclideFuzzyNative()).Matcher((0, (_collection || _load_collection()).arrayCompact)(atom.workspace.getTextEditors().map(editor => editor.getPath())));
-  return matcher.match(query, { recordMatchIndexes: true }).map(result => ({
+  const matcher = new (_nuclideFuzzyNative().Matcher)((0, _collection().arrayCompact)(atom.workspace.getTextEditors().map(editor => editor.getPath())));
+  return matcher.match(query, {
+    recordMatchIndexes: true
+  }).map(result => ({
     resultType: 'FILE',
     path: result.value,
     score: result.score,
     matchIndexes: result.matchIndexes
   }));
-} /**
-   * Copyright (c) 2015-present, Facebook, Inc.
-   * All rights reserved.
-   *
-   * This source code is licensed under the license found in the LICENSE file in
-   * the root directory of this source tree.
-   *
-   *  strict-local
-   * @format
-   */
+}
 
 const OpenFileListProvider = {
   providerType: 'GLOBAL',
@@ -49,7 +60,7 @@ const OpenFileListProvider = {
   executeQuery(query, directories) {
     return Promise.resolve(getOpenTabsMatching(query));
   }
-};
 
-// eslint-disable-next-line nuclide-internal/no-commonjs
+}; // eslint-disable-next-line nuclide-internal/no-commonjs
+
 module.exports = OpenFileListProvider;

@@ -1,23 +1,10 @@
-'use strict';
+"use strict";
 
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-const ServerStatus = exports.ServerStatus = Object.freeze({
-  FAILED: 'failed',
-  UNKNOWN: 'unknown',
-  NOT_RUNNING: 'not running',
-  NOT_INSTALLED: 'not installed',
-  BUSY: 'busy',
-  INIT: 'init',
-  READY: 'ready'
-});
+exports.VERSION_TIMEOUT_MS = exports.ServerStatus = void 0;
 
-// If we put this type on the definition, use sites will not see the individual properties in the
-// Server object for things like autocomplete. Worse, Flow will assume that *any* string key will
-// yield a valid ServerStatus result, so we won't get protection against typos. Adding this
-// assertion here ensures that all of the values are valid ServerStatus options, while yielding
-// better Flow behavior at use sites.
 /**
  * Copyright (c) 2015-present, Facebook, Inc.
  * All rights reserved.
@@ -28,8 +15,23 @@ const ServerStatus = exports.ServerStatus = Object.freeze({
  *  strict-local
  * @format
  */
+const ServerStatus = Object.freeze({
+  FAILED: 'failed',
+  UNKNOWN: 'unknown',
+  NOT_RUNNING: 'not running',
+  NOT_INSTALLED: 'not installed',
+  BUSY: 'busy',
+  INIT: 'init',
+  READY: 'ready'
+}); // If we put this type on the definition, use sites will not see the individual properties in the
+// Server object for things like autocomplete. Worse, Flow will assume that *any* string key will
+// yield a valid ServerStatus result, so we won't get protection against typos. Adding this
+// assertion here ensures that all of the values are valid ServerStatus options, while yielding
+// better Flow behavior at use sites.
 
-ServerStatus;
+exports.ServerStatus = ServerStatus;
+ServerStatus; // Controls how long the Flow version will be cached before it is considered invalid.
 
-// Controls how long the Flow version will be cached before it is considered invalid.
-const VERSION_TIMEOUT_MS = exports.VERSION_TIMEOUT_MS = 10 * 60 * 1000; // 10 minutes in ms
+const VERSION_TIMEOUT_MS = 10 * 60 * 1000; // 10 minutes in ms
+
+exports.VERSION_TIMEOUT_MS = VERSION_TIMEOUT_MS;

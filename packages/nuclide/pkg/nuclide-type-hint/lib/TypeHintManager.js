@@ -1,31 +1,58 @@
-'use strict';
+"use strict";
 
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
+exports.default = void 0;
 
-var _analytics;
+function _ProviderRegistry() {
+  const data = _interopRequireDefault(require("../../../modules/nuclide-commons-atom/ProviderRegistry"));
 
-function _load_analytics() {
-  return _analytics = _interopRequireDefault(require('../../../modules/nuclide-commons/analytics'));
+  _ProviderRegistry = function () {
+    return data;
+  };
+
+  return data;
 }
 
-var _getFragmentGrammar;
+function _analytics() {
+  const data = _interopRequireDefault(require("../../../modules/nuclide-commons/analytics"));
 
-function _load_getFragmentGrammar() {
-  return _getFragmentGrammar = _interopRequireDefault(require('../../../modules/nuclide-commons-atom/getFragmentGrammar'));
+  _analytics = function () {
+    return data;
+  };
+
+  return data;
 }
 
-var _collection;
+function _getFragmentGrammar() {
+  const data = _interopRequireDefault(require("../../../modules/nuclide-commons-atom/getFragmentGrammar"));
 
-function _load_collection() {
-  return _collection = require('../../../modules/nuclide-commons/collection');
+  _getFragmentGrammar = function () {
+    return data;
+  };
+
+  return data;
 }
 
-var _log4js;
+function _log4js() {
+  const data = require("log4js");
 
-function _load_log4js() {
-  return _log4js = require('log4js');
+  _log4js = function () {
+    return data;
+  };
+
+  return data;
+}
+
+function _promise() {
+  const data = require("../../../modules/nuclide-commons/promise");
+
+  _promise = function () {
+    return data;
+  };
+
+  return data;
 }
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
@@ -40,57 +67,73 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
  * 
  * @format
  */
-
-const logger = (0, (_log4js || _load_log4js()).getLogger)('nuclide-type-hint');
+const logger = (0, _log4js().getLogger)('nuclide-type-hint');
 
 class TypeHintManager {
-
-  constructor() {
-    this._typeHintProviders = [];
-  }
   /**
    * This helps determine if we should show the type hint when toggling it via
    * command. The toggle command first negates this, and then if this is true
    * shows a type hint, otherwise it hides the current typehint.
    */
-
+  constructor() {
+    this._providers = new (_ProviderRegistry().default)();
+  }
 
   async datatip(editor, position) {
     const grammar = editor.getGrammar();
-    const { scopeName } = grammar;
-    const [provider] = this._getMatchingProvidersForScopeName(scopeName);
+    const matchingProviders = [...this._providers.getAllProvidersForEditor(editor)];
+    return (0, _promise().asyncFind)(matchingProviders.map(provider => this._getDatatipFromProvider(editor, position, grammar, provider)), x => x);
+  }
+
+  async _getDatatipFromProvider(editor, position, grammar, provider) {
     if (provider == null) {
       return null;
     }
+
     let name;
+
     if (provider.providerName != null) {
       name = provider.providerName;
     } else {
       name = 'unknown';
       logger.error('Type hint provider has no name', provider);
     }
-    const typeHint = await (_analytics || _load_analytics()).default.trackTiming(name + '.typeHint', () => provider.typeHint(editor, position));
-    // $FlowFixMe(>=0.68.0) Flow suppress (T27187857)
+
+    const typeHint = await _analytics().default.trackTiming(name + '.typeHint', () => provider.typeHint(editor, position)); // $FlowFixMe(>=0.68.0) Flow suppress (T27187857)
+
     if (!typeHint || this._marker || !typeHint.hint.length === 0) {
       return;
     }
-    const { hint, range } = typeHint;
-    // We track the timing above, but we still want to know the number of popups that are shown.
-    (_analytics || _load_analytics()).default.track('type-hint-popup', {
+
+    const {
+      hint,
+      range
+    } = typeHint;
+    const {
+      scopeName
+    } = grammar; // We track the timing above, but we still want to know the number of popups that are shown.
+
+    _analytics().default.track('type-hint-popup', {
       scope: scopeName,
       message: hint
     });
 
-    const markedStrings = hint.map(h => {
+    const markedStrings = hint.filter(h => {
+      // Ignore all results of length 0. Maybe the next provider will do better?
+      return h.value.length > 0;
+    }).map(h => {
       // Flow doesn't like it when I don't specify these as literals.
       if (h.type === 'snippet') {
         return {
           type: 'snippet',
           value: h.value,
-          grammar: (0, (_getFragmentGrammar || _load_getFragmentGrammar()).default)(grammar)
+          grammar: (0, _getFragmentGrammar().default)(grammar)
         };
       } else {
-        return { type: 'markdown', value: h.value };
+        return {
+          type: 'markdown',
+          value: h.value
+        };
       }
     });
 
@@ -104,21 +147,10 @@ class TypeHintManager {
     };
   }
 
-  _getMatchingProvidersForScopeName(scopeName) {
-    return this._typeHintProviders.filter(provider => {
-      const providerGrammars = provider.selector.split(/, ?/);
-      return provider.inclusionPriority > 0 && providerGrammars.indexOf(scopeName) !== -1;
-    }).sort((providerA, providerB) => {
-      return providerA.inclusionPriority - providerB.inclusionPriority;
-    });
-  }
-
   addProvider(provider) {
-    this._typeHintProviders.push(provider);
+    return this._providers.addProvider(provider);
   }
 
-  removeProvider(provider) {
-    (0, (_collection || _load_collection()).arrayRemove)(this._typeHintProviders, provider);
-  }
 }
+
 exports.default = TypeHintManager;

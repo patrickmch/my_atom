@@ -1,24 +1,37 @@
-'use strict';
+"use strict";
 
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.StatusBarTile = undefined;
+exports.StatusBarTile = void 0;
 
-var _react = _interopRequireWildcard(require('react'));
+var React = _interopRequireWildcard(require("react"));
 
-var _rxjsBundlesRxMinJs = require('rxjs/bundles/Rx.min.js');
+var _rxjsCompatUmdMin = require("rxjs-compat/bundles/rxjs-compat.umd.min.js");
 
-var _StatusBarTileComponent;
+function _StatusBarTileComponent() {
+  const data = require("./StatusBarTileComponent");
 
-function _load_StatusBarTileComponent() {
-  return _StatusBarTileComponent = require('./StatusBarTileComponent');
+  _StatusBarTileComponent = function () {
+    return data;
+  };
+
+  return data;
 }
 
-function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
+function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) { var desc = Object.defineProperty && Object.getOwnPropertyDescriptor ? Object.getOwnPropertyDescriptor(obj, key) : {}; if (desc.get || desc.set) { Object.defineProperty(newObj, key, desc); } else { newObj[key] = obj[key]; } } } } newObj.default = obj; return newObj; } }
 
-class StatusBarTile extends _react.Component {
-
+/**
+ * Copyright (c) 2015-present, Facebook, Inc.
+ * All rights reserved.
+ *
+ * This source code is licensed under the license found in the LICENSE file in
+ * the root directory of this source tree.
+ *
+ * 
+ * @format
+ */
+class StatusBarTile extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
@@ -30,22 +43,24 @@ class StatusBarTile extends _react.Component {
 
   componentDidMount() {
     if (!(this.subscription == null)) {
-      throw new Error('Invariant violation: "this.subscription == null"');
+      throw new Error("Invariant violation: \"this.subscription == null\"");
     }
 
-    const subscription = this.subscription = new _rxjsBundlesRxMinJs.Subscription();
+    const subscription = this.subscription = new _rxjsCompatUmdMin.Subscription();
     subscription.add(this.props.results.subscribe(result => this._consumeResult(result)));
     subscription.add(this.props.isActive.subscribe(isActive => this._consumeIsActive(isActive)));
   }
 
   componentWillUnmount() {
     if (!(this.subscription != null)) {
-      throw new Error('Invariant violation: "this.subscription != null"');
+      throw new Error("Invariant violation: \"this.subscription != null\"");
     }
 
     this.subscription.unsubscribe();
     this.subscription = null;
-    this.setState({ result: null });
+    this.setState({
+      result: null
+    });
   }
 
   _consumeResult(result) {
@@ -53,13 +68,18 @@ class StatusBarTile extends _react.Component {
       case 'not-text-editor':
       case 'no-provider':
       case 'provider-error':
-        this.setState({ result: null });
+        this.setState({
+          result: null
+        });
         break;
+
       case 'pane-change':
-      case 'edit':
       case 'save':
-        this.setState({ pending: true });
+        this.setState({
+          pending: true
+        });
         break;
+
       case 'result':
         const coverageResult = result.result;
         this.setState({
@@ -71,6 +91,7 @@ class StatusBarTile extends _react.Component {
           pending: false
         });
         break;
+
       default:
         result;
         throw new Error(`Should handle kind ${result.kind}`);
@@ -78,20 +99,17 @@ class StatusBarTile extends _react.Component {
   }
 
   _consumeIsActive(isActive) {
-    this.setState({ isActive });
+    this.setState({
+      isActive
+    });
   }
 
   render() {
-    return _react.createElement((_StatusBarTileComponent || _load_StatusBarTileComponent()).StatusBarTileComponent, Object.assign({}, this.state, { onClick: this.props.onClick }));
+    return React.createElement(_StatusBarTileComponent().StatusBarTileComponent, Object.assign({}, this.state, {
+      onClick: this.props.onClick
+    }));
   }
+
 }
-exports.StatusBarTile = StatusBarTile; /**
-                                        * Copyright (c) 2015-present, Facebook, Inc.
-                                        * All rights reserved.
-                                        *
-                                        * This source code is licensed under the license found in the LICENSE file in
-                                        * the root directory of this source tree.
-                                        *
-                                        * 
-                                        * @format
-                                        */
+
+exports.StatusBarTile = StatusBarTile;

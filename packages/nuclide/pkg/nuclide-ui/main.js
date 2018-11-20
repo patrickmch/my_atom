@@ -1,10 +1,11 @@
-'use strict';
+"use strict";
 
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
 exports.activate = activate;
 exports.deactivate = deactivate;
+
 /**
  * Copyright (c) 2015-present, Facebook, Inc.
  * All rights reserved.
@@ -15,11 +16,10 @@ exports.deactivate = deactivate;
  * 
  * @format
  */
-
 let disposable;
 
 function activate() {
-  disposable = require('../../modules/nuclide-commons-ui');
+  disposable = require("../../modules/nuclide-commons-ui");
 }
 
 function deactivate() {

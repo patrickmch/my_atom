@@ -1,4 +1,4 @@
-'use strict';
+"use strict";
 
 Object.defineProperty(exports, "__esModule", {
   value: true
@@ -6,12 +6,26 @@ Object.defineProperty(exports, "__esModule", {
 exports.getAutocompleteSuggestions = getAutocompleteSuggestions;
 exports.getCompletions = getCompletions;
 
-var _range;
+function _range() {
+  const data = require("../../../modules/nuclide-commons/range");
 
-function _load_range() {
-  return _range = require('../../../modules/nuclide-commons/range');
+  _range = function () {
+    return data;
+  };
+
+  return data;
 }
 
+/**
+ * Copyright (c) 2015-present, Facebook, Inc.
+ * All rights reserved.
+ *
+ * This source code is licensed under the license found in the LICENSE file in
+ * the root directory of this source tree.
+ *
+ *  strict-local
+ * @format
+ */
 // Type mappings between Jedi types and autocomplete-plus types used for styling.
 const TYPES = {
   module: 'import',
@@ -23,19 +37,8 @@ const TYPES = {
   import: 'import',
   param: 'variable',
   property: 'property'
-}; /**
-    * Copyright (c) 2015-present, Facebook, Inc.
-    * All rights reserved.
-    *
-    * This source code is licensed under the license found in the LICENSE file in
-    * the root directory of this source tree.
-    *
-    *  strict-local
-    * @format
-    */
-
+};
 const TRIGGER_REGEX = /(\.|[a-zA-Z_][a-zA-Z0-9_]*)$/;
-
 /**
  * Generate a function-signature line string if completion is a function.
  * Otherwise just return the completion text.
@@ -46,10 +49,10 @@ const TRIGGER_REGEX = /(\.|[a-zA-Z_][a-zA-Z0-9_]*)$/;
  *   instead of plain text.
  * @return string               Textual representation of the completion.
  */
+
 function getText(completion, includeOptionalArgs = true, createPlaceholders = false) {
   if (completion.params) {
     const params = includeOptionalArgs ? completion.params : completion.params.filter(param => param.indexOf('=') < 0 && param.indexOf('*') < 0);
-
     const paramTexts = params.map((param, index) => {
       return createPlaceholders ? `\${${index + 1}:${param}}` : param;
     });
@@ -60,20 +63,28 @@ function getText(completion, includeOptionalArgs = true, createPlaceholders = fa
 }
 
 async function getAutocompleteSuggestions(serverManager, filePath, buffer, position, activatedManually, autocompleteArguments, includeOptionalArguments) {
-  if (!activatedManually && (0, (_range || _load_range()).matchRegexEndingAt)(buffer, position, TRIGGER_REGEX) == null) {
-    return { isIncomplete: false, items: [] };
+  if (!activatedManually && (0, _range().matchRegexEndingAt)(buffer, position, TRIGGER_REGEX) == null) {
+    return {
+      isIncomplete: false,
+      items: []
+    };
   }
 
   const results = await getCompletions(serverManager, filePath, buffer.getText(), position.row, position.column);
+
   if (results == null) {
-    return { isIncomplete: false, items: [] };
+    return {
+      isIncomplete: false,
+      items: []
+    };
   }
 
   const items = results.map(completion => {
     // Always display optional arguments in the UI.
-    const displayText = getText(completion);
-    // Only autocomplete arguments if the include optional arguments setting is on.
-    const snippet = autocompleteArguments ? getText(completion, includeOptionalArguments, true /* createPlaceholders */
+    const displayText = getText(completion); // Only autocomplete arguments if the include optional arguments setting is on.
+
+    const snippet = autocompleteArguments ? getText(completion, includeOptionalArguments, true
+    /* createPlaceholders */
     ) : completion.text;
     return {
       displayText,

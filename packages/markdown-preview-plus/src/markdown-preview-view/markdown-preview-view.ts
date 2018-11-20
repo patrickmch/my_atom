@@ -1,20 +1,14 @@
 import path = require('path')
-import {
-  CommandEvent,
-  Emitter,
-  Disposable,
-  CompositeDisposable,
-  Grammar,
-} from 'atom'
-import _ = require('lodash')
+import { Emitter, Disposable, CompositeDisposable, Grammar } from 'atom'
+import { debounce } from 'lodash'
 import fs = require('fs')
 
 import renderer = require('../renderer')
 import markdownIt = require('../markdown-it-helper')
-import imageWatcher = require('../image-watch-helper')
 import { handlePromise, copyHtml, atomConfig } from '../util'
 import * as util from './util'
 import { WebviewHandler } from './webview-handler'
+import { ImageWatcher } from '../image-watch-helper'
 
 export interface SerializedMPV {
   deserializer: 'markdown-preview-plus/MarkdownPreviewView'
@@ -38,6 +32,7 @@ export abstract class MarkdownPreviewView {
   protected disposables = new CompositeDisposable()
   protected destroyed = false
   private loading: boolean = true
+  private imageWatcher!: ImageWatcher
 
   protected constructor(
     private defaultRenderMode: Exclude<renderer.RenderMode, 'save'> = 'normal',
@@ -46,18 +41,14 @@ export abstract class MarkdownPreviewView {
   ) {
     this.renderPromise = new Promise((resolve) => {
       this.handler = new WebviewHandler(() => {
-        this.handler.init(
-          atom.getConfigDirPath(),
-          atomConfig().mathConfig.numberEquations,
-        )
-        // TODO: observe
-        this.handler.setUseGitHubStyle(
-          atom.config.get('markdown-preview-plus.useGitHubStyle'),
-        )
+        this.handler.init(atom.getConfigDirPath(), atomConfig().mathConfig)
         this.handler.setBasePath(this.getPath())
         this.emitter.emit('did-change-title')
         resolve(this.renderMarkdown())
       })
+      this.imageWatcher = new ImageWatcher(
+        this.handler.updateImages.bind(this.handler),
+      )
       MarkdownPreviewView.elementMap.set(this.element, this)
     })
     this.runJS = this.handler.runJS.bind(this.handler)
@@ -76,8 +67,7 @@ export abstract class MarkdownPreviewView {
   public destroy() {
     if (this.destroyed) return
     this.destroyed = true
-    const path = this.getPath()
-    path && imageWatcher.removeFile(path)
+    this.imageWatcher.dispose()
     this.disposables.dispose()
     this.handler.destroy()
     MarkdownPreviewView.elementMap.delete(this.element)
@@ -94,11 +84,6 @@ export abstract class MarkdownPreviewView {
   public toggleRenderLatex() {
     this.renderLaTeX = !this.renderLaTeX
     this.changeHandler()
-  }
-
-  public async refreshImages(oldsrc: string): Promise<void> {
-    const v = await imageWatcher.getVersion(oldsrc, this.getPath())
-    this.handler.updateImages(oldsrc, v)
   }
 
   public abstract getTitle(): string
@@ -135,7 +120,13 @@ export abstract class MarkdownPreviewView {
     const { name, ext } = path.parse(filePath)
 
     if (ext === '.pdf') {
-      this.handler.saveToPDF(filePath)
+      this.handler.saveToPDF(filePath).catch((error: Error) => {
+        atom.notifications.addError('Failed saving to PDF', {
+          description: error.toString(),
+          dismissable: true,
+          stack: error.stack,
+        })
+      })
     } else {
       handlePromise(
         this.getHTMLToSave(filePath).then(async (html) => {
@@ -143,7 +134,6 @@ export abstract class MarkdownPreviewView {
             name,
             html,
             this.renderLaTeX,
-            atom.config.get('markdown-preview-plus.useGitHubStyle'),
             await this.handler.getTeXConfig(),
           )
 
@@ -182,8 +172,8 @@ export abstract class MarkdownPreviewView {
     )
   }
 
-  protected syncPreview(line: number) {
-    this.handler.sync(line)
+  protected syncPreview(line: number, flash: boolean) {
+    this.handler.sync(line, flash)
   }
 
   protected openNewWindow() {
@@ -204,23 +194,20 @@ export abstract class MarkdownPreviewView {
   private handleEvents() {
     this.disposables.add(
       atom.grammars.onDidAddGrammar(() =>
-        _.debounce(() => {
+        debounce(() => {
           handlePromise(this.renderMarkdown())
         }, 250),
       ),
       atom.grammars.onDidUpdateGrammar(
-        _.debounce(() => {
+        debounce(() => {
           handlePromise(this.renderMarkdown())
         }, 250),
       ),
-    )
-
-    this.disposables.add(
       atom.commands.add(this.element, {
         'core:move-up': () => this.element.scrollBy({ top: -10 }),
         'core:move-down': () => this.element.scrollBy({ top: 10 }),
-        'core:copy': (event: CommandEvent) => {
-          if (this.copyToClipboard()) event.stopPropagation()
+        'core:copy': () => {
+          handlePromise(this.copyToClipboard())
         },
         'markdown-preview-plus:open-dev-tools': () => {
           this.handler.openDevTools()
@@ -245,9 +232,6 @@ export abstract class MarkdownPreviewView {
           this.openSource(line)
         },
       }),
-    )
-
-    this.disposables.add(
       atom.config.onDidChange('markdown-preview-plus.markdownItConfig', () => {
         if (atomConfig().renderer === 'markdown-it') this.changeHandler()
       }),
@@ -256,7 +240,9 @@ export abstract class MarkdownPreviewView {
       }),
       atom.config.onDidChange(
         'markdown-preview-plus.mathConfig.latexRenderer',
-        this.changeHandler,
+        () => {
+          handlePromise(this.handler.reload())
+        },
       ),
       atom.config.onDidChange(
         'markdown-preview-plus.mathConfig.numberEquations',
@@ -268,10 +254,16 @@ export abstract class MarkdownPreviewView {
         'markdown-preview-plus.renderer',
         this.changeHandler,
       ),
+      atom.config.onDidChange('markdown-preview-plus.useGitHubStyle', () => {
+        this.handler.updateStyles()
+      }),
+      atom.config.onDidChange('markdown-preview-plus.syntaxThemeName', () => {
+        this.handler.updateStyles()
+      }),
       atom.config.onDidChange(
-        'markdown-preview-plus.useGitHubStyle',
-        ({ newValue }) => {
-          this.handler.setUseGitHubStyle(newValue)
+        'markdown-preview-plus.importPackageStyles',
+        () => {
+          this.handler.updateStyles()
         },
       ),
     )
@@ -284,32 +276,33 @@ export abstract class MarkdownPreviewView {
 
   private async getHTMLToSave(savePath: string) {
     const source = await this.getMarkdownSource()
-    return renderer.render(
-      source,
-      this.getPath(),
-      this.getGrammar(),
-      this.renderLaTeX,
-      'save',
+    return renderer.render({
+      text: source,
+      filePath: this.getPath(),
+      grammar: this.getGrammar(),
+      renderLaTeX: this.renderLaTeX,
+      mode: 'save',
       savePath,
-    )
+    })
   }
 
   private async renderMarkdownText(text: string): Promise<void> {
     try {
-      const domDocument = await renderer.render(
+      const domDocument = await renderer.render({
         text,
-        this.getPath(),
-        this.getGrammar(),
-        this.renderLaTeX,
-        this.defaultRenderMode,
-      )
+        filePath: this.getPath(),
+        grammar: this.getGrammar(),
+        renderLaTeX: this.renderLaTeX,
+        mode: this.defaultRenderMode,
+        imageWatcher: this.imageWatcher,
+      })
+
       if (this.destroyed) return
       this.loading = false
       handlePromise(
         this.handler.update(
           domDocument.documentElement.outerHTML,
           this.renderLaTeX,
-          atomConfig().mathConfig.latexRenderer,
         ),
       )
       this.handler.setSourceMap(
@@ -336,31 +329,12 @@ export abstract class MarkdownPreviewView {
     this.handler.error(error.message)
   }
 
-  private copyToClipboard() {
-    if (this.loading) {
-      return false
-    }
-
-    const selection = window.getSelection()
-    const selectedText = selection.toString()
-    const selectedNode = selection.baseNode as HTMLElement
-
+  private async copyToClipboard(): Promise<void> {
+    await this.renderPromise
+    const selection = await this.handler.getSelection()
     // Use default copy event handler if there is selected text inside this view
-    if (
-      selectedText &&
-      // tslint:disable-next-line:strict-type-predicates //TODO: complain on TS
-      selectedNode != null // &&
-      // (this.preview === selectedNode || this.preview.contains(selectedNode))
-    ) {
-      return false
-    }
-
-    handlePromise(
-      this.getMarkdownSource().then(async (src) =>
-        copyHtml(src, this.getPath(), this.renderLaTeX),
-      ),
-    )
-
-    return true
+    if (selection !== undefined) return
+    const src = await this.getMarkdownSource()
+    await copyHtml(src, this.getPath(), this.renderLaTeX)
   }
 }

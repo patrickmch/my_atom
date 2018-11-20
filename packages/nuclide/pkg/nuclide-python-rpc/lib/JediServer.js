@@ -1,95 +1,129 @@
-'use strict';
+"use strict";
 
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
+exports.default = void 0;
 
-var _rxjsBundlesRxMinJs = require('rxjs/bundles/Rx.min.js');
+var _rxjsCompatUmdMin = require("rxjs-compat/bundles/rxjs-compat.umd.min.js");
 
-var _nuclideUri;
+function _nuclideUri() {
+  const data = _interopRequireDefault(require("../../../modules/nuclide-commons/nuclideUri"));
 
-function _load_nuclideUri() {
-  return _nuclideUri = _interopRequireDefault(require('../../../modules/nuclide-commons/nuclideUri'));
+  _nuclideUri = function () {
+    return data;
+  };
+
+  return data;
 }
 
-var _process;
+function _process() {
+  const data = require("../../../modules/nuclide-commons/process");
 
-function _load_process() {
-  return _process = require('../../../modules/nuclide-commons/process');
+  _process = function () {
+    return data;
+  };
+
+  return data;
 }
 
-var _which;
+function _which() {
+  const data = _interopRequireDefault(require("../../../modules/nuclide-commons/which"));
 
-function _load_which() {
-  return _which = _interopRequireDefault(require('../../../modules/nuclide-commons/which'));
+  _which = function () {
+    return data;
+  };
+
+  return data;
 }
 
-var _nuclideRpc;
+function _nuclideRpc() {
+  const data = require("../../nuclide-rpc");
 
-function _load_nuclideRpc() {
-  return _nuclideRpc = require('../../nuclide-rpc');
+  _nuclideRpc = function () {
+    return data;
+  };
+
+  return data;
 }
 
-var _nuclideMarshalersCommon;
+function _nuclideMarshalersCommon() {
+  const data = require("../../nuclide-marshalers-common");
 
-function _load_nuclideMarshalersCommon() {
-  return _nuclideMarshalersCommon = require('../../nuclide-marshalers-common');
+  _nuclideMarshalersCommon = function () {
+    return data;
+  };
+
+  return data;
 }
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-const LIB_PATH = (_nuclideUri || _load_nuclideUri()).default.join(__dirname, '../VendorLib'); /**
-                                                                                               * Copyright (c) 2015-present, Facebook, Inc.
-                                                                                               * All rights reserved.
-                                                                                               *
-                                                                                               * This source code is licensed under the license found in the LICENSE file in
-                                                                                               * the root directory of this source tree.
-                                                                                               *
-                                                                                               *  strict-local
-                                                                                               * @format
-                                                                                               */
+/**
+ * Copyright (c) 2015-present, Facebook, Inc.
+ * All rights reserved.
+ *
+ * This source code is licensed under the license found in the LICENSE file in
+ * the root directory of this source tree.
+ *
+ *  strict-local
+ * @format
+ */
+const LIB_PATH = _nuclideUri().default.join(__dirname, '../VendorLib');
 
-const PROCESS_PATH = (_nuclideUri || _load_nuclideUri()).default.join(__dirname, '../python/jediserver.py');
+const PROCESS_PATH = _nuclideUri().default.join(__dirname, '../python/jediserver.py');
+
 const OPTS = {
-  cwd: (_nuclideUri || _load_nuclideUri()).default.dirname(PROCESS_PATH),
+  cwd: _nuclideUri().default.dirname(PROCESS_PATH),
   stdio: 'pipe',
-  detached: false, // When Atom is killed, server process should be killed.
-  env: Object.assign({}, process.env, { PYTHONPATH: LIB_PATH }),
-  /* TODO(T17353599) */isExitError: () => false
-};
+  detached: false,
+  // When Atom is killed, server process should be killed.
+  env: Object.assign({}, process.env, {
+    PYTHONPATH: LIB_PATH
+  }),
 
+  /* TODO(T17353599) */
+  isExitError: () => false
+};
 let serviceRegistry = null;
 
 function getServiceRegistry() {
   if (serviceRegistry == null) {
-    serviceRegistry = new (_nuclideRpc || _load_nuclideRpc()).ServiceRegistry([(_nuclideMarshalersCommon || _load_nuclideMarshalersCommon()).localNuclideUriMarshalers], (0, (_nuclideRpc || _load_nuclideRpc()).loadServicesConfig)((_nuclideUri || _load_nuclideUri()).default.join(__dirname, '..')), 'python_language_service');
+    serviceRegistry = new (_nuclideRpc().ServiceRegistry)([_nuclideMarshalersCommon().localNuclideUriMarshalers], (0, _nuclideRpc().loadServicesConfig)(_nuclideUri().default.join(__dirname, '..')), 'python_language_service');
   }
+
   return serviceRegistry;
 }
 
 async function getServerArgs() {
   let overrides = {};
+
   try {
     // Override the python path and additional sys paths
     // if override script is present.
     // $FlowFB
-    const findJediServerArgs = require('./fb/find-jedi-server-args').default;
+    const findJediServerArgs = require("./fb/find-jedi-server-args").default;
+
     overrides = await findJediServerArgs();
-  } catch (e) {}
-  // Ignore.
-
-
+  } catch (e) {} // Ignore.
   // Append the user's PYTHONPATH if it exists.
-  const { PYTHONPATH } = await (0, (_process || _load_process()).getOriginalEnvironment)();
-  if (PYTHONPATH != null && PYTHONPATH.trim() !== '') {
-    overrides.paths = (overrides.paths || []).concat((_nuclideUri || _load_nuclideUri()).default.splitPathList(PYTHONPATH));
-  }
 
-  // Jedi only parses Python3 files if we start with Python3.
+
+  const {
+    PYTHONPATH
+  } = await (0, _process().getOriginalEnvironment)();
+
+  if (PYTHONPATH != null && PYTHONPATH.trim() !== '') {
+    overrides.paths = (overrides.paths || []).concat(_nuclideUri().default.splitPathList(PYTHONPATH));
+  } // Jedi only parses Python3 files if we start with Python3.
   // It's not the end of the world if Python3 isn't available, though.
+
+
   let pythonPath = 'python';
+
   if (overrides.pythonPath == null) {
-    const python3Path = await (0, (_which || _load_which()).default)('python3');
+    const python3Path = await (0, _which().default)('python3');
+
     if (python3Path != null) {
       pythonPath = python3Path;
     }
@@ -103,17 +137,22 @@ async function getServerArgs() {
 }
 
 class JediServer {
-
   constructor() {
-    const processStream = _rxjsBundlesRxMinJs.Observable.fromPromise(getServerArgs()).switchMap(({ pythonPath, paths }) => {
+    const processStream = _rxjsCompatUmdMin.Observable.fromPromise(getServerArgs()).switchMap(({
+      pythonPath,
+      paths
+    }) => {
       let args = [PROCESS_PATH];
+
       if (paths.length > 0) {
         args.push('-p');
         args = args.concat(paths);
       }
-      return (0, (_process || _load_process()).spawn)(pythonPath, args, OPTS);
+
+      return (0, _process().spawn)(pythonPath, args, OPTS);
     });
-    this._process = new (_nuclideRpc || _load_nuclideRpc()).RpcProcess('JediServer', getServiceRegistry(), processStream);
+
+    this._process = new (_nuclideRpc().RpcProcess)('JediServer', getServiceRegistry(), processStream);
     this._isDisposed = false;
   }
 
@@ -131,7 +170,10 @@ class JediServer {
 
   dispose() {
     this._isDisposed = true;
+
     this._process.dispose();
   }
+
 }
+
 exports.default = JediServer;

@@ -1,15 +1,20 @@
-'use strict';
+"use strict";
 
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
 exports.isPending = isPending;
 exports.observePendingStateEnd = observePendingStateEnd;
+exports.isConsoleVisible = isConsoleVisible;
 
-var _event;
+function _event() {
+  const data = require("../nuclide-commons/event");
 
-function _load_event() {
-  return _event = require('../nuclide-commons/event');
+  _event = function () {
+    return data;
+  };
+
+  return data;
 }
 
 /**
@@ -23,7 +28,6 @@ function _load_event() {
  * 
  * @format
  */
-
 function isPending(paneItem) {
   const pane = atom.workspace.paneForItem(paneItem);
   return pane && pane.getPendingItem() === paneItem;
@@ -34,5 +38,16 @@ function observePendingStateEnd(paneItem) {
     throw new Error('paneItem must implement onDidTerminatePendingState method');
   }
 
-  return (0, (_event || _load_event()).observableFromSubscribeFunction)(paneItem.onDidTerminatePendingState.bind(paneItem));
+  return (0, _event().observableFromSubscribeFunction)(paneItem.onDidTerminatePendingState.bind(paneItem));
+}
+
+const CONSOLE_VIEW_URI = 'atom://nuclide/console';
+
+function isConsoleVisible() {
+  const consolePane = atom.workspace.paneForURI(CONSOLE_VIEW_URI);
+  const consoleItem = consolePane && consolePane.itemForURI(CONSOLE_VIEW_URI);
+  const paneContainer = atom.workspace.paneContainerForItem(consoleItem); // This visibility check has been taken from
+  // https://github.com/atom/atom/blob/v1.28.2/src/workspace.js#L1084
+
+  return (paneContainer === atom.workspace.getCenter() || paneContainer != null && paneContainer.isVisible()) && consoleItem === consolePane.getActiveItem();
 }

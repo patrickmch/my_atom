@@ -1,26 +1,38 @@
-'use strict';
+"use strict";
 
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
 exports.getDefinition = getDefinition;
 
-var _simpleTextBuffer;
+function _simpleTextBuffer() {
+  const data = require("simple-text-buffer");
 
-function _load_simpleTextBuffer() {
-  return _simpleTextBuffer = require('simple-text-buffer');
+  _simpleTextBuffer = function () {
+    return data;
+  };
+
+  return data;
 }
 
-var _range;
+function _range() {
+  const data = require("../../../modules/nuclide-commons/range");
 
-function _load_range() {
-  return _range = require('../../../modules/nuclide-commons/range');
+  _range = function () {
+    return data;
+  };
+
+  return data;
 }
 
-var _constants;
+function _constants() {
+  const data = require("./constants");
 
-function _load_constants() {
-  return _constants = require('./constants');
+  _constants = function () {
+    return data;
+  };
+
+  return data;
 }
 
 /**
@@ -33,33 +45,33 @@ function _load_constants() {
  * 
  * @format
  */
-
 async function getDefinition(serverManager, filePath, buffer, position) {
-  const wordMatch = (0, (_range || _load_range()).wordAtPositionFromBuffer)(buffer, position, (_constants || _load_constants()).IDENTIFIER_REGEXP);
+  const wordMatch = (0, _range().wordAtPositionFromBuffer)(buffer, position, _constants().IDENTIFIER_REGEXP);
+
   if (wordMatch == null) {
     return null;
   }
 
-  const { range } = wordMatch;
-
+  const {
+    range
+  } = wordMatch;
   const line = position.row;
   const column = position.column;
   const contents = buffer.getText();
-
   const service = await serverManager.getJediService();
   const result = await service.get_definitions(filePath, contents, serverManager.getSysPath(filePath), line, column);
+
   if (result == null || result.length === 0) {
     return null;
   }
 
   const definitions = result.map(definition => ({
     path: definition.file,
-    position: new (_simpleTextBuffer || _load_simpleTextBuffer()).Point(definition.line, definition.column),
+    position: new (_simpleTextBuffer().Point)(definition.line, definition.column),
     id: definition.text,
     name: definition.text,
     language: 'python'
   }));
-
   return {
     queryRange: [range],
     definitions

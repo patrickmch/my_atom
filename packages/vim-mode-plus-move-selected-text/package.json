@@ -1,0 +1,81 @@
+{
+  "_args": [
+    [
+      {
+        "raw": "/private/var/folders/dp/vj05cwss7pz9mjl62ccqzysm0000gp/T/d-118729-45645-iowmzo.znt5dpwrk9/package.tgz",
+        "scope": null,
+        "escapedName": null,
+        "name": null,
+        "rawSpec": "/private/var/folders/dp/vj05cwss7pz9mjl62ccqzysm0000gp/T/d-118729-45645-iowmzo.znt5dpwrk9/package.tgz",
+        "spec": "/private/var/folders/dp/vj05cwss7pz9mjl62ccqzysm0000gp/T/d-118729-45645-iowmzo.znt5dpwrk9/package.tgz",
+        "type": "local"
+      },
+      "/private/var/folders/dp/vj05cwss7pz9mjl62ccqzysm0000gp/T/apm-install-dir-118729-45645-125ds4s.5y6fgycik9"
+    ]
+  ],
+  "_from": "../d-118729-45645-iowmzo.znt5dpwrk9/package.tgz",
+  "_id": "vim-mode-plus-move-selected-text@0.12.0",
+  "_inCache": true,
+  "_location": "/vim-mode-plus-move-selected-text",
+  "_phantomChildren": {},
+  "_requested": {
+    "raw": "/private/var/folders/dp/vj05cwss7pz9mjl62ccqzysm0000gp/T/d-118729-45645-iowmzo.znt5dpwrk9/package.tgz",
+    "scope": null,
+    "escapedName": null,
+    "name": null,
+    "rawSpec": "/private/var/folders/dp/vj05cwss7pz9mjl62ccqzysm0000gp/T/d-118729-45645-iowmzo.znt5dpwrk9/package.tgz",
+    "spec": "/private/var/folders/dp/vj05cwss7pz9mjl62ccqzysm0000gp/T/d-118729-45645-iowmzo.znt5dpwrk9/package.tgz",
+    "type": "local"
+  },
+  "_requiredBy": [
+    "#USER"
+  ],
+  "_resolved": "file:../d-118729-45645-iowmzo.znt5dpwrk9/package.tgz",
+  "_shasum": "fe7b7cfa9eada7a8d0a87db52bf5dc3aebb5f91c",
+  "_shrinkwrap": null,
+  "_spec": "/private/var/folders/dp/vj05cwss7pz9mjl62ccqzysm0000gp/T/d-118729-45645-iowmzo.znt5dpwrk9/package.tgz",
+  "_where": "/private/var/folders/dp/vj05cwss7pz9mjl62ccqzysm0000gp/T/apm-install-dir-118729-45645-125ds4s.5y6fgycik9",
+  "activationCommands": {
+    "atom-text-editor.vim-mode-plus.visual-mode": [
+      "vim-mode-plus-user:move-selected-text-toggle-overwrite",
+      "vim-mode-plus-user:move-selected-text-up",
+      "vim-mode-plus-user:move-selected-text-down",
+      "vim-mode-plus-user:move-selected-text-left",
+      "vim-mode-plus-user:move-selected-text-right",
+      "vim-mode-plus-user:duplicate-selected-text-up",
+      "vim-mode-plus-user:duplicate-selected-text-down",
+      "vim-mode-plus-user:duplicate-selected-text-left",
+      "vim-mode-plus-user:duplicate-selected-text-right"
+    ]
+  },
+  "bugs": {
+    "url": "https://github.com/t9md/atom-vim-mode-plus-move-selected-text/issues"
+  },
+  "consumedServices": {
+    "vim-mode-plus": {
+      "versions": {
+        "^0.1.0": "consumeVim"
+      }
+    }
+  },
+  "dependencies": {},
+  "description": "Move selected text like object",
+  "devDependencies": {
+    "underscore-plus": "^1.6.6"
+  },
+  "engines": {
+    "atom": "^1.13.0-beta1"
+  },
+  "homepage": "https://github.com/t9md/atom-vim-mode-plus-move-selected-text#readme",
+  "license": "MIT",
+  "main": "./lib/main",
+  "name": "vim-mode-plus-move-selected-text",
+  "optionalDependencies": {},
+  "readme": "[![Build Status](https://travis-ci.org/t9md/atom-vim-mode-plus-move-selected-text.svg?branch=master)](https://travis-ci.org/t9md/atom-vim-mode-plus-move-selected-text)\n\n# vim-mode-plus-move-selected-text\n\nMove selected text like object.  \n\nThis is operator plugin for [vim-mode-plus](https://atom.io/packages/vim-mode-plus).  \nRequire **latest** [vim-mode-plus](https://atom.io/packages/vim-mode-plus).\n\n- Works only in visual mode.  \n- Support all submode(`linewise`, `characterwise`, `blockwise`).\n- Can revert consecutive movement by single undo.\n- Can switch `overwrite` mode via `vim-mode-plus-user:toggle-overwrite` command.  \n- Green cursor color indicate your are now in `overwrite` mode.\n\nThis package is feature migration from my [vim-textmanip](https://github.com/t9md/vim-textmanip) plugin for pure Vim.  \n\n![](https://raw.githubusercontent.com/t9md/t9md/d44c35f193478c0ccf996d0b3085d276fe9ea4b9/img/vim-mode-plus/move-selected-text.gif)\n\n## keymap example\n\nNo keymap by default.  \nSet following keymap to in your `keymap.cson`.  \n\n```coffeescipt\n'atom-text-editor.vim-mode-plus.visual-mode':\n  'ctrl-t': 'vim-mode-plus-user:move-selected-text-toggle-overwrite'\n\n  'ctrl-k': 'vim-mode-plus-user:move-selected-text-up'\n  'ctrl-j': 'vim-mode-plus-user:move-selected-text-down'\n  'ctrl-h': 'vim-mode-plus-user:move-selected-text-left'\n  'ctrl-l': 'vim-mode-plus-user:move-selected-text-right'\n\n  'cmd-K': 'vim-mode-plus-user:duplicate-selected-text-up'\n  'cmd-J': 'vim-mode-plus-user:duplicate-selected-text-down'\n  'cmd-H': 'vim-mode-plus-user:duplicate-selected-text-left'\n  'cmd-L': 'vim-mode-plus-user:duplicate-selected-text-right'\n```\n",
+  "readmeFilename": "README.md",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/t9md/atom-vim-mode-plus-move-selected-text.git"
+  },
+  "version": "0.12.0"
+}

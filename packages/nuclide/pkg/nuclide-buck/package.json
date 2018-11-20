@@ -4,10 +4,8 @@
   "version": "0.0.0",
   "description": "Buck integration for Nuclide.",
   "author": "NEEDS OWNER",
-  "atomTestRunner": "../../lib/test-runner-entry.js",
   "nuclide": {
-    "packageType": "Atom",
-    "testRunner": "apm",
+    "packageType": "AtomPackage",
     "configMetadata": {
       "pathComponents": [
         "IDE",
@@ -27,10 +25,26 @@
         "default": "true",
         "description": "Attempt to detect and display compile errors in Diagnostics."
       },
+      "suggestTaskRunner": {
+        "title": "Suggest building with the Task Runner after detecting CLI Buck builds.",
+        "type": "boolean",
+        "default": "true"
+      },
       "buildDbErrorNotify": {
         "title": "Show notification for errors and warnings when building compilation database.",
         "type": "boolean",
         "default": "true"
+      },
+      "watchConfigArgs": {
+        "title": "Update compilation database arguments when changes detected",
+        "type": "string",
+        "default": "Prompt",
+        "enum": [
+          "Always",
+          "Never",
+          "Prompt"
+        ],
+        "description": "Whether to update compilation database arguments automatically when CLI Buck build is detected"
       }
     }
   },

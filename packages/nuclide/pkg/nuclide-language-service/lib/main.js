@@ -1,56 +1,87 @@
-'use strict';
+"use strict";
 
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
+Object.defineProperty(exports, "AtomLanguageService", {
+  enumerable: true,
+  get: function () {
+    return _AtomLanguageService().AtomLanguageService;
+  }
+});
+Object.defineProperty(exports, "AtomLanguageServiceConfig", {
+  enumerable: true,
+  get: function () {
+    return _AtomLanguageService().AtomLanguageServiceConfig;
+  }
+});
+Object.defineProperty(exports, "getHostServices", {
+  enumerable: true,
+  get: function () {
+    return _HostServices().getHostServices;
+  }
+});
+Object.defineProperty(exports, "LanguageService", {
+  enumerable: true,
+  get: function () {
+    return _LanguageService().LanguageService;
+  }
+});
+Object.defineProperty(exports, "updateAutocompleteResults", {
+  enumerable: true,
+  get: function () {
+    return _AutocompleteProvider().updateAutocompleteResults;
+  }
+});
+Object.defineProperty(exports, "updateAutocompleteFirstResults", {
+  enumerable: true,
+  get: function () {
+    return _AutocompleteProvider().updateAutocompleteFirstResults;
+  }
+});
+Object.defineProperty(exports, "updateAutocompleteResultRanges", {
+  enumerable: true,
+  get: function () {
+    return _AutocompleteProvider().updateAutocompleteResultRanges;
+  }
+});
 
-var _AtomLanguageService;
+function _AtomLanguageService() {
+  const data = require("./AtomLanguageService");
 
-function _load_AtomLanguageService() {
-  return _AtomLanguageService = require('./AtomLanguageService');
+  _AtomLanguageService = function () {
+    return data;
+  };
+
+  return data;
 }
 
-Object.defineProperty(exports, 'AtomLanguageService', {
-  enumerable: true,
-  get: function () {
-    return (_AtomLanguageService || _load_AtomLanguageService()).AtomLanguageService;
-  }
-});
+function _HostServices() {
+  const data = require("./HostServices");
 
-var _HostServices;
+  _HostServices = function () {
+    return data;
+  };
 
-function _load_HostServices() {
-  return _HostServices = require('./HostServices');
+  return data;
 }
 
-Object.defineProperty(exports, 'getHostServices', {
-  enumerable: true,
-  get: function () {
-    return (_HostServices || _load_HostServices()).getHostServices;
-  }
-});
+function _LanguageService() {
+  const data = require("./LanguageService");
 
-var _AutocompleteProvider;
+  _LanguageService = function () {
+    return data;
+  };
 
-function _load_AutocompleteProvider() {
-  return _AutocompleteProvider = require('./AutocompleteProvider');
+  return data;
 }
 
-Object.defineProperty(exports, 'updateAutocompleteResults', {
-  enumerable: true,
-  get: function () {
-    return (_AutocompleteProvider || _load_AutocompleteProvider()).updateAutocompleteResults;
-  }
-});
-Object.defineProperty(exports, 'updateAutocompleteFirstResults', {
-  enumerable: true,
-  get: function () {
-    return (_AutocompleteProvider || _load_AutocompleteProvider()).updateAutocompleteFirstResults;
-  }
-});
-Object.defineProperty(exports, 'updateAutocompleteResultRanges', {
-  enumerable: true,
-  get: function () {
-    return (_AutocompleteProvider || _load_AutocompleteProvider()).updateAutocompleteResultRanges;
-  }
-});
+function _AutocompleteProvider() {
+  const data = require("./AutocompleteProvider");
+
+  _AutocompleteProvider = function () {
+    return data;
+  };
+
+  return data;
+}

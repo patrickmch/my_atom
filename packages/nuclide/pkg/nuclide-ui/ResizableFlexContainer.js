@@ -1,39 +1,55 @@
-'use strict';
+"use strict";
 
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.ResizableFlexItem = exports.ResizableFlexContainer = exports.FlexDirections = undefined;
+exports.ResizableFlexItem = exports.ResizableFlexContainer = exports.FlexDirections = void 0;
 
-var _collection;
+function _collection() {
+  const data = require("../../modules/nuclide-commons/collection");
 
-function _load_collection() {
-  return _collection = require('../../modules/nuclide-commons/collection');
+  _collection = function () {
+    return data;
+  };
+
+  return data;
 }
 
-var _classnames;
+function _classnames() {
+  const data = _interopRequireDefault(require("classnames"));
 
-function _load_classnames() {
-  return _classnames = _interopRequireDefault(require('classnames'));
+  _classnames = function () {
+    return data;
+  };
+
+  return data;
 }
 
-var _createPaneContainer;
+function _createPaneContainer() {
+  const data = _interopRequireDefault(require("../../modules/nuclide-commons-atom/create-pane-container"));
 
-function _load_createPaneContainer() {
-  return _createPaneContainer = _interopRequireDefault(require('../../modules/nuclide-commons-atom/create-pane-container'));
+  _createPaneContainer = function () {
+    return data;
+  };
+
+  return data;
 }
 
-var _nullthrows;
+function _nullthrows() {
+  const data = _interopRequireDefault(require("nullthrows"));
 
-function _load_nullthrows() {
-  return _nullthrows = _interopRequireDefault(require('nullthrows'));
+  _nullthrows = function () {
+    return data;
+  };
+
+  return data;
 }
 
-var _react = _interopRequireWildcard(require('react'));
+var React = _interopRequireWildcard(require("react"));
 
-var _reactDom = _interopRequireDefault(require('react-dom'));
+var _reactDom = _interopRequireDefault(require("react-dom"));
 
-function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
+function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) { var desc = Object.defineProperty && Object.getOwnPropertyDescriptor ? Object.getOwnPropertyDescriptor(obj, key) : {}; if (desc.get || desc.set) { Object.defineProperty(newObj, key, desc); } else { newObj[key] = obj[key]; } } } } newObj.default = obj; return newObj; } }
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -47,14 +63,14 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
  * 
  * @format
  */
-
-const FlexDirections = exports.FlexDirections = Object.freeze({
+const FlexDirections = Object.freeze({
   HORIZONTAL: 'HORIZONTAL',
   VERTICAL: 'VERTICAL'
 });
+exports.FlexDirections = FlexDirections;
 
 function getChildrenFlexScales(children) {
-  return (0, (_collection || _load_collection()).arrayCompact)(_react.Children.map(children, child => {
+  return (0, _collection().arrayCompact)(React.Children.map(children, child => {
     if (child == null) {
       return null;
     } else if (!(child.type === ResizableFlexItem)) {
@@ -65,16 +81,17 @@ function getChildrenFlexScales(children) {
   }) || []);
 }
 
-class ResizableFlexContainer extends _react.Component {
-
+class ResizableFlexContainer extends React.Component {
   componentDidMount() {
     this._setupPanes(this.props);
+
     this._renderPanes();
   }
 
-  componentWillReceiveProps(newProps) {
-    if (!(0, (_collection || _load_collection()).arrayEqual)(getChildrenFlexScales(this.props.children), getChildrenFlexScales(newProps.children))) {
+  UNSAFE_componentWillReceiveProps(newProps) {
+    if (!(0, _collection().arrayEqual)(getChildrenFlexScales(this.props.children), getChildrenFlexScales(newProps.children))) {
       this._destroyPanes();
+
       this._setupPanes(newProps);
     }
   }
@@ -85,33 +102,49 @@ class ResizableFlexContainer extends _react.Component {
 
   _setupPanes(props) {
     const flexScales = getChildrenFlexScales(props.children);
-    const { direction } = props;
-    this._paneContainer = (0, (_createPaneContainer || _load_createPaneContainer()).default)();
-    const containerNode = (0, (_nullthrows || _load_nullthrows()).default)(this._flexContainer);
+    const {
+      direction
+    } = props;
+    this._paneContainer = (0, _createPaneContainer().default)();
+    const containerNode = (0, _nullthrows().default)(this._flexContainer);
     containerNode.innerHTML = '';
     containerNode.appendChild(atom.views.getView(this._paneContainer));
+
     const startingPane = this._paneContainer.getActivePane();
+
     let lastPane = startingPane;
     this._panes = [startingPane];
+
     for (let i = 1; i < flexScales.length; i++) {
       const flexScale = flexScales[i];
+
       if (direction === FlexDirections.HORIZONTAL) {
-        lastPane = lastPane.splitRight({ flexScale });
+        lastPane = lastPane.splitRight({
+          flexScale
+        });
       } else {
-        /* direction === SplitDirections.VERTICAL */lastPane = lastPane.splitDown({ flexScale });
+        /* direction === SplitDirections.VERTICAL */
+        lastPane = lastPane.splitDown({
+          flexScale
+        });
       }
+
       this._panes.push(lastPane);
     }
+
     startingPane.setFlexScale(flexScales[0]);
   }
 
   _renderPanes() {
-    const { children } = this.props;
+    const {
+      children
+    } = this.props;
     let i = 0;
-    _react.Children.forEach(children, child => {
+    React.Children.forEach(children, child => {
       if (child == null) {
         return;
       }
+
       _reactDom.default.render(child, this._getPaneElement(this._panes[i++]));
     });
   }
@@ -123,8 +156,10 @@ class ResizableFlexContainer extends _react.Component {
   _destroyPanes() {
     this._panes.forEach(pane => {
       _reactDom.default.unmountComponentAtNode(_reactDom.default.findDOMNode(this._getPaneElement(pane)));
+
       pane.destroy();
     });
+
     this._panes = [];
   }
 
@@ -134,25 +169,29 @@ class ResizableFlexContainer extends _react.Component {
   }
 
   render() {
-    const { className } = this.props;
-    const containerClassName = (0, (_classnames || _load_classnames()).default)('nuclide-ui-resizable-flex-container', className);
-    return _react.createElement('div', {
+    const {
+      className
+    } = this.props;
+    const containerClassName = (0, _classnames().default)('nuclide-ui-resizable-flex-container', className);
+    return React.createElement("div", {
       className: containerClassName,
       ref: el => {
         this._flexContainer = el;
       }
     });
   }
+
 }
 
 exports.ResizableFlexContainer = ResizableFlexContainer;
-class ResizableFlexItem extends _react.Component {
+
+class ResizableFlexItem extends React.Component {
   render() {
-    return _react.createElement(
-      'div',
-      { className: 'nuclide-ui-resizable-flex-item' },
-      this.props.children
-    );
+    return React.createElement("div", {
+      className: "nuclide-ui-resizable-flex-item"
+    }, this.props.children);
   }
+
 }
+
 exports.ResizableFlexItem = ResizableFlexItem;

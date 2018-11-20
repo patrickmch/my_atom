@@ -4,6 +4,7 @@ Object.defineProperty(exports, "__esModule", {
   value: true
 });
 exports.importedFunction = importedFunction;
+
 /**
  * Copyright (c) 2017-present, Facebook, Inc.
  * All rights reserved.
@@ -15,7 +16,6 @@ exports.importedFunction = importedFunction;
  * 
  * @format
  */
-
 function importedFunction(arg) {
   return 0;
 }

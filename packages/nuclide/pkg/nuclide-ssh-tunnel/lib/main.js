@@ -1,72 +1,126 @@
-'use strict';
+"use strict";
 
-var _createPackage;
+function _createPackage() {
+  const data = _interopRequireDefault(require("../../../modules/nuclide-commons-atom/createPackage"));
 
-function _load_createPackage() {
-  return _createPackage = _interopRequireDefault(require('../../../modules/nuclide-commons-atom/createPackage'));
+  _createPackage = function () {
+    return data;
+  };
+
+  return data;
 }
 
-var _destroyItemWhere;
+function _destroyItemWhere() {
+  const data = require("../../../modules/nuclide-commons-atom/destroyItemWhere");
 
-function _load_destroyItemWhere() {
-  return _destroyItemWhere = require('../../../modules/nuclide-commons-atom/destroyItemWhere');
+  _destroyItemWhere = function () {
+    return data;
+  };
+
+  return data;
 }
 
-var _UniversalDisposable;
+function _epicHelpers() {
+  const data = require("../../../modules/nuclide-commons/epicHelpers");
 
-function _load_UniversalDisposable() {
-  return _UniversalDisposable = _interopRequireDefault(require('../../../modules/nuclide-commons/UniversalDisposable'));
+  _epicHelpers = function () {
+    return data;
+  };
+
+  return data;
 }
 
-var _CreateObservables;
+function _UniversalDisposable() {
+  const data = _interopRequireDefault(require("../../../modules/nuclide-commons/UniversalDisposable"));
 
-function _load_CreateObservables() {
-  return _CreateObservables = require('./CreateObservables');
+  _UniversalDisposable = function () {
+    return data;
+  };
+
+  return data;
 }
 
-var _Normalization;
+function _CreateObservables() {
+  const data = require("./CreateObservables");
 
-function _load_Normalization() {
-  return _Normalization = require('./Normalization');
+  _CreateObservables = function () {
+    return data;
+  };
+
+  return data;
 }
 
-var _TunnelsPanel;
+function _Normalization() {
+  const data = require("./Normalization");
 
-function _load_TunnelsPanel() {
-  return _TunnelsPanel = require('./ui/TunnelsPanel');
+  _Normalization = function () {
+    return data;
+  };
+
+  return data;
 }
 
-var _Actions;
+function _TunnelsPanel() {
+  const data = require("./ui/TunnelsPanel");
 
-function _load_Actions() {
-  return _Actions = _interopRequireWildcard(require('./redux/Actions'));
+  _TunnelsPanel = function () {
+    return data;
+  };
+
+  return data;
 }
 
-var _Epics;
+function Actions() {
+  const data = _interopRequireWildcard(require("./redux/Actions"));
 
-function _load_Epics() {
-  return _Epics = _interopRequireWildcard(require('./redux/Epics'));
+  Actions = function () {
+    return data;
+  };
+
+  return data;
 }
 
-var _Reducers;
+function Epics() {
+  const data = _interopRequireWildcard(require("./redux/Epics"));
 
-function _load_Reducers() {
-  return _Reducers = _interopRequireWildcard(require('./redux/Reducers'));
+  Epics = function () {
+    return data;
+  };
+
+  return data;
 }
 
-var _reduxMin;
+function Reducers() {
+  const data = _interopRequireWildcard(require("./redux/Reducers"));
 
-function _load_reduxMin() {
-  return _reduxMin = require('redux/dist/redux.min.js');
+  Reducers = function () {
+    return data;
+  };
+
+  return data;
 }
 
-var _reduxObservable;
+function _reduxMin() {
+  const data = require("redux/dist/redux.min.js");
 
-function _load_reduxObservable() {
-  return _reduxObservable = require('../../../modules/nuclide-commons/redux-observable');
+  _reduxMin = function () {
+    return data;
+  };
+
+  return data;
 }
 
-function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
+function _reduxObservable() {
+  const data = require("../../../modules/nuclide-commons/redux-observable");
+
+  _reduxObservable = function () {
+    return data;
+  };
+
+  return data;
+}
+
+function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) { var desc = Object.defineProperty && Object.getOwnPropertyDescriptor ? Object.getOwnPropertyDescriptor(obj, key) : {}; if (desc.get || desc.set) { Object.defineProperty(newObj, key, desc); } else { newObj[key] = obj[key]; } } } } newObj.default = obj; return newObj; } }
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -80,14 +134,10 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
  * 
  * @format
  */
-
 class Activation {
-
   constructor(rawState) {
-    const epics = Object.keys(_Epics || _load_Epics()).map(k => (_Epics || _load_Epics())[k]).filter(epic => typeof epic === 'function');
-    this._store = (0, (_reduxMin || _load_reduxMin()).createStore)((0, (_reduxMin || _load_reduxMin()).combineReducers)(_Reducers || _load_Reducers()), (0, (_reduxMin || _load_reduxMin()).applyMiddleware)((0, (_reduxObservable || _load_reduxObservable()).createEpicMiddleware)((0, (_reduxObservable || _load_reduxObservable()).combineEpics)(...epics))));
-
-    this._disposables = new (_UniversalDisposable || _load_UniversalDisposable()).default(this._closeAllTunnels.bind(this), this._registerCommandAndOpener());
+    this._store = (0, _reduxMin().createStore)((0, _reduxMin().combineReducers)(Reducers()), (0, _reduxMin().applyMiddleware)((0, _reduxObservable().createEpicMiddleware)((0, _epicHelpers().combineEpicsFromImports)(Epics(), 'nuclide-ssh-tunnel'))));
+    this._disposables = new (_UniversalDisposable().default)(this._closeAllTunnels.bind(this), this._registerCommandAndOpener());
   }
 
   dispose() {
@@ -95,44 +145,54 @@ class Activation {
   }
 
   _registerCommandAndOpener() {
-    return new (_UniversalDisposable || _load_UniversalDisposable()).default(atom.workspace.addOpener(uri => {
-      if (uri === (_TunnelsPanel || _load_TunnelsPanel()).WORKSPACE_VIEW_URI) {
-        return new (_TunnelsPanel || _load_TunnelsPanel()).TunnelsPanel(this._store);
+    return new (_UniversalDisposable().default)(atom.workspace.addOpener(uri => {
+      if (uri === _TunnelsPanel().WORKSPACE_VIEW_URI) {
+        return new (_TunnelsPanel().TunnelsPanel)(this._store);
       }
-    }), () => (0, (_destroyItemWhere || _load_destroyItemWhere()).destroyItemWhere)(item => item instanceof (_TunnelsPanel || _load_TunnelsPanel()).TunnelsPanel), atom.commands.add('atom-workspace', 'nuclide-ssh-tunnels-panel:toggle', () => {
-      atom.workspace.toggle((_TunnelsPanel || _load_TunnelsPanel()).WORKSPACE_VIEW_URI);
+    }), () => (0, _destroyItemWhere().destroyItemWhere)(item => item instanceof _TunnelsPanel().TunnelsPanel), atom.commands.add('atom-workspace', 'nuclide-tunnels-panel:toggle', () => {
+      atom.workspace.toggle(_TunnelsPanel().WORKSPACE_VIEW_URI);
     }));
   }
 
   provideSshTunnelService() {
     return {
-      openTunnels: tunnel => (0, (_CreateObservables || _load_CreateObservables()).createObservableForTunnels)(tunnel, this._store),
+      openTunnels: tunnel => (0, _CreateObservables().createObservableForTunnels)(tunnel, this._store),
       getOpenTunnels: () => this._store.getState().tunnels.toList().map(t => t.tunnel).toSet(),
-      getAvailableServerPort: async uri => (0, (_Normalization || _load_Normalization()).getSocketServiceByHost)((0, (_Normalization || _load_Normalization()).getSharedHostUri)(uri)).getAvailableServerPort()
+      getAvailableServerPort: async uri => (0, _Normalization().getSocketServiceByHost)((0, _Normalization().getSharedHostUri)(uri)).getAvailableServerPort()
     };
   }
 
   deserializeSshTunnelsPanel() {
-    return new (_TunnelsPanel || _load_TunnelsPanel()).TunnelsPanel(this._store);
+    return new (_TunnelsPanel().TunnelsPanel)(this._store);
   }
 
   _closeAllTunnels() {
     const tunnels = this._store.getState().tunnels;
-    tunnels.toList().forEach(active => this._store.dispatch((_Actions || _load_Actions()).closeTunnel(active.tunnel)));
+
+    tunnels.toList().forEach(active => this._store.dispatch(Actions().closeTunnel(active.tunnel)));
   }
 
   consumeCurrentWorkingDirectory(api) {
     this._disposables.add(api.observeCwd(directory => {
-      this._store.dispatch((_Actions || _load_Actions()).setCurrentWorkingDirectory(directory));
+      this._store.dispatch(Actions().setCurrentWorkingDirectory(directory));
     }));
   }
 
-  consumeOutputService(api) {
-    this._disposables.add(api.registerOutputProvider({
-      id: 'SSH tunnels',
-      messages: this._store.getState().consoleOutput
-    }));
+  consumeConsole(consoleService) {
+    let consoleApi = consoleService({
+      id: 'Nuclide tunnels',
+      name: 'Nuclide tunnels'
+    });
+    const disposable = new (_UniversalDisposable().default)(() => {
+      consoleApi != null && consoleApi.dispose();
+      consoleApi = null;
+    }, this._store.getState().consoleOutput.subscribe(message => consoleApi != null && consoleApi.append(message)));
+
+    this._disposables.add(disposable);
+
+    return disposable;
   }
+
 }
 
-(0, (_createPackage || _load_createPackage()).default)(module.exports, Activation);
+(0, _createPackage().default)(module.exports, Activation);

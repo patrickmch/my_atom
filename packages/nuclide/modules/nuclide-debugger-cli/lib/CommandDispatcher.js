@@ -1,8 +1,22 @@
-'use strict';
+"use strict";
 
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
+exports.default = void 0;
+
+function _TokenizedLine() {
+  const data = _interopRequireDefault(require("./TokenizedLine"));
+
+  _TokenizedLine = function () {
+    return data;
+  };
+
+  return data;
+}
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
 /**
  * Copyright (c) 2017-present, Facebook, Inc.
  * All rights reserved.
@@ -14,12 +28,9 @@ Object.defineProperty(exports, "__esModule", {
  *  strict
  * @format
  */
-
 class CommandDispatcher {
-
   constructor(aliases) {
     this._commands = [];
-
     this._aliases = aliases;
   }
 
@@ -42,41 +53,22 @@ class CommandDispatcher {
   }
 
   async execute(line) {
-    let tail = line;
-    const tokens = [];
-
-    // Here we're looking for quoted arguments.
-    // \1 is the contents of a single-quoted arg that may contain spaces
-    // \2 is a space-delimited arg if there are no quotes
-    // \3 is the rest of the command line
-    const tokenizer = /^\s*(?:('([^']*)')|(\S+))\s*(.*)$/;
-
-    while (tail.length > 0) {
-      const match = tail.match(tokenizer);
-      if (match == null) {
-        break;
-      }
-
-      const [,, quoted, unquoted, rest] = match;
-      tokens.push(quoted != null ? quoted : unquoted);
-      tail = rest;
-    }
-
+    const tokens = new (_TokenizedLine().default)(line);
     return this.executeTokenizedLine(tokens);
   }
 
   async executeTokenizedLine(tokens) {
-    if (tokens.length === 0 || !tokens[0]) {
-      return;
-    }
-
-    // Get all commands of which the given command is a prefix
-    const cmd = tokens[0];
-
     // resolve aliases
     const alias = this.resolveAlias(tokens);
+
     if (alias != null) {
       return this.execute(alias);
+    }
+
+    const cmd = tokens.stringTokens()[0];
+
+    if (cmd == null) {
+      return;
     }
 
     const matches = this.getCommandsMatching(cmd);
@@ -91,26 +83,55 @@ class CommandDispatcher {
     }
 
     return new Promise((resolve, reject) => {
-      matches[0].execute(tokens.slice(1)).then(_ => resolve(null), _ => resolve(_));
+      matches[0].execute(tokens).then(_ => resolve(null), _ => resolve(_));
     });
   }
 
   resolveAlias(tokens) {
-    const alias = this._aliases.get(tokens[0]);
-    if (alias != null) {
-      return `${alias} ${tokens.splice(1).join(' ')}`;
+    const cmd = tokens.stringTokens()[0];
+
+    if (cmd == null) {
+      return null;
     }
 
-    const match = tokens[0].match(/^([^a-zA-Z0-9]+)(.*)$/);
-    if (match != null) {
-      const [, prefix, tail] = match;
-      const puncAlias = this._aliases.get(prefix);
-      if (puncAlias != null) {
-        return `${puncAlias} ${tail} ${tokens.splice(1).join(' ')}`;
+    const alias = this._aliases.get(cmd);
+
+    if (alias != null) {
+      return `${alias} ${tokens.rest(1)}`;
+    } // punctuation aliases are things like '=' for print ala hphpd
+    // we have to be careful here since we want '=$x' to work to
+    // print the value of x
+    //
+    // Find the longest punctuation alias match
+
+
+    let puncMatch = null;
+
+    for (const key of this._aliases.keys()) {
+      if (key.match(/^[^a-zA-Z0-9]+$/)) {
+        if (puncMatch != null && key.length < puncMatch.length) {
+          continue;
+        }
+
+        if (cmd.startsWith(key)) {
+          puncMatch = key;
+        }
       }
+    }
+
+    if (puncMatch != null) {
+      const puncAlias = this._aliases.get(puncMatch);
+
+      if (!(puncAlias != null)) {
+        throw new Error("Invariant violation: \"puncAlias != null\"");
+      }
+
+      return `${puncAlias} ${tokens.rest(0).substr(puncMatch.length)}`;
     }
 
     return null;
   }
+
 }
+
 exports.default = CommandDispatcher;

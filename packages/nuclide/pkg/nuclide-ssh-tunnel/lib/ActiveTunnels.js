@@ -1,26 +1,40 @@
-'use strict';
+"use strict";
 
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.ActiveTunnels = undefined;
+exports.ActiveTunnels = void 0;
 
-var _immutable;
+function _immutable() {
+  const data = require("immutable");
 
-function _load_immutable() {
-  return _immutable = require('immutable');
+  _immutable = function () {
+    return data;
+  };
+
+  return data;
 }
 
+/**
+ * Copyright (c) 2015-present, Facebook, Inc.
+ * All rights reserved.
+ *
+ * This source code is licensed under the license found in the LICENSE file in
+ * the root directory of this source tree.
+ *
+ *  strict-local
+ * @format
+ */
 // A thin wrapper around Immutable.Map with a key factory
 class ActiveTunnels {
-
-  constructor(storage = (0, (_immutable || _load_immutable()).Map)()) {
+  constructor(storage = (0, _immutable().Map)()) {
     this.get = tunnel => {
       return this._storage.get(this._keyForTunnel(tunnel));
     };
 
     this.set = (tunnel, value) => {
       const key = this._keyForTunnel(tunnel);
+
       return new ActiveTunnels(this._storage.set(key, value));
     };
 
@@ -30,11 +44,13 @@ class ActiveTunnels {
 
     this.update = (tunnel, updater) => {
       const key = this._keyForTunnel(tunnel);
+
       return new ActiveTunnels(this._storage.update(key, value => updater(value)));
     };
 
     this.delete = tunnel => {
       const key = this._keyForTunnel(tunnel);
+
       return new ActiveTunnels(this._storage.delete(key));
     };
 
@@ -46,13 +62,5 @@ class ActiveTunnels {
   }
 
 }
-exports.ActiveTunnels = ActiveTunnels; /**
-                                        * Copyright (c) 2015-present, Facebook, Inc.
-                                        * All rights reserved.
-                                        *
-                                        * This source code is licensed under the license found in the LICENSE file in
-                                        * the root directory of this source tree.
-                                        *
-                                        *  strict-local
-                                        * @format
-                                        */
+
+exports.ActiveTunnels = ActiveTunnels;

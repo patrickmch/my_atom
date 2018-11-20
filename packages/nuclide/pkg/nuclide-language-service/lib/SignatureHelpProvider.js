@@ -1,32 +1,48 @@
-'use strict';
+"use strict";
 
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.SignatureHelpProvider = undefined;
+exports.SignatureHelpProvider = void 0;
 
-var _UniversalDisposable;
+function _UniversalDisposable() {
+  const data = _interopRequireDefault(require("../../../modules/nuclide-commons/UniversalDisposable"));
 
-function _load_UniversalDisposable() {
-  return _UniversalDisposable = _interopRequireDefault(require('../../../modules/nuclide-commons/UniversalDisposable'));
+  _UniversalDisposable = function () {
+    return data;
+  };
+
+  return data;
 }
 
-var _nuclideRemoteConnection;
+function _nuclideRemoteConnection() {
+  const data = require("../../nuclide-remote-connection");
 
-function _load_nuclideRemoteConnection() {
-  return _nuclideRemoteConnection = require('../../nuclide-remote-connection');
+  _nuclideRemoteConnection = function () {
+    return data;
+  };
+
+  return data;
 }
 
-var _nuclideOpenFiles;
+function _nuclideOpenFiles() {
+  const data = require("../../nuclide-open-files");
 
-function _load_nuclideOpenFiles() {
-  return _nuclideOpenFiles = require('../../nuclide-open-files');
+  _nuclideOpenFiles = function () {
+    return data;
+  };
+
+  return data;
 }
 
-var _nuclideAnalytics;
+function _nuclideAnalytics() {
+  const data = require("../../../modules/nuclide-analytics");
 
-function _load_nuclideAnalytics() {
-  return _nuclideAnalytics = require('../../nuclide-analytics');
+  _nuclideAnalytics = function () {
+    return data;
+  };
+
+  return data;
 }
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
@@ -41,9 +57,7 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
  *  strict-local
  * @format
  */
-
 class SignatureHelpProvider {
-
   constructor(grammarScopes, config, connectionToLanguageService) {
     this.grammarScopes = grammarScopes;
     this.triggerCharacters = config.triggerCharacters;
@@ -53,7 +67,7 @@ class SignatureHelpProvider {
   }
 
   static register(grammarScopes, config, connectionToLanguageService) {
-    const disposables = new (_UniversalDisposable || _load_UniversalDisposable()).default();
+    const disposables = new (_UniversalDisposable().default)();
     disposables.add(atom.packages.serviceHub.consume('signature-help', config.version, registry => {
       disposables.add(registry(new SignatureHelpProvider(grammarScopes, config, connectionToLanguageService)));
     }));
@@ -61,15 +75,19 @@ class SignatureHelpProvider {
   }
 
   getSignatureHelp(editor, position) {
-    return (0, (_nuclideAnalytics || _load_nuclideAnalytics()).trackTiming)(this._analyticsEventName, async () => {
+    return (0, _nuclideAnalytics().trackTiming)(this._analyticsEventName, async () => {
       const languageService = await this._connectionToLanguageService.getForUri(editor.getPath());
+
       if (languageService == null) {
         return null;
       }
-      const fileVersion = await (0, (_nuclideOpenFiles || _load_nuclideOpenFiles()).getFileVersionOfEditor)(editor);
+
+      const fileVersion = await (0, _nuclideOpenFiles().getFileVersionOfEditor)(editor);
+
       if (fileVersion == null) {
         return null;
       }
+
       const signatureHelp = await languageService.signatureHelp(fileVersion, position);
 
       if (!this.showDocBlock && signatureHelp != null && signatureHelp.signatures != null) {
@@ -81,5 +99,7 @@ class SignatureHelpProvider {
       return signatureHelp;
     });
   }
+
 }
+
 exports.SignatureHelpProvider = SignatureHelpProvider;

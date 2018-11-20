@@ -1,9 +1,10 @@
-'use strict';
+"use strict";
 
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
 exports.getProviders = getProviders;
+
 /**
  * Copyright (c) 2015-present, Facebook, Inc.
  * All rights reserved.
@@ -14,7 +15,6 @@ exports.getProviders = getProviders;
  *  strict-local
  * @format
  */
-
 const providers = {
   deviceList: new Set(),
   deviceInfo: new Set(),

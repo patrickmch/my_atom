@@ -5,8 +5,6 @@
  * This renderer supports cell-caching while the user is scrolling.
  */
 
-var babelPluginFlowReactPropTypes_proptype_CellRangeRendererParams = require('./types').babelPluginFlowReactPropTypes_proptype_CellRangeRendererParams || require('prop-types').any;
-
 export default function defaultCellRangeRenderer(_ref) {
   var cellCache = _ref.cellCache,
       cellRenderer = _ref.cellRenderer,
@@ -16,6 +14,7 @@ export default function defaultCellRangeRenderer(_ref) {
       deferredMeasurementCache = _ref.deferredMeasurementCache,
       horizontalOffsetAdjustment = _ref.horizontalOffsetAdjustment,
       isScrolling = _ref.isScrolling,
+      isScrollingOptOut = _ref.isScrollingOptOut,
       parent = _ref.parent,
       rowSizeAndPositionManager = _ref.rowSizeAndPositionManager,
       rowStartIndex = _ref.rowStartIndex,
@@ -94,7 +93,10 @@ export default function defaultCellRangeRenderer(_ref) {
       // However if we are scaling scroll positions and sizes, we should also avoid caching.
       // This is because the offset changes slightly as scroll position changes and caching leads to stale values.
       // For more info refer to issue #395
-      if (isScrolling && !horizontalOffsetAdjustment && !verticalOffsetAdjustment) {
+      //
+      // If isScrollingOptOut is specified, we always cache cells.
+      // For more info refer to issue #1028
+      if ((isScrollingOptOut || isScrolling) && !horizontalOffsetAdjustment && !verticalOffsetAdjustment) {
         if (!cellCache[key]) {
           cellCache[key] = cellRenderer(cellRendererParams);
         }
@@ -139,3 +141,4 @@ function warnAboutMissingStyle(parent, renderedCell) {
     }
   }
 }
+import { bpfrpt_proptype_CellRangeRendererParams } from './types';

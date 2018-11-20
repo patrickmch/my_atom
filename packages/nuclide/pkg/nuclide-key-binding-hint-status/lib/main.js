@@ -1,30 +1,42 @@
-'use strict';
+"use strict";
 
-var _react = _interopRequireWildcard(require('react'));
+var React = _interopRequireWildcard(require("react"));
 
-var _reactDom = _interopRequireDefault(require('react-dom'));
+var _reactDom = _interopRequireDefault(require("react-dom"));
 
-var _createPackage;
+function _createPackage() {
+  const data = _interopRequireDefault(require("../../../modules/nuclide-commons-atom/createPackage"));
 
-function _load_createPackage() {
-  return _createPackage = _interopRequireDefault(require('../../../modules/nuclide-commons-atom/createPackage'));
+  _createPackage = function () {
+    return data;
+  };
+
+  return data;
 }
 
-var _UniversalDisposable;
+function _UniversalDisposable() {
+  const data = _interopRequireDefault(require("../../../modules/nuclide-commons/UniversalDisposable"));
 
-function _load_UniversalDisposable() {
-  return _UniversalDisposable = _interopRequireDefault(require('../../../modules/nuclide-commons/UniversalDisposable'));
+  _UniversalDisposable = function () {
+    return data;
+  };
+
+  return data;
 }
 
-var _KeyBindingHint;
+function _KeyBindingHint() {
+  const data = _interopRequireDefault(require("./KeyBindingHint"));
 
-function _load_KeyBindingHint() {
-  return _KeyBindingHint = _interopRequireDefault(require('./KeyBindingHint'));
+  _KeyBindingHint = function () {
+    return data;
+  };
+
+  return data;
 }
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
+function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) { var desc = Object.defineProperty && Object.getOwnPropertyDescriptor ? Object.getOwnPropertyDescriptor(obj, key) : {}; if (desc.get || desc.set) { Object.defineProperty(newObj, key, desc); } else { newObj[key] = obj[key]; } } } } newObj.default = obj; return newObj; } }
 
 /**
  * Copyright (c) 2015-present, Facebook, Inc.
@@ -36,26 +48,23 @@ function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj;
  *  strict-local
  * @format
  */
-
-const STATUS_BAR_PRIORITY = 500;
-
-// TODO: Allow the user to toggle this feature.
-
+const STATUS_BAR_PRIORITY = 500; // TODO: Allow the user to toggle this feature.
 
 class Activation {
-
   constructor(state) {
     this._statusNode = document.createElement('div');
+
     this._statusNode.classList.add('inline-block', 'text');
 
     if (!this._statusNode) {
-      throw new Error('Invariant violation: "this._statusNode"');
+      throw new Error("Invariant violation: \"this._statusNode\"");
     }
 
-    _reactDom.default.render(_react.createElement((_KeyBindingHint || _load_KeyBindingHint()).default, null), this._statusNode);
+    _reactDom.default.render(React.createElement(_KeyBindingHint().default, null), this._statusNode);
 
-    this._disposables = new (_UniversalDisposable || _load_UniversalDisposable()).default(() => {
+    this._disposables = new (_UniversalDisposable().default)(() => {
       _reactDom.default.unmountComponentAtNode(this._statusNode);
+
       this._statusNode = null;
     });
   }
@@ -74,6 +83,7 @@ class Activation {
   dispose() {
     this._disposables.dispose();
   }
+
 }
 
-(0, (_createPackage || _load_createPackage()).default)(module.exports, Activation);
+(0, _createPackage().default)(module.exports, Activation);

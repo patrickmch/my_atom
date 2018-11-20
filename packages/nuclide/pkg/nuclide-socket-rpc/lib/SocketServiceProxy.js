@@ -244,7 +244,7 @@ Object.defineProperty(module.exports, "defs", {
       location: {
         type: "source",
         fileName: "types.js",
-        line: 57
+        line: 48
       },
       name: "TunnelHost",
       definition: {
@@ -457,7 +457,7 @@ Object.defineProperty(module.exports, "defs", {
       location: {
         type: "source",
         fileName: "types.js",
-        line: 63
+        line: 54
       },
       name: "ResolvedTunnel",
       definition: {

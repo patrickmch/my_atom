@@ -1,44 +1,70 @@
-'use strict';
+"use strict";
 
-var _nullthrows;
+function _nullthrows() {
+  const data = _interopRequireDefault(require("nullthrows"));
 
-function _load_nullthrows() {
-  return _nullthrows = _interopRequireDefault(require('nullthrows'));
+  _nullthrows = function () {
+    return data;
+  };
+
+  return data;
 }
 
-var _createPackage;
+function _createPackage() {
+  const data = _interopRequireDefault(require("../../../modules/nuclide-commons-atom/createPackage"));
 
-function _load_createPackage() {
-  return _createPackage = _interopRequireDefault(require('../../../modules/nuclide-commons-atom/createPackage'));
+  _createPackage = function () {
+    return data;
+  };
+
+  return data;
 }
 
-var _UniversalDisposable;
+function _UniversalDisposable() {
+  const data = _interopRequireDefault(require("../../../modules/nuclide-commons/UniversalDisposable"));
 
-function _load_UniversalDisposable() {
-  return _UniversalDisposable = _interopRequireDefault(require('../../../modules/nuclide-commons/UniversalDisposable'));
+  _UniversalDisposable = function () {
+    return data;
+  };
+
+  return data;
 }
 
-var _rxjsBundlesRxMinJs = require('rxjs/bundles/Rx.min.js');
+var _rxjsCompatUmdMin = require("rxjs-compat/bundles/rxjs-compat.umd.min.js");
 
-var _ProjectionistFileFamilyProvider;
+function _ProjectionistFileFamilyProvider() {
+  const data = _interopRequireDefault(require("./ProjectionistFileFamilyProvider"));
 
-function _load_ProjectionistFileFamilyProvider() {
-  return _ProjectionistFileFamilyProvider = _interopRequireDefault(require('./ProjectionistFileFamilyProvider'));
+  _ProjectionistFileFamilyProvider = function () {
+    return data;
+  };
+
+  return data;
 }
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
+/**
+ * Copyright (c) 2015-present, Facebook, Inc.
+ * All rights reserved.
+ *
+ * This source code is licensed under the license found in the LICENSE file in
+ * the root directory of this source tree.
+ *
+ * 
+ * @format
+ */
 class Activation {
   constructor() {
-    this._cwdApis = new _rxjsBundlesRxMinJs.BehaviorSubject(null);
+    this._cwdApis = new _rxjsCompatUmdMin.BehaviorSubject(null);
   }
 
   activate() {
-    this._subscriptions = new (_UniversalDisposable || _load_UniversalDisposable()).default();
+    this._subscriptions = new (_UniversalDisposable().default)();
   }
 
   dispose() {
-    (0, (_nullthrows || _load_nullthrows()).default)(this._subscriptions).dispose();
+    (0, _nullthrows().default)(this._subscriptions).dispose();
   }
 
   consumeCwdApi(cwdApi) {
@@ -46,17 +72,9 @@ class Activation {
   }
 
   provideFileFamilyService() {
-    return new (_ProjectionistFileFamilyProvider || _load_ProjectionistFileFamilyProvider()).default(this._cwdApis.asObservable());
+    return new (_ProjectionistFileFamilyProvider().default)(this._cwdApis.asObservable());
   }
-} /**
-   * Copyright (c) 2015-present, Facebook, Inc.
-   * All rights reserved.
-   *
-   * This source code is licensed under the license found in the LICENSE file in
-   * the root directory of this source tree.
-   *
-   * 
-   * @format
-   */
 
-(0, (_createPackage || _load_createPackage()).default)(module.exports, Activation);
+}
+
+(0, _createPackage().default)(module.exports, Activation);

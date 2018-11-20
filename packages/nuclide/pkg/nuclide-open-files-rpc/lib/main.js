@@ -1,65 +1,74 @@
-'use strict';
+"use strict";
 
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.OPEN_FILES_SERVICE = exports.ConfigObserver = exports.FileEventKind = exports.FileVersionNotifier = exports.FileCache = undefined;
-
-var _constants;
-
-function _load_constants() {
-  return _constants = require('./constants');
-}
-
-Object.defineProperty(exports, 'FileEventKind', {
-  enumerable: true,
-  get: function () {
-    return (_constants || _load_constants()).FileEventKind;
-  }
-});
-
-var _ConfigObserver;
-
-function _load_ConfigObserver() {
-  return _ConfigObserver = require('./ConfigObserver');
-}
-
-Object.defineProperty(exports, 'ConfigObserver', {
-  enumerable: true,
-  get: function () {
-    return (_ConfigObserver || _load_ConfigObserver()).ConfigObserver;
-  }
-});
 exports.getBufferAtVersion = getBufferAtVersion;
+Object.defineProperty(exports, "FileCache", {
+  enumerable: true,
+  get: function () {
+    return _FileCache().FileCache;
+  }
+});
+Object.defineProperty(exports, "FileVersionNotifier", {
+  enumerable: true,
+  get: function () {
+    return _FileVersionNotifier().FileVersionNotifier;
+  }
+});
+Object.defineProperty(exports, "FileEventKind", {
+  enumerable: true,
+  get: function () {
+    return _constants().FileEventKind;
+  }
+});
+exports.OPEN_FILES_SERVICE = void 0;
 
-var _FileCache;
+function _FileCache() {
+  const data = require("./FileCache");
 
-function _load_FileCache() {
-  return _FileCache = require('./FileCache');
+  _FileCache = function () {
+    return data;
+  };
+
+  return data;
 }
 
-var _FileVersionNotifier;
+function _FileVersionNotifier() {
+  const data = require("./FileVersionNotifier");
 
-function _load_FileVersionNotifier() {
-  return _FileVersionNotifier = require('./FileVersionNotifier');
+  _FileVersionNotifier = function () {
+    return data;
+  };
+
+  return data;
 }
 
-exports.FileCache = (_FileCache || _load_FileCache()).FileCache;
-exports.FileVersionNotifier = (_FileVersionNotifier || _load_FileVersionNotifier()).FileVersionNotifier; /**
-                                                                                                          * Copyright (c) 2015-present, Facebook, Inc.
-                                                                                                          * All rights reserved.
-                                                                                                          *
-                                                                                                          * This source code is licensed under the license found in the LICENSE file in
-                                                                                                          * the root directory of this source tree.
-                                                                                                          *
-                                                                                                          *  strict-local
-                                                                                                          * @format
-                                                                                                          */
+function _constants() {
+  const data = require("./constants");
 
-const OPEN_FILES_SERVICE = exports.OPEN_FILES_SERVICE = 'OpenFilesService';
+  _constants = function () {
+    return data;
+  };
+
+  return data;
+}
+
+/**
+ * Copyright (c) 2015-present, Facebook, Inc.
+ * All rights reserved.
+ *
+ * This source code is licensed under the license found in the LICENSE file in
+ * the root directory of this source tree.
+ *
+ *  strict-local
+ * @format
+ */
+const OPEN_FILES_SERVICE = 'OpenFilesService';
+exports.OPEN_FILES_SERVICE = OPEN_FILES_SERVICE;
 
 function getBufferAtVersion(fileVersion) {
-  if (!(fileVersion.notifier instanceof (_FileCache || _load_FileCache()).FileCache)) {
+  if (!(fileVersion.notifier instanceof _FileCache().FileCache)) {
     throw new Error("Don't call this from the Atom process");
   }
 

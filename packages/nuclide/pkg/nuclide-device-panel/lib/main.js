@@ -1,78 +1,136 @@
-'use strict';
+"use strict";
 
-var _createPackage;
+function _createPackage() {
+  const data = _interopRequireDefault(require("../../../modules/nuclide-commons-atom/createPackage"));
 
-function _load_createPackage() {
-  return _createPackage = _interopRequireDefault(require('../../../modules/nuclide-commons-atom/createPackage'));
+  _createPackage = function () {
+    return data;
+  };
+
+  return data;
 }
 
-var _UniversalDisposable;
+function _epicHelpers() {
+  const data = require("../../../modules/nuclide-commons/epicHelpers");
 
-function _load_UniversalDisposable() {
-  return _UniversalDisposable = _interopRequireDefault(require('../../../modules/nuclide-commons/UniversalDisposable'));
+  _epicHelpers = function () {
+    return data;
+  };
+
+  return data;
 }
 
-var _DevicePanelWorkspaceView;
+function _UniversalDisposable() {
+  const data = _interopRequireDefault(require("../../../modules/nuclide-commons/UniversalDisposable"));
 
-function _load_DevicePanelWorkspaceView() {
-  return _DevicePanelWorkspaceView = require('./DevicePanelWorkspaceView');
+  _UniversalDisposable = function () {
+    return data;
+  };
+
+  return data;
 }
 
-var _ServerConnection;
+function _DevicePanelWorkspaceView() {
+  const data = require("./DevicePanelWorkspaceView");
 
-function _load_ServerConnection() {
-  return _ServerConnection = require('../../nuclide-remote-connection/lib/ServerConnection');
+  _DevicePanelWorkspaceView = function () {
+    return data;
+  };
+
+  return data;
 }
 
-var _reduxObservable;
+function _ServerConnection() {
+  const data = require("../../nuclide-remote-connection/lib/ServerConnection");
 
-function _load_reduxObservable() {
-  return _reduxObservable = require('../../../modules/nuclide-commons/redux-observable');
+  _ServerConnection = function () {
+    return data;
+  };
+
+  return data;
 }
 
-var _reduxMin;
+function _reduxObservable() {
+  const data = require("../../../modules/nuclide-commons/redux-observable");
 
-function _load_reduxMin() {
-  return _reduxMin = require('redux/dist/redux.min.js');
+  _reduxObservable = function () {
+    return data;
+  };
+
+  return data;
 }
 
-var _createEmptyAppState;
+function _reduxMin() {
+  const data = require("redux/dist/redux.min.js");
 
-function _load_createEmptyAppState() {
-  return _createEmptyAppState = require('./redux/createEmptyAppState');
+  _reduxMin = function () {
+    return data;
+  };
+
+  return data;
 }
 
-var _Reducers;
+function _createEmptyAppState() {
+  const data = require("./redux/createEmptyAppState");
 
-function _load_Reducers() {
-  return _Reducers = _interopRequireWildcard(require('./redux/Reducers'));
+  _createEmptyAppState = function () {
+    return data;
+  };
+
+  return data;
 }
 
-var _Actions;
+function Reducers() {
+  const data = _interopRequireWildcard(require("./redux/Reducers"));
 
-function _load_Actions() {
-  return _Actions = _interopRequireWildcard(require('./redux/Actions'));
+  Reducers = function () {
+    return data;
+  };
+
+  return data;
 }
 
-var _Epics;
+function Actions() {
+  const data = _interopRequireWildcard(require("./redux/Actions"));
 
-function _load_Epics() {
-  return _Epics = _interopRequireWildcard(require('./redux/Epics'));
+  Actions = function () {
+    return data;
+  };
+
+  return data;
 }
 
-var _providers;
+function Epics() {
+  const data = _interopRequireWildcard(require("./redux/Epics"));
 
-function _load_providers() {
-  return _providers = require('./providers');
+  Epics = function () {
+    return data;
+  };
+
+  return data;
 }
 
-var _destroyItemWhere;
+function _providers() {
+  const data = require("./providers");
 
-function _load_destroyItemWhere() {
-  return _destroyItemWhere = require('../../../modules/nuclide-commons-atom/destroyItemWhere');
+  _providers = function () {
+    return data;
+  };
+
+  return data;
 }
 
-function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
+function _destroyItemWhere() {
+  const data = require("../../../modules/nuclide-commons-atom/destroyItemWhere");
+
+  _destroyItemWhere = function () {
+    return data;
+  };
+
+  return data;
+}
+
+function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) { var desc = Object.defineProperty && Object.getOwnPropertyDescriptor ? Object.getOwnPropertyDescriptor(obj, key) : {}; if (desc.get || desc.set) { Object.defineProperty(newObj, key, desc); } else { newObj[key] = obj[key]; } } } } newObj.default = obj; return newObj; } }
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -86,17 +144,15 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
  * 
  * @format
  */
-
 let activation = null;
 
 class Activation {
-
   constructor(state) {
-    const epics = Object.keys(_Epics || _load_Epics()).map(k => (_Epics || _load_Epics())[k]).filter(epic => typeof epic === 'function');
-    this._store = (0, (_reduxMin || _load_reduxMin()).createStore)((_Reducers || _load_Reducers()).app, (0, (_createEmptyAppState || _load_createEmptyAppState()).createEmptyAppState)(), (0, (_reduxMin || _load_reduxMin()).applyMiddleware)((0, (_reduxObservable || _load_reduxObservable()).createEpicMiddleware)((0, (_reduxObservable || _load_reduxObservable()).combineEpics)(...epics))));
-    this._disposables = new (_UniversalDisposable || _load_UniversalDisposable()).default((_ServerConnection || _load_ServerConnection()).ServerConnection.observeRemoteConnections().subscribe(conns => {
+    this._store = (0, _reduxMin().createStore)(Reducers().app, (0, _createEmptyAppState().createEmptyAppState)(), (0, _reduxMin().applyMiddleware)((0, _reduxObservable().createEpicMiddleware)((0, _epicHelpers().combineEpicsFromImports)(Epics(), 'nuclide-device-panel'))));
+    this._disposables = new (_UniversalDisposable().default)(_ServerConnection().ServerConnection.observeRemoteConnections().subscribe(conns => {
       const hosts = conns.map(conn => conn.getUriOfRemotePath('/'));
-      this._store.dispatch((_Actions || _load_Actions()).setHosts([''].concat(hosts)));
+
+      this._store.dispatch(Actions().setHosts([''].concat(hosts)));
     }), this._registerCommandAndOpener());
   }
 
@@ -105,21 +161,25 @@ class Activation {
   }
 
   _registerCommandAndOpener() {
-    return new (_UniversalDisposable || _load_UniversalDisposable()).default(atom.workspace.addOpener(uri => {
-      if (uri === (_DevicePanelWorkspaceView || _load_DevicePanelWorkspaceView()).WORKSPACE_VIEW_URI) {
-        return new (_DevicePanelWorkspaceView || _load_DevicePanelWorkspaceView()).DevicePanelWorkspaceView(this._store);
+    return new (_UniversalDisposable().default)(atom.workspace.addOpener(uri => {
+      if (uri === _DevicePanelWorkspaceView().WORKSPACE_VIEW_URI) {
+        return new (_DevicePanelWorkspaceView().DevicePanelWorkspaceView)(this._store);
       }
-    }), () => (0, (_destroyItemWhere || _load_destroyItemWhere()).destroyItemWhere)(item => item instanceof (_DevicePanelWorkspaceView || _load_DevicePanelWorkspaceView()).DevicePanelWorkspaceView), atom.commands.add('atom-workspace', 'nuclide-devices-panel:toggle', () => {
-      atom.workspace.toggle((_DevicePanelWorkspaceView || _load_DevicePanelWorkspaceView()).WORKSPACE_VIEW_URI);
+    }), () => (0, _destroyItemWhere().destroyItemWhere)(item => item instanceof _DevicePanelWorkspaceView().DevicePanelWorkspaceView), atom.commands.add('atom-workspace', 'nuclide-devices-panel:toggle', () => {
+      atom.workspace.toggle(_DevicePanelWorkspaceView().WORKSPACE_VIEW_URI);
     }));
   }
 
   deserializeDevicePanelState() {
-    return new (_DevicePanelWorkspaceView || _load_DevicePanelWorkspaceView()).DevicePanelWorkspaceView(this._store);
+    return new (_DevicePanelWorkspaceView().DevicePanelWorkspaceView)(this._store);
   }
 
   _refreshDeviceTypes() {
-    this._store.dispatch((_Actions || _load_Actions()).setDeviceTypes(Array.from((0, (_providers || _load_providers()).getProviders)().deviceList).map(p => p.getType()).sort((a, b) => a.localeCompare(b))));
+    this._store.dispatch(Actions().setDeviceTypes(Array.from((0, _providers().getProviders)().deviceList).map(p => p.getType()).sort((a, b) => a.localeCompare(b))));
+  }
+
+  _refreshDevices() {
+    this._store.dispatch(Actions().setDevices(this._store.getState().devices));
   }
 
   _createProviderRegistration(providers, onDispose) {
@@ -129,10 +189,12 @@ class Activation {
       }
 
       providers.add(provider);
+
       if (onDispose != null) {
         onDispose();
       }
-      return new (_UniversalDisposable || _load_UniversalDisposable()).default(() => {
+
+      return new (_UniversalDisposable().default)(() => {
         if (activation != null) {
           providers.delete(provider);
         }
@@ -142,22 +204,24 @@ class Activation {
 
   provideDevicePanelServiceApi() {
     activation = this;
+
     this._disposables.add(() => {
       activation = null;
     });
-    const providers = (0, (_providers || _load_providers()).getProviders)();
+
+    const providers = (0, _providers().getProviders)();
     return {
       registerListProvider: this._createProviderRegistration(providers.deviceList, () => this._refreshDeviceTypes()),
       registerInfoProvider: this._createProviderRegistration(providers.deviceInfo),
       registerProcessesProvider: this._createProviderRegistration(providers.deviceProcesses),
-      registerTaskProvider: this._createProviderRegistration(providers.deviceTask),
+      registerDeviceTaskProvider: this._createProviderRegistration(providers.deviceTask, () => this._refreshDevices()),
       registerProcessTaskProvider: this._createProviderRegistration(providers.processTask),
       registerDeviceTypeTaskProvider: this._createProviderRegistration(providers.deviceTypeTask, () => this._refreshDeviceTypes()),
-      registerDeviceActionProvider: this._createProviderRegistration(providers.deviceAction),
       registerAppInfoProvider: this._createProviderRegistration(providers.appInfo),
       registerDeviceTypeComponentProvider: this._createProviderRegistration(providers.deviceTypeComponent)
     };
   }
+
 }
 
-(0, (_createPackage || _load_createPackage()).default)(module.exports, Activation);
+(0, _createPackage().default)(module.exports, Activation);

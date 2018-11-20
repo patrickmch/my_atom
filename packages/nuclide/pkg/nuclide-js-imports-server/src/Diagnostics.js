@@ -1,41 +1,54 @@
-'use strict';
+"use strict";
 
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.Diagnostics = exports.DIAGNOSTIC_SOURCE = undefined;
+exports.Diagnostics = exports.DIAGNOSTIC_SOURCE = void 0;
 
-var _vscodeLanguageserver;
+function _vscodeLanguageserver() {
+  const data = require("vscode-languageserver");
 
-function _load_vscodeLanguageserver() {
-  return _vscodeLanguageserver = require('vscode-languageserver');
+  _vscodeLanguageserver = function () {
+    return data;
+  };
+
+  return data;
 }
 
-var _AutoImportsManager;
+function _AutoImportsManager() {
+  const data = require("./lib/AutoImportsManager");
 
-function _load_AutoImportsManager() {
-  return _AutoImportsManager = require('./lib/AutoImportsManager');
+  _AutoImportsManager = function () {
+    return data;
+  };
+
+  return data;
 }
 
-var _ImportFormatter;
+function _ImportFormatter() {
+  const data = require("./lib/ImportFormatter");
 
-function _load_ImportFormatter() {
-  return _ImportFormatter = require('./lib/ImportFormatter');
+  _ImportFormatter = function () {
+    return data;
+  };
+
+  return data;
 }
 
-const DIAGNOSTIC_SOURCE = exports.DIAGNOSTIC_SOURCE = 'JS Auto-imports'; /**
-                                                                          * Copyright (c) 2015-present, Facebook, Inc.
-                                                                          * All rights reserved.
-                                                                          *
-                                                                          * This source code is licensed under the license found in the LICENSE file in
-                                                                          * the root directory of this source tree.
-                                                                          *
-                                                                          * 
-                                                                          * @format
-                                                                          */
+/**
+ * Copyright (c) 2015-present, Facebook, Inc.
+ * All rights reserved.
+ *
+ * This source code is licensed under the license found in the LICENSE file in
+ * the root directory of this source tree.
+ *
+ * 
+ * @format
+ */
+const DIAGNOSTIC_SOURCE = 'JS Auto-imports';
+exports.DIAGNOSTIC_SOURCE = DIAGNOSTIC_SOURCE;
 
 class Diagnostics {
-
   constructor(autoImportsManager, importFormatter) {
     this.autoImportsManager = autoImportsManager;
     this.importFormatter = importFormatter;
@@ -48,13 +61,17 @@ class Diagnostics {
     // (Of course, this is a much slower user experience, but being wrong is even worse.)
     return this.autoImportsManager.findMissingImports(uri, text).filter(missingImport => missingImport.symbol.type === 'value').map(missingImport => missingImportToDiagnostic(this.importFormatter, missingImport, uri));
   }
+
 }
 
 exports.Diagnostics = Diagnostics;
+
 function missingImportToDiagnostic(importFormatter, importSuggestion, uri) {
-  const { symbol } = importSuggestion;
+  const {
+    symbol
+  } = importSuggestion;
   return {
-    severity: (_vscodeLanguageserver || _load_vscodeLanguageserver()).DiagnosticSeverity.Information,
+    severity: _vscodeLanguageserver().DiagnosticSeverity.Information,
     range: {
       start: {
         character: symbol.location.start.col,

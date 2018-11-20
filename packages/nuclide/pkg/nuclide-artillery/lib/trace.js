@@ -3,6 +3,8 @@
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
+exports.NuclideArtilleryTrace = void 0;
+
 /**
  * Copyright (c) 2015-present, Facebook, Inc.
  * All rights reserved.
@@ -13,12 +15,13 @@ Object.defineProperty(exports, "__esModule", {
  *  strict
  * @format
  */
-
 class NuclideArtilleryTrace {
   static begin(categoryName, eventName) {
     return new NuclideArtilleryTrace();
   }
 
   end() {}
+
 }
+
 exports.NuclideArtilleryTrace = NuclideArtilleryTrace;

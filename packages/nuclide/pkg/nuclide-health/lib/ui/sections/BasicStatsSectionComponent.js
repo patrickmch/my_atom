@@ -1,12 +1,13 @@
-'use strict';
+"use strict";
 
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
+exports.default = void 0;
 
-var _react = _interopRequireWildcard(require('react'));
+var React = _interopRequireWildcard(require("react"));
 
-function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
+function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) { var desc = Object.defineProperty && Object.getOwnPropertyDescriptor ? Object.getOwnPropertyDescriptor(obj, key) : {}; if (desc.get || desc.set) { Object.defineProperty(newObj, key, desc); } else { newObj[key] = obj[key]; } } } } newObj.default = obj; return newObj; } }
 
 /**
  * Copyright (c) 2015-present, Facebook, Inc.
@@ -18,8 +19,7 @@ function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj;
  * 
  * @format
  */
-
-class BasicStatsSectionComponent extends _react.Component {
+class BasicStatsSectionComponent extends React.Component {
   render() {
     const stats = [{
       name: 'CPU',
@@ -49,54 +49,23 @@ class BasicStatsSectionComponent extends _react.Component {
       name: 'DOM Listeners',
       value: `${this.props.domListeners != null ? this.props.domListeners : 'N/A - are your devtools open?'}`
     }];
-    return _react.createElement(
-      'table',
-      { className: 'table' },
-      _react.createElement(
-        'thead',
-        null,
-        _react.createElement(
-          'tr',
-          null,
-          _react.createElement(
-            'th',
-            { width: '30%' },
-            'Metric'
-          ),
-          _react.createElement(
-            'th',
-            { width: '50%' },
-            'Value'
-          ),
-          _react.createElement(
-            'th',
-            { width: '20%', className: 'text-right' },
-            'Toolbar'
-          )
-        )
-      ),
-      _react.createElement(
-        'tbody',
-        null,
-        stats.map((stat, s) => {
-          const props = {};
-          return _react.createElement(
-            'tr',
-            Object.assign({}, props, { key: s }),
-            _react.createElement(
-              'th',
-              null,
-              stat.name
-            ),
-            _react.createElement(
-              'td',
-              null,
-              stat.value
-            )
-          );
-        })
-      )
-    );
+    return React.createElement("table", {
+      className: "table"
+    }, React.createElement("thead", null, React.createElement("tr", null, React.createElement("th", {
+      width: "30%"
+    }, "Metric"), React.createElement("th", {
+      width: "50%"
+    }, "Value"), React.createElement("th", {
+      width: "20%",
+      className: "text-right"
+    }, "Toolbar"))), React.createElement("tbody", null, stats.map((stat, s) => {
+      const props = {};
+      return React.createElement("tr", Object.assign({}, props, {
+        key: s
+      }), React.createElement("th", null, stat.name), React.createElement("td", null, stat.value));
+    })));
   }
+
 }
+
 exports.default = BasicStatsSectionComponent;

@@ -1,35 +1,62 @@
-'use strict';
+"use strict";
 
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
 exports.default = patchAtomWorkspaceReplace;
 
-var _collection;
+function _collection() {
+  const data = require("../../../modules/nuclide-commons/collection");
 
-function _load_collection() {
-  return _collection = require('../../../modules/nuclide-commons/collection');
+  _collection = function () {
+    return data;
+  };
+
+  return data;
 }
 
-var _nuclideUri;
+function _nuclideUri() {
+  const data = _interopRequireDefault(require("../../../modules/nuclide-commons/nuclideUri"));
 
-function _load_nuclideUri() {
-  return _nuclideUri = _interopRequireDefault(require('../../../modules/nuclide-commons/nuclideUri'));
+  _nuclideUri = function () {
+    return data;
+  };
+
+  return data;
 }
 
-var _UniversalDisposable;
+function _UniversalDisposable() {
+  const data = _interopRequireDefault(require("../../../modules/nuclide-commons/UniversalDisposable"));
 
-function _load_UniversalDisposable() {
-  return _UniversalDisposable = _interopRequireDefault(require('../../../modules/nuclide-commons/UniversalDisposable'));
+  _UniversalDisposable = function () {
+    return data;
+  };
+
+  return data;
 }
 
-var _nuclideRemoteConnection;
+function _nuclideRemoteConnection() {
+  const data = require("../../nuclide-remote-connection");
 
-function _load_nuclideRemoteConnection() {
-  return _nuclideRemoteConnection = require('../../nuclide-remote-connection');
+  _nuclideRemoteConnection = function () {
+    return data;
+  };
+
+  return data;
 }
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+/**
+ * Copyright (c) 2015-present, Facebook, Inc.
+ * All rights reserved.
+ *
+ * This source code is licensed under the license found in the LICENSE file in
+ * the root directory of this source tree.
+ *
+ * 
+ * @format
+ */
 
 /**
  *           |\___/|
@@ -52,17 +79,6 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
  * The right fix is probably to have Atom call `Directory.replace` or similar,
  * which we can then override in our custom `RemoteDirectory` implementation.
  */
-/**
- * Copyright (c) 2015-present, Facebook, Inc.
- * All rights reserved.
- *
- * This source code is licensed under the license found in the LICENSE file in
- * the root directory of this source tree.
- *
- * 
- * @format
- */
-
 function patchAtomWorkspaceReplace() {
   const workspace = atom.workspace;
   const originalReplace = workspace.replace;
@@ -71,18 +87,22 @@ function patchAtomWorkspaceReplace() {
     // Atom can handle local paths and opened buffers, so filter those out.
     const filePathSet = new Set(filePaths);
     const openBuffers = new Set(atom.project.getBuffers().map(buf => buf.getPath()).filter(Boolean));
-    const unopenedRemotePaths = new Set(filePaths.filter(path => (_nuclideUri || _load_nuclideUri()).default.isRemote(path) && !openBuffers.has(path)));
-    const regularReplace = unopenedRemotePaths.size === filePathSet.size ? Promise.resolve(null) : originalReplace.call(atom.workspace, regex, replacementText, Array.from((0, (_collection || _load_collection()).setDifference)(filePathSet, unopenedRemotePaths)), iterator);
+    const unopenedRemotePaths = new Set(filePaths.filter(path => _nuclideUri().default.isRemote(path) && !openBuffers.has(path)));
+    const regularReplace = unopenedRemotePaths.size === filePathSet.size ? Promise.resolve(null) : originalReplace.call(atom.workspace, regex, replacementText, Array.from((0, _collection().setDifference)(filePathSet, unopenedRemotePaths)), iterator);
     const remotePaths = new Map();
+
     for (const path of unopenedRemotePaths) {
-      const service = (0, (_nuclideRemoteConnection || _load_nuclideRemoteConnection()).getGrepServiceByNuclideUri)(path);
+      const service = (0, _nuclideRemoteConnection().getGrepServiceByNuclideUri)(path);
       let list = remotePaths.get(service);
+
       if (list == null) {
         list = [];
         remotePaths.set(service, list);
       }
+
       list.push(path);
     }
+
     const promises = [regularReplace];
     remotePaths.forEach((paths, service) => {
       promises.push(service.grepReplace(paths, regex, replacementText).refCount().do(result => {
@@ -98,7 +118,7 @@ function patchAtomWorkspaceReplace() {
     return Promise.all(promises);
   };
 
-  return new (_UniversalDisposable || _load_UniversalDisposable()).default(() => {
+  return new (_UniversalDisposable().default)(() => {
     workspace.replace = originalReplace;
   });
 }

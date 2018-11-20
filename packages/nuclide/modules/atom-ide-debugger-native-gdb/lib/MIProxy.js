@@ -1,41 +1,63 @@
-'use strict';
+"use strict";
 
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
+exports.default = void 0;
 
-var _child_process = _interopRequireWildcard(require('child_process'));
+var child_process = _interopRequireWildcard(require("child_process"));
 
-var _MIDebugSession;
+function _Logger() {
+  const data = require("./Logger");
 
-function _load_MIDebugSession() {
-  return _MIDebugSession = require('./MIDebugSession');
+  _Logger = function () {
+    return data;
+  };
+
+  return data;
 }
 
-var _MILineParser;
+function _MILineParser() {
+  const data = _interopRequireDefault(require("./MILineParser"));
 
-function _load_MILineParser() {
-  return _MILineParser = _interopRequireDefault(require('./MILineParser'));
+  _MILineParser = function () {
+    return data;
+  };
+
+  return data;
 }
 
-var _MIRecord;
+function _MIRecord() {
+  const data = require("./MIRecord");
 
-function _load_MIRecord() {
-  return _MIRecord = require('./MIRecord');
+  _MIRecord = function () {
+    return data;
+  };
+
+  return data;
 }
 
-var _events = _interopRequireDefault(require('events'));
+var _events = _interopRequireDefault(require("events"));
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
+function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) { var desc = Object.defineProperty && Object.getOwnPropertyDescriptor ? Object.getOwnPropertyDescriptor(obj, key) : {}; if (desc.get || desc.set) { Object.defineProperty(newObj, key, desc); } else { newObj[key] = obj[key]; } } } } newObj.default = obj; return newObj; } }
 
+/**
+ * Copyright (c) 2017-present, Facebook, Inc.
+ * All rights reserved.
+ *
+ * This source code is licensed under the BSD-style license found in the
+ * LICENSE file in the root directory of this source tree. An additional grant
+ * of patent rights can be found in the PATENTS file in the same directory.
+ *
+ *  strict-local
+ * @format
+ */
 class MIProxy extends _events.default {
-
   constructor() {
     super();
-
-    this._parser = new (_MILineParser || _load_MILineParser()).default();
+    this._parser = new (_MILineParser().default)();
     this._nextToken = 1;
     this._lastPartialString = '';
     this._pendingCommands = new Map();
@@ -51,15 +73,15 @@ class MIProxy extends _events.default {
     }
 
     let options = {};
+
     if (env != null) {
       options = Object.assign({}, options, {
         env: Object.assign({}, process.env, env)
       });
     }
 
-    const proc = _child_process.spawn(executable, args, options);
+    const proc = child_process.spawn(executable, args, options);
     this._miServer = proc;
-
     proc.stdout.on('data', buffer => this._onData(buffer));
     proc.on('error', err => {
       this.emit('error', err);
@@ -71,6 +93,7 @@ class MIProxy extends _events.default {
 
   pause() {
     const server = this._miServer;
+
     if (server == null) {
       return;
     }
@@ -81,6 +104,7 @@ class MIProxy extends _events.default {
   stop() {
     if (this._miServer != null) {
       this._miServer.disconnect();
+
       this._miServer = null;
     }
   }
@@ -88,6 +112,7 @@ class MIProxy extends _events.default {
   async sendCommand(command) {
     return new Promise((resolve, reject) => {
       const dbg = this._miServer;
+
       if (dbg == null) {
         reject(new Error('Attempt to send a command when no MI server connected'));
         return;
@@ -100,18 +125,37 @@ class MIProxy extends _events.default {
         resolve: record => {}
       };
       pendingCommand.resolve = resolve;
+
       this._pendingCommands.set(token, pendingCommand);
+
       const tokenizedCommand = `${token}-${command}\n`;
-      (0, (_MIDebugSession || _load_MIDebugSession()).logVerbose)(`MIProxy sending command '${tokenizedCommand}' to server`);
+      (0, _Logger().logVerbose)(`MIProxy sending command '${tokenizedCommand}' to server`);
       dbg.stdin.write(tokenizedCommand);
+    });
+  }
+
+  async sendRawCommand(command) {
+    return new Promise((resolve, reject) => {
+      const dbg = this._miServer;
+
+      if (dbg == null) {
+        reject(new Error('Attempt to send a command when no MI server connected'));
+        return;
+      } // We're making the assumption here that if we've stopped gdb at the prompt
+      // and sent a real gdb (not MI) command, that it will execute synchronously
+      // with no intermixed MI traffic.
+
+
+      this._pendingRawCommandResolve = resolve;
+      dbg.stdin.write(`${command}\n`);
     });
   }
 
   _onData(buffer) {
     // NB data coming back from gdb will be ASCII, and data from the target
     const str = this._lastPartialString + buffer.toString('ASCII');
-
     const tailSplit = str.lastIndexOf('\n');
+
     if (tailSplit === -1) {
       this._lastPartialString = str;
       return;
@@ -126,31 +170,45 @@ class MIProxy extends _events.default {
       return;
     }
 
-    (0, (_MIDebugSession || _load_MIDebugSession()).logVerbose)(`proxy received line ${line}`);
+    (0, _Logger().logVerbose)(`proxy received line ${line}`);
+
     const parsed = this._parser.parseMILine(line);
+
     this._emitRecord(parsed, line);
   }
 
   _emitRecord(record, line) {
-    if (record instanceof (_MIRecord || _load_MIRecord()).MIResultRecord) {
-      const token = record.token;
+    if (record instanceof _MIRecord().MIResultRecord) {
+      const token = record.token; // if we have a raw gdb command, it won't have an associated token
+
+      const rawResolve = this._pendingRawCommandResolve;
+
+      if (token == null && rawResolve != null) {
+        rawResolve();
+        this._pendingRawCommandResolve = null;
+        return;
+      }
 
       if (!(token != null)) {
         throw new Error('token should always exist in a result record');
       }
 
       const pending = this._pendingCommands.get(token);
+
       if (pending != null) {
         pending.resolve(record);
+
         this._pendingCommands.delete(token);
+
         return;
       }
-      throw new Error(`Received response with token ${token} which matches no pending command`);
+
+      (0, _Logger().logVerbose)(`Received response with token ${token} which matches no pending command`);
     }
 
-    if (record instanceof (_MIRecord || _load_MIRecord()).MIAsyncRecord) {
+    if (record instanceof _MIRecord().MIAsyncRecord) {
       this.emit('async', record);
-    } else if (record instanceof (_MIRecord || _load_MIRecord()).MIStreamRecord) {
+    } else if (record instanceof _MIRecord().MIStreamRecord) {
       if (!this._hackForAttachPermissions(record)) {
         this.emit('stream', record);
       }
@@ -172,9 +230,7 @@ class MIProxy extends _events.default {
       return false;
     }
 
-    const [token, command] = attach;
-
-    // Modern versions of linux default to a locked down security model for
+    const [token, command] = attach; // Modern versions of linux default to a locked down security model for
     // ptrace where ptrace can only attach to a child process. A sysctl call
     // must be made in order to get the old behavior, which gdb target-attach
     // depends on, of being able to ptrace any process owned by the user.
@@ -182,21 +238,17 @@ class MIProxy extends _events.default {
     // MI failure in this case; it prints a message to the log saying how
     // to fix the problem but the command never actually completes. Hence
     // this hack...
-    const failure = new (_MIRecord || _load_MIRecord()).MIResultRecord(token, { msg: record.text.replace('\n', ' ') }, 'error');
+
+    const failure = new (_MIRecord().MIResultRecord)(token, {
+      msg: record.text.replace('\n', ' ')
+    }, 'error');
     command.resolve(failure);
+
     this._pendingCommands.delete(token);
 
     return true;
   }
+
 }
-exports.default = MIProxy; /**
-                            * Copyright (c) 2017-present, Facebook, Inc.
-                            * All rights reserved.
-                            *
-                            * This source code is licensed under the BSD-style license found in the
-                            * LICENSE file in the root directory of this source tree. An additional grant
-                            * of patent rights can be found in the PATENTS file in the same directory.
-                            *
-                            *  strict-local
-                            * @format
-                            */
+
+exports.default = MIProxy;

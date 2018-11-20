@@ -1,69 +1,102 @@
-'use strict';
+"use strict";
 
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.WELCOME_PAGE_VIEW_URI = undefined;
+exports.getURIForTopic = getURIForTopic;
+exports.default = exports.WELCOME_PAGE_VIEW_URI_PREFIX = exports.ALL_WELCOME_PAGE_TOPICS = void 0;
 
-var _observePaneItemVisibility;
+function _observePaneItemVisibility() {
+  const data = _interopRequireDefault(require("../../../../modules/nuclide-commons-atom/observePaneItemVisibility"));
 
-function _load_observePaneItemVisibility() {
-  return _observePaneItemVisibility = _interopRequireDefault(require('../../../../modules/nuclide-commons-atom/observePaneItemVisibility'));
+  _observePaneItemVisibility = function () {
+    return data;
+  };
+
+  return data;
 }
 
-var _reactRedux;
+function _reactRedux() {
+  const data = require("react-redux");
 
-function _load_reactRedux() {
-  return _reactRedux = require('react-redux');
+  _reactRedux = function () {
+    return data;
+  };
+
+  return data;
 }
 
-var _Actions;
+function _Actions() {
+  const data = require("../redux/Actions");
 
-function _load_Actions() {
-  return _Actions = require('../redux/Actions');
+  _Actions = function () {
+    return data;
+  };
+
+  return data;
 }
 
-var _react = _interopRequireWildcard(require('react'));
+var React = _interopRequireWildcard(require("react"));
 
-var _WelcomePageComponent;
+function _WelcomePageComponent() {
+  const data = require("./WelcomePageComponent");
 
-function _load_WelcomePageComponent() {
-  return _WelcomePageComponent = require('./WelcomePageComponent');
+  _WelcomePageComponent = function () {
+    return data;
+  };
+
+  return data;
 }
 
-function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
+function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) { var desc = Object.defineProperty && Object.getOwnPropertyDescriptor ? Object.getOwnPropertyDescriptor(obj, key) : {}; if (desc.get || desc.set) { Object.defineProperty(newObj, key, desc); } else { newObj[key] = obj[key]; } } } } newObj.default = obj; return newObj; } }
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-const WELCOME_PAGE_VIEW_URI = exports.WELCOME_PAGE_VIEW_URI = 'atom://nuclide/welcome-page'; /**
-                                                                                              * Copyright (c) 2015-present, Facebook, Inc.
-                                                                                              * All rights reserved.
-                                                                                              *
-                                                                                              * This source code is licensed under the license found in the LICENSE file in
-                                                                                              * the root directory of this source tree.
-                                                                                              *
-                                                                                              * 
-                                                                                              * @format
-                                                                                              */
+/**
+ * Copyright (c) 2015-present, Facebook, Inc.
+ * All rights reserved.
+ *
+ * This source code is licensed under the license found in the LICENSE file in
+ * the root directory of this source tree.
+ *
+ * 
+ * @format
+ */
+const ALL_WELCOME_PAGE_TOPICS = 'all-welcome-pages';
+exports.ALL_WELCOME_PAGE_TOPICS = ALL_WELCOME_PAGE_TOPICS;
+const WELCOME_PAGE_VIEW_URI_PREFIX = 'atom://nuclide/welcome-page/';
+exports.WELCOME_PAGE_VIEW_URI_PREFIX = WELCOME_PAGE_VIEW_URI_PREFIX;
 
-class WelcomePageGadget extends _react.Component {
+function getURIForTopic(topic) {
+  return WELCOME_PAGE_VIEW_URI_PREFIX + topic;
+}
+
+class WelcomePageGadget extends React.Component {
   constructor(...args) {
     var _temp;
 
     return _temp = super(...args), this._customSubscribe = listener => {
-      const { store } = this.props;
+      const {
+        store
+      } = this.props;
       return store.subscribe(() => {
-        const { isWelcomePageVisible } = store.getState();
+        const {
+          isWelcomePageVisible
+        } = store.getState();
+
         if (!isWelcomePageVisible) {
           return;
         }
+
         listener();
       });
     }, _temp;
   }
 
   getTitle() {
-    return 'Welcome to Nuclide';
+    var _ref, _this$props$paneProps;
+
+    return (_ref = (_this$props$paneProps = this.props.paneProps) === null || _this$props$paneProps === void 0 ? void 0 : _this$props$paneProps.title) !== null && _ref !== void 0 ? _ref : 'Welcome to Nuclide';
   }
 
   getIconName() {
@@ -71,14 +104,15 @@ class WelcomePageGadget extends _react.Component {
   }
 
   componentDidMount() {
-    this._visibilitySubscription = (0, (_observePaneItemVisibility || _load_observePaneItemVisibility()).default)(this).subscribe(visible => {
+    this._visibilitySubscription = (0, _observePaneItemVisibility().default)(this).subscribe(visible => {
       this.didChangeVisibility(visible);
     });
   }
 
   componentWillUnmount() {
     // This ensures that if the pane is closed the visibility is updated
-    this.props.store.dispatch((0, (_Actions || _load_Actions()).updateWelcomePageVisibility)(false));
+    this.props.store.dispatch((0, _Actions().updateWelcomePageVisibility)(false));
+
     this._visibilitySubscription.unsubscribe();
   }
 
@@ -90,20 +124,25 @@ class WelcomePageGadget extends _react.Component {
       atom.workspace.getActivePane().activate();
     }
 
-    this.props.store.dispatch((0, (_Actions || _load_Actions()).updateWelcomePageVisibility)(visible));
+    this.props.store.dispatch((0, _Actions().updateWelcomePageVisibility)(visible));
   }
 
   render() {
-    const { store } = this.props;
-    const visibleStore = Object.assign({}, store, { subscribe: this._customSubscribe });
-    return _react.createElement(
-      (_reactRedux || _load_reactRedux()).Provider,
-      { store: visibleStore },
-      _react.createElement((_WelcomePageComponent || _load_WelcomePageComponent()).WelcomePageContainer, null)
-    );
-  }
-
-  // don't emit when smartlog's not visible to prevent needless re-calculations
+    const {
+      paneProps,
+      store,
+      topic
+    } = this.props;
+    const visibleStore = Object.assign({}, store, {
+      subscribe: this._customSubscribe
+    });
+    return React.createElement(_reactRedux().Provider, {
+      store: visibleStore
+    }, React.createElement(_WelcomePageComponent().WelcomePageContainer, {
+      className: paneProps === null || paneProps === void 0 ? void 0 : paneProps.className,
+      topic: topic
+    }));
+  } // don't emit when welcome page is not visible to prevent needless re-calculations
 
 
   getDefaultLocation() {
@@ -111,7 +150,9 @@ class WelcomePageGadget extends _react.Component {
   }
 
   getURI() {
-    return WELCOME_PAGE_VIEW_URI;
+    return getURIForTopic(this.props.topic);
   }
+
 }
+
 exports.default = WelcomePageGadget;

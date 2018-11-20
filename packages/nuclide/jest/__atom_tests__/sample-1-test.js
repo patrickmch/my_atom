@@ -1,4 +1,4 @@
-'use strict';
+"use strict";
 
 /**
  * Copyright (c) 2015-present, Facebook, Inc.
@@ -9,8 +9,8 @@
  *
  *  strict
  * @format
+ * @emails oncall+nuclide
  */
-
 test('atom', () => {
   expect(1).toBe(1);
 });

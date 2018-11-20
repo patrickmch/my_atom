@@ -1,103 +1,168 @@
-'use strict';
+"use strict";
 
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.Console = exports.WORKSPACE_VIEW_URI = undefined;
+exports.Console = exports.WORKSPACE_VIEW_URI = void 0;
 
-var _observePaneItemVisibility;
+function _observePaneItemVisibility() {
+  const data = _interopRequireDefault(require("../../../../../nuclide-commons-atom/observePaneItemVisibility"));
 
-function _load_observePaneItemVisibility() {
-  return _observePaneItemVisibility = _interopRequireDefault(require('../../../../../nuclide-commons-atom/observePaneItemVisibility'));
+  _observePaneItemVisibility = function () {
+    return data;
+  };
+
+  return data;
 }
 
-var _Model;
+function _collection() {
+  const data = require("../../../../../nuclide-commons/collection");
 
-function _load_Model() {
-  return _Model = _interopRequireDefault(require('../../../../../nuclide-commons/Model'));
+  _collection = function () {
+    return data;
+  };
+
+  return data;
 }
 
-var _shallowequal;
+function _Model() {
+  const data = _interopRequireDefault(require("../../../../../nuclide-commons/Model"));
 
-function _load_shallowequal() {
-  return _shallowequal = _interopRequireDefault(require('shallowequal'));
+  _Model = function () {
+    return data;
+  };
+
+  return data;
 }
 
-var _bindObservableAsProps;
+function _shallowequal() {
+  const data = _interopRequireDefault(require("shallowequal"));
 
-function _load_bindObservableAsProps() {
-  return _bindObservableAsProps = require('../../../../../nuclide-commons-ui/bindObservableAsProps');
+  _shallowequal = function () {
+    return data;
+  };
+
+  return data;
 }
 
-var _renderReactRoot;
+function _bindObservableAsProps() {
+  const data = require("../../../../../nuclide-commons-ui/bindObservableAsProps");
 
-function _load_renderReactRoot() {
-  return _renderReactRoot = require('../../../../../nuclide-commons-ui/renderReactRoot');
+  _bindObservableAsProps = function () {
+    return data;
+  };
+
+  return data;
 }
 
-var _memoizeUntilChanged;
+function _renderReactRoot() {
+  const data = require("../../../../../nuclide-commons-ui/renderReactRoot");
 
-function _load_memoizeUntilChanged() {
-  return _memoizeUntilChanged = _interopRequireDefault(require('../../../../../nuclide-commons/memoizeUntilChanged'));
+  _renderReactRoot = function () {
+    return data;
+  };
+
+  return data;
 }
 
-var _observable;
+function _memoizeUntilChanged() {
+  const data = _interopRequireDefault(require("../../../../../nuclide-commons/memoizeUntilChanged"));
 
-function _load_observable() {
-  return _observable = require('../../../../../nuclide-commons/observable');
+  _memoizeUntilChanged = function () {
+    return data;
+  };
+
+  return data;
 }
 
-var _UniversalDisposable;
+function _observable() {
+  const data = require("../../../../../nuclide-commons/observable");
 
-function _load_UniversalDisposable() {
-  return _UniversalDisposable = _interopRequireDefault(require('../../../../../nuclide-commons/UniversalDisposable'));
+  _observable = function () {
+    return data;
+  };
+
+  return data;
 }
 
-var _RegExpFilter;
+function _UniversalDisposable() {
+  const data = _interopRequireDefault(require("../../../../../nuclide-commons/UniversalDisposable"));
 
-function _load_RegExpFilter() {
-  return _RegExpFilter = require('../../../../../nuclide-commons-ui/RegExpFilter');
+  _UniversalDisposable = function () {
+    return data;
+  };
+
+  return data;
 }
 
-var _getCurrentExecutorId;
+function _observableFromReduxStore() {
+  const data = _interopRequireDefault(require("../../../../../nuclide-commons/observableFromReduxStore"));
 
-function _load_getCurrentExecutorId() {
-  return _getCurrentExecutorId = _interopRequireDefault(require('../getCurrentExecutorId'));
+  _observableFromReduxStore = function () {
+    return data;
+  };
+
+  return data;
 }
 
-var _Actions;
+function _RegExpFilter() {
+  const data = require("../../../../../nuclide-commons-ui/RegExpFilter");
 
-function _load_Actions() {
-  return _Actions = _interopRequireWildcard(require('../redux/Actions'));
+  _RegExpFilter = function () {
+    return data;
+  };
+
+  return data;
 }
 
-var _ConsoleView;
+function Actions() {
+  const data = _interopRequireWildcard(require("../redux/Actions"));
 
-function _load_ConsoleView() {
-  return _ConsoleView = _interopRequireDefault(require('./ConsoleView'));
+  Actions = function () {
+    return data;
+  };
+
+  return data;
 }
 
-var _immutable;
+function Selectors() {
+  const data = _interopRequireWildcard(require("../redux/Selectors"));
 
-function _load_immutable() {
-  return _immutable = require('immutable');
+  Selectors = function () {
+    return data;
+  };
+
+  return data;
 }
 
-var _react = _interopRequireWildcard(require('react'));
+function _ConsoleView() {
+  const data = _interopRequireDefault(require("./ConsoleView"));
 
-var _rxjsBundlesRxMinJs = require('rxjs/bundles/Rx.min.js');
+  _ConsoleView = function () {
+    return data;
+  };
 
-function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
+  return data;
+}
+
+function _immutable() {
+  const data = require("immutable");
+
+  _immutable = function () {
+    return data;
+  };
+
+  return data;
+}
+
+var React = _interopRequireWildcard(require("react"));
+
+var _rxjsCompatUmdMin = require("rxjs-compat/bundles/rxjs-compat.umd.min.js");
+
+function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) { var desc = Object.defineProperty && Object.getOwnPropertyDescriptor ? Object.getOwnPropertyDescriptor(obj, key) : {}; if (desc.get || desc.set) { Object.defineProperty(newObj, key, desc); } else { newObj[key] = obj[key]; } } } } newObj.default = obj; return newObj; } }
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-// Other Nuclide packages (which cannot import this) depend on this URI. If this
-// needs to be changed, grep for CONSOLE_VIEW_URI and ensure that the URIs match.
-
-
-//
-// State unique to this particular Console instance
-//
 /**
  * Copyright (c) 2017-present, Facebook, Inc.
  * All rights reserved.
@@ -111,116 +176,168 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
  */
 
 /* eslint-env browser */
-
-const WORKSPACE_VIEW_URI = exports.WORKSPACE_VIEW_URI = 'atom://nuclide/console';
-
+// Other Nuclide packages (which cannot import this) depend on this URI. If this
+// needs to be changed, grep for CONSOLE_VIEW_URI and ensure that the URIs match.
+const WORKSPACE_VIEW_URI = 'atom://nuclide/console';
+exports.WORKSPACE_VIEW_URI = WORKSPACE_VIEW_URI;
 const ERROR_TRANSCRIBING_MESSAGE = "// Nuclide couldn't find the right text to display";
-const INITIAL_RECORD_HEIGHT = 21;
-
+const ALL_SEVERITIES = new Set(['error', 'warning', 'info']);
 /**
  * An Atom "view model" for the console. This object is responsible for creating a stateful view
  * (via `getElement()`). That view is bound to both global state (from the store) and view-specific
  * state (from this instance's `_model`).
  */
-class Console {
 
+class Console {
   constructor(options) {
-    this._getSourcesMemoized = (0, (_memoizeUntilChanged || _load_memoizeUntilChanged()).default)(getSources, opts => opts, (a, b) => (0, (_shallowequal || _load_shallowequal()).default)(a, b));
+    this._getSourcesMemoized = (0, _memoizeUntilChanged().default)(getSources, opts => opts, (a, b) => (0, _shallowequal().default)(a, b));
 
     this._resetAllFilters = () => {
       this._selectSources(this._getSources().map(s => s.id));
-      this._model.setState({ filterText: '' });
+
+      this._model.setState({
+        filterText: ''
+      });
     };
 
     this._createPaste = async () => {
-      const displayableRecords = this._getDisplayableRecords();
+      const displayableRecords = Selectors().getAllRecords(this._store.getState()).toArray();
+
       const createPasteImpl = this._store.getState().createPasteFunction;
+
       if (createPasteImpl == null) {
         return;
       }
+
       return createPaste(createPasteImpl, displayableRecords);
     };
 
     this._selectSources = selectedSourceIds => {
       const sourceIds = this._getSources().map(source => source.id);
+
       const unselectedSourceIds = sourceIds.filter(sourceId => selectedSourceIds.indexOf(sourceId) === -1);
-      this._model.setState({ unselectedSourceIds });
+
+      this._model.setState({
+        unselectedSourceIds
+      });
     };
 
     this._updateFilter = change => {
-      const { text, isRegExp } = change;
+      const {
+        text,
+        isRegExp
+      } = change;
+
       this._model.setState({
         filterText: text,
         enableRegExpFilter: isRegExp
       });
     };
 
-    this._handleDisplayableRecordHeightChange = (recordId, newHeight, callback) => {
-      const { records } = this._store.getState();
-      const nextDisplayableRecords = Array(records.size);
-      records.forEach((record, i) => {
-        let displayableRecord = this._toDisplayableRecord(record);
-        if (displayableRecord.id === recordId) {
-          // Update the record with the new height.
-          displayableRecord = Object.assign({}, displayableRecord, {
-            height: newHeight
-          });
-          this._displayableRecords.set(record, displayableRecord);
-        }
-        nextDisplayableRecords[i] = displayableRecord;
-      });
+    this._toggleSeverity = severity => {
+      const {
+        selectedSeverities
+      } = this._model.state;
+      const nextSelectedSeverities = new Set(selectedSeverities);
 
-      this._model.setState({ displayableRecords: nextDisplayableRecords });
-      requestAnimationFrame(callback);
+      if (nextSelectedSeverities.has(severity)) {
+        nextSelectedSeverities.delete(severity);
+      } else {
+        nextSelectedSeverities.add(severity);
+      }
+
+      this._model.setState({
+        selectedSeverities: nextSelectedSeverities
+      });
     };
 
     const {
       store,
       initialFilterText,
       initialEnableRegExpFilter,
-      initialUnselectedSourceIds
+      initialUnselectedSourceIds,
+      initialUnselectedSeverities
     } = options;
-    this._model = new (_Model || _load_Model()).default({
+    this._model = new (_Model().default)({
       displayableRecords: [],
       filterText: initialFilterText == null ? '' : initialFilterText,
       enableRegExpFilter: Boolean(initialEnableRegExpFilter),
-      unselectedSourceIds: initialUnselectedSourceIds == null ? [] : initialUnselectedSourceIds
+      unselectedSourceIds: initialUnselectedSourceIds == null ? [] : initialUnselectedSourceIds,
+      selectedSeverities: initialUnselectedSeverities == null ? ALL_SEVERITIES : (0, _collection().setDifference)(ALL_SEVERITIES, initialUnselectedSeverities)
     });
-
     this._store = store;
-    this._nextRecordId = 0;
-    this._displayableRecords = new WeakMap();
-    this._destroyed = new _rxjsBundlesRxMinJs.ReplaySubject(1);
-
-    this._titleChanges = _rxjsBundlesRxMinJs.Observable.combineLatest(this._model.toObservable(),
-    // $FlowIssue: Flow doesn't know about Symbol.observable
-    _rxjsBundlesRxMinJs.Observable.from(store)).takeUntil(this._destroyed).map(() => this.getTitle()).distinctUntilChanged().share();
+    this._destroyed = new _rxjsCompatUmdMin.ReplaySubject(1);
+    this._titleChanges = _rxjsCompatUmdMin.Observable.combineLatest(this._model.toObservable(), (0, _observableFromReduxStore().default)(store)).takeUntil(this._destroyed).map(() => this.getTitle()).distinctUntilChanged().share();
   }
 
-  // Associates Records with their display state (height, expansionStateId).
+  open(event) {
+    const unselectedSourceIds = new Set(this._model.state.unselectedSourceIds);
 
+    const currentlySelectedSources = this._getSources().map(s => s.id).filter(id => !unselectedSourceIds.has(id));
+
+    if (currentlySelectedSources.length === 0) {
+      this._selectSources([event.id]);
+    } else if (currentlySelectedSources.length === 1 && currentlySelectedSources[0] === event.id) {// do nothing because source is already visible and isolated
+    } else if (event.isolate) {
+      var _event$consoleAlready;
+
+      const consoleAlreadyOpen = (_event$consoleAlready = event.consoleAlreadyOpen) !== null && _event$consoleAlready !== void 0 ? _event$consoleAlready : true;
+
+      if (consoleAlreadyOpen) {
+        const allPanes = atom.workspace.getPanes();
+        const panes = allPanes.filter(p => p.getItems().filter(item => item._element === this._element).length !== 0);
+
+        if (!(panes.length === 1)) {
+          throw new Error("Invariant violation: \"panes.length === 1\"");
+        }
+
+        const consolePane = panes[0];
+        const consolePaneAllItems = consolePane.getItems();
+        const consolePaneItems = consolePaneAllItems.filter(cp => cp === this);
+
+        if (!(consolePaneItems.length === 1)) {
+          throw new Error("Invariant violation: \"consolePaneItems.length === 1\"");
+        }
+
+        this._selectSources(currentlySelectedSources.filter(id => id !== event.id));
+
+        const consoleObj = consolePaneItems[0];
+        const newConsoleObj = consoleObj.copy();
+        consolePane.addItem(newConsoleObj);
+      }
+
+      this._selectSources([event.id]);
+    } else if (currentlySelectedSources.includes(event.id)) {// do nothing because we do not need to isolate and this source is already visible
+    } else {
+      this._selectSources(currentlySelectedSources.concat([event.id]));
+    }
+  }
 
   getIconName() {
-    return 'terminal';
-  }
-
-  // Get the pane item's title. If there's only one source selected, we'll use that to make a more
+    return 'nuclicon-console';
+  } // Get the pane item's title. If there's only one source selected, we'll use that to make a more
   // descriptive title.
+
+
   getTitle() {
     const enabledProviderCount = this._store.getState().providers.size;
-    const { unselectedSourceIds } = this._model.state;
 
-    // Calling `_getSources()` is (currently) expensive because it needs to search all the records
+    const {
+      unselectedSourceIds
+    } = this._model.state; // Calling `_getSources()` is (currently) expensive because it needs to search all the records
     // for sources that have been disabled but still have records. We try to avoid calling it if we
     // already know that there's more than one selected source.
+
     if (enabledProviderCount - unselectedSourceIds.length > 1) {
       return 'Console';
-    }
+    } // If there's only one source selected, use its name in the tab title.
 
-    // If there's only one source selected, use its name in the tab title.
+
     const sources = this._getSources();
+
     if (sources.length - unselectedSourceIds.length === 1) {
       const selectedSource = sources.find(source => unselectedSourceIds.indexOf(source.id) === -1);
+
       if (selectedSource) {
         return `Console: ${selectedSource.name}`;
       }
@@ -238,15 +355,24 @@ class Console {
   }
 
   onDidChangeTitle(callback) {
-    return new (_UniversalDisposable || _load_UniversalDisposable()).default(this._titleChanges.subscribe(callback));
+    return new (_UniversalDisposable().default)(this._titleChanges.subscribe(callback));
   }
 
   _getSources() {
-    const { providers, providerStatuses, records } = this._store.getState();
-    return this._getSourcesMemoized({ providers, providerStatuses, records });
-  }
+    const {
+      providers,
+      providerStatuses,
+      records,
+      incompleteRecords
+    } = this._store.getState();
 
-  // Memoize `getSources()`. Unfortunately, since we look for unrepresented sources in the record
+    return this._getSourcesMemoized({
+      providers,
+      providerStatuses,
+      records,
+      incompleteRecords
+    });
+  } // Memoize `getSources()`. Unfortunately, since we look for unrepresented sources in the record
   // list, this still needs to be called whenever the records change.
   // TODO: Consider removing records when their source is removed. This will likely require adding
   // the ability to enable and disable sources so, for example, when the debugger is no longer
@@ -262,7 +388,8 @@ class Console {
       store: this._store,
       initialFilterText: this._model.state.filterText,
       initialEnableRegExpFilter: this._model.state.enableRegExpFilter,
-      initialUnselectedSourceIds: this._model.state.unselectedSourceIds
+      initialUnselectedSourceIds: this._model.state.unselectedSourceIds,
+      initialUnselectedSeverities: (0, _collection().setDifference)(ALL_SEVERITIES, this._model.state.selectedSeverities)
     });
   }
 
@@ -270,29 +397,37 @@ class Console {
     if (this._actionCreators == null) {
       this._actionCreators = {
         execute: code => {
-          this._store.dispatch((_Actions || _load_Actions()).execute(code));
+          this._store.dispatch(Actions().execute(code));
         },
         selectExecutor: executorId => {
-          this._store.dispatch((_Actions || _load_Actions()).selectExecutor(executorId));
+          this._store.dispatch(Actions().selectExecutor(executorId));
         },
         clearRecords: () => {
-          this._store.dispatch((_Actions || _load_Actions()).clearRecords());
+          this._store.dispatch(Actions().clearRecords());
         }
       };
     }
+
     return this._actionCreators;
   }
 
   _getFilterInfo() {
-    const { pattern, invalid } = (0, (_RegExpFilter || _load_RegExpFilter()).getFilterPattern)(this._model.state.filterText, this._model.state.enableRegExpFilter);
+    const {
+      pattern,
+      invalid
+    } = (0, _RegExpFilter().getFilterPattern)(this._model.state.filterText, this._model.state.enableRegExpFilter);
+
     const sources = this._getSources();
+
     const selectedSourceIds = sources.map(source => source.id).filter(sourceId => this._model.state.unselectedSourceIds.indexOf(sourceId) === -1);
-
-    const filteredRecords = filterRecords(this._getDisplayableRecords(), selectedSourceIds, pattern, sources.length !== selectedSourceIds.length);
-
+    const {
+      selectedSeverities
+    } = this._model.state;
+    const filteredRecords = filterRecords(Selectors().getAllRecords(this._store.getState()).toArray(), selectedSourceIds, selectedSeverities, pattern, sources.length !== selectedSourceIds.length);
     return {
       invalid,
       selectedSourceIds,
+      selectedSeverities,
       filteredRecords
     };
   }
@@ -303,20 +438,20 @@ class Console {
     }
 
     const actionCreators = this._getBoundActionCreators();
-    const props = _rxjsBundlesRxMinJs.Observable.combineLatest(this._model.toObservable(),
-    // $FlowIssue: Flow doesn't know about Symbol.observable
-    _rxjsBundlesRxMinJs.Observable.from(this._store))
-    // Don't re-render when the console isn't visible.
-    .let((0, (_observable || _load_observable()).toggle)((0, (_observePaneItemVisibility || _load_observePaneItemVisibility()).default)(this))).audit(() => (_observable || _load_observable()).nextAnimationFrame).map(([localState, globalState]) => {
+
+    const globalStates = (0, _observableFromReduxStore().default)(this._store);
+
+    const props = _rxjsCompatUmdMin.Observable.combineLatest(this._model.toObservable(), globalStates) // Don't re-render when the console isn't visible.
+    .let((0, _observable().toggle)((0, _observePaneItemVisibility().default)(this))).audit(() => _observable().nextAnimationFrame).map(([localState, globalState]) => {
       const {
         invalid,
         selectedSourceIds,
+        selectedSeverities,
         filteredRecords
       } = this._getFilterInfo();
 
-      const currentExecutorId = (0, (_getCurrentExecutorId || _load_getCurrentExecutorId()).default)(globalState);
+      const currentExecutorId = Selectors().getCurrentExecutorId(globalState);
       const currentExecutor = currentExecutorId != null ? globalState.executors.get(currentExecutorId) : null;
-
       return {
         invalidFilterInput: invalid,
         execute: actionCreators.execute,
@@ -328,8 +463,8 @@ class Console {
         unselectedSourceIds: localState.unselectedSourceIds,
         filterText: localState.filterText,
         enableRegExpFilter: localState.enableRegExpFilter,
-        displayableRecords: filteredRecords,
-        filteredRecordCount: globalState.records.size - filteredRecords.length,
+        records: filteredRecords,
+        filteredRecordCount: Selectors().getAllRecords(globalState).size - filteredRecords.length,
         history: globalState.history,
         sources: this._getSources(),
         selectedSourceIds,
@@ -337,78 +472,65 @@ class Console {
         executors: globalState.executors,
         getProvider: id => globalState.providers.get(id),
         updateFilter: this._updateFilter,
-        onDisplayableRecordHeightChange: this._handleDisplayableRecordHeightChange,
         resetAllFilters: this._resetAllFilters,
-        fontSize: globalState.fontSize
+        fontSize: globalState.fontSize,
+        selectedSeverities,
+        toggleSeverity: this._toggleSeverity
       };
     });
 
-    const StatefulConsoleView = (0, (_bindObservableAsProps || _load_bindObservableAsProps()).bindObservableAsProps)(props, (_ConsoleView || _load_ConsoleView()).default);
-    return this._element = (0, (_renderReactRoot || _load_renderReactRoot()).renderReactRoot)(_react.createElement(StatefulConsoleView, null));
+    const StatefulConsoleView = (0, _bindObservableAsProps().bindObservableAsProps)(props, _ConsoleView().default);
+    return this._element = (0, _renderReactRoot().renderReactRoot)(React.createElement(StatefulConsoleView, null));
   }
 
   serialize() {
     const {
       filterText,
       enableRegExpFilter,
-      unselectedSourceIds
+      unselectedSourceIds,
+      selectedSeverities
     } = this._model.state;
     return {
       deserializer: 'nuclide.Console',
       filterText,
       enableRegExpFilter,
-      unselectedSourceIds
+      unselectedSourceIds,
+      unselectedSeverities: [...(0, _collection().setDifference)(ALL_SEVERITIES, selectedSeverities)]
     };
   }
 
-  _getDisplayableRecords() {
-    const { records } = this._store.getState();
-    const displayableRecords = Array(records.size);
-    records.forEach((record, i) => {
-      displayableRecords[i] = this._toDisplayableRecord(record);
+  /** Unselects the sources from the given IDs */
+  unselectSources(ids) {
+    const newIds = ids.filter(id => !this._model.state.unselectedSourceIds.includes(id));
+
+    this._model.setState({
+      unselectedSourceIds: this._model.state.unselectedSourceIds.concat(newIds)
     });
-    return displayableRecords;
   }
 
-  /**
-   * Transforms the Records from the store into DisplayableRecords. This caches the result
-   * per-Console instance because the same record can have different heights in different
-   * containers.
-   */
-  _toDisplayableRecord(record) {
-    const displayableRecord = this._displayableRecords.get(record);
-    if (displayableRecord != null) {
-      return displayableRecord;
-    }
-    const newDisplayableRecord = {
-      id: this._nextRecordId++,
-      record,
-      height: INITIAL_RECORD_HEIGHT,
-      expansionStateId: {}
-    };
-    this._displayableRecords.set(record, newDisplayableRecord);
-    return newDisplayableRecord;
-  }
 }
 
 exports.Console = Console;
-function getSources(options) {
-  const { providers, providerStatuses, records } = options;
 
-  // Convert the providers to a map of sources.
+function getSources(options) {
+  const {
+    providers,
+    providerStatuses,
+    records
+  } = options; // Convert the providers to a map of sources.
+
   const mapOfSources = new Map(Array.from(providers.entries()).map(([k, provider]) => {
     const source = {
       id: provider.id,
-      name: provider.id,
+      name: provider.name,
       status: providerStatuses.get(provider.id) || 'stopped',
       start: typeof provider.start === 'function' ? provider.start : undefined,
       stop: typeof provider.stop === 'function' ? provider.stop : undefined
     };
     return [k, source];
-  }));
-
-  // Some providers may have been unregistered, but still have records. Add sources for them too.
+  })); // Some providers may have been unregistered, but still have records. Add sources for them too.
   // TODO: Iterating over all the records to get this every time we get a new record is inefficient.
+
   records.forEach((record, i) => {
     if (!mapOfSources.has(record.sourceId)) {
       mapOfSources.set(record.sourceId, {
@@ -420,19 +542,22 @@ function getSources(options) {
       });
     }
   });
-
   return Array.from(mapOfSources.values());
 }
 
-function filterRecords(displayableRecords, selectedSourceIds, filterPattern, filterSources) {
-  if (!filterSources && filterPattern == null) {
-    return displayableRecords;
+function filterRecords(records, selectedSourceIds, selectedSeverities, filterPattern, filterSources) {
+  if (!filterSources && filterPattern == null && (0, _collection().areSetsEqual)(ALL_SEVERITIES, selectedSeverities)) {
+    return records;
   }
 
-  return displayableRecords.filter(({ record }) => {
+  return records.filter(record => {
     // Only filter regular messages
     if (record.kind !== 'message') {
       return true;
+    }
+
+    if (!selectedSeverities.has(levelToSeverity(record.level))) {
+      return false;
     }
 
     const sourceMatches = selectedSourceIds.indexOf(record.sourceId) !== -1;
@@ -443,9 +568,11 @@ function filterRecords(displayableRecords, selectedSourceIds, filterPattern, fil
 async function serializeRecordObject(executor, visited, data, text, level) {
   const getText = record => {
     let indent = '';
+
     for (let i = 0; i < level; i++) {
       indent += '\t';
     }
+
     return indent + (record.description != null ? record.description : record.value != null ? record.value : '');
   };
 
@@ -455,6 +582,7 @@ async function serializeRecordObject(executor, visited, data, text, level) {
   }
 
   const id = data.objectId;
+
   if (visited.has(id)) {
     // Guard against cycles.
     return text;
@@ -474,14 +602,14 @@ async function serializeRecordObject(executor, visited, data, text, level) {
 }
 
 async function createPaste(createPasteImpl, records) {
-  const linePromises = records.filter(displayable => displayable.record.kind === 'message' || displayable.record.kind === 'request' || displayable.record.kind === 'response').map(async displayable => {
-    const record = displayable.record;
+  const linePromises = records.filter(record => record.kind === 'message' || record.kind === 'request' || record.kind === 'response').map(async record => {
     const level = record.level != null ? record.level.toString().toUpperCase() : 'LOG';
     const timestamp = record.timestamp.toLocaleString();
     let text = record.text || record.data && record.data.value || ERROR_TRANSCRIBING_MESSAGE;
 
     if (record.kind === 'response' && record.data != null && record.data.objectId != null && record.data.objectId !== '') {
       const executor = record.executor;
+
       if (executor != null) {
         // If the record has a data object, and the object has an ID,
         // recursively expand the nodes of the object and serialize it
@@ -492,7 +620,6 @@ async function createPaste(createPasteImpl, records) {
 
     return `[${level}][${record.sourceId}][${timestamp}]\t ${text}`;
   });
-
   const lines = (await Promise.all(linePromises)).join('\n');
 
   if (lines === '') {
@@ -513,10 +640,31 @@ async function createPaste(createPasteImpl, records) {
       atom.notifications.addError(`Failed to create paste: ${String(error.message || error)}`);
       return;
     }
+
     const errorMessages = error.stdout.trim().split('\n').map(JSON.parse).map(e => e.message);
     atom.notifications.addError('Failed to create paste', {
       detail: errorMessages.join('\n'),
       dismissable: true
     });
+  }
+}
+
+function levelToSeverity(level) {
+  switch (level) {
+    case 'error':
+      return 'error';
+
+    case 'warning':
+      return 'warning';
+
+    case 'log':
+    case 'info':
+    case 'debug':
+    case 'success':
+      return 'info';
+
+    default:
+      // All the colors are "info"
+      return 'info';
   }
 }

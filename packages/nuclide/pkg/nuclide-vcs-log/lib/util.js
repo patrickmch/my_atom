@@ -4,6 +4,7 @@ Object.defineProperty(exports, "__esModule", {
   value: true
 });
 exports.shortNameForAuthor = shortNameForAuthor;
+
 /**
  * Copyright (c) 2015-present, Facebook, Inc.
  * All rights reserved.
@@ -14,10 +15,8 @@ exports.shortNameForAuthor = shortNameForAuthor;
  *  strict
  * @format
  */
-
 // Mercurial history emails can be invalid.
 const HG_EMAIL_REGEX = /\b([A-Za-z0-9._%+-]+)@[A-Za-z0-9.-]+\b/;
-
 /**
  * `hg blame` may return the 'user' name in a mix of formats:
  *   - foo@bar.com
@@ -27,8 +26,9 @@ const HG_EMAIL_REGEX = /\b([A-Za-z0-9._%+-]+)@[A-Za-z0-9.-]+\b/;
  * return the beginning part of the email, iff an email is present.
  * The examples above would become 'foo'.
  */
+
 function shortNameForAuthor(blameName) {
-  const match = blameName.match(HG_EMAIL_REGEX);
-  // Index 0 will be the whole email. Index 1 is the capture group.
+  const match = blameName.match(HG_EMAIL_REGEX); // Index 0 will be the whole email. Index 1 is the capture group.
+
   return match ? match[1] : blameName;
 }

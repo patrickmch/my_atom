@@ -304,6 +304,15 @@ public final class Utils {
     _logger.logException(message, verboseErrorDataFor(ex), true /* verbose */);
   }
 
+  public static void logTrace(ContextManager cm, String message) {
+    Utils.logTrace(cm, message, new Throwable());
+  }
+
+  public static void logTrace(ContextManager cm, String message, Throwable thr) {
+    cm.sendUserMessage(
+        message + System.lineSeparator() + verboseErrorDataFor(thr), UserMessageLevel.INFO);
+  }
+
   public static String shellExec(String command) {
     try {
       Process p = Runtime.getRuntime().exec(command);

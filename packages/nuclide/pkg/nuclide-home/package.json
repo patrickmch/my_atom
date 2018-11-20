@@ -4,7 +4,6 @@
   "version": "0.0.0",
   "description": "Provides a welcome message and other links for first time users.",
   "author": "NEEDS OWNER",
-  "atomTestRunner": "../../lib/test-runner-entry.js",
   "nuclide": {
     "configMetadata": {
       "pathComponents": [
@@ -20,8 +19,7 @@
         "description": "Show the home pane (by default shown on first startup)."
       }
     },
-    "packageType": "Atom",
-    "testRunner": "apm"
+    "packageType": "AtomPackage"
   },
   "consumedServices": {
     "nuclide-home.homeFragments": {

@@ -1,0 +1,235 @@
+diff --git a/nols_website/core/utils_dataentry.py b/nols_website/core/utils_dataentry.py
+index 23a9b3f39..b8ae71c81 100644
+--- a/nols_website/core/utils_dataentry.py
++++ b/nols_website/core/utils_dataentry.py
+@@ -1,185 +1,224 @@
+ import datetime
+ 
+ from core.nmc import da
+ 
+ from core.forms import AddressForm, EmailAddressForm, PhoneForm, HoneyPotForm,\
+     PersonForm, EntityEmailAddressForm, DateBasedStatusForm
+ from admissions.forms import MailingAddressForm
++from django.core.urlresolvers import reverse
+ 
+ 
+ def build_initial_form(request=None, initial=None):
+     """
+     build the initial contact form using the core.forms
+     @param request:
+     @return:
+     """
+     if request:
+         post_data = request.POST
+         forms = dict(person_form=PersonForm(post_data,
+                                             show_minimum_name=True,
+                                             show_gender=False,
+                                             gender_required=False,
+                                             show_ethnicity=False),
+                      email_form=EmailAddressForm(post_data),
+                      honeypot_form=HoneyPotForm(post_data))
+     else:
+         forms = dict(person_form=PersonForm(initial=initial,
+                                             show_minimum_name=True,
+                                             show_gender=False,
+                                             gender_required=False,
+                                             show_ethnicity=False),
+                      email_form=EmailAddressForm(initial=initial),
+                      honeypot_form=HoneyPotForm())
+ 
+     return forms
+ 
+ 
+ def build_dataentry_forms(post_data=None,
+                           initial_data=None,
+                           extras_form=None,
+                           show_min_name=False,
+                           collapse_extra_name_fields=False,
+                           show_ethnicity=True,
+                           show_gender=True,
+                           address_required=True,
+                           show_organization=False,
+                           phone_required=False,
+                           citizenship_required=False,
+                           show_citizenship=False,
+                           show_mailing_address=False):
+     """
+     Build Data Entry form from core.forms.
+ 
+     @return: A dictionary of forms.
+     """
+     person_params = {'show_minimum_name': show_min_name,
+                      'collapse_extra_name_fields': collapse_extra_name_fields,
+                      'show_gender': show_gender,
+                      'show_ethnicity': show_ethnicity,
+                      'show_citizenship': show_citizenship,
+                      'citizenship_required': citizenship_required}
+     address_params = {'show_organization': show_organization,
+                       'address_required': address_required}
+     phone_params = {'allow_type_update': True,
+                     'phone_required': phone_required}
+ 
+     if post_data:
+         forms = {
+             'person_form': PersonForm(post_data, **person_params),
+             'phone_form': PhoneForm(post_data, **phone_params),
+             'honeypot_form': HoneyPotForm(post_data),
+             'email_form': EmailAddressForm(post_data),
+             'extras_form': extras_form(post_data)
+         }
+ 
+         if show_mailing_address:
+             forms['address_form'] = MailingAddressForm(post_data, **address_params)
+ 
+         else:
+             forms['address_form'] = AddressForm(post_data, **address_params)
+ 
+     else:
+         forms = {
+             'person_form': PersonForm(initial=initial_data, **person_params),
+             'email_form': EmailAddressForm(initial=initial_data),
+             'extras_form': extras_form(initial=initial_data),
+             'phone_form': PhoneForm(**phone_params),
+             'honeypot_form': HoneyPotForm(),
+         }
+ 
+         if show_mailing_address:
+             forms['address_form'] = MailingAddressForm(**address_params)
+ 
+         else:
+             forms['address_form'] = AddressForm(**address_params)
+ 
+     return forms
+ 
+ 
+ def build_dataentry_user_forms(user, data=None, extras_form=None, prefix=None):
+     forms = {
+-        'person_form': PersonForm(data=data, user=user, show_citizenship=True),
+-        'email_form': EntityEmailAddressForm(data=data,
++        'person_form': build_form_context(PersonForm(data=data, user=user, show_citizenship=True)),
++        'email_form': build_form_context(EntityEmailAddressForm(data=data,
+                                              user=user,
+                                              existing_email_id=None,
+                                              initial={'status': 'Current'},
+-                                             allow_status_edit=True),
+-        'address_form': AddressForm(data=data),
++                                             allow_status_edit=True)),
++        'address_form': build_form_context(AddressForm(data=data)),
+         'date_based_address_status_form': DateBasedStatusForm(),
+-        'phone_form': PhoneForm(data=data,
++        'phone_form': build_form_context(PhoneForm(data=data,
+                                 initial={'status': 'Permanent'},
+                                 allow_type_update=True,
+                                 phone_required=True,
+-                                prefix=prefix),
++                                prefix=prefix)),
+         'date_based_phone_status_form': DateBasedStatusForm(),
+     }
+     if extras_form:
+         forms['extras_form'] = extras_form(data=data)
+     return forms
+ 
+ 
+ def connect_user_using_forms(user, person_data, email_data):
+     save = False
+     if not user.first_name:
+         user.first_name = person_data['first_name']
+         save = True
+     if not user.last_name:
+         user.last_name = person_data['last_name']
+         save = True
+     if not user.email:
+         user.email = email_data['email_address']
+         save = True
+     if save:
+         user.save()
+     if not user.connect(create=True, birth_date=person_data['birth_date']):
+         user.was_connected = True
+     user.save()
+ 
+     entity = user.entity
+     entity.birth_date = person_data['birth_date']
+     da.entity.save_entity(entity)
+ 
+ 
+ def build_dataentry_elog_message(person_id, how_created, event):
+     entity = da.entity.get_entity(person_id)
+ 
+     if how_created == 'admin':
+         how_created_msg = 'by staff via the NOLS admin site'
+     elif how_created == 'unauthenticated user':
+         how_created_msg = 'by an unauthenticated website user via the public facing site'
+     elif how_created == 'authenticated user':
+         how_created_msg = 'by an authenticated website user via the public facing site'
+     elif how_created == 'auto populated':
+         pronoun = ''
+         if entity.is_person:
+             if entity.gender == 'Female':
+                 pronoun = 'she'
+             elif entity.gender == 'Male':
+                 pronoun = 'he'
+             else:
+                 pronoun = 'this person'
+         elif entity.is_org:
+             pronoun = 'this organization'
+ 
+         how_created_msg = 'automatically, because %s was enrolled through WMI' % pronoun
+     else:
+         how_created_msg = '(%s)' % how_created
+ 
+     try:
+         event_type = event._meta.verbose_name
+     except AttributeError:
+         event_type = ''
+ 
+     data = {
+         'full_name': entity.name.full_name,
+         'date': datetime.datetime.now().strftime('%d-%b-%Y %H:%M:%S'),
+         'how_created': how_created_msg,
+         'event_type': event_type + ' - ' if event_type else '',
+         'event_name': event.__unicode__(),
+     }
+ 
+     message = """
+ %(full_name)s was added to the %(event_type)s%(event_name)s on %(date)s %(how_created)s.
+         """ % data
+ 
+     return message
++
++
++def build_form_context(form_instance):
++    form_context = {
++        "AuthenticationForm": {
++            "form_name": "auth_form",
++            "title": "Login",
++            "redirect_name": "next",
++            "form_action": reverse("login")
++        },
++        "PhoneForm": {
++            "form_name": "phone_form",
++            "title": "Add Phone Number",
++            "redirect_name": "next",
++            "form_action": reverse("core.views.edit_phone")
++        },
++        "PersonForm": {
++            "form_name": "person_form",
++            "title": "Edit Personal Information",
++            "redirect_name": "when_finished",
++            "form_action": reverse("core.views.edit_personal")
++        },
++        "EntityEmailAddressForm": {
++            "form_name": "email_form",
++            "title": "Add Email Address",
++            "redirect_name": "next",
++            "form_action": reverse("core.views.edit_email")
++        },
++        "AddressForm": {
++            "form_name": "address_form",
++            "title": "Add Address",
++            "redirect_name": "next",
++            "form_action": reverse("core.views.edit_address")
++        }
++    }
++    context = form_context[form_instance.__class__.__name__]
++    context['form'] = form_instance
++    return context

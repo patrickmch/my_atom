@@ -1,101 +1,164 @@
-'use strict';
+"use strict";
 
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
+exports.default = void 0;
 
-var _Actions;
+function _observable() {
+  const data = require("../../../../../nuclide-commons/observable");
 
-function _load_Actions() {
-  return _Actions = _interopRequireWildcard(require('../redux/Actions'));
+  _observable = function () {
+    return data;
+  };
+
+  return data;
 }
 
-var _Selectors;
+function Actions() {
+  const data = _interopRequireWildcard(require("../redux/Actions"));
 
-function _load_Selectors() {
-  return _Selectors = _interopRequireWildcard(require('../redux/Selectors'));
+  Actions = function () {
+    return data;
+  };
+
+  return data;
 }
 
-var _collection;
+function Selectors() {
+  const data = _interopRequireWildcard(require("../redux/Selectors"));
 
-function _load_collection() {
-  return _collection = require('../../../../../nuclide-commons/collection');
+  Selectors = function () {
+    return data;
+  };
+
+  return data;
 }
 
-var _UniversalDisposable;
+function _observableFromReduxStore() {
+  const data = _interopRequireDefault(require("../../../../../nuclide-commons/observableFromReduxStore"));
 
-function _load_UniversalDisposable() {
-  return _UniversalDisposable = _interopRequireDefault(require('../../../../../nuclide-commons/UniversalDisposable'));
+  _observableFromReduxStore = function () {
+    return data;
+  };
+
+  return data;
 }
 
-var _rxjsBundlesRxMinJs = require('rxjs/bundles/Rx.min.js');
+function _collection() {
+  const data = require("../../../../../nuclide-commons/collection");
+
+  _collection = function () {
+    return data;
+  };
+
+  return data;
+}
+
+function _UniversalDisposable() {
+  const data = _interopRequireDefault(require("../../../../../nuclide-commons/UniversalDisposable"));
+
+  _UniversalDisposable = function () {
+    return data;
+  };
+
+  return data;
+}
+
+var _rxjsCompatUmdMin = require("rxjs-compat/bundles/rxjs-compat.umd.min.js");
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
+function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) { var desc = Object.defineProperty && Object.getOwnPropertyDescriptor ? Object.getOwnPropertyDescriptor(obj, key) : {}; if (desc.get || desc.set) { Object.defineProperty(newObj, key, desc); } else { newObj[key] = obj[key]; } } } } newObj.default = obj; return newObj; } }
+
+/**
+ * Copyright (c) 2017-present, Facebook, Inc.
+ * All rights reserved.
+ *
+ * This source code is licensed under the BSD-style license found in the
+ * LICENSE file in the root directory of this source tree. An additional grant
+ * of patent rights can be found in the PATENTS file in the same directory.
+ *
+ *  strict-local
+ * @format
+ */
+const THROTTLE_FILE_MESSAGE_MS = 100;
 
 class DiagnosticUpdater {
-
   constructor(store) {
     this.getMessages = () => {
-      return (_Selectors || _load_Selectors()).getMessages(this._store.getState());
+      return Selectors().getMessages(this._store.getState());
     };
 
     this.getFileMessageUpdates = filePath => {
-      return (_Selectors || _load_Selectors()).getFileMessageUpdates(this._store.getState(), filePath);
+      return Selectors().getFileMessageUpdates(this._store.getState(), filePath);
+    };
+
+    this.getLastUpdateSource = () => {
+      return this._store.getState().lastUpdateSource;
     };
 
     this.observeMessages = callback => {
-      return new (_UniversalDisposable || _load_UniversalDisposable()).default(this._allMessageUpdates.subscribe(callback));
+      return new (_UniversalDisposable().default)(this._allMessageUpdates.subscribe(callback));
+    };
+
+    this.observeFileMessagesIterator = (filePath, callback) => {
+      return new (_UniversalDisposable().default)(this._states.distinctUntilChanged((a, b) => a.messages === b.messages).let((0, _observable().throttle)(THROTTLE_FILE_MESSAGE_MS)).map(state => ({
+        [Symbol.iterator]() {
+          return Selectors().getBoundedThreadedFileMessages(state, filePath);
+        }
+
+      })) // $FlowFixMe Flow doesn't know about Symbol.iterator
+      .subscribe(callback));
     };
 
     this.observeFileMessages = (filePath, callback) => {
-      return new (_UniversalDisposable || _load_UniversalDisposable()).default(
-      // TODO: As a potential perf improvement, we could cache so the mapping only happens once.
+      return new (_UniversalDisposable().default)( // TODO: As a potential perf improvement, we could cache so the mapping only happens once.
       // Whether that's worth it depends on how often this is actually called with the same path.
-      this._states.distinctUntilChanged((a, b) => a.messages === b.messages).map(state => (_Selectors || _load_Selectors()).getFileMessageUpdates(state, filePath)).distinctUntilChanged((a, b) => (0, (_collection || _load_collection()).arrayEqual)(a.messages, b.messages)).subscribe(callback));
+      this._states.distinctUntilChanged((a, b) => a.messages === b.messages).let((0, _observable().throttle)(THROTTLE_FILE_MESSAGE_MS)).map(state => Selectors().getFileMessageUpdates(state, filePath)).distinctUntilChanged((a, b) => a.totalMessages === b.totalMessages && (0, _collection().arrayEqual)(a.messages, b.messages)).subscribe(callback));
     };
 
     this.observeCodeActionsForMessage = callback => {
-      return new (_UniversalDisposable || _load_UniversalDisposable()).default(this._states.map(state => state.codeActionsForMessage).distinctUntilChanged().subscribe(callback));
+      return new (_UniversalDisposable().default)(this._states.map(state => state.codeActionsForMessage).distinctUntilChanged().subscribe(callback));
+    };
+
+    this.observeDescriptions = callback => {
+      return new (_UniversalDisposable().default)(this._states.map(state => state.descriptions).distinctUntilChanged().subscribe(callback));
     };
 
     this.observeSupportedMessageKinds = callback => {
-      return new (_UniversalDisposable || _load_UniversalDisposable()).default(this._states.map((_Selectors || _load_Selectors()).getSupportedMessageKinds).subscribe(callback));
+      return new (_UniversalDisposable().default)(this._states.map(Selectors().getSupportedMessageKinds).subscribe(callback));
     };
 
     this.observeUiConfig = callback => {
-      return new (_UniversalDisposable || _load_UniversalDisposable()).default(this._states.map((_Selectors || _load_Selectors()).getUiConfig).subscribe(callback));
+      return new (_UniversalDisposable().default)(this._states.map(Selectors().getUiConfig) // Being a selector means we'll always get the same ui config for a given
+      // slice of state (in this case `state.providers`). However, other parts
+      // of state may change. Don't emit in those cases, or in the common case
+      // that the config changed from an empty array to a different empty array.
+      .distinctUntilChanged((a, b) => a === b || a.length === 0 && b.length === 0).subscribe(callback));
     };
 
     this.applyFix = message => {
-      this._store.dispatch((_Actions || _load_Actions()).applyFix(message));
+      this._store.dispatch(Actions().applyFix(message));
     };
 
     this.applyFixesForFile = file => {
-      this._store.dispatch((_Actions || _load_Actions()).applyFixesForFile(file));
+      this._store.dispatch(Actions().applyFixesForFile(file));
     };
 
     this.fetchCodeActions = (editor, messages) => {
-      this._store.dispatch((_Actions || _load_Actions()).fetchCodeActions(editor, messages));
+      this._store.dispatch(Actions().fetchCodeActions(editor, messages));
+    };
+
+    this.fetchDescriptions = messages => {
+      this._store.dispatch(Actions().fetchDescriptions(messages));
     };
 
     this._store = store;
-    // $FlowIgnore: Flow doesn't know about Symbol.observable
-    this._states = _rxjsBundlesRxMinJs.Observable.from(store);
-
-    this._allMessageUpdates = this._states.map((_Selectors || _load_Selectors()).getMessages).distinctUntilChanged();
+    this._states = (0, _observableFromReduxStore().default)(store);
+    this._allMessageUpdates = this._states.map(Selectors().getMessages).distinctUntilChanged();
   }
 
 }
-exports.default = DiagnosticUpdater; /**
-                                      * Copyright (c) 2017-present, Facebook, Inc.
-                                      * All rights reserved.
-                                      *
-                                      * This source code is licensed under the BSD-style license found in the
-                                      * LICENSE file in the root directory of this source tree. An additional grant
-                                      * of patent rights can be found in the PATENTS file in the same directory.
-                                      *
-                                      *  strict-local
-                                      * @format
-                                      */
+
+exports.default = DiagnosticUpdater;

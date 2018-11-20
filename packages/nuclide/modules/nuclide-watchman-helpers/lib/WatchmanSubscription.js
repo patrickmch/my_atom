@@ -1,14 +1,31 @@
-'use strict';
+"use strict";
 
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
+exports.default = void 0;
 
-var _eventKit;
+function _eventKit() {
+  const data = require("event-kit");
 
-function _load_eventKit() {
-  return _eventKit = require('event-kit');
+  _eventKit = function () {
+    return data;
+  };
+
+  return data;
 }
+
+/**
+ * Copyright (c) 2017-present, Facebook, Inc.
+ * All rights reserved.
+ *
+ * This source code is licensed under the BSD-style license found in the
+ * LICENSE file in the root directory of this source tree. An additional grant
+ * of patent rights can be found in the PATENTS file in the same directory.
+ *
+ *  strict
+ * @format
+ */
 
 /**
  * @param pathFromSubscriptionRootToSubscriptionPath The relative path from
@@ -17,7 +34,7 @@ function _load_eventKit() {
  *   Notably, this value should be undefined if subscriptionRoot is the same as
  *   subscriptionPath.
  */
-class WatchmanSubscription extends (_eventKit || _load_eventKit()).Emitter {
+class WatchmanSubscription extends _eventKit().Emitter {
   constructor(subscriptionRoot, pathFromSubscriptionRootToSubscriptionPath, subscriptionPath, subscriptionName, subscriptionCount, subscriptionOptions) {
     super();
     this.root = subscriptionRoot;
@@ -27,15 +44,7 @@ class WatchmanSubscription extends (_eventKit || _load_eventKit()).Emitter {
     this.subscriptionCount = subscriptionCount;
     this.options = subscriptionOptions;
   }
+
 }
-exports.default = WatchmanSubscription; /**
-                                         * Copyright (c) 2017-present, Facebook, Inc.
-                                         * All rights reserved.
-                                         *
-                                         * This source code is licensed under the BSD-style license found in the
-                                         * LICENSE file in the root directory of this source tree. An additional grant
-                                         * of patent rights can be found in the PATENTS file in the same directory.
-                                         *
-                                         *  strict
-                                         * @format
-                                         */
+
+exports.default = WatchmanSubscription;

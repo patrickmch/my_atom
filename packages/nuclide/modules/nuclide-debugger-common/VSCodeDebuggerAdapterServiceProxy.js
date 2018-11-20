@@ -13,7 +13,7 @@ module.exports = _client => {
         location: {
           type: "source",
           fileName: "VSCodeDebuggerAdapterService.js",
-          line: 21
+          line: 24
         },
         name: "VsRawAdapterSpawnerService"
       }), "spawnAdapter", "observable", _client.marshalArguments(Array.from(arguments), [{
@@ -36,7 +36,7 @@ module.exports = _client => {
         location: {
           type: "source",
           fileName: "VSCodeDebuggerAdapterService.js",
-          line: 21
+          line: 24
         },
         name: "VsRawAdapterSpawnerService"
       }), "write", "promise", _client.marshalArguments(Array.from(arguments), [{
@@ -74,6 +74,51 @@ module.exports = _client => {
           kind: "named",
           name: "ProcessInfo"
         }
+      });
+    });
+  };
+
+  remoteModule.getBuckRootFromUri = function (arg0) {
+    return _client.callRemoteFunction("VSCodeDebuggerAdapterService/getBuckRootFromUri", "promise", _client.marshalArguments(Array.from(arguments), [{
+      name: "uri",
+      type: {
+        kind: "string"
+      }
+    }])).then(value => {
+      return _client.unmarshal(value, {
+        kind: "nullable",
+        type: {
+          kind: "string"
+        }
+      });
+    });
+  };
+
+  remoteModule.getBuckRootFromPid = function (arg0) {
+    return _client.callRemoteFunction("VSCodeDebuggerAdapterService/getBuckRootFromPid", "promise", _client.marshalArguments(Array.from(arguments), [{
+      name: "pid",
+      type: {
+        kind: "number"
+      }
+    }])).then(value => {
+      return _client.unmarshal(value, {
+        kind: "nullable",
+        type: {
+          kind: "string"
+        }
+      });
+    });
+  };
+
+  remoteModule.realpath = function (arg0) {
+    return _client.callRemoteFunction("VSCodeDebuggerAdapterService/realpath", "promise", _client.marshalArguments(Array.from(arguments), [{
+      name: "path",
+      type: {
+        kind: "string"
+      }
+    }])).then(value => {
+      return _client.unmarshal(value, {
+        kind: "string"
       });
     });
   };
@@ -159,7 +204,7 @@ Object.defineProperty(module.exports, "defs", {
       location: {
         type: "source",
         fileName: "process.js",
-        line: 664
+        line: 691
       },
       name: "ProcessExitMessage",
       definition: {
@@ -197,7 +242,7 @@ Object.defineProperty(module.exports, "defs", {
       location: {
         type: "source",
         fileName: "process.js",
-        line: 670
+        line: 697
       },
       name: "ProcessMessage",
       definition: {
@@ -271,7 +316,7 @@ Object.defineProperty(module.exports, "defs", {
       location: {
         type: "source",
         fileName: "types.js",
-        line: 38
+        line: 35
       },
       name: "VSAdapterExecutableInfo",
       definition: {
@@ -291,6 +336,19 @@ Object.defineProperty(module.exports, "defs", {
             }
           },
           optional: false
+        }, {
+          name: "cwd",
+          type: {
+            kind: "string"
+          },
+          optional: true
+        }, {
+          name: "env",
+          type: {
+            kind: "object",
+            fields: []
+          },
+          optional: true
         }]
       }
     },
@@ -300,7 +358,7 @@ Object.defineProperty(module.exports, "defs", {
       location: {
         type: "source",
         fileName: "VSCodeDebuggerAdapterService.js",
-        line: 21
+        line: 24
       },
       staticMethods: {},
       instanceMethods: {
@@ -308,7 +366,7 @@ Object.defineProperty(module.exports, "defs", {
           location: {
             type: "source",
             fileName: "VSCodeDebuggerAdapterService.js",
-            line: 22
+            line: 25
           },
           kind: "function",
           argumentTypes: [{
@@ -330,7 +388,7 @@ Object.defineProperty(module.exports, "defs", {
           location: {
             type: "source",
             fileName: "VSCodeDebuggerAdapterService.js",
-            line: 28
+            line: 31
           },
           kind: "function",
           argumentTypes: [{
@@ -350,7 +408,7 @@ Object.defineProperty(module.exports, "defs", {
           location: {
             type: "source",
             fileName: "VSCodeDebuggerAdapterService.js",
-            line: 32
+            line: 35
           },
           kind: "function",
           argumentTypes: [],
@@ -369,13 +427,13 @@ Object.defineProperty(module.exports, "defs", {
       location: {
         type: "source",
         fileName: "VSCodeDebuggerAdapterService.js",
-        line: 37
+        line: 40
       },
       type: {
         location: {
           type: "source",
           fileName: "VSCodeDebuggerAdapterService.js",
-          line: 37
+          line: 40
         },
         kind: "function",
         argumentTypes: [],
@@ -393,7 +451,7 @@ Object.defineProperty(module.exports, "defs", {
       location: {
         type: "source",
         fileName: "process.js",
-        line: 687
+        line: 714
       },
       name: "ProcessInfo",
       definition: {
@@ -431,13 +489,13 @@ Object.defineProperty(module.exports, "defs", {
       location: {
         type: "source",
         fileName: "VSCodeDebuggerAdapterService.js",
-        line: 43
+        line: 46
       },
       type: {
         location: {
           type: "source",
           fileName: "VSCodeDebuggerAdapterService.js",
-          line: 43
+          line: 46
         },
         kind: "function",
         argumentTypes: [],
@@ -453,12 +511,105 @@ Object.defineProperty(module.exports, "defs", {
         }
       }
     },
+    getBuckRootFromUri: {
+      kind: "function",
+      name: "getBuckRootFromUri",
+      location: {
+        type: "source",
+        fileName: "VSCodeDebuggerAdapterService.js",
+        line: 50
+      },
+      type: {
+        location: {
+          type: "source",
+          fileName: "VSCodeDebuggerAdapterService.js",
+          line: 50
+        },
+        kind: "function",
+        argumentTypes: [{
+          name: "uri",
+          type: {
+            kind: "string"
+          }
+        }],
+        returnType: {
+          kind: "promise",
+          type: {
+            kind: "nullable",
+            type: {
+              kind: "string"
+            }
+          }
+        }
+      }
+    },
+    getBuckRootFromPid: {
+      kind: "function",
+      name: "getBuckRootFromPid",
+      location: {
+        type: "source",
+        fileName: "VSCodeDebuggerAdapterService.js",
+        line: 73
+      },
+      type: {
+        location: {
+          type: "source",
+          fileName: "VSCodeDebuggerAdapterService.js",
+          line: 73
+        },
+        kind: "function",
+        argumentTypes: [{
+          name: "pid",
+          type: {
+            kind: "number"
+          }
+        }],
+        returnType: {
+          kind: "promise",
+          type: {
+            kind: "nullable",
+            type: {
+              kind: "string"
+            }
+          }
+        }
+      }
+    },
+    realpath: {
+      kind: "function",
+      name: "realpath",
+      location: {
+        type: "source",
+        fileName: "VSCodeDebuggerAdapterService.js",
+        line: 82
+      },
+      type: {
+        location: {
+          type: "source",
+          fileName: "VSCodeDebuggerAdapterService.js",
+          line: 82
+        },
+        kind: "function",
+        argumentTypes: [{
+          name: "path",
+          type: {
+            kind: "string"
+          }
+        }],
+        returnType: {
+          kind: "promise",
+          type: {
+            kind: "string"
+          }
+        }
+      }
+    },
     VsAdapterType: {
       kind: "alias",
       location: {
         type: "source",
         fileName: "types.js",
-        line: 45
+        line: 44
       },
       name: "VsAdapterType",
       definition: {
@@ -505,13 +656,13 @@ Object.defineProperty(module.exports, "defs", {
       location: {
         type: "source",
         fileName: "VSCodeDebuggerAdapterService.js",
-        line: 47
+        line: 86
       },
       type: {
         location: {
           type: "source",
           fileName: "VSCodeDebuggerAdapterService.js",
-          line: 47
+          line: 86
         },
         kind: "function",
         argumentTypes: [{

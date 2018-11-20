@@ -1,39 +1,63 @@
-'use strict';
+"use strict";
 
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.LanguageAdditionalLogFilesProvider = undefined;
+exports.LanguageAdditionalLogFilesProvider = void 0;
 
-var _collection;
+function _collection() {
+  const data = require("../../../modules/nuclide-commons/collection");
 
-function _load_collection() {
-  return _collection = require('../../../modules/nuclide-commons/collection');
+  _collection = function () {
+    return data;
+  };
+
+  return data;
 }
 
-var _promise;
+function _promise() {
+  const data = require("../../../modules/nuclide-commons/promise");
 
-function _load_promise() {
-  return _promise = require('../../../modules/nuclide-commons/promise');
+  _promise = function () {
+    return data;
+  };
+
+  return data;
 }
 
-var _string;
+function _string() {
+  const data = require("../../../modules/nuclide-commons/string");
 
-function _load_string() {
-  return _string = require('../../../modules/nuclide-commons/string');
+  _string = function () {
+    return data;
+  };
+
+  return data;
 }
 
-var _nuclideRemoteConnection;
+function _nuclideRemoteConnection() {
+  const data = require("../../nuclide-remote-connection");
 
-function _load_nuclideRemoteConnection() {
-  return _nuclideRemoteConnection = require('../../nuclide-remote-connection');
+  _nuclideRemoteConnection = function () {
+    return data;
+  };
+
+  return data;
 }
 
+/**
+ * Copyright (c) 2015-present, Facebook, Inc.
+ * All rights reserved.
+ *
+ * This source code is licensed under the license found in the LICENSE file in
+ * the root directory of this source tree.
+ *
+ *  strict-local
+ * @format
+ */
 class LanguageAdditionalLogFilesProvider {
-
   constructor(name, connectionToLanguageService) {
     this.id = 'als';
-
     this._name = name;
     this._connectionToLanguageService = connectionToLanguageService;
   }
@@ -46,27 +70,22 @@ class LanguageAdditionalLogFilesProvider {
     const resultsForConnection = async (prefix, connection) => {
       const service = await this._connectionToLanguageService.get(connection);
       const subResults = await service.getAdditionalLogFiles(deadline - 1000);
-      return subResults.map(log => Object.assign({}, log, { title: prefix + log.title }));
+      return subResults.map(log => Object.assign({}, log, {
+        title: prefix + log.title
+      }));
     };
 
     const connections = Array.from(this._connectionToLanguageService.keys());
     const results = await Promise.all(connections.map(connection => {
       const prefix = `[${this._name}]` + (connection == null ? '' : connection.getRemoteHostname() + ':');
-      return (0, (_promise || _load_promise()).timeoutAfterDeadline)(deadline, resultsForConnection(prefix, connection)).catch(e => [{
+      return (0, _promise().timeoutAfterDeadline)(deadline, resultsForConnection(prefix, connection)).catch(e => [{
         title: `${prefix}language_service`,
-        data: (0, (_string || _load_string()).stringifyError)(e)
+        data: (0, _string().stringifyError)(e)
       }]);
     }));
-    return (0, (_collection || _load_collection()).arrayFlatten)(results);
+    return (0, _collection().arrayFlatten)(results);
   }
+
 }
-exports.LanguageAdditionalLogFilesProvider = LanguageAdditionalLogFilesProvider; /**
-                                                                                  * Copyright (c) 2015-present, Facebook, Inc.
-                                                                                  * All rights reserved.
-                                                                                  *
-                                                                                  * This source code is licensed under the license found in the LICENSE file in
-                                                                                  * the root directory of this source tree.
-                                                                                  *
-                                                                                  *  strict-local
-                                                                                  * @format
-                                                                                  */
+
+exports.LanguageAdditionalLogFilesProvider = LanguageAdditionalLogFilesProvider;

@@ -1,4 +1,4 @@
-'use strict';
+"use strict";
 
 Object.defineProperty(exports, "__esModule", {
   value: true
@@ -6,22 +6,34 @@ Object.defineProperty(exports, "__esModule", {
 exports.getHomeFragments = getHomeFragments;
 exports.createAdditionalLogFilesProvider = createAdditionalLogFilesProvider;
 
-var _nuclideUri;
+function _nuclideUri() {
+  const data = _interopRequireDefault(require("../../../modules/nuclide-commons/nuclideUri"));
 
-function _load_nuclideUri() {
-  return _nuclideUri = _interopRequireDefault(require('../../../modules/nuclide-commons/nuclideUri'));
+  _nuclideUri = function () {
+    return data;
+  };
+
+  return data;
 }
 
-var _nuclideRemoteConnection;
+function _nuclideRemoteConnection() {
+  const data = require("../../nuclide-remote-connection");
 
-function _load_nuclideRemoteConnection() {
-  return _nuclideRemoteConnection = require('../../nuclide-remote-connection');
+  _nuclideRemoteConnection = function () {
+    return data;
+  };
+
+  return data;
 }
 
-var _collection;
+function _collection() {
+  const data = require("../../../modules/nuclide-commons/collection");
 
-function _load_collection() {
-  return _collection = require('../../../modules/nuclide-commons/collection');
+  _collection = function () {
+    return data;
+  };
+
+  return data;
 }
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
@@ -36,7 +48,6 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
  *  strict-local
  * @format
  */
-
 function getHomeFragments() {
   return {
     feature: {
@@ -50,14 +61,14 @@ function getHomeFragments() {
 }
 
 async function getAdditionalLogFiles(deadline) {
-  const hostnames = (0, (_collection || _load_collection()).arrayUnique)(atom.project.getPaths().filter((_nuclideUri || _load_nuclideUri()).default.isRemote).map((_nuclideUri || _load_nuclideUri()).default.getHostname));
-
+  const hostnames = (0, _collection().arrayUnique)(atom.project.getPaths().filter(_nuclideUri().default.isRemote).map(_nuclideUri().default.getHostname));
   return Promise.all(hostnames.map(async hostname => {
-    const service = (0, (_nuclideRemoteConnection || _load_nuclideRemoteConnection()).getHhvmDebuggerServiceByNuclideUri)((_nuclideUri || _load_nuclideUri()).default.createRemoteUri(hostname, '/'));
+    const service = (0, _nuclideRemoteConnection().getHhvmDebuggerServiceByNuclideUri)(_nuclideUri().default.createRemoteUri(hostname, '/'));
+
     if (service != null) {
       return {
         title: `HHVM Debugger log for ${hostname}`,
-        data: await service.createLogFilePaste()
+        data: await service.getDebugServerLog()
       };
     }
 

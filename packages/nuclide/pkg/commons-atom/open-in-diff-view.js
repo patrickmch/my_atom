@@ -1,11 +1,11 @@
-'use strict';
+"use strict";
 
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
 exports.openFileInDiffView = openFileInDiffView;
 
-var _url = _interopRequireDefault(require('url'));
+var _url = _interopRequireDefault(require("url"));
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -19,7 +19,6 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
  * 
  * @format
  */
-
 function openFileInDiffView(filePath) {
   const diffOpenUrl = _url.default.format({
     protocol: 'atom',
@@ -30,8 +29,9 @@ function openFileInDiffView(filePath) {
       file: filePath,
       onlyDiff: true
     }
-  });
-  // This is not a file URI
+  }); // This is not a file URI
   // eslint-disable-next-line nuclide-internal/atom-apis
+
+
   atom.workspace.open(diffOpenUrl);
 }

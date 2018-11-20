@@ -1,4 +1,4 @@
-'use strict';
+"use strict";
 
 Object.defineProperty(exports, "__esModule", {
   value: true
@@ -7,6 +7,7 @@ exports.getDeploymentTargetPreference = getDeploymentTargetPreference;
 exports.selectValidDeploymentTarget = selectValidDeploymentTarget;
 exports.getPlatformProviderUiForDeploymentTarget = getPlatformProviderUiForDeploymentTarget;
 exports.formatDeploymentTarget = formatDeploymentTarget;
+
 /**
  * Copyright (c) 2015-present, Facebook, Inc.
  * All rights reserved.
@@ -17,10 +18,9 @@ exports.formatDeploymentTarget = formatDeploymentTarget;
  *  strict-local
  * @format
  */
-
 function getDeploymentTargetPreference(state) {
-  const target = state.userSelectedDeploymentTarget || state.selectedDeploymentTarget;
-  // If a deployment target exists, that's our first choice, otherwise look at the last session
+  const target = state.userSelectedDeploymentTarget || state.selectedDeploymentTarget; // If a deployment target exists, that's our first choice, otherwise look at the last session
+
   if (target != null) {
     return {
       platformGroupName: target.platformGroup.name,
@@ -48,21 +48,20 @@ function selectValidDeploymentTarget(preferred, platformGroups) {
   const platformGroup = result.value;
 
   if (!platformGroup) {
-    throw new Error('Invariant violation: "platformGroup"');
+    throw new Error("Invariant violation: \"platformGroup\"");
   }
 
   result = getPreferred(platformGroup.platforms, preferred.platformName, result.skipRest);
   const platform = result.value;
 
   if (!platform) {
-    throw new Error('Invariant violation: "platform"');
+    throw new Error("Invariant violation: \"platform\"");
   }
 
   result = platform.isMobile ? getPreferred(platform.deviceGroups, preferred.deviceGroupName, result.skipRest) : null;
   const deviceGroup = result != null ? result.value : null;
   result = result != null && deviceGroup != null ? getPreferred(deviceGroup.devices, preferred.deviceName, result.skipRest) : null;
   const device = result && result.value;
-
   return {
     platformGroup,
     platform,
@@ -73,30 +72,41 @@ function selectValidDeploymentTarget(preferred, platformGroups) {
 
 function getPreferred(groups, name, chooseFirst) {
   if (groups.length === 0) {
-    return { value: null, skipRest: true };
+    return {
+      value: null,
+      skipRest: true
+    };
   }
-  let match;
-  // We want === in case of an empty string
+
+  let match; // We want === in case of an empty string
   // eslint-disable-next-line eqeqeq
+
   if (name === null || chooseFirst) {
     match = null;
   } else {
     match = groups.find(group => group.name === name);
   }
+
   let skipRest;
+
   if (match == null) {
     match = groups[0];
     skipRest = true;
   } else {
     skipRest = false;
   }
-  return { value: match, skipRest };
+
+  return {
+    value: match,
+    skipRest
+  };
 }
 
 function getPlatformProviderUiForDeploymentTarget(deploymentTarget) {
   if (deploymentTarget == null || !deploymentTarget.platform.isMobile || deploymentTarget.platform.extraUiWhenSelected == null) {
     return null;
   }
+
   return deploymentTarget.platform.extraUiWhenSelected(deploymentTarget.device);
 }
 
@@ -104,7 +114,13 @@ function formatDeploymentTarget(deploymentTarget) {
   if (deploymentTarget == null) {
     return '';
   }
-  const { device, deviceGroup, platform, platformGroup } = deploymentTarget;
+
+  const {
+    device,
+    deviceGroup,
+    platform,
+    platformGroup
+  } = deploymentTarget;
   const deviceString = device != null ? `: ${device.name}` : '';
   const deviceGroupString = deviceGroup != null && deviceGroup.name !== '' ? ` (${deviceGroup.name})` : '';
   return `${platformGroup.name} ${platform.name}${deviceString}${deviceGroupString}`;

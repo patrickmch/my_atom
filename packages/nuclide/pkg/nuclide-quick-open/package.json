@@ -4,7 +4,6 @@
   "version": "0.0.0",
   "description": "Provides quick open functionality in Nuclide",
   "author": "Nuclide : Core UI",
-  "atomTestRunner": "../../lib/test-runner-entry.js",
   "nuclide": {
     "configMetadata": {
       "pathComponents": [
@@ -20,8 +19,7 @@
         "description": "Use current selection to pre-fill search input"
       }
     },
-    "packageType": "Atom",
-    "testRunner": "apm"
+    "packageType": "AtomPackage"
   },
   "consumedServices": {
     "nuclide-quick-open-register-provider": {

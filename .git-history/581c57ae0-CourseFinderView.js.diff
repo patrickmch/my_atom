@@ -1,0 +1,379 @@
+diff --git a/client/js/site/CourseFinderView.js b/client/js/site/CourseFinderView.js
+index de7504f19..22b4a51ae 100644
+--- a/client/js/site/CourseFinderView.js
++++ b/client/js/site/CourseFinderView.js
+@@ -1,355 +1,361 @@
+ 'use strict';
+ 
+ var $ = require('jquery');
+ var SearchView = require('./SearchView');
+ require('jquery.cookie');
+ require('foundation-sites');
+ 
+ var filtersSelector = '.filters',
+     filterButtonsSelector = '.filter-buttons',
+     destinationAccordion = 'destination-accordion',
+     dateAccordion = 'date-range-accordion',
+     ageAccordion = 'age-accordion',
+     typeAccordion = 'type-accordion',
+     skillAccordion = 'skill-accordion',
+     durationAccordion = 'duration-accordion',
+     locationAccordion = 'locations-accordion',
+     accordions = [
+       destinationAccordion,
+       dateAccordion,
+       ageAccordion,
+       typeAccordion,
+       skillAccordion,
+       durationAccordion,
+       locationAccordion
+     ];
+ 
+ var openCookie = 'open',
+     closeCookie = 'close';
+ 
+ var windowWidth;
+ 
+ function setAccordion(accordion, cookie) {
+-  var targetFilter = $('.' + accordion);
+-  var targetContent = $('.' + accordion + ' .accordion-content');
++  var targetFilter = $('#' + accordion);
++  var targetContent = $('#' + accordion + ' .accordion-content');
+   var element = new Foundation.Accordion(targetFilter);
+   if (cookie === openCookie) {
+     element.down(targetContent);
+   } else {
+     element.up(targetContent);
+   }
+ }
+ 
+ function _setAccordionAsActive(accordion) {
+   setAccordion(accordion, openCookie);
+ }
+ 
+ function _setAccordionAsClosed(accordion) {
+   setAccordion(accordion, closeCookie);
+ }
+ 
+ /**
+  * Represents the filter navigation on the coursefinder.
+  * @module
+  */
+ 
+ var CourseFinderView = SearchView.extend({
+ 
+   events: {
+     'click .js-button-apply-filters': 'submitSearchForm',
+     'click .expose-filters': 'exposeFilters',
+     'click .hide-filters': 'hideFilters',
+     'click #grid-view': 'showGridView',
+     'click #list-view': 'showListView',
+     'change #id_sort': 'updateSort',
+     'change input[type=checkbox]': 'submitSearchForm',
+     'change #id_age': 'submitSearchForm',
+     'change #location_states': 'submitSearchForm',
+     'change #location_countries': 'submitSearchForm'
+   },
+ 
+   cookies: {
+     destinationAccordion: $('.destination-accordion .accordion-title'),
+     dateAccordion: $('.date-range-accordion .accordion-title'),
+     ageAccordion: $('.age-accordion .accordion-title'),
+     typeAccordion: $('.type-accordion .accordion-title'),
+     skillAccordion: $('.skill-accordion .accordion-title'),
+     durationAccordion: $('.duration-accordion .accordion-title'),
+     locationAccordion: $('.locations-accordion .accordion-title')
+   },
+ 
+   /**
+    * @param {string} options.el - the filter container
+    */
+   initialize(options) {
+     var that = this;
+     this.bodyClass = 'page-shows-filters';
+     this.el = options.el;
+     this.$el = $(this.el);
+     this.filters = $(filtersSelector);
+     this.exposeFiltersToggle = $('.expose-filters');
+     this.hideFiltersToggle = $('.hide-filters');
+     this.filterButtons = $(filterButtonsSelector);
+ 
+     this.hideFiltersIfSmall();
+     $(window).resize(this.hideFiltersIfSmall);
+ 
+     this.setResetFilterListeners();
+ 
+     this.setAccordions();
+ 
+     this.gridView = $('.search-results-grid-view');
+     this.listView = $('#search-results-list-view');
+     this.gridToggle = $('#grid-view');
+     this.listToggle = $('#list-view');
+     this.cookie = 'course-search-grid-list-view';
+     this.gridViewChoice = 'grid-view';
+     this.listViewChoice = 'list-view';
+     this.activeClass = 'is-active';
+ 
+     this.setView();
+ 
+     this.setCourseTabAsSelected();
+ 
+     $('#search-form').keyup(function(e) {
+       if ( e && e.keyCode === 13 ) {
+         // enter
+         that.submitSearchForm(e);
+       }
+     });
+   },
+ 
+   // Underlines Courses in the menu bar to indicate you are on that page.
+   // Because the Django CMS page has a redirect this does not automatically
+   // get applied, so we have to manually update the html.
+   setCourseTabAsSelected() {
+     var courseTab = $('.js-menu-item:has(a[href="/coursefinder/course_search/"])');
+     courseTab.removeClass('sibling');
+     courseTab.addClass('selected');
+   },
+ 
+   submitSearchForm(e) {
+     e.preventDefault();
+ 
+     // Disable all unselected form elements so that they won't get
+     // passed as an empty query param
+     var searchForm = $('#search-form');
+     this.disableInputs(searchForm,
+       '.js-search-bar-input',
+       null);
+     searchForm.find('select').each(function(i, obj) {
+       if (obj.value == "") {
+         obj.setAttribute('disabled', true);
+       }
+     });
+     searchForm.find('.datepicker').each(function(i, obj) {
+       if (obj.value == "") {
+         obj.setAttribute('disabled', true);
+       }
+     });
+-
++    $('#accordion-filters').children().each(function(){
++      let current_accordion = $(this);
++      if (current_accordion.hasClass('is-active')){
++        $.cookie(current_accordion.attr('id'), openCookie);
++      } else {
++        $.cookie(current_accordion.attr('id'), closeCookie);
++      }
++    });
+     searchForm.submit();
+     $('body').removeClass(this.bodyClass);
+   },
+ 
+   //
+   // Listeners for the applied filters buttons on mobile
+   // Used to remove the query param from the search
+   //
+   setResetFilterListeners() {
+     var filterToSearchParams = [
+       // [filter, param, couldHaveMoreThanOneValue]
+       ['start-months-filter', 'start_months', false],
+       ['end-months-filter', 'end_months', false],
+       ['age-filter', 'age', false],
+       ['query-string-filter', 'q', false],
+       ['pillar-filter', 'course_type_categories', true],
+       ['country-filter', 'location_countries', true],
+       ['state-filter', 'location_states', true],
+       ['type-filter', 'category', true],
+       ['skills-filter', 'skills', true],
+       ['duration-filter', 'duration', true],
+       ['location-filter', 'location_nols', true]
+     ];
+ 
+     var queryStr = window.location.search.substr(1); // Remove '?'
+     // [q=x, start_months=2018-03-31]
+     var params = queryStr.split('&');
+     $('.reset-filter button.close').click(function(event) {
+       event.preventDefault();
+       var resetFilterButton = event.target.parentElement,
+           valueElement = resetFilterButton.getElementsByTagName('span')[0],
+           paramValue = valueElement.textContent;
+       var removedParam = false;
+       // [filter-button, reset-filter, start-months-filter]
+       resetFilterButton.classList.forEach(function(cls) {
+         if (cls === 'filter-button' || cls === 'reset-filter') {
+           return;
+         }
+         if (removedParam) {
+           return;
+         }
+         filterToSearchParams.forEach(function(filter) {
+           if (removedParam) {
+             return;
+           }
+           var param = filter[1],
+               couldHaveMoreThanOneValue = filter[2];
+           filter = filter[0];
+           if (filter === cls) {
+             params.forEach(function(searchParamStr, idx) {
+               if (removedParam) {
+                 return;
+               }
+               searchParamStr = searchParamStr.split('=');
+               var key = searchParamStr[0],
+                   value = searchParamStr[1];
+               value = value.split('+').join(' ');
+               value = decodeURIComponent(value);
+               if (key === param) {
+                 if (couldHaveMoreThanOneValue) {
+                   if (paramValue !== value) {
+                     return;
+                   }
+                 }
+                 params.splice(idx, 1);
+                 removedParam = true;
+               }
+             });
+           }
+         });
+       });
+       var search = '?';
+       search = search + params.join('&');
+       window.location.search = search;
+     });
+   },
+ 
+   //
+   // Set accordion filters open on page load based on window width...
+   //
+   _setAccordionsForWidth() {
+     var filtersExposedDesktop = [
+       destinationAccordion,
+       dateAccordion,
+       ageAccordion
+     ];
+     if ($(window).width() >= 640) {
+       filtersExposedDesktop.forEach(_setAccordionAsActive);
+     }
+   },
+ 
+-  setAccordions() {
++  setAccordions(accordions) {
+     // check for cookies
+     var userHasSetCookies = false;
+     accordions.forEach(function(accordion) {
+-      // Set open/close listeners
+-      var target = $('.' + accordion);
+-      target.on('down.zf.accordion', function() {
+-        $.cookie(accordion, openCookie);
+-      });
+-      target.on('up.zf.accordion', function() {
+-        $.cookie(accordion, closeCookie);
+-      });
+-
+       // Set as open or closed based on cookie or width
++      // var target = $('.' + accordion);
++      // target.on('down.zf.accordion', function() {
++      //   $.cookie(accordion, openCookie);
++      // });
++      // target.on('up.zf.accordion', function() {
++      //   $.cookie(accordion, closeCookie);
++      // });
++
+       var cookieValue = $.cookie(accordion);
+       if (cookieValue === openCookie) {
+         userHasSetCookies = true;
+         _setAccordionAsActive(accordion);
+       } else if (cookieValue === closeCookie) {
+         userHasSetCookies = true;
+         _setAccordionAsClosed(accordion);
+       }
+     });
+     if (!userHasSetCookies) {
+       this._setAccordionsForWidth();
+     }
+   },
+ 
+   //
+   // Show the Expose Filters/Hide Filters toggle only when on mobile
+   //
+   hideFiltersIfSmall() {
+     if (windowWidth && windowWidth === $(window).width()) {
+       // Dont need to do anything because width hasn't changed
+       // and we don't want to trigger filter hiding accidentally
+       return;
+     } else {
+       windowWidth = $(window).width();
+     }
+     if (windowWidth < 640) {
+       $(filtersSelector).hide();
+       $(filterButtonsSelector).hide();
+     } else {
+       $(filtersSelector).show();
+       $(filterButtonsSelector).show();
+     }
+   },
+ 
+   exposeFilters() {
+     this.filters.show();
+     this.filterButtons.show();
+     this.exposeFiltersToggle.hide();
+     this.hideFiltersToggle.show();
+   },
+ 
+   hideFilters() {
+     this.filters.hide();
+     this.filterButtons.hide();
+     this.exposeFiltersToggle.show();
+     this.hideFiltersToggle.hide();
+   },
+ 
+   // Grid/List view setters
+   setView() {
+     var view = $.cookie(this.cookie);
+     if (view == 'grid-view') {
+       this.showGridView();
+     } else {
+       this.showListView();
+     }
+   },
+ 
+   showGridView() {
+     this.gridView.show();
+     this.listView.hide();
+     this.gridToggle.addClass(this.activeClass);
+     this.listToggle.removeClass(this.activeClass);
+     $.cookie(this.cookie, this.gridViewChoice);
+   },
+ 
+   showListView() {
+     this.listView.show();
+     this.gridView.hide();
+     this.gridToggle.removeClass(this.activeClass);
+     this.listToggle.addClass(this.activeClass);
+     $.cookie(this.cookie, this.listViewChoice);
+   },
+ 
+   updateSort(event) {
+     var selectedValue = event.target.value;
+     // refresh url with sort=selectedValue
+     var queryStr = window.location.search;
+     if (queryStr === '' || queryStr === '?') {
+       window.location.search = '?sort=' + selectedValue;
+     } else if (!queryStr.includes('sort=')) {
+       window.location.search = queryStr + '&sort=' + selectedValue;
+     } else {
+       // replace old sort with selectedValue
+       queryStr = queryStr.substr(1);
+       var queryParams = queryStr.split('&')
+       queryParams.forEach(function(param, idx) {
+         var splitParam = param.split('=');
+         if (splitParam[0] === 'sort') {
+           var newParam = 'sort=' + selectedValue;
+           queryParams.splice(idx, 1, newParam);
+           window.location.search = '?' + queryParams.join('&');
+         }
+       });
+     }
+   }
+ 
+ });
+ 
+ module.exports = CourseFinderView;

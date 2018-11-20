@@ -1108,7 +1108,10 @@ Object.defineProperty(module.exports, "defs", {
         }, {
           name: "documentation",
           type: {
-            kind: "string"
+            kind: "nullable",
+            type: {
+              kind: "string"
+            }
           },
           optional: true
         }]
@@ -1133,16 +1136,22 @@ Object.defineProperty(module.exports, "defs", {
         }, {
           name: "documentation",
           type: {
-            kind: "string"
+            kind: "nullable",
+            type: {
+              kind: "string"
+            }
           },
           optional: true
         }, {
           name: "parameters",
           type: {
-            kind: "array",
+            kind: "nullable",
             type: {
-              kind: "named",
-              name: "SignatureParameter"
+              kind: "array",
+              type: {
+                kind: "named",
+                name: "SignatureParameter"
+              }
             }
           },
           optional: true
@@ -1172,13 +1181,19 @@ Object.defineProperty(module.exports, "defs", {
         }, {
           name: "activeSignature",
           type: {
-            kind: "number"
+            kind: "nullable",
+            type: {
+              kind: "number"
+            }
           },
           optional: true
         }, {
           name: "activeParameter",
           type: {
-            kind: "number"
+            kind: "nullable",
+            type: {
+              kind: "number"
+            }
           },
           optional: true
         }]

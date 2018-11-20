@@ -1,4 +1,4 @@
-'use strict';
+"use strict";
 
 Object.defineProperty(exports, "__esModule", {
   value: true
@@ -6,60 +6,71 @@ Object.defineProperty(exports, "__esModule", {
 exports.activate = activate;
 exports.deactivate = deactivate;
 
-var _viewableFromReactElement;
+function _viewableFromReactElement() {
+  const data = require("../../commons-atom/viewableFromReactElement");
 
-function _load_viewableFromReactElement() {
-  return _viewableFromReactElement = require('../../commons-atom/viewableFromReactElement');
+  _viewableFromReactElement = function () {
+    return data;
+  };
+
+  return data;
 }
 
-var _UniversalDisposable;
+function _UniversalDisposable() {
+  const data = _interopRequireDefault(require("../../../modules/nuclide-commons/UniversalDisposable"));
 
-function _load_UniversalDisposable() {
-  return _UniversalDisposable = _interopRequireDefault(require('../../../modules/nuclide-commons/UniversalDisposable'));
+  _UniversalDisposable = function () {
+    return data;
+  };
+
+  return data;
 }
 
-var _Inspector;
+function _Inspector() {
+  const data = _interopRequireWildcard(require("./ui/Inspector"));
 
-function _load_Inspector() {
-  return _Inspector = _interopRequireDefault(require('./ui/Inspector'));
+  _Inspector = function () {
+    return data;
+  };
+
+  return data;
 }
 
-var _Inspector2;
+var React = _interopRequireWildcard(require("react"));
 
-function _load_Inspector2() {
-  return _Inspector2 = require('./ui/Inspector');
+function _destroyItemWhere() {
+  const data = require("../../../modules/nuclide-commons-atom/destroyItemWhere");
+
+  _destroyItemWhere = function () {
+    return data;
+  };
+
+  return data;
 }
 
-var _react = _interopRequireWildcard(require('react'));
-
-var _destroyItemWhere;
-
-function _load_destroyItemWhere() {
-  return _destroyItemWhere = require('../../../modules/nuclide-commons-atom/destroyItemWhere');
-}
-
-function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
+function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) { var desc = Object.defineProperty && Object.getOwnPropertyDescriptor ? Object.getOwnPropertyDescriptor(obj, key) : {}; if (desc.get || desc.set) { Object.defineProperty(newObj, key, desc); } else { newObj[key] = obj[key]; } } } } newObj.default = obj; return newObj; } }
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-let disposables = null; /**
-                         * Copyright (c) 2015-present, Facebook, Inc.
-                         * All rights reserved.
-                         *
-                         * This source code is licensed under the license found in the LICENSE file in
-                         * the root directory of this source tree.
-                         *
-                         *  strict-local
-                         * @format
-                         */
+/**
+ * Copyright (c) 2015-present, Facebook, Inc.
+ * All rights reserved.
+ *
+ * This source code is licensed under the license found in the LICENSE file in
+ * the root directory of this source tree.
+ *
+ *  strict-local
+ * @format
+ */
+let disposables = null;
 
 function activate() {
-  disposables = new (_UniversalDisposable || _load_UniversalDisposable()).default(registerCommandAndOpener());
+  disposables = new (_UniversalDisposable().default)(registerCommandAndOpener());
 }
 
 function deactivate() {
   if (!(disposables != null)) {
-    throw new Error('Invariant violation: "disposables != null"');
+    throw new Error("Invariant violation: \"disposables != null\"");
   }
 
   disposables.dispose();
@@ -67,11 +78,11 @@ function deactivate() {
 }
 
 function registerCommandAndOpener() {
-  return new (_UniversalDisposable || _load_UniversalDisposable()).default(atom.workspace.addOpener(uri => {
-    if (uri === (_Inspector2 || _load_Inspector2()).WORKSPACE_VIEW_URI) {
-      return (0, (_viewableFromReactElement || _load_viewableFromReactElement()).viewableFromReactElement)(_react.createElement((_Inspector || _load_Inspector()).default, null));
+  return new (_UniversalDisposable().default)(atom.workspace.addOpener(uri => {
+    if (uri === _Inspector().WORKSPACE_VIEW_URI) {
+      return (0, _viewableFromReactElement().viewableFromReactElement)(React.createElement(_Inspector().default, null));
     }
-  }), () => (0, (_destroyItemWhere || _load_destroyItemWhere()).destroyItemWhere)(item => item instanceof (_Inspector || _load_Inspector()).default), atom.commands.add('atom-workspace', 'nuclide-react-inspector:toggle', () => {
-    atom.workspace.toggle((_Inspector2 || _load_Inspector2()).WORKSPACE_VIEW_URI);
+  }), () => (0, _destroyItemWhere().destroyItemWhere)(item => item instanceof _Inspector().default), atom.commands.add('atom-workspace', 'nuclide-react-inspector:toggle', () => {
+    atom.workspace.toggle(_Inspector().WORKSPACE_VIEW_URI);
   }));
 }

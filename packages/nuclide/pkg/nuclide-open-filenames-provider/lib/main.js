@@ -1,14 +1,18 @@
-'use strict';
+"use strict";
 
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
 exports.registerProvider = registerProvider;
 
-var _OpenFileNameProvider;
+function _OpenFileNameProvider() {
+  const data = _interopRequireDefault(require("./OpenFileNameProvider"));
 
-function _load_OpenFileNameProvider() {
-  return _OpenFileNameProvider = _interopRequireDefault(require('./OpenFileNameProvider'));
+  _OpenFileNameProvider = function () {
+    return data;
+  };
+
+  return data;
 }
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
@@ -23,7 +27,6 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
  *  strict-local
  * @format
  */
-
 function registerProvider() {
-  return (_OpenFileNameProvider || _load_OpenFileNameProvider()).default;
+  return _OpenFileNameProvider().default;
 }

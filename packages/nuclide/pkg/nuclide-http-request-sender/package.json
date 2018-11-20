@@ -4,10 +4,8 @@
   "version": "0.0.0",
   "description": "Configure and send HTTP requests from Nuclide via a dedicated UI.",
   "author": "NEEDS OWNER",
-  "atomTestRunner": "../../lib/test-runner-entry.js",
   "nuclide": {
-    "packageType": "Atom",
-    "testRunner": "apm"
+    "packageType": "AtomPackage"
   },
   "providedServices": {
     "nuclide-http-request-sender": {

@@ -1,75 +1,32 @@
-"""local settings intended to be used in the NOLS default dev environment."""
-
-import os
-import sys
-from .base import *
-
-# Toggle use of local database VM
-USE_ORA_VM = os.getenv('ORAVM', False)
-if USE_ORA_VM:
-    NOLS_DA_DSN = 'oravm'
-    NOLS_DA_HTTP_HOST = 'oravm'
-    DATABASES['default']['NAME'] = 'oravm'
-    DATABASES['default']['HOST'] = 'oravm'
-    FLAMINGO_PASSWORD = 'florida'
-
-DEBUG = True
-TEMPLATE_DEBUG = DEBUG
-
-NOLS_WEB_HOST = 'localhost:8888'
-NEXUS_SERVER = NOLS_WEB_HOST if USE_ORA_VM else 'nexusclone.nols.edu'
-
-LOCAL_USER = environ['USER']
-DATABASES['default']['USER'] += '_%s' % LOCAL_USER
-
-# Test Database
-DATABASES['default']['TEST'] = {
-    'NAME': '_'.join(['test', DATABASES['default']['NAME'], LOCAL_USER])
-}
-DATABASES['default']['TEST']['TBLSPACE'] = '_'.join(
-    ['test', DATABASES['default']['NAME'], LOCAL_USER]
-)
-DATABASES['default']['TEST']['TBLSPACE_TMP'] = '_'.join(
-    ['test', DATABASES['default']['NAME'], 'temp', LOCAL_USER]
-)
-
-TEST_FIRST_NAME = u''.join([unicode(LOCAL_USER), u'\xe9'])
-
-CACHES['default'] = {
-    'BACKEND': 'django.core.cache.backends.locmem.LocMemCache'
-}
-
-# debug toolbar settings
-USE_DEBUG_TOOLBAR = False
-INSTALLED_APPS.append('sslserver')
-if USE_DEBUG_TOOLBAR:
-    INSTALLED_APPS.append('debug_toolbar')
-    MIDDLEWARE_CLASSES.append('debug_toolbar.middleware.DebugToolbarMiddleware')
-
-
-EMAIL_BACKEND = 'django.core.mail.backends.filebased.EmailBackend'
-EMAIL_FILE_PATH = '/tmp/website-email'
-
-LOGGING['handlers']['file']['level'] = 'DEBUG'
-for key in LOGGING['loggers'].keys():
-    LOGGING['loggers'][key]['handlers'] = ['mail_admins', 'file']
-
-ALLOWED_HOSTS.append('localhost')
-
-AXES_IP_WHITELIST.append('127.0.0.1')
-
-# Use this test api key in dev. You can view activity from this api key by logging into NOLS
-# Mandrill account, and switching to test mode.
-MANDRILL_API_KEY = 'rp6IowynBLZ4M3PnoMnAUw'
-if len(sys.argv) > 1 and (sys.argv[1] == 'test' or sys.argv[0] == 'nosetests'):
-    MANDRILL_BACKEND = 'django.core.mail.backends.locmem.EmailBackend'
-
-MEDIA_URL = '/'
-
-STATICFILES_STORAGE = 'django.contrib.staticfiles.storage.StaticFilesStorage'
-
-# CMS_HOST defaults to www.nols.edu
-# CMS_HOST = 'http://testweb.nols.edu'
-# CMS_HOST = 'http://localhost:3000'
-# API_HOST defaults to cs1.dev.nols.edu, but if you wan to run api locally, uncomment this
-# API_HOST = 'localhost:8080'
+<div id="{{ form.form_name }}" class="reveal fade" data-reveal tabindex="-1">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <button type="button" class="close" data-close aria-hidden="true">x</button>
+      <form action="{{ form.form_action }}{% if form.redirect_name %}?{{ form.redirect_name }}={{ redirect }}{% endif %}"
+            method="post"
+            class="form-horizontal modal-form"
+            data-form-url="{% block validation_url %}{% url "validate_core_form" form.form_name %}{% endblock %}">
+          <div class="modal-body container-fluid  content_container-fluid row">
+              <div class="modal-header">
+                  <div class="modal-header">
+                    <h3 class="modal-title">
+                      {{ form.title }}
+                    </h3>
+                  </div>
+                  <div class="modal-body column small-12 error-container">
+                    {% with form=form.form %}
+                      {% include "bs_responsive_form_layout.html" %}
+                    {% endwith %}
+                 </div>
+                  <div class="small-12 medium-8 column modal-buttons">
+                    <button type="button" class="button button--hollow" data-close><span>Cancel</span></button>
+                    <input class="button " type="submit" value="Submit"/>
+                  </div>
+                  {% block below_buttons %}
+                  {% endblock %}
+              </div>
+          </div>
+      </form>
+    </div>
+  </div>
+</div>

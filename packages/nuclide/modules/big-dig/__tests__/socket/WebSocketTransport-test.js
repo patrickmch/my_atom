@@ -1,17 +1,25 @@
-'use strict';
+"use strict";
 
-var _events = _interopRequireDefault(require('events'));
+var _events = _interopRequireDefault(require("events"));
 
-var _WebSocketTransport;
+function _WebSocketTransport() {
+  const data = require("../../src/socket/WebSocketTransport");
 
-function _load_WebSocketTransport() {
-  return _WebSocketTransport = require('../../src/socket/WebSocketTransport');
+  _WebSocketTransport = function () {
+    return data;
+  };
+
+  return data;
 }
 
-var _compression;
+function _compression() {
+  const data = require("../../src/socket/compression");
 
-function _load_compression() {
-  return _compression = require('../../src/socket/compression');
+  _compression = function () {
+    return data;
+  };
+
+  return data;
 }
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
@@ -26,13 +34,15 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
  *
  * 
  * @format
+ * @emails oncall+nuclide
  */
-
 function mockSocket() {
   const result = new _events.default();
+
   result.close = () => {
     result.emit('close');
   };
+
   jest.spyOn(result, 'on');
   return result;
 }
@@ -40,21 +50,22 @@ function mockSocket() {
 describe('WebSocketTransport', () => {
   let socket = null;
   let transport = null;
-
   beforeEach(() => {
     socket = mockSocket();
-    transport = new (_WebSocketTransport || _load_WebSocketTransport()).WebSocketTransport('42', socket, { syncCompression: false });
+    transport = new (_WebSocketTransport().WebSocketTransport)('42', socket, {
+      syncCompression: false
+    });
   });
-
   it('constructor', () => {
     expect(transport.isClosed()).toBe(false);
     expect(socket.on).toHaveBeenCalledWith('message', expect.any(Function));
     expect(socket.on).toHaveBeenCalledWith('error', expect.any(Function));
     expect(socket.on).toHaveBeenCalledWith('close', expect.any(Function));
   });
-
   it('can receive a message', () => {
-    const payload = JSON.stringify({ foo: 42 });
+    const payload = JSON.stringify({
+      foo: 42
+    });
     let result;
     transport.onMessage().subscribe(message => {
       result = message;
@@ -62,25 +73,26 @@ describe('WebSocketTransport', () => {
     socket.emit('message', payload, {});
     expect(result).toEqual(payload);
   });
-
   it('send - success', async () => {
     const s = socket;
     s.send = jest.fn((data, _, callback) => callback(null));
-    const data = JSON.stringify({ foo: 42 });
+    const data = JSON.stringify({
+      foo: 42
+    });
     const result = await transport.send(data);
     expect(result).toBe(true);
     expect(socket.send).toBeCalledWith(data, expect.any(Object), expect.any(Function));
   });
-
   it('send - error', async () => {
     const s = socket;
     s.send = jest.fn((data, _, callback) => callback(new Error()));
-    const data = JSON.stringify({ foo: 42 });
+    const data = JSON.stringify({
+      foo: 42
+    });
     const result = await transport.send(data);
     expect(result).toBe(false);
     expect(socket.send).toBeCalledWith(data, expect.any(Object), expect.any(Function));
   });
-
   it('close event', () => {
     let closed = false;
     transport.onClose(() => {
@@ -90,12 +102,10 @@ describe('WebSocketTransport', () => {
     });
     socket.emit('close');
     expect(transport.isClosed()).toBe(true);
-    expect(closed).toBe(true);
+    expect(closed).toBe(true); // This shouldn't throw
 
-    // This shouldn't throw
     socket.emit('close');
   });
-
   it('manual close', () => {
     let closed = false;
     transport.onClose(() => {
@@ -105,12 +115,10 @@ describe('WebSocketTransport', () => {
     });
     transport.close();
     expect(transport.isClosed()).toBe(true);
-    expect(closed).toBe(true);
+    expect(closed).toBe(true); // This shouldn't throw
 
-    // This shouldn't throw
     socket.emit('close');
   });
-
   it('error', () => {
     let error;
     const expected = new Error('error message');
@@ -118,12 +126,12 @@ describe('WebSocketTransport', () => {
       error = actual;
     });
     socket.emit('error', expected);
-
     expect(error).toBe(expected);
   });
-
   it('can send compressed messages', async () => {
-    transport = new (_WebSocketTransport || _load_WebSocketTransport()).WebSocketTransport('42', socket, { syncCompression: true });
+    transport = new (_WebSocketTransport().WebSocketTransport)('42', socket, {
+      syncCompression: true
+    });
     const s = socket;
     s.send = jest.fn((data, _, callback) => callback(null));
     const data = 'a'.repeat(10000);
@@ -132,16 +140,17 @@ describe('WebSocketTransport', () => {
     expect(s.send).toBeCalled();
     const buffer = s.send.mock.calls[0][0];
     expect(buffer instanceof Buffer).toBe(true);
-    expect((0, (_compression || _load_compression()).decompress)(buffer)).toBe(data);
+    expect((0, _compression().decompress)(buffer)).toBe(data);
   });
-
   it('can receive compressed messages', () => {
-    const payload = (0, (_compression || _load_compression()).compress)('abcd');
+    const payload = (0, _compression().compress)('abcd');
     let result;
     transport.onMessage().subscribe(message => {
       result = message;
     });
-    socket.emit('message', payload, { binary: true });
+    socket.emit('message', payload, {
+      binary: true
+    });
     expect(result).toEqual('abcd');
   });
 });

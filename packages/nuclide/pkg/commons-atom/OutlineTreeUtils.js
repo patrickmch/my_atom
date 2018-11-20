@@ -1,10 +1,11 @@
-'use strict';
+"use strict";
 
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
 exports.iconForOutlineKind = iconForOutlineKind;
 exports.iconForOutlineTree = iconForOutlineTree;
+
 /**
  * Copyright (c) 2015-present, Facebook, Inc.
  * All rights reserved.
@@ -15,7 +16,6 @@ exports.iconForOutlineTree = iconForOutlineTree;
  *  strict-local
  * @format
  */
-
 const OUTLINE_KIND_TO_ICON = {
   array: 'type-array',
   boolean: 'type-boolean',
@@ -42,12 +42,16 @@ function iconForOutlineKind(kind) {
 }
 
 function iconForOutlineTree(outlineTree) {
-  const { kind } = outlineTree;
-  // $FlowFixMe these come from the RPC and are untyped.
+  const {
+    kind
+  } = outlineTree; // $FlowFixMe these come from the RPC and are untyped.
+
   const icon = outlineTree.icon;
   const iconName = icon != null ? icon : kind && iconForOutlineKind(kind);
+
   if (iconName == null) {
     return 'code';
   }
+
   return iconName;
 }

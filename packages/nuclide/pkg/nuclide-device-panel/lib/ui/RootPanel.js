@@ -1,79 +1,130 @@
-'use strict';
+"use strict";
 
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.RootPanel = undefined;
+exports.RootPanel = void 0;
 
-var _bindObservableAsProps;
+function _bindObservableAsProps() {
+  const data = require("../../../../modules/nuclide-commons-ui/bindObservableAsProps");
 
-function _load_bindObservableAsProps() {
-  return _bindObservableAsProps = require('../../../../modules/nuclide-commons-ui/bindObservableAsProps');
+  _bindObservableAsProps = function () {
+    return data;
+  };
+
+  return data;
 }
 
-var _TaskButton;
+function _TaskButton() {
+  const data = require("./TaskButton");
 
-function _load_TaskButton() {
-  return _TaskButton = require('./TaskButton');
+  _TaskButton = function () {
+    return data;
+  };
+
+  return data;
 }
 
-var _react = _interopRequireWildcard(require('react'));
+var React = _interopRequireWildcard(require("react"));
 
-var _PanelComponentScroller;
+function _PanelComponentScroller() {
+  const data = require("../../../../modules/nuclide-commons-ui/PanelComponentScroller");
 
-function _load_PanelComponentScroller() {
-  return _PanelComponentScroller = require('../../../../modules/nuclide-commons-ui/PanelComponentScroller');
+  _PanelComponentScroller = function () {
+    return data;
+  };
+
+  return data;
 }
 
-var _Selectors;
+function _Selectors() {
+  const data = require("./Selectors");
 
-function _load_Selectors() {
-  return _Selectors = require('./Selectors');
+  _Selectors = function () {
+    return data;
+  };
+
+  return data;
 }
 
-var _DeviceTable;
+function _DeviceTable() {
+  const data = require("./DeviceTable");
 
-function _load_DeviceTable() {
-  return _DeviceTable = require('./DeviceTable');
+  _DeviceTable = function () {
+    return data;
+  };
+
+  return data;
 }
 
-var _DevicePanel;
+function _DevicePanel() {
+  const data = require("./DevicePanel");
 
-function _load_DevicePanel() {
-  return _DevicePanel = require('./DevicePanel');
+  _DevicePanel = function () {
+    return data;
+  };
+
+  return data;
 }
 
-var _immutable;
+function Immutable() {
+  const data = _interopRequireWildcard(require("immutable"));
 
-function _load_immutable() {
-  return _immutable = _interopRequireWildcard(require('immutable'));
+  Immutable = function () {
+    return data;
+  };
+
+  return data;
 }
 
-function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
+function _nullthrows() {
+  const data = _interopRequireDefault(require("nullthrows"));
 
-class RootPanel extends _react.Component {
+  _nullthrows = function () {
+    return data;
+  };
+
+  return data;
+}
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) { var desc = Object.defineProperty && Object.getOwnPropertyDescriptor ? Object.getOwnPropertyDescriptor(obj, key) : {}; if (desc.get || desc.set) { Object.defineProperty(newObj, key, desc); } else { newObj[key] = obj[key]; } } } } newObj.default = obj; return newObj; } }
+
+/**
+ * Copyright (c) 2015-present, Facebook, Inc.
+ * All rights reserved.
+ *
+ * This source code is licensed under the license found in the LICENSE file in
+ * the root directory of this source tree.
+ *
+ * 
+ * @format
+ */
+class RootPanel extends React.Component {
   constructor(props) {
     super(props);
 
     this._getHostSelectorComponents = () => {
-      return this.props.deviceTypeComponents.get('host_selector') || (_immutable || _load_immutable()).List();
+      return this.props.deviceTypeComponents.get('host_selector') || Immutable().List();
     };
 
     this._getDeviceTypeComponents = position => {
       const components = this.props.deviceTypeComponents.get(position);
+
       if (components == null) {
         return null;
       }
+
       const nodes = components.map(component => {
         const Type = component.type;
-        return _react.createElement(Type, { key: component.key });
+        return React.createElement(Type, {
+          key: component.key
+        });
       });
-
-      return _react.createElement(
-        'div',
-        { className: `block nuclide-device-panel-components-${position}` },
-        nodes
-      );
+      return React.createElement("div", {
+        className: `block nuclide-device-panel-components-${position}`
+      }, nodes);
     };
 
     this._goToRootPanel = () => {
@@ -81,7 +132,7 @@ class RootPanel extends _react.Component {
     };
 
     if (!(props.hosts.length > 0)) {
-      throw new Error('Invariant violation: "props.hosts.length > 0"');
+      throw new Error("Invariant violation: \"props.hosts.length > 0\"");
     }
   }
 
@@ -98,10 +149,11 @@ class RootPanel extends _react.Component {
     if (this.props.deviceType === null) {
       return null;
     }
-    return _react.createElement((_DeviceTable || _load_DeviceTable()).DeviceTable, {
+
+    return React.createElement(_DeviceTable().DeviceTable, {
       devices: this.props.devices,
-      device: this.props.device,
-      setDevice: this.props.setDevice
+      setDevice: this.props.setDevice,
+      deviceTasks: this.props.deviceTasks
     });
   }
 
@@ -117,80 +169,61 @@ class RootPanel extends _react.Component {
 
   _getTasks() {
     const tasks = Array.from(this.props.deviceTypeTasks).map(task => {
-      const StreamedTaskButton = (0, (_bindObservableAsProps || _load_bindObservableAsProps()).bindObservableAsProps)(task.getTaskEvents().distinctUntilChanged().map(taskEvent => this._taskEventsToProps(task, taskEvent)), (_TaskButton || _load_TaskButton()).TaskButton);
-      return _react.createElement(StreamedTaskButton, { key: task.getName() });
+      const StreamedTaskButton = (0, _bindObservableAsProps().bindObservableAsProps)(task.getTaskEvents().distinctUntilChanged().map(taskEvent => this._taskEventsToProps(task, taskEvent)), _TaskButton().TaskButton);
+      return React.createElement(StreamedTaskButton, {
+        key: task.getName()
+      });
     });
+
     if (tasks.length < 1) {
       return null;
     }
-    return _react.createElement(
-      'div',
-      { className: 'block nuclide-device-panel-tasks-container' },
-      tasks
-    );
+
+    return React.createElement("div", {
+      className: "block nuclide-device-panel-tasks-container"
+    }, tasks);
   }
 
   _getInnerPanel() {
-    if (this.props.device != null) {
-      return _react.createElement(
-        'div',
-        { className: 'block' },
-        _react.createElement((_DevicePanel || _load_DevicePanel()).DevicePanel, {
-          infoTables: this.props.infoTables,
-          appInfoTables: this.props.appInfoTables,
-          processes: this.props.processes,
-          processTasks: this.props.processTasks,
-          deviceTasks: this.props.deviceTasks,
-          goToRootPanel: this._goToRootPanel,
-          toggleProcessPolling: this.props.toggleProcessPolling,
-          isDeviceConnected: this.props.isDeviceConnected
-        })
-      );
+    const {
+      device
+    } = this.props;
+
+    if (device != null) {
+      return React.createElement("div", {
+        className: "block"
+      }, React.createElement(_DevicePanel().DevicePanel, {
+        infoTables: this.props.infoTables,
+        appInfoTables: this.props.appInfoTables,
+        processes: this.props.processes,
+        processTasks: this.props.processTasks,
+        deviceTasks: (0, _nullthrows().default)(this.props.deviceTasks.get(device.identifier)),
+        goToRootPanel: this._goToRootPanel,
+        toggleProcessPolling: this.props.toggleProcessPolling,
+        isDeviceConnected: this.props.isDeviceConnected
+      }));
     }
 
-    return _react.createElement(
-      'div',
-      null,
-      _react.createElement((_Selectors || _load_Selectors()).Selectors, {
-        deviceType: this.props.deviceType,
-        deviceTypes: this.props.deviceTypes,
-        hosts: this.props.hosts,
-        host: this.props.host,
-        setDeviceType: this.props.setDeviceType,
-        toggleDevicePolling: this.props.toggleDevicePolling,
-        setHost: this.props.setHost,
-        hostSelectorComponents: this._getHostSelectorComponents()
-      }),
-      this._getDeviceTypeComponents('above_table'),
-      _react.createElement(
-        'div',
-        { className: 'block' },
-        this._createDeviceTable()
-      ),
-      this._getTasks(),
-      this._getDeviceTypeComponents('below_table')
-    );
+    return React.createElement("div", null, React.createElement(_Selectors().Selectors, {
+      deviceType: this.props.deviceType,
+      deviceTypes: this.props.deviceTypes,
+      hosts: this.props.hosts,
+      host: this.props.host,
+      setDeviceType: this.props.setDeviceType,
+      toggleDevicePolling: this.props.toggleDevicePolling,
+      setHost: this.props.setHost,
+      hostSelectorComponents: this._getHostSelectorComponents()
+    }), this._getDeviceTypeComponents('above_table'), React.createElement("div", {
+      className: "block"
+    }, this._createDeviceTable()), this._getTasks(), this._getDeviceTypeComponents('below_table'));
   }
 
   render() {
-    return _react.createElement(
-      (_PanelComponentScroller || _load_PanelComponentScroller()).PanelComponentScroller,
-      null,
-      _react.createElement(
-        'div',
-        { className: 'nuclide-device-panel-container' },
-        this._getInnerPanel()
-      )
-    );
+    return React.createElement(_PanelComponentScroller().PanelComponentScroller, null, React.createElement("div", {
+      className: "nuclide-device-panel-container"
+    }, this._getInnerPanel()));
   }
+
 }
-exports.RootPanel = RootPanel; /**
-                                * Copyright (c) 2015-present, Facebook, Inc.
-                                * All rights reserved.
-                                *
-                                * This source code is licensed under the license found in the LICENSE file in
-                                * the root directory of this source tree.
-                                *
-                                * 
-                                * @format
-                                */
+
+exports.RootPanel = RootPanel;

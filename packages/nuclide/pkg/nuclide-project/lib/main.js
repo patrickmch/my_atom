@@ -1,45 +1,76 @@
-'use strict';
+"use strict";
 
-var _createPackage;
+function _createPackage() {
+  const data = _interopRequireDefault(require("../../../modules/nuclide-commons-atom/createPackage"));
 
-function _load_createPackage() {
-  return _createPackage = _interopRequireDefault(require('../../../modules/nuclide-commons-atom/createPackage'));
+  _createPackage = function () {
+    return data;
+  };
+
+  return data;
 }
 
-var _projects;
+function _projects() {
+  const data = require("../../../modules/nuclide-commons-atom/projects");
 
-function _load_projects() {
-  return _projects = require('../../../modules/nuclide-commons-atom/projects');
+  _projects = function () {
+    return data;
+  };
+
+  return data;
 }
 
-var _UniversalDisposable;
+function _UniversalDisposable() {
+  const data = _interopRequireDefault(require("../../../modules/nuclide-commons/UniversalDisposable"));
 
-function _load_UniversalDisposable() {
-  return _UniversalDisposable = _interopRequireDefault(require('../../../modules/nuclide-commons/UniversalDisposable'));
+  _UniversalDisposable = function () {
+    return data;
+  };
+
+  return data;
 }
 
-var _fsPromise;
+function _fsPromise() {
+  const data = _interopRequireDefault(require("../../../modules/nuclide-commons/fsPromise"));
 
-function _load_fsPromise() {
-  return _fsPromise = _interopRequireDefault(require('../../../modules/nuclide-commons/fsPromise'));
+  _fsPromise = function () {
+    return data;
+  };
+
+  return data;
 }
 
-var _nuclideUri;
+function _nuclideUri() {
+  const data = _interopRequireDefault(require("../../../modules/nuclide-commons/nuclideUri"));
 
-function _load_nuclideUri() {
-  return _nuclideUri = _interopRequireDefault(require('../../../modules/nuclide-commons/nuclideUri'));
+  _nuclideUri = function () {
+    return data;
+  };
+
+  return data;
 }
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
+/**
+ * Copyright (c) 2015-present, Facebook, Inc.
+ * All rights reserved.
+ *
+ * This source code is licensed under the license found in the LICENSE file in
+ * the root directory of this source tree.
+ *
+ * 
+ * @format
+ */
 class Activation {
-
   constructor(state) {
-    this._disposables = new (_UniversalDisposable || _load_UniversalDisposable()).default((0, (_projects || _load_projects()).observeProjectPaths)(async projectPath => {
-      if ((_nuclideUri || _load_nuclideUri()).default.isRemote(projectPath)) {
+    this._disposables = new (_UniversalDisposable().default)((0, _projects().observeProjectPaths)(async projectPath => {
+      if (_nuclideUri().default.isRemote(projectPath)) {
         return;
       }
-      const realPath = await (_fsPromise || _load_fsPromise()).default.realpath(projectPath);
+
+      const realPath = await _fsPromise().default.realpath(projectPath);
+
       if (realPath !== projectPath) {
         atom.notifications.addWarning('You have mounted a non-canonical project path. ' + 'Nuclide only supports mounting canonical paths as local projects.<br />' + '<strong>Some Nuclide features such as Flow might not work properly.</strong>', {
           detail: `Mounted path: ${projectPath}\n \n ` + `Try re-mounting the canonical project path instead:\n${realPath}`
@@ -51,15 +82,7 @@ class Activation {
   dispose() {
     this._disposables.dispose();
   }
-} /**
-   * Copyright (c) 2015-present, Facebook, Inc.
-   * All rights reserved.
-   *
-   * This source code is licensed under the license found in the LICENSE file in
-   * the root directory of this source tree.
-   *
-   * 
-   * @format
-   */
 
-(0, (_createPackage || _load_createPackage()).default)(module.exports, Activation);
+}
+
+(0, _createPackage().default)(module.exports, Activation);

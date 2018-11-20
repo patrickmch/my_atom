@@ -5,9 +5,7 @@ Object.defineProperty(exports, "__esModule", {
 });
 exports.default = createCellPositioner;
 
-var babelPluginFlowReactPropTypes_proptype_Positioner = require('./Masonry').babelPluginFlowReactPropTypes_proptype_Positioner || require('prop-types').any;
-
-var babelPluginFlowReactPropTypes_proptype_CellMeasurerCache = require('./Masonry').babelPluginFlowReactPropTypes_proptype_CellMeasurerCache || require('prop-types').any;
+var _Masonry = require('./Masonry');
 
 function createCellPositioner(_ref) {
   var cellMeasurerCache = _ref.cellMeasurerCache,

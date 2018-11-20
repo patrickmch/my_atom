@@ -1,8 +1,7 @@
-var babelPluginFlowReactPropTypes_proptype_OverscanIndices = require('./types').babelPluginFlowReactPropTypes_proptype_OverscanIndices || require('prop-types').any;
 
-var babelPluginFlowReactPropTypes_proptype_OverscanIndicesGetterParams = require('./types').babelPluginFlowReactPropTypes_proptype_OverscanIndicesGetterParams || require('prop-types').any;
 
 export var SCROLL_DIRECTION_BACKWARD = -1;
+
 export var SCROLL_DIRECTION_FORWARD = 1;
 
 export var SCROLL_DIRECTION_HORIZONTAL = 'horizontal';
@@ -32,3 +31,5 @@ export default function defaultOverscanIndicesGetter(_ref) {
     };
   }
 }
+import { bpfrpt_proptype_OverscanIndicesGetterParams } from './types';
+import { bpfrpt_proptype_OverscanIndices } from './types';

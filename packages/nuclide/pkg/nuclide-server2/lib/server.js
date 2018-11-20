@@ -1,33 +1,53 @@
-'use strict';
+"use strict";
 
-var _nuclideLogging;
+function _nuclideLogging() {
+  const data = require("../../nuclide-logging");
 
-function _load_nuclideLogging() {
-  return _nuclideLogging = require('../../nuclide-logging');
+  _nuclideLogging = function () {
+    return data;
+  };
+
+  return data;
 }
 
-var _nuclideMarshalersCommon;
+function _nuclideMarshalersCommon() {
+  const data = require("../../nuclide-marshalers-common");
 
-function _load_nuclideMarshalersCommon() {
-  return _nuclideMarshalersCommon = require('../../nuclide-marshalers-common');
+  _nuclideMarshalersCommon = function () {
+    return data;
+  };
+
+  return data;
 }
 
-var _nuclideRpc;
+function _nuclideRpc() {
+  const data = require("../../nuclide-rpc");
 
-function _load_nuclideRpc() {
-  return _nuclideRpc = require('../../nuclide-rpc');
+  _nuclideRpc = function () {
+    return data;
+  };
+
+  return data;
 }
 
-var _servicesConfig;
+function _servicesConfig() {
+  const data = _interopRequireDefault(require("../../nuclide-server/lib/servicesConfig"));
 
-function _load_servicesConfig() {
-  return _servicesConfig = _interopRequireDefault(require('../../nuclide-server/lib/servicesConfig'));
+  _servicesConfig = function () {
+    return data;
+  };
+
+  return data;
 }
 
-var _constants;
+function _constants() {
+  const data = require("./constants");
 
-function _load_constants() {
-  return _constants = require('./constants');
+  _constants = function () {
+    return data;
+  };
+
+  return data;
 }
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
@@ -42,34 +62,39 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
  *  strict-local
  * @format
  */
+// @fb-only: import vscodeLaunch from 'fb-big-dig-vscode-server/server';
+(0, _nuclideLogging().initializeLogging)();
 
-(0, (_nuclideLogging || _load_nuclideLogging()).initializeLogging)();
-
-function launch(launcherParams) {
-  const rpcServiceRegistry = new (_nuclideRpc || _load_nuclideRpc()).ServiceRegistry((_nuclideMarshalersCommon || _load_nuclideMarshalersCommon()).getServerSideMarshalers, (_servicesConfig || _load_servicesConfig()).default);
-
-  const { server } = launcherParams;
-  server.addSubscriber((_constants || _load_constants()).NUCLIDE_RPC_TAG, {
+function launch(server) {
+  const rpcServiceRegistry = new (_nuclideRpc().ServiceRegistry)(_nuclideMarshalersCommon().getServerSideMarshalers, _servicesConfig().default);
+  server.addSubscriber(_constants().NUCLIDE_RPC_TAG, {
     onConnection(transport) {
       const rpcTransport = {
         send(message) {
           transport.send(message);
         },
+
         onMessage() {
           return transport.onMessage();
         },
+
         // TODO: Right now, connections are never closed.
         close() {},
+
         isClosed() {
           return false;
         }
+
       };
-      (_nuclideRpc || _load_nuclideRpc()).RpcConnection.createServer(rpcServiceRegistry, rpcTransport, {});
+
+      _nuclideRpc().RpcConnection.createServer(rpcServiceRegistry, rpcTransport, {});
     }
-  });
 
-  return Promise.resolve();
-}
+  }); // Enable VSCode to connect to Nuclide servers by default.
+  // @fb-only: return vscodeLaunch(server);
 
-// eslint-disable-next-line nuclide-internal/no-commonjs
+  return Promise.resolve(); // @oss-only
+} // eslint-disable-next-line nuclide-internal/no-commonjs
+
+
 module.exports = launch;

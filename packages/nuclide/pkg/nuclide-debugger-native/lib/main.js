@@ -1,65 +1,105 @@
-'use strict';
+"use strict";
 
-var _debugger;
+function _debugger() {
+  const data = require("../../../modules/nuclide-commons-atom/debugger");
 
-function _load_debugger() {
-  return _debugger = require('../../../modules/nuclide-commons-atom/debugger');
+  _debugger = function () {
+    return data;
+  };
+
+  return data;
 }
 
-var _createPackage;
+function _createPackage() {
+  const data = _interopRequireDefault(require("../../../modules/nuclide-commons-atom/createPackage"));
 
-function _load_createPackage() {
-  return _createPackage = _interopRequireDefault(require('../../../modules/nuclide-commons-atom/createPackage'));
+  _createPackage = function () {
+    return data;
+  };
+
+  return data;
 }
 
-var _rxjsBundlesRxMinJs = require('rxjs/bundles/Rx.min.js');
+var _rxjsCompatUmdMin = require("rxjs-compat/bundles/rxjs-compat.umd.min.js");
 
-var _BuckTaskRunner;
+function _BuckTaskRunner() {
+  const data = require("../../nuclide-buck/lib/BuckTaskRunner");
 
-function _load_BuckTaskRunner() {
-  return _BuckTaskRunner = require('../../nuclide-buck/lib/BuckTaskRunner');
+  _BuckTaskRunner = function () {
+    return data;
+  };
+
+  return data;
 }
 
-var _UniversalDisposable;
+function _UniversalDisposable() {
+  const data = _interopRequireDefault(require("../../../modules/nuclide-commons/UniversalDisposable"));
 
-function _load_UniversalDisposable() {
-  return _UniversalDisposable = _interopRequireDefault(require('../../../modules/nuclide-commons/UniversalDisposable'));
+  _UniversalDisposable = function () {
+    return data;
+  };
+
+  return data;
 }
 
-var _utils;
+function _utils() {
+  const data = require("../../nuclide-debugger-vsp/lib/utils");
 
-function _load_utils() {
-  return _utils = require('../../nuclide-debugger-vsp/lib/utils');
+  _utils = function () {
+    return data;
+  };
+
+  return data;
 }
 
-var _nuclideDebuggerCommon;
+function _nuclideDebuggerCommon() {
+  const data = require("../../../modules/nuclide-debugger-common");
 
-function _load_nuclideDebuggerCommon() {
-  return _nuclideDebuggerCommon = require('../../../modules/nuclide-debugger-common');
+  _nuclideDebuggerCommon = function () {
+    return data;
+  };
+
+  return data;
 }
 
-var _nuclideUri;
+function _nuclideUri() {
+  const data = _interopRequireDefault(require("../../../modules/nuclide-commons/nuclideUri"));
 
-function _load_nuclideUri() {
-  return _nuclideUri = _interopRequireDefault(require('../../../modules/nuclide-commons/nuclideUri'));
+  _nuclideUri = function () {
+    return data;
+  };
+
+  return data;
 }
 
-var _nuclideRemoteConnection;
+function _nuclideRemoteConnection() {
+  const data = require("../../nuclide-remote-connection");
 
-function _load_nuclideRemoteConnection() {
-  return _nuclideRemoteConnection = require('../../nuclide-remote-connection');
+  _nuclideRemoteConnection = function () {
+    return data;
+  };
+
+  return data;
 }
 
-var _log4js;
+function _log4js() {
+  const data = require("log4js");
 
-function _load_log4js() {
-  return _log4js = require('log4js');
+  _log4js = function () {
+    return data;
+  };
+
+  return data;
 }
 
-var _passesGK;
+function _passesGK() {
+  const data = _interopRequireDefault(require("../../../modules/nuclide-commons/passesGK"));
 
-function _load_passesGK() {
-  return _passesGK = _interopRequireDefault(require('../../commons-node/passesGK'));
+  _passesGK = function () {
+    return data;
+  };
+
+  return data;
 }
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
@@ -74,18 +114,14 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
  * 
  * @format
  */
-
+// eslint-disable-next-line nuclide-internal/no-cross-atom-imports
+// eslint-disable-next-line nuclide-internal/no-cross-atom-imports
 const SUPPORTED_RULE_TYPES = new Set(['cxx_binary', 'cxx_test']);
-// eslint-disable-next-line nuclide-internal/no-cross-atom-imports
-
-// eslint-disable-next-line nuclide-internal/no-cross-atom-imports
-
 const LLDB_PROCESS_ID_REGEX = /lldb -p ([0-9]+)/;
 
 class Activation {
-
   constructor() {
-    this._disposables = new (_UniversalDisposable || _load_UniversalDisposable()).default();
+    this._disposables = new (_UniversalDisposable().default)();
     this.createNativeDebuggerService = this.createNativeDebuggerService.bind(this);
     this.provideLLDBPlatformGroup = this.provideLLDBPlatformGroup.bind(this);
   }
@@ -96,10 +132,12 @@ class Activation {
 
   createNativeDebuggerService() {
     const callback = this._waitForBuckThenDebugNativeTarget.bind(this);
+
     return {
       debugTargetFromBuckOutput(buckRoot, processStream) {
         return callback(buckRoot, processStream);
       }
+
     };
   }
 
@@ -109,12 +147,13 @@ class Activation {
 
   provideLLDBPlatformGroup(buckRoot, ruleType, buildTarget) {
     const underlyingRuleType = this._getUnderlyingRuleType(ruleType, buildTarget);
+
     if (!SUPPORTED_RULE_TYPES.has(underlyingRuleType)) {
-      return _rxjsBundlesRxMinJs.Observable.of(null);
+      return _rxjsCompatUmdMin.Observable.of(null);
     }
 
-    const availableActions = new Set(['build', 'run', 'test', 'debug']);
-    return _rxjsBundlesRxMinJs.Observable.of({
+    const availableActions = new Set(['build', 'run', 'test', 'build-launch-debug', 'launch-debug', 'attach-debug']);
+    return _rxjsCompatUmdMin.Observable.of({
       name: 'Native',
       platforms: [{
         isMobile: false,
@@ -122,12 +161,13 @@ class Activation {
         tasksForBuildRuleType: buildRuleType => {
           return availableActions;
         },
-        runTask: (builder, taskType, target, settings, device) => {
-          const subcommand = taskType === 'debug' ? 'build' : taskType;
-          if ((0, (_BuckTaskRunner || _load_BuckTaskRunner()).isDebugTask)(taskType)) {
-            return this._runDebugTask(builder, taskType, target, settings, device, buckRoot, underlyingRuleType);
+        runTask: (builder, taskType, target, settings) => {
+          const subcommand = taskType === 'build-launch-debug' ? 'build' : taskType;
+
+          if ((0, _BuckTaskRunner().isDebugTask)(taskType)) {
+            return this._runDebugTask(builder, taskType, target, settings, buckRoot, underlyingRuleType);
           } else {
-            return builder.runSubcommand(buckRoot, (0, (_BuckTaskRunner || _load_BuckTaskRunner()).getBuckSubcommandForTaskType)(subcommand), target, settings, false, null);
+            return builder.runSubcommand(buckRoot, (0, _BuckTaskRunner().getBuckSubcommandForTaskType)(subcommand), target, settings, false, null);
           }
         }
       }]
@@ -145,17 +185,18 @@ class Activation {
   _waitForBuckThenDebugNativeTarget(buckRoot, processStream) {
     return processStream.flatMap(message => {
       if (message.kind !== 'stderr') {
-        return _rxjsBundlesRxMinJs.Observable.empty();
+        return _rxjsCompatUmdMin.Observable.empty();
       }
 
       const regMatch = message.data.match(LLDB_PROCESS_ID_REGEX);
+
       if (regMatch != null) {
-        return _rxjsBundlesRxMinJs.Observable.of(regMatch[1]);
+        return _rxjsCompatUmdMin.Observable.of(regMatch[1]);
       }
 
-      return _rxjsBundlesRxMinJs.Observable.empty();
+      return _rxjsCompatUmdMin.Observable.empty();
     }).switchMap(attachArg => {
-      return _rxjsBundlesRxMinJs.Observable.fromPromise(this._debugPidWithLLDB(parseInt(attachArg, 10), buckRoot)).ignoreElements().startWith({
+      return _rxjsCompatUmdMin.Observable.fromPromise(this._debugPidWithLLDB(parseInt(attachArg, 10), buckRoot)).ignoreElements().startWith({
         type: 'log',
         message: `Attaching LLDB debugger to pid ${attachArg}...`,
         level: 'info'
@@ -163,50 +204,74 @@ class Activation {
     });
   }
 
-  _runDebugTask(builder, taskType, buildTarget, taskSettings, device, buckRoot, ruleType) {
-    if (!(taskType === 'debug')) {
-      throw new Error('Invariant violation: "taskType === \'debug\'"');
+  _runDebugTask(builder, taskType, buildTarget, taskSettings, buckRoot, ruleType) {
+    if (taskType === 'attach-debug') {
+      // TODO: The implementation below is annoying/wrong
+      // It redirects to the attach dialog, ignores the buildTarget input and asks user to choose what they want to attach to.
+      // Instead it should automatically figure out the process based on buildTarget and attach to it.
+      return _rxjsCompatUmdMin.Observable.defer(async () => {
+        const providerType = await this._getBuckNativeDebugAdapterType();
+        atom.commands.dispatch(atom.views.getView(atom.workspace), 'debugger:show-attach-dialog', {
+          selectedTabName: providerType === _nuclideDebuggerCommon().VsAdapterTypes.NATIVE_GDB ? _nuclideDebuggerCommon().VsAdapterNames.NATIVE_GDB : _nuclideDebuggerCommon().VsAdapterNames.NATIVE_LLDB,
+          config: {
+            sourcePath: _nuclideUri().default.getPath(buckRoot)
+          }
+        });
+      }).ignoreElements();
+    }
+
+    const buckService = (0, _nuclideRemoteConnection().getBuckServiceByNuclideUri)(buckRoot);
+
+    if (!(buckService != null)) {
+      throw new Error("Invariant violation: \"buckService != null\"");
+    }
+
+    const {
+      qualifiedName,
+      flavors
+    } = buildTarget;
+    const separator = flavors.length > 0 ? '#' : '';
+    const targetString = `${qualifiedName}${separator}${flavors.join(',')}`;
+    const runArguments = taskSettings.runArguments || [];
+    const argString = runArguments.length === 0 ? '' : ` with arguments "${runArguments.join(' ')}"`;
+
+    const debugBuckTarget = _rxjsCompatUmdMin.Observable.defer(() => this._debugBuckTarget(buckService, buckRoot, targetString, taskSettings.buildArguments || [], runArguments)).ignoreElements().catch(err => {
+      (0, _log4js().getLogger)('nuclide-buck').error(`Failed to launch debugger for ${targetString}`, err);
+      return _rxjsCompatUmdMin.Observable.of({
+        type: 'message',
+        message: {
+          level: 'error',
+          text: `Failed to launch debugger: ${err.message}`
+        }
+      });
+    }).startWith({
+      type: 'message',
+      message: {
+        level: 'log',
+        text: `Launching debugger for ${targetString}${argString}...`
+      }
+    }, {
+      type: 'progress',
+      progress: null
+    });
+
+    if (taskType === 'launch-debug') {
+      return debugBuckTarget;
+    }
+
+    if (!(taskType === 'build-launch-debug')) {
+      throw new Error("Invariant violation: \"taskType === 'build-launch-debug'\"");
     }
 
     return this._addModeDbgIfNoModeInBuildArguments(buckRoot, taskSettings).switchMap(settings => {
       switch (ruleType) {
         case 'cxx_binary':
         case 'cxx_test':
-          return builder.runSubcommand(buckRoot, 'build', buildTarget, settings, false, null, processStream => {
-            const buckService = (0, (_nuclideRemoteConnection || _load_nuclideRemoteConnection()).getBuckServiceByNuclideUri)(buckRoot);
+          return builder.runSubcommand(buckRoot, 'build', buildTarget, settings, false, null).ignoreElements().concat(debugBuckTarget);
 
-            if (!(buckService != null)) {
-              throw new Error('Invariant violation: "buckService != null"');
-            }
-
-            const { qualifiedName, flavors } = buildTarget;
-            const separator = flavors.length > 0 ? '#' : '';
-            const targetString = `${qualifiedName}${separator}${flavors.join(',')}`;
-            const runArguments = settings.runArguments || [];
-            const argString = runArguments.length === 0 ? '' : ` with arguments "${runArguments.join(' ')}"`;
-            return _rxjsBundlesRxMinJs.Observable.concat(processStream.ignoreElements(), _rxjsBundlesRxMinJs.Observable.defer(() => this._debugBuckTarget(buckService, buckRoot, targetString, runArguments)).ignoreElements().map(path => ({
-              type: 'log',
-              message: `Launched debugger with ${path}`,
-              level: 'info'
-            })).catch(err => {
-              (0, (_log4js || _load_log4js()).getLogger)('nuclide-buck').error(`Failed to launch debugger for ${targetString}`, err);
-              return _rxjsBundlesRxMinJs.Observable.of({
-                type: 'log',
-                message: `Failed to launch debugger: ${err.message}`,
-                level: 'error'
-              });
-            }).startWith({
-              type: 'log',
-              message: `Launching debugger for ${targetString}${argString}...`,
-              level: 'log'
-            }, {
-              type: 'progress',
-              progress: null
-            }));
-          });
         default:
           if (!false) {
-            throw new Error('Invariant violation: "false"');
+            throw new Error("Invariant violation: \"false\"");
           }
 
       }
@@ -214,34 +279,40 @@ class Activation {
   }
 
   async _debugPidWithLLDB(pid, buckRoot) {
-    const attachInfo = await (0, (_utils || _load_utils()).getNativeVSPAttachProcessInfo)((_nuclideDebuggerCommon || _load_nuclideDebuggerCommon()).VsAdapterTypes.NATIVE_LLDB, buckRoot, {
+    const config = (0, _utils().getNativeVSPAttachProcessConfig)(_nuclideDebuggerCommon().VsAdapterTypes.NATIVE_LLDB, buckRoot, {
       pid,
-      sourcePath: (_nuclideUri || _load_nuclideUri()).default.getPath(buckRoot)
+      sourcePath: _nuclideUri().default.getPath(buckRoot),
+      debuggerRoot: _nuclideUri().default.getPath(buckRoot)
     });
-    const debuggerService = await (0, (_debugger || _load_debugger()).getDebuggerService)();
-    debuggerService.startDebugging(attachInfo);
+    const debuggerService = await (0, _debugger().getDebuggerService)();
+    debuggerService.startVspDebugging(config);
   }
 
-  async _debugBuckTarget(buckService, buckRoot, buildTarget, runArguments) {
-    const output = await buckService.showOutput(buckRoot, buildTarget);
+  async _debugBuckTarget(buckService, buckRoot, buildTarget, buildArguments, runArguments) {
+    const output = await buckService.showOutput(buckRoot, buildTarget, buildArguments);
+
     if (output.length === 0) {
       throw new Error(`Could not find build output path for target ${buildTarget}`);
     }
+
     if (output.length > 1) {
       throw new Error(`Target ${buildTarget} is ambiguous. Please specify a single test.`);
     }
 
     const targetOutput = output[0];
     const relativeOutputPath = targetOutput['buck.outputPath'];
+
     if (relativeOutputPath == null) {
       throw new Error(`Target ${buildTarget} does not have executable build output.`);
-    }
+    } // launch config's arguments should be local to the remote directory.
 
-    // LaunchProcessInfo's arguments should be local to the remote directory.
-    const remoteBuckRoot = (_nuclideUri || _load_nuclideUri()).default.getPath(buckRoot);
-    const remoteOutputPath = (_nuclideUri || _load_nuclideUri()).default.getPath((_nuclideUri || _load_nuclideUri()).default.join(buckRoot, relativeOutputPath));
+
+    const remoteBuckRoot = _nuclideUri().default.getPath(buckRoot);
+
+    const remoteOutputPath = _nuclideUri().default.getPath(_nuclideUri().default.join(buckRoot, relativeOutputPath));
 
     const env = [];
+
     if (targetOutput.env) {
       for (const key of Object.keys(targetOutput.env)) {
         // NOTE: no escaping is necessary here; LLDB passes these directly to the process.
@@ -249,33 +320,37 @@ class Activation {
       }
     }
 
-    let adapter = (_nuclideDebuggerCommon || _load_nuclideDebuggerCommon()).VsAdapterTypes.NATIVE_LLDB;
-
-    if (await (0, (_passesGK || _load_passesGK()).default)('nuclide_buck_uses_gdb')) {
-      adapter = (_nuclideDebuggerCommon || _load_nuclideDebuggerCommon()).VsAdapterTypes.NATIVE_GDB;
-    }
-
-    const info = await (0, (_utils || _load_utils()).getNativeVSPLaunchProcessInfo)(adapter, (_nuclideUri || _load_nuclideUri()).default.join(buckRoot, relativeOutputPath), {
+    const config = await (0, _utils().getNativeVSPLaunchProcessConfig)((await this._getBuckNativeDebugAdapterType()), _nuclideUri().default.join(buckRoot, relativeOutputPath), {
       args: (runArguments.length ? runArguments : targetOutput.args) || [],
       cwd: remoteBuckRoot,
       env,
       sourcePath: remoteBuckRoot,
       debuggerRoot: remoteBuckRoot
     });
-    const debuggerService = await (0, (_debugger || _load_debugger()).getDebuggerService)();
-    await debuggerService.startDebugging(info);
+    const debuggerService = await (0, _debugger().getDebuggerService)();
+    await debuggerService.startVspDebugging(config);
     return remoteOutputPath;
+  }
+
+  async _getBuckNativeDebugAdapterType() {
+    if (await (0, _passesGK().default)('nuclide_buck_uses_gdb')) {
+      return _nuclideDebuggerCommon().VsAdapterTypes.NATIVE_GDB;
+    } else {
+      return _nuclideDebuggerCommon().VsAdapterTypes.NATIVE_LLDB;
+    }
   }
 
   _addModeDbgIfNoModeInBuildArguments(buckRoot, settings) {
     const buildArguments = settings.buildArguments != null ? settings.buildArguments : [];
+
     if (buildArguments.some(arg => arg.includes('@mode'))) {
-      return _rxjsBundlesRxMinJs.Observable.of(settings);
+      return _rxjsCompatUmdMin.Observable.of(settings);
     }
 
-    const fileSystemService = (0, (_nuclideRemoteConnection || _load_nuclideRemoteConnection()).getFileSystemServiceByNuclideUri)(buckRoot);
-    return _rxjsBundlesRxMinJs.Observable.defer(async () => {
-      const modeDbgFile = (_nuclideUri || _load_nuclideUri()).default.join(buckRoot, 'mode', 'dbg');
+    const fileSystemService = (0, _nuclideRemoteConnection().getFileSystemServiceByNuclideUri)(buckRoot);
+    return _rxjsCompatUmdMin.Observable.defer(async () => {
+      const modeDbgFile = _nuclideUri().default.join(buckRoot, 'mode', 'dbg');
+
       if (await fileSystemService.exists(modeDbgFile)) {
         buildArguments.push('@mode/dbg');
         return {
@@ -287,6 +362,7 @@ class Activation {
       }
     });
   }
+
 }
 
-(0, (_createPackage || _load_createPackage()).default)(module.exports, Activation);
+(0, _createPackage().default)(module.exports, Activation);

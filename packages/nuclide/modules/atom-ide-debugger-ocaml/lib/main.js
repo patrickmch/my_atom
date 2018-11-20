@@ -1,54 +1,73 @@
-'use strict';
+"use strict";
 
-var _createPackage;
+function _createPackage() {
+  const data = _interopRequireDefault(require("../../nuclide-commons-atom/createPackage"));
 
-function _load_createPackage() {
-  return _createPackage = _interopRequireDefault(require('../../nuclide-commons-atom/createPackage'));
+  _createPackage = function () {
+    return data;
+  };
+
+  return data;
 }
 
-var _constants;
+function _AutoGenLaunchAttachProvider() {
+  const data = require("../../nuclide-debugger-common/AutoGenLaunchAttachProvider");
 
-function _load_constants() {
-  return _constants = require('../../nuclide-debugger-common/constants');
+  _AutoGenLaunchAttachProvider = function () {
+    return data;
+  };
+
+  return data;
 }
 
-var _AutoGenLaunchAttachProvider;
+function _nuclideDebuggerCommon() {
+  const data = require("../../nuclide-debugger-common");
 
-function _load_AutoGenLaunchAttachProvider() {
-  return _AutoGenLaunchAttachProvider = _interopRequireDefault(require('../../nuclide-debugger-common/AutoGenLaunchAttachProvider'));
+  _nuclideDebuggerCommon = function () {
+    return data;
+  };
+
+  return data;
 }
 
-var _vscodeDebugadapter;
+function _vscodeDebugadapter() {
+  const data = require("vscode-debugadapter");
 
-function _load_vscodeDebugadapter() {
-  return _vscodeDebugadapter = require('vscode-debugadapter');
+  _vscodeDebugadapter = function () {
+    return data;
+  };
+
+  return data;
 }
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
+/**
+ * Copyright (c) 2017-present, Facebook, Inc.
+ * All rights reserved.
+ *
+ * This source code is licensed under the BSD-style license found in the
+ * LICENSE file in the root directory of this source tree. An additional grant
+ * of patent rights can be found in the PATENTS file in the same directory.
+ *
+ * 
+ * @format
+ */
 class Activation {
   constructor() {}
+
   dispose() {}
 
   createDebuggerProvider() {
     return {
-      name: 'OCaml',
+      type: _nuclideDebuggerCommon().VsAdapterTypes.OCAML,
       getLaunchAttachProvider: connection => {
-        return new (_AutoGenLaunchAttachProvider || _load_AutoGenLaunchAttachProvider()).default('OCaml', connection, getOCamlAutoGenConfig());
+        return new (_AutoGenLaunchAttachProvider().AutoGenLaunchAttachProvider)(_nuclideDebuggerCommon().VsAdapterNames.OCAML, connection, getOCamlAutoGenConfig());
       }
     };
   }
-} /**
-   * Copyright (c) 2017-present, Facebook, Inc.
-   * All rights reserved.
-   *
-   * This source code is licensed under the BSD-style license found in the
-   * LICENSE file in the root directory of this source tree. An additional grant
-   * of patent rights can be found in the PATENTS file in the same directory.
-   *
-   * 
-   * @format
-   */
+
+}
 
 function getOCamlAutoGenConfig() {
   const debugExecutable = {
@@ -112,18 +131,21 @@ function getOCamlAutoGenConfig() {
     type: 'string',
     description: '',
     required: false,
-    defaultValue: (_vscodeDebugadapter || _load_vscodeDebugadapter()).Logger.LogLevel.Verbose,
+    defaultValue: _vscodeDebugadapter().Logger.LogLevel.Verbose,
     visible: false
   };
-
   const autoGenLaunchConfig = {
     launch: true,
-    vsAdapterType: (_constants || _load_constants()).VsAdapterTypes.OCAML,
-    threads: false,
+    vsAdapterType: _nuclideDebuggerCommon().VsAdapterTypes.OCAML,
     properties: [debugExecutable, executablePath, argumentsProperty, environmentVariables, workingDirectory, additionalIncludeDirectories, breakAfterStart, logLevel],
     scriptPropertyName: 'executable',
     cwdPropertyName: 'working directory',
-    header: null
+    header: null,
+
+    getProcessName(values) {
+      return values.debugExecutable + ' (OCaml)';
+    }
+
   };
   return {
     launch: autoGenLaunchConfig,
@@ -131,4 +153,4 @@ function getOCamlAutoGenConfig() {
   };
 }
 
-(0, (_createPackage || _load_createPackage()).default)(module.exports, Activation);
+(0, _createPackage().default)(module.exports, Activation);

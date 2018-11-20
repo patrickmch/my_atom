@@ -1,22 +1,30 @@
-'use strict';
+"use strict";
 
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
 exports.getConnectionDialogDefaultSettings = getConnectionDialogDefaultSettings;
 
-var _nuclideUri;
+function _nuclideUri() {
+  const data = _interopRequireDefault(require("../../../modules/nuclide-commons/nuclideUri"));
 
-function _load_nuclideUri() {
-  return _nuclideUri = _interopRequireDefault(require('../../../modules/nuclide-commons/nuclideUri'));
+  _nuclideUri = function () {
+    return data;
+  };
+
+  return data;
 }
 
-var _os = _interopRequireDefault(require('os'));
+var _os = _interopRequireDefault(require("os"));
 
-var _nuclideRemoteConnection;
+function _nuclideRemoteConnection() {
+  const data = require("../../nuclide-remote-connection");
 
-function _load_nuclideRemoteConnection() {
-  return _nuclideRemoteConnection = require('../../nuclide-remote-connection');
+  _nuclideRemoteConnection = function () {
+    return data;
+  };
+
+  return data;
 }
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
@@ -31,9 +39,12 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
  * 
  * @format
  */
-
 function getConnectionDialogDefaultSettings() {
-  const { username, homedir } = _os.default.userInfo();
+  const {
+    username,
+    homedir
+  } = _os.default.userInfo();
+
   return {
     server: '',
     username,
@@ -41,9 +52,9 @@ function getConnectionDialogDefaultSettings() {
     // so we always want to use `/` as the path separator for cwd, even if Atom
     // is running on Windows.
     cwd: `/home/${username}/`,
-    pathToPrivateKey: (_nuclideUri || _load_nuclideUri()).default.join(homedir, '.ssh', 'id_rsa'),
+    pathToPrivateKey: _nuclideUri().default.join(homedir, '.ssh', 'id_rsa'),
     remoteServerCommand: 'nuclide-start-server',
-    authMethod: (_nuclideRemoteConnection || _load_nuclideRemoteConnection()).SshHandshake.SupportedMethods.PASSWORD,
+    authMethod: _nuclideRemoteConnection().SshHandshake.SupportedMethods.PASSWORD,
     displayTitle: '(default)',
     sshPort: '22'
   };

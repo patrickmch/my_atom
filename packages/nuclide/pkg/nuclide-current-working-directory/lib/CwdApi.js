@@ -1,68 +1,89 @@
-'use strict';
+"use strict";
 
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
+exports.default = void 0;
 
-var _memoize2;
+function _memoize2() {
+  const data = _interopRequireDefault(require("lodash/memoize"));
 
-function _load_memoize() {
-  return _memoize2 = _interopRequireDefault(require('lodash/memoize'));
+  _memoize2 = function () {
+    return data;
+  };
+
+  return data;
 }
 
-var _event;
+function _event() {
+  const data = require("../../../modules/nuclide-commons/event");
 
-function _load_event() {
-  return _event = require('../../../modules/nuclide-commons/event');
+  _event = function () {
+    return data;
+  };
+
+  return data;
 }
 
-var _UniversalDisposable;
+function _UniversalDisposable() {
+  const data = _interopRequireDefault(require("../../../modules/nuclide-commons/UniversalDisposable"));
 
-function _load_UniversalDisposable() {
-  return _UniversalDisposable = _interopRequireDefault(require('../../../modules/nuclide-commons/UniversalDisposable'));
+  _UniversalDisposable = function () {
+    return data;
+  };
+
+  return data;
 }
 
-var _nuclideUri;
+function _nuclideUri() {
+  const data = _interopRequireDefault(require("../../../modules/nuclide-commons/nuclideUri"));
 
-function _load_nuclideUri() {
-  return _nuclideUri = _interopRequireDefault(require('../../../modules/nuclide-commons/nuclideUri'));
+  _nuclideUri = function () {
+    return data;
+  };
+
+  return data;
 }
 
-var _FileTreeHelpers;
+function FileTreeHelpers() {
+  const data = _interopRequireWildcard(require("../../nuclide-file-tree/lib/FileTreeHelpers"));
 
-function _load_FileTreeHelpers() {
-  return _FileTreeHelpers = _interopRequireDefault(require('../../nuclide-file-tree/lib/FileTreeHelpers'));
+  FileTreeHelpers = function () {
+    return data;
+  };
+
+  return data;
 }
 
-var _rxjsBundlesRxMinJs = require('rxjs/bundles/Rx.min.js');
+var _rxjsCompatUmdMin = require("rxjs-compat/bundles/rxjs-compat.umd.min.js");
+
+function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) { var desc = Object.defineProperty && Object.getOwnPropertyDescriptor ? Object.getOwnPropertyDescriptor(obj, key) : {}; if (desc.get || desc.set) { Object.defineProperty(newObj, key, desc); } else { newObj[key] = obj[key]; } } } } newObj.default = obj; return newObj; } }
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 // eslint-disable-next-line nuclide-internal/no-cross-atom-imports
 class CwdApi {
-
   constructor(initialPath) {
-    this._disposed = new _rxjsBundlesRxMinJs.ReplaySubject(1);
-    this._getPaths = (0, (_memoize2 || _load_memoize()).default)(() => {
+    this._disposed = new _rxjsCompatUmdMin.ReplaySubject(1);
+    this._getPaths = (0, _memoize2().default)(() => {
       // Since adding and removing projects can affect the validity of cwdPath, we need to re-query
       // every time it happens.
-      const projectPathChanges = (0, (_event || _load_event()).observableFromSubscribeFunction)(cb => atom.project.onDidChangePaths(cb)).mapTo(null).share();
-
-      return _rxjsBundlesRxMinJs.Observable.merge(this._explicitlySetPaths, projectPathChanges).map(() => this.getCwd()).distinctUntilChanged().takeUntil(this._disposed);
+      const projectPathChanges = (0, _event().observableFromSubscribeFunction)(cb => atom.project.onDidChangePaths(cb)).mapTo(null).share();
+      return _rxjsCompatUmdMin.Observable.merge(this._explicitlySetPaths, projectPathChanges).map(() => this.getCwd()).distinctUntilChanged().takeUntil(this._disposed);
     });
-
-    this._explicitlySetPaths = new _rxjsBundlesRxMinJs.BehaviorSubject(initialPath);
+    this._explicitlySetPaths = new _rxjsCompatUmdMin.BehaviorSubject(initialPath);
   }
 
   setCwd(path) {
     if (getDirectory(path) == null) {
       throw new Error(`Path does not belong to a project root: ${path}`);
     }
+
     this._explicitlySetPaths.next(path);
   }
 
   observeCwd(callback) {
-    return new (_UniversalDisposable || _load_UniversalDisposable()).default(this._getPaths().subscribe(path => {
+    return new (_UniversalDisposable().default)(this._getPaths().subscribe(path => {
       callback(path);
     }));
   }
@@ -70,7 +91,6 @@ class CwdApi {
   dispose() {
     this._disposed.next();
   }
-
   /**
    * Create an observable that represents the CWD path changes.
    */
@@ -82,6 +102,7 @@ class CwdApi {
         return directory.getPath();
       }
     }
+
     return null;
   }
 
@@ -91,32 +112,29 @@ class CwdApi {
     } else if (isValidDirectoryPath(this._getDefaultPath())) {
       return this._getDefaultPath();
     }
+
     return null;
   }
+
 }
 
-exports.default = CwdApi; /**
-                           * Copyright (c) 2015-present, Facebook, Inc.
-                           * All rights reserved.
-                           *
-                           * This source code is licensed under the license found in the LICENSE file in
-                           * the root directory of this source tree.
-                           *
-                           *  strict-local
-                           * @format
-                           */
+exports.default = CwdApi;
 
 function getDirectory(path) {
   if (path == null) {
     return null;
   }
+
   for (const directory of atom.project.getDirectories()) {
     if (!isValidDirectory(directory)) {
       continue;
     }
+
     const dirPath = directory.getPath();
-    if ((_nuclideUri || _load_nuclideUri()).default.contains(dirPath, path)) {
-      const relative = (_nuclideUri || _load_nuclideUri()).default.relative(dirPath, path);
+
+    if (_nuclideUri().default.contains(dirPath, path)) {
+      const relative = _nuclideUri().default.relative(dirPath, path);
+
       return directory.getSubdirectory(relative);
     }
   }
@@ -130,5 +148,6 @@ function isValidDirectory(directory) {
   if (directory == null) {
     return true;
   }
-  return (_FileTreeHelpers || _load_FileTreeHelpers()).default.isValidDirectory(directory);
+
+  return FileTreeHelpers().isValidDirectory(directory);
 }

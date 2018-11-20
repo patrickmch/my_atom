@@ -4,7 +4,6 @@
   "version": "0.0.0",
   "description": "Provides hack language support in Nuclide",
   "author": "NEEDS OWNER",
-  "atomTestRunner": "../../lib/test-runner-entry.js",
   "nuclide": {
     "configMetadata": {
       "pathComponents": [
@@ -18,12 +17,6 @@
         "type": "string",
         "default": "",
         "description": "Primarily for testing new versions of hh_client."
-      },
-      "legacyHackIde": {
-        "title": "Use legacy Hack IDE services.",
-        "type": "boolean",
-        "default": false,
-        "description": "Requires restart. Intended only for HHVM <= 3.22. Not supported."
       },
       "logLevel": {
         "title": "Log Level",
@@ -42,8 +35,7 @@
         ]
       }
     },
-    "packageType": "Atom",
-    "testRunner": "apm"
+    "packageType": "AtomPackage"
   },
   "providedServices": {
     "nuclide-project-symbol-search-service": {
@@ -57,5 +49,6 @@
         "0.0.0": "registerQuickOpenProvider"
       }
     }
-  }
+  },
+  "activationHooks": ["!nuclide_fb_hack_vscode_ext:gk:nuclide"]
 }

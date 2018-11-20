@@ -1,14 +1,18 @@
-'use strict';
+"use strict";
 
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
 exports.hgRepositoryForEditor = hgRepositoryForEditor;
 
-var _nuclideVcsBase;
+function _nuclideVcsBase() {
+  const data = require("../../nuclide-vcs-base");
 
-function _load_nuclideVcsBase() {
-  return _nuclideVcsBase = require('../../nuclide-vcs-base');
+  _nuclideVcsBase = function () {
+    return data;
+  };
+
+  return data;
 }
 
 /**
@@ -21,11 +25,12 @@ function _load_nuclideVcsBase() {
  * 
  * @format
  */
-
 function hgRepositoryForEditor(editor) {
-  const repo = (0, (_nuclideVcsBase || _load_nuclideVcsBase()).repositoryForPath)(editor.getPath() || '');
+  const repo = (0, _nuclideVcsBase().repositoryForPath)(editor.getPath() || '');
+
   if (!repo || repo.getType() !== 'hg') {
     return null;
   }
+
   return repo;
 }

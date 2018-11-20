@@ -1,43 +1,56 @@
-'use strict';
+"use strict";
 
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
 exports.provideLint = provideLint;
 
-var _atom = require('atom');
+var _atom = require("atom");
 
-var _log4js;
+function _log4js() {
+  const data = require("log4js");
 
-function _load_log4js() {
-  return _log4js = require('log4js');
+  _log4js = function () {
+    return data;
+  };
+
+  return data;
 }
 
-var _rxjsBundlesRxMinJs = require('rxjs/bundles/Rx.min.js');
+var _rxjsCompatUmdMin = require("rxjs-compat/bundles/rxjs-compat.umd.min.js");
 
-var _nuclideUri;
+function _nuclideUri() {
+  const data = _interopRequireDefault(require("../../../modules/nuclide-commons/nuclideUri"));
 
-function _load_nuclideUri() {
-  return _nuclideUri = _interopRequireDefault(require('../../../modules/nuclide-commons/nuclideUri'));
+  _nuclideUri = function () {
+    return data;
+  };
+
+  return data;
 }
 
-var _process;
+function _process() {
+  const data = require("../../../modules/nuclide-commons/process");
 
-function _load_process() {
-  return _process = require('../../../modules/nuclide-commons/process');
+  _process = function () {
+    return data;
+  };
+
+  return data;
 }
 
-var _featureConfig;
+function _featureConfig() {
+  const data = _interopRequireDefault(require("../../../modules/nuclide-commons-atom/feature-config"));
 
-function _load_featureConfig() {
-  return _featureConfig = _interopRequireDefault(require('../../../modules/nuclide-commons-atom/feature-config'));
+  _featureConfig = function () {
+    return data;
+  };
+
+  return data;
 }
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-const requests = new _rxjsBundlesRxMinJs.Subject();
-
-// Check for a new version every 10 minutes.
 /**
  * Copyright (c) 2015-present, Facebook, Inc.
  * All rights reserved.
@@ -48,44 +61,42 @@ const requests = new _rxjsBundlesRxMinJs.Subject();
  * 
  * @format
  */
+const requests = new _rxjsCompatUmdMin.Subject(); // Check for a new version every 10 minutes.
 
-const DOWNLOAD_INTERVAL = 10 * 60 * 1000;
-// Display a "fetching" notification if it hasn't completed within 5s.
+const DOWNLOAD_INTERVAL = 10 * 60 * 1000; // Display a "fetching" notification if it hasn't completed within 5s.
+
 const DOWNLOAD_NOTIFICATION_DELAY = 5 * 1000;
-
 let cachedVersionCheck = null;
 let versionCheckTime = 0;
 
 function getInferCommand() {
-  return String((_featureConfig || _load_featureConfig()).default.get('nuclide-infer-al.pathToInfer'));
+  return String(_featureConfig().default.get('nuclide-infer-al.pathToInfer'));
 }
 
 function checkVersion(cwd) {
   if (cachedVersionCheck == null || Date.now() - versionCheckTime > DOWNLOAD_INTERVAL) {
     versionCheckTime = Date.now();
-    cachedVersionCheck = (0, (_process || _load_process()).runCommand)(getInferCommand(), ['--version'], {
+    cachedVersionCheck = (0, _process().runCommand)(getInferCommand(), ['--version'], {
       cwd
-    })
-    // Return true as long as there's no error.
+    }) // Return true as long as there's no error.
     .mapTo(true).catch(err => {
-      (0, (_log4js || _load_log4js()).getLogger)('nuclide-infer-al').error('Error running infer --version:', err);
+      (0, _log4js().getLogger)('nuclide-infer-al').error('Error running infer --version:', err);
       atom.notifications.addError('Error running Infer', {
         description: String(err),
         dismissable: true
       });
-      return _rxjsBundlesRxMinJs.Observable.of(false);
-    }).race(
-    // By using 'race', this won't show up if the version comes back first.
-    _rxjsBundlesRxMinJs.Observable.timer(DOWNLOAD_NOTIFICATION_DELAY).do(() => {
+      return _rxjsCompatUmdMin.Observable.of(false);
+    }).race( // By using 'race', this won't show up if the version comes back first.
+    _rxjsCompatUmdMin.Observable.timer(DOWNLOAD_NOTIFICATION_DELAY).do(() => {
       atom.notifications.addInfo('Fetching Infer...', {
         description: 'Fetching the latest version of Infer. This may take quite some time initially...',
         dismissable: true
       });
-    }).concat(_rxjsBundlesRxMinJs.Observable.never()).ignoreElements())
-    // Share this and make it replayable.
+    }).concat(_rxjsCompatUmdMin.Observable.never()).ignoreElements()) // Share this and make it replayable.
     .publishReplay(1).refCount();
     return cachedVersionCheck;
   }
+
   return cachedVersionCheck;
 }
 
@@ -95,19 +106,26 @@ function provideLint() {
     grammarScopes: ['source.infer.al'],
     scope: 'file',
     lintOnFly: false,
+
     lint(editor) {
       const src = editor.getPath();
-      if (src == null || (_nuclideUri || _load_nuclideUri()).default.isRemote(src)) {
+
+      if (src == null || _nuclideUri().default.isRemote(src)) {
         return Promise.resolve([]);
       }
-      const cwd = (_nuclideUri || _load_nuclideUri()).default.dirname(src);
+
+      const cwd = _nuclideUri().default.dirname(src);
 
       requests.next();
       return checkVersion(cwd).take(1).switchMap(success => {
         if (!success) {
-          return _rxjsBundlesRxMinJs.Observable.of(null);
+          return _rxjsCompatUmdMin.Observable.of(null);
         }
-        return (0, (_process || _load_process()).runCommandDetailed)(getInferCommand(), ['--linters-def-file', src, '--no-default-linters', '--linters-validate-syntax-only'], { isExitError: () => false, cwd }).map(result => {
+
+        return (0, _process().runCommandDetailed)(getInferCommand(), ['--linters-def-file', src, '--no-default-linters', '--linters-validate-syntax-only'], {
+          isExitError: () => false,
+          cwd
+        }).map(result => {
           if (result.exitCode === 0) {
             return [];
           } else {
@@ -121,16 +139,16 @@ function provideLint() {
             }));
           }
         }).catch(err => {
-          (0, (_log4js || _load_log4js()).getLogger)('nuclide-infer-al').error('Error running Infer command: ', err);
+          (0, _log4js().getLogger)('nuclide-infer-al').error('Error running Infer command: ', err);
           atom.notifications.addError('Error running Infer', {
             description: String(err),
             dismissable: true
           });
-          return _rxjsBundlesRxMinJs.Observable.of(null);
-        })
-        // Stop if we get a new request in the meantime.
+          return _rxjsCompatUmdMin.Observable.of(null);
+        }) // Stop if we get a new request in the meantime.
         .takeUntil(requests);
       }).toPromise();
     }
+
   };
 }

@@ -1,57 +1,83 @@
-'use strict';
+"use strict";
 
-var _createPackage;
+function _createPackage() {
+  const data = _interopRequireDefault(require("../../../modules/nuclide-commons-atom/createPackage"));
 
-function _load_createPackage() {
-  return _createPackage = _interopRequireDefault(require('../../../modules/nuclide-commons-atom/createPackage'));
+  _createPackage = function () {
+    return data;
+  };
+
+  return data;
 }
 
-var _registerGrammar;
+function _registerGrammar() {
+  const data = _interopRequireDefault(require("../../commons-atom/register-grammar"));
 
-function _load_registerGrammar() {
-  return _registerGrammar = _interopRequireDefault(require('../../commons-atom/register-grammar'));
+  _registerGrammar = function () {
+    return data;
+  };
+
+  return data;
 }
 
-var _UniversalDisposable;
+function _UniversalDisposable() {
+  const data = _interopRequireDefault(require("../../../modules/nuclide-commons/UniversalDisposable"));
 
-function _load_UniversalDisposable() {
-  return _UniversalDisposable = _interopRequireDefault(require('../../../modules/nuclide-commons/UniversalDisposable'));
+  _UniversalDisposable = function () {
+    return data;
+  };
+
+  return data;
 }
 
-var _buildFiles;
+function _buildFiles() {
+  const data = require("./buildFiles");
 
-function _load_buildFiles() {
-  return _buildFiles = require('./buildFiles');
+  _buildFiles = function () {
+    return data;
+  };
+
+  return data;
 }
 
-var _HyperclickProvider;
+function _HyperclickProvider() {
+  const data = require("./HyperclickProvider");
 
-function _load_HyperclickProvider() {
-  return _HyperclickProvider = require('./HyperclickProvider');
+  _HyperclickProvider = function () {
+    return data;
+  };
+
+  return data;
 }
 
-var _nuclideAnalytics;
+function _BuckTaskRunner() {
+  const data = require("./BuckTaskRunner");
 
-function _load_nuclideAnalytics() {
-  return _nuclideAnalytics = require('../../nuclide-analytics');
+  _BuckTaskRunner = function () {
+    return data;
+  };
+
+  return data;
 }
 
-var _BuckTaskRunner;
+function _PlatformService() {
+  const data = require("./PlatformService");
 
-function _load_BuckTaskRunner() {
-  return _BuckTaskRunner = require('./BuckTaskRunner');
+  _PlatformService = function () {
+    return data;
+  };
+
+  return data;
 }
 
-var _PlatformService;
+function _BuckClangProvider() {
+  const data = require("./BuckClangProvider");
 
-function _load_PlatformService() {
-  return _PlatformService = require('./PlatformService');
-}
+  _BuckClangProvider = function () {
+    return data;
+  };
 
-var _BuckClangProvider;
-
-function _load_BuckClangProvider() {
-  return _BuckClangProvider = require('./BuckClangProvider');
+  return data;
 }
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
@@ -66,24 +92,20 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
  * 
  * @format
  */
-
 const OPEN_NEAREST_BUILD_FILE_COMMAND = 'nuclide-buck:open-nearest-build-file';
 
 class Activation {
-
   constructor(rawState) {
     this._initialState = null;
-
-    this._taskRunner = new (_BuckTaskRunner || _load_BuckTaskRunner()).BuckTaskRunner(rawState);
-    this._disposables = new (_UniversalDisposable || _load_UniversalDisposable()).default(atom.commands.add('atom-workspace', OPEN_NEAREST_BUILD_FILE_COMMAND, event => {
-      (0, (_nuclideAnalytics || _load_nuclideAnalytics()).track)(OPEN_NEAREST_BUILD_FILE_COMMAND);
+    this._taskRunner = new (_BuckTaskRunner().BuckTaskRunner)(rawState);
+    this._disposables = new (_UniversalDisposable().default)(atom.commands.add('atom-workspace', OPEN_NEAREST_BUILD_FILE_COMMAND, event => {
       // Add feature logging.
       const target = event.target;
-      (0, (_buildFiles || _load_buildFiles()).openNearestBuildFile)(target); // Note this returns a Promise.
+      (0, _buildFiles().openNearestBuildFile)(target); // Note this returns a Promise.
     }), this._taskRunner);
-    (0, (_registerGrammar || _load_registerGrammar()).default)('source.python', ['BUCK']);
-    (0, (_registerGrammar || _load_registerGrammar()).default)('source.json', ['BUCK.autodeps']);
-    (0, (_registerGrammar || _load_registerGrammar()).default)('source.ini', ['.buckconfig']);
+    (0, _registerGrammar().default)('source.python', ['BUCK']);
+    (0, _registerGrammar().default)('source.json', ['BUCK.autodeps']);
+    (0, _registerGrammar().default)('source.ini', ['.buckconfig']);
   }
 
   dispose() {
@@ -92,12 +114,13 @@ class Activation {
 
   consumeTaskRunnerServiceApi(api) {
     this._printToConsole = message => api.printToConsole(message, this._taskRunner);
-    this._disposables.add(new (_UniversalDisposable || _load_UniversalDisposable()).default(api.register(this._taskRunner), () => this._printToConsole = null));
+
+    this._disposables.add(new (_UniversalDisposable().default)(api.register(this._taskRunner), () => this._printToConsole = null));
   }
 
   consumeBusySignal(service) {
     this._busySignalService = service;
-    return new (_UniversalDisposable || _load_UniversalDisposable()).default(() => {
+    return new (_UniversalDisposable().default)(() => {
       this._busySignalService = null;
     });
   }
@@ -114,9 +137,11 @@ class Activation {
     return {
       priority: 200,
       providerName: 'nuclide-buck',
+
       getSuggestion(editor, position) {
-        return (0, (_HyperclickProvider || _load_HyperclickProvider()).getSuggestion)(editor, position);
+        return (0, _HyperclickProvider().getSuggestion)(editor, position);
       }
+
     };
   }
 
@@ -128,8 +153,9 @@ class Activation {
     return {
       getBuildTarget: () => this._taskRunner.getBuildTarget(),
       setBuildTarget: buildTarget => this._taskRunner.setBuildTarget(buildTarget),
+      setDeploymentTarget: preferredNames => this._taskRunner.setDeploymentTarget(preferredNames),
       onDidCompleteTask: callback => {
-        return new (_UniversalDisposable || _load_UniversalDisposable()).default(this._taskRunner.getCompletedTasks().subscribe(callback));
+        return new (_UniversalDisposable().default)(this._taskRunner.getCompletedTasks().subscribe(callback));
       }
     };
   }
@@ -139,8 +165,9 @@ class Activation {
   }
 
   provideClangConfiguration() {
-    return (0, (_BuckClangProvider || _load_BuckClangProvider()).getClangProvider)(this._taskRunner, () => this._busySignalService, () => this._printToConsole);
+    return (0, _BuckClangProvider().getClangProvider)(this._taskRunner, () => this._busySignalService, () => this._printToConsole);
   }
+
 }
 
-(0, (_createPackage || _load_createPackage()).default)(module.exports, Activation);
+(0, _createPackage().default)(module.exports, Activation);

@@ -1,4 +1,4 @@
-'use strict';
+"use strict";
 
 /**
  * Copyright (c) 2017-present, Facebook, Inc.
@@ -10,18 +10,21 @@
  *
  *  strict
  * @format
+ * @emails oncall+nuclide
  */
-
-const modulePath = require.resolve('../ReactMountRootElement');
+const modulePath = require.resolve("../ReactMountRootElement");
 
 describe('ReactMountRootElement', () => {
   it('works when required twice', () => {
     const element1 = require(modulePath).default;
+
     delete require.cache[modulePath];
+
     const element2 = require(modulePath).default;
-    expect(element1).toBe(element2);
-    // Make sure this doesn't throw.
+
+    expect(element1).toBe(element2); // Make sure this doesn't throw.
+
     const createdElement = new element2();
-    expect(createdElement.constructor.name).toBe('nuclide-react-mount-root');
+    expect(createdElement.constructor.name).toBe('ReactMountRootElement');
   });
 });

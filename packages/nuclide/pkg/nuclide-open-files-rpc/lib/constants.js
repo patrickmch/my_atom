@@ -1,8 +1,10 @@
-'use strict';
+"use strict";
 
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
+exports.FileEventKind = void 0;
+
 /**
  * Copyright (c) 2015-present, Facebook, Inc.
  * All rights reserved.
@@ -13,11 +15,11 @@ Object.defineProperty(exports, "__esModule", {
  *  strict
  * @format
  */
-
-const FileEventKind = exports.FileEventKind = Object.freeze({
+const FileEventKind = Object.freeze({
   OPEN: 'open',
   SYNC: 'sync',
   CLOSE: 'close',
   EDIT: 'edit',
   SAVE: 'save'
 });
+exports.FileEventKind = FileEventKind;

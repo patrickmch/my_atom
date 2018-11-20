@@ -4,6 +4,7 @@ Object.defineProperty(exports, "__esModule", {
   value: true
 });
 exports.default = createUtmUrl;
+
 /**
  * Copyright (c) 2015-present, Facebook, Inc.
  * All rights reserved.
@@ -14,7 +15,6 @@ exports.default = createUtmUrl;
  *  strict
  * @format
  */
-
 function createUtmUrl(url, campaign) {
   return `${url}/?utm_source=nuclide&utm_medium=app&utm_campaign=${campaign}`;
 }

@@ -1,4 +1,4 @@
-'use strict';
+"use strict";
 
 Object.defineProperty(exports, "__esModule", {
   value: true
@@ -11,47 +11,52 @@ exports.getShowSignatureHelp = getShowSignatureHelp;
 exports.getEnableLinting = getEnableLinting;
 exports.getLintExtensionBlacklist = getLintExtensionBlacklist;
 
-var _featureConfig;
+function _featureConfig() {
+  const data = _interopRequireDefault(require("../../../modules/nuclide-commons-atom/feature-config"));
 
-function _load_featureConfig() {
-  return _featureConfig = _interopRequireDefault(require('../../../modules/nuclide-commons-atom/feature-config'));
+  _featureConfig = function () {
+    return data;
+  };
+
+  return data;
 }
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
+/**
+ * Copyright (c) 2015-present, Facebook, Inc.
+ * All rights reserved.
+ *
+ * This source code is licensed under the license found in the LICENSE file in
+ * the root directory of this source tree.
+ *
+ * 
+ * @format
+ */
 function getAutocompleteArguments() {
-  return (_featureConfig || _load_featureConfig()).default.get('nuclide-python.autocompleteArguments');
-} /**
-   * Copyright (c) 2015-present, Facebook, Inc.
-   * All rights reserved.
-   *
-   * This source code is licensed under the license found in the LICENSE file in
-   * the root directory of this source tree.
-   *
-   * 
-   * @format
-   */
+  return _featureConfig().default.get('nuclide-python.autocompleteArguments');
+}
 
 function getIncludeOptionalArguments() {
-  return (_featureConfig || _load_featureConfig()).default.get('nuclide-python.includeOptionalArguments');
+  return _featureConfig().default.get('nuclide-python.includeOptionalArguments');
 }
 
 function getPythonPath() {
-  return (_featureConfig || _load_featureConfig()).default.get('nuclide-python.pathToPython');
+  return _featureConfig().default.get('nuclide-python.pathToPython');
 }
 
 function getShowGlobalVariables() {
-  return (_featureConfig || _load_featureConfig()).default.get('nuclide-python.showGlobalVariables');
+  return _featureConfig().default.get('nuclide-python.showGlobalVariables');
 }
 
 function getShowSignatureHelp() {
-  return Boolean((_featureConfig || _load_featureConfig()).default.get('nuclide-python.showSignatureHelp'));
+  return Boolean(_featureConfig().default.get('nuclide-python.showSignatureHelp'));
 }
 
 function getEnableLinting() {
-  return (_featureConfig || _load_featureConfig()).default.get('nuclide-python.enableLinting');
+  return _featureConfig().default.get('nuclide-python.enableLinting');
 }
 
 function getLintExtensionBlacklist() {
-  return (_featureConfig || _load_featureConfig()).default.get('nuclide-python.lintExtensionBlacklist');
+  return _featureConfig().default.get('nuclide-python.lintExtensionBlacklist');
 }

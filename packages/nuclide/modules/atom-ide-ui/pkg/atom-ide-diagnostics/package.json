@@ -8,8 +8,7 @@
   "author": "Nuclide : Diagnostics",
   "atomTestRunner": "../../../scripts/atom-test-runner.js",
   "nuclide": {
-    "packageType": "Atom",
-    "testRunner": "apm"
+    "packageType": "AtomPackage"
   },
   "activationCommands": {},
   "consumedServices": {
@@ -38,6 +37,11 @@
       "versions": {
         "0.1.0": "consumeDiagnosticsProviderV1",
         "0.2.0": "consumeDiagnosticsProviderV2"
+      }
+    },
+    "fb-gatekeeper": {
+      "versions": {
+        "0.0.0": "consumeGatekeeperService"
       }
     }
   },

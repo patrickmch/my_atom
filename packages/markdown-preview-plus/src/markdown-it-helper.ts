@@ -2,7 +2,7 @@ import markdownItModule = require('markdown-it')
 import * as twemoji from 'twemoji'
 import * as path from 'path'
 import { pairUp, atomConfig } from './util'
-import * as _ from 'lodash'
+import { isEqual } from 'lodash'
 
 type InitState = Readonly<ReturnType<typeof currentConfig>>
 
@@ -34,6 +34,8 @@ function currentConfig(rL: boolean) {
     toc: config.useToc,
     emoji: config.useEmoji,
     breaks: config.breakOnSingleNewline,
+    criticMarkup: config.useCriticMarkup,
+    imsize: config.useImsize,
     inlineMathSeparators: config.inlineMathSeparators,
     blockMathSeparators: config.blockMathSeparators,
   }
@@ -75,6 +77,11 @@ function init(initState: InitState): markdownItModule.MarkdownIt {
     }
   }
 
+  if (initState.criticMarkup) {
+    markdownIt.use(require('./markdown-it-criticmarkup'))
+  }
+  if (initState.imsize) markdownIt.use(require('markdown-it-imsize'))
+
   return markdownIt
 }
 
@@ -83,7 +90,7 @@ function wrapInitIfNeeded(initf: typeof init): typeof init {
   let initState: InitState | null = null
 
   return function(newState: InitState) {
-    if (markdownIt === null || !_.isEqual(initState, newState)) {
+    if (markdownIt === null || !isEqual(initState, newState)) {
       initState = newState
       markdownIt = initf(newState)
     }

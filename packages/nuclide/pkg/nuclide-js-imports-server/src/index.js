@@ -1,111 +1,163 @@
-'use strict';
+"use strict";
 
-var _idx;
+function _vscodeLanguageserver() {
+  const data = require("vscode-languageserver");
 
-function _load_idx() {
-  return _idx = _interopRequireDefault(require('idx'));
+  _vscodeLanguageserver = function () {
+    return data;
+  };
+
+  return data;
 }
 
-var _vscodeLanguageserver;
+function _vscodeJsonrpc() {
+  const data = require("vscode-jsonrpc");
 
-function _load_vscodeLanguageserver() {
-  return _vscodeLanguageserver = require('vscode-languageserver');
+  _vscodeJsonrpc = function () {
+    return data;
+  };
+
+  return data;
 }
 
-var _vscodeJsonrpc;
+function _log4js() {
+  const data = require("log4js");
 
-function _load_vscodeJsonrpc() {
-  return _vscodeJsonrpc = require('vscode-jsonrpc');
+  _log4js = function () {
+    return data;
+  };
+
+  return data;
 }
 
-var _log4js;
+function _SafeStreamMessageReader() {
+  const data = _interopRequireDefault(require("../../../modules/nuclide-commons/SafeStreamMessageReader"));
 
-function _load_log4js() {
-  return _log4js = require('log4js');
+  _SafeStreamMessageReader = function () {
+    return data;
+  };
+
+  return data;
 }
 
-var _SafeStreamMessageReader;
+function _AutoImportsManager() {
+  const data = require("./lib/AutoImportsManager");
 
-function _load_SafeStreamMessageReader() {
-  return _SafeStreamMessageReader = _interopRequireDefault(require('../../../modules/nuclide-commons/SafeStreamMessageReader'));
+  _AutoImportsManager = function () {
+    return data;
+  };
+
+  return data;
 }
 
-var _AutoImportsManager;
+function _TextDocuments() {
+  const data = _interopRequireDefault(require("../../nuclide-lsp-implementation-common/TextDocuments"));
 
-function _load_AutoImportsManager() {
-  return _AutoImportsManager = require('./lib/AutoImportsManager');
+  _TextDocuments = function () {
+    return data;
+  };
+
+  return data;
 }
 
-var _TextDocuments;
+function _ImportFormatter() {
+  const data = require("./lib/ImportFormatter");
 
-function _load_TextDocuments() {
-  return _TextDocuments = _interopRequireDefault(require('../../nuclide-lsp-implementation-common/TextDocuments'));
+  _ImportFormatter = function () {
+    return data;
+  };
+
+  return data;
 }
 
-var _ImportFormatter;
+function _Completions() {
+  const data = require("./Completions");
 
-function _load_ImportFormatter() {
-  return _ImportFormatter = require('./lib/ImportFormatter');
+  _Completions = function () {
+    return data;
+  };
+
+  return data;
 }
 
-var _Completions;
+function _Diagnostics() {
+  const data = require("./Diagnostics");
 
-function _load_Completions() {
-  return _Completions = require('./Completions');
+  _Diagnostics = function () {
+    return data;
+  };
+
+  return data;
 }
 
-var _Diagnostics;
+function _Settings() {
+  const data = require("./Settings");
 
-function _load_Diagnostics() {
-  return _Diagnostics = require('./Diagnostics');
+  _Settings = function () {
+    return data;
+  };
+
+  return data;
 }
 
-var _Settings;
+function _CodeActions() {
+  const data = require("./CodeActions");
 
-function _load_Settings() {
-  return _Settings = require('./Settings');
+  _CodeActions = function () {
+    return data;
+  };
+
+  return data;
 }
 
-var _CodeActions;
+function _CommandExecutor() {
+  const data = require("./CommandExecutor");
 
-function _load_CodeActions() {
-  return _CodeActions = require('./CodeActions');
+  _CommandExecutor = function () {
+    return data;
+  };
+
+  return data;
 }
 
-var _CommandExecutor;
+function _initializeLogging() {
+  const data = _interopRequireDefault(require("../logging/initializeLogging"));
 
-function _load_CommandExecutor() {
-  return _CommandExecutor = require('./CommandExecutor');
+  _initializeLogging = function () {
+    return data;
+  };
+
+  return data;
 }
 
-var _initializeLogging;
+function _Config() {
+  const data = require("./Config");
 
-function _load_initializeLogging() {
-  return _initializeLogging = _interopRequireDefault(require('../logging/initializeLogging'));
+  _Config = function () {
+    return data;
+  };
+
+  return data;
 }
 
-var _Config;
+function _nuclideUri() {
+  const data = _interopRequireDefault(require("../../../modules/nuclide-commons/nuclideUri"));
 
-function _load_Config() {
-  return _Config = require('./Config');
+  _nuclideUri = function () {
+    return data;
+  };
+
+  return data;
 }
 
-var _nuclideUri;
+function _WorkspaceSymbols() {
+  const data = require("./WorkspaceSymbols");
 
-function _load_nuclideUri() {
-  return _nuclideUri = _interopRequireDefault(require('../../../modules/nuclide-commons/nuclideUri'));
-}
+  _WorkspaceSymbols = function () {
+    return data;
+  };
 
-var _constantsForClient;
-
-function _load_constantsForClient() {
-  return _constantsForClient = require('./utils/constantsForClient');
-}
-
-var _WorkspaceSymbols;
-
-function _load_WorkspaceSymbols() {
-  return _WorkspaceSymbols = require('./WorkspaceSymbols');
+  return data;
 }
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
@@ -120,60 +172,56 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
  * 
  * @format
  */
+const reader = new (_SafeStreamMessageReader().default)(process.stdin);
+const writer = new (_vscodeJsonrpc().StreamMessageWriter)(process.stdout);
+const connection = (0, _vscodeLanguageserver().createConnection)(reader, writer);
+(0, _initializeLogging().default)(connection);
+const logger = (0, _log4js().getLogger)('nuclide-js-imports-server');
+const documents = new (_TextDocuments().default)(); // This will be set based on initializationOptions.
 
-const reader = new (_SafeStreamMessageReader || _load_SafeStreamMessageReader()).default(process.stdin);
-const writer = new (_vscodeJsonrpc || _load_vscodeJsonrpc()).StreamMessageWriter(process.stdout);
-
-const connection = (0, (_vscodeLanguageserver || _load_vscodeLanguageserver()).createConnection)(reader, writer);
-(0, (_initializeLogging || _load_initializeLogging()).default)(connection);
-
-const logger = (0, (_log4js || _load_log4js()).getLogger)('nuclide-js-imports-server');
-
-const documents = new (_TextDocuments || _load_TextDocuments()).default();
-
-// This will be set based on initializationOptions.
 const shouldProvideFlags = {
   diagnostics: false
 };
-
-let autoImportsManager = new (_AutoImportsManager || _load_AutoImportsManager()).AutoImportsManager([]);
-let importFormatter = new (_ImportFormatter || _load_ImportFormatter()).ImportFormatter([], false);
-let completion = new (_Completions || _load_Completions()).Completions(documents, autoImportsManager, importFormatter);
-let diagnostics = new (_Diagnostics || _load_Diagnostics()).Diagnostics(autoImportsManager, importFormatter);
-let codeActions = new (_CodeActions || _load_CodeActions()).CodeActions(autoImportsManager, importFormatter);
-let commandExecuter = new (_CommandExecutor || _load_CommandExecutor()).CommandExecutor(connection, autoImportsManager, importFormatter, documents);
-
+let autoImportsManager = new (_AutoImportsManager().AutoImportsManager)([]);
+let importFormatter = new (_ImportFormatter().ImportFormatter)([], false);
+let completion = new (_Completions().Completions)(autoImportsManager.getDefinitionManager(), documents, autoImportsManager, importFormatter);
+let diagnostics = new (_Diagnostics().Diagnostics)(autoImportsManager, importFormatter);
+let codeActions = new (_CodeActions().CodeActions)(autoImportsManager, importFormatter);
+let commandExecuter = new (_CommandExecutor().CommandExecutor)(connection, autoImportsManager, importFormatter, documents);
 connection.onInitialize(params => {
   const root = params.rootPath || process.cwd();
-  logger.debug('Server initialized.');
-  const eslintGlobals = (0, (_Config || _load_Config()).getEslintGlobals)(root);
-  const flowConfig = (0, (_Config || _load_Config()).getConfigFromFlow)(root);
+  const eslintGlobals = (0, _Config().getEslintGlobals)(root);
+  const flowConfig = (0, _Config().getConfigFromFlow)(root);
   shouldProvideFlags.diagnostics = shouldProvideDiagnostics(params, root);
-  importFormatter = new (_ImportFormatter || _load_ImportFormatter()).ImportFormatter(flowConfig.moduleDirs, shouldUseRequires(params, root));
-  autoImportsManager = new (_AutoImportsManager || _load_AutoImportsManager()).AutoImportsManager(eslintGlobals);
+  importFormatter = new (_ImportFormatter().ImportFormatter)(flowConfig.moduleDirs, shouldUseRequires(params, root));
+  autoImportsManager = new (_AutoImportsManager().AutoImportsManager)(eslintGlobals, params.initializationOptions ? {
+    componentModulePathFilter: params.initializationOptions.componentModulePathFilter
+  } : undefined);
   autoImportsManager.indexAndWatchDirectory(root);
-  completion = new (_Completions || _load_Completions()).Completions(documents, autoImportsManager, importFormatter);
-  diagnostics = new (_Diagnostics || _load_Diagnostics()).Diagnostics(autoImportsManager, importFormatter);
-  codeActions = new (_CodeActions || _load_CodeActions()).CodeActions(autoImportsManager, importFormatter);
-  commandExecuter = new (_CommandExecutor || _load_CommandExecutor()).CommandExecutor(connection, autoImportsManager, importFormatter, documents);
+  completion = new (_Completions().Completions)(autoImportsManager.getDefinitionManager(), documents, autoImportsManager, importFormatter);
+  diagnostics = new (_Diagnostics().Diagnostics)(autoImportsManager, importFormatter);
+  codeActions = new (_CodeActions().CodeActions)(autoImportsManager, importFormatter);
+  commandExecuter = new (_CommandExecutor().CommandExecutor)(connection, autoImportsManager, importFormatter, documents);
   return {
     capabilities: {
       textDocumentSync: documents.syncKind,
       completionProvider: {
-        resolveProvider: true,
+        resolveProvider: false,
         triggerCharacters: getAllTriggerCharacters()
       },
       codeActionProvider: true,
-      documentFormattingProvider: true,
-      executeCommandProvider: Array.from(Object.keys((_CommandExecutor || _load_CommandExecutor()).CommandExecutor.COMMANDS)),
-      workspaceSymbolProvider: true
+      executeCommandProvider: {
+        commands: Array.from(Object.keys(_CommandExecutor().CommandExecutor.COMMANDS))
+      },
+      workspaceSymbolProvider: true,
+      hoverProvider: true
     }
   };
 });
-
 documents.onDidOpenTextDocument(params => {
   try {
-    const uri = (_nuclideUri || _load_nuclideUri()).default.uriToNuclideUri(params.textDocument.uri);
+    const uri = _nuclideUri().default.uriToNuclideUri(params.textDocument.uri);
+
     if (uri != null) {
       autoImportsManager.workerIndexFile(uri, params.textDocument.getText());
       findAndSendDiagnostics(params.textDocument.getText(), uri);
@@ -182,10 +230,10 @@ documents.onDidOpenTextDocument(params => {
     logger.error(e);
   }
 });
-
 documents.onDidChangeContent(params => {
   try {
-    const uri = (_nuclideUri || _load_nuclideUri()).default.uriToNuclideUri(params.textDocument.uri);
+    const uri = _nuclideUri().default.uriToNuclideUri(params.textDocument.uri);
+
     if (uri != null) {
       autoImportsManager.workerIndexFile(uri, params.textDocument.getText());
       findAndSendDiagnostics(params.textDocument.getText(), uri);
@@ -194,75 +242,77 @@ documents.onDidChangeContent(params => {
     logger.error(e);
   }
 });
-
 documents.onDidClose(params => {
   // Clear out diagnostics.
-  connection.sendDiagnostics({ uri: params.textDocument.uri, diagnostics: [] });
+  connection.sendDiagnostics({
+    uri: params.textDocument.uri,
+    diagnostics: []
+  });
 });
 
 function findAndSendDiagnostics(text, uri) {
   if (shouldProvideFlags.diagnostics) {
     const diagnosticsForFile = diagnostics.findDiagnosticsForFile(text, uri);
     connection.sendDiagnostics({
-      uri: (_nuclideUri || _load_nuclideUri()).default.nuclideUriToUri(uri),
+      uri: _nuclideUri().default.nuclideUriToUri(uri),
       diagnostics: diagnosticsForFile
     });
   }
 }
 
-// Code completion:
+connection.onHover(hoverRequest => {
+  return autoImportsManager.getDefinitionManager().getHover(documents.get(hoverRequest.textDocument.uri), hoverRequest);
+}); // Code completion:
+
 connection.onCompletion(textDocumentPosition => {
-  const nuclideFormattedUri = (_nuclideUri || _load_nuclideUri()).default.uriToNuclideUri(textDocumentPosition.textDocument.uri);
+  const nuclideFormattedUri = _nuclideUri().default.uriToNuclideUri(textDocumentPosition.textDocument.uri);
+
   return nuclideFormattedUri != null ? completion.provideCompletions(textDocumentPosition, nuclideFormattedUri) : [];
 });
-
 connection.onCodeAction(codeActionParams => {
   try {
-    const uri = (_nuclideUri || _load_nuclideUri()).default.uriToNuclideUri(codeActionParams.textDocument.uri);
+    const uri = _nuclideUri().default.uriToNuclideUri(codeActionParams.textDocument.uri);
+
     return uri != null ? codeActions.provideCodeActions(codeActionParams.context && codeActionParams.context.diagnostics, uri) : [];
   } catch (error) {
     logger.error(error);
     return [];
   }
 });
-
 connection.onExecuteCommand(params => {
-  const { command, arguments: args } = params;
+  const {
+    command,
+    arguments: args
+  } = params;
   logger.debug('Executing command', command, 'with args', args);
-  commandExecuter.executeCommand(command, args);
+  return commandExecuter.executeCommand(command, args);
 });
-
 connection.onWorkspaceSymbol(params => {
-  return (_WorkspaceSymbols || _load_WorkspaceSymbols()).WorkspaceSymbols.getWorkspaceSymbols(autoImportsManager, params);
+  return _WorkspaceSymbols().WorkspaceSymbols.getWorkspaceSymbols(autoImportsManager, params);
 });
-
-connection.onDocumentFormatting(params => {
-  const fileUri = (_nuclideUri || _load_nuclideUri()).default.uriToNuclideUri(params.textDocument.uri);
-  return Promise.resolve(params.options.tabSize !== (_constantsForClient || _load_constantsForClient()).TAB_SIZE_SIGNIFYING_FIX_ALL_IMPORTS_FORMATTING || fileUri == null ? [] : commandExecuter.getEditsForFixingAllImports(fileUri));
-});
-
 documents.listen(connection);
 connection.listen();
 
 function getAllTriggerCharacters() {
-  const characters = [' ', '}', '='];
-  // Add all the characters from A-z
+  const characters = [' ', '}', '=']; // Add all the characters from A-z
+
   for (let char = 'A'.charCodeAt(0); char <= 'z'.charCodeAt(0); char++) {
     characters.push(String.fromCharCode(char));
   }
+
   return characters;
 }
 
 function shouldProvideDiagnostics(params, root) {
-  var _ref, _ref2;
+  var _ref;
 
-  const diagnosticsWhitelist = ((_ref = params) != null ? (_ref2 = _ref.initializationOptions) != null ? _ref2.diagnosticsWhitelist : _ref2 : _ref) || [];
-  return diagnosticsWhitelist.length !== 0 ? diagnosticsWhitelist.some(regex => root.match(new RegExp(regex))) : (_Settings || _load_Settings()).Settings.shouldProvideDiagnosticsDefault;
+  const diagnosticsWhitelist = ((_ref = params) != null ? (_ref = _ref.initializationOptions) != null ? _ref.diagnosticsWhitelist : _ref : _ref) || [];
+  return diagnosticsWhitelist.length !== 0 ? diagnosticsWhitelist.some(regex => root.match(new RegExp(regex))) : _Settings().Settings.shouldProvideDiagnosticsDefault;
 }
 
 function shouldUseRequires(params, root) {
-  var _ref3, _ref4;
+  var _ref2;
 
-  const requiresWhitelist = ((_ref3 = params) != null ? (_ref4 = _ref3.initializationOptions) != null ? _ref4.requiresWhitelist : _ref4 : _ref3) || [];
+  const requiresWhitelist = ((_ref2 = params) != null ? (_ref2 = _ref2.initializationOptions) != null ? _ref2.requiresWhitelist : _ref2 : _ref2) || [];
   return requiresWhitelist.some(regex => root.match(new RegExp(regex)));
 }

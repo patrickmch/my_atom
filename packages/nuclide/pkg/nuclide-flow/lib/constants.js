@@ -1,8 +1,10 @@
-'use strict';
+"use strict";
 
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
+exports.JS_GRAMMARS = void 0;
+
 /**
  * Copyright (c) 2015-present, Facebook, Inc.
  * All rights reserved.
@@ -13,5 +15,5 @@ Object.defineProperty(exports, "__esModule", {
  *  strict
  * @format
  */
-
-const JS_GRAMMARS = exports.JS_GRAMMARS = Object.freeze(['source.js', 'source.js.jsx']);
+const JS_GRAMMARS = Object.freeze(['source.js', 'source.js.jsx', 'source.flow']);
+exports.JS_GRAMMARS = JS_GRAMMARS;

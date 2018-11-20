@@ -1,21 +1,33 @@
-'use strict';
+"use strict";
 
-var _CodeSearchProvider;
+function _CodeSearchProvider() {
+  const data = require("./CodeSearchProvider");
 
-function _load_CodeSearchProvider() {
-  return _CodeSearchProvider = require('./CodeSearchProvider');
+  _CodeSearchProvider = function () {
+    return data;
+  };
+
+  return data;
 }
 
-var _createPackage;
+function _createPackage() {
+  const data = _interopRequireDefault(require("../../../modules/nuclide-commons-atom/createPackage"));
 
-function _load_createPackage() {
-  return _createPackage = _interopRequireDefault(require('../../../modules/nuclide-commons-atom/createPackage'));
+  _createPackage = function () {
+    return data;
+  };
+
+  return data;
 }
 
-var _UniversalDisposable;
+function _UniversalDisposable() {
+  const data = _interopRequireDefault(require("../../../modules/nuclide-commons/UniversalDisposable"));
 
-function _load_UniversalDisposable() {
-  return _UniversalDisposable = _interopRequireDefault(require('../../../modules/nuclide-commons/UniversalDisposable'));
+  _UniversalDisposable = function () {
+    return data;
+  };
+
+  return data;
 }
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
@@ -30,12 +42,10 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
  *  strict-local
  * @format
  */
-
 class Activation {
-
   constructor(state) {
     // TODO(wallace): Add activation code here.
-    this._disposables = new (_UniversalDisposable || _load_UniversalDisposable()).default();
+    this._disposables = new (_UniversalDisposable().default)();
   }
 
   dispose() {
@@ -43,8 +53,9 @@ class Activation {
   }
 
   registerProvider() {
-    return (_CodeSearchProvider || _load_CodeSearchProvider()).CodeSearchProvider;
+    return _CodeSearchProvider().CodeSearchProvider;
   }
+
 }
 
-(0, (_createPackage || _load_createPackage()).default)(module.exports, Activation);
+(0, _createPackage().default)(module.exports, Activation);

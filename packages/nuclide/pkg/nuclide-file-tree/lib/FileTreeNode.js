@@ -1,58 +1,79 @@
-'use strict';
+"use strict";
 
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.FileTreeNode = undefined;
+exports.FileTreeNode = void 0;
 
-var _MemoizedFieldsDeriver;
+function _MemoizedFieldsDeriver() {
+  const data = require("./MemoizedFieldsDeriver");
 
-function _load_MemoizedFieldsDeriver() {
-  return _MemoizedFieldsDeriver = require('./MemoizedFieldsDeriver');
+  _MemoizedFieldsDeriver = function () {
+    return data;
+  };
+
+  return data;
 }
 
-var _nuclideUri;
+function _nuclideUri() {
+  const data = _interopRequireDefault(require("../../../modules/nuclide-commons/nuclideUri"));
 
-function _load_nuclideUri() {
-  return _nuclideUri = _interopRequireDefault(require('../../../modules/nuclide-commons/nuclideUri'));
+  _nuclideUri = function () {
+    return data;
+  };
+
+  return data;
 }
 
-var _immutable;
+function Immutable() {
+  const data = _interopRequireWildcard(require("immutable"));
 
-function _load_immutable() {
-  return _immutable = _interopRequireWildcard(require('immutable'));
+  Immutable = function () {
+    return data;
+  };
+
+  return data;
 }
 
-function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
+function FileTreeHelpers() {
+  const data = _interopRequireWildcard(require("./FileTreeHelpers"));
+
+  FileTreeHelpers = function () {
+    return data;
+  };
+
+  return data;
+}
+
+function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) { var desc = Object.defineProperty && Object.getOwnPropertyDescriptor ? Object.getOwnPropertyDescriptor(obj, key) : {}; if (desc.get || desc.set) { Object.defineProperty(newObj, key, desc); } else { newObj[key] = obj[key]; } } } } newObj.default = obj; return newObj; } }
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
+/**
+ * Copyright (c) 2015-present, Facebook, Inc.
+ * All rights reserved.
+ *
+ * This source code is licensed under the license found in the LICENSE file in
+ * the root directory of this source tree.
+ *
+ *  strict-local
+ * @format
+ */
 const DEFAULT_OPTIONS = {
   isExpanded: false,
-  isSelected: false,
-  isFocused: false,
   isDragHovered: false,
   isBeingReordered: false,
   isLoading: false,
   wasFetched: false,
   isCwd: false,
-  children: (_immutable || _load_immutable()).OrderedMap(),
+  children: Immutable().OrderedMap(),
   connectionTitle: '',
   subscription: null,
   highlightedText: '',
   matchesFilter: true,
   isPendingLoad: false,
   generatedStatus: null
-}; /**
-    * Copyright (c) 2015-present, Facebook, Inc.
-    * All rights reserved.
-    *
-    * This source code is licensed under the license found in the LICENSE file in
-    * the root directory of this source tree.
-    *
-    * 
-    * @format
-    */
+};
 
 /**
  * OVERVIEW
@@ -102,6 +123,8 @@ const DEFAULT_OPTIONS = {
  *   All property derivation and links set-up is done with one traversal only over the children.
  */
 class FileTreeNode {
+  // Mutable properties - set when the node is assigned to its parent (and are immutable after)
+  // Derived
 
   /**
    * The children property is an OrderedMap instance keyed by child's name property.
@@ -109,111 +132,67 @@ class FileTreeNode {
    * of FileTreeNode instances
    */
   static childrenFromArray(children) {
-    return (_immutable || _load_immutable()).OrderedMap(children.map(child => [child.name, child]));
+    return Immutable().OrderedMap(children.map(child => [child.name, child]));
   }
-
   /**
    * The _derivedChange param is not for external use.
    */
 
 
-  // Derived from children
-
-
-  // Derived
-
-  // Mutable properties - set when the node is assigned to its parent (and are immutable after)
   constructor(options, conf, _deriver = null) {
     this.parent = null;
     this.nextSibling = null;
     this.prevSibling = null;
-    this.conf = conf;
+    this._conf = conf;
 
     this._assignOptions(options);
 
-    this._deriver = _deriver || new (_MemoizedFieldsDeriver || _load_MemoizedFieldsDeriver()).MemoizedFieldsDeriver(options.uri, options.rootUri);
-    const derived = this._deriver.buildDerivedFields(conf);
-    this._assignDerived(derived);
+    this._deriver = _deriver || new (_MemoizedFieldsDeriver().MemoizedFieldsDeriver)(options.uri, options.rootUri);
+
+    this._assignDerived();
 
     this._handleChildren();
   }
-
   /**
    * Sets the links from the children to this instance (their parent) and the links between the
    * siblings.
-   *   Additionally calculates the properties derived from children and assigns them to this instance
    */
-  _handleChildren() {
-    let containsDragHover = this.isDragHovered;
-    let containsFilterMatches = this.matchesFilter;
-    let containsHidden = !this.shouldBeShown;
-    let childrenAreLoading = this.childrenAreLoading || this.isLoading;
-    let childCountIfNotPendingLoad = 0;
 
+
+  _handleChildren() {
     let prevChild = null;
     this.children.forEach(c => {
       c.parent = this;
-
       c.prevSibling = prevChild;
+
       if (prevChild != null) {
         prevChild.nextSibling = c;
       }
+
       prevChild = c;
-
-      if (c.containsFilterMatches) {
-        containsFilterMatches = true;
-      }
-
-      if (!containsDragHover && c.containsDragHover) {
-        containsDragHover = true;
-      }
-
-      if (this.shouldBeShown && this.isExpanded) {
-        childCountIfNotPendingLoad += c.shownChildrenCount;
-      }
-
-      if (!containsHidden && c.containsHidden) {
-        containsHidden = true;
-      }
-
-      if (!childrenAreLoading && c.childrenAreLoading) {
-        childrenAreLoading = true;
-      }
     });
+
     if (prevChild != null) {
       prevChild.nextSibling = null;
     }
-
-    this.containsDragHover = containsDragHover;
-    this.containsFilterMatches = containsFilterMatches;
-    this.containsHidden = containsHidden;
-    this.childrenAreLoading = childrenAreLoading;
-
-    this.isPendingLoad = this.isPendingLoad && childrenAreLoading;
-    let shownChildrenCount = this.shouldBeShown ? 1 : 0;
-    if (!this.isPendingLoad) {
-      shownChildrenCount += childCountIfNotPendingLoad;
-    }
-    this.shownChildrenCount = shownChildrenCount;
   }
-
   /**
    * Using object.assign() was proven to be less performant than direct named assignment
    * Since in heavy updates, nodes are created by the thousands we need to keep the creation
    * flow performant.
    */
+
+
   _assignOptions(options) {
+    var _options$name, _options$relativePath, _options$localPath;
+
     this.uri = options.uri;
     this.rootUri = options.rootUri;
+    this.name = (_options$name = options.name) !== null && _options$name !== void 0 ? _options$name : FileTreeHelpers().keyToName(this.uri);
+    this.isRoot = this.uri === this.rootUri;
+    this.relativePath = (_options$relativePath = options.relativePath) !== null && _options$relativePath !== void 0 ? _options$relativePath : _nuclideUri().default.relative(this.rootUri, this.uri);
+    this.localPath = (_options$localPath = options.localPath) !== null && _options$localPath !== void 0 ? _options$localPath : FileTreeHelpers().keyToPath(_nuclideUri().default.isRemote(this.uri) ? _nuclideUri().default.parse(this.uri).path : this.uri);
     this.isExpanded = options.isExpanded !== undefined ? options.isExpanded : DEFAULT_OPTIONS.isExpanded;
-    const isSelected = options.isSelected !== undefined ? options.isSelected : DEFAULT_OPTIONS.isSelected;
-    if (isSelected) {
-      this.conf.selectionManager.select(this);
-    }
-    const isFocused = options.isFocused !== undefined ? options.isFocused : DEFAULT_OPTIONS.isFocused;
-    if (isFocused) {
-      this.conf.selectionManager.focus(this);
-    }
     this.isDragHovered = options.isDragHovered !== undefined ? options.isDragHovered : DEFAULT_OPTIONS.isDragHovered;
     this.isBeingReordered = options.isBeingReordered !== undefined ? options.isBeingReordered : DEFAULT_OPTIONS.isBeingReordered;
     this.isLoading = options.isLoading !== undefined ? options.isLoading : DEFAULT_OPTIONS.isLoading;
@@ -224,42 +203,51 @@ class FileTreeNode {
     this.subscription = options.subscription !== undefined ? options.subscription : DEFAULT_OPTIONS.subscription;
     this.highlightedText = options.highlightedText !== undefined ? options.highlightedText : DEFAULT_OPTIONS.highlightedText;
     this.matchesFilter = options.matchesFilter !== undefined ? options.matchesFilter : DEFAULT_OPTIONS.matchesFilter;
-    this.isPendingLoad = options.isPendingLoad !== undefined ? options.isPendingLoad : DEFAULT_OPTIONS.isPendingLoad;
-    this.generatedStatus = options.generatedStatus !== undefined ? options.generatedStatus : DEFAULT_OPTIONS.generatedStatus;
-  }
+    this.generatedStatus = options.generatedStatus !== undefined ? options.generatedStatus : DEFAULT_OPTIONS.generatedStatus; // `isPendingLoad` is a special case in that it's sticky. Once a node's not pending load, it can
+    // never be pending load again. When you move from loading -> not loading, a load is no longer
+    // pending.
 
+    if (!this.isLoading) {
+      this.isPendingLoad = false;
+    } else if (this.isPendingLoad !== false) {
+      var _options$isPendingLoa;
+
+      this.isPendingLoad = (_options$isPendingLoa = options.isPendingLoad) !== null && _options$isPendingLoa !== void 0 ? _options$isPendingLoa : DEFAULT_OPTIONS.isPendingLoad;
+    }
+  }
   /**
    * Using object.assign() was proven to be less performant than direct named assignment
    * Since in heavy updates, nodes are created by the thousands we need to keep the creation
    * flow performant.
    */
-  _assignDerived(derived) {
-    this.isRoot = derived.isRoot;
-    this.name = derived.name;
+
+
+  _assignDerived() {
+    const derived = this._deriver.buildDerivedFields(this._conf);
+
     this.hashKey = derived.hashKey;
-    this.relativePath = derived.relativePath;
-    this.localPath = derived.localPath;
     this.isContainer = derived.isContainer;
     this.shouldBeShown = derived.shouldBeShown;
     this.shouldBeSoftened = derived.shouldBeSoftened;
-    this.vcsStatusCode = derived.vcsStatusCode;
     this.repo = derived.repo;
     this.isIgnored = derived.isIgnored;
     this.checkedStatus = derived.checkedStatus;
   }
-
   /**
    * When modifying some of the properties a new instance needs to be created with all of the
    * properties identical except for those being modified. This method creates the baseline options
    * instance
    */
+
+
   _buildOptions() {
     return {
       uri: this.uri,
       rootUri: this.rootUri,
+      name: this.name,
+      relativePath: this.relativePath,
+      localPath: this.localPath,
       isExpanded: this.isExpanded,
-      isSelected: this.isSelected(),
-      isFocused: this.isFocused(),
       isDragHovered: this.isDragHovered,
       isBeingReordered: this.isBeingReordered,
       isLoading: this.isLoading,
@@ -276,78 +264,71 @@ class FileTreeNode {
   }
 
   setIsExpanded(isExpanded) {
-    return this.set({ isExpanded });
-  }
-
-  setIsSelected(isSelected) {
-    return this.set({ isSelected });
-  }
-
-  setIsFocused(isFocused) {
-    return this.set({ isFocused });
+    return this.set({
+      isExpanded
+    });
   }
 
   setIsDragHovered(isDragHovered) {
-    return this.set({ isDragHovered });
+    return this.set({
+      isDragHovered
+    });
   }
 
   setIsBeingReordered(isBeingReordered) {
-    return this.setRecursive(node => node.shouldBeShown ? null : node, node => node.shouldBeShown ? node.set({ isBeingReordered }) : node);
+    return this.setRecursive(node => node.shouldBeShown ? null : node, node => node.shouldBeShown ? node.set({
+      isBeingReordered
+    }) : node);
   }
 
   setIsLoading(isLoading) {
-    return this.set({ isLoading });
+    return this.set({
+      isLoading
+    });
   }
 
   setIsCwd(isCwd) {
-    return this.set({ isCwd });
+    return this.set({
+      isCwd
+    });
   }
 
   setChildren(children) {
-    return this.set({ children });
+    return this.set({
+      children
+    });
   }
 
   setGeneratedStatus(generatedStatus) {
-    return this.set({ generatedStatus });
+    return this.set({
+      generatedStatus
+    });
   }
-
   /**
    * Notifies the node about the change that happened in the configuration object. Will trigger
    * the complete reconstruction of the entire tree branch
    */
-  updateConf() {
-    const children = this.children.map(c => c.updateConf());
-    return this._newNode({ children }, this.conf);
-  }
 
+
+  updateConf(conf) {
+    const children = this.children.map(c => c.updateConf(conf));
+
+    const options = this._buildOptions();
+
+    return new FileTreeNode(Object.assign({}, options, {
+      children
+    }), conf, this._deriver);
+  }
   /**
    * Used to modify several properties at once and skip unnecessary construction of intermediate
    * instances. For example:
-   * const newNode = node.set({isExpanded: true, isSelected: false});
+   * const newNode = node.set({isExpanded: true});
    */
+
+
   set(props) {
-    if (this._propsAreTheSame(props)) {
-      // Prevent an expensive operation on a very frequent update (selection)
-      if (props.isSelected !== undefined && this.isSelected() !== props.isSelected) {
-        if (props.isSelected) {
-          this.conf.selectionManager.select(this);
-        } else {
-          this.conf.selectionManager.unselect(this);
-        }
-      }
-      if (props.isFocused !== undefined && this.isFocused() !== props.isFocused) {
-        if (props.isFocused) {
-          this.conf.selectionManager.focus(this);
-        } else {
-          this.conf.selectionManager.unfocus(this);
-        }
-      }
-      return this;
-    }
-
-    return this._newNode(props, this.conf);
+    return this._propsAreTheSame(props) ? this : this._newNode(props);
   }
-
   /**
    * Performs an update of a tree branch. Receives two optional predicates
    *
@@ -358,35 +339,41 @@ class FileTreeNode {
    * The `postPredicate` is invoked on the way up. It has to return a non-null node, but it may
    * be the same instance as it was called with.
    */
+
+
   setRecursive(prePredicate, postPredicate = n => n) {
     if (prePredicate != null) {
       const newNode = prePredicate(this);
+
       if (newNode != null) {
         return postPredicate(newNode);
       }
     }
 
     const children = this.children.map(child => child.setRecursive(prePredicate, postPredicate));
-
     return postPredicate(this.setChildren(children));
   }
-
   /**
    * Updates a single child in the map of children. The method only receives the new child instance
    * and the retrieval in from the map is performed by the child's name. This uses the fact
    * that children names (derived from their uris) are unmodifiable. Thus we won't ever have a
    * problem locating the value that we need to replace.
    */
+
+
   updateChild(newChild) {
     const children = this.children.set(newChild.name, newChild);
-    return this.set({ children });
+    return this.set({
+      children
+    });
   }
-
   /**
    * A hierarchical equivalent of forEach. The method receives two predicates
    * The first is invoked upon descent and with its return value controls whether need to traverse
    * deeper into the tree. True - descend, False - don't.
    */
+
+
   traverse(preCallback, postCallback = () => {}) {
     const descend = preCallback(this);
 
@@ -396,10 +383,11 @@ class FileTreeNode {
 
     postCallback(this);
   }
-
   /**
    * Looks for a node with the given URI in the sub branch - returns null if not found
    */
+
+
   find(uri) {
     const deepestFound = this.findDeepest(uri);
 
@@ -409,12 +397,13 @@ class FileTreeNode {
 
     return deepestFound;
   }
-
   /**
    * Looks for a node with the given URI in the sub branch - returns the deepest found ancesstor
    * of the node being looked for.
    * Returns null if the node can not belong to the sub-branch
    */
+
+
   findDeepest(uri) {
     if (!uri.startsWith(this.uri)) {
       return null;
@@ -424,108 +413,15 @@ class FileTreeNode {
       return this;
     }
 
-    const childNamePath = (_nuclideUri || _load_nuclideUri()).default.split((_nuclideUri || _load_nuclideUri()).default.relative(this.uri, uri));
+    const childNamePath = _nuclideUri().default.split(_nuclideUri().default.relative(this.uri, uri));
+
     return this._findLastByNamePath(childNamePath);
-  }
-
-  /**
-   * Finds the next node in the tree in the natural order - from top to to bottom as is displayed
-   * in the file-tree panel, minus the indentation. Only the nodes that should be shown are returned.
-   */
-  findNext() {
-    if (!this.shouldBeShown) {
-      if (this.parent != null) {
-        return this.parent.findNext();
-      }
-
-      return null;
-    }
-
-    if (this.shownChildrenCount > 1) {
-      return this.children.find(c => c.shouldBeShown);
-    }
-
-    // Not really an alias, but an iterating reference
-    let it = this;
-    while (it != null) {
-      const nextShownSibling = it.findNextShownSibling();
-      if (nextShownSibling != null) {
-        return nextShownSibling;
-      }
-
-      it = it.parent;
-    }
-
-    return null;
-  }
-
-  findNextShownSibling() {
-    let it = this.nextSibling;
-    while (it != null && !it.shouldBeShown) {
-      it = it.nextSibling;
-    }
-
-    return it;
-  }
-
-  /**
-   * Finds the previous node in the tree in the natural order - from top to to bottom as is displayed
-   * in the file-tree panel, minus the indentation. Only the nodes that should be shown are returned.
-   */
-  findPrevious() {
-    if (!this.shouldBeShown) {
-      if (this.parent != null) {
-        return this.parent.findPrevious();
-      }
-
-      return null;
-    }
-
-    const prevShownSibling = this.findPrevShownSibling();
-    if (prevShownSibling != null) {
-      return prevShownSibling.findLastRecursiveChild();
-    }
-
-    return this.parent;
-  }
-
-  findPrevShownSibling() {
-    let it = this.prevSibling;
-    while (it != null && !it.shouldBeShown) {
-      it = it.prevSibling;
-    }
-
-    return it;
-  }
-
-  /**
-   * Returns the last shown descendant according to the natural tree order as is to be displayed by
-   * the file-tree panel. (Last child of the last child of the last child...)
-   * Or null, if none are found
-   */
-  findLastRecursiveChild() {
-    if (!this.isContainer || !this.isExpanded || this.children.isEmpty()) {
-      return this;
-    }
-
-    let it = this.children.last();
-    while (it != null && !it.shouldBeShown) {
-      it = it.prevSibling;
-    }
-
-    if (it == null) {
-      if (this.shouldBeShown) {
-        return this;
-      }
-      return this.findPrevious();
-    } else {
-      return it.findLastRecursiveChild();
-    }
   }
 
   getDepth() {
     let it = this.parent;
     let depth = 0;
+
     while (it != null) {
       it = it.parent;
       depth++;
@@ -534,73 +430,44 @@ class FileTreeNode {
     return depth;
   }
 
-  /**
-   * Calculate the index of current Node w.r.t the top of the tree.
-   * The index is one based.
-   * If the node is not shown, the index is for the previous shown node.
-   */
-  calculateVisualIndex() {
-    let index = this.shouldBeShown ? 1 : 0;
-    let prev = this.findPrevShownSibling();
-    while (prev != null) {
-      index += prev.shownChildrenCount;
-      prev = prev.findPrevShownSibling();
-    }
-    return index + (this.parent == null ? 0 : this.parent.calculateVisualIndex());
-  }
-
-  findByIndex(index) {
-    if (index === 1) {
-      return this;
-    }
-
-    if (index > this.shownChildrenCount) {
-      const nextShownSibling = this.findNextShownSibling();
-      if (nextShownSibling != null) {
-        return nextShownSibling.findByIndex(index - this.shownChildrenCount);
-      }
-
-      return null;
-    }
-
-    const firstVisibleChild = this.children.find(c => c.shouldBeShown);
-    if (firstVisibleChild != null) {
-      return firstVisibleChild.findByIndex(index - 1);
-    }
-
-    return null;
-  }
-
   _propsAreTheSame(props) {
     if (props.isDragHovered !== undefined && this.isDragHovered !== props.isDragHovered) {
       return false;
     }
+
     if (props.isBeingReordered !== undefined && this.isBeingReordered !== props.isBeingReordered) {
       return false;
     }
+
     if (props.isExpanded !== undefined && this.isExpanded !== props.isExpanded) {
       return false;
     }
+
     if (props.isLoading !== undefined && this.isLoading !== props.isLoading) {
       return false;
     }
+
     if (props.wasFetched !== undefined && this.wasFetched !== props.wasFetched) {
       return false;
     }
+
     if (props.isCwd !== undefined && this.isCwd !== props.isCwd) {
       return false;
     }
+
     if (props.subscription !== undefined && this.subscription !== props.subscription) {
       return false;
     }
+
     if (props.highlightedText !== undefined && this.highlightedText !== props.highlightedText) {
       return false;
     }
+
     if (props.matchesFilter !== undefined && this.matchesFilter !== props.matchesFilter) {
       return false;
     }
 
-    if (props.children !== undefined && props.children !== this.children && !(_immutable || _load_immutable()).is(this.children, props.children)) {
+    if (props.children !== undefined && props.children !== this.children && !Immutable().is(this.children, props.children)) {
       return false;
     }
 
@@ -615,42 +482,10 @@ class FileTreeNode {
     return true;
   }
 
-  _newNode(props, conf) {
+  _newNode(props) {
     const options = this._buildOptions();
-    if (props.children !== undefined) {
-      this._handleChildrenChange(this.children, props.children);
-    }
-    this.conf.selectionManager.unselect(this);
-    this.conf.selectionManager.unfocus(this);
 
-    return new FileTreeNode(Object.assign({}, options, props), conf, this._deriver);
-  }
-
-  _handleChildrenChange(oldChildren, newChildren) {
-    if (oldChildren === newChildren) {
-      return;
-    }
-    const childrenToUnselect = new Set();
-    const childrenToUnfocus = new Set();
-
-    oldChildren.forEach(node => {
-      const newChild = newChildren.get(node.name);
-      if (newChild === node) {
-        return;
-      }
-
-      childrenToUnselect.add(node);
-      childrenToUnfocus.add(node);
-
-      if (newChild != null) {
-        this._handleChildrenChange(node.children, newChild.children);
-      } else {
-        this._handleChildrenChange(node.children, (_immutable || _load_immutable()).OrderedMap());
-      }
-    });
-
-    childrenToUnselect.forEach(node => this.conf.selectionManager.unselect(node));
-    childrenToUnfocus.forEach(node => this.conf.selectionManager.unfocus(node));
+    return new FileTreeNode(Object.assign({}, options, props), this._conf, this._deriver);
   }
 
   _findLastByNamePath(childNamePath) {
@@ -659,19 +494,12 @@ class FileTreeNode {
     }
 
     const child = this.children.get(childNamePath[0]);
+
     if (child == null) {
       return this;
     }
 
     return child._findLastByNamePath(childNamePath.slice(1));
-  }
-
-  isSelected() {
-    return this.conf.selectionManager.isSelected(this);
-  }
-
-  isFocused() {
-    return this.conf.selectionManager.isFocused(this);
   }
 
   collectDebugState() {
@@ -697,17 +525,12 @@ class FileTreeNode {
       isContainer: this.isContainer,
       shouldBeShown: this.shouldBeShown,
       shouldBeSoftened: this.shouldBeSoftened,
-      vcsStatusCode: this.vcsStatusCode,
       isIgnored: this.isIgnored,
       checkedStatus: this.checkedStatus,
-      containsDragHover: this.containsDragHover,
-      containsFilterMatches: this.containsFilterMatches,
-      shownChildrenCount: this.shownChildrenCount,
-      containsHidden: this.containsHidden,
-      childrenAreLoading: this.childrenAreLoading,
-
       children: Array.from(this.children.values()).map(child => child.collectDebugState())
     };
   }
+
 }
+
 exports.FileTreeNode = FileTreeNode;

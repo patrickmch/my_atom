@@ -1,21 +1,29 @@
-'use strict';
+"use strict";
 
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.KEYSTROKES_TO_IGNORE = undefined;
 exports.default = trackKeyLatency;
+exports.KEYSTROKES_TO_IGNORE = void 0;
 
-var _UniversalDisposable;
+function _UniversalDisposable() {
+  const data = _interopRequireDefault(require("../../../modules/nuclide-commons/UniversalDisposable"));
 
-function _load_UniversalDisposable() {
-  return _UniversalDisposable = _interopRequireDefault(require('../../../modules/nuclide-commons/UniversalDisposable'));
+  _UniversalDisposable = function () {
+    return data;
+  };
+
+  return data;
 }
 
-var _nuclideAnalytics;
+function _nuclideAnalytics() {
+  const data = require("../../../modules/nuclide-analytics");
 
-function _load_nuclideAnalytics() {
-  return _nuclideAnalytics = require('../../nuclide-analytics');
+  _nuclideAnalytics = function () {
+    return data;
+  };
+
+  return data;
 }
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
@@ -32,11 +40,14 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
  */
 
 /* global performance, requestAnimationFrame */
-
 const SAMPLE_RATE = 100; // 1 in 100 keystrokes will be measured.
-const KEYSTROKES_TO_IGNORE = exports.KEYSTROKES_TO_IGNORE = 10; // exported for testing
+
+const KEYSTROKES_TO_IGNORE = 10; // exported for testing
+
+exports.KEYSTROKES_TO_IGNORE = KEYSTROKES_TO_IGNORE;
 const HISTOGRAM_MAX = 100;
 const HISTOGRAM_BUCKETS = 10; // 10ms / bucket
+
 const HISTOGRAM_INTERVAL_SEC = 10 * 60; // 5 mins
 
 /**
@@ -48,23 +59,27 @@ const HISTOGRAM_INTERVAL_SEC = 10 * 60; // 5 mins
  *
  * For a justification, see this profile of a keystroke's journey: https://i.imgur.com/rY0C2uf.png
  */
+
 function trackKeyLatency() {
-  const keyLatencyTracker = new (_nuclideAnalytics || _load_nuclideAnalytics()).HistogramTracker('key-latency', HISTOGRAM_MAX, HISTOGRAM_BUCKETS, HISTOGRAM_INTERVAL_SEC);
-  const keyListenerLatencyTracker = new (_nuclideAnalytics || _load_nuclideAnalytics()).HistogramTracker('key-listener-latency', HISTOGRAM_MAX, HISTOGRAM_BUCKETS, HISTOGRAM_INTERVAL_SEC);
-  const disposables = new (_UniversalDisposable || _load_UniversalDisposable()).default(keyLatencyTracker, keyListenerLatencyTracker);
+  const keyLatencyTracker = new (_nuclideAnalytics().HistogramTracker)('key-latency', HISTOGRAM_MAX, HISTOGRAM_BUCKETS, HISTOGRAM_INTERVAL_SEC);
+  const keyListenerLatencyTracker = new (_nuclideAnalytics().HistogramTracker)('key-listener-latency', HISTOGRAM_MAX, HISTOGRAM_BUCKETS, HISTOGRAM_INTERVAL_SEC);
+  const disposables = new (_UniversalDisposable().default)(keyLatencyTracker, keyListenerLatencyTracker);
   disposables.add(atom.workspace.observeTextEditors(editor => {
     // Add a slight delay to allow other listeners to attach first.
     setTimeout(() => {
       if (editor.isDestroyed()) {
         return;
-      }
-      // The first few keystrokes tend to be slower, so ignore them.
+      } // The first few keystrokes tend to be slower, so ignore them.
+
+
       let keystroke = SAMPLE_RATE - KEYSTROKES_TO_IGNORE;
-      const unshift = true;
-      // We need to access the (private) emitter to use `unshift`.
+      const unshift = true; // We need to access the (private) emitter to use `unshift`.
       // This ensures that we include other will-insert-text handlers.
-      // $FlowIgnore
-      const disposable = editor.emitter.on('will-insert-text', ({ text }) => {
+
+      disposables.addUntilDestroyed(editor, // $FlowIgnore
+      editor.emitter.on('will-insert-text', ({
+        text
+      }) => {
         if (keystroke++ % SAMPLE_RATE === 0 && text.length === 1) {
           const startTime = performance.now();
           setImmediate(() => {
@@ -74,12 +89,7 @@ function trackKeyLatency() {
             });
           });
         }
-      }, unshift);
-      const destroyDisposable = new (_UniversalDisposable || _load_UniversalDisposable()).default(disposable, editor.onDidDestroy(() => {
-        destroyDisposable.dispose();
-        disposables.remove(destroyDisposable);
-      }));
-      disposables.add(destroyDisposable);
+      }, unshift));
     }, 100);
   }));
   return disposables;

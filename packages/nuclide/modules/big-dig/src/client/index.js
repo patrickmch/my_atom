@@ -1,46 +1,55 @@
-'use strict';
+"use strict";
 
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-
-var _BigDigClient;
-
-function _load_BigDigClient() {
-  return _BigDigClient = require('./BigDigClient');
-}
-
-Object.defineProperty(exports, 'BigDigClient', {
+Object.defineProperty(exports, "BigDigClient", {
   enumerable: true,
   get: function () {
-    return (_BigDigClient || _load_BigDigClient()).BigDigClient;
+    return _BigDigClient().BigDigClient;
+  }
+});
+Object.defineProperty(exports, "SshHandshake", {
+  enumerable: true,
+  get: function () {
+    return _SshHandshake().SshHandshake;
+  }
+});
+Object.defineProperty(exports, "createBigDigClient", {
+  enumerable: true,
+  get: function () {
+    return _createBigDigClient().default;
   }
 });
 
-var _SshHandshake;
+function _BigDigClient() {
+  const data = require("./BigDigClient");
 
-function _load_SshHandshake() {
-  return _SshHandshake = require('./SshHandshake');
+  _BigDigClient = function () {
+    return data;
+  };
+
+  return data;
 }
 
-Object.defineProperty(exports, 'SshHandshake', {
-  enumerable: true,
-  get: function () {
-    return (_SshHandshake || _load_SshHandshake()).SshHandshake;
-  }
-});
+function _SshHandshake() {
+  const data = require("./SshHandshake");
 
-var _createBigDigClient;
+  _SshHandshake = function () {
+    return data;
+  };
 
-function _load_createBigDigClient() {
-  return _createBigDigClient = require('./createBigDigClient');
+  return data;
 }
 
-Object.defineProperty(exports, 'createBigDigClient', {
-  enumerable: true,
-  get: function () {
-    return _interopRequireDefault(_createBigDigClient || _load_createBigDigClient()).default;
-  }
-});
+function _createBigDigClient() {
+  const data = _interopRequireDefault(require("./createBigDigClient"));
+
+  _createBigDigClient = function () {
+    return data;
+  };
+
+  return data;
+}
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }

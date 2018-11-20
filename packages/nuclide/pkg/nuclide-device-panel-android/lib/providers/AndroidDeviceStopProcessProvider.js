@@ -1,16 +1,20 @@
-'use strict';
+"use strict";
 
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.AndroidDeviceStopProcessProvider = undefined;
+exports.AndroidDeviceStopProcessProvider = void 0;
 
-var _rxjsBundlesRxMinJs = require('rxjs/bundles/Rx.min.js');
+var _rxjsCompatUmdMin = require("rxjs-compat/bundles/rxjs-compat.umd.min.js");
 
-var _utils;
+function _utils() {
+  const data = require("../../../../modules/nuclide-adb/lib/utils");
 
-function _load_utils() {
-  return _utils = require('../../../../modules/nuclide-adb/lib/utils');
+  _utils = function () {
+    return data;
+  };
+
+  return data;
 }
 
 /**
@@ -23,7 +27,6 @@ function _load_utils() {
  *  strict-local
  * @format
  */
-
 class AndroidDeviceStopProcessProvider {
   getType() {
     return 'Android';
@@ -42,11 +45,13 @@ class AndroidDeviceStopProcessProvider {
   }
 
   getSupportedPIDs(host, device, procs) {
-    return _rxjsBundlesRxMinJs.Observable.of(new Set(procs.map(proc => proc.pid)));
+    return _rxjsCompatUmdMin.Observable.of(new Set(procs.map(proc => proc.pid)));
   }
 
   async run(host, device, proc) {
-    return (0, (_utils || _load_utils()).getAdbServiceByNuclideUri)(host).stopProcess(device, proc.name, proc.pid);
+    return (0, _utils().getAdbServiceByNuclideUri)(host).stopProcess(device.identifier, proc.name, proc.pid);
   }
+
 }
+
 exports.AndroidDeviceStopProcessProvider = AndroidDeviceStopProcessProvider;

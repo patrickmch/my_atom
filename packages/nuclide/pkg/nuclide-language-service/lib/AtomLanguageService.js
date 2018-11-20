@@ -1,130 +1,234 @@
-'use strict';
+"use strict";
 
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.AtomLanguageService = undefined;
+exports.AtomLanguageService = void 0;
 
-var _nuclideRemoteConnection;
+function _nuclideOpenFiles() {
+  const data = require("../../nuclide-open-files");
 
-function _load_nuclideRemoteConnection() {
-  return _nuclideRemoteConnection = require('../../nuclide-remote-connection');
+  _nuclideOpenFiles = function () {
+    return data;
+  };
+
+  return data;
 }
 
-var _rxjsBundlesRxMinJs = require('rxjs/bundles/Rx.min.js');
+function _FileEventHandlers() {
+  const data = require("../../../modules/nuclide-commons-atom/FileEventHandlers");
 
-var _UniversalDisposable;
+  _FileEventHandlers = function () {
+    return data;
+  };
 
-function _load_UniversalDisposable() {
-  return _UniversalDisposable = _interopRequireDefault(require('../../../modules/nuclide-commons/UniversalDisposable'));
+  return data;
 }
 
-var _AdditionalLogFileProvider;
+function _nuclideRemoteConnection() {
+  const data = require("../../nuclide-remote-connection");
 
-function _load_AdditionalLogFileProvider() {
-  return _AdditionalLogFileProvider = require('./AdditionalLogFileProvider');
+  _nuclideRemoteConnection = function () {
+    return data;
+  };
+
+  return data;
 }
 
-var _CodeHighlightProvider;
+var _rxjsCompatUmdMin = require("rxjs-compat/bundles/rxjs-compat.umd.min.js");
 
-function _load_CodeHighlightProvider() {
-  return _CodeHighlightProvider = require('./CodeHighlightProvider');
+function _UniversalDisposable() {
+  const data = _interopRequireDefault(require("../../../modules/nuclide-commons/UniversalDisposable"));
+
+  _UniversalDisposable = function () {
+    return data;
+  };
+
+  return data;
 }
 
-var _OutlineViewProvider;
+function _AdditionalLogFileProvider() {
+  const data = require("./AdditionalLogFileProvider");
 
-function _load_OutlineViewProvider() {
-  return _OutlineViewProvider = require('./OutlineViewProvider');
+  _AdditionalLogFileProvider = function () {
+    return data;
+  };
+
+  return data;
 }
 
-var _StatusProvider;
+function _CodeHighlightProvider() {
+  const data = require("./CodeHighlightProvider");
 
-function _load_StatusProvider() {
-  return _StatusProvider = require('./StatusProvider');
+  _CodeHighlightProvider = function () {
+    return data;
+  };
+
+  return data;
 }
 
-var _TypeCoverageProvider;
+function _OutlineViewProvider() {
+  const data = require("./OutlineViewProvider");
 
-function _load_TypeCoverageProvider() {
-  return _TypeCoverageProvider = require('./TypeCoverageProvider');
+  _OutlineViewProvider = function () {
+    return data;
+  };
+
+  return data;
 }
 
-var _DefinitionProvider;
+function _RenameProvider() {
+  const data = require("./RenameProvider");
 
-function _load_DefinitionProvider() {
-  return _DefinitionProvider = require('./DefinitionProvider');
+  _RenameProvider = function () {
+    return data;
+  };
+
+  return data;
 }
 
-var _TypeHintProvider;
+function _StatusProvider() {
+  const data = require("./StatusProvider");
 
-function _load_TypeHintProvider() {
-  return _TypeHintProvider = require('./TypeHintProvider');
+  _StatusProvider = function () {
+    return data;
+  };
+
+  return data;
 }
 
-var _CodeFormatProvider;
+function _TypeCoverageProvider() {
+  const data = require("./TypeCoverageProvider");
 
-function _load_CodeFormatProvider() {
-  return _CodeFormatProvider = require('./CodeFormatProvider');
+  _TypeCoverageProvider = function () {
+    return data;
+  };
+
+  return data;
 }
 
-var _FindReferencesProvider;
+function _DefinitionProvider() {
+  const data = require("./DefinitionProvider");
 
-function _load_FindReferencesProvider() {
-  return _FindReferencesProvider = require('./FindReferencesProvider');
+  _DefinitionProvider = function () {
+    return data;
+  };
+
+  return data;
 }
 
-var _AutocompleteProvider;
+function _TypeHintProvider() {
+  const data = require("./TypeHintProvider");
 
-function _load_AutocompleteProvider() {
-  return _AutocompleteProvider = require('./AutocompleteProvider');
+  _TypeHintProvider = function () {
+    return data;
+  };
+
+  return data;
 }
 
-var _DiagnosticsProvider;
+function _CodeFormatProvider() {
+  const data = require("./CodeFormatProvider");
 
-function _load_DiagnosticsProvider() {
-  return _DiagnosticsProvider = require('./DiagnosticsProvider');
+  _CodeFormatProvider = function () {
+    return data;
+  };
+
+  return data;
 }
 
-var _CodeActionProvider;
+function _FindReferencesProvider() {
+  const data = require("./FindReferencesProvider");
 
-function _load_CodeActionProvider() {
-  return _CodeActionProvider = require('./CodeActionProvider');
+  _FindReferencesProvider = function () {
+    return data;
+  };
+
+  return data;
 }
 
-var _SignatureHelpProvider;
+function _AutocompleteProvider() {
+  const data = require("./AutocompleteProvider");
 
-function _load_SignatureHelpProvider() {
-  return _SignatureHelpProvider = require('./SignatureHelpProvider');
+  _AutocompleteProvider = function () {
+    return data;
+  };
+
+  return data;
 }
 
-var _SyntacticSelectionProvider;
+function _DiagnosticsProvider() {
+  const data = require("./DiagnosticsProvider");
 
-function _load_SyntacticSelectionProvider() {
-  return _SyntacticSelectionProvider = require('./SyntacticSelectionProvider');
+  _DiagnosticsProvider = function () {
+    return data;
+  };
+
+  return data;
 }
 
-var _log4js;
+function _CodeActionProvider() {
+  const data = require("./CodeActionProvider");
 
-function _load_log4js() {
-  return _log4js = require('log4js');
+  _CodeActionProvider = function () {
+    return data;
+  };
+
+  return data;
+}
+
+function _SignatureHelpProvider() {
+  const data = require("./SignatureHelpProvider");
+
+  _SignatureHelpProvider = function () {
+    return data;
+  };
+
+  return data;
+}
+
+function _SyntacticSelectionProvider() {
+  const data = require("./SyntacticSelectionProvider");
+
+  _SyntacticSelectionProvider = function () {
+    return data;
+  };
+
+  return data;
+}
+
+function _log4js() {
+  const data = require("log4js");
+
+  _log4js = function () {
+    return data;
+  };
+
+  return data;
 }
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
+/**
+ * Copyright (c) 2015-present, Facebook, Inc.
+ * All rights reserved.
+ *
+ * This source code is licensed under the license found in the LICENSE file in
+ * the root directory of this source tree.
+ *
+ *  strict-local
+ * @format
+ */
 class AtomLanguageService {
-
-  constructor(languageServiceFactory, config, onDidInsertSuggestion, logger = (0, (_log4js || _load_log4js()).getLogger)('nuclide-language-service')) {
+  constructor(languageServiceFactory, config, onDidInsertSuggestion, logger = (0, _log4js().getLogger)('nuclide-language-service')) {
     this._config = config;
     this._onDidInsertSuggestion = onDidInsertSuggestion;
     this._logger = logger;
-    this._subscriptions = new (_UniversalDisposable || _load_UniversalDisposable()).default();
+    this._subscriptions = new (_UniversalDisposable().default)();
     const lazy = true;
-    this._connectionToLanguageService = new (_nuclideRemoteConnection || _load_nuclideRemoteConnection()).ConnectionCache(languageServiceFactory, lazy);
-    this._subscriptions.add(this._connectionToLanguageService);
-  }
+    this._connectionToLanguageService = new (_nuclideRemoteConnection().ConnectionCache)(languageServiceFactory, lazy);
 
-  _selector() {
-    return this._config.grammars.join(', ');
+    this._subscriptions.add(this._connectionToLanguageService);
   }
 
   activate() {
@@ -137,83 +241,115 @@ class AtomLanguageService {
           return f();
         }
       }
+
     };
 
     this._subscriptions.add(atom.packages.serviceHub.consume('atom-ide-busy-signal', '0.1.0', service => {
       this._subscriptions.add(service);
+
       busySignalService = service;
-      return new (_UniversalDisposable || _load_UniversalDisposable()).default(() => {
+      return new (_UniversalDisposable().default)(() => {
         this._subscriptions.remove(service);
+
         busySignalService = null;
       });
     }));
 
     const highlightConfig = this._config.highlight;
+
     if (highlightConfig != null) {
-      this._subscriptions.add((_CodeHighlightProvider || _load_CodeHighlightProvider()).CodeHighlightProvider.register(this._config.name, this._config.grammars, highlightConfig, this._connectionToLanguageService));
+      this._subscriptions.add(_CodeHighlightProvider().CodeHighlightProvider.register(this._config.name, this._config.grammars, highlightConfig, this._connectionToLanguageService));
     }
 
     const outlineConfig = this._config.outline;
+
     if (outlineConfig != null) {
-      this._subscriptions.add((_OutlineViewProvider || _load_OutlineViewProvider()).OutlineViewProvider.register(this._config.name, this._config.grammars, outlineConfig, this._connectionToLanguageService));
+      this._subscriptions.add(_OutlineViewProvider().OutlineViewProvider.register(this._config.name, this._config.grammars, outlineConfig, this._connectionToLanguageService));
     }
 
     const coverageConfig = this._config.coverage;
+
     if (coverageConfig != null) {
-      this._subscriptions.add((_TypeCoverageProvider || _load_TypeCoverageProvider()).TypeCoverageProvider.register(this._config.name, this._selector(), coverageConfig, this._connectionToLanguageService));
+      this._subscriptions.add(_TypeCoverageProvider().TypeCoverageProvider.register(this._config.name, this._config.grammars, coverageConfig, this._connectionToLanguageService));
     }
 
     const definitionConfig = this._config.definition;
+
     if (definitionConfig != null) {
-      this._subscriptions.add((_DefinitionProvider || _load_DefinitionProvider()).DefinitionProvider.register(this._config.name, this._config.grammars, definitionConfig, this._connectionToLanguageService));
+      this._subscriptions.add(_DefinitionProvider().DefinitionProvider.register(this._config.name, this._config.grammars, definitionConfig, this._connectionToLanguageService));
     }
 
     const typeHintConfig = this._config.typeHint;
+
     if (typeHintConfig != null) {
-      this._subscriptions.add((_TypeHintProvider || _load_TypeHintProvider()).TypeHintProvider.register(this._config.name, this._selector(), typeHintConfig, this._connectionToLanguageService));
+      this._subscriptions.add(_TypeHintProvider().TypeHintProvider.register(this._config.name, this._config.grammars, typeHintConfig, this._connectionToLanguageService));
     }
 
     const codeFormatConfig = this._config.codeFormat;
+
     if (codeFormatConfig != null) {
-      this._subscriptions.add((_CodeFormatProvider || _load_CodeFormatProvider()).CodeFormatProvider.register(this._config.name, this._config.grammars, codeFormatConfig, this._connectionToLanguageService));
+      this._subscriptions.add(_CodeFormatProvider().CodeFormatProvider.register(this._config.name, this._config.grammars, codeFormatConfig, this._connectionToLanguageService));
     }
 
     const findReferencesConfig = this._config.findReferences;
+
     if (findReferencesConfig != null) {
-      this._subscriptions.add((_FindReferencesProvider || _load_FindReferencesProvider()).FindReferencesProvider.register(this._config.name, this._config.grammars, findReferencesConfig, this._connectionToLanguageService));
+      this._subscriptions.add(_FindReferencesProvider().FindReferencesProvider.register(this._config.name, this._config.grammars, findReferencesConfig, this._connectionToLanguageService));
+    }
+
+    const renameConfig = this._config.rename;
+
+    if (renameConfig != null) {
+      this._subscriptions.add(_RenameProvider().RenameProvider.register(this._config.name, this._config.grammars, renameConfig, this._connectionToLanguageService));
     }
 
     const autocompleteConfig = this._config.autocomplete;
+
     if (autocompleteConfig != null) {
-      this._subscriptions.add((_AutocompleteProvider || _load_AutocompleteProvider()).AutocompleteProvider.register(this._config.name, this._config.grammars, autocompleteConfig, this._onDidInsertSuggestion, this._connectionToLanguageService));
+      this._subscriptions.add(_AutocompleteProvider().AutocompleteProvider.register(this._config.name, this._config.grammars, autocompleteConfig, this._onDidInsertSuggestion, this._connectionToLanguageService));
     }
 
     const diagnosticsConfig = this._config.diagnostics;
+
     if (diagnosticsConfig != null) {
-      this._subscriptions.add((0, (_DiagnosticsProvider || _load_DiagnosticsProvider()).registerDiagnostics)(this._config.name, this._config.grammars, diagnosticsConfig, this._logger, this._connectionToLanguageService, busySignalProvider));
+      this._subscriptions.add((0, _DiagnosticsProvider().registerDiagnostics)(this._config.name, this._config.grammars, diagnosticsConfig, this._logger, this._connectionToLanguageService, busySignalProvider));
     }
 
     const codeActionConfig = this._config.codeAction;
+
     if (codeActionConfig != null) {
-      this._subscriptions.add((_CodeActionProvider || _load_CodeActionProvider()).CodeActionProvider.register(this._config.name, this._config.grammars, codeActionConfig, this._connectionToLanguageService));
+      this._subscriptions.add(_CodeActionProvider().CodeActionProvider.register(this._config.name, this._config.grammars, codeActionConfig, this._connectionToLanguageService));
     }
 
-    const { signatureHelp } = this._config;
+    const {
+      signatureHelp
+    } = this._config;
+
     if (signatureHelp != null) {
-      this._subscriptions.add((_SignatureHelpProvider || _load_SignatureHelpProvider()).SignatureHelpProvider.register(this._config.grammars, signatureHelp, this._connectionToLanguageService));
+      this._subscriptions.add(_SignatureHelpProvider().SignatureHelpProvider.register(this._config.grammars, signatureHelp, this._connectionToLanguageService));
     }
 
     const syntacticSelection = this._config.syntacticSelection;
+
     if (syntacticSelection != null) {
-      this._subscriptions.add((_SyntacticSelectionProvider || _load_SyntacticSelectionProvider()).SyntacticSelectionProvider.register(this._config.name, this._config.grammars, syntacticSelection, this._connectionToLanguageService));
+      this._subscriptions.add(_SyntacticSelectionProvider().SyntacticSelectionProvider.register(this._config.name, this._config.grammars, syntacticSelection, this._connectionToLanguageService));
     }
 
     const status = this._config.status;
+
     if (status != null) {
-      this._subscriptions.add((_StatusProvider || _load_StatusProvider()).StatusProvider.register(this._config.name, this._config.grammars, status, this._connectionToLanguageService));
+      this._subscriptions.add(_StatusProvider().StatusProvider.register(this._config.name, this._config.grammars, status, this._connectionToLanguageService));
     }
 
-    this._subscriptions.add((_AdditionalLogFileProvider || _load_AdditionalLogFileProvider()).LanguageAdditionalLogFilesProvider.register(this._config.name, this._connectionToLanguageService));
+    const fileEventHandlersConfig = this._config.fileEventHandlers;
+
+    if (fileEventHandlersConfig != null) {
+      if (fileEventHandlersConfig.supportsOnWillSave) {
+        this._subscriptions.add(this._registerOnWillSave(fileEventHandlersConfig));
+      }
+    }
+
+    this._subscriptions.add(_AdditionalLogFileProvider().LanguageAdditionalLogFilesProvider.register(this._config.name, this._connectionToLanguageService));
   }
 
   async getLanguageServiceForUri(fileUri) {
@@ -222,9 +358,11 @@ class AtomLanguageService {
 
   async isFileInProject(fileUri) {
     const languageService = this._connectionToLanguageService.getExistingForUri(fileUri);
+
     if (languageService == null) {
       return false;
     }
+
     return (await languageService).isFileInProject(fileUri);
   }
 
@@ -234,27 +372,48 @@ class AtomLanguageService {
 
   observeLanguageServices() {
     return this._connectionToLanguageService.observeValues().switchMap(languageService => {
-      return _rxjsBundlesRxMinJs.Observable.fromPromise(languageService);
+      return _rxjsCompatUmdMin.Observable.fromPromise(languageService);
     });
   }
 
   observeConnectionLanguageEntries() {
     return this._connectionToLanguageService.observeEntries().switchMap(([connection, servicePromise]) => {
-      return _rxjsBundlesRxMinJs.Observable.fromPromise(servicePromise).map(languageService => [connection, languageService]);
+      return _rxjsCompatUmdMin.Observable.fromPromise(servicePromise).map(languageService => [connection, languageService]);
+    });
+  }
+
+  _registerOnWillSave(config) {
+    const callback = editor => {
+      return _rxjsCompatUmdMin.Observable.defer(async () => {
+        const fileVersion = await (0, _nuclideOpenFiles().getFileVersionOfEditor)(editor);
+        const languageService = await this._connectionToLanguageService.getForUri(editor.getPath());
+        return [languageService, fileVersion];
+      }).flatMap(([languageService, fileVersion]) => {
+        if (languageService == null || fileVersion == null) {
+          return _rxjsCompatUmdMin.Observable.empty();
+        }
+
+        return languageService.onWillSave(fileVersion).refCount();
+      });
+    };
+
+    const {
+      onWillSavePriority,
+      onWillSaveTimeout
+    } = config;
+    return (0, _FileEventHandlers().registerOnWillSave)({
+      name: this._config.name,
+      grammarScopes: this._config.grammars,
+      callback,
+      priority: onWillSavePriority == null ? 0 : onWillSavePriority,
+      timeout: onWillSaveTimeout == null ? 50 : onWillSaveTimeout
     });
   }
 
   dispose() {
     this._subscriptions.dispose();
   }
+
 }
-exports.AtomLanguageService = AtomLanguageService; /**
-                                                    * Copyright (c) 2015-present, Facebook, Inc.
-                                                    * All rights reserved.
-                                                    *
-                                                    * This source code is licensed under the license found in the LICENSE file in
-                                                    * the root directory of this source tree.
-                                                    *
-                                                    *  strict-local
-                                                    * @format
-                                                    */
+
+exports.AtomLanguageService = AtomLanguageService;

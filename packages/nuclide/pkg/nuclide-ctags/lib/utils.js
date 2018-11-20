@@ -1,25 +1,43 @@
-'use strict';
+"use strict";
 
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.CTAGS_KIND_ICONS = exports.CTAGS_KIND_NAMES = undefined;
 exports.getLineNumberForTag = getLineNumberForTag;
+exports.CTAGS_KIND_ICONS = exports.CTAGS_KIND_NAMES = void 0;
 
-var _log4js;
+function _log4js() {
+  const data = require("log4js");
 
-function _load_log4js() {
-  return _log4js = require('log4js');
+  _log4js = function () {
+    return data;
+  };
+
+  return data;
 }
 
-var _nuclideRemoteConnection;
+function _nuclideRemoteConnection() {
+  const data = require("../../nuclide-remote-connection");
 
-function _load_nuclideRemoteConnection() {
-  return _nuclideRemoteConnection = require('../../nuclide-remote-connection');
+  _nuclideRemoteConnection = function () {
+    return data;
+  };
+
+  return data;
 }
 
+/**
+ * Copyright (c) 2015-present, Facebook, Inc.
+ * All rights reserved.
+ *
+ * This source code is licensed under the license found in the LICENSE file in
+ * the root directory of this source tree.
+ *
+ *  strict-local
+ * @format
+ */
 // Taken from http://ctags.sourceforge.net/FORMAT
-const CTAGS_KIND_NAMES = exports.CTAGS_KIND_NAMES = {
+const CTAGS_KIND_NAMES = {
   c: 'class',
   d: 'define',
   e: 'enum',
@@ -32,18 +50,9 @@ const CTAGS_KIND_NAMES = exports.CTAGS_KIND_NAMES = {
   t: 'typedef',
   u: 'union',
   v: 'var'
-}; /**
-    * Copyright (c) 2015-present, Facebook, Inc.
-    * All rights reserved.
-    *
-    * This source code is licensed under the license found in the LICENSE file in
-    * the root directory of this source tree.
-    *
-    *  strict-local
-    * @format
-    */
-
-const CTAGS_KIND_ICONS = exports.CTAGS_KIND_ICONS = {
+};
+exports.CTAGS_KIND_NAMES = CTAGS_KIND_NAMES;
+const CTAGS_KIND_ICONS = {
   c: 'icon-code',
   d: 'icon-quote',
   e: 'icon-quote',
@@ -57,28 +66,37 @@ const CTAGS_KIND_ICONS = exports.CTAGS_KIND_ICONS = {
   u: 'icon-code',
   v: 'icon-code'
 };
+exports.CTAGS_KIND_ICONS = CTAGS_KIND_ICONS;
 
 async function getLineNumberForTag(tag) {
-  let { lineNumber, pattern } = tag;
+  let {
+    lineNumber,
+    pattern
+  } = tag;
+
   if (lineNumber) {
     lineNumber--; // ctags line numbers start at 1
   } else if (pattern != null) {
     // ctags does not escape regexps properly.
     // However, it should never create anything beyond /x/ or /^x$/.
     let exactMatch = false;
+
     if (pattern.startsWith('/') && pattern.endsWith('/')) {
       pattern = pattern.substr(1, pattern.length - 2);
+
       if (pattern.startsWith('^') && pattern.endsWith('$')) {
         pattern = pattern.substr(1, pattern.length - 2);
         exactMatch = true;
       }
     }
+
     try {
       // Search for the pattern in the file.
-      const service = (0, (_nuclideRemoteConnection || _load_nuclideRemoteConnection()).getFileSystemServiceByNuclideUri)(tag.file);
+      const service = (0, _nuclideRemoteConnection().getFileSystemServiceByNuclideUri)(tag.file);
       const contents = await service.readFile(tag.file);
       const lines = contents.toString('utf8').split('\n');
       lineNumber = 0;
+
       for (let i = 0; i < lines.length; i++) {
         if (exactMatch ? lines[i] === pattern : lines[i].indexOf(pattern) !== -1) {
           lineNumber = i;
@@ -86,7 +104,7 @@ async function getLineNumberForTag(tag) {
         }
       }
     } catch (e) {
-      (0, (_log4js || _load_log4js()).getLogger)('nuclide-ctags').warn(`nuclide-ctags: Could not locate pattern in ${tag.file}`, e);
+      (0, _log4js().getLogger)('nuclide-ctags').warn(`nuclide-ctags: Could not locate pattern in ${tag.file}`, e);
     }
   }
 

@@ -1,22 +1,30 @@
-'use strict';
+"use strict";
 
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.INDEFINITE_END_COLUMN = undefined;
+exports.default = exports.INDEFINITE_END_COLUMN = void 0;
 
-var _atom = require('atom');
+var _atom = require("atom");
 
-var _nuclideUri;
+function _nuclideUri() {
+  const data = _interopRequireDefault(require("../../../modules/nuclide-commons/nuclideUri"));
 
-function _load_nuclideUri() {
-  return _nuclideUri = _interopRequireDefault(require('../../../modules/nuclide-commons/nuclideUri'));
+  _nuclideUri = function () {
+    return data;
+  };
+
+  return data;
 }
 
-var _nuclideRemoteConnection;
+function _nuclideRemoteConnection() {
+  const data = require("../../nuclide-remote-connection");
 
-function _load_nuclideRemoteConnection() {
-  return _nuclideRemoteConnection = require('../../nuclide-remote-connection');
+  _nuclideRemoteConnection = function () {
+    return data;
+  };
+
+  return data;
 }
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
@@ -31,26 +39,21 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
  * 
  * @format
  */
-
-const DIAGNOSTIC_REGEX = /^([^\s:]+):([0-9]+):([0-9]+): (.*)$/gm;
-
-// Buck output for Objetive-C tests looks something like this:
+const DIAGNOSTIC_REGEX = /^([^\s:]+):([0-9]+):([0-9]+): (.*)$/gm; // Buck output for Objetive-C tests looks something like this:
 //     PASS    <100ms  6 Passed   0 Skipped   0 Failed   FooTests
 //     FAIL    <100ms  6 Passed   0 Skipped   1 Failed   BarTests
 //     FAILURE BarTests -[BarTests testBaz]: path/to/BarTests.m:33: ((obj == obj) is true) failed
 //     path/to/BarTests.m:36: ((ObjectIsEqual(obj, obj)) is false) failed
 // In this example, there are two failures in the -[BarTests testBaz] test method.
 // The START regex matches the first failure, the CONTINUED regex matches every other failure.
-const TEST_FAILURE_START_REGEX = /^FAILURE.*: (.*):([0-9]+): (.*)$/gm;
-const TEST_FAILURE_CONTINUED_REGEX = /^([^:]+):([0-9]+): (.*)$/gm;
 
-// Buck output for OCaml errors looks somthing like this:
+const TEST_FAILURE_START_REGEX = /^FAILURE.*: (.*):([0-9]+): (.*)$/gm;
+const TEST_FAILURE_CONTINUED_REGEX = /^([^:]+):([0-9]+): (.*)$/gm; // Buck output for OCaml errors looks somthing like this:
 // File "/path/to/bar.ml", line 110, characters 16-28:
 // Error: Unbound value id_to_string
 // (Hint: Did you mean id_to_stridng?)
-const OCAML_ERROR_REGEX = /^File "([^"]+)", line ([0-9]+), characters ([0-9]+)-[0-9]+:\n(\S+: .*)\n?(Hint:.*)?$/gm;
 
-// Buck output for Rust warnings and errors look something like this:
+const OCAML_ERROR_REGEX = /^File "([^"]+)", line ([0-9]+), characters ([0-9]+)-[0-9]+:\n(\S+: .*)\n?(Hint:.*)?$/gm; // Buck output for Rust warnings and errors look something like this:
 //
 // warning: unused variable: `unused`
 //   --> some-container/path/to/foo.rs:15:9
@@ -68,19 +71,18 @@ const OCAML_ERROR_REGEX = /^File "([^"]+)", line ([0-9]+), characters ([0-9]+)-[
 //
 // error: aborting due to previous error
 //
-const RUST_ERROR_REGEX = /(^(error|note|warning)(?:\[.+?\]){0,1}: [^\n]+)(?:\n +--> ([^:]+\.rs):([0-9]+):([0-9]+)(?:[\s\S]+?))+/gm;
 
-// It's expensive to get the real length of the lines (we'd have to read each file).
+const RUST_ERROR_REGEX = /(^(error|note|warning)(?:\[.+?\]){0,1}: [^\n]+)(?:\n +--> ([^:]+\.rs):([0-9]+):([0-9]+)(?:[\s\S]+?))+/gm; // It's expensive to get the real length of the lines (we'd have to read each file).
 // Instead, just use a very large number ("infinity"). The diagnostics UI handles this
 // and won't underline any characters past the end of the line.
-const INDEFINITE_END_COLUMN = exports.INDEFINITE_END_COLUMN = 1e9;
 
-// An intermediate step towards creating real diagnostics.
+const INDEFINITE_END_COLUMN = 1e9; // An intermediate step towards creating real diagnostics.
 
+exports.INDEFINITE_END_COLUMN = INDEFINITE_END_COLUMN;
 
 function getFileSystemServiceIfNecessary(fileSystemService, root) {
   if (fileSystemService == null) {
-    return (0, (_nuclideRemoteConnection || _load_nuclideRemoteConnection()).getFileSystemServiceByNuclideUri)(root);
+    return (0, _nuclideRemoteConnection().getFileSystemServiceByNuclideUri)(root);
   } else {
     return fileSystemService;
   }
@@ -88,16 +90,17 @@ function getFileSystemServiceIfNecessary(fileSystemService, root) {
 
 function pushParsedDiagnostic(fileSystemService, promises, root, file, level, text, line, column) {
   if (fileSystemService != null) {
-    const filePath = (_nuclideUri || _load_nuclideUri()).default.resolve(root, file);
-    const localPath = (_nuclideUri || _load_nuclideUri()).default.getPath(filePath);
+    const filePath = _nuclideUri().default.resolve(root, file);
+
+    const localPath = _nuclideUri().default.getPath(filePath);
+
     promises.push(fileSystemService.exists(localPath).then(exists => !exists ? null : {
       level,
       filePath,
       text,
       line,
       column
-    },
-    // Silently ignore files resulting in an error.
+    }, // Silently ignore files resulting in an error.
     () => null));
   }
 }
@@ -128,12 +131,13 @@ function makeTrace(result) {
     range: new _atom.Range(point, point)
   };
 }
-
 /**
  * Consumes Buck console output and emits a set of file-level diagnostic messages.
  * Ideally Buck should do this for us, but let's parse the messages manually for now.
  * This only (officially) handles Clang/g++ output.
  */
+
+
 class DiagnosticsParser {
   constructor() {
     this.testFailuresHaveStarted = false;
@@ -141,17 +145,16 @@ class DiagnosticsParser {
 
   async getDiagnostics(message, level, root) {
     // Only fetch the file system service if we need it.
-    let fileSystemService;
+    let fileSystemService; // Global regexps need to be reset before use.
 
-    // Global regexps need to be reset before use.
     DIAGNOSTIC_REGEX.lastIndex = 0;
     TEST_FAILURE_START_REGEX.lastIndex = 0;
     TEST_FAILURE_CONTINUED_REGEX.lastIndex = 0;
-    OCAML_ERROR_REGEX.lastIndex = 0;
+    OCAML_ERROR_REGEX.lastIndex = 0; // Collect diagnostics promises and check all matches at once.
 
-    // Collect diagnostics promises and check all matches at once.
     const promises = [];
     let diagnosticMatch;
+
     while (diagnosticMatch = DIAGNOSTIC_REGEX.exec(message)) {
       const [, file, strLine, strCol, text] = diagnosticMatch;
       fileSystemService = getFileSystemServiceIfNecessary(fileSystemService, root);
@@ -161,34 +164,35 @@ class DiagnosticsParser {
     }
 
     let ocamlMatch;
+
     while (ocamlMatch = OCAML_ERROR_REGEX.exec(message)) {
-      const [, file, strLine, column, problem, hint] = ocamlMatch;
+      const [, file, strLine, strCol, problem, hint] = ocamlMatch;
       fileSystemService = getFileSystemServiceIfNecessary(fileSystemService, root);
       const line = parseInt(strLine, 10);
+      const column = parseInt(strCol, 10);
       const text = hint ? problem + ', ' + hint : problem;
       const ocamlLevel = problem.startsWith('Error') ? 'error' : level;
-
       pushParsedDiagnostic(fileSystemService, promises, root, file, ocamlLevel, text, line, column);
     }
 
     let rustMatch;
+
     while (rustMatch = RUST_ERROR_REGEX.exec(message)) {
       const [, rustMessage, rustLevel, file, strLine, strColumn] = rustMatch;
       fileSystemService = getFileSystemServiceIfNecessary(fileSystemService, root);
       const line = parseInt(strLine, 10);
       const column = parseInt(strColumn, 10);
-
       pushParsedDiagnostic(fileSystemService, promises, root, file, rustLevel, rustMessage, line, column);
-    }
+    } // Collect test failure promises and check all matches at once.
 
-    // Collect test failure promises and check all matches at once.
-    let testFailureMatch;
-    // Only check for test failures if this line hasn't already matched for something else.
+
+    let testFailureMatch; // Only check for test failures if this line hasn't already matched for something else.
+
     if (promises.length === 0) {
       const regexp = this.testFailuresHaveStarted ? TEST_FAILURE_CONTINUED_REGEX : TEST_FAILURE_START_REGEX;
       const failuresHadStarted = this.testFailuresHaveStarted;
-
       this.testFailuresHaveStarted = false;
+
       while (testFailureMatch = regexp.exec(message)) {
         this.testFailuresHaveStarted = true;
         fileSystemService = getFileSystemServiceIfNecessary(fileSystemService, root);
@@ -211,21 +215,27 @@ class DiagnosticsParser {
       }
     }
 
-    const results = await Promise.all(promises);
-    // Merge 'note' level messages into diagnostics as traces.
+    const results = await Promise.all(promises); // Merge 'note' level messages into diagnostics as traces.
+
     const diagnostics = [];
+
     for (const result of results.filter(Boolean)) {
       if (result.text.startsWith('note: ') && diagnostics.length > 0) {
         const previous = diagnostics[diagnostics.length - 1];
+
         if (previous.trace == null) {
           previous.trace = [];
         }
+
         previous.trace.push(makeTrace(result));
       } else {
         diagnostics.push(makeDiagnostic(result));
       }
     }
+
     return diagnostics;
   }
+
 }
+
 exports.default = DiagnosticsParser;

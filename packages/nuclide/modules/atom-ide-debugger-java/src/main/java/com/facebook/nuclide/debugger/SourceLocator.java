@@ -21,10 +21,12 @@ import java.util.HashSet;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Stream;
+import org.json.JSONObject;
 
 /** Responsible for locating source file using class/source file paths. */
 public class SourceLocator {
-  public static final String DEFAULT_ANDROID_SDK = "/opt/android_sdk";
+  private static final String DEFAULT_ANDROID_SDK = "/opt/android_sdk";
+  private static final String JS_DIR = "/js/";
   // TODO: use ReadWriteLock if perf is an issue.
   private final Object _sourceSearchPathsLock = new Object();
   private final Set<String> _sourceSearchPaths = new HashSet<>();
@@ -247,6 +249,26 @@ public class SourceLocator {
 
   /** Search source file for input originalSourceFilePath. */
   public Optional<File> findSourceFile(String originalSourceFilePath) {
+    Optional<File> sourceFile = findSourceFileH(originalSourceFilePath);
+    if (sourceFile.isPresent()) {
+      return sourceFile;
+    }
+    int indexOfJs = originalSourceFilePath.indexOf(JS_DIR);
+    if (indexOfJs >= 0) {
+      String transposedSourceFilePath =
+          originalSourceFilePath.substring(indexOfJs + JS_DIR.length());
+      sourceFile = findSourceFileH(transposedSourceFilePath);
+      if (sourceFile.isPresent()) {
+        return sourceFile;
+      }
+    }
+    JSONObject values = new JSONObject();
+    values.put("originalSourceFilePath", originalSourceFilePath);
+    _contextManager.sendTelemetryEvent("atom-ide-debugger-java-findSourceFile-failed", values);
+    return Optional.empty();
+  }
+
+  private Optional<File> findSourceFileH(String originalSourceFilePath) {
     synchronized (_sourceSearchPathsLock) {
       return _sourceSearchPaths
           .stream()

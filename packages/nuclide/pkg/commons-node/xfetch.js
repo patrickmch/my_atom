@@ -1,19 +1,28 @@
-'use strict';
+"use strict";
 
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
+exports.default = void 0;
 
-var _systemInfo;
+function _systemInfo() {
+  const data = require("../../modules/nuclide-commons/system-info");
 
-function _load_systemInfo() {
-  return _systemInfo = require('./system-info');
+  _systemInfo = function () {
+    return data;
+  };
+
+  return data;
 }
 
-var _nodeFetch;
+function _nodeFetch() {
+  const data = _interopRequireDefault(require("node-fetch"));
 
-function _load_nodeFetch() {
-  return _nodeFetch = _interopRequireDefault(require('node-fetch'));
+  _nodeFetch = function () {
+    return data;
+  };
+
+  return data;
 }
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
@@ -53,21 +62,21 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
  *
  * https://developer.mozilla.org/en-US/docs/Web/API/Fetch_API/Using_Fetch
  */
-
 // The `fetch` function is directly exported (no wrapper) so that this module
 // doesn't create a frame in stack traces. Also, so the "initiator" in the
 // Network Panel reflects the actual `fetch` call site and not this module.
 // The export is typed with `typeof fetch` so flow treats the polyfill as the
 // real `fetch`.
+const fetchImpl = typeof global.fetch === 'function' ? global.fetch : _nodeFetch().default; // Stub out `fetch` in all tests so we don't inadvertently rely on external URLs.
 
-const fetchImpl = typeof global.fetch === 'function' ? global.fetch : (_nodeFetch || _load_nodeFetch()).default;
-
-// Stub out `fetch` in all tests so we don't inadvertently rely on external URLs.
 const testFetch = function testFetch(url) {
   if (typeof url === 'string' && url.startsWith('http://localhost')) {
     return fetchImpl(url);
   }
+
   return Promise.reject(Error('fetch is stubbed out for testing. Use a spy instead.'));
 };
 
-exports.default = (0, (_systemInfo || _load_systemInfo()).isRunningInTest)() ? testFetch : fetchImpl;
+var _default = (0, _systemInfo().isRunningInTest)() ? testFetch : fetchImpl;
+
+exports.default = _default;

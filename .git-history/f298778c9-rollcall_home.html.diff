@@ -1,0 +1,33 @@
+diff --git a/nols_website/wmi/templates/dataentry/rollcall_home.html b/nols_website/wmi/templates/dataentry/rollcall_home.html
+index 3e3d44536..60cbca660 100644
+--- a/nols_website/wmi/templates/dataentry/rollcall_home.html
++++ b/nols_website/wmi/templates/dataentry/rollcall_home.html
+@@ -1,26 +1,22 @@
+ {% extends 'dataentry/base.html' %}
+ 
+ {% block content %}
+ {{ block.super }}
+-<div class="row">
+-  <div class="column small-6 small-centered">
++<div class="row column small-centered large-8 medium-10">
++  <div class="column small-12">
+     <h3 class="lead">
+       Find Your Course Roster:
+     </h3>
+-  </div>
+-</div>
+-<div class="row">
+-  <div class="column small-6 small-centered">
+     <form class="form-horizontal" action="" method="Post">
+       {% with form=form %}
+       {% include "bs_responsive_form_layout.html" %}
+       {% endwith %}
+       <div class="row">
+         <div class="column medium-12">
+           <input class="button float-right " type="submit" value="Submit" />
+         </div>
+       </div>
+     </form>
+   </div>
+ </div>
+ {% endblock content %}

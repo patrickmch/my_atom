@@ -1,19 +1,20 @@
-'use strict';
+"use strict";
 
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
 exports.getCommandServer = getCommandServer;
 
-var _CommandServer;
+function _CommandServer() {
+  const data = require("./CommandServer");
 
-function _load_CommandServer() {
-  return _CommandServer = require('./CommandServer');
+  _CommandServer = function () {
+    return data;
+  };
+
+  return data;
 }
 
-const commandServerInstance = new (_CommandServer || _load_CommandServer()).CommandServer();
-
-/** @return singleton instance of CommandServer. */
 /**
  * Copyright (c) 2015-present, Facebook, Inc.
  * All rights reserved.
@@ -24,6 +25,8 @@ const commandServerInstance = new (_CommandServer || _load_CommandServer()).Comm
  *  strict-local
  * @format
  */
+const commandServerInstance = new (_CommandServer().CommandServer)();
+/** @return singleton instance of CommandServer. */
 
 function getCommandServer() {
   return commandServerInstance;

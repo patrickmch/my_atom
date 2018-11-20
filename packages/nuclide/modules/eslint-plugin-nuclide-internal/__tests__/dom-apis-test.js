@@ -7,14 +7,12 @@
  * of patent rights can be found in the PATENTS file in the same directory.
  *
  * @noflow
+ * @emails oncall+nuclide
+ * @format
  */
 'use strict';
 
-/* eslint
-  comma-dangle: [1, always-multiline],
-  prefer-object-spread/prefer-object-spread: 0,
-  nuclide-internal/no-commonjs: 0,
-  */
+/* eslint nuclide-internal/no-commonjs: 0 */
 
 const rule = require('../dom-apis');
 const RuleTester = require('eslint').RuleTester;
@@ -24,7 +22,6 @@ const ruleTester = new RuleTester();
 const ERROR_MESSAGE =
   'Use the utilities in nuclide-commons-ui/scrollIntoView instead of Element.scrollIntoView() ' +
   'and Element.scrollIntoViewIfNeeded(). See that module for more information.';
-
 
 ruleTester.run('dom-apis', rule, {
   valid: [
@@ -36,38 +33,48 @@ ruleTester.run('dom-apis', rule, {
   invalid: [
     {
       code: 'el.scrollIntoView()',
-      errors: [{
-        message: ERROR_MESSAGE,
-        type: 'CallExpression',
-      }],
+      errors: [
+        {
+          message: ERROR_MESSAGE,
+          type: 'CallExpression',
+        },
+      ],
     },
     {
       code: 'el.scrollIntoViewIfNeeded()',
-      errors: [{
-        message: ERROR_MESSAGE,
-        type: 'CallExpression',
-      }],
+      errors: [
+        {
+          message: ERROR_MESSAGE,
+          type: 'CallExpression',
+        },
+      ],
     },
     {
       code: 'el.scrollIntoView(true)',
-      errors: [{
-        message: ERROR_MESSAGE,
-        type: 'CallExpression',
-      }],
+      errors: [
+        {
+          message: ERROR_MESSAGE,
+          type: 'CallExpression',
+        },
+      ],
     },
     {
       code: 'el.scrollIntoViewIfNeeded(false)',
-      errors: [{
-        message: ERROR_MESSAGE,
-        type: 'CallExpression',
-      }],
+      errors: [
+        {
+          message: ERROR_MESSAGE,
+          type: 'CallExpression',
+        },
+      ],
     },
     {
       code: 'el.scrollIntoView({behavior: "smooth"})',
-      errors: [{
-        message: ERROR_MESSAGE,
-        type: 'CallExpression',
-      }],
+      errors: [
+        {
+          message: ERROR_MESSAGE,
+          type: 'CallExpression',
+        },
+      ],
     },
   ],
 });

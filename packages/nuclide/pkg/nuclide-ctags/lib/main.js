@@ -1,4 +1,4 @@
-'use strict';
+"use strict";
 
 Object.defineProperty(exports, "__esModule", {
   value: true
@@ -8,16 +8,24 @@ exports.getHyperclickProvider = getHyperclickProvider;
 exports.getQuickOpenProvider = getQuickOpenProvider;
 exports.deactivate = deactivate;
 
-var _HyperclickHelpers;
+function _HyperclickHelpers() {
+  const data = _interopRequireDefault(require("./HyperclickHelpers"));
 
-function _load_HyperclickHelpers() {
-  return _HyperclickHelpers = _interopRequireDefault(require('./HyperclickHelpers'));
+  _HyperclickHelpers = function () {
+    return data;
+  };
+
+  return data;
 }
 
-var _QuickOpenHelpers;
+function _QuickOpenHelpers() {
+  const data = _interopRequireDefault(require("./QuickOpenHelpers"));
 
-function _load_QuickOpenHelpers() {
-  return _QuickOpenHelpers = _interopRequireDefault(require('./QuickOpenHelpers'));
+  _QuickOpenHelpers = function () {
+    return data;
+  };
+
+  return data;
 }
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
@@ -32,16 +40,18 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
  * 
  * @format
  */
-
 function activate(state) {}
 
 function getHyperclickProvider() {
   return {
-    priority: 1, // Should be lower than all language-specific providers.
+    priority: 1,
+    // Should be lower than all language-specific providers.
     providerName: 'nuclide-ctags',
+
     getSuggestionForWord(editor, text, range) {
-      return (_HyperclickHelpers || _load_HyperclickHelpers()).default.getSuggestionForWord(editor, text, range);
+      return _HyperclickHelpers().default.getSuggestionForWord(editor, text, range);
     }
+
   };
 }
 
@@ -53,15 +63,19 @@ function getQuickOpenProvider() {
       title: 'Ctags',
       prompt: 'Search Ctags...'
     },
+
     isEligibleForDirectory(directory) {
-      return (_QuickOpenHelpers || _load_QuickOpenHelpers()).default.isEligibleForDirectory(directory);
+      return _QuickOpenHelpers().default.isEligibleForDirectory(directory);
     },
+
     getComponentForItem(item) {
-      return (_QuickOpenHelpers || _load_QuickOpenHelpers()).default.getComponentForItem(item);
+      return _QuickOpenHelpers().default.getComponentForItem(item);
     },
+
     executeQuery(query, directory) {
-      return (_QuickOpenHelpers || _load_QuickOpenHelpers()).default.executeQuery(query, directory);
+      return _QuickOpenHelpers().default.executeQuery(query, directory);
     }
+
   };
 }
 

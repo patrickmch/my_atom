@@ -1,48 +1,63 @@
-'use strict';
+"use strict";
 
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
+exports.default = void 0;
 
-var _escapeStringRegexp;
+function _escapeStringRegexp() {
+  const data = _interopRequireDefault(require("escape-string-regexp"));
 
-function _load_escapeStringRegexp() {
-  return _escapeStringRegexp = _interopRequireDefault(require('escape-string-regexp'));
+  _escapeStringRegexp = function () {
+    return data;
+  };
+
+  return data;
 }
 
-var _fsPromise;
+function _fsPromise() {
+  const data = _interopRequireDefault(require("../../../modules/nuclide-commons/fsPromise"));
 
-function _load_fsPromise() {
-  return _fsPromise = _interopRequireDefault(require('../../../modules/nuclide-commons/fsPromise'));
+  _fsPromise = function () {
+    return data;
+  };
+
+  return data;
 }
 
-var _nuclideAnalytics;
+function _nuclideAnalytics() {
+  const data = require("../../../modules/nuclide-analytics");
 
-function _load_nuclideAnalytics() {
-  return _nuclideAnalytics = require('../../nuclide-analytics');
+  _nuclideAnalytics = function () {
+    return data;
+  };
+
+  return data;
 }
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
+/**
+ * Copyright (c) 2015-present, Facebook, Inc.
+ * All rights reserved.
+ *
+ * This source code is licensed under the license found in the LICENSE file in
+ * the root directory of this source tree.
+ *
+ * 
+ * @format
+ */
 function quoteRegExp(str) {
   const boundary = '([\'"])';
   return `${boundary}(${str})${boundary}`;
-} /**
-   * Copyright (c) 2015-present, Facebook, Inc.
-   * All rights reserved.
-   *
-   * This source code is licensed under the license found in the LICENSE file in
-   * the root directory of this source tree.
-   *
-   * 
-   * @format
-   */
+}
 
-exports.default = async function updateKeymap(keymapPath, deprecatedCommands) {
-  const keymapFile = await (_fsPromise || _load_fsPromise()).default.readFile(keymapPath, 'utf8');
-  // Search for all deprecated commands (whole words, escaped).
-  const mergedRegExp = Object.keys(deprecatedCommands).map((_escapeStringRegexp || _load_escapeStringRegexp()).default).join('|');
+var updateKeymap = async function updateKeymap(keymapPath, deprecatedCommands) {
+  const keymapFile = await _fsPromise().default.readFile(keymapPath, 'utf8'); // Search for all deprecated commands (whole words, escaped).
+
+  const mergedRegExp = Object.keys(deprecatedCommands).map(_escapeStringRegexp().default).join('|');
   const matches = keymapFile.match(new RegExp(quoteRegExp(mergedRegExp), 'g'));
+
   if (matches != null) {
     // Format as a list.
     const matchesSet = new Set(matches.map(m => m.substr(1, m.length - 2)));
@@ -57,9 +72,11 @@ exports.default = async function updateKeymap(keymapPath, deprecatedCommands) {
           text: 'Update Keymap',
           className: 'icon icon-keyboard',
           onDidClick: async () => {
-            (0, (_nuclideAnalytics || _load_nuclideAnalytics()).track)('deprecated-command-replaced', { commands: matchesArray });
-            const replaced = matchesArray.reduce((str, match) => str.replace(new RegExp(quoteRegExp((0, (_escapeStringRegexp || _load_escapeStringRegexp()).default)(match)), 'g'), `$1${deprecatedCommands[match]}$3`), keymapFile);
-            await (_fsPromise || _load_fsPromise()).default.writeFile(keymapPath, replaced);
+            (0, _nuclideAnalytics().track)('deprecated-command-replaced', {
+              commands: matchesArray
+            });
+            const replaced = matchesArray.reduce((str, match) => str.replace(new RegExp(quoteRegExp((0, _escapeStringRegexp().default)(match)), 'g'), `$1${deprecatedCommands[match]}$3`), keymapFile);
+            await _fsPromise().default.writeFile(keymapPath, replaced);
             atom.notifications.addSuccess('Keymap successfully updated!');
             notification.dismiss();
             resolve();
@@ -69,3 +86,5 @@ exports.default = async function updateKeymap(keymapPath, deprecatedCommands) {
     });
   }
 };
+
+exports.default = updateKeymap;

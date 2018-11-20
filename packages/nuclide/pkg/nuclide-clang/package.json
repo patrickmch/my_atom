@@ -4,10 +4,8 @@
   "version": "0.0.0",
   "description": "Exposes features from nuclide-clang in Atom",
   "author": "NEEDS OWNER",
-  "atomTestRunner": "../../lib/test-runner-entry.js",
   "nuclide": {
-    "packageType": "Atom",
-    "testRunner": "apm",
+    "packageType": "AtomPackage",
     "configMetadata": {
       "pathComponents": [
         "Language",
@@ -70,11 +68,6 @@
     "nuclide.clang.declaration-info": {
       "versions": {
         "0.0.0": "provideDeclarationInfo"
-      }
-    },
-    "nuclide.related-files.provider": {
-      "versions": {
-        "0.0.0": "provideRelatedFiles"
       }
     },
     "nuclide-autocomplete.provider": {

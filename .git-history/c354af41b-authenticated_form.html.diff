@@ -1,0 +1,86 @@
+diff --git a/nols_website/wmi/templates/dataentry/authenticated_form.html b/nols_website/wmi/templates/dataentry/authenticated_form.html
+index bb928a730..4edac140b 100644
+--- a/nols_website/wmi/templates/dataentry/authenticated_form.html
++++ b/nols_website/wmi/templates/dataentry/authenticated_form.html
+@@ -1,78 +1,80 @@
+ {% extends 'dataentry/event_base.html' %}
+ {% load widget_tweaks %}
+ {% load l10n %}
+ {% load static from staticfiles %}
+ 
+ {% block content %}
+ {{ block.super }}
+ <div class="rollcall-authenticated-form column small-centered small-12 large-8 medium-10">
+   {% if not allow_post %}
+       <div data-closable class="callout warning">
+           <button type="button" class="close" data-close data-dismiss="alert">x</button>
+           {{ validated_message|safe }}
+       </div>
+       <h3 class="lead">Please ensure that your information is up to date.</h3>
+   {% endif %}
+-  {% include "dataentry/fragments/account_info.html" %}
++  {% with "account-info-module column small-12 medium-6 large-3" as wrapper_class %}
++    {% include "dataentry/fragments/account_info.html" %}
++  {% endwith %}
+   {% with user.entity as entity %}
+ 
+     {% with person_form as form %}
+         {% url "get_started"  event.wmi_course_id as redirect %}
+         {% include "dataentry/form_modal.html" %}
+     {% endwith %}
+ 
+     {% with email_form as form %}
+         {% url "get_started"  event.wmi_course_id as redirect %}
+         {% include 'dataentry/form_modal.html' %}
+     {% endwith %}
+ 
+     {% with address_form as form %}
+         {% url "get_started"  event.wmi_course_id as redirect %}
+         {% include 'dataentry/form_modal.html' %}
+     {% endwith %}
+ 
+     {% with phone_form as form %}
+         {% url "get_started"  event.wmi_course_id as redirect %}
+         {% include 'dataentry/form_modal.html' %}
+     {% endwith %}
+ 
+   {% endwith %}
+ 
+   {% if allow_post %}
+       <form id="extras-form" action="{% url "submit_authenticated"  event.wmi_course_id %}" method="post">
+         {% with extras_form as form %}
+           {% url "submit_authenticated"  event.wmi_course_id as redirect %}
+           {% include 'bs_responsive_form_layout.html' %}
+         {% endwith %}
+       </form>
+       <div class="row">
+           <div class="column small-12">
+               <button id="heard_about_submit" type="button" class="button float-right"><span>Submit</span></button>
+           </div>
+       </div>
+   {% else %}
+       <div class="row">
+           <div class="column small-12">
+             <h3>Thanks for updating your information!</h3>
+               <a href="{% url "logout" %}?next={% url "get_started"  event.wmi_course_id %}"
+                  role="button"
+                  class="button button-default"><span>Log out</span></a>
+           </div>
+       </div>
+   {% endif %}
+ </div>
+ {% endblock content %}
+ 
+ 
+ {% block extra_js %}
+     {{ block.super }}
+     <script src="{% static 'admissions/js/province_update.js' %}"></script>
+     <script type="text/javascript">
+         $("#id_country").addClass('form-country-selection');
+         main_update_provinces('{% url 'get_province_choices' %}');
+ 
+         $('#heard_about_submit').click(function(){
+             $('#extras-form').submit();
+         });
+     </script>
+ {% endblock extra_js %}

@@ -1,14 +1,18 @@
-'use strict';
+"use strict";
 
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
 exports.provideDefinitionPreview = provideDefinitionPreview;
 
-var _nuclideRemoteConnection;
+function _nuclideRemoteConnection() {
+  const data = require("../../nuclide-remote-connection");
 
-function _load_nuclideRemoteConnection() {
-  return _nuclideRemoteConnection = require('../../nuclide-remote-connection');
+  _nuclideRemoteConnection = function () {
+    return data;
+  };
+
+  return data;
 }
 
 /**
@@ -21,13 +25,12 @@ function _load_nuclideRemoteConnection() {
  *  strict-local
  * @format
  */
-
 function provideDefinitionPreview() {
   return {
     async getDefinitionPreview(definition) {
-      const service = await (0, (_nuclideRemoteConnection || _load_nuclideRemoteConnection()).getDefinitionPreviewServiceByNuclideUri)(definition.path);
-
+      const service = await (0, _nuclideRemoteConnection().getDefinitionPreviewServiceByNuclideUri)(definition.path);
       return service.getDefinitionPreview(definition);
     }
+
   };
 }

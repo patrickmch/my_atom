@@ -1,53 +1,81 @@
-'use strict';
+"use strict";
 
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
+exports.default = void 0;
 
-var _simpleTextBuffer;
+function _simpleTextBuffer() {
+  const data = _interopRequireDefault(require("simple-text-buffer"));
 
-function _load_simpleTextBuffer() {
-  return _simpleTextBuffer = _interopRequireDefault(require('simple-text-buffer'));
+  _simpleTextBuffer = function () {
+    return data;
+  };
+
+  return data;
 }
 
-var _UniversalDisposable;
+function _UniversalDisposable() {
+  const data = _interopRequireDefault(require("../../modules/nuclide-commons/UniversalDisposable"));
 
-function _load_UniversalDisposable() {
-  return _UniversalDisposable = _interopRequireDefault(require('../../modules/nuclide-commons/UniversalDisposable'));
+  _UniversalDisposable = function () {
+    return data;
+  };
+
+  return data;
 }
 
-var _eventKit;
+function _eventKit() {
+  const data = require("event-kit");
 
-function _load_eventKit() {
-  return _eventKit = require('event-kit');
+  _eventKit = function () {
+    return data;
+  };
+
+  return data;
 }
 
-var _lspUtils;
+function _lspUtils() {
+  const data = require("./lsp-utils");
 
-function _load_lspUtils() {
-  return _lspUtils = require('./lsp-utils');
+  _lspUtils = function () {
+    return data;
+  };
+
+  return data;
 }
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
+/**
+ * Copyright (c) 2015-present, Facebook, Inc.
+ * All rights reserved.
+ *
+ * This source code is licensed under the license found in the LICENSE file in
+ * the root directory of this source tree.
+ *
+ * 
+ * @format
+ */
 class TextDocument {
-
   constructor(uri, languageId, version, text) {
     this.isDirty = false;
-    this._disposables = new (_UniversalDisposable || _load_UniversalDisposable()).default();
-    this._emitter = new (_eventKit || _load_eventKit()).Emitter();
+    this._disposables = new (_UniversalDisposable().default)();
+    this._emitter = new (_eventKit().Emitter)();
 
     this._handleDidStopChanging = () => {
       this.assertNotDisposed();
+
       this._emitter.emit('didStopChanging', this);
     };
 
     this.uri = uri;
     this.languageId = languageId;
     this.version = version;
-    this.buffer = new (_simpleTextBuffer || _load_simpleTextBuffer()).default(text);
+    this.buffer = new (_simpleTextBuffer().default)(text);
 
     this._disposables.add(this._emitter);
+
     this._disposables.add(this.buffer.onDidStopChanging(this._handleDidStopChanging));
   }
 
@@ -59,7 +87,9 @@ class TextDocument {
 
   dispose() {
     this._emitter.emit('dispose');
+
     this.assertNotDisposed();
+
     this._disposables.dispose();
   }
 
@@ -79,7 +109,7 @@ class TextDocument {
 
   offsetAt(position) {
     this.assertNotDisposed();
-    return this.buffer.characterIndexForPosition((0, (_lspUtils || _load_lspUtils()).lspPositionToAtomPoint)(position));
+    return this.buffer.characterIndexForPosition((0, _lspUtils().lspPositionToAtomPoint)(position));
   }
 
   onDidDispose(handler) {
@@ -98,39 +128,39 @@ class TextDocument {
 
   positionAt(offset) {
     this.assertNotDisposed();
-    return (0, (_lspUtils || _load_lspUtils()).atomPointToLSPPosition)(this.buffer.positionForCharacterIndex(offset));
+    return (0, _lspUtils().atomPointToLSPPosition)(this.buffer.positionForCharacterIndex(offset));
   }
 
   save(text) {
     this.assertNotDisposed();
+
     if (text != null) {
       this.buffer.setText(text);
     }
 
     this.isDirty = false;
+
     this._emitter.emit('didSave', this);
   }
 
   updateMany(changes, version) {
     this.assertNotDisposed();
-
     this.isDirty = true;
-    this.version = version;
-
-    // Ensure that ranged changes are sorted in reverse order.
+    this.version = version; // Ensure that ranged changes are sorted in reverse order.
     // Otherwise, the changes can't be applied cleanly.
+
     changes.sort((a, b) => {
       if (!(a.range != null && b.range != null)) {
         throw new Error('There should only be one full-text update.');
       }
 
-      return (0, (_lspUtils || _load_lspUtils()).compareLspRange)(b.range, a.range);
+      return (0, _lspUtils().compareLspRange)(b.range, a.range);
     });
 
     for (const change of changes) {
       if (change.range != null) {
         // Incremental update
-        this.buffer.setTextInRange((0, (_lspUtils || _load_lspUtils()).lspRangeToAtomRange)(change.range), change.text);
+        this.buffer.setTextInRange((0, _lspUtils().lspRangeToAtomRange)(change.range), change.text);
       } else {
         // Full text update
         this.buffer.setText(change.text);
@@ -139,13 +169,5 @@ class TextDocument {
   }
 
 }
-exports.default = TextDocument; /**
-                                 * Copyright (c) 2015-present, Facebook, Inc.
-                                 * All rights reserved.
-                                 *
-                                 * This source code is licensed under the license found in the LICENSE file in
-                                 * the root directory of this source tree.
-                                 *
-                                 * 
-                                 * @format
-                                 */
+
+exports.default = TextDocument;

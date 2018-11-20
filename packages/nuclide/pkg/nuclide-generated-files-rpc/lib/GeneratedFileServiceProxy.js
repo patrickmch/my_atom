@@ -128,7 +128,7 @@ Object.defineProperty(module.exports, "defs", {
       location: {
         type: "source",
         fileName: "GeneratedFileService.js",
-        line: 24
+        line: 25
       },
       name: "GeneratedFileType",
       definition: {
@@ -151,13 +151,13 @@ Object.defineProperty(module.exports, "defs", {
       location: {
         type: "source",
         fileName: "GeneratedFileService.js",
-        line: 26
+        line: 27
       },
       type: {
         location: {
           type: "source",
           fileName: "GeneratedFileService.js",
-          line: 26
+          line: 27
         },
         kind: "function",
         argumentTypes: [{
@@ -190,13 +190,13 @@ Object.defineProperty(module.exports, "defs", {
       location: {
         type: "source",
         fileName: "GeneratedFileService.js",
-        line: 56
+        line: 57
       },
       type: {
         location: {
           type: "source",
           fileName: "GeneratedFileService.js",
-          line: 56
+          line: 57
         },
         kind: "function",
         argumentTypes: [{
@@ -220,13 +220,13 @@ Object.defineProperty(module.exports, "defs", {
       location: {
         type: "source",
         fileName: "GeneratedFileService.js",
-        line: 62
+        line: 63
       },
       type: {
         location: {
           type: "source",
           fileName: "GeneratedFileService.js",
-          line: 62
+          line: 63
         },
         kind: "function",
         argumentTypes: [{

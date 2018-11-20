@@ -1,0 +1,227 @@
+diff --git a/nols_website/wmi/templates/dataentry/base.html b/nols_website/wmi/templates/dataentry/base.html
+index 600607235..b7e152bb0 100644
+--- a/nols_website/wmi/templates/dataentry/base.html
++++ b/nols_website/wmi/templates/dataentry/base.html
+@@ -1,172 +1,57 @@
+ {% extends 'bootstrapped/base.html' %}
+ {% load static from staticfiles %}
+-<!DOCTYPE html>
+-<html lang="en">
+-  <head>
+-    <meta charset="utf-8">
+-    <title>{% block title %}NOLS Data Entry{% endblock title %}</title>
+-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+-    <meta name="robots" content="NONE,NOARCHIVE">
+-
+-    <!-- Styles -->
+-
+-    <!-- HTML5 shim, for IE6-8 support of HTML5 elements -->
+-    <!--[if lt IE 9]>
+-      <script src="https://html5shim.googlecode.com/svn/trunk/html5.js"></script>
+-    <![endif]-->
+-    <script src=""></script>
+-
+-    <!-- This file stores project specific CSS -->
+-    <link href="{% static "wmi/css/dataentry.css" %}" rel="stylesheet">
+-
+-    {{ person_form.media }}
+-
+-    <!-- Use this to quickly test CSS changes in a template,
+-        then move to dataentry.css -->
+-    {% block extra_css %}{% endblock extra_css %}
+-    {% comment %}{% include "fragments/js/head_js.html" %} <!--website/base.html-->{% endcomment %}
+-  </head>
+-
+-  <body>
+-
+-    {% include "fragments/test_watermark.html" %}
+-
+-    {% block content_header %}
+-    {% with "Wilderness Medicine" as title %}
+-    {% with "Rollcall" as subtitle %}
+-    {% include "fragments/title_row.html" %}
+-    {% endwith %}
++{% block extra_head %}
++  <meta name="robots" content="NONE,NOARCHIVE">
++  <link href="{% static "wmi/css/dataentry.css" %}" rel="stylesheet">
++{% endblock %}
++
++{% block title %}NOLS Data Entry{% endblock title %}
++
++{% block content_header %}
++  {% with "Wilderness Medicine" as title %}
++  {% with "Rollcall" as subtitle %}
++  {% include "fragments/title_row.html" %}
++  {% endwith %}
++  {% endwith %}
++{% endblock %}
++
++{% block content %}
++
++    {% with auth_form as form %}
++        {% url "get_started"  event.wmi_course_id as redirect %}
++          {% include "dataentry/fragments/login_modal.html" %}
+     {% endwith %}
+-    {% endblock %}
+ 
+-    {% block content %}
++        <div id="user_modal" class="reveal fade" data-reveal tabindex="-1" role="dialog">
++            <div class="modal-dialog">
++                <div class="modal-content">
++                    <div class="modal-header">
++                        <button type="button" class="close" data-close aria-hidden="true">x</button>
++                        <h3 id="user-modal-header text-center">hi {{ user.first_name }} {{ user.last_name }}!</h3>
++                    </div>
++                    <div class="modal-body">
++                        <p>you are currently logged in as <code>{{ user.username }}</code>.</p>
++                        <p>please
++                            <a href="{% url "django.contrib.auth.views.logout" %}{% if event %}?next={% url "get_started"  event.wmi_course_id %}{% endif %}">
++                                logout
++                            </a>
++                            if you are not {{ user.first_name }} {{ user.last_name }}.
++                        </p>
++                    </div>
++                    <div class="modal-footer">
++                        <button id="thats-me" class="button " data-close aria-hidden="true"><span>stay logged-in</span></button>
++                        <a class="button button-default" href="{% url "django.contrib.auth.views.logout" %}{% if event %}?next={% url "get_started"  event.wmi_course_id %}{% endif %}">
++                            log-out
++                        </a>
++                    </div>
++                </div>
++            </div>
++        </div>
++
++{% endblock content %}
++{% block extra_js %}
+     {{ block.super }}
+-    {% with "auth_form" as form_id %}
+-      {% with auth_form as form %}
+-          {% url "login"  as form_action %}
+-          {% url "get_started"  event.wmi_course_id as redirect %}
+-          {% with "next" as redirect_name %}
+-          {% with "Login" as modal_title %}
+-            {% include "dataentry/fragments/login_modal.html" %}
+-          {% endwith %}
+-          {% endwith %}
+-      {% endwith %}
+-    {% endwith %}
+-
+-      <div id="user_modal" class="reveal fade" data-reveal tabindex="-1" role="dialog">
+-          <div class="modal-dialog">
+-              <div class="modal-content">
+-                  <div class="modal-header">
+-                      <button type="button" class="close" data-close aria-hidden="true">x</button>
+-                      <h3 id="user-modal-header text-center">Hi {{ user.first_name }} {{ user.last_name }}!</h3>
+-                  </div>
+-                  <div class="modal-body">
+-                      <p>You are currently logged in as <code>{{ user.username }}</code>.</p>
+-                      <p>Please
+-                          <a href="{% url "django.contrib.auth.views.logout" %}{% if event %}?next={% url "get_started"  event.wmi_course_id %}{% endif %}">
+-                              logout
+-                          </a>
+-                          if you are not {{ user.first_name }} {{ user.last_name }}.
+-                      </p>
+-                  </div>
+-                  <div class="modal-footer">
+-                      <button id="thats-me" class="button " data-close aria-hidden="true"><span>Stay Logged-In</span></button>
+-                      <a class="button button-default" href="{% url "django.contrib.auth.views.logout" %}{% if event %}?next={% url "get_started"  event.wmi_course_id %}{% endif %}">
+-                          Log-Out
+-                      </a>
+-                  </div>
+-              </div>
+-          </div>
+-      </div>
+-  </div> <!-- /container -->
+-
+-    <!-- Javascript
+-    ================================================== -->
+-    <!-- place project specific Javascript in this file -->
+     <script src="{% static "wmi/js/dataentry.js" %}"></script>
+-    <script>
+-        $('#auth_form form').submit(function(e) {
+-            return validateCoreForm($(this), '{% url "validate_login_form" %}');
+-        })
+-
+-        // a fix for the iOS Modal bug.
+-        // iOS check...ugly but necessary
+-        if( navigator.userAgent.match(/iPhone|iPad|iPod/i) ) {
+-
+-            $('.modal').on('open.zf.reveal', function() {
+-
+-                // Position modal absolute and bump it down to the scrollPosition
+-                $(this)
+-                    .css({
+-                        position: 'absolute',
+-                        marginTop: $(window).scrollTop() + 'px',
+-                        bottom: 'auto'
+-                    });
+-
+-                // Position backdrop absolute and make it span the entire page
+-                //
+-                // Also dirty, but we need to tap into the backdrop after Boostrap
+-                // positions it but before transitions finish.
+-                //
+-                setTimeout( function() {
+-                    $('.modal-backdrop').css({
+-                        position: 'absolute',
+-                        top: 0,
+-                        left: 0,
+-                        width: '100%',
+-                        height: Math.max(
+-                            document.body.scrollHeight, document.documentElement.scrollHeight,
+-                            document.body.offsetHeight, document.documentElement.offsetHeight,
+-                            document.body.clientHeight, document.documentElement.clientHeight
+-                        ) + 'px'
+-                    });
+-                }, 0);
+-
+-            });
+-
+-        };
+-
+-        // Prevent double form submission when button is double clicked.
+-        $(document).ready(function(){
+-            $('form').not('.modal-form').on('submit', function(){
+-                $(this).find('input[type="submit"]').attr('disabled', 'disabled');
+-            });
+-        });
+-    </script>
+-
+-    {% if confirm_user %}
+-        <script type="text/javascript">
+-            $(document).ready( function() {
+-                new Foundation.Reveal($('#user_modal')).open();
+-            })
+-        </script>
+-    {% endif %}
+-
+-        {% block extra_js %}
+-        {{ block.super }}
+-        {% endblock extra_js %}
+-
+-        <script>
+-            // Only show the ethnicity input to US citizens.
+-            $(document).ready(function(){
+-                var USA = 'UNITED STATES';
+-                var citizenship = $('#id_citizenship');
+-                var ethnicity = $('#id_ethnicity');
+-
+-                if (citizenship.val() !== USA) {
+-                    ethnicity.parents('.fieldwrapper').fadeOut();
+-                }
+-
+-                citizenship.on('change', function() {
+-                    if(this.value == USA) {
+-                        ethnicity.parents('.fieldwrapper').fadeIn();
+-                    } else {
+-                        ethnicity.parents('.fieldwrapper').fadeOut();
+-                    }
+-                })
+-            });
+-        </script>
++    {% include "core/fragments/citizen_ethnicity_toggle_js.html" %}
+ 
+-    {% endblock content %}
+-  </body>
+-</html>
++{% endblock extra_js %}

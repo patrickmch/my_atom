@@ -211,6 +211,60 @@
       "contributions": [
         "bug"
       ]
+    },
+    {
+      "login": "MaxPower9",
+      "name": "MaxPower9",
+      "avatar_url": "https://avatars0.githubusercontent.com/u/1761899?v=4",
+      "profile": "https://github.com/MaxPower9",
+      "contributions": [
+        "bug"
+      ]
+    },
+    {
+      "login": "gbirke",
+      "name": "Gabriel Birke",
+      "avatar_url": "https://avatars1.githubusercontent.com/u/223326?v=4",
+      "profile": "http://www.lebenplusplus.de/",
+      "contributions": [
+        "bug"
+      ]
+    },
+    {
+      "login": "raysewell",
+      "name": "raysewell",
+      "avatar_url": "https://avatars2.githubusercontent.com/u/10551088?v=4",
+      "profile": "https://github.com/raysewell",
+      "contributions": [
+        "bug"
+      ]
+    },
+    {
+      "login": "memeplex",
+      "name": "memeplex",
+      "avatar_url": "https://avatars3.githubusercontent.com/u/2845433?v=4",
+      "profile": "https://github.com/memeplex",
+      "contributions": [
+        "bug"
+      ]
+    },
+    {
+      "login": "onesentforth",
+      "name": "Jason West",
+      "avatar_url": "https://avatars1.githubusercontent.com/u/10100089?v=4",
+      "profile": "http://onesentforth.com",
+      "contributions": [
+        "bug"
+      ]
+    },
+    {
+      "login": "tgrrr",
+      "name": "Phil",
+      "avatar_url": "https://avatars3.githubusercontent.com/u/4689707?v=4",
+      "profile": "http://botbotdot.com",
+      "contributions": [
+        "bug"
+      ]
     }
   ],
   "repoType": "github"

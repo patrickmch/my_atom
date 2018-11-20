@@ -1,12 +1,12 @@
-'use strict';
+"use strict";
 
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.configure = exports.appender = undefined;
 exports.getNuclideConsoleMessages = getNuclideConsoleMessages;
+exports.configure = exports.appender = void 0;
 
-var _rxjsBundlesRxMinJs = require('rxjs/bundles/Rx.min.js');
+var _rxjsCompatUmdMin = require("rxjs-compat/bundles/rxjs-compat.umd.min.js");
 
 /**
  * Copyright (c) 2015-present, Facebook, Inc.
@@ -18,12 +18,13 @@ var _rxjsBundlesRxMinJs = require('rxjs/bundles/Rx.min.js');
  * 
  * @format
  */
-
 let sub = null;
+
 function getSubject() {
   if (sub == null) {
-    sub = new _rxjsBundlesRxMinJs.Subject();
+    sub = new _rxjsCompatUmdMin.Subject();
   }
+
   return sub;
 }
 
@@ -37,5 +38,7 @@ function consoleAppender() {
   };
 }
 
-const appender = exports.appender = consoleAppender;
-const configure = exports.configure = consoleAppender;
+const appender = consoleAppender;
+exports.appender = appender;
+const configure = consoleAppender;
+exports.configure = configure;

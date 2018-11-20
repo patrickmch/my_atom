@@ -1,4 +1,4 @@
-'use strict';
+"use strict";
 
 /**
  * Copyright (c) 2017-present, Facebook, Inc.
@@ -11,5 +11,4 @@
  *  strict
  * @format
  */
-
 throw new Error('Errored!');

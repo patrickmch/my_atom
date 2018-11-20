@@ -114,7 +114,7 @@ module.exports = _client => {
     }).publish();
   };
 
-  remoteModule.remoteAtomSearch = function (arg0, arg1, arg2, arg3, arg4) {
+  remoteModule.remoteAtomSearch = function (arg0, arg1, arg2, arg3, arg4, arg5, arg6) {
     return _client.callRemoteFunction("CodeSearchService/remoteAtomSearch", "observable", _client.marshalArguments(Array.from(arguments), [{
       name: "directory",
       type: {
@@ -147,6 +147,22 @@ module.exports = _client => {
         type: {
           kind: "named",
           name: "CodeSearchTool"
+        }
+      }
+    }, {
+      name: "leadingLines",
+      type: {
+        kind: "nullable",
+        type: {
+          kind: "number"
+        }
+      }
+    }, {
+      name: "trailingLines",
+      type: {
+        kind: "nullable",
+        type: {
+          kind: "number"
         }
       }
     }])).map(value => {
@@ -253,7 +269,7 @@ Object.defineProperty(module.exports, "defs", {
       location: {
         type: "source",
         fileName: "types.js",
-        line: 34
+        line: 36
       },
       name: "CodeSearchResult",
       definition: {
@@ -394,13 +410,13 @@ Object.defineProperty(module.exports, "defs", {
       location: {
         type: "source",
         fileName: "CodeSearchService.js",
-        line: 70
+        line: 74
       },
       type: {
         location: {
           type: "source",
           fileName: "CodeSearchService.js",
-          line: 70
+          line: 74
         },
         kind: "function",
         argumentTypes: [{
@@ -466,7 +482,7 @@ Object.defineProperty(module.exports, "defs", {
       location: {
         type: "source",
         fileName: "types.js",
-        line: 44
+        line: 46
       },
       name: "search$Match",
       definition: {
@@ -501,6 +517,24 @@ Object.defineProperty(module.exports, "defs", {
             }
           },
           optional: false
+        }, {
+          name: "leadingContextLines",
+          type: {
+            kind: "array",
+            type: {
+              kind: "string"
+            }
+          },
+          optional: false
+        }, {
+          name: "trailingContextLines",
+          type: {
+            kind: "array",
+            type: {
+              kind: "string"
+            }
+          },
+          optional: false
         }]
       }
     },
@@ -509,7 +543,7 @@ Object.defineProperty(module.exports, "defs", {
       location: {
         type: "source",
         fileName: "types.js",
-        line: 51
+        line: 55
       },
       name: "search$FileResult",
       definition: {
@@ -540,13 +574,13 @@ Object.defineProperty(module.exports, "defs", {
       location: {
         type: "source",
         fileName: "CodeSearchService.js",
-        line: 99
+        line: 96
       },
       type: {
         location: {
           type: "source",
           fileName: "CodeSearchService.js",
-          line: 99
+          line: 96
         },
         kind: "function",
         argumentTypes: [{
@@ -581,6 +615,22 @@ Object.defineProperty(module.exports, "defs", {
             type: {
               kind: "named",
               name: "CodeSearchTool"
+            }
+          }
+        }, {
+          name: "leadingLines",
+          type: {
+            kind: "nullable",
+            type: {
+              kind: "number"
+            }
+          }
+        }, {
+          name: "trailingLines",
+          type: {
+            kind: "nullable",
+            type: {
+              kind: "number"
             }
           }
         }],

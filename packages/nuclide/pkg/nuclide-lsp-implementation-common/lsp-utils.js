@@ -1,4 +1,4 @@
-'use strict';
+"use strict";
 
 Object.defineProperty(exports, "__esModule", {
   value: true
@@ -10,10 +10,14 @@ exports.atomRangeToLSPRange = atomRangeToLSPRange;
 exports.compareLspPosition = compareLspPosition;
 exports.compareLspRange = compareLspRange;
 
-var _simpleTextBuffer;
+function _simpleTextBuffer() {
+  const data = require("simple-text-buffer");
 
-function _load_simpleTextBuffer() {
-  return _simpleTextBuffer = require('simple-text-buffer');
+  _simpleTextBuffer = function () {
+    return data;
+  };
+
+  return data;
 }
 
 /**
@@ -26,10 +30,9 @@ function _load_simpleTextBuffer() {
  *  strict
  * @format
  */
-
 // flowlint-next-line untyped-type-import:off
 function lspPositionToAtomPoint(lspPosition) {
-  return new (_simpleTextBuffer || _load_simpleTextBuffer()).Point(lspPosition.line, lspPosition.character);
+  return new (_simpleTextBuffer().Point)(lspPosition.line, lspPosition.character);
 }
 
 function atomPointToLSPPosition(atomPoint) {

@@ -1,14 +1,18 @@
-'use strict';
+"use strict";
 
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
 exports.getDefinitionPreview = getDefinitionPreview;
 
-var _symbolDefinitionPreview;
+function _symbolDefinitionPreview() {
+  const data = require("../../../modules/nuclide-commons/symbol-definition-preview");
 
-function _load_symbolDefinitionPreview() {
-  return _symbolDefinitionPreview = require('../../../modules/nuclide-commons/symbol-definition-preview');
+  _symbolDefinitionPreview = function () {
+    return data;
+  };
+
+  return data;
 }
 
 /**
@@ -21,7 +25,6 @@ function _load_symbolDefinitionPreview() {
  * 
  * @format
  */
-
 function getDefinitionPreview(definition) {
-  return (0, (_symbolDefinitionPreview || _load_symbolDefinitionPreview()).getDefinitionPreview)(definition);
+  return (0, _symbolDefinitionPreview().getDefinitionPreview)(definition);
 }

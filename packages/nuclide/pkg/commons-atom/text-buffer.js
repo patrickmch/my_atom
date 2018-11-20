@@ -1,4 +1,4 @@
-'use strict';
+"use strict";
 
 Object.defineProperty(exports, "__esModule", {
   value: true
@@ -6,26 +6,18 @@ Object.defineProperty(exports, "__esModule", {
 exports.observeBufferOpen = observeBufferOpen;
 exports.observeBufferCloseOrRename = observeBufferCloseOrRename;
 
-var _rxjsBundlesRxMinJs = require('rxjs/bundles/Rx.min.js');
+var _rxjsCompatUmdMin = require("rxjs-compat/bundles/rxjs-compat.umd.min.js");
 
-var _event;
+function _event() {
+  const data = require("../../modules/nuclide-commons/event");
 
-function _load_event() {
-  return _event = require('../../modules/nuclide-commons/event');
+  _event = function () {
+    return data;
+  };
+
+  return data;
 }
 
-// Observes all buffer opens.
-// Buffer renames are sent as an open of the new name.
-function observeBufferOpen() {
-  return (0, (_event || _load_event()).observableFromSubscribeFunction)(cb => atom.project.observeBuffers(cb)).mergeMap(buffer => {
-    const end = (0, (_event || _load_event()).observableFromSubscribeFunction)(buffer.onDidDestroy.bind(buffer));
-    const rename = (0, (_event || _load_event()).observableFromSubscribeFunction)(buffer.onDidChangePath.bind(buffer)).map(() => buffer).takeUntil(end);
-    return _rxjsBundlesRxMinJs.Observable.of(buffer).concat(rename);
-  });
-}
-
-// Note that on a rename, the openedPath will be the path of the buffer when the open was sent,
-// which may not match the current name of the buffer.
 /**
  * Copyright (c) 2015-present, Facebook, Inc.
  * All rights reserved.
@@ -36,12 +28,27 @@ function observeBufferOpen() {
  * 
  * @format
  */
+// Observes all buffer opens.
+// Buffer renames are sent as an open of the new name.
+function observeBufferOpen() {
+  return (0, _event().observableFromSubscribeFunction)(cb => atom.project.observeBuffers(cb)).mergeMap(buffer => {
+    const end = (0, _event().observableFromSubscribeFunction)(buffer.onDidDestroy.bind(buffer));
+    const rename = (0, _event().observableFromSubscribeFunction)(buffer.onDidChangePath.bind(buffer)).map(() => buffer).takeUntil(end);
+    return _rxjsCompatUmdMin.Observable.of(buffer).concat(rename);
+  });
+} // Note that on a rename, the openedPath will be the path of the buffer when the open was sent,
+// which may not match the current name of the buffer.
+
 
 // Fires a single event when the buffer is destroyed or renamed.
 // Note that on a rename the buffer path will not be the same as the openedPath.
 function observeBufferCloseOrRename(buffer) {
   const openedPath = buffer.getPath();
-  const end = (0, (_event || _load_event()).observableFromSubscribeFunction)(buffer.onDidDestroy.bind(buffer));
-  const rename = (0, (_event || _load_event()).observableFromSubscribeFunction)(buffer.onDidChangePath.bind(buffer));
-  return end.merge(rename).take(1).map(() => ({ kind: 'close', buffer, openedPath }));
+  const end = (0, _event().observableFromSubscribeFunction)(buffer.onDidDestroy.bind(buffer));
+  const rename = (0, _event().observableFromSubscribeFunction)(buffer.onDidChangePath.bind(buffer));
+  return end.merge(rename).take(1).map(() => ({
+    kind: 'close',
+    buffer,
+    openedPath
+  }));
 }

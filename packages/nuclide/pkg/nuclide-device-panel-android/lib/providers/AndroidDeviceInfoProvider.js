@@ -1,16 +1,20 @@
-'use strict';
+"use strict";
 
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.AndroidDeviceInfoProvider = undefined;
+exports.AndroidDeviceInfoProvider = void 0;
 
-var _rxjsBundlesRxMinJs = require('rxjs/bundles/Rx.min.js');
+var _rxjsCompatUmdMin = require("rxjs-compat/bundles/rxjs-compat.umd.min.js");
 
-var _utils;
+function _utils() {
+  const data = require("../../../../modules/nuclide-adb/lib/utils");
 
-function _load_utils() {
-  return _utils = require('../../../../modules/nuclide-adb/lib/utils');
+  _utils = function () {
+    return data;
+  };
+
+  return data;
 }
 
 /**
@@ -23,19 +27,20 @@ function _load_utils() {
  *  strict-local
  * @format
  */
-
 class AndroidDeviceInfoProvider {
   getType() {
     return 'Android';
   }
 
   fetch(host, device) {
-    return (0, (_utils || _load_utils()).getAdbServiceByNuclideUri)(host).getDeviceInfo(device).refCount().map(props => {
+    return (0, _utils().getAdbServiceByNuclideUri)(host).getDeviceInfo(device.identifier).refCount().map(props => {
       const infoMap = new Map();
+
       for (const [key, value] of props) {
         const beautifulKey = key.toLowerCase().replace('_', ' ');
         infoMap.set(beautifulKey.charAt(0).toUpperCase() + beautifulKey.slice(1), value);
       }
+
       return infoMap;
     });
   }
@@ -49,7 +54,9 @@ class AndroidDeviceInfoProvider {
   }
 
   isSupported() {
-    return _rxjsBundlesRxMinJs.Observable.of(true);
+    return _rxjsCompatUmdMin.Observable.of(true);
   }
+
 }
+
 exports.AndroidDeviceInfoProvider = AndroidDeviceInfoProvider;

@@ -1,63 +1,113 @@
-'use strict';
+"use strict";
 
-var _constants;
+function _passesGK() {
+  const data = _interopRequireDefault(require("../../../modules/nuclide-commons/passesGK"));
 
-function _load_constants() {
-  return _constants = require('./constants');
+  _passesGK = function () {
+    return data;
+  };
+
+  return data;
 }
 
-var _LinkTreeLinter;
+function _constants() {
+  const data = require("./constants");
 
-function _load_LinkTreeLinter() {
-  return _LinkTreeLinter = _interopRequireDefault(require('./LinkTreeLinter'));
+  _constants = function () {
+    return data;
+  };
+
+  return data;
 }
 
-var _LintHelpers;
+function _LinkTreeLinter() {
+  const data = _interopRequireDefault(require("./LinkTreeLinter"));
 
-function _load_LintHelpers() {
-  return _LintHelpers = _interopRequireDefault(require('./LintHelpers'));
+  _LinkTreeLinter = function () {
+    return data;
+  };
+
+  return data;
 }
 
-var _nuclideRemoteConnection;
+function _LintHelpers() {
+  const data = _interopRequireDefault(require("./LintHelpers"));
 
-function _load_nuclideRemoteConnection() {
-  return _nuclideRemoteConnection = require('../../nuclide-remote-connection');
+  _LintHelpers = function () {
+    return data;
+  };
+
+  return data;
 }
 
-var _nuclideOpenFiles;
+function _nuclideRemoteConnection() {
+  const data = require("../../nuclide-remote-connection");
 
-function _load_nuclideOpenFiles() {
-  return _nuclideOpenFiles = require('../../nuclide-open-files');
+  _nuclideRemoteConnection = function () {
+    return data;
+  };
+
+  return data;
 }
 
-var _nuclideLanguageService;
+function _nuclideOpenFiles() {
+  const data = require("../../nuclide-open-files");
 
-function _load_nuclideLanguageService() {
-  return _nuclideLanguageService = require('../../nuclide-language-service');
+  _nuclideOpenFiles = function () {
+    return data;
+  };
+
+  return data;
 }
 
-var _createPackage;
+function _nuclideLanguageService() {
+  const data = require("../../nuclide-language-service");
 
-function _load_createPackage() {
-  return _createPackage = _interopRequireDefault(require('../../../modules/nuclide-commons-atom/createPackage'));
+  _nuclideLanguageService = function () {
+    return data;
+  };
+
+  return data;
 }
 
-var _config;
+function _createPackage() {
+  const data = _interopRequireDefault(require("../../../modules/nuclide-commons-atom/createPackage"));
 
-function _load_config() {
-  return _config = require('./config');
+  _createPackage = function () {
+    return data;
+  };
+
+  return data;
 }
 
-var _pythonPlatform;
+function _config() {
+  const data = require("./config");
 
-function _load_pythonPlatform() {
-  return _pythonPlatform = require('./pythonPlatform');
+  _config = function () {
+    return data;
+  };
+
+  return data;
 }
 
-var _UniversalDisposable;
+function _pythonPlatform() {
+  const data = require("./pythonPlatform");
 
-function _load_UniversalDisposable() {
-  return _UniversalDisposable = _interopRequireDefault(require('../../../modules/nuclide-commons/UniversalDisposable'));
+  _pythonPlatform = function () {
+    return data;
+  };
+
+  return data;
+}
+
+function _UniversalDisposable() {
+  const data = _interopRequireDefault(require("../../../modules/nuclide-commons/UniversalDisposable"));
+
+  _UniversalDisposable = function () {
+    return data;
+  };
+
+  return data;
 }
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
@@ -72,23 +122,21 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
  * 
  * @format
  */
-
 async function connectionToPythonService(connection) {
-  const pythonService = (0, (_nuclideRemoteConnection || _load_nuclideRemoteConnection()).getPythonServiceByConnection)(connection);
-  const fileNotifier = await (0, (_nuclideOpenFiles || _load_nuclideOpenFiles()).getNotifierByConnection)(connection);
+  const pythonService = (0, _nuclideRemoteConnection().getPythonServiceByConnection)(connection);
+  const fileNotifier = await (0, _nuclideOpenFiles().getNotifierByConnection)(connection);
   const languageService = await pythonService.initialize(fileNotifier, {
-    showGlobalVariables: (0, (_config || _load_config()).getShowGlobalVariables)(),
-    autocompleteArguments: (0, (_config || _load_config()).getAutocompleteArguments)(),
-    includeOptionalArguments: (0, (_config || _load_config()).getIncludeOptionalArguments)()
+    showGlobalVariables: (0, _config().getShowGlobalVariables)(),
+    autocompleteArguments: (0, _config().getAutocompleteArguments)(),
+    includeOptionalArguments: (0, _config().getIncludeOptionalArguments)()
   });
-
   return languageService;
 }
 
 function getAtomConfig() {
   return {
     name: 'Python',
-    grammars: (_constants || _load_constants()).GRAMMARS,
+    grammars: _constants().GRAMMARS,
     outline: {
       version: '0.1.0',
       priority: 1,
@@ -107,7 +155,8 @@ function getAtomConfig() {
     },
     autocomplete: {
       inclusionPriority: 5,
-      suggestionPriority: 5, // Higher than the snippets provider.
+      suggestionPriority: 5,
+      // Higher than the snippets provider.
       disableForSelector: '.source.python .comment, .source.python .string',
       excludeLowerPriority: false,
       analytics: {
@@ -115,8 +164,8 @@ function getAtomConfig() {
         shouldLogInsertedSuggestion: false
       },
       autocompleteCacherConfig: {
-        updateResults: (_nuclideLanguageService || _load_nuclideLanguageService()).updateAutocompleteResults,
-        updateFirstResults: (_nuclideLanguageService || _load_nuclideLanguageService()).updateAutocompleteFirstResults
+        updateResults: _nuclideLanguageService().updateAutocompleteResults,
+        updateFirstResults: _nuclideLanguageService().updateAutocompleteFirstResults
       },
       supportsResolve: false
     },
@@ -130,7 +179,7 @@ function getAtomConfig() {
       priority: 5,
       analyticsEventName: 'python.hover'
     },
-    signatureHelp: (0, (_config || _load_config()).getShowSignatureHelp)() ? {
+    signatureHelp: (0, _config().getShowSignatureHelp)() ? {
       version: '0.1.0',
       priority: 1,
       triggerCharacters: new Set(['(', ',']),
@@ -140,41 +189,59 @@ function getAtomConfig() {
 }
 
 function resetServices() {
-  (0, (_nuclideRemoteConnection || _load_nuclideRemoteConnection()).getPythonServiceByConnection)(null).reset();
-  (_nuclideRemoteConnection || _load_nuclideRemoteConnection()).ServerConnection.getAllConnections().forEach(conn => {
-    (0, (_nuclideRemoteConnection || _load_nuclideRemoteConnection()).getPythonServiceByConnection)(conn).reset();
+  (0, _nuclideRemoteConnection().getPythonServiceByConnection)(null).reset();
+
+  _nuclideRemoteConnection().ServerConnection.getAllConnections().forEach(conn => {
+    (0, _nuclideRemoteConnection().getPythonServiceByConnection)(conn).reset();
   });
 }
 
 class Activation {
+  constructor() {
+    this._subscriptions = new (_UniversalDisposable().default)();
+    this._linkTreeLinter = new (_LinkTreeLinter().default)();
 
-  constructor(rawState) {
-    this._pythonLanguageService = new (_nuclideLanguageService || _load_nuclideLanguageService()).AtomLanguageService(connectionToPythonService, getAtomConfig());
-    this._pythonLanguageService.activate();
-    this._linkTreeLinter = new (_LinkTreeLinter || _load_LinkTreeLinter()).default();
-    this._subscriptions = new (_UniversalDisposable || _load_UniversalDisposable()).default(this._pythonLanguageService, atom.commands.add('atom-workspace', 'nuclide-python:reset-language-services', resetServices));
+    this._initLanguageServer();
   }
 
-  provideLint() {
-    return {
-      grammarScopes: Array.from((_constants || _load_constants()).GRAMMAR_SET),
+  async _initLanguageServer() {
+    if (await (0, _passesGK().default)('nuclide_fb_pyls_vscode_ext')) {
+      return;
+    }
+
+    const pythonLanguageService = new (_nuclideLanguageService().AtomLanguageService)(connectionToPythonService, getAtomConfig());
+    pythonLanguageService.activate();
+
+    this._subscriptions.add(this._provideLint(), pythonLanguageService, atom.commands.add('atom-workspace', 'nuclide-python:reset-language-services', resetServices));
+  }
+
+  _provideLint() {
+    const lintProvier = {
+      grammarScopes: Array.from(_constants().GRAMMAR_SET),
       scope: 'file',
       name: 'flake8',
-      lint: editor => (_LintHelpers || _load_LintHelpers()).default.lint(editor)
+      lint: editor => _LintHelpers().default.lint(editor)
     };
+    return atom.packages.serviceHub.provide('linter', '1.0.0', lintProvier);
   }
 
   consumeLinterIndie(register) {
-    const linter = register({ name: 'Python' });
-    const disposable = new (_UniversalDisposable || _load_UniversalDisposable()).default(linter, this._linkTreeLinter.observeMessages().subscribe(messages => linter.setAllMessages(messages)));
+    const linter = register({
+      name: 'Python'
+    });
+    const disposable = new (_UniversalDisposable().default)(linter, this._linkTreeLinter.observeMessages().subscribe(messages => linter.setAllMessages(messages)));
+
     this._subscriptions.add(disposable);
-    return new (_UniversalDisposable || _load_UniversalDisposable()).default(disposable, () => this._subscriptions.remove(disposable));
+
+    return new (_UniversalDisposable().default)(disposable, () => this._subscriptions.remove(disposable));
   }
 
   consumePlatformService(service) {
-    const disposable = service.register((_pythonPlatform || _load_pythonPlatform()).providePythonPlatformGroup);
+    const disposable = service.register(_pythonPlatform().providePythonPlatformGroup);
+
     this._subscriptions.add(disposable);
-    return new (_UniversalDisposable || _load_UniversalDisposable()).default(() => {
+
+    return new (_UniversalDisposable().default)(() => {
       this._subscriptions.remove(disposable);
     });
   }
@@ -190,6 +257,7 @@ class Activation {
   dispose() {
     this._subscriptions.dispose();
   }
+
 }
 
-(0, (_createPackage || _load_createPackage()).default)(module.exports, Activation);
+(0, _createPackage().default)(module.exports, Activation);

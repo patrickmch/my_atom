@@ -6,10 +6,8 @@
   "version": "0.0.0",
   "description": "A projectionist backend for File Family",
   "keywords": [],
-  "atomTestRunner": "../../lib/test-runner-entry.js",
   "nuclide": {
-    "packageType": "Atom",
-    "testRunner": "apm"
+    "packageType": "AtomPackage"
   },
   "consumedServices": {
     "nuclide-current-working-directory": {

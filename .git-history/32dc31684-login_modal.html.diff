@@ -1,0 +1,31 @@
+diff --git a/nols_website/wmi/templates/dataentry/fragments/login_modal.html b/nols_website/wmi/templates/dataentry/fragments/login_modal.html
+index ea5881c55..19fd7c84b 100644
+--- a/nols_website/wmi/templates/dataentry/fragments/login_modal.html
++++ b/nols_website/wmi/templates/dataentry/fragments/login_modal.html
+@@ -1,19 +1,8 @@
+ {% extends 'dataentry/form_modal.html' %}
+-<div id="{{ form_id }}_modal" class="reveal fade" data-reveal tabindex="-1">
+-  {% block modal_content %}
+-    {{ block.super }}
+-  {% endblock %}
+-  {% block title %}Login{% endblock %}
+-  {% block form_type %}
+-    {% with auth_form as form %}
+-      {% include "bs_responsive_form_layout.html" %}
+-    {% endwith %}
+-  {% endblock %}
+-  {% block below_buttons %}
+-    <div class="forgot-pass-container column controls small-12">
+-      <a href="{% url "django.contrib.auth.views.password_reset" %}">
+-          Forgot your username or password?
+-      </a>
+-    </div>
+-  {% endblock %}
+-</div>
++{% block below_buttons %}
++  <div class="forgot-pass-container column controls small-12">
++    <a href="{% url "django.contrib.auth.views.password_reset" %}">
++        Forgot your username or password?
++    </a>
++  </div>
++{% endblock %}

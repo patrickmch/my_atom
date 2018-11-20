@@ -1,106 +1,110 @@
-'use strict';
+"use strict";
 
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.DeviceTable = undefined;
+exports.DeviceTable = void 0;
 
-var _react = _interopRequireWildcard(require('react'));
+var React = _interopRequireWildcard(require("react"));
 
-var _Table;
+function _Table() {
+  const data = require("../../../../modules/nuclide-commons-ui/Table");
 
-function _load_Table() {
-  return _Table = require('../../../../modules/nuclide-commons-ui/Table');
+  _Table = function () {
+    return data;
+  };
+
+  return data;
 }
 
-var _providers;
+function _DeviceTaskButton() {
+  const data = require("./DeviceTaskButton");
 
-function _load_providers() {
-  return _providers = require('../providers');
+  _DeviceTaskButton = function () {
+    return data;
+  };
+
+  return data;
 }
 
-var _DeviceTaskButton;
+function _LoadingSpinner() {
+  const data = require("../../../../modules/nuclide-commons-ui/LoadingSpinner");
 
-function _load_DeviceTaskButton() {
-  return _DeviceTaskButton = require('./DeviceTaskButton');
+  _LoadingSpinner = function () {
+    return data;
+  };
+
+  return data;
 }
 
-var _LoadingSpinner;
+function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) { var desc = Object.defineProperty && Object.getOwnPropertyDescriptor ? Object.getOwnPropertyDescriptor(obj, key) : {}; if (desc.get || desc.set) { Object.defineProperty(newObj, key, desc); } else { newObj[key] = obj[key]; } } } } newObj.default = obj; return newObj; } }
 
-function _load_LoadingSpinner() {
-  return _LoadingSpinner = require('../../../../modules/nuclide-commons-ui/LoadingSpinner');
-}
-
-function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
-
-class DeviceTable extends _react.Component {
+/**
+ * Copyright (c) 2015-present, Facebook, Inc.
+ * All rights reserved.
+ *
+ * This source code is licensed under the license found in the LICENSE file in
+ * the root directory of this source tree.
+ *
+ * 
+ * @format
+ */
+class DeviceTable extends React.Component {
   constructor(...args) {
     var _temp;
 
     return _temp = super(...args), this._pendingComponent = () => {
-      return _react.createElement(
-        'div',
-        { className: 'padded' },
-        _react.createElement((_LoadingSpinner || _load_LoadingSpinner()).LoadingSpinner, { size: 'EXTRA_SMALL' })
-      );
+      return React.createElement("div", {
+        className: "padded"
+      }, React.createElement(_LoadingSpinner().LoadingSpinner, {
+        size: "EXTRA_SMALL"
+      }));
     }, this._noDevicesComponent = () => {
-      return _react.createElement(
-        'div',
-        { className: 'padded' },
-        'No devices connected'
-      );
+      return React.createElement("div", {
+        className: "padded"
+      }, "No devices connected");
     }, this._handleDeviceWillSelect = (item, selectedIndex, event) => {
       if (event != null) {
         let element = event.target;
+
         while (element != null) {
           if (element.classList.contains('nuclide-device-panel-device-action-button')) {
             return false;
           }
+
           element = element.parentElement;
         }
       }
-      if (!this.props.devices.isError && this.props.devices.value[selectedIndex].ignoresSelection) {
+
+      if (this.props.devices.isValue && this.props.devices.value[selectedIndex].ignoresSelection) {
         return false;
       }
+
       return true;
     }, this._handleDeviceTableSelection = (item, selectedDeviceIndex) => {
-      if (!this.props.devices.isError) {
+      if (this.props.devices.isValue) {
         this.props.setDevice(this.props.devices.value[selectedDeviceIndex]);
       }
     }, _temp;
   }
 
-  _getActionsForDevice(device, actionProviders) {
-    const actions = [];
-    for (const provider of actionProviders) {
-      const deviceActions = provider.getActionsForDevice(device);
-      if (deviceActions.length > 0) {
-        actions.push(...deviceActions);
-      }
-    }
-    return actions;
-  }
-
   render() {
     const devices = this.props.devices.getOrDefault([]);
-
-    const actionProviders = (0, (_providers || _load_providers()).getProviders)().deviceAction;
-    const anyActions = devices.length > 0 && devices.find(device => this._getActionsForDevice(device, actionProviders).length > 0) != null;
-    const rows = devices.map(_device => {
-      const actions = this._getActionsForDevice(_device, actionProviders);
+    const anyTasks = Array.from(this.props.deviceTasks.values()).some(t => t.length > 0);
+    const rows = devices.map(device => {
+      const tasks = this.props.deviceTasks.get(device.identifier) || [];
       return {
         data: {
-          name: _device.displayName,
-          actions: actions.length === 0 ? null : _react.createElement((_DeviceTaskButton || _load_DeviceTaskButton()).DeviceTaskButton, {
-            actions: actions,
-            device: _device,
-            icon: 'device-mobile',
-            title: 'Device actions'
+          name: device.displayName,
+          actions: tasks.length === 0 ? null : React.createElement(_DeviceTaskButton().DeviceTaskButton, {
+            tasks: tasks,
+            icon: "device-mobile",
+            title: "Device actions"
           })
         }
       };
     });
-    const columns = anyActions ? [{
+    const columns = anyTasks ? [{
       key: 'name',
       title: 'Devices',
       width: 0.7
@@ -113,21 +117,20 @@ class DeviceTable extends _react.Component {
       title: 'Devices',
       width: 1.0
     }];
-
-    return _react.createElement((_Table || _load_Table()).Table, {
+    return React.createElement(_Table().Table, {
       collapsable: false,
       columns: columns,
       fixedHeader: true,
-      maxBodyHeight: '99999px',
+      maxBodyHeight: "99999px",
       emptyComponent: this._getEmptyComponent(),
       selectable: true,
       onSelect: this._handleDeviceTableSelection,
       onWillSelect: this._handleDeviceWillSelect,
       rows: rows
     });
-  }
+  } // Passes down identical stateless components so === for them works as expected
 
-  // Passes down identical stateless components so === for them works as expected
+
   _getEmptyComponent() {
     if (this.props.devices.isError) {
       return this._getErrorComponent(this.props.devices.error.message);
@@ -141,23 +144,15 @@ class DeviceTable extends _react.Component {
   _getErrorComponent(message) {
     if (this._lastErrorMessage !== message) {
       this._lastErrorMessage = message;
-      this._lastErrorComponent = () => _react.createElement(
-        'div',
-        { className: 'padded nuclide-device-panel-device-list-error' },
-        message
-      );
+
+      this._lastErrorComponent = () => React.createElement("div", {
+        className: "padded nuclide-device-panel-device-list-error"
+      }, message);
     }
+
     return this._lastErrorComponent;
   }
 
 }
-exports.DeviceTable = DeviceTable; /**
-                                    * Copyright (c) 2015-present, Facebook, Inc.
-                                    * All rights reserved.
-                                    *
-                                    * This source code is licensed under the license found in the LICENSE file in
-                                    * the root directory of this source tree.
-                                    *
-                                    * 
-                                    * @format
-                                    */
+
+exports.DeviceTable = DeviceTable;

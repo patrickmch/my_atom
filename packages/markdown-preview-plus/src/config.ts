@@ -6,6 +6,8 @@ export interface IConfig {
     description?: string
     properties?: IConfig
     default?: any
+    minimum?: any
+    maximum?: any
     enum?: any[]
     items?: {
       type: string
@@ -47,12 +49,51 @@ export const config: IConfig = {
     default: false,
     order: 2,
   },
+  syntaxThemeName: {
+    title: 'Syntax theme for code blocks',
+    description:
+      'If not empty, will try to use the given syntax theme for code blocks in preview',
+    type: 'string',
+    default: '',
+    order: 2.5,
+  },
+  importPackageStyles: {
+    title: 'Packages that can affect preview rendering',
+    description:
+      'A list of Atom package names that can affect preview style, comma-separated. ' +
+      'A special value of `*` (star) will import all Atom styles into the preview, ' +
+      'use with care. This does not affect exported HTML',
+    type: 'array',
+    items: {
+      type: 'string',
+    },
+    default: ['fonts'],
+    order: 2.6,
+  },
+  codeTabWidth: {
+    title: 'Tab width for code blocks',
+    description:
+      'How to render tab character in code blocks;' +
+      ' 0 means use Atom global setting',
+    type: 'integer',
+    default: 0,
+    minimum: 0,
+    order: 2.7,
+  },
   renderer: {
     type: 'string',
     default: 'markdown-it',
     title: 'Renderer backend',
     enum: ['markdown-it', 'pandoc'],
     order: 3,
+  },
+  richClipboard: {
+    type: 'boolean',
+    default: true,
+    title: 'Use rich clipboard',
+    description:
+      'Copy rich text to clipboard in addition to raw HTML when using copy html commands',
+    order: 4,
   },
   previewConfig: {
     title: 'Preview Behaviour',
@@ -91,6 +132,40 @@ export const config: IConfig = {
         default: false,
         order: 27,
       },
+      shellOpenFileExtensions: {
+        title: 'Always open links to these file types externally',
+        description:
+          'This is a comma-separated list of file name extensions that ' +
+          'should always be opened with an external program. ' +
+          'For example, if you want to always open PDF files (presumably named `something.pdf`) ' +
+          'in system PDF viewer, add `pdf` here.',
+        type: 'array',
+        default: [
+          'odt',
+          'doc',
+          'docx',
+          'ods',
+          'xls',
+          'xlsx',
+          'odp',
+          'ppt',
+          'pptx',
+          'zip',
+          'rar',
+          '7z',
+          'gz',
+          'xz',
+          'bz2',
+          'tar',
+          'tgz',
+          'txz',
+          'tbz2',
+        ],
+        order: 28,
+        items: {
+          type: 'string',
+        },
+      },
     },
   },
   saveConfig: {
@@ -128,6 +203,68 @@ export const config: IConfig = {
         order: 20,
         enum: ['html', 'pdf'],
         default: 'html',
+      },
+      saveToPDFOptions: {
+        title: 'Save to PDF options',
+        type: 'object',
+        order: 25,
+        properties: {
+          marginsType: {
+            title: 'Margins Type',
+            type: 'integer',
+            enum: [
+              { value: 0, description: 'Default margins' },
+              { value: 1, description: 'No margins' },
+              { value: 2, description: 'Minimum margins' },
+            ],
+            default: 0,
+            order: 10,
+          },
+          pageSize: {
+            title: 'Page Size',
+            enum: ['A3', 'A4', 'A5', 'Legal', 'Letter', 'Tabloid', 'Custom'],
+            type: 'string',
+            default: 'A4',
+            order: 20,
+          },
+          customPageSize: {
+            title: 'Custom Page Size',
+            description:
+              'Takes effect when Page Size is set to `Custom`. Specified as ' +
+              '`<width>x<height>`, where `<height>` and `<width>` are ' +
+              'floating-point numbers with `.` (dot) as decimal separator, no thousands separator, ' +
+              'and with optional `cm`, `mm` or `in` suffix to indicate units, default is `mm`. ' +
+              'For example, A4 is `8.3in x 11.7in` or `210mm x 297mm` or `210 x 297`. ' +
+              'Whitespace is ignored.',
+            type: 'string',
+            default: '',
+            order: 25,
+          },
+          landscape: {
+            title: 'Page orientation',
+            type: 'boolean',
+            enum: [
+              { value: false, description: 'Portrait' },
+              { value: true, description: 'Landscape' },
+            ],
+            default: false,
+            order: 26,
+          },
+          printBackground: {
+            title: 'Render background',
+            description: 'Whether to render CSS backgrounds in PDF',
+            type: 'boolean',
+            default: false,
+            order: 30,
+          },
+          printSelectionOnly: {
+            title: 'Render only selection',
+            description: 'Only render selected document fragment. Experimental',
+            type: 'boolean',
+            default: false,
+            order: 40,
+          },
+        },
       },
     },
   },
@@ -191,6 +328,24 @@ export const config: IConfig = {
         default: false,
         order: 10,
       },
+      texExtensions: {
+        title: 'MathJax TeX extensions',
+        type: 'array',
+        default: [
+          'AMSmath.js',
+          'AMSsymbols.js',
+          'noErrors.js',
+          'noUndefined.js',
+        ],
+        order: 15,
+        items: { type: 'string' },
+      },
+      undefinedFamily: {
+        title: 'MathJax `undefinedFamily` (font family)',
+        type: 'string',
+        default: 'serif',
+        order: 20,
+      },
     },
   },
   markdownItConfig: {
@@ -232,13 +387,30 @@ export const config: IConfig = {
         default: true,
         order: 20,
       },
+      useImsize: {
+        title: 'Allow specifying image size in image title',
+        description:
+          'Allow non-standard syntax for specifying image size via ' +
+          'appending `=<width>x<height>` to image spacification, ' +
+          'f.ex. `![test](image.png =100x200)`',
+        type: 'boolean',
+        default: true,
+        order: 25,
+      },
+      useCriticMarkup: {
+        title: 'Enable CriticMarkup syntax support',
+        description: 'Support is limited to inline only',
+        type: 'boolean',
+        default: false,
+        order: 40,
+      },
       inlineMathSeparators: {
         title: 'Inline math separators',
         description:
           'List of inline math separators in pairs -- first opening, then closing',
         type: 'array',
         default: ['$', '$', '\\(', '\\)'],
-        order: 25,
+        order: 110,
         items: {
           type: 'string',
         },
@@ -249,7 +421,7 @@ export const config: IConfig = {
           'List of block math separators in pairs -- first opening, then closing',
         type: 'array',
         default: ['$$', '$$', '\\[', '\\]'],
-        order: 30,
+        order: 120,
         items: {
           type: 'string',
         },
@@ -363,7 +535,11 @@ declare module 'atom' {
     'markdown-preview-plus.grammars': string[]
     'markdown-preview-plus.extensions': string[]
     'markdown-preview-plus.useGitHubStyle': boolean
+    'markdown-preview-plus.syntaxThemeName': string
+    'markdown-preview-plus.importPackageStyles': string[]
+    'markdown-preview-plus.codeTabWidth': number
     'markdown-preview-plus.renderer': 'markdown-it' | 'pandoc'
+    'markdown-preview-plus.richClipboard': boolean
     'markdown-preview-plus.previewConfig.liveUpdate': boolean
     'markdown-preview-plus.previewConfig.previewSplitPaneDir':
       | 'down'
@@ -376,12 +552,14 @@ declare module 'atom' {
       | 'center'
     'markdown-preview-plus.previewConfig.closePreviewWithEditor': boolean
     'markdown-preview-plus.previewConfig.activatePreviewWithEditor': boolean
+    'markdown-preview-plus.previewConfig.shellOpenFileExtensions': string[]
     'markdown-preview-plus.previewConfig': {
       liveUpdate: boolean
       previewSplitPaneDir: 'down' | 'right' | 'none'
       previewDock: 'left' | 'right' | 'bottom' | 'center'
       closePreviewWithEditor: boolean
       activatePreviewWithEditor: boolean
+      shellOpenFileExtensions: string[]
     }
     'markdown-preview-plus.saveConfig.mediaOnSaveAsHTMLBehaviour':
       | 'relativized'
@@ -392,10 +570,52 @@ declare module 'atom' {
       | 'absolutized'
       | 'untouched'
     'markdown-preview-plus.saveConfig.defaultSaveFormat': 'html' | 'pdf'
+    'markdown-preview-plus.saveConfig.saveToPDFOptions.marginsType': 0 | 1 | 2
+    'markdown-preview-plus.saveConfig.saveToPDFOptions.pageSize':
+      | 'A3'
+      | 'A4'
+      | 'A5'
+      | 'Legal'
+      | 'Letter'
+      | 'Tabloid'
+      | 'Custom'
+    'markdown-preview-plus.saveConfig.saveToPDFOptions.customPageSize': string
+    'markdown-preview-plus.saveConfig.saveToPDFOptions.landscape': false | true
+    'markdown-preview-plus.saveConfig.saveToPDFOptions.printBackground': boolean
+    'markdown-preview-plus.saveConfig.saveToPDFOptions.printSelectionOnly': boolean
+    'markdown-preview-plus.saveConfig.saveToPDFOptions': {
+      marginsType: 0 | 1 | 2
+      pageSize: 'A3' | 'A4' | 'A5' | 'Legal' | 'Letter' | 'Tabloid' | 'Custom'
+      customPageSize: string
+      landscape: false | true
+      printBackground: boolean
+      printSelectionOnly: boolean
+    }
     'markdown-preview-plus.saveConfig': {
       mediaOnSaveAsHTMLBehaviour: 'relativized' | 'absolutized' | 'untouched'
       mediaOnCopyAsHTMLBehaviour: 'relativized' | 'absolutized' | 'untouched'
       defaultSaveFormat: 'html' | 'pdf'
+      'saveToPDFOptions.marginsType': 0 | 1 | 2
+      'saveToPDFOptions.pageSize':
+        | 'A3'
+        | 'A4'
+        | 'A5'
+        | 'Legal'
+        | 'Letter'
+        | 'Tabloid'
+        | 'Custom'
+      'saveToPDFOptions.customPageSize': string
+      'saveToPDFOptions.landscape': false | true
+      'saveToPDFOptions.printBackground': boolean
+      'saveToPDFOptions.printSelectionOnly': boolean
+      saveToPDFOptions: {
+        marginsType: 0 | 1 | 2
+        pageSize: 'A3' | 'A4' | 'A5' | 'Legal' | 'Letter' | 'Tabloid' | 'Custom'
+        customPageSize: string
+        landscape: false | true
+        printBackground: boolean
+        printSelectionOnly: boolean
+      }
     }
     'markdown-preview-plus.syncConfig.syncPreviewOnChange': boolean
     'markdown-preview-plus.syncConfig.syncPreviewOnEditorScroll': boolean
@@ -408,16 +628,22 @@ declare module 'atom' {
     'markdown-preview-plus.mathConfig.enableLatexRenderingByDefault': boolean
     'markdown-preview-plus.mathConfig.latexRenderer': 'HTML-CSS' | 'SVG'
     'markdown-preview-plus.mathConfig.numberEquations': boolean
+    'markdown-preview-plus.mathConfig.texExtensions': string[]
+    'markdown-preview-plus.mathConfig.undefinedFamily': string
     'markdown-preview-plus.mathConfig': {
       enableLatexRenderingByDefault: boolean
       latexRenderer: 'HTML-CSS' | 'SVG'
       numberEquations: boolean
+      texExtensions: string[]
+      undefinedFamily: string
     }
     'markdown-preview-plus.markdownItConfig.breakOnSingleNewline': boolean
     'markdown-preview-plus.markdownItConfig.useLazyHeaders': boolean
     'markdown-preview-plus.markdownItConfig.useCheckBoxes': boolean
     'markdown-preview-plus.markdownItConfig.useEmoji': boolean
     'markdown-preview-plus.markdownItConfig.useToc': boolean
+    'markdown-preview-plus.markdownItConfig.useImsize': boolean
+    'markdown-preview-plus.markdownItConfig.useCriticMarkup': boolean
     'markdown-preview-plus.markdownItConfig.inlineMathSeparators': string[]
     'markdown-preview-plus.markdownItConfig.blockMathSeparators': string[]
     'markdown-preview-plus.markdownItConfig': {
@@ -426,6 +652,8 @@ declare module 'atom' {
       useCheckBoxes: boolean
       useEmoji: boolean
       useToc: boolean
+      useImsize: boolean
+      useCriticMarkup: boolean
       inlineMathSeparators: string[]
       blockMathSeparators: string[]
     }
@@ -457,18 +685,24 @@ declare module 'atom' {
       grammars: string[]
       extensions: string[]
       useGitHubStyle: boolean
+      syntaxThemeName: string
+      importPackageStyles: string[]
+      codeTabWidth: number
       renderer: 'markdown-it' | 'pandoc'
+      richClipboard: boolean
       'previewConfig.liveUpdate': boolean
       'previewConfig.previewSplitPaneDir': 'down' | 'right' | 'none'
       'previewConfig.previewDock': 'left' | 'right' | 'bottom' | 'center'
       'previewConfig.closePreviewWithEditor': boolean
       'previewConfig.activatePreviewWithEditor': boolean
+      'previewConfig.shellOpenFileExtensions': string[]
       previewConfig: {
         liveUpdate: boolean
         previewSplitPaneDir: 'down' | 'right' | 'none'
         previewDock: 'left' | 'right' | 'bottom' | 'center'
         closePreviewWithEditor: boolean
         activatePreviewWithEditor: boolean
+        shellOpenFileExtensions: string[]
       }
       'saveConfig.mediaOnSaveAsHTMLBehaviour':
         | 'relativized'
@@ -479,10 +713,59 @@ declare module 'atom' {
         | 'absolutized'
         | 'untouched'
       'saveConfig.defaultSaveFormat': 'html' | 'pdf'
+      'saveConfig.saveToPDFOptions.marginsType': 0 | 1 | 2
+      'saveConfig.saveToPDFOptions.pageSize':
+        | 'A3'
+        | 'A4'
+        | 'A5'
+        | 'Legal'
+        | 'Letter'
+        | 'Tabloid'
+        | 'Custom'
+      'saveConfig.saveToPDFOptions.customPageSize': string
+      'saveConfig.saveToPDFOptions.landscape': false | true
+      'saveConfig.saveToPDFOptions.printBackground': boolean
+      'saveConfig.saveToPDFOptions.printSelectionOnly': boolean
+      'saveConfig.saveToPDFOptions': {
+        marginsType: 0 | 1 | 2
+        pageSize: 'A3' | 'A4' | 'A5' | 'Legal' | 'Letter' | 'Tabloid' | 'Custom'
+        customPageSize: string
+        landscape: false | true
+        printBackground: boolean
+        printSelectionOnly: boolean
+      }
       saveConfig: {
         mediaOnSaveAsHTMLBehaviour: 'relativized' | 'absolutized' | 'untouched'
         mediaOnCopyAsHTMLBehaviour: 'relativized' | 'absolutized' | 'untouched'
         defaultSaveFormat: 'html' | 'pdf'
+        'saveToPDFOptions.marginsType': 0 | 1 | 2
+        'saveToPDFOptions.pageSize':
+          | 'A3'
+          | 'A4'
+          | 'A5'
+          | 'Legal'
+          | 'Letter'
+          | 'Tabloid'
+          | 'Custom'
+        'saveToPDFOptions.customPageSize': string
+        'saveToPDFOptions.landscape': false | true
+        'saveToPDFOptions.printBackground': boolean
+        'saveToPDFOptions.printSelectionOnly': boolean
+        saveToPDFOptions: {
+          marginsType: 0 | 1 | 2
+          pageSize:
+            | 'A3'
+            | 'A4'
+            | 'A5'
+            | 'Legal'
+            | 'Letter'
+            | 'Tabloid'
+            | 'Custom'
+          customPageSize: string
+          landscape: false | true
+          printBackground: boolean
+          printSelectionOnly: boolean
+        }
       }
       'syncConfig.syncPreviewOnChange': boolean
       'syncConfig.syncPreviewOnEditorScroll': boolean
@@ -495,16 +778,22 @@ declare module 'atom' {
       'mathConfig.enableLatexRenderingByDefault': boolean
       'mathConfig.latexRenderer': 'HTML-CSS' | 'SVG'
       'mathConfig.numberEquations': boolean
+      'mathConfig.texExtensions': string[]
+      'mathConfig.undefinedFamily': string
       mathConfig: {
         enableLatexRenderingByDefault: boolean
         latexRenderer: 'HTML-CSS' | 'SVG'
         numberEquations: boolean
+        texExtensions: string[]
+        undefinedFamily: string
       }
       'markdownItConfig.breakOnSingleNewline': boolean
       'markdownItConfig.useLazyHeaders': boolean
       'markdownItConfig.useCheckBoxes': boolean
       'markdownItConfig.useEmoji': boolean
       'markdownItConfig.useToc': boolean
+      'markdownItConfig.useImsize': boolean
+      'markdownItConfig.useCriticMarkup': boolean
       'markdownItConfig.inlineMathSeparators': string[]
       'markdownItConfig.blockMathSeparators': string[]
       markdownItConfig: {
@@ -513,6 +802,8 @@ declare module 'atom' {
         useCheckBoxes: boolean
         useEmoji: boolean
         useToc: boolean
+        useImsize: boolean
+        useCriticMarkup: boolean
         inlineMathSeparators: string[]
         blockMathSeparators: string[]
       }

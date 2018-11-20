@@ -1,76 +1,146 @@
-'use strict';
+"use strict";
 
-var _createPackage;
+function _createPackage() {
+  const data = _interopRequireDefault(require("../../../modules/nuclide-commons-atom/createPackage"));
 
-function _load_createPackage() {
-  return _createPackage = _interopRequireDefault(require('../../../modules/nuclide-commons-atom/createPackage'));
+  _createPackage = function () {
+    return data;
+  };
+
+  return data;
 }
 
-var _UniversalDisposable;
+function _nuclideUri() {
+  const data = _interopRequireDefault(require("../../../modules/nuclide-commons/nuclideUri"));
 
-function _load_UniversalDisposable() {
-  return _UniversalDisposable = _interopRequireDefault(require('../../../modules/nuclide-commons/UniversalDisposable'));
+  _nuclideUri = function () {
+    return data;
+  };
+
+  return data;
 }
 
-var _textEdit;
+function _UniversalDisposable() {
+  const data = _interopRequireDefault(require("../../../modules/nuclide-commons/UniversalDisposable"));
 
-function _load_textEdit() {
-  return _textEdit = require('../../../modules/nuclide-commons-atom/text-edit');
+  _UniversalDisposable = function () {
+    return data;
+  };
+
+  return data;
 }
 
-var _constantsForClient;
+function _textEdit() {
+  const data = require("../../../modules/nuclide-commons-atom/text-edit");
 
-function _load_constantsForClient() {
-  return _constantsForClient = require('../../nuclide-js-imports-server/src/utils/constantsForClient');
+  _textEdit = function () {
+    return data;
+  };
+
+  return data;
 }
 
-var _nuclideLanguageService;
+function _nuclideAnalytics() {
+  const data = require("../../../modules/nuclide-analytics");
 
-function _load_nuclideLanguageService() {
-  return _nuclideLanguageService = require('../../nuclide-language-service');
+  _nuclideAnalytics = function () {
+    return data;
+  };
+
+  return data;
 }
 
-var _nuclideLanguageServiceRpc;
+function convert() {
+  const data = _interopRequireWildcard(require("../../nuclide-vscode-language-service-rpc/lib/convert"));
 
-function _load_nuclideLanguageServiceRpc() {
-  return _nuclideLanguageServiceRpc = require('../../nuclide-language-service-rpc');
+  convert = function () {
+    return data;
+  };
+
+  return data;
 }
 
-var _nuclideOpenFiles;
+function _nuclideLanguageService() {
+  const data = require("../../nuclide-language-service");
 
-function _load_nuclideOpenFiles() {
-  return _nuclideOpenFiles = require('../../nuclide-open-files');
+  _nuclideLanguageService = function () {
+    return data;
+  };
+
+  return data;
 }
 
-var _nuclideRemoteConnection;
+function _nuclideLanguageServiceRpc() {
+  const data = require("../../nuclide-language-service-rpc");
 
-function _load_nuclideRemoteConnection() {
-  return _nuclideRemoteConnection = require('../../nuclide-remote-connection');
+  _nuclideLanguageServiceRpc = function () {
+    return data;
+  };
+
+  return data;
 }
 
-var _featureConfig;
+function _nuclideOpenFiles() {
+  const data = require("../../nuclide-open-files");
 
-function _load_featureConfig() {
-  return _featureConfig = _interopRequireDefault(require('../../../modules/nuclide-commons-atom/feature-config'));
+  _nuclideOpenFiles = function () {
+    return data;
+  };
+
+  return data;
 }
 
-var _QuickOpenProvider;
+function _nuclideRemoteConnection() {
+  const data = require("../../nuclide-remote-connection");
 
-function _load_QuickOpenProvider() {
-  return _QuickOpenProvider = _interopRequireDefault(require('./QuickOpenProvider'));
+  _nuclideRemoteConnection = function () {
+    return data;
+  };
+
+  return data;
 }
 
-var _JSSymbolSearchProvider;
+function _featureConfig() {
+  const data = _interopRequireDefault(require("../../../modules/nuclide-commons-atom/feature-config"));
 
-function _load_JSSymbolSearchProvider() {
-  return _JSSymbolSearchProvider = _interopRequireDefault(require('./JSSymbolSearchProvider'));
+  _featureConfig = function () {
+    return data;
+  };
+
+  return data;
 }
 
-var _DashProjectSymbolProvider;
+function _QuickOpenProvider() {
+  const data = _interopRequireDefault(require("./QuickOpenProvider"));
 
-function _load_DashProjectSymbolProvider() {
-  return _DashProjectSymbolProvider = _interopRequireDefault(require('./DashProjectSymbolProvider'));
+  _QuickOpenProvider = function () {
+    return data;
+  };
+
+  return data;
 }
+
+function _JSSymbolSearchProvider() {
+  const data = _interopRequireDefault(require("./JSSymbolSearchProvider"));
+
+  _JSSymbolSearchProvider = function () {
+    return data;
+  };
+
+  return data;
+}
+
+function _DashProjectSymbolProvider() {
+  const data = _interopRequireDefault(require("./DashProjectSymbolProvider"));
+
+  _DashProjectSymbolProvider = function () {
+    return data;
+  };
+
+  return data;
+}
+
+function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) { var desc = Object.defineProperty && Object.getOwnPropertyDescriptor ? Object.getOwnPropertyDescriptor(obj, key) : {}; if (desc.get || desc.set) { Object.defineProperty(newObj, key, desc); } else { newObj[key] = obj[key]; } } } } newObj.default = obj; return newObj; } }
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -84,23 +154,21 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
  * 
  * @format
  */
-
 // $FlowFB
 async function connectToJSImportsService(connection) {
-  const [fileNotifier, host] = await Promise.all([(0, (_nuclideOpenFiles || _load_nuclideOpenFiles()).getNotifierByConnection)(connection), (0, (_nuclideLanguageService || _load_nuclideLanguageService()).getHostServices)()]);
-
-  const service = (0, (_nuclideRemoteConnection || _load_nuclideRemoteConnection()).getVSCodeLanguageServiceByConnection)(connection);
+  const [fileNotifier, host] = await Promise.all([(0, _nuclideOpenFiles().getNotifierByConnection)(connection), (0, _nuclideLanguageService().getHostServices)()]);
+  const service = (0, _nuclideRemoteConnection().getVSCodeLanguageServiceByConnection)(connection);
   const lspService = await service.createMultiLspLanguageService('jsimports', './pkg/nuclide-js-imports-server/src/index-entry.js', [], {
     fileNotifier,
     host,
     logCategory: 'jsimports',
-    logLevel: (_featureConfig || _load_featureConfig()).default.get('nuclide-js-imports-client.logLevel'),
+    logLevel: _featureConfig().default.get('nuclide-js-imports-client.logLevel'),
     projectFileNames: ['.flowconfig'],
     fileExtensions: ['.js', '.jsx'],
     initializationOptions: getAutoImportSettings(),
     fork: true
   });
-  return lspService || new (_nuclideLanguageServiceRpc || _load_nuclideLanguageServiceRpc()).NullLanguageService();
+  return lspService || new (_nuclideLanguageServiceRpc().NullLanguageService)();
 }
 
 function createLanguageService() {
@@ -108,35 +176,64 @@ function createLanguageService() {
     version: '0.2.0',
     analyticsEventName: 'jsimports.observe-diagnostics'
   };
-
   const autocompleteConfig = {
     inclusionPriority: 1,
     suggestionPriority: 3,
     excludeLowerPriority: false,
     analytics: {
       eventName: 'nuclide-js-imports',
-      shouldLogInsertedSuggestion: false
+      shouldLogInsertedSuggestion: true
     },
     disableForSelector: null,
     autocompleteCacherConfig: null,
     supportsResolve: false
   };
-
   const codeActionConfig = {
     version: '0.1.0',
     priority: 0,
     analyticsEventName: 'jsimports.codeAction',
     applyAnalyticsEventName: 'jsimports.applyCodeAction'
   };
-
   const atomConfig = {
     name: 'JSAutoImports',
-    grammars: ['source.js.jsx', 'source.js'],
+    grammars: ['source.js.jsx', 'source.js', 'source.flow'],
     diagnostics: diagnosticsConfig,
     autocomplete: autocompleteConfig,
-    codeAction: codeActionConfig
+    codeAction: codeActionConfig,
+    typeHint: {
+      version: '0.0.0',
+      priority: 0.1,
+      analyticsEventName: 'jsimports.typeHint'
+    }
   };
-  return new (_nuclideLanguageService || _load_nuclideLanguageService()).AtomLanguageService(connectToJSImportsService, atomConfig);
+  return new (_nuclideLanguageService().AtomLanguageService)(connectToJSImportsService, atomConfig, onDidInsertSuggestion);
+}
+
+function onDidInsertSuggestion({
+  suggestion
+}) {
+  const {
+    description,
+    displayText,
+    extraData,
+    remoteUri,
+    replacementPrefix,
+    snippet,
+    text,
+    type
+  } = suggestion;
+  (0, _nuclideAnalytics().track)('nuclide-js-imports:insert-suggestion', {
+    suggestion: {
+      description,
+      displayText,
+      extraData,
+      remoteUri,
+      replacementPrefix,
+      snippet,
+      text,
+      type
+    }
+  });
 }
 
 function getAutoImportSettings() {
@@ -146,30 +243,33 @@ function getAutoImportSettings() {
   // their settings and send DidChangeConfiguration requests to the server.
   // TODO: Observe settings changes + send to the server.
   return {
-    diagnosticsWhitelist: (_featureConfig || _load_featureConfig()).default.get('nuclide-js-imports-client.diagnosticsWhitelist'),
-    requiresWhitelist: (_featureConfig || _load_featureConfig()).default.get('nuclide-js-imports-client.requiresWhitelist')
+    componentModulePathFilter: _featureConfig().default.get('nuclide-js-imports-client.componentModulePathFilter'),
+    diagnosticsWhitelist: _featureConfig().default.get('nuclide-js-imports-client.diagnosticsWhitelist'),
+    requiresWhitelist: _featureConfig().default.get('nuclide-js-imports-client.requiresWhitelist')
   };
 }
 
 class Activation {
-
   constructor() {
     this._languageService = createLanguageService();
+
     this._languageService.activate();
-    this._quickOpenProvider = new (_QuickOpenProvider || _load_QuickOpenProvider()).default(this._languageService);
-    this._commandSubscription = new (_UniversalDisposable || _load_UniversalDisposable()).default();
+
+    this._quickOpenProvider = new (_QuickOpenProvider().default)(this._languageService);
+    this._commandSubscription = new (_UniversalDisposable().default)();
   }
 
   provideProjectSymbolSearch() {
-    return new (_DashProjectSymbolProvider || _load_DashProjectSymbolProvider()).default(this._languageService);
+    return new (_DashProjectSymbolProvider().default)(this._languageService);
   }
 
   provideJSSymbolSearchService() {
-    return new (_JSSymbolSearchProvider || _load_JSSymbolSearchProvider()).default(this._languageService);
+    return new (_JSSymbolSearchProvider().default)(this._languageService);
   }
 
   dispose() {
     this._languageService.dispose();
+
     this._commandSubscription.dispose();
   }
 
@@ -180,44 +280,51 @@ class Activation {
   consumeOrganizeRequiresService(organizeRequires) {
     this._commandSubscription.add(atom.commands.add('atom-text-editor', 'nuclide-js-imports:auto-require', async () => {
       const editor = atom.workspace.getActiveTextEditor();
+
       if (editor == null) {
         return;
       }
-      const fileVersion = await (0, (_nuclideOpenFiles || _load_nuclideOpenFiles()).getFileVersionOfEditor)(editor);
-      if (fileVersion == null) {
+
+      const editorPath = editor.getPath();
+      const fileVersion = await (0, _nuclideOpenFiles().getFileVersionOfEditor)(editor);
+
+      if (fileVersion == null || editorPath == null) {
         return;
       }
+
       const buffer = editor.getBuffer();
-      const range = buffer.getRange();
-      const languageService = await this._languageService.getLanguageServiceForUri(editor.getPath());
+      const languageService = await this._languageService.getLanguageServiceForUri(editorPath);
+
       if (languageService == null) {
         return;
       }
-      const triggerOptions = {
-        // secret code
-        tabSize: (_constantsForClient || _load_constantsForClient()).TAB_SIZE_SIGNIFYING_FIX_ALL_IMPORTS_FORMATTING,
-        // just for typechecking to pass
-        insertSpaces: true
-      };
-      const result = await languageService.formatSource(fileVersion, range, triggerOptions);
+
       const beforeEditsCheckpoint = buffer.createCheckpoint();
-      // First add all new imports naively
-      if (result != null) {
-        if (!(0, (_textEdit || _load_textEdit()).applyTextEditsToBuffer)(buffer, result)) {
-          // TODO(T24077432): Show the error to the user
-          throw new Error('Could not apply edits to text buffer.');
-        }
-      }
-      // Then use nuclide-format-js to properly format the imports
-      const successfulEdits = (result || []).filter(edit => edit.newText !== '');
+      const {
+        edits,
+        addedRequires,
+        missingExports
+      } = await languageService.sendLspRequest(editorPath, 'workspace/executeCommand', {
+        command: 'getAllImports',
+        arguments: [_nuclideUri().default.getPath(editorPath)]
+      });
+
+      if (!(0, _textEdit().applyTextEditsToBuffer)(buffer, convert().lspTextEdits_atomTextEdits(edits || []))) {
+        // TODO(T24077432): Show the error to the user
+        throw new Error('Could not apply edits to text buffer.');
+      } // Then use nuclide-format-js to properly format the imports
+
+
       organizeRequires({
-        addedRequires: successfulEdits.length > 0,
-        missingExports: successfulEdits.length !== (result || []).length
+        addedRequires,
+        missingExports
       });
       buffer.groupChangesSinceCheckpoint(beforeEditsCheckpoint);
     }));
+
     return this._commandSubscription;
   }
+
 }
 
-(0, (_createPackage || _load_createPackage()).default)(module.exports, Activation);
+(0, _createPackage().default)(module.exports, Activation);

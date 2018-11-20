@@ -1,31 +1,34 @@
-'use strict';
+"use strict";
 
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
+exports.default = void 0;
 
-var _atom = require('atom');
+var _atom = require("atom");
 
-var _nuclideAnalytics;
+function _nuclideAnalytics() {
+  const data = require("../../../modules/nuclide-analytics");
 
-function _load_nuclideAnalytics() {
-  return _nuclideAnalytics = require('../../nuclide-analytics');
+  _nuclideAnalytics = function () {
+    return data;
+  };
+
+  return data;
 }
 
-var _observeLanguageTextEditors;
+function _observeLanguageTextEditors() {
+  const data = _interopRequireDefault(require("../../commons-atom/observe-language-text-editors"));
 
-function _load_observeLanguageTextEditors() {
-  return _observeLanguageTextEditors = _interopRequireDefault(require('../../commons-atom/observe-language-text-editors'));
+  _observeLanguageTextEditors = function () {
+    return data;
+  };
+
+  return data;
 }
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-const GRAMMARS = ['source.objc', 'source.objcpp'];
-
-/**
- * This closes square brackets for Objective-C message calls.
- * Clients must call `disable()` once they're done with an instance.
- */
 /**
  * Copyright (c) 2015-present, Facebook, Inc.
  * All rights reserved.
@@ -36,9 +39,13 @@ const GRAMMARS = ['source.objc', 'source.objcpp'];
  *  strict-local
  * @format
  */
+const GRAMMARS = ['source.objc', 'source.objcpp'];
+/**
+ * This closes square brackets for Objective-C message calls.
+ * Clients must call `disable()` once they're done with an instance.
+ */
 
 class ObjectiveCBracketBalancer {
-
   enable() {
     // The feature is already enabled.
     if (this._languageListener) {
@@ -46,7 +53,7 @@ class ObjectiveCBracketBalancer {
     }
 
     this._editingSubscriptionsMap = new Map();
-    this._languageListener = (0, (_observeLanguageTextEditors || _load_observeLanguageTextEditors()).default)(GRAMMARS, textEditor => this._enableInTextEditor(textEditor), textEditor => this._disableInTextEditor(textEditor));
+    this._languageListener = (0, _observeLanguageTextEditors().default)(GRAMMARS, textEditor => this._enableInTextEditor(textEditor), textEditor => this._disableInTextEditor(textEditor));
   }
 
   disable() {
@@ -54,33 +61,44 @@ class ObjectiveCBracketBalancer {
     if (!this._languageListener) {
       return;
     }
+
     this._languageListener.dispose();
+
     this._languageListener = null;
 
     this._editingSubscriptionsMap.forEach(subscription => subscription.dispose());
+
     this._editingSubscriptionsMap.clear();
   }
 
   _enableInTextEditor(textEditor) {
     const insertTextSubscription = textEditor.onDidInsertText(event => {
-      (0, (_nuclideAnalytics || _load_nuclideAnalytics()).trackTiming)('objc:balance-bracket', () => {
-        const { range, text } = event;
+      (0, _nuclideAnalytics().trackTiming)('objc:balance-bracket', () => {
+        const {
+          range,
+          text
+        } = event;
+
         if (text === ']') {
           const buffer = textEditor.getBuffer();
           const leftBracketInsertPosition = ObjectiveCBracketBalancer.getOpenBracketInsertPosition(buffer, range.start);
+
           if (leftBracketInsertPosition) {
             buffer.insert(leftBracketInsertPosition, '[');
           }
         }
       });
     });
+
     this._editingSubscriptionsMap.set(textEditor, insertTextSubscription);
   }
 
   _disableInTextEditor(textEditor) {
     const subscription = this._editingSubscriptionsMap.get(textEditor);
+
     if (subscription) {
       subscription.dispose();
+
       this._editingSubscriptionsMap.delete(textEditor);
     }
   }
@@ -92,10 +110,9 @@ class ObjectiveCBracketBalancer {
     const characterCount = {
       '[': 0,
       ']': 0
-    };
-
-    // Iterate through the line, determining if we have balanced brackets.
+    }; // Iterate through the line, determining if we have balanced brackets.
     // We do not count brackets we encounter inside string/char literals.
+
     for (let i = 0; i < startingLine.length; i++) {
       if (startingLine[i] === "'") {
         singleQuoteCount++;
@@ -110,6 +127,7 @@ class ObjectiveCBracketBalancer {
     }
 
     const stringLiteralMatch = /@".*"\s.*]/.exec(startingLine);
+
     if (stringLiteralMatch) {
       return _atom.Point.fromObject([closeBracketPosition.row, stringLiteralMatch.index]);
     } else if (characterCount['['] < characterCount[']']) {
@@ -117,18 +135,17 @@ class ObjectiveCBracketBalancer {
       const multiLineMethodRegex = /^[\s\w[]*:.*[^;{];?$/;
       let currentRow = closeBracketPosition.row;
       let currentRowPlusOne = null;
-      let match = multiLineMethodRegex.exec(buffer.lineForRow(currentRow));
+      let match = multiLineMethodRegex.exec(buffer.lineForRow(currentRow)); // eslint-disable-next-line eqeqeq
 
-      // eslint-disable-next-line eqeqeq
       while (match !== null) {
         currentRowPlusOne = currentRow;
         match = multiLineMethodRegex.exec(buffer.lineForRow(--currentRow));
       }
 
-      if (
-      // eslint-disable-next-line eqeqeq
+      if ( // eslint-disable-next-line eqeqeq
       currentRowPlusOne !== null && currentRowPlusOne !== closeBracketPosition.row) {
-        const targetLine = buffer.lineForRow(currentRowPlusOne);
+        const targetLine = buffer.lineForRow(currentRowPlusOne); // $FlowFixMe (>= v0.75.0)
+
         const targetMatch = /\S/.exec(targetLine);
 
         if (targetLine[targetMatch.index] === '[') {
@@ -158,5 +175,7 @@ class ObjectiveCBracketBalancer {
       return null;
     }
   }
+
 }
+
 exports.default = ObjectiveCBracketBalancer;

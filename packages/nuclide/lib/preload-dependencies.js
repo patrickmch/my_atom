@@ -1,4 +1,4 @@
-'use strict';
+"use strict";
 
 /**
  * Copyright (c) 2015-present, Facebook, Inc.
@@ -24,13 +24,17 @@
  * - Be transpiled so that `use-minified-libs-tr` is applied to it.
  * - Use `require` and not `import` to avoid `inline-imports` optimizations.
  */
-
 require('immutable');
-require('log4js');
-require('react');
-require('react-dom');
-require('redux/dist/redux.min.js');
-require('rxjs/bundles/Rx.min.js');
 
-// Single out fs-plus since we can probably remove it one day.
+require('log4js');
+
+require('react');
+
+require('react-dom');
+
+require("redux/dist/redux.min.js");
+
+require("rxjs-compat/bundles/rxjs-compat.umd.min.js"); // Single out fs-plus since we can probably remove it one day.
+
+
 require('fs-plus');

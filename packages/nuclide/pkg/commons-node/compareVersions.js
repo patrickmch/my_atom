@@ -1,9 +1,10 @@
-'use strict';
+"use strict";
 
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
 exports.default = compareVersions;
+
 /**
  * Copyright (c) 2015-present, Facebook, Inc.
  * All rights reserved.
@@ -22,15 +23,19 @@ exports.default = compareVersions;
 function compareVersions(a, b) {
   const aParts = a.split('.').map(x => parseInt(x, 10));
   const bParts = b.split('.').map(x => parseInt(x, 10));
+
   for (let i = 0; i < Math.max(aParts.length, bParts.length); i++) {
     const aNumber = aParts[i] || 0;
     const bNumber = bParts[i] || 0;
+
     if (aNumber < bNumber) {
       return -1;
     }
+
     if (aNumber > bNumber) {
       return 1;
     }
   }
+
   return 0;
 }

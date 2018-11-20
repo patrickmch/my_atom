@@ -1,95 +1,151 @@
-'use strict';
+"use strict";
 
-var _goToLocation;
+function _goToLocation() {
+  const data = require("../../../modules/nuclide-commons-atom/go-to-location");
 
-function _load_goToLocation() {
-  return _goToLocation = require('../../../modules/nuclide-commons-atom/go-to-location');
+  _goToLocation = function () {
+    return data;
+  };
+
+  return data;
 }
 
-var _react = _interopRequireWildcard(require('react'));
+var React = _interopRequireWildcard(require("react"));
 
-var _createPackage;
+function _createPackage() {
+  const data = _interopRequireDefault(require("../../../modules/nuclide-commons-atom/createPackage"));
 
-function _load_createPackage() {
-  return _createPackage = _interopRequireDefault(require('../../../modules/nuclide-commons-atom/createPackage'));
+  _createPackage = function () {
+    return data;
+  };
+
+  return data;
 }
 
-var _destroyItemWhere;
+function _destroyItemWhere() {
+  const data = require("../../../modules/nuclide-commons-atom/destroyItemWhere");
 
-function _load_destroyItemWhere() {
-  return _destroyItemWhere = require('../../../modules/nuclide-commons-atom/destroyItemWhere');
+  _destroyItemWhere = function () {
+    return data;
+  };
+
+  return data;
 }
 
-var _UniversalDisposable;
+function _UniversalDisposable() {
+  const data = _interopRequireDefault(require("../../../modules/nuclide-commons/UniversalDisposable"));
 
-function _load_UniversalDisposable() {
-  return _UniversalDisposable = _interopRequireDefault(require('../../../modules/nuclide-commons/UniversalDisposable'));
+  _UniversalDisposable = function () {
+    return data;
+  };
+
+  return data;
 }
 
-var _reduxMin;
+function _reduxMin() {
+  const data = require("redux/dist/redux.min.js");
 
-function _load_reduxMin() {
-  return _reduxMin = require('redux/dist/redux.min.js');
+  _reduxMin = function () {
+    return data;
+  };
+
+  return data;
 }
 
-var _viewableFromReactElement;
+function _viewableFromReactElement() {
+  const data = require("../../commons-atom/viewableFromReactElement");
 
-function _load_viewableFromReactElement() {
-  return _viewableFromReactElement = require('../../commons-atom/viewableFromReactElement');
+  _viewableFromReactElement = function () {
+    return data;
+  };
+
+  return data;
 }
 
-var _Actions;
+function _config() {
+  const data = require("./config");
 
-function _load_Actions() {
-  return _Actions = _interopRequireWildcard(require('./redux/Actions'));
+  _config = function () {
+    return data;
+  };
+
+  return data;
 }
 
-var _createEmptyAppState;
+function Actions() {
+  const data = _interopRequireWildcard(require("./redux/Actions"));
 
-function _load_createEmptyAppState() {
-  return _createEmptyAppState = require('./redux/createEmptyAppState');
+  Actions = function () {
+    return data;
+  };
+
+  return data;
 }
 
-var _rootReducer;
+function _createEmptyAppState() {
+  const data = require("./redux/createEmptyAppState");
 
-function _load_rootReducer() {
-  return _rootReducer = _interopRequireDefault(require('./redux/rootReducer'));
+  _createEmptyAppState = function () {
+    return data;
+  };
+
+  return data;
 }
 
-var _WelcomePageGadget;
+function _rootReducer() {
+  const data = _interopRequireDefault(require("./redux/rootReducer"));
 
-function _load_WelcomePageGadget() {
-  return _WelcomePageGadget = require('./ui/WelcomePageGadget');
+  _rootReducer = function () {
+    return data;
+  };
+
+  return data;
 }
 
-var _WelcomePageGadget2;
+function _WelcomePageGadget() {
+  const data = _interopRequireWildcard(require("./ui/WelcomePageGadget"));
 
-function _load_WelcomePageGadget2() {
-  return _WelcomePageGadget2 = _interopRequireDefault(require('./ui/WelcomePageGadget'));
+  _WelcomePageGadget = function () {
+    return data;
+  };
+
+  return data;
 }
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
+function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) { var desc = Object.defineProperty && Object.getOwnPropertyDescriptor ? Object.getOwnPropertyDescriptor(obj, key) : {}; if (desc.get || desc.set) { Object.defineProperty(newObj, key, desc); } else { newObj[key] = obj[key]; } } } } newObj.default = obj; return newObj; } }
 
-const SHOW_COMMAND_NAME = 'nuclide-welcome-page:show-welcome-page'; /**
-                                                                     * Copyright (c) 2015-present, Facebook, Inc.
-                                                                     * All rights reserved.
-                                                                     *
-                                                                     * This source code is licensed under the license found in the LICENSE file in
-                                                                     * the root directory of this source tree.
-                                                                     *
-                                                                     * 
-                                                                     * @format
-                                                                     */
-
+/**
+ * Copyright (c) 2015-present, Facebook, Inc.
+ * All rights reserved.
+ *
+ * This source code is licensed under the license found in the LICENSE file in
+ * the root directory of this source tree.
+ *
+ * 
+ * @format
+ */
 const SHOW_ALL_COMMAND_NAME = 'nuclide-welcome-page:show-all-welcome-pages';
+const SHOW_COMMAND_NAME_PREFIX = 'nuclide-welcome-page:show-';
+
+function getShowCommandNameForTopic(topic) {
+  return SHOW_COMMAND_NAME_PREFIX + topic;
+} // Since we depend on the topic string format for the construction of pane URI
+// and show command, it must match this REGEX. Matches dash-delimited alphabetical
+// strings starting with a letter and ending with -welcome-page
+
+
+const WELCOME_PAGE_TOPIC_REGEX = /^[A-Za-z]+([-]?[A-Za-z]*)-welcome-page$/;
 
 class Activation {
-
-  constructor(serializedState) {
-    this._store = (0, (_reduxMin || _load_reduxMin()).createStore)((_rootReducer || _load_rootReducer()).default, (0, (_createEmptyAppState || _load_createEmptyAppState()).createEmptyAppState)(serializedState));
-    this._disposables = new (_UniversalDisposable || _load_UniversalDisposable()).default(this._registerDisplayCommandAndOpener());
+  constructor() {
+    (0, _config().migrateShowOnboardingConfigValue)();
+    const hiddenTopics = (0, _config().getHiddenTopics)();
+    this._store = (0, _reduxMin().createStore)(_rootReducer().default, (0, _createEmptyAppState().createEmptyAppState)(hiddenTopics));
+    this._disposables = new (_UniversalDisposable().default)(this._registerDisplayAllCommand(), this._store.subscribe(() => {
+      (0, _config().setHiddenTopics)(this._store.getState().hiddenTopics);
+    }));
   }
 
   dispose() {
@@ -97,46 +153,65 @@ class Activation {
   }
 
   consumeWelcomePage(welcomePage) {
-    this._store.dispatch((_Actions || _load_Actions()).addWelcomePage(welcomePage));
-    return new (_UniversalDisposable || _load_UniversalDisposable()).default(() => {
-      this._store.dispatch((_Actions || _load_Actions()).deleteWelcomePage(welcomePage.topic));
+    this._store.dispatch(Actions().addWelcomePage(welcomePage));
+
+    const topic = welcomePage.topic;
+
+    if (!WELCOME_PAGE_TOPIC_REGEX.test(topic)) {
+      throw new Error("Invariant violation: \"WELCOME_PAGE_TOPIC_REGEX.test(topic)\"");
+    } // Add opener and command (based on topic) for individual welcome pages
+
+
+    return new (_UniversalDisposable().default)(atom.workspace.addOpener(uri => {
+      if (uri === (0, _WelcomePageGadget().getURIForTopic)(topic)) {
+        return this._createWelcomePageViewable(topic, welcomePage.paneProps);
+      }
+    }), this._registerCommandForTopic(topic, welcomePage.menuLabel), // clean up all welcome page panes before removing welcome pages from store
+    () => {
+      (0, _destroyItemWhere().destroyItemWhere)(item => item instanceof _WelcomePageGadget().default).then(() => this._store.dispatch(Actions().deleteWelcomePage(topic)));
     });
   }
 
-  _registerDisplayCommandAndOpener() {
-    return new (_UniversalDisposable || _load_UniversalDisposable()).default(atom.workspace.addOpener(uri => {
-      if (uri === (_WelcomePageGadget || _load_WelcomePageGadget()).WELCOME_PAGE_VIEW_URI) {
-        return this._createWelcomePageViewable();
-      }
-    }), () => (0, (_destroyItemWhere || _load_destroyItemWhere()).destroyItemWhere)(item => item instanceof (_WelcomePageGadget2 || _load_WelcomePageGadget2()).default),
-    // show non-hidden welcome page sections
-    atom.commands.add('atom-workspace', SHOW_COMMAND_NAME, () => {
-      if (this._hasWelcomePagesToShow()) {
-        this._store.dispatch((_Actions || _load_Actions()).clearShowOption());
-        (0, (_goToLocation || _load_goToLocation()).goToLocation)((_WelcomePageGadget || _load_WelcomePageGadget()).WELCOME_PAGE_VIEW_URI);
-      }
-    }),
-    // show all welcome page sections, hidden or not
+  _registerCommandForTopic(topic, menuLabel) {
+    const showCommand = getShowCommandNameForTopic(topic);
+    return new (_UniversalDisposable().default)(atom.commands.add('atom-workspace', showCommand, () => {
+      this.showPageForTopic(topic, {
+        override: true
+      });
+    }), // Add menu item for individual welcome pages
+    atom.menu.add([{
+      label: 'Nuclide',
+      submenu: [{
+        label: 'Welcome Page',
+        submenu: [{
+          label: 'Topics',
+          submenu: [{
+            label: menuLabel,
+            command: showCommand
+          }]
+        }]
+      }]
+    }]));
+  }
+
+  _registerDisplayAllCommand() {
+    return new (_UniversalDisposable().default)( // show all welcome page sections, hidden or not
     atom.commands.add('atom-workspace', SHOW_ALL_COMMAND_NAME, () => {
-      this._store.dispatch((_Actions || _load_Actions()).setShowAll());
-      (0, (_goToLocation || _load_goToLocation()).goToLocation)((_WelcomePageGadget || _load_WelcomePageGadget()).WELCOME_PAGE_VIEW_URI);
-    }));
-  }
-
-  // TODO: is there a better place to put this?
-  _createWelcomePageViewable() {
-    return (0, (_viewableFromReactElement || _load_viewableFromReactElement()).viewableFromReactElement)(_react.createElement((_WelcomePageGadget2 || _load_WelcomePageGadget2()).default, { store: this._store }));
-  }
-
-  _hasWelcomePagesToShow() {
-    const { welcomePages, hiddenTopics } = this._store.getState();
-    for (const topic of welcomePages.keys()) {
-      if (!hiddenTopics.has(topic)) {
-        // if any topic is not hidden
-        return true;
+      for (const topic of this._store.getState().welcomePages.keys()) {
+        this.showPageForTopic(topic, {
+          override: true
+        });
       }
-    }
-    return false;
+    }));
+  } // TODO: is there a better place to put this?
+
+
+  _createWelcomePageViewable(topic, paneProps) {
+    return (0, _viewableFromReactElement().viewableFromReactElement)(React.createElement(_WelcomePageGadget().default, {
+      paneProps: paneProps,
+      store: this._store,
+      topic: topic
+    }));
   }
 
   provideWelcomePageApi() {
@@ -144,20 +219,19 @@ class Activation {
   }
 
   showPageForTopic(topic, options = {}) {
-    const { welcomePages, hiddenTopics } = this._store.getState();
+    const {
+      welcomePages,
+      hiddenTopics
+    } = this._store.getState();
+
     const showAnyway = options != null && options.override != null && options.override;
+
     if (showAnyway || welcomePages.has(topic) && !hiddenTopics.has(topic)) {
       // if the topic exists and isn't hidden
-      this._store.dispatch((_Actions || _load_Actions()).setShowOne(topic));
-      (0, (_goToLocation || _load_goToLocation()).goToLocation)((_WelcomePageGadget || _load_WelcomePageGadget()).WELCOME_PAGE_VIEW_URI);
+      (0, _goToLocation().goToLocation)((0, _WelcomePageGadget().getURIForTopic)(topic));
     }
   }
 
-  serialize() {
-    return {
-      hiddenTopics: Array.from(this._store.getState().hiddenTopics)
-    };
-  }
 }
 
-(0, (_createPackage || _load_createPackage()).default)(module.exports, Activation);
+(0, _createPackage().default)(module.exports, Activation);

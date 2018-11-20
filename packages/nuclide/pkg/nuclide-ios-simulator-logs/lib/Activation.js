@@ -1,52 +1,86 @@
-'use strict';
+"use strict";
 
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
+exports.default = void 0;
 
-var _UniversalDisposable;
+function _UniversalDisposable() {
+  const data = _interopRequireDefault(require("../../../modules/nuclide-commons/UniversalDisposable"));
 
-function _load_UniversalDisposable() {
-  return _UniversalDisposable = _interopRequireDefault(require('../../../modules/nuclide-commons/UniversalDisposable'));
+  _UniversalDisposable = function () {
+    return data;
+  };
+
+  return data;
 }
 
-var _formatEnoentNotification;
+function _formatEnoentNotification() {
+  const data = _interopRequireDefault(require("../../commons-atom/format-enoent-notification"));
 
-function _load_formatEnoentNotification() {
-  return _formatEnoentNotification = _interopRequireDefault(require('../../commons-atom/format-enoent-notification'));
+  _formatEnoentNotification = function () {
+    return data;
+  };
+
+  return data;
 }
 
-var _LogTailer;
+function _LogTailer() {
+  const data = require("../../nuclide-console-base/lib/LogTailer");
 
-function _load_LogTailer() {
-  return _LogTailer = require('../../nuclide-console-base/lib/LogTailer');
+  _LogTailer = function () {
+    return data;
+  };
+
+  return data;
 }
 
-var _createMessageStream;
+function _createMessageStream() {
+  const data = require("./createMessageStream");
 
-function _load_createMessageStream() {
-  return _createMessageStream = require('./createMessageStream');
+  _createMessageStream = function () {
+    return data;
+  };
+
+  return data;
 }
 
-var _createProcessStream;
+function _createProcessStream() {
+  const data = require("./createProcessStream");
 
-function _load_createProcessStream() {
-  return _createProcessStream = require('./createProcessStream');
+  _createProcessStream = function () {
+    return data;
+  };
+
+  return data;
 }
 
-var _rxjsBundlesRxMinJs = require('rxjs/bundles/Rx.min.js');
+var _rxjsCompatUmdMin = require("rxjs-compat/bundles/rxjs-compat.umd.min.js");
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
+/**
+ * Copyright (c) 2015-present, Facebook, Inc.
+ * All rights reserved.
+ *
+ * This source code is licensed under the license found in the LICENSE file in
+ * the root directory of this source tree.
+ *
+ * 
+ * @format
+ */
 class Activation {
-
   constructor(state) {
-    this._iosLogTailer = new (_LogTailer || _load_LogTailer()).LogTailer({
+    this._iosLogTailer = new (_LogTailer().LogTailer)({
       name: 'iOS Simulator Logs',
-      messages: _rxjsBundlesRxMinJs.Observable.defer(() => (0, (_createMessageStream || _load_createMessageStream()).createMessageStream)((0, (_createProcessStream || _load_createProcessStream()).createProcessStream)())),
+      messages: _rxjsCompatUmdMin.Observable.defer(() => (0, _createMessageStream().createMessageStream)((0, _createProcessStream().createProcessStream)())),
+
       handleError(err) {
         if (err.code === 'ENOENT') {
-          const { message, meta } = (0, (_formatEnoentNotification || _load_formatEnoentNotification()).default)({
+          const {
+            message,
+            meta
+          } = (0, _formatEnoentNotification().default)({
             feature: 'iOS Syslog tailing',
             toolName: 'syslog',
             pathSetting: 'nuclide-ios-simulator-logs.pathToSyslog'
@@ -54,16 +88,17 @@ class Activation {
           atom.notifications.addError(message, meta);
           return;
         }
+
         throw err;
       },
+
       trackingEvents: {
         start: 'ios-simulator-logs:start',
         stop: 'ios-simulator-logs:stop',
         restart: 'ios-simulator-logs:restart'
       }
     });
-
-    this._disposables = new (_UniversalDisposable || _load_UniversalDisposable()).default(() => {
+    this._disposables = new (_UniversalDisposable().default)(() => {
       this._iosLogTailer.stop();
     }, atom.commands.add('atom-workspace', {
       'nuclide-ios-simulator-logs:start': () => this._iosLogTailer.start(),
@@ -72,31 +107,31 @@ class Activation {
     }));
   }
 
-  consumeOutputService(api) {
-    this._disposables.add(api.registerOutputProvider({
+  consumeConsole(consoleService) {
+    let consoleApi = consoleService({
       id: 'iOS Simulator Logs',
-      messages: this._iosLogTailer.getMessages(),
-      observeStatus: cb => this._iosLogTailer.observeStatus(cb),
-      start: () => {
-        this._iosLogTailer.start();
-      },
-      stop: () => {
-        this._iosLogTailer.stop();
+      name: 'iOS Simulator Logs',
+      start: () => this._iosLogTailer.start(),
+      stop: () => this._iosLogTailer.stop()
+    });
+    const disposable = new (_UniversalDisposable().default)(() => {
+      consoleApi != null && consoleApi.dispose();
+      consoleApi = null;
+    }, this._iosLogTailer.getMessages().subscribe(message => consoleApi != null && consoleApi.append(message)), this._iosLogTailer.observeStatus(status => {
+      if (consoleApi != null) {
+        consoleApi.setStatus(status);
       }
     }));
+
+    this._disposables.add(disposable);
+
+    return disposable;
   }
 
   dispose() {
     this._disposables.dispose();
   }
+
 }
-exports.default = Activation; /**
-                               * Copyright (c) 2015-present, Facebook, Inc.
-                               * All rights reserved.
-                               *
-                               * This source code is licensed under the license found in the LICENSE file in
-                               * the root directory of this source tree.
-                               *
-                               * 
-                               * @format
-                               */
+
+exports.default = Activation;

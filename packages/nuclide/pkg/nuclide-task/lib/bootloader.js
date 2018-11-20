@@ -1,23 +1,32 @@
-'use strict';
+"use strict";
 
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
+exports.default = void 0;
 
-var _child_process = _interopRequireDefault(require('child_process'));
+var _child_process = _interopRequireDefault(require("child_process"));
 
-var _events = _interopRequireDefault(require('events'));
+var _events = _interopRequireDefault(require("events"));
 
-var _log4js;
+function _log4js() {
+  const data = require("log4js");
 
-function _load_log4js() {
-  return _log4js = require('log4js');
+  _log4js = function () {
+    return data;
+  };
+
+  return data;
 }
 
-var _runtimeInfo;
+function _runtimeInfo() {
+  const data = require("../../../modules/nuclide-commons/runtime-info");
 
-function _load_runtimeInfo() {
-  return _runtimeInfo = require('../../commons-node/runtime-info');
+  _runtimeInfo = function () {
+    return data;
+  };
+
+  return data;
 }
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
@@ -32,17 +41,17 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
  * 
  * @format
  */
+const BOOTSTRAP_PATH = require.resolve("./bootstrap");
 
-const BOOTSTRAP_PATH = require.resolve('./bootstrap');
-const TRANSPILER_PATH = require.resolve('../../commons-node/load-transpiler');
-
+const TRANSPILER_PATH = require.resolve("../../commons-node/load-transpiler");
 /**
  * Task creates and manages communication with another Node process. In addition
  * to executing ordinary .js files, the other Node process can also run .js files
  * under the Babel transpiler, so long as they have the  pragma.
  */
-class Task {
 
+
+class Task {
   /**
    * The constructor takes a single string, `name`, used for tracking purposes.
    * In particular, the "name" makes it easy to distinguish between bootloader
@@ -57,51 +66,60 @@ class Task {
 
   _initialize() {
     if (!(this._child == null)) {
-      throw new Error('Invariant violation: "this._child == null"');
+      throw new Error("Invariant violation: \"this._child == null\"");
     }
 
     const child = this._child = this._fork();
+
     const log = buffer => {
       // eslint-disable-next-line no-console
       console.log(`TASK(${this._name}, ${child.pid}): ${buffer}`);
     };
+
     child.stdout.on('data', log);
     child.stderr.on('data', log);
     child.on('message', response => {
       const id = response.id;
+
       this._emitter.emit(id, response);
     });
     child.on('error', buffer => {
       log(buffer);
-      (0, (_log4js || _load_log4js()).getLogger)('nuclide-task').error(`Error from task ${this._name}: ${buffer}`);
+      (0, _log4js().getLogger)('nuclide-task').error(`Error from task ${this._name}: ${buffer}`);
       child.kill();
+
       this._emitter.emit('error', buffer.toString());
+
       this._emitter.emit('child-process-error', buffer);
     });
 
     const onExitCallback = () => {
       child.kill();
     };
+
     process.on('exit', onExitCallback);
     child.on('exit', () => {
       this._emitter.emit('exit');
+
       process.removeListener('exit', onExitCallback);
     });
   }
 
   _fork() {
     // The transpiler is only loaded in development.
-    if ((_runtimeInfo || _load_runtimeInfo()).__DEV__) {
-      return _child_process.default.fork('--require',
-      // _name is not used, but just passed along as a tag for `ps`.
-      [TRANSPILER_PATH, BOOTSTRAP_PATH, this._name], { silent: true } // Needed so stdout/stderr are available.
+    if (_runtimeInfo().__DEV__) {
+      return _child_process.default.fork('--require', // _name is not used, but just passed along as a tag for `ps`.
+      [TRANSPILER_PATH, BOOTSTRAP_PATH, this._name], {
+        silent: true
+      } // Needed so stdout/stderr are available.
       );
     } else {
-      return _child_process.default.fork(BOOTSTRAP_PATH, [this._name], { silent: true } // Needed so stdout/stderr are available.
+      return _child_process.default.fork(BOOTSTRAP_PATH, [this._name], {
+        silent: true
+      } // Needed so stdout/stderr are available.
       );
     }
   }
-
   /**
    * Invokes a remote method that is specified as an export of a .js file.
    *
@@ -125,6 +143,8 @@ class Task {
    *     method. If an error is thrown, a rejected Promise will be returned
    *     instead.
    */
+
+
   invokeRemoteMethod(params) {
     if (this._child == null) {
       this._initialize();
@@ -137,12 +157,13 @@ class Task {
       method: params.method,
       args: params.args
     };
-
     return new Promise((resolve, reject) => {
       // Ensure the response listener is set up before the request is sent.
       this._emitter.once(requestId, response => {
         this._emitter.removeListener('error', reject);
+
         const err = response.error;
+
         if (!err) {
           resolve(response.result);
         } else {
@@ -153,10 +174,11 @@ class Task {
           reject(error);
         }
       });
+
       this._emitter.once('error', reject);
 
       if (!(this._child != null)) {
-        throw new Error('Invariant violation: "this._child != null"');
+        throw new Error("Invariant violation: \"this._child != null\"");
       }
 
       this._child.send(request);
@@ -175,7 +197,10 @@ class Task {
     if (this._child != null && this._child.connected) {
       this._child.kill();
     }
+
     this._emitter.removeAllListeners();
   }
+
 }
+
 exports.default = Task;

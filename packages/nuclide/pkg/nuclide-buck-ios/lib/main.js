@@ -1,4 +1,4 @@
-'use strict';
+"use strict";
 
 Object.defineProperty(exports, "__esModule", {
   value: true
@@ -6,50 +6,71 @@ Object.defineProperty(exports, "__esModule", {
 exports.deactivate = deactivate;
 exports.consumePlatformService = consumePlatformService;
 
-var _types;
+function _types() {
+  const data = require("./types");
 
-function _load_types() {
-  return _types = require('./types');
+  _types = function () {
+    return data;
+  };
+
+  return data;
 }
 
-var _Platforms;
+function _Platforms() {
+  const data = require("./Platforms");
 
-function _load_Platforms() {
-  return _Platforms = require('./Platforms');
+  _Platforms = function () {
+    return data;
+  };
+
+  return data;
 }
 
-var _fsPromise;
+function _fsPromise() {
+  const data = _interopRequireDefault(require("../../../modules/nuclide-commons/fsPromise"));
 
-function _load_fsPromise() {
-  return _fsPromise = _interopRequireDefault(require('../../../modules/nuclide-commons/fsPromise'));
+  _fsPromise = function () {
+    return data;
+  };
+
+  return data;
 }
 
-var _nuclideUri;
+function _nuclideUri() {
+  const data = _interopRequireDefault(require("../../../modules/nuclide-commons/nuclideUri"));
 
-function _load_nuclideUri() {
-  return _nuclideUri = _interopRequireDefault(require('../../../modules/nuclide-commons/nuclideUri'));
+  _nuclideUri = function () {
+    return data;
+  };
+
+  return data;
 }
 
-var _rxjsBundlesRxMinJs = require('rxjs/bundles/Rx.min.js');
+var _rxjsCompatUmdMin = require("rxjs-compat/bundles/rxjs-compat.umd.min.js");
 
-var _consumeFirstProvider;
+function _consumeFirstProvider() {
+  const data = _interopRequireDefault(require("../../../modules/nuclide-commons-atom/consumeFirstProvider"));
 
-function _load_consumeFirstProvider() {
-  return _consumeFirstProvider = _interopRequireDefault(require('../../../modules/nuclide-commons-atom/consumeFirstProvider'));
+  _consumeFirstProvider = function () {
+    return data;
+  };
+
+  return data;
 }
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-let disposable = null; /**
-                        * Copyright (c) 2015-present, Facebook, Inc.
-                        * All rights reserved.
-                        *
-                        * This source code is licensed under the license found in the LICENSE file in
-                        * the root directory of this source tree.
-                        *
-                        *  strict-local
-                        * @format
-                        */
+/**
+ * Copyright (c) 2015-present, Facebook, Inc.
+ * All rights reserved.
+ *
+ * This source code is licensed under the license found in the LICENSE file in
+ * the root directory of this source tree.
+ *
+ *  strict-local
+ * @format
+ */
+let disposable = null;
 
 function deactivate() {
   if (disposable != null) {
@@ -63,19 +84,20 @@ function consumePlatformService(service) {
 }
 
 function provideIosPlatformGroup(buckRoot, ruleType, buildTarget) {
-  if (!(_types || _load_types()).SUPPORTED_RULE_TYPES.has(ruleType)) {
-    return _rxjsBundlesRxMinJs.Observable.of(null);
-  }
-  if (ruleType === 'apple_binary' && buildTarget.endsWith('AppleMac')) {
-    return _rxjsBundlesRxMinJs.Observable.of(null);
+  if (!_types().SUPPORTED_RULE_TYPES.has(ruleType)) {
+    return _rxjsCompatUmdMin.Observable.of(null);
   }
 
-  return _rxjsBundlesRxMinJs.Observable.fromPromise((_fsPromise || _load_fsPromise()).default.exists((_nuclideUri || _load_nuclideUri()).default.join(buckRoot, 'mode', 'oculus-mobile'))).switchMap(result => {
+  if (ruleType === 'apple_binary' && buildTarget.endsWith('AppleMac')) {
+    return _rxjsCompatUmdMin.Observable.of(null);
+  }
+
+  return _rxjsCompatUmdMin.Observable.fromPromise(_fsPromise().default.exists(_nuclideUri().default.join(buckRoot, 'mode', 'oculus-mobile'))).switchMap(result => {
     if (result) {
-      return _rxjsBundlesRxMinJs.Observable.of(null);
+      return _rxjsCompatUmdMin.Observable.of(null);
     } else {
-      return _rxjsBundlesRxMinJs.Observable.fromPromise(_getDebuggerCallback(buckRoot)).switchMap(debuggerCallback => {
-        return _rxjsBundlesRxMinJs.Observable.combineLatest((0, (_Platforms || _load_Platforms()).getSimulatorPlatform)(buckRoot, ruleType, debuggerCallback), (0, (_Platforms || _load_Platforms()).getDevicePlatform)(buckRoot, ruleType, debuggerCallback)).map(([simulatorPlatform, devicePlatform]) => {
+      return _rxjsCompatUmdMin.Observable.fromPromise(_getDebuggerCallback(buckRoot)).switchMap(debuggerCallback => {
+        return _rxjsCompatUmdMin.Observable.combineLatest((0, _Platforms().getSimulatorPlatform)(buckRoot, ruleType, debuggerCallback), (0, _Platforms().getDevicePlatform)(buckRoot, ruleType, debuggerCallback)).map(([simulatorPlatform, devicePlatform]) => {
           return {
             name: 'iOS',
             platforms: [simulatorPlatform, devicePlatform]
@@ -87,7 +109,7 @@ function provideIosPlatformGroup(buckRoot, ruleType, buildTarget) {
 }
 
 async function _getDebuggerCallback(buckRoot) {
-  const nativeDebuggerService = await (0, (_consumeFirstProvider || _load_consumeFirstProvider()).default)('debugger.native-debugger-service');
+  const nativeDebuggerService = await (0, _consumeFirstProvider().default)('debugger.native-debugger-service');
 
   if (nativeDebuggerService == null) {
     return null;

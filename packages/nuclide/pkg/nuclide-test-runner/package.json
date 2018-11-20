@@ -4,10 +4,8 @@
   "version": "0.0.0",
   "description": "A panel for running tests provided by test runner service packages",
   "author": "NEEDS OWNER",
-  "atomTestRunner": "../../lib/test-runner-entry.js",
   "nuclide": {
-    "packageType": "Atom",
-    "testRunner": "apm"
+    "packageType": "AtomPackage"
   },
   "deserializers": {
     "nuclide.TestRunnerPanelState": "deserializeTestRunnerPanelState"
@@ -29,5 +27,7 @@
       }
     }
   },
-  "activationHooks": ["!nuclide_experimental_test_runner:gk:nuclide"]
+  "activationHooks": [
+    "!nuclide_experimental_test_runner:gk:nuclide"
+  ]
 }

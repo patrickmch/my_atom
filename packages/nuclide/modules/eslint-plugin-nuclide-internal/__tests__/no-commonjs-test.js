@@ -7,14 +7,12 @@
  * of patent rights can be found in the PATENTS file in the same directory.
  *
  * @noflow
+ * @emails oncall+nuclide
+ * @format
  */
 'use strict';
 
-/* eslint
-  comma-dangle: [1, always-multiline],
-  prefer-object-spread/prefer-object-spread: 0,
-  nuclide-internal/no-commonjs: 0,
-  */
+/* eslint nuclide-internal/no-commonjs: 0 */
 
 const rule = require('../no-commonjs');
 const RuleTester = require('eslint').RuleTester;
@@ -34,24 +32,30 @@ ruleTester.run('no-commonjs', rule, {
   invalid: [
     {
       code: "var path = require('path')",
-      errors: [{
-        message: 'Use "import" instead of "require"',
-        type: 'CallExpression',
-      }],
+      errors: [
+        {
+          message: 'Use "import" instead of "require"',
+          type: 'CallExpression',
+        },
+      ],
     },
     {
       code: 'module.exports = {}',
-      errors: [{
-        message: 'Use "export" instead of "module.exports"',
-        type: 'AssignmentExpression',
-      }],
+      errors: [
+        {
+          message: 'Use "export" instead of "module.exports"',
+          type: 'AssignmentExpression',
+        },
+      ],
     },
     {
       code: 'module.exports.dog = {}',
-      errors: [{
-        message: 'Use "export" instead of "module.exports"',
-        type: 'AssignmentExpression',
-      }],
+      errors: [
+        {
+          message: 'Use "export" instead of "module.exports"',
+          type: 'AssignmentExpression',
+        },
+      ],
     },
   ],
 });

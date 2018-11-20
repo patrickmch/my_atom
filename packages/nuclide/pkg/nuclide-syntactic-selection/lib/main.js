@@ -1,15 +1,23 @@
-'use strict';
+"use strict";
 
-var _createPackage;
+function _createPackage() {
+  const data = _interopRequireDefault(require("../../../modules/nuclide-commons-atom/createPackage"));
 
-function _load_createPackage() {
-  return _createPackage = _interopRequireDefault(require('../../../modules/nuclide-commons-atom/createPackage'));
+  _createPackage = function () {
+    return data;
+  };
+
+  return data;
 }
 
-var _SyntacticSelectionManager;
+function _SyntacticSelectionManager() {
+  const data = require("./SyntacticSelectionManager");
 
-function _load_SyntacticSelectionManager() {
-  return _SyntacticSelectionManager = require('./SyntacticSelectionManager');
+  _SyntacticSelectionManager = function () {
+    return data;
+  };
+
+  return data;
 }
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
@@ -24,11 +32,9 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
  * 
  * @format
  */
-
 class Activation {
-
   constructor() {
-    this._syntacticSelectionManager = new (_SyntacticSelectionManager || _load_SyntacticSelectionManager()).SyntacticSelectionManager();
+    this._syntacticSelectionManager = new (_SyntacticSelectionManager().SyntacticSelectionManager)();
   }
 
   dispose() {
@@ -38,6 +44,7 @@ class Activation {
   consumeSyntacticSelectionProvider(provider) {
     return this._syntacticSelectionManager.addProvider(provider);
   }
+
 }
 
-(0, (_createPackage || _load_createPackage()).default)(module.exports, Activation);
+(0, _createPackage().default)(module.exports, Activation);

@@ -1,4 +1,60 @@
+# 1.36.0: Big default changes and custom surround
+- Breaking, new Default: #1106
+  - `setCursorToStartOfChangeOnUndoRedo`: now `false` for precise cursor placement on `undo/redo`
+    - To say simply, this is just directly using atom's undo/redo marker for cursor placement.
+    - To make this work well, careful marker snapshotting(transact, checkpoint) is crucial(#603).
+    - I consider this change as part of default `stayOnXXX` = `true`.
+  - `replaceByDiffOnSurround`: now `true` for better cursor placement and highlight on `undo/redo`
+    - Old: Replaced whole text. e.g. Replacing `word` with `(word)`
+    - New: Modify surrounding text only, intact inner text.
+- New: custom surround #1104, #1102(inspirational PR by @isundaylee)
+  - New `customSurroundPairs` config is introduced, its value is JSON string with following key-value pair.
+    - key: char to access
+    - value: array `[openText:string, closeText:string, addSpace:boolean]`
+      - `addSpace` is optional, it control padding space.
+  - Custom surround can be used in all surround operation(`surround`, `delete-surround`, `change-surround`)
+  - Example configuration and possible operations
+    - Config
+      ```coffeescript
+      "vim-mode-plus":
+        customSurroundPairs: '''
+          {
+            "p": ["<?php", "?>", true],
+            "%": ["<%", "%>", true],
+            "=": ["<%=", "%>", true],
+            "s": ["\\"", "\\""]
+          }
+        '''
+      ```
+    - `y s c p`: `surround`(`y s`) `inner-word`(`c` or `i w`) with `p`(PHP tag)
+    - `c s p s`: `change-surround`(`c s`) from `p`(PHP tag) to `s`(double quotes)
+    - `d s =`: `delete-surround`(`d s`) of `=`(ruby-IRB tag)
+
+# 1.35.0: TreeSitter support
+- Support: Set minimum engines to `^1.31.0-beta1`.
+- Fix: TextObject function and fold now work with TreeSitter parser have enabled.
+  - Function TextObject #1096
+  - Fold TextObject #1096
+
+# 1.34.0:
+- Diff: [here](https://github.com/t9md/atom-vim-mode-plus/compare/v1.33.0...v1.34.0)
+- Improve: `ChangeCase` family operators(`~`, `g u` and `g U`) now target non-ascii chars. #1085 by @zensoup
+  - Ex: `g U` can upper-case `αρρ` to `ΑΡΡ`.
+
+# 1.33.0:
+- Diff: [here](https://github.com/t9md/atom-vim-mode-plus/compare/v1.32.1...v1.33.0)
+- New: BlockComment text-object. #1082
+  - `inner-block-comment`(`i *`)
+    - Select from first non-white-space-char to last non-white-space-char within block comment.
+  - `a-block-comment`(`a *`)
+    - Select whole block-comment.
+
+# 1.32.1:
+- Diff: [here](https://github.com/t9md/atom-vim-mode-plus/compare/v1.32.0...v1.32.1)
+- Improve: `vim-mode-plus:clip-debug-info` no longer report diff for default value with `type:array` config.
+
 # 1.32.0: Big improvement for hardTab editor(`j`, `k` and `visual-blockwise-mode`)!!
+- Diff: [here](https://github.com/t9md/atom-vim-mode-plus/compare/v1.31.1...v1.32.0)
 - Improve: Now BlockwiseSelection properly select block in hardTab using editor #1052.
   - Calculate accurate column by expanidng/de-expanding hardTab of selected row.
 - Improve: `j`, `k` motions now handle hardTab appropriately when moving up and down.
@@ -12,6 +68,7 @@
     - `move-to-previous-fold-end-with-same-indent`, `move-to-next-fold-end-with-same-indent`
 
 # 1.31.1:
+- Diff: [here](https://github.com/t9md/atom-vim-mode-plus/compare/v1.31.0...v1.31.1)
 - Fix: Now properly disable `readOnly` state on package deactivation.
   - Condition
     - When user enabled `autoDisableInputMethodWhenLeavingInsertMode`
@@ -19,6 +76,7 @@
   - editor's hiddenInput remain `readOnly = true` which make editor un-editable.
 
 # 1.31.0:
+- Diff: [here](https://github.com/t9md/atom-vim-mode-plus/compare/v1.30.1...v1.31.0)
 - New: Introduce new configuration to affect **word** finding in motion and text-object.
   - Purpose
     - When finding word in motions(`w`, `e` etc) and text-objet(`i w` etc), vmp use nonWordCharacters which vary from grammars.
@@ -29,9 +87,11 @@
     - Default value is borrowed from `DEFAULT_NON_WORD_CHARACTERS` in `text-editor.js`.
 
 # 1.30.1:
+- Diff: [here](https://github.com/t9md/atom-vim-mode-plus/compare/v1.30.0...v1.30.1)
 - Improve: `deMaximize` maximized state also on `atom.workspace.onDidAddPaneItem` timing.
 
 # 1.30.0:
+- Diff: [here](https://github.com/t9md/atom-vim-mode-plus/compare/v1.29.0...v1.30.0)
 - New, Experiment: `autoDisableInputMethodWhenLeavingInsertMode` config to auto-disable IME when leaving `insert-mode`.
   - Default `false`.
   - Once this feature was brought by PR#151 then reverted because of unfixable BUG.
@@ -40,6 +100,7 @@
   - Credit: Borrowed whole idea from @frapples's `vim-mode-plus-patch-switch-ime` package. Thanks @frapples!!
 
 # 1.29.0:
+- Diff: [here](https://github.com/t9md/atom-vim-mode-plus/compare/v1.28.0...v1.29.0)
 - New: `hideCommandsFromCommandPalette` config which hide commands from command-palette when set to `true` #1033, #1034
   - Default `false` to to make it compatible with older version.
   - This feature is once implemented in #943 but reverted before releasing it. Because I find no big perf gain by this feature.

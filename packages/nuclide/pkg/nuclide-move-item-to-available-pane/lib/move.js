@@ -1,4 +1,4 @@
-'use strict';
+"use strict";
 
 Object.defineProperty(exports, "__esModule", {
   value: true
@@ -8,10 +8,14 @@ exports.moveDown = moveDown;
 exports.moveRight = moveRight;
 exports.moveLeft = moveLeft;
 
-var _nuclideAnalytics;
+function _nuclideAnalytics() {
+  const data = require("../../../modules/nuclide-analytics");
 
-function _load_nuclideAnalytics() {
-  return _nuclideAnalytics = require('../../nuclide-analytics');
+  _nuclideAnalytics = function () {
+    return data;
+  };
+
+  return data;
 }
 
 /**
@@ -24,7 +28,6 @@ function _load_nuclideAnalytics() {
  *  strict-local
  * @format
  */
-
 function moveUp(el) {
   doSplit(el, 'up', (pane, params) => pane.splitUp(params));
 }
@@ -43,14 +46,17 @@ function moveLeft(el) {
 
 function doSplit(el, operation, splitOperation) {
   const pane = findNearestPane(el) || getCenter().getActivePane();
+
   if (pane == null) {
     return;
   }
 
-  (0, (_nuclideAnalytics || _load_nuclideAnalytics()).track)('nuclide-move-item-to-available-pane');
+  (0, _nuclideAnalytics().track)('nuclide-move-item-to-available-pane');
   const activeItem = pane.getActiveItem();
+
   if (activeItem != null) {
     const targetPane = findTargetPane(pane, operation);
+
     if (targetPane != null) {
       const index = targetPane.getItems().length;
       pane.moveItemToPane(activeItem, targetPane, index);
@@ -58,44 +64,50 @@ function doSplit(el, operation, splitOperation) {
       targetPane.activate();
       return;
     }
-  }
-
-  // Note that this will (intentionally) create an empty pane if the active
+  } // Note that this will (intentionally) create an empty pane if the active
   // pane contains exactly zero or one items.
   // The new empty pane will be kept if the global atom setting
   // 'Destroy Empty Panes' is false, otherwise it will be removed.
-  const newPane = splitOperation(pane, { copyActiveItem: false });
+
+
+  const newPane = splitOperation(pane, {
+    copyActiveItem: false
+  });
   const item = pane.getActiveItem();
+
   if (item) {
     pane.moveItemToPane(item, newPane, 0);
   }
 }
-
 /**
  * Find the Pane that contains the provided element.
  */
+
+
 function findNearestPane(el_) {
   let el = el_;
+
   while (el != null) {
     // $FlowFixMe(>=0.68.0) Flow suppress (T27187857)
     if (el.tagName === 'ATOM-PANE' && typeof el.getModel === 'function') {
       return el.getModel();
     }
+
     el = el.parentElement;
   }
-}
+} // TODO: Replace this once our lowest supported version is 1.17
 
-// TODO: Replace this once our lowest supported version is 1.17
+
 const getCenter = () => atom.workspace.getCenter ? atom.workspace.getCenter() : atom.workspace;
-
 /**
  * See if there is already a pane in the direction the user is trying to split.
  * If there are multiple, returns the "nearest" pane.
  */
+
+
 function findTargetPane(activePane, operation) {
   const activeRect = atom.views.getView(activePane).getBoundingClientRect();
   const predicate = createPredicate(operation, activeRect);
-
   const paneToRect = new WeakMap();
   const candidatePanes = activePane.getContainer().getPanes().filter(pane => {
     if (pane === activePane) {
@@ -111,7 +123,9 @@ function findTargetPane(activePane, operation) {
     return candidatePanes[0];
   } else if (candidatePanes.length > 1) {
     const xAxisComparator = rect => Math.abs(rect.left - activeRect.left);
+
     const yAxisComparator = rect => Math.abs(rect.top - activeRect.top);
+
     const isHorizontalMove = operation === 'left' || operation === 'right';
     const primaryComparator = isHorizontalMove ? xAxisComparator : yAxisComparator;
     const secondaryComparator = isHorizontalMove ? yAxisComparator : xAxisComparator;
@@ -120,14 +134,15 @@ function findTargetPane(activePane, operation) {
       const rect2 = paneToRect.get(pane2);
 
       if (!(rect1 != null)) {
-        throw new Error('Invariant violation: "rect1 != null"');
+        throw new Error("Invariant violation: \"rect1 != null\"");
       }
 
       if (!(rect2 != null)) {
-        throw new Error('Invariant violation: "rect2 != null"');
+        throw new Error("Invariant violation: \"rect2 != null\"");
       }
 
       const comp = primaryComparator(rect1) - primaryComparator(rect2);
+
       if (comp !== 0) {
         return comp;
       } else {
@@ -144,12 +159,16 @@ function createPredicate(operation, activeRect) {
   switch (operation) {
     case 'up':
       return rect => rect.top < activeRect.top;
+
     case 'down':
       return rect => rect.top > activeRect.top;
+
     case 'left':
       return rect => rect.left < activeRect.left;
+
     case 'right':
       return rect => rect.left > activeRect.left;
   }
-  throw Error(`Unknown operation: ${operation}`);
+
+  throw new Error(`Unknown operation: ${operation}`);
 }

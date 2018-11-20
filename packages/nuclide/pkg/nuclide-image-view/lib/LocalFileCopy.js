@@ -1,98 +1,151 @@
-'use strict';
+"use strict";
 
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
+exports.default = void 0;
 
-var _atom = require('atom');
+var _atom = require("atom");
 
-var _crypto = _interopRequireDefault(require('crypto'));
+var _crypto = _interopRequireDefault(require("crypto"));
 
-var _log4js;
+function _log4js() {
+  const data = require("log4js");
 
-function _load_log4js() {
-  return _log4js = require('log4js');
+  _log4js = function () {
+    return data;
+  };
+
+  return data;
 }
 
-var _projects;
+function _projects() {
+  const data = require("../../../modules/nuclide-commons-atom/projects");
 
-function _load_projects() {
-  return _projects = require('../../../modules/nuclide-commons-atom/projects');
+  _projects = function () {
+    return data;
+  };
+
+  return data;
 }
 
-var _event;
+function _event() {
+  const data = require("../../../modules/nuclide-commons/event");
 
-function _load_event() {
-  return _event = require('../../../modules/nuclide-commons/event');
+  _event = function () {
+    return data;
+  };
+
+  return data;
 }
 
-var _fsPromise;
+function _fsPromise() {
+  const data = _interopRequireDefault(require("../../../modules/nuclide-commons/fsPromise"));
 
-function _load_fsPromise() {
-  return _fsPromise = _interopRequireDefault(require('../../../modules/nuclide-commons/fsPromise'));
+  _fsPromise = function () {
+    return data;
+  };
+
+  return data;
 }
 
-var _nuclideUri;
+function _nuclideUri() {
+  const data = _interopRequireDefault(require("../../../modules/nuclide-commons/nuclideUri"));
 
-function _load_nuclideUri() {
-  return _nuclideUri = _interopRequireDefault(require('../../../modules/nuclide-commons/nuclideUri'));
+  _nuclideUri = function () {
+    return data;
+  };
+
+  return data;
 }
 
-var _stream;
+function _stream() {
+  const data = require("../../../modules/nuclide-commons/stream");
 
-function _load_stream() {
-  return _stream = require('../../../modules/nuclide-commons/stream');
+  _stream = function () {
+    return data;
+  };
+
+  return data;
 }
 
-var _UniversalDisposable;
+function _UniversalDisposable() {
+  const data = _interopRequireDefault(require("../../../modules/nuclide-commons/UniversalDisposable"));
 
-function _load_UniversalDisposable() {
-  return _UniversalDisposable = _interopRequireDefault(require('../../../modules/nuclide-commons/UniversalDisposable'));
+  _UniversalDisposable = function () {
+    return data;
+  };
+
+  return data;
 }
 
-var _nullthrows;
+function _nullthrows() {
+  const data = _interopRequireDefault(require("nullthrows"));
 
-function _load_nullthrows() {
-  return _nullthrows = _interopRequireDefault(require('nullthrows'));
+  _nullthrows = function () {
+    return data;
+  };
+
+  return data;
 }
 
-var _os = _interopRequireDefault(require('os'));
+var _os = _interopRequireDefault(require("os"));
 
-var _rxjsBundlesRxMinJs = require('rxjs/bundles/Rx.min.js');
+var _rxjsCompatUmdMin = require("rxjs-compat/bundles/rxjs-compat.umd.min.js");
 
-var _temp;
+function _temp() {
+  const data = _interopRequireDefault(require("temp"));
 
-function _load_temp() {
-  return _temp = _interopRequireDefault(require('temp'));
+  _temp = function () {
+    return data;
+  };
+
+  return data;
 }
 
-var _nuclideRemoteConnection;
+function _nuclideRemoteConnection() {
+  const data = require("../../nuclide-remote-connection");
 
-function _load_nuclideRemoteConnection() {
-  return _nuclideRemoteConnection = require('../../nuclide-remote-connection');
+  _nuclideRemoteConnection = function () {
+    return data;
+  };
+
+  return data;
 }
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 /**
+ * Copyright (c) 2015-present, Facebook, Inc.
+ * All rights reserved.
+ *
+ * This source code is licensed under the license found in the LICENSE file in
+ * the root directory of this source tree.
+ *
+ * 
+ * @format
+ */
+
+/**
  * A file-like object that represents a local copy of a remote file.
  */
 class LocalFileCopy {
-
   constructor(filePath) {
-    this._remoteFile = new _rxjsBundlesRxMinJs.BehaviorSubject();
-    this._tmpFile = new _rxjsBundlesRxMinJs.BehaviorSubject();
-    this._disposed = new _rxjsBundlesRxMinJs.ReplaySubject(1);
-
+    this._remoteFile = new _rxjsCompatUmdMin.BehaviorSubject();
+    this._tmpFile = new _rxjsCompatUmdMin.BehaviorSubject();
+    this._disposed = new _rxjsCompatUmdMin.ReplaySubject(1);
     this._initialFilePath = filePath;
     getRemoteFile(filePath).takeUntil(this._disposed).subscribe(remoteFile => {
       this._remoteFile.next(remoteFile);
     });
-    this._remoteFile.filter(Boolean).switchMap(file => (0, (_event || _load_event()).observableFromSubscribeFunction)(cb => file.onDidChange(cb)).startWith(null).switchMap(path => copyToLocalTempFile(file.getPath())).catch(err => {
+
+    this._remoteFile.filter(Boolean).switchMap(file => (0, _event().observableFromSubscribeFunction)(cb => file.onDidChange(cb)).startWith(null).switchMap(path => copyToLocalTempFile(file.getPath())).catch(err => {
       // TODO: Improve error handling by updating view instead of resorting to notifications.
-      atom.notifications.addError('There was an error loading the image. Please close the tab and try again.', { dismissable: true });
-      (0, (_log4js || _load_log4js()).getLogger)('nuclide-image-view').error(err);
-      return _rxjsBundlesRxMinJs.Observable.empty();
+      atom.notifications.addError('There was an error loading the image. Please close the tab and try again.', {
+        dismissable: true
+      });
+      (0, _log4js().getLogger)('nuclide-image-view').error(err);
+      return _rxjsCompatUmdMin.Observable.empty();
     })).takeUntil(this._disposed).subscribe(tmpFile => {
       this._tmpFile.next(tmpFile);
     });
@@ -103,92 +156,103 @@ class LocalFileCopy {
   }
 
   whenReady(callback) {
-    return new (_UniversalDisposable || _load_UniversalDisposable()).default(this._tmpFile.filter(Boolean).take(1).takeUntil(this._disposed).subscribe(() => {
+    return new (_UniversalDisposable().default)(this._tmpFile.filter(Boolean).take(1).takeUntil(this._disposed).subscribe(() => {
       callback();
     }));
   }
 
   getPath() {
     const remoteFile = this._remoteFile.getValue();
+
     return remoteFile == null ? this._initialFilePath : remoteFile.getPath();
   }
 
   getLocalPath() {
     const tmpFile = this._tmpFile.getValue();
+
     return tmpFile == null ? null : tmpFile.getPath();
   }
 
   onDidChange(callback) {
-    return new (_UniversalDisposable || _load_UniversalDisposable()).default(this._tmpFile.takeUntil(this._disposed).subscribe(() => {
+    return new (_UniversalDisposable().default)(this._tmpFile.takeUntil(this._disposed).subscribe(() => {
       callback();
     }));
   }
 
   onDidRename(callback) {
-    return new (_UniversalDisposable || _load_UniversalDisposable()).default(this._remoteFile.filter(Boolean).switchMap(remoteFile => (0, (_event || _load_event()).observableFromSubscribeFunction)(cb => (0, (_nullthrows || _load_nullthrows()).default)(remoteFile).onDidRename(cb))).takeUntil(this._disposed).subscribe(() => {
+    return new (_UniversalDisposable().default)(this._remoteFile.filter(Boolean).switchMap(remoteFile => (0, _event().observableFromSubscribeFunction)(cb => (0, _nullthrows().default)(remoteFile).onDidRename(cb))).takeUntil(this._disposed).subscribe(() => {
       callback();
     }));
   }
 
   onDidDelete(callback) {
-    return new (_UniversalDisposable || _load_UniversalDisposable()).default(this._remoteFile.filter(Boolean).switchMap(remoteFile => (0, (_event || _load_event()).observableFromSubscribeFunction)(cb => (0, (_nullthrows || _load_nullthrows()).default)(remoteFile).onDidDelete(cb))).takeUntil(this._disposed).subscribe(() => {
+    return new (_UniversalDisposable().default)(this._remoteFile.filter(Boolean).switchMap(remoteFile => (0, _event().observableFromSubscribeFunction)(cb => (0, _nullthrows().default)(remoteFile).onDidDelete(cb))).takeUntil(this._disposed).subscribe(() => {
       callback();
     }));
   }
+
 }
 
-exports.default = LocalFileCopy; /**
-                                  * Copyright (c) 2015-present, Facebook, Inc.
-                                  * All rights reserved.
-                                  *
-                                  * This source code is licensed under the license found in the LICENSE file in
-                                  * the root directory of this source tree.
-                                  *
-                                  * 
-                                  * @format
-                                  */
+exports.default = LocalFileCopy;
 
 function copyToLocalTempFile(remotePath) {
-  return _rxjsBundlesRxMinJs.Observable.defer(async () => {
-    const fsService = (0, (_nuclideRemoteConnection || _load_nuclideRemoteConnection()).getFileSystemServiceByNuclideUri)(remotePath);
-    const { mtime } = await fsService.stat(remotePath);
-    return { fsService, mtime };
-  }).switchMap(({ fsService, mtime }) => {
-    const cacheDir = (_nuclideUri || _load_nuclideUri()).default.join(_os.default.tmpdir(), 'nuclide-remote-images');
-    // Create a unique filename based on the path and mtime. We use a hash so we don't run into
+  return _rxjsCompatUmdMin.Observable.defer(async () => {
+    const fsService = (0, _nuclideRemoteConnection().getFileSystemServiceByNuclideUri)(remotePath);
+    const {
+      mtime
+    } = await fsService.stat(remotePath);
+    return {
+      fsService,
+      mtime
+    };
+  }).switchMap(({
+    fsService,
+    mtime
+  }) => {
+    const cacheDir = _nuclideUri().default.join(_os.default.tmpdir(), 'nuclide-remote-images'); // Create a unique filename based on the path and mtime. We use a hash so we don't run into
     // filename length restrictions.
+
+
     const hash = _crypto.default.createHash('md5').update(remotePath).digest('hex').slice(0, 7);
-    const extname = (_nuclideUri || _load_nuclideUri()).default.extname(remotePath);
-    const basename = (_nuclideUri || _load_nuclideUri()).default.basename(remotePath);
+
+    const extname = _nuclideUri().default.extname(remotePath);
+
+    const basename = _nuclideUri().default.basename(remotePath);
+
     const name = basename.slice(0, basename.length - extname.length);
-    const tmpFilePath = (_nuclideUri || _load_nuclideUri()).default.join(cacheDir, `${name}-${hash}-${mtime.getTime()}${extname}`);
-    return _rxjsBundlesRxMinJs.Observable.fromPromise((_fsPromise || _load_fsPromise()).default.exists(tmpFilePath)).switchMap(exists => {
+
+    const tmpFilePath = _nuclideUri().default.join(cacheDir, `${name}-${hash}-${mtime.getTime()}${extname}`);
+
+    return _rxjsCompatUmdMin.Observable.fromPromise(_fsPromise().default.exists(tmpFilePath)).switchMap(exists => {
       if (exists) {
-        return _rxjsBundlesRxMinJs.Observable.of(new _atom.File(tmpFilePath));
+        return _rxjsCompatUmdMin.Observable.of(new _atom.File(tmpFilePath));
       }
+
       return fsService.createReadStream(remotePath).refCount().let(writeToTempFile(tmpFilePath));
     });
   });
 }
 
 const writeToTempFile = targetPath => source => {
-  return _rxjsBundlesRxMinJs.Observable.defer(() => {
-    const writeStream = (_temp || _load_temp()).default.createWriteStream();
-    return (0, (_stream || _load_stream()).writeToStream)(source, writeStream).ignoreElements().concat(_rxjsBundlesRxMinJs.Observable.defer(async () => {
+  return _rxjsCompatUmdMin.Observable.defer(() => {
+    const writeStream = _temp().default.createWriteStream();
+
+    return (0, _stream().writeToStream)(source, writeStream).ignoreElements().concat(_rxjsCompatUmdMin.Observable.defer(async () => {
       // Move the file to the final destination.
-      await (_fsPromise || _load_fsPromise()).default.mkdirp((_nuclideUri || _load_nuclideUri()).default.dirname(targetPath));
-      await (_fsPromise || _load_fsPromise()).default.mv(writeStream.path, targetPath);
+      await _fsPromise().default.mkdirp(_nuclideUri().default.dirname(targetPath));
+      await _fsPromise().default.mv(writeStream.path, targetPath);
       return new _atom.File(targetPath);
     }));
   });
-};
+}; // We have to wait for so much.
 
-// We have to wait for so much.
+
 function getRemoteFile(path) {
-  return (0, (_event || _load_event()).observableFromSubscribeFunction)(cb => atom.packages.serviceHub.consume('nuclide-remote-projects', '0.0.0', cb)).switchMap(service => {
+  return (0, _event().observableFromSubscribeFunction)(cb => atom.packages.serviceHub.consume('nuclide-remote-projects', '0.0.0', cb)).switchMap(service => {
     if (service == null) {
-      return _rxjsBundlesRxMinJs.Observable.of(null);
+      return _rxjsCompatUmdMin.Observable.of(null);
     }
-    return (0, (_event || _load_event()).observableFromSubscribeFunction)(cb => service.waitForRemoteProjectReload(cb)).map(() => (0, (_projects || _load_projects()).getFileForPath)(path));
+
+    return (0, _event().observableFromSubscribeFunction)(cb => service.waitForRemoteProjectReload(cb)).map(() => (0, _projects().getFileForPath)(path));
   }).take(1);
 }

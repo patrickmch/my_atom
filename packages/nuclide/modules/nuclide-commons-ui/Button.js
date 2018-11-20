@@ -1,68 +1,79 @@
-'use strict';
+"use strict";
 
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.Button = exports.ButtonTypes = exports.ButtonSizes = undefined;
+exports.Button = exports.ButtonTypes = exports.ButtonSizes = void 0;
 
-var _classnames;
+function _omit2() {
+  const data = _interopRequireDefault(require("lodash/omit"));
 
-function _load_classnames() {
-  return _classnames = _interopRequireDefault(require('classnames'));
+  _omit2 = function () {
+    return data;
+  };
+
+  return data;
 }
 
-var _react = _interopRequireWildcard(require('react'));
+function _classnames() {
+  const data = _interopRequireDefault(require("classnames"));
 
-var _reactDom = _interopRequireDefault(require('react-dom'));
+  _classnames = function () {
+    return data;
+  };
 
-var _string;
-
-function _load_string() {
-  return _string = require('../nuclide-commons/string');
+  return data;
 }
 
-var _addTooltip;
+var React = _interopRequireWildcard(require("react"));
 
-function _load_addTooltip() {
-  return _addTooltip = _interopRequireDefault(require('./addTooltip'));
+var _reactDom = _interopRequireDefault(require("react-dom"));
+
+function _string() {
+  const data = require("../nuclide-commons/string");
+
+  _string = function () {
+    return data;
+  };
+
+  return data;
 }
 
-function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
+function _addTooltip() {
+  const data = _interopRequireDefault(require("./addTooltip"));
+
+  _addTooltip = function () {
+    return data;
+  };
+
+  return data;
+}
+
+function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) { var desc = Object.defineProperty && Object.getOwnPropertyDescriptor ? Object.getOwnPropertyDescriptor(obj, key) : {}; if (desc.get || desc.set) { Object.defineProperty(newObj, key, desc); } else { newObj[key] = obj[key]; } } } } newObj.default = obj; return newObj; } }
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-function _objectWithoutProperties(obj, keys) { var target = {}; for (var i in obj) { if (keys.indexOf(i) >= 0) continue; if (!Object.prototype.hasOwnProperty.call(obj, i)) continue; target[i] = obj[i]; } return target; } /**
-                                                                                                                                                                                                                              * Copyright (c) 2017-present, Facebook, Inc.
-                                                                                                                                                                                                                              * All rights reserved.
-                                                                                                                                                                                                                              *
-                                                                                                                                                                                                                              * This source code is licensed under the BSD-style license found in the
-                                                                                                                                                                                                                              * LICENSE file in the root directory of this source tree. An additional grant
-                                                                                                                                                                                                                              * of patent rights can be found in the PATENTS file in the same directory.
-                                                                                                                                                                                                                              *
-                                                                                                                                                                                                                              * 
-                                                                                                                                                                                                                              * @format
-                                                                                                                                                                                                                              */
+function _objectWithoutProperties(source, excluded) { if (source == null) return {}; var target = {}; var sourceKeys = Object.keys(source); var key, i; for (i = 0; i < sourceKeys.length; i++) { key = sourceKeys[i]; if (excluded.indexOf(key) >= 0) continue; target[key] = source[key]; } if (Object.getOwnPropertySymbols) { var sourceSymbolKeys = Object.getOwnPropertySymbols(source); for (i = 0; i < sourceSymbolKeys.length; i++) { key = sourceSymbolKeys[i]; if (excluded.indexOf(key) >= 0) continue; if (!Object.prototype.propertyIsEnumerable.call(source, key)) continue; target[key] = source[key]; } } return target; }
 
-const ButtonSizes = exports.ButtonSizes = Object.freeze({
+const ButtonSizes = Object.freeze({
   EXTRA_SMALL: 'EXTRA_SMALL',
   SMALL: 'SMALL',
   LARGE: 'LARGE'
 });
-
-const ButtonTypes = exports.ButtonTypes = Object.freeze({
+exports.ButtonSizes = ButtonSizes;
+const ButtonTypes = Object.freeze({
   PRIMARY: 'PRIMARY',
   INFO: 'INFO',
   SUCCESS: 'SUCCESS',
   WARNING: 'WARNING',
   ERROR: 'ERROR'
 });
-
+exports.ButtonTypes = ButtonTypes;
 const ButtonSizeClassnames = Object.freeze({
   EXTRA_SMALL: 'btn-xs',
   SMALL: 'btn-sm',
   LARGE: 'btn-lg'
 });
-
 const ButtonTypeClassnames = Object.freeze({
   PRIMARY: 'btn-primary',
   INFO: 'btn-info',
@@ -70,23 +81,58 @@ const ButtonTypeClassnames = Object.freeze({
   WARNING: 'btn-warning',
   ERROR: 'btn-error'
 });
-
 /**
  * Generic Button wrapper.
  */
-class Button extends _react.Component {
+
+class Button extends React.Component {
+  constructor(...args) {
+    var _temp;
+
+    return _temp = super(...args), this._onRefChange = button => {
+      const {
+        disabled,
+        onButtonDOMNodeChange,
+        tooltip
+      } = this.props;
+      this._button = button;
+
+      if (onButtonDOMNodeChange) {
+        onButtonDOMNodeChange(this._button);
+      } // When the element goes away (e.g. on unmount), remove the tooltip.
+
+
+      if (button == null && this._removeTooltip != null) {
+        this._removeTooltip();
+      }
+
+      if (!disabled && tooltip && button != null) {
+        const updateTooltip = (0, _addTooltip().default)(tooltip);
+        updateTooltip(button);
+
+        this._removeTooltip = () => {
+          updateTooltip(null);
+          this._removeTooltip = null;
+        };
+      }
+    }, _temp;
+  }
+
   focus() {
     const node = _reactDom.default.findDOMNode(this);
+
     if (node == null) {
       return;
-    }
-    // $FlowFixMe
+    } // $FlowFixMe
+
+
     node.focus();
   }
 
   render() {
-    const _props = this.props,
+    const _this$props = this.props,
           {
+      disabled,
       icon,
       buttonType,
       selected,
@@ -95,32 +141,30 @@ class Button extends _react.Component {
       className,
       wrapperElement,
       tooltip
-    } = _props,
-          remainingProps = _objectWithoutProperties(_props, ['icon', 'buttonType', 'selected', 'size', 'children', 'className', 'wrapperElement', 'tooltip']);
+    } = _this$props,
+          remainingProps = _objectWithoutProperties(_this$props, ["disabled", "icon", "buttonType", "selected", "size", "children", "className", "wrapperElement", "tooltip"]);
+
+    const buttonProps = (0, _omit2().default)(remainingProps, 'onButtonDOMNodeChange');
     const sizeClassname = size == null ? '' : ButtonSizeClassnames[size] || '';
     const buttonTypeClassname = buttonType == null ? '' : ButtonTypeClassnames[buttonType] || '';
-    const ref = tooltip && !this.props.disabled ? (0, (_addTooltip || _load_addTooltip()).default)(tooltip) : null;
-    const titleToolTip = tooltip && this.props.disabled ? tooltip.title : null;
-    const newClassName = (0, (_classnames || _load_classnames()).default)(className, 'btn', {
-      [`icon icon-${(0, (_string || _load_string()).maybeToString)(icon)}`]: icon != null,
+    const titleToolTip = tooltip && disabled ? tooltip.title : null;
+    const newClassName = (0, _classnames().default)(className, 'btn', {
+      [`icon icon-${(0, _string().maybeToString)(icon)}`]: icon != null,
       [sizeClassname]: size != null,
       selected,
       [buttonTypeClassname]: buttonType != null
     });
     const Wrapper = wrapperElement == null ? 'button' : wrapperElement;
-    return (
-      // $FlowFixMe(>=0.53.0) Flow suppress
-      _react.createElement(
-        Wrapper,
-        Object.assign({
-          className: newClassName
-          // eslint-disable-next-line nuclide-internal/jsx-simple-callback-refs
-          , ref: ref
-        }, remainingProps, {
-          title: titleToolTip }),
-        children
-      )
-    );
+    return React.createElement(Wrapper, Object.assign({
+      className: newClassName // eslint-disable-next-line nuclide-internal/jsx-simple-callback-refs
+      ,
+      ref: this._onRefChange,
+      disabled: disabled
+    }, buttonProps, {
+      title: titleToolTip
+    }), children);
   }
+
 }
+
 exports.Button = Button;

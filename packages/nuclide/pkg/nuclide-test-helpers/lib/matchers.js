@@ -1,4 +1,4 @@
-'use strict';
+"use strict";
 
 Object.defineProperty(exports, "__esModule", {
   value: true
@@ -7,19 +7,27 @@ exports.diffJson = diffJson;
 exports.diffLines = diffLines;
 exports.addMatchers = addMatchers;
 
-var _chalk;
+function _chalk() {
+  const data = _interopRequireDefault(require("chalk"));
 
-function _load_chalk() {
-  return _chalk = _interopRequireDefault(require('chalk'));
+  _chalk = function () {
+    return data;
+  };
+
+  return data;
 }
 
-var _diff;
+function diff() {
+  const data = _interopRequireWildcard(require("diff"));
 
-function _load_diff() {
-  return _diff = _interopRequireWildcard(require('diff'));
+  diff = function () {
+    return data;
+  };
+
+  return data;
 }
 
-function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
+function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) { var desc = Object.defineProperty && Object.getOwnPropertyDescriptor ? Object.getOwnPropertyDescriptor(obj, key) : {}; if (desc.get || desc.set) { Object.defineProperty(newObj, key, desc); } else { newObj[key] = obj[key]; } } } } newObj.default = obj; return newObj; } }
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -48,7 +56,6 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
  * }
  * ```
  */
-
 // We have to create an invariant function that is a lie because using invariant() with an
 // instanceof check is the only way to convince Flow of the type of an unbound `this`.
 const invariant = condition => {};
@@ -61,13 +68,17 @@ const invariant = condition => {};
  * @returns True if the objects are identical.
  */
 function diffJson(expected) {
-  const parts = (_diff || _load_diff()).diffJson(expected, this.actual);
-  const { message, changes } = formatMessage(parts);
+  const parts = diff().diffJson(expected, this.actual);
+  const {
+    message,
+    changes
+  } = formatMessage(parts);
   invariant(this instanceof jasmine.Matchers);
+
   this.message = () => message;
+
   return changes === 0;
 }
-
 /**
  * Do a line by line diff of two strings. This function should not be called
  * directly, but rather added as a Jasmine custom matcher.
@@ -75,14 +86,20 @@ function diffJson(expected) {
  * @this A JasmineMatcher object.
  * @returns True if the strings are identical.
  */
+
+
 function diffLines(expected) {
-  const parts = (_diff || _load_diff()).diffLines(expected, this.actual);
-  const { message, changes } = formatMessage(parts);
+  const parts = diff().diffLines(expected, this.actual);
+  const {
+    message,
+    changes
+  } = formatMessage(parts);
   invariant(this instanceof jasmine.Matchers);
+
   this.message = () => message;
+
   return changes === 0;
 }
-
 /**
  * Helper function that counts changes in the output from JsDiff, as well as
  * generates a colored message that shows diff output.
@@ -90,18 +107,27 @@ function diffLines(expected) {
  * @returns On object containing the number of changes (added or removed parts),
  *   and a string containing the colored diff output.
  */
+
+
 function formatMessage(parts) {
   let changes = 0;
   let message = '';
+
   for (const part of parts) {
     let color = 'gray';
+
     if (part.added || part.removed) {
       ++changes;
       color = part.added ? 'green' : 'red';
     }
-    message += (_chalk || _load_chalk()).default[color](part.value);
+
+    message += _chalk().default[color](part.value);
   }
-  return { changes, message };
+
+  return {
+    changes,
+    message
+  };
 }
 
 function addMatchers(spec) {

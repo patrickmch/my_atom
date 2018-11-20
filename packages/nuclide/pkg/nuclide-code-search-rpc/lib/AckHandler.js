@@ -1,22 +1,30 @@
-'use strict';
+"use strict";
 
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
 exports.search = search;
 
-var _rxjsBundlesRxMinJs = require('rxjs/bundles/Rx.min.js');
+var _rxjsCompatUmdMin = require("rxjs-compat/bundles/rxjs-compat.umd.min.js");
 
-var _handlerCommon;
+function _handlerCommon() {
+  const data = require("./handlerCommon");
 
-function _load_handlerCommon() {
-  return _handlerCommon = require('./handlerCommon');
+  _handlerCommon = function () {
+    return data;
+  };
+
+  return data;
 }
 
-var _parser;
+function _parser() {
+  const data = require("./parser");
 
-function _load_parser() {
-  return _parser = require('./parser');
+  _parser = function () {
+    return data;
+  };
+
+  return data;
 }
 
 /**
@@ -29,22 +37,30 @@ function _load_parser() {
  *  strict-local
  * @format
  */
-
 function search(params) {
-  const { regex, limit, leadingLines, trailingLines } = params;
+  const {
+    regex,
+    limit,
+    leadingLines,
+    trailingLines
+  } = params;
   const searchSources = params.recursive ? [params.directory] : params.files;
+
   if (searchSources.length === 0) {
-    return _rxjsBundlesRxMinJs.Observable.empty();
+    return _rxjsCompatUmdMin.Observable.empty();
   }
+
   const baseArgs = [];
+
   if (regex.ignoreCase) {
     baseArgs.push('--ignore-case');
   }
+
   if (limit != null) {
     baseArgs.push('-m', String(limit));
   }
-  const output = (0, (_handlerCommon || _load_handlerCommon()).observeGrepLikeProcess)('ack', baseArgs.concat(leadingLines != null ? ['-B', String(leadingLines)] : []).concat(trailingLines != null ? ['-A', String(trailingLines)] : []).concat([
-  // no colors, one result per line, always show filename, no smart case
+
+  const output = (0, _handlerCommon().observeGrepLikeProcess)('ack', baseArgs.concat(leadingLines != null ? ['-B', String(leadingLines)] : []).concat(trailingLines != null ? ['-A', String(trailingLines)] : []).concat([// no colors, one result per line, always show filename, no smart case
   '--with-filename', '--nosmart-case', '--nocolor', '--nopager', '--nogroup', regex.source]).concat(searchSources));
-  return (0, (_handlerCommon || _load_handlerCommon()).mergeOutputToResults)(output, event => (0, (_parser || _load_parser()).parseProcessLine)(event, 'ack'), regex, leadingLines || 0, trailingLines || 0);
+  return (0, _handlerCommon().mergeOutputToResults)(output, event => (0, _parser().parseProcessLine)(event, 'ack'), regex, leadingLines || 0, trailingLines || 0);
 }

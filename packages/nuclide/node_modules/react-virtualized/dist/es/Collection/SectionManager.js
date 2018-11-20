@@ -8,9 +8,6 @@ import _createClass from 'babel-runtime/helpers/createClass';
  */
 import Section from './Section';
 
-var babelPluginFlowReactPropTypes_proptype_SizeAndPositionInfo = require('./types').babelPluginFlowReactPropTypes_proptype_SizeAndPositionInfo || require('prop-types').any;
-
-var babelPluginFlowReactPropTypes_proptype_Index = require('./types').babelPluginFlowReactPropTypes_proptype_Index || require('prop-types').any;
 
 var SECTION_SIZE = 100;
 
@@ -146,3 +143,5 @@ var SectionManager = function () {
 }();
 
 export default SectionManager;
+import { bpfrpt_proptype_Index } from './types';
+import { bpfrpt_proptype_SizeAndPositionInfo } from './types';

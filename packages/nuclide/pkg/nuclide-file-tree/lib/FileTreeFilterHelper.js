@@ -1,4 +1,4 @@
-'use strict';
+"use strict";
 
 Object.defineProperty(exports, "__esModule", {
   value: true
@@ -6,17 +6,21 @@ Object.defineProperty(exports, "__esModule", {
 exports.matchesFilter = matchesFilter;
 exports.filterName = filterName;
 
-var _react = _interopRequireWildcard(require('react'));
+var React = _interopRequireWildcard(require("react"));
 
-var _classnames;
+function _classnames() {
+  const data = _interopRequireDefault(require("classnames"));
 
-function _load_classnames() {
-  return _classnames = _interopRequireDefault(require('classnames'));
+  _classnames = function () {
+    return data;
+  };
+
+  return data;
 }
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
+function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) { var desc = Object.defineProperty && Object.getOwnPropertyDescriptor ? Object.getOwnPropertyDescriptor(obj, key) : {}; if (desc.get || desc.set) { Object.defineProperty(newObj, key, desc); } else { newObj[key] = obj[key]; } } } } newObj.default = obj; return newObj; } }
 
 /**
  * Copyright (c) 2015-present, Facebook, Inc.
@@ -28,7 +32,6 @@ function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj;
  * 
  * @format
  */
-
 const SPECIAL_CHARACTERS = './@_';
 
 function formatFilter(filter) {
@@ -48,34 +51,24 @@ function matchesFilter(name, filter) {
 
 function filterName(name, filter, isSelected) {
   if (filter.length) {
-    const classes = (0, (_classnames || _load_classnames()).default)({
+    const classes = (0, _classnames().default)({
       'nuclide-file-tree-entry-highlight': true,
       'text-highlight': !isSelected
     });
-
     return name.split(new RegExp(`(?:(?=${formatFilter(filter)}))`, 'ig')).map((text, i) => {
       if (matchesFilter(text, filter)) {
-        return _react.createElement(
-          'span',
-          { key: filter + i },
-          _react.createElement(
-            'span',
-            { className: classes },
-            text.substr(0, filter.length)
-          ),
-          _react.createElement(
-            'span',
-            null,
-            text.substr(filter.length)
-          )
-        );
+        return React.createElement("span", {
+          key: filter + i
+        }, React.createElement("span", {
+          className: classes
+        }, text.substr(0, filter.length)), React.createElement("span", null, text.substr(filter.length)));
       }
-      return _react.createElement(
-        'span',
-        { key: filter + i },
-        text
-      );
+
+      return React.createElement("span", {
+        key: filter + i
+      }, text);
     });
   }
+
   return name;
 }

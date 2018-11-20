@@ -1,14 +1,19 @@
 import * as path from 'path'
 import { MarkdownPreviewView } from '../lib/markdown-preview-view'
 import { TextEditor } from 'atom'
-import { expectPreviewInSplitPane, waitsFor, previewFragment } from './util'
+import {
+  expectPreviewInSplitPane,
+  waitsFor,
+  previewFragment,
+  activateMe,
+} from './util'
 import { expect } from 'chai'
 
 describe('the difference algorithm that updates the preview', function() {
   let editor: TextEditor
   let preview: MarkdownPreviewView
 
-  before(async () => atom.packages.activatePackage(path.join(__dirname, '..')))
+  before(async () => activateMe())
   after(async () => atom.packages.deactivatePackage('markdown-preview-plus'))
 
   beforeEach(async function() {
@@ -276,11 +281,13 @@ describe('the difference algorithm that updates the preview', function() {
       await loadPreviewInSplitPane()
 
       const f = await previewFragment(preview)
-      const atomTextEditors = Array.from(f.querySelectorAll('atom-text-editor'))
+      const atomTextEditors = Array.from(
+        f.querySelectorAll('pre.editor-colors'),
+      )
       expect(atomTextEditors).to.have.lengthOf(5)
 
       await preview.runJS(`
-      document.querySelectorAll('atom-text-editor').forEach((x) => {
+      document.querySelectorAll('pre.editor-colors').forEach((x) => {
         x.unmodified=true
       })
       `)
@@ -301,8 +308,8 @@ describe('the difference algorithm that updates the preview', function() {
 
       const [unModLen, text] = await waitsFor(async () =>
         preview.runJS<[number, string]>(`
-          [Array.from(document.querySelectorAll('atom-text-editor.lang-js')).length,
-           document.querySelector('atom-text-editor.lang-js').innerText
+          [Array.from(document.querySelectorAll('pre.editor-colors.lang-js')).length,
+           document.querySelector('pre.editor-colors.lang-js').innerText
           ]
         `),
       )

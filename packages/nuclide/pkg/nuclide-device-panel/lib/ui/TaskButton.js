@@ -1,19 +1,23 @@
-'use strict';
+"use strict";
 
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.TaskButton = undefined;
+exports.TaskButton = void 0;
 
-var _Button;
+function _Button() {
+  const data = require("../../../../modules/nuclide-commons-ui/Button");
 
-function _load_Button() {
-  return _Button = require('../../../../modules/nuclide-commons-ui/Button');
+  _Button = function () {
+    return data;
+  };
+
+  return data;
 }
 
-var _react = _interopRequireWildcard(require('react'));
+var React = _interopRequireWildcard(require("react"));
 
-function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
+function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) { var desc = Object.defineProperty && Object.getOwnPropertyDescriptor ? Object.getOwnPropertyDescriptor(obj, key) : {}; if (desc.get || desc.set) { Object.defineProperty(newObj, key, desc); } else { newObj[key] = obj[key]; } } } } newObj.default = obj; return newObj; } }
 
 /**
  * Copyright (c) 2015-present, Facebook, Inc.
@@ -25,31 +29,23 @@ function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj;
  * 
  * @format
  */
-
-class TaskButton extends _react.Component {
+class TaskButton extends React.Component {
   _getLabel() {
     if (!this.props.isRunning) {
       return this.props.name;
     }
+
     const progress = this.props.progress != null ? `${this.props.progress.toFixed(2)}%` : 'running';
-    return _react.createElement(
-      'i',
-      null,
-      this.props.name,
-      ' (',
-      progress,
-      '). Click to cancel'
-    );
+    return React.createElement("i", null, this.props.name, " (", progress, "). Click to cancel");
   }
 
   render() {
-    return _react.createElement(
-      (_Button || _load_Button()).Button,
-      {
-        size: (_Button || _load_Button()).ButtonSizes.SMALL,
-        onClick: this.props.isRunning ? this.props.cancel : this.props.start },
-      this._getLabel()
-    );
+    return React.createElement(_Button().Button, {
+      size: _Button().ButtonSizes.SMALL,
+      onClick: this.props.isRunning ? this.props.cancel : this.props.start
+    }, this._getLabel());
   }
+
 }
+
 exports.TaskButton = TaskButton;

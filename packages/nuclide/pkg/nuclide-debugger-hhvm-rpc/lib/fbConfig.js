@@ -1,37 +1,47 @@
-'use strict';
+"use strict";
 
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.DEVSERVER_HHVM_PATH = undefined;
 exports.getHHVMRuntimeArgs = getHHVMRuntimeArgs;
 exports.getHhvmStackTraces = getHhvmStackTraces;
 exports.getRestartInstructions = getRestartInstructions;
+exports.DEVSERVER_HHVM_PATH = void 0;
 
-var _fsPromise;
+function _fsPromise() {
+  const data = _interopRequireDefault(require("../../../modules/nuclide-commons/fsPromise"));
 
-function _load_fsPromise() {
-  return _fsPromise = _interopRequireDefault(require('../../../modules/nuclide-commons/fsPromise'));
+  _fsPromise = function () {
+    return data;
+  };
+
+  return data;
 }
 
-var _nuclideUri;
+function _nuclideUri() {
+  const data = _interopRequireDefault(require("../../../modules/nuclide-commons/nuclideUri"));
 
-function _load_nuclideUri() {
-  return _nuclideUri = _interopRequireDefault(require('../../../modules/nuclide-commons/nuclideUri'));
+  _nuclideUri = function () {
+    return data;
+  };
+
+  return data;
 }
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-const DEVSERVER_HHVM_PATH = exports.DEVSERVER_HHVM_PATH = '/usr/local/hphpi/bin/hhvm'; /**
-                                                                                        * Copyright (c) 2015-present, Facebook, Inc.
-                                                                                        * All rights reserved.
-                                                                                        *
-                                                                                        * This source code is licensed under the license found in the LICENSE file in
-                                                                                        * the root directory of this source tree.
-                                                                                        *
-                                                                                        * 
-                                                                                        * @format
-                                                                                        */
+/**
+ * Copyright (c) 2015-present, Facebook, Inc.
+ * All rights reserved.
+ *
+ * This source code is licensed under the license found in the LICENSE file in
+ * the root directory of this source tree.
+ *
+ * 
+ * @format
+ */
+const DEVSERVER_HHVM_PATH = '/usr/local/hphpi/bin/hhvm';
+exports.DEVSERVER_HHVM_PATH = DEVSERVER_HHVM_PATH;
 
 function getHHVMRuntimeArgs(launchConfig) {
   if (launchConfig.hhvmRuntimeArgs.some(s => s === '-c' || s === '--config')) {
@@ -44,8 +54,8 @@ function getHHVMRuntimeArgs(launchConfig) {
 async function getHhvmStackTraces() {
   const STACK_TRACE_LOCATION = '/var/tmp/cores/';
   const STACK_TRACE_PATTERN = /stacktrace\..+\.log/;
-  const fileNames = await (_fsPromise || _load_fsPromise()).default.readdir(STACK_TRACE_LOCATION);
-  return fileNames.filter(fileName => STACK_TRACE_PATTERN.exec(fileName) != null).map(fileName => (_nuclideUri || _load_nuclideUri()).default.join(STACK_TRACE_LOCATION, fileName));
+  const fileNames = await _fsPromise().default.readdir(STACK_TRACE_LOCATION);
+  return fileNames.filter(fileName => STACK_TRACE_PATTERN.exec(fileName) != null).map(fileName => _nuclideUri().default.join(STACK_TRACE_LOCATION, fileName));
 }
 
 function getRestartInstructions() {

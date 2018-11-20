@@ -1,8 +1,26 @@
 import { ipcRenderer } from 'electron'
 import { UpdatePreview } from './update-preview'
-import { processHTMLString, jaxTeXConfig } from './mathjax-helper'
+import { processHTMLString, jaxTeXConfig, rerenderMath } from './mathjax-helper'
 import * as util from './util'
 import { getMedia } from '../src/util-common'
+
+window.addEventListener('error', (e) => {
+  const err = e.error as Error
+  ipcRenderer.sendToHost<'uncaught-error'>('uncaught-error', {
+    message: err.message,
+    name: err.name,
+    stack: err.stack,
+  })
+})
+
+window.addEventListener('unhandledrejection', (evt) => {
+  const err = (evt as any).reason as Error
+  ipcRenderer.sendToHost<'uncaught-error'>('uncaught-error', {
+    message: err.message,
+    name: err.name,
+    stack: err.stack,
+  })
+})
 
 function mkResPromise<T>(): ResolvablePromise<T> {
   let resFn: (value?: T | PromiseLike<T> | undefined) => void
@@ -15,15 +33,21 @@ function mkResPromise<T>(): ResolvablePromise<T> {
 
 window.atomVars = {
   home: mkResPromise(),
-  numberEqns: mkResPromise(),
+  mathJaxConfig: mkResPromise(),
   sourceLineMap: new Map(),
   revSourceMap: new WeakMap(),
 }
 
-ipcRenderer.on<'init'>('init', (_evt, { atomHome, numberEqns }) => {
-  window.atomVars.home.resolve(atomHome)
-  window.atomVars.numberEqns.resolve(numberEqns)
-})
+ipcRenderer.on<'init'>(
+  'init',
+  (_evt, { atomHome, mathJaxConfig, mathJaxRenderer }) => {
+    window.atomVars.home.resolve(atomHome)
+    window.atomVars.mathJaxConfig.resolve({
+      ...mathJaxConfig,
+      renderer: mathJaxRenderer,
+    })
+  },
+)
 
 ipcRenderer.on<'set-source-map'>('set-source-map', (_evt, { map }) => {
   const root = document.querySelector('div.update-preview')
@@ -92,17 +116,20 @@ ipcRenderer.on<'update-images'>('update-images', (_event, { oldsrc, v }) => {
   for (const img of Array.from(imgs)) {
     let ovs: string | undefined
     let ov: number | undefined
-    let src = img.getAttribute('src')!
+    let attrName: 'href' | 'src'
+    if (img.tagName === 'LINK') attrName = 'href'
+    else attrName = 'src'
+    let src = img.getAttribute(attrName)!
     const match = src.match(/^(.*)\?v=(\d+)$/)
     if (match) [, src, ovs] = match
     if (src === oldsrc) {
       if (ovs !== undefined) ov = parseInt(ovs, 10)
-      if (v !== ov) img.src = v ? `${src}?v=${v}` : `${src}`
+      if (v !== ov) img[attrName] = v ? `${src}?v=${v}` : `${src}`
     }
   }
 })
 
-ipcRenderer.on<'sync'>('sync', (_event, { line }) => {
+ipcRenderer.on<'sync'>('sync', (_event, { line, flash }) => {
   const root = document.querySelector('div.update-preview')
   if (!root) return
 
@@ -119,17 +146,9 @@ ipcRenderer.on<'sync'>('sync', (_event, { line }) => {
 
   element.scrollIntoViewIfNeeded(true)
 
-  element.classList.add('flash')
-  setTimeout(() => element!.classList.remove('flash'), 1000)
-})
-
-ipcRenderer.on<'use-github-style'>('use-github-style', (_event, { value }) => {
-  const elem = document.querySelector('markdown-preview-plus-view')
-  if (!elem) throw new Error(`Can't find MPP-view`)
-  if (value) {
-    elem.setAttribute('data-use-github-style', '')
-  } else {
-    elem.removeAttribute('data-use-github-style')
+  if (flash) {
+    element.classList.add('flash')
+    setTimeout(() => element!.classList.remove('flash'), 1000)
   }
 })
 
@@ -137,7 +156,7 @@ let updatePreview: UpdatePreview | undefined
 
 ipcRenderer.on<'update-preview'>(
   'update-preview',
-  (_event, { id, html, renderLaTeX, mjrenderer }) => {
+  (_event, { id, html, renderLaTeX }) => {
     // div.update-preview created after constructor st UpdatePreview cannot
     // be instanced in the constructor
     const preview = document.querySelector('div.update-preview')
@@ -148,15 +167,13 @@ ipcRenderer.on<'update-preview'>(
     const parser = new DOMParser()
     const domDocument = parser.parseFromString(html, 'text/html')
     util.handlePromise(
-      updatePreview
-        .update(domDocument.body, renderLaTeX, mjrenderer)
-        .then(async () => {
-          ipcRenderer.sendToHost<'request-reply'>('request-reply', {
-            id,
-            request: 'update-preview',
-            result: await processHTMLString(preview),
-          })
-        }),
+      updatePreview.update(domDocument.body, renderLaTeX).then(async () => {
+        ipcRenderer.sendToHost<'request-reply'>('request-reply', {
+          id,
+          request: 'update-preview',
+          result: await processHTMLString(preview),
+        })
+      }),
     )
     const doc = document
     if (doc && domDocument.head.hasChildNodes) {
@@ -257,5 +274,35 @@ ipcRenderer.on<'get-tex-config'>('get-tex-config', async (_, { id }) => {
     id,
     request: 'get-tex-config',
     result: await jaxTeXConfig(),
+  })
+})
+
+ipcRenderer.on<'set-width'>('set-width', async (_, { id, width }) => {
+  if (width === undefined) {
+    document.documentElement.style.removeProperty('width')
+  } else {
+    document.documentElement.style.setProperty(
+      'width',
+      `${width}mm`,
+      'important',
+    )
+  }
+  await rerenderMath()
+  ipcRenderer.sendToHost<'request-reply'>('request-reply', {
+    id,
+    request: 'set-width',
+    result: undefined,
+  })
+})
+
+ipcRenderer.on<'get-selection'>('get-selection', async (_, { id }) => {
+  const selection = window.getSelection()
+  const selectedText = selection.toString()
+  const selectedNode = selection.baseNode
+
+  ipcRenderer.sendToHost<'request-reply'>('request-reply', {
+    id,
+    request: 'get-selection',
+    result: selectedText && selectedNode ? selectedText : undefined,
   })
 })

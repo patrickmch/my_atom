@@ -1,3 +1,23 @@
+## v0.27.0
+- #233 - Add typescript code blocks (thanks @kylebarron)
+- #228 - Fix whitespace issues (thanks @kylebarron)
+- b1a1da1 - Prevent matching invalid HTML-tags (thanks @kylebarron)
+- #235 - Add julia-repl to fenced code blocks (thanks @NHDaly)
+
+## v0.26.0
+- #191 - Add classes for vertical and horizontal lines in GitHub tables (thanks @thancock20)
+- #193 - Match knowing that a newline character may not exist (thanks @50Wliu)
+- #202 - Add support for State fenced-code-blocks (thanks @kylebarron)
+- #220 - Add support for Kotlin fenced-code-blocks (thanks @shd101wyy)
+- #211 - Add support for language-babel fenced-code-block (thanks @remcohaszing)
+- #218 - Add east-end and east-end-notebook syntax themes to README (thanks @MarcusE1W)
+- #210 - Fix multiple links with span inline attributes on a single line (thanks @tobihagemann)
+- #208 - Resolve scope selector conflict with link core package (thanks @dineshbhosale and @50Wliu)
+- #206 - Add support for SAS code blocks (thanks @kylebarron)
+- #217 - Add YAML code block syntax highlighting (thanks @kylebarron)
+- #219 - Add support for HCL code blocks (thanks @veger)
+- #215 - And setting for disabling auto-increment of ordered list items (thanks @wesleyem)
+
 ### v0.24.1
 - #188 - Fix `!` and `@` not working when `linkShortcuts` was disabled (thanks @mp4096)
 

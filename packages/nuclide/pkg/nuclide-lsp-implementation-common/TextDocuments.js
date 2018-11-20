@@ -1,36 +1,52 @@
-'use strict';
+"use strict";
 
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
+exports.default = void 0;
 
-var _TextDocument;
+function _TextDocument() {
+  const data = _interopRequireDefault(require("./TextDocument"));
 
-function _load_TextDocument() {
-  return _TextDocument = _interopRequireDefault(require('./TextDocument'));
+  _TextDocument = function () {
+    return data;
+  };
+
+  return data;
 }
 
-var _UniversalDisposable;
+function _UniversalDisposable() {
+  const data = _interopRequireDefault(require("../../modules/nuclide-commons/UniversalDisposable"));
 
-function _load_UniversalDisposable() {
-  return _UniversalDisposable = _interopRequireDefault(require('../../modules/nuclide-commons/UniversalDisposable'));
+  _UniversalDisposable = function () {
+    return data;
+  };
+
+  return data;
 }
 
-var _eventKit;
+function _eventKit() {
+  const data = require("event-kit");
 
-function _load_eventKit() {
-  return _eventKit = require('event-kit');
+  _eventKit = function () {
+    return data;
+  };
+
+  return data;
 }
 
-var _vscodeLanguageserver;
+function _vscodeLanguageserver() {
+  const data = require("vscode-languageserver");
 
-function _load_vscodeLanguageserver() {
-  return _vscodeLanguageserver = require('vscode-languageserver');
+  _vscodeLanguageserver = function () {
+    return data;
+  };
+
+  return data;
 }
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-// flowlint-next-line untyped-type-import:off
 /**
  * Copyright (c) 2015-present, Facebook, Inc.
  * All rights reserved.
@@ -41,24 +57,27 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
  * 
  * @format
  */
-
+// flowlint-next-line untyped-type-import:off
 function textDocumentFromLSPTextDocument(textDocument) {
-  return new (_TextDocument || _load_TextDocument()).default(textDocument.uri, textDocument.languageId, textDocument.version, textDocument.text);
+  return new (_TextDocument().default)(textDocument.uri, textDocument.languageId, textDocument.version, textDocument.text);
 }
 
 class TextDocuments {
-
   constructor() {
-    this._disposables = new (_UniversalDisposable || _load_UniversalDisposable()).default();
+    this._disposables = new (_UniversalDisposable().default)();
     this._documents = new Map();
-    this._emitter = new (_eventKit || _load_eventKit()).Emitter();
+    this._emitter = new (_eventKit().Emitter)();
 
     this._handleDidStopChanging = textDocument => {
-      this._emitter.emit('didChangeContent', { textDocument });
+      this._emitter.emit('didChangeContent', {
+        textDocument
+      });
     };
 
     this._handleDidSave = textDocument => {
-      this._emitter.emit('didSave', { textDocument });
+      this._emitter.emit('didSave', {
+        textDocument
+      });
     };
 
     this._disposables.add(this._emitter);
@@ -73,7 +92,7 @@ class TextDocuments {
   }
 
   get syncKind() {
-    return (_vscodeLanguageserver || _load_vscodeLanguageserver()).TextDocumentSyncKind.Incremental;
+    return _vscodeLanguageserver().TextDocumentSyncKind.Incremental;
   }
 
   get(uri) {
@@ -88,21 +107,23 @@ class TextDocuments {
 
   listen(connection) {
     connection.onDidOpenTextDocument(e => {
-      const { textDocument } = e;
+      const {
+        textDocument
+      } = e;
       const document = textDocumentFromLSPTextDocument(textDocument);
       this.addDocument(textDocument.uri, document);
     });
-
     connection.onDidChangeTextDocument(e => {
-      const { contentChanges, textDocument } = e;
+      const {
+        contentChanges,
+        textDocument
+      } = e;
       const document = this.get(textDocument.uri);
       document.updateMany(contentChanges, textDocument.version);
     });
-
     connection.onDidCloseTextDocument(e => {
       this.removeDocument(e.textDocument.uri);
     });
-
     connection.onDidSaveTextDocument(e => {
       const document = this.get(e.textDocument.uri);
       document.save(e.text);
@@ -111,17 +132,28 @@ class TextDocuments {
 
   addDocument(uri, document) {
     this._documents.set(uri, document);
+
     this._disposables.add(document);
-    this._emitter.emit('didOpenTextDocument', { textDocument: document });
+
+    this._emitter.emit('didOpenTextDocument', {
+      textDocument: document
+    });
+
     document.onDidStopChanging(this._handleDidStopChanging);
     document.onDidSave(this._handleDidSave);
   }
 
   removeDocument(uri) {
     const document = this.get(uri);
-    this._emitter.emit('didClose', { textDocument: document });
+
+    this._emitter.emit('didClose', {
+      textDocument: document
+    });
+
     this._disposables.remove(document);
+
     this._documents.delete(uri);
+
     document.dispose();
   }
 
@@ -146,4 +178,5 @@ class TextDocuments {
   }
 
 }
+
 exports.default = TextDocuments;

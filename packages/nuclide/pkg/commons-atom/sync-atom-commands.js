@@ -1,32 +1,34 @@
-'use strict';
+"use strict";
 
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
 exports.default = syncAtomCommands;
 
-var _observable;
+function _observable() {
+  const data = require("../../modules/nuclide-commons/observable");
 
-function _load_observable() {
-  return _observable = require('../../modules/nuclide-commons/observable');
+  _observable = function () {
+    return data;
+  };
+
+  return data;
 }
 
-var _UniversalDisposable;
+function _UniversalDisposable() {
+  const data = _interopRequireDefault(require("../../modules/nuclide-commons/UniversalDisposable"));
 
-function _load_UniversalDisposable() {
-  return _UniversalDisposable = _interopRequireDefault(require('../../modules/nuclide-commons/UniversalDisposable'));
+  _UniversalDisposable = function () {
+    return data;
+  };
+
+  return data;
 }
 
-var _rxjsBundlesRxMinJs = require('rxjs/bundles/Rx.min.js');
+var _rxjsCompatUmdMin = require("rxjs-compat/bundles/rxjs-compat.umd.min.js");
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-/**
- * A utility that adds and removes commands to the Atom command registry based on their presence in
- * a stream. This is basically like a mini-React for Atom commands, however, instead of diffing the
- * result (commands), we diff the input (sets) since it's easier and less likely to contain
- * functions (which are unlikely to be able to be safely compared using `===`).
- */
 /**
  * Copyright (c) 2015-present, Facebook, Inc.
  * All rights reserved.
@@ -38,14 +40,19 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
  * @format
  */
 
+/**
+ * A utility that adds and removes commands to the Atom command registry based on their presence in
+ * a stream. This is basically like a mini-React for Atom commands, however, instead of diffing the
+ * result (commands), we diff the input (sets) since it's easier and less likely to contain
+ * functions (which are unlikely to be able to be safely compared using `===`).
+ */
 function syncAtomCommands(source, project, hash) {
   // Add empty sets before completing and erroring to make sure that we remove remaining commands
   // in both cases.
-  const sets = source.concat(_rxjsBundlesRxMinJs.Observable.of(new Set())).catch(err => _rxjsBundlesRxMinJs.Observable.of(new Set()).concat(_rxjsBundlesRxMinJs.Observable.throw(err)));
-
-  return (0, (_observable || _load_observable()).reconcileSets)(sets, item => {
+  const sets = source.concat(_rxjsCompatUmdMin.Observable.of(new Set())).catch(err => _rxjsCompatUmdMin.Observable.of(new Set()).concat(_rxjsCompatUmdMin.Observable.throw(err)));
+  return (0, _observable().reconcileSets)(sets, item => {
     const commands = project(item);
     const disposables = Object.keys(commands).map(target => atom.commands.add(target, commands[target]));
-    return new (_UniversalDisposable || _load_UniversalDisposable()).default(...disposables);
+    return new (_UniversalDisposable().default)(...disposables);
   }, hash);
 }

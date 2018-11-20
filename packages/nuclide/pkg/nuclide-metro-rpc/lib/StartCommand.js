@@ -1,4 +1,4 @@
-'use strict';
+"use strict";
 
 Object.defineProperty(exports, "__esModule", {
   value: true
@@ -6,28 +6,34 @@ Object.defineProperty(exports, "__esModule", {
 exports.getStartCommandFromNodePackage = getStartCommandFromNodePackage;
 exports.getStartCommandFromBuck = getStartCommandFromBuck;
 
-var _nuclideBuckRpc;
+function _nuclideBuckRpc() {
+  const data = require("../../nuclide-buck-rpc");
 
-function _load_nuclideBuckRpc() {
-  return _nuclideBuckRpc = require('../../nuclide-buck-rpc');
+  _nuclideBuckRpc = function () {
+    return data;
+  };
+
+  return data;
 }
 
-var _fsPromise;
+function _fsPromise() {
+  const data = _interopRequireDefault(require("../../../modules/nuclide-commons/fsPromise"));
 
-function _load_fsPromise() {
-  return _fsPromise = _interopRequireDefault(require('../../../modules/nuclide-commons/fsPromise'));
+  _fsPromise = function () {
+    return data;
+  };
+
+  return data;
 }
 
-var _nuclideUri;
+function _nuclideUri() {
+  const data = _interopRequireDefault(require("../../../modules/nuclide-commons/nuclideUri"));
 
-function _load_nuclideUri() {
-  return _nuclideUri = _interopRequireDefault(require('../../../modules/nuclide-commons/nuclideUri'));
-}
+  _nuclideUri = function () {
+    return data;
+  };
 
-var _ini;
-
-function _load_ini() {
-  return _ini = _interopRequireDefault(require('ini'));
+  return data;
 }
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
@@ -42,59 +48,63 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
  * 
  * @format
  */
-
 async function getStartCommandFromNodePackage(projectRoot) {
   return (await getStartCommandFromNodeModules(projectRoot)) || getStartCommandFromReactNative(projectRoot);
 }
 
 async function getStartCommandFromBuck(projectRoot) {
-  const buckProjectRoot = await (0, (_nuclideBuckRpc || _load_nuclideBuckRpc()).getRootForPath)(projectRoot);
+  const buckProjectRoot = await (0, _nuclideBuckRpc().getRootForPath)(projectRoot);
+
   if (buckProjectRoot == null) {
     return null;
   }
-  // TODO(matthewwithanm): Move this to BuckUtils?
-  const filePath = (_nuclideUri || _load_nuclideUri()).default.join(buckProjectRoot, '.buckconfig');
-  const content = await (_fsPromise || _load_fsPromise()).default.readFile(filePath, 'utf8');
-  const parsed = (_ini || _load_ini()).default.parse(`scope = global\n${content}`);
-  const section = parsed['react-native'];
-  if (section == null || section.server == null) {
+
+  const serverCommand = await (0, _nuclideBuckRpc().getBuckConfig)(buckProjectRoot, 'react-native', 'server');
+
+  if (serverCommand == null) {
     return null;
   }
+
   return {
     cwd: buckProjectRoot,
     args: ['--disable-global-hotkey'],
-    command: section.server
+    command: serverCommand
   };
 }
-
 /**
  * Look in the nearest node_modules directory for react-native and extract the packager script if
  * it's found.
  */
+
+
 async function getStartCommandFromNodeModules(projectRoot) {
-  const nodeModulesParent = await (_fsPromise || _load_fsPromise()).default.findNearestFile('node_modules', projectRoot);
+  const nodeModulesParent = await _fsPromise().default.findNearestFile('node_modules', projectRoot);
+
   if (nodeModulesParent == null) {
     return null;
   }
 
-  const command = await getCommandForCli((_nuclideUri || _load_nuclideUri()).default.join(nodeModulesParent, 'node_modules', 'react-native'));
-
+  const command = await getCommandForCli(_nuclideUri().default.join(nodeModulesParent, 'node_modules', 'react-native'));
   return command == null ? null : Object.assign({}, command, {
     cwd: nodeModulesParent
   });
 }
-
 /**
  * See if this is React Native itself and, if so, return the command to run the packager. This is
  * special cased so that the bundled examples work out of the box.
  */
+
+
 async function getStartCommandFromReactNative(dir) {
-  const projectRoot = await (_fsPromise || _load_fsPromise()).default.findNearestFile('package.json', dir);
+  const projectRoot = await _fsPromise().default.findNearestFile('package.json', dir);
+
   if (projectRoot == null) {
     return null;
   }
-  const filePath = (_nuclideUri || _load_nuclideUri()).default.join(projectRoot, 'package.json');
-  const content = await (_fsPromise || _load_fsPromise()).default.readFile(filePath, 'utf8');
+
+  const filePath = _nuclideUri().default.join(projectRoot, 'package.json');
+
+  const content = await _fsPromise().default.readFile(filePath, 'utf8');
   const parsed = JSON.parse(content);
   const isReactNative = parsed.name === 'react-native';
 
@@ -103,18 +113,20 @@ async function getStartCommandFromReactNative(dir) {
   }
 
   const command = await getCommandForCli(projectRoot);
-
   return command == null ? null : Object.assign({}, command, {
     cwd: projectRoot
   });
 }
 
 async function getCommandForCli(pathToReactNative) {
-  const cliPath = (_nuclideUri || _load_nuclideUri()).default.join(pathToReactNative, 'local-cli', 'cli.js');
-  const cliExists = await (_fsPromise || _load_fsPromise()).default.exists(cliPath);
+  const cliPath = _nuclideUri().default.join(pathToReactNative, 'local-cli', 'cli.js');
+
+  const cliExists = await _fsPromise().default.exists(cliPath);
+
   if (!cliExists) {
     return null;
   }
+
   return {
     command: 'node',
     args: [cliPath, 'start']

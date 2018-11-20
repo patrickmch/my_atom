@@ -1,38 +1,63 @@
-'use strict';
+"use strict";
 
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
+exports.default = void 0;
 
-var _process;
+function _process() {
+  const data = require("../nuclide-commons/process");
 
-function _load_process() {
-  return _process = require('../nuclide-commons/process');
+  _process = function () {
+    return data;
+  };
+
+  return data;
 }
 
-var _rxjsBundlesRxMinJs = require('rxjs/bundles/Rx.min.js');
+var _rxjsCompatUmdMin = require("rxjs-compat/bundles/rxjs-compat.umd.min.js");
 
+/**
+ * Copyright (c) 2017-present, Facebook, Inc.
+ * All rights reserved.
+ *
+ * This source code is licensed under the BSD-style license found in the
+ * LICENSE file in the root directory of this source tree. An additional grant
+ * of patent rights can be found in the PATENTS file in the same directory.
+ *
+ *  strict-local
+ * @format
+ */
 class VsAdapterSpawner {
-
   constructor() {
-    this._stdin = new _rxjsBundlesRxMinJs.Subject();
+    this._stdin = new _rxjsCompatUmdMin.Subject();
   }
 
   spawnAdapter(adapter) {
-    const environment = _rxjsBundlesRxMinJs.Observable.fromPromise((0, (_process || _load_process()).getOriginalEnvironment)());
-    return _rxjsBundlesRxMinJs.Observable.forkJoin(this._stdin.buffer(environment), environment).switchMap(([stdinBuffer, env]) => {
+    const environment = _rxjsCompatUmdMin.Observable.fromPromise((0, _process().getOriginalEnvironment)());
+
+    return _rxjsCompatUmdMin.Observable.forkJoin(this._stdin.buffer(environment), environment).switchMap(([stdinBuffer, env]) => {
       const options = {
         stdio: ['pipe', // stdin
         'pipe', // stdout
         'pipe'],
-        env: Object.assign({}, env, { ELECTRON_RUN_AS_NODE: 1 }),
-        input: _rxjsBundlesRxMinJs.Observable.from(stdinBuffer).concat(this._stdin),
-        killTreeWhenDone: true
+        env: Object.assign({}, env, {
+          ELECTRON_RUN_AS_NODE: 1
+        }, adapter.env),
+        input: _rxjsCompatUmdMin.Observable.from(stdinBuffer).concat(this._stdin),
+        killTreeWhenDone: true,
+        killTreeSignal: 'SIGKILL',
+        isExitError: () => false,
+        cwd: adapter.cwd == null ? undefined : adapter.cwd
       };
+
       if (adapter.command === 'node') {
         adapter.command = process.execPath;
+      } else if (adapter.command === 'sudo' && adapter.args[0] === 'node') {
+        adapter.args[0] = process.execPath;
       }
-      return (0, (_process || _load_process()).observeProcessRaw)(adapter.command, adapter.args, options);
+
+      return (0, _process().observeProcessRaw)(adapter.command, adapter.args, options);
     }).publish();
   }
 
@@ -43,15 +68,7 @@ class VsAdapterSpawner {
   async dispose() {
     this._stdin.complete();
   }
+
 }
-exports.default = VsAdapterSpawner; /**
-                                     * Copyright (c) 2017-present, Facebook, Inc.
-                                     * All rights reserved.
-                                     *
-                                     * This source code is licensed under the BSD-style license found in the
-                                     * LICENSE file in the root directory of this source tree. An additional grant
-                                     * of patent rights can be found in the PATENTS file in the same directory.
-                                     *
-                                     *  strict-local
-                                     * @format
-                                     */
+
+exports.default = VsAdapterSpawner;

@@ -1,25 +1,38 @@
-'use strict';
+"use strict";
 
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
+exports.default = void 0;
 
-var _MIDebugSession;
+function _Logger() {
+  const data = require("./Logger");
 
-function _load_MIDebugSession() {
-  return _MIDebugSession = require('./MIDebugSession');
+  _Logger = function () {
+    return data;
+  };
+
+  return data;
 }
 
-var _MITypes;
+function _MITypes() {
+  const data = require("./MITypes");
 
-function _load_MITypes() {
-  return _MITypes = require('./MITypes');
+  _MITypes = function () {
+    return data;
+  };
+
+  return data;
 }
 
-var _MIProxy;
+function _MIProxy() {
+  const data = _interopRequireDefault(require("./MIProxy"));
 
-function _load_MIProxy() {
-  return _MIProxy = _interopRequireDefault(require('./MIProxy'));
+  _MIProxy = function () {
+    return data;
+  };
+
+  return data;
 }
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
@@ -35,9 +48,7 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
  * 
  * @format
  */
-
 class VariableReference {
-
   constructor(args) {
     this._client = args.client;
     this._variables = args.variables;
@@ -51,12 +62,12 @@ class VariableReference {
 
   async getVariables(start, count) {
     throw new Error('Base class VariableReference.getVariables called (abstract method)');
-  }
-
-  // typeClass describes what type of container the variable's type is
+  } // typeClass describes what type of container the variable's type is
   // simple variables are not containers
   // named variables have named members: struct, union, class
   // indexed variables are native arrays and pointers
+
+
   async getTypeClass(value) {
     // it would seem to make sense to infer the type class from the actual
     // type. but that doesn't work, because the actual type may be a typedef,
@@ -77,15 +88,15 @@ class VariableReference {
       type = 'named';
     } else {
       const leading = value[0];
+
       if (leading === '[') {
         type = 'indexed';
       } else if (leading === '{') {
         type = 'named';
       } else {
-        const children = await this.getChildCount();
-
-        // if the value is not formatted as a struct or array, and children
+        const children = await this.getChildCount(); // if the value is not formatted as a struct or array, and children
         // are available, then it's a pointer (which we treat as an array)
+
         if (children > 0) {
           type = 'indexed';
         }
@@ -103,25 +114,26 @@ class VariableReference {
 
     const varName = await this._getVarName();
     const result = await this._client.sendCommand(`var-info-type ${varName}`);
+
     if (result.error) {
-      throw new Error(`Error determining variable's type (${(0, (_MITypes || _load_MITypes()).toCommandError)(result).msg})`);
+      throw new Error(`Error determining variable's type (${(0, _MITypes().toCommandError)(result).msg})`);
     }
 
-    this._type = (0, (_MITypes || _load_MITypes()).varInfoTypeResult)(result).type;
+    this._type = (0, _MITypes().varInfoTypeResult)(result).type;
     return this._type;
-  }
-
-  // The value of a container variable is a summary of the value
+  } // The value of a container variable is a summary of the value
   // of its contents.
+
+
   async getValue() {
     const varName = await this._getVarName();
     const result = await this._client.sendCommand(`var-evaluate-expression ${varName}`);
 
     if (result.error) {
-      throw new Error(`Error determining variable's value (${(0, (_MITypes || _load_MITypes()).toCommandError)(result).msg})`);
+      throw new Error(`Error determining variable's value (${(0, _MITypes().toCommandError)(result).msg})`);
     }
 
-    return (0, (_MITypes || _load_MITypes()).varEvaluateExpressionResult)(result).value;
+    return (0, _MITypes().varEvaluateExpressionResult)(result).value;
   }
 
   async getChildCount() {
@@ -129,52 +141,53 @@ class VariableReference {
       return this._childCount;
     }
 
-    const varName = await this._getVarName();
-
-    // If we had to create the var name, we will have gotten the child count
+    const varName = await this._getVarName(); // If we had to create the var name, we will have gotten the child count
     // as a side effect
+
     if (this._childCount != null) {
       return this._childCount;
-    }
+    } // otherwise, we have to ask
 
-    // otherwise, we have to ask
+
     const result = await this._client.sendCommand(`var-info-num-children ${varName}`);
+
     if (result.error) {
-      throw new Error(`Error determining the number of children (${(0, (_MITypes || _load_MITypes()).toCommandError)(result).msg})`);
+      throw new Error(`Error determining the number of children (${(0, _MITypes().toCommandError)(result).msg})`);
     }
 
-    const childCountStr = (0, (_MITypes || _load_MITypes()).varInfoNumChildrenResult)(result).numchild;
+    const childCountStr = (0, _MITypes().varInfoNumChildrenResult)(result).numchild;
 
     if (!(childCountStr != null)) {
-      throw new Error('Invariant violation: "childCountStr != null"');
+      throw new Error("Invariant violation: \"childCountStr != null\"");
     }
 
     const childCount = parseInt(childCountStr, 10);
     this._childCount = childCount;
-
     return childCount;
   }
 
   async setChildValue(name, value) {
     const varname = await this._getVarName();
     const childrenResult = await this._client.sendCommand(`var-list-children ${varname}`);
+
     if (childrenResult.error) {
-      throw new Error(`Error getting the children of ${varname} ${(0, (_MITypes || _load_MITypes()).toCommandError)(childrenResult).msg}`);
+      throw new Error(`Error getting the children of ${varname} ${(0, _MITypes().toCommandError)(childrenResult).msg}`);
     }
 
-    const children = (0, (_MITypes || _load_MITypes()).varListChildrenResult)(childrenResult);
+    const children = (0, _MITypes().varListChildrenResult)(childrenResult);
     const child = children.children.find(_ => _.child.exp === name);
+
     if (child == null) {
       throw new Error(`Cannot find variable ${name} to modify`);
     }
 
     const assignResult = await this._client.sendCommand(`var-assign ${child.child.name} ${value}`);
+
     if (assignResult.error) {
-      throw new Error(`Unable to set ${name} to {$value}: ${(0, (_MITypes || _load_MITypes()).toCommandError)(assignResult).msg}`);
+      throw new Error(`Unable to set ${name} to {$value}: ${(0, _MITypes().toCommandError)(assignResult).msg}`);
     }
 
-    const assign = (0, (_MITypes || _load_MITypes()).varAssignResult)(assignResult);
-
+    const assign = (0, _MITypes().varAssignResult)(assignResult);
     return {
       value: assign.value,
       type: child.child.type,
@@ -185,9 +198,10 @@ class VariableReference {
   async deleteResources() {
     if (this.needsDeletion && this._varName != null) {
       const result = await this._client.sendCommand(`var-delete ${this._varName}`);
+
       if (result.error) {
         // don't throw here, because we can still continue safely, but log the error.
-        (0, (_MIDebugSession || _load_MIDebugSession()).logVerbose)(`Error deleting variable ${(0, (_MITypes || _load_MITypes()).toCommandError)(result).msg}`);
+        (0, _Logger().logVerbose)(`Error deleting variable ${(0, _MITypes().toCommandError)(result).msg}`);
       }
     }
   }
@@ -212,16 +226,13 @@ class VariableReference {
     const varref = this._variables.getVariableReference(handle);
 
     if (!(varref != null)) {
-      throw new Error('Invariant violation: "varref != null"');
+      throw new Error("Invariant violation: \"varref != null\"");
     }
 
     const value = await varref.getValue();
     const typeClass = await varref.getTypeClass(value);
-
     const resolvedType = type == null ? await varref.getType() : type;
-
-    (0, (_MIDebugSession || _load_MIDebugSession()).logVerbose)(`name ${name} type ${resolvedType} value ${value} typeClass ${typeClass}`);
-
+    (0, _Logger().logVerbose)(`name ${name} type ${resolvedType} value ${value} typeClass ${typeClass}`);
     let variable = {
       name,
       value,
@@ -252,6 +263,7 @@ class VariableReference {
     // '-' means to let gdb create a unique name for the binding
     // '*' means use the current frame (which we specify via --thread/--frame)
     let command;
+
     if (this.threadId != null && this.frameIndex != null) {
       command = `var-create --thread ${this.threadId} --frame ${this.frameIndex} - * ${expression}`;
     } else {
@@ -259,14 +271,14 @@ class VariableReference {
     }
 
     const result = await this._client.sendCommand(command);
+
     if (result.error) {
-      throw new Error(`Error creating variable binding (${(0, (_MITypes || _load_MITypes()).toCommandError)(result).msg})`);
+      throw new Error(`Error creating variable binding (${(0, _MITypes().toCommandError)(result).msg})`);
     }
 
-    const varResult = (0, (_MITypes || _load_MITypes()).varCreateResult)(result);
+    const varResult = (0, _MITypes().varCreateResult)(result);
     this._varName = varResult.name;
     this._childCount = parseInt(varResult.numchild, 10);
-
     return varResult.name;
   }
 
@@ -279,10 +291,12 @@ class VariableReference {
     const varName = this._varName;
 
     if (!(varName != null)) {
-      throw new Error('Invariant violation: "varName != null"');
+      throw new Error("Invariant violation: \"varName != null\"");
     }
 
     return varName;
   }
+
 }
+
 exports.default = VariableReference;

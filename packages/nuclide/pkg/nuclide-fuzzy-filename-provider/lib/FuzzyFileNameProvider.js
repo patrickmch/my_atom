@@ -1,37 +1,78 @@
-'use strict';
+"use strict";
 
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
+exports.default = void 0;
 
-var _featureConfig;
+function _featureConfig() {
+  const data = _interopRequireDefault(require("../../../modules/nuclide-commons-atom/feature-config"));
 
-function _load_featureConfig() {
-  return _featureConfig = _interopRequireDefault(require('../../../modules/nuclide-commons-atom/feature-config'));
+  _featureConfig = function () {
+    return data;
+  };
+
+  return data;
 }
 
-var _nuclideUri;
+function _nuclideUri() {
+  const data = _interopRequireDefault(require("../../../modules/nuclide-commons/nuclideUri"));
 
-function _load_nuclideUri() {
-  return _nuclideUri = _interopRequireDefault(require('../../../modules/nuclide-commons/nuclideUri'));
+  _nuclideUri = function () {
+    return data;
+  };
+
+  return data;
 }
 
-var _passesGK;
+function _passesGK() {
+  const data = require("../../../modules/nuclide-commons/passesGK");
 
-function _load_passesGK() {
-  return _passesGK = require('../../commons-node/passesGK');
+  _passesGK = function () {
+    return data;
+  };
+
+  return data;
 }
 
-var _nuclideRemoteConnection;
+function _nuclideRemoteConnection() {
+  const data = require("../../nuclide-remote-connection");
 
-function _load_nuclideRemoteConnection() {
-  return _nuclideRemoteConnection = require('../../nuclide-remote-connection');
+  _nuclideRemoteConnection = function () {
+    return data;
+  };
+
+  return data;
 }
 
-var _utils;
+function _ClientQueryContext() {
+  const data = require("../../commons-atom/ClientQueryContext");
 
-function _load_utils() {
-  return _utils = require('./utils');
+  _ClientQueryContext = function () {
+    return data;
+  };
+
+  return data;
+}
+
+function _goToLocation() {
+  const data = require("../../../modules/nuclide-commons-atom/go-to-location");
+
+  _goToLocation = function () {
+    return data;
+  };
+
+  return data;
+}
+
+function _utils() {
+  const data = require("./utils");
+
+  _utils = function () {
+    return data;
+  };
+
+  return data;
 }
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
@@ -46,8 +87,18 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
  * 
  * @format
  */
+const {
+  logCustomFileSearchFeedback
+} = function () {
+  try {
+    // $FlowFB
+    return require("../../commons-atom/fb-custom-file-search-graphql");
+  } catch (err) {
+    return {};
+  }
+}();
 
-exports.default = {
+var _default = {
   providerType: 'DIRECTORY',
   name: 'FuzzyFileNameProvider',
   debounceDelay: 0,
@@ -64,26 +115,34 @@ exports.default = {
   },
 
   async executeQuery(query, directory) {
-    const { fileName, line, column } = (0, (_utils || _load_utils()).parseFileNameQuery)(query);
+    const {
+      fileName,
+      line,
+      column
+    } = (0, _utils().parseFileNameQuery)(query);
+
     if (fileName.length === 0) {
       return [];
     }
 
     const directoryPath = directory.getPath();
-    const service = (0, (_nuclideRemoteConnection || _load_nuclideRemoteConnection()).getFuzzyFileSearchServiceByNuclideUri)(directoryPath);
+    const service = (0, _nuclideRemoteConnection().getFuzzyFileSearchServiceByNuclideUri)(directoryPath);
+    const preferCustomSearch = Boolean((0, _passesGK().isGkEnabled)('nuclide_prefer_myles_search'));
+    const context = preferCustomSearch ? await (0, _ClientQueryContext().getNuclideContext)(directoryPath) : null;
     const results = await service.queryFuzzyFile({
       rootDirectory: directoryPath,
       queryRoot: getQueryRoot(directoryPath),
       queryString: fileName,
-      ignoredNames: (0, (_utils || _load_utils()).getIgnoredNames)(),
-      smartCase: Boolean((_featureConfig || _load_featureConfig()).default.get('nuclide-fuzzy-filename-provider.smartCase')),
-      preferCustomSearch: Boolean((0, (_passesGK || _load_passesGK()).isGkEnabled)('nuclide_prefer_myles_search'))
-    });
+      ignoredNames: (0, _utils().getIgnoredNames)(),
+      smartCase: Boolean(_featureConfig().default.get('nuclide-fuzzy-filename-provider.smartCase')),
+      preferCustomSearch,
+      context
+    }); // Take the `nuclide://<host>` prefix into account for matchIndexes of remote files.
 
-    // Take the `nuclide://<host>` prefix into account for matchIndexes of remote files.
-    if ((_nuclideRemoteConnection || _load_nuclideRemoteConnection()).RemoteDirectory.isRemoteDirectory(directory)) {
+    if (_nuclideRemoteConnection().RemoteDirectory.isRemoteDirectory(directory)) {
       const remoteDir = directory;
       const indexOffset = directoryPath.length - remoteDir.getLocalPath().length;
+
       for (let i = 0; i < results.length; i++) {
         for (let j = 0; j < results[i].matchIndexes.length; j++) {
           results[i].matchIndexes[j] += indexOffset;
@@ -97,21 +156,35 @@ exports.default = {
       score: result.score,
       matchIndexes: result.matchIndexes,
       line,
-      column
+      column,
+
+      callback() {
+        if (preferCustomSearch && logCustomFileSearchFeedback && context != null) {
+          logCustomFileSearchFeedback(result, results, query, directoryPath, context.session_id);
+        } // Custom callbacks need to run goToLocation
+
+
+        (0, _goToLocation().goToLocation)(result.path, {
+          line,
+          column
+        });
+      }
+
     }));
   }
-};
 
-// Returns the directory of the active text editor which will be used to unbreak
+}; // Returns the directory of the active text editor which will be used to unbreak
 // ties when sorting the suggestions.
 // TODO(T26559382) Extract to util function
 
+exports.default = _default;
+
 function getQueryRoot(directoryPath) {
-  if (!(0, (_passesGK || _load_passesGK()).isGkEnabled)('nuclide_fuzzy_file_search_with_root_path')) {
+  if (!(0, _passesGK().isGkEnabled)('nuclide_fuzzy_file_search_with_root_path')) {
     return undefined;
   }
+
   const editor = atom.workspace.getActiveTextEditor();
   const uri = editor ? editor.getURI() : null;
-
-  return uri != null && (_nuclideUri || _load_nuclideUri()).default.contains(directoryPath, uri) ? (_nuclideUri || _load_nuclideUri()).default.dirname(uri) : undefined;
+  return uri != null && _nuclideUri().default.contains(directoryPath, uri) ? _nuclideUri().default.dirname(uri) : undefined;
 }

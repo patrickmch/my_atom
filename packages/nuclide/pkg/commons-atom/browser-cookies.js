@@ -1,10 +1,11 @@
-'use strict';
+"use strict";
 
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
+exports.default = void 0;
 
-var _electron = _interopRequireDefault(require('electron'));
+var _electron = _interopRequireDefault(require("electron"));
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -18,17 +19,17 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
  *  strict
  * @format
  */
-
-const { remote } = _electron.default;
+const {
+  remote
+} = _electron.default;
 
 if (!(remote != null)) {
-  throw new Error('Invariant violation: "remote != null"');
+  throw new Error("Invariant violation: \"remote != null\"");
 }
 
-exports.default = {
+var _default = {
   getCookies(domain) {
     return new Promise((resolve, reject) => {
-      // $FlowFixMe: Add types for electron$WebContents
       remote.getCurrentWindow().webContents.session.cookies.get({
         domain
       }, (error, cookies) => {
@@ -47,7 +48,6 @@ exports.default = {
 
   setCookie(url, domain, name, value) {
     return new Promise((resolve, reject) => {
-      // $FlowFixMe: Add types for electron$WebContents
       remote.getCurrentWindow().webContents.session.cookies.set({
         url,
         domain,
@@ -62,4 +62,6 @@ exports.default = {
       });
     });
   }
+
 };
+exports.default = _default;

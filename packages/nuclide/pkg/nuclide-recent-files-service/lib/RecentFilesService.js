@@ -1,22 +1,33 @@
-'use strict';
+"use strict";
 
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
+exports.default = void 0;
 
-var _lruCache;
+function RecentFilesDB() {
+  const data = _interopRequireWildcard(require("./RecentFilesDB"));
 
-function _load_lruCache() {
-  return _lruCache = _interopRequireDefault(require('lru-cache'));
+  RecentFilesDB = function () {
+    return data;
+  };
+
+  return data;
 }
 
-var _UniversalDisposable;
+function _UniversalDisposable() {
+  const data = _interopRequireDefault(require("../../../modules/nuclide-commons/UniversalDisposable"));
 
-function _load_UniversalDisposable() {
-  return _UniversalDisposable = _interopRequireDefault(require('../../../modules/nuclide-commons/UniversalDisposable'));
+  _UniversalDisposable = function () {
+    return data;
+  };
+
+  return data;
 }
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) { var desc = Object.defineProperty && Object.getOwnPropertyDescriptor ? Object.getOwnPropertyDescriptor(obj, key) : {}; if (desc.get || desc.set) { Object.defineProperty(newObj, key, desc); } else { newObj[key] = obj[key]; } } } } newObj.default = obj; return newObj; } }
 
 /**
  * Copyright (c) 2015-present, Facebook, Inc.
@@ -28,48 +39,54 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
  *  strict-local
  * @format
  */
-
 class RecentFilesService {
-  // Map uses `Map`'s insertion ordering to keep files in order.
-  constructor(state) {
-    this._fileList = (0, (_lruCache || _load_lruCache()).default)({ max: 100 });
-    if (state != null && state.filelist != null) {
-      // Serialized state is in reverse chronological order. Reverse it to insert items correctly.
-      state.filelist.reduceRight((_, fileItem) => {
-        this._fileList.set(fileItem.path, fileItem.timestamp);
-      }, null);
-    }
-    this._subscriptions = new (_UniversalDisposable || _load_UniversalDisposable()).default();
+  constructor() {
+    this._subscriptions = new (_UniversalDisposable().default)();
+
     this._subscriptions.add(atom.workspace.onDidChangeActivePaneItem(item => {
       // Not all `item`s are instances of TextEditor (e.g. the diff view).
       // flowlint-next-line sketchy-null-mixed:off
       if (!item || typeof item.getPath !== 'function') {
         return;
       }
+
       const editorPath = item.getPath();
+
       if (editorPath != null) {
         this.touchFile(editorPath);
       }
     }));
   }
 
-  touchFile(path) {
-    this._fileList.set(path, Date.now());
+  async touchFile(path) {
+    await RecentFilesDB().touchFileDB(path, Date.now());
   }
-
   /**
    * Returns a reverse-chronological list of recently opened files.
    */
-  getRecentFiles() {
-    return this._fileList.dump().map(({ k, v }) => ({
+
+
+  async getRecentFiles() {
+    const fileList = await RecentFilesDB().getAllRecents();
+    return fileList.dump().map(({
+      k,
+      v
+    }) => ({
       resultType: 'FILE',
       path: k,
       timestamp: v
     }));
   }
 
-  dispose() {
-    this._subscriptions.dispose();
+  async dispose() {
+    this._subscriptions.dispose(); // Try one last time to sync back. Changes should be periodically saved,
+    // so if this doesn't run before we quit, that's OK. If package deactivation
+    // were async, then we could wait for the DB save to complete.
+
+
+    await RecentFilesDB().syncCache(true);
   }
+
 }
+
 exports.default = RecentFilesService;

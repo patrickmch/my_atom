@@ -1,14 +1,18 @@
-'use strict';
+"use strict";
 
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
 exports.provideHgBlameProvider = provideHgBlameProvider;
 
-var _HgBlameProvider;
+function _HgBlameProvider() {
+  const data = _interopRequireDefault(require("./HgBlameProvider"));
 
-function _load_HgBlameProvider() {
-  return _HgBlameProvider = _interopRequireDefault(require('./HgBlameProvider'));
+  _HgBlameProvider = function () {
+    return data;
+  };
+
+  return data;
 }
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
@@ -23,7 +27,6 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
  *  strict-local
  * @format
  */
-
 function provideHgBlameProvider() {
-  return (_HgBlameProvider || _load_HgBlameProvider()).default;
+  return _HgBlameProvider().default;
 }

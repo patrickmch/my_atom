@@ -1,30 +1,43 @@
-'use strict';
+"use strict";
 
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.ExportIndex = undefined;
+exports.ExportIndex = void 0;
 
-var _ExportMatcher;
+function _ExportMatcher() {
+  const data = _interopRequireDefault(require("./ExportMatcher"));
 
-function _load_ExportMatcher() {
-  return _ExportMatcher = _interopRequireDefault(require('./ExportMatcher'));
+  _ExportMatcher = function () {
+    return data;
+  };
+
+  return data;
 }
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
+/**
+ * Copyright (c) 2015-present, Facebook, Inc.
+ * All rights reserved.
+ *
+ * This source code is licensed under the license found in the LICENSE file in
+ * the root directory of this source tree.
+ *
+ * 
+ * @format
+ */
 class ExportIndex {
-
   constructor() {
     this.exportsForId = new Map();
     this.exportsForFile = new Map();
-    this.exportIdMatcher = new (_ExportMatcher || _load_ExportMatcher()).default();
+    this.exportIdMatcher = new (_ExportMatcher().default)();
   }
 
   clearAllExports() {
     this.exportsForId = new Map();
     this.exportsForFile = new Map();
-    this.exportIdMatcher = new (_ExportMatcher || _load_ExportMatcher()).default();
+    this.exportIdMatcher = new (_ExportMatcher().default)();
   }
 
   hasExport(id) {
@@ -33,15 +46,18 @@ class ExportIndex {
 
   clearExportsFromFile(file) {
     const toClear = this.exportsForFile.get(file);
+
     if (!toClear) {
       return;
     }
-    this.exportsForFile.set(file, new Set());
 
+    this.exportsForFile.set(file, new Set());
     toClear.forEach(exp => {
       const exportsWithSameId = this.exportsForId.get(exp.id);
+
       if (exportsWithSameId) {
         exportsWithSameId.delete(exp);
+
         if (exportsWithSameId.size === 0) {
           this.exportsForId.delete(exp.id);
           this.exportIdMatcher.remove(exp.id);
@@ -52,9 +68,11 @@ class ExportIndex {
 
   getExportsFromId(id) {
     const indexExports = this.exportsForId.get(id);
+
     if (indexExports) {
       return Array.from(indexExports);
     }
+
     return [];
   }
 
@@ -71,7 +89,10 @@ class ExportIndex {
   }
 
   _add(newExport) {
-    const { id, uri } = newExport;
+    const {
+      id,
+      uri
+    } = newExport;
     const idExports = this.exportsForId.get(id);
     const fileExports = this.exportsForFile.get(uri);
 
@@ -88,14 +109,7 @@ class ExportIndex {
       this.exportsForFile.set(uri, new Set([newExport]));
     }
   }
+
 }
-exports.ExportIndex = ExportIndex; /**
-                                    * Copyright (c) 2015-present, Facebook, Inc.
-                                    * All rights reserved.
-                                    *
-                                    * This source code is licensed under the license found in the LICENSE file in
-                                    * the root directory of this source tree.
-                                    *
-                                    * 
-                                    * @format
-                                    */
+
+exports.ExportIndex = ExportIndex;

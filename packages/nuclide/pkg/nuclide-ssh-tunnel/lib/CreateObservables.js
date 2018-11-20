@@ -1,4 +1,4 @@
-'use strict';
+"use strict";
 
 Object.defineProperty(exports, "__esModule", {
   value: true
@@ -6,33 +6,49 @@ Object.defineProperty(exports, "__esModule", {
 exports.createObservableForTunnels = createObservableForTunnels;
 exports.createObservableForTunnel = createObservableForTunnel;
 
-var _UniversalDisposable;
+function _UniversalDisposable() {
+  const data = _interopRequireDefault(require("../../../modules/nuclide-commons/UniversalDisposable"));
 
-function _load_UniversalDisposable() {
-  return _UniversalDisposable = _interopRequireDefault(require('../../../modules/nuclide-commons/UniversalDisposable'));
+  _UniversalDisposable = function () {
+    return data;
+  };
+
+  return data;
 }
 
-var _rxjsBundlesRxMinJs = require('rxjs/bundles/Rx.min.js');
+var _rxjsCompatUmdMin = require("rxjs-compat/bundles/rxjs-compat.umd.min.js");
 
-var _shallowequal;
+function _shallowequal() {
+  const data = _interopRequireDefault(require("shallowequal"));
 
-function _load_shallowequal() {
-  return _shallowequal = _interopRequireDefault(require('shallowequal'));
+  _shallowequal = function () {
+    return data;
+  };
+
+  return data;
 }
 
-var _Normalization;
+function _Normalization() {
+  const data = require("./Normalization");
 
-function _load_Normalization() {
-  return _Normalization = require('./Normalization');
+  _Normalization = function () {
+    return data;
+  };
+
+  return data;
 }
 
-var _Actions;
+function Actions() {
+  const data = _interopRequireWildcard(require("./redux/Actions"));
 
-function _load_Actions() {
-  return _Actions = _interopRequireWildcard(require('./redux/Actions'));
+  Actions = function () {
+    return data;
+  };
+
+  return data;
 }
 
-function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
+function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) { var desc = Object.defineProperty && Object.getOwnPropertyDescriptor ? Object.getOwnPropertyDescriptor(obj, key) : {}; if (desc.get || desc.set) { Object.defineProperty(newObj, key, desc); } else { newObj[key] = obj[key]; } } } } newObj.default = obj; return newObj; } }
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -46,41 +62,41 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
  * 
  * @format
  */
-
 function createObservableForTunnels(tunnels, store) {
   const observables = tunnels.map(t => createObservableForTunnel(t, store));
-  const highOrder = _rxjsBundlesRxMinJs.Observable.from(observables);
-  // $FlowFixMe combineAll
-  return highOrder.combineAll().mapTo('ready');
+
+  const highOrder = _rxjsCompatUmdMin.Observable.from(observables);
+
+  return highOrder.combineAll();
 }
 
 function createObservableForTunnel(tunnel, store) {
-  const resolved = (0, (_Normalization || _load_Normalization()).resolveTunnel)(tunnel);
-  if ((0, (_shallowequal || _load_shallowequal()).default)(resolved.from, resolved.to)) {
-    // Identical source/destination tunnels are always immediately ready, never close.
-    // Makes it easy for users to call this function without branching on whether they need to.
-    return _rxjsBundlesRxMinJs.Observable.of('ready').concat(_rxjsBundlesRxMinJs.Observable.never());
-  }
+  return _rxjsCompatUmdMin.Observable.defer(() => (0, _Normalization().resolveTunnel)(tunnel)).concatMap(resolved => {
+    if ((0, _shallowequal().default)(resolved.from, resolved.to)) {
+      // Identical source/destination tunnels are always immediately ready, never close.
+      // Makes it easy for users to call this function without branching on whether they need to.
+      return _rxjsCompatUmdMin.Observable.of(resolved).concat(_rxjsCompatUmdMin.Observable.never());
+    }
 
-  return _rxjsBundlesRxMinJs.Observable.create(observer => {
-    const subscription = {
-      description: tunnel.description,
-      onTunnelClose: error => {
+    return _rxjsCompatUmdMin.Observable.create(observer => {
+      const subscription = {
+        description: tunnel.description,
+        onTunnelClose: error => {
+          if (error == null) {
+            observer.complete();
+          } else {
+            observer.error(error);
+          }
+        }
+      };
+      store.dispatch(Actions().subscribeToTunnel(subscription, resolved, error => {
         if (error == null) {
-          observer.complete();
+          observer.next(resolved);
         } else {
           observer.error(error);
         }
-      }
-    };
-    store.dispatch((_Actions || _load_Actions()).subscribeToTunnel(subscription, resolved, error => {
-      if (error == null) {
-        observer.next('ready');
-      } else {
-        observer.error(error);
-      }
-    }));
-
-    return new (_UniversalDisposable || _load_UniversalDisposable()).default(() => store.dispatch((_Actions || _load_Actions()).unsubscribeFromTunnel(subscription, resolved)));
+      }));
+      return new (_UniversalDisposable().default)(() => store.dispatch(Actions().unsubscribeFromTunnel(subscription, resolved)));
+    });
   });
 }

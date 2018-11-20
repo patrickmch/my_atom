@@ -13,7 +13,6 @@ import { isFileSync } from './util'
 const mjSrc = `${global.require.resolve(
   'mathjax',
 )}?delayStartupUntil=configured`
-const defaultRenderer: MathJaxRenderer = 'HTML-CSS'
 
 //
 // Process DOM elements for LaTeX equations with MathJax
@@ -22,12 +21,9 @@ const defaultRenderer: MathJaxRenderer = 'HTML-CSS'
 //   [element](https://developer.mozilla.org/en-US/docs/Web/API/element) for
 //   details on DOM elements.
 //
-export async function mathProcessor(
-  domElement: Node,
-  renderer: MathJaxRenderer,
-) {
+export async function mathProcessor(domElement: Node) {
   await loadMathJax()
-  await queueTypeset(domElement, renderer)
+  await queueTypeset(domElement)
 }
 
 //
@@ -47,12 +43,20 @@ export async function processHTMLString(element: Element) {
   }
 }
 
+export async function rerenderMath() {
+  if (mjPromise !== undefined) {
+    await mjPromise
+    return new Promise<void>((resolve) => {
+      MathJax.Hub.Queue(['Rerender', MathJax.Hub])
+      MathJax.Hub.Queue([resolve])
+    })
+  } else {
+    return
+  }
+}
+
 //
 // Load MathJax environment
-//
-// @param listener method to call when the MathJax script was been
-//   loaded to the window. The method is passed no arguments.
-//
 let mjPromise: Promise<void> | undefined
 async function loadMathJax(): Promise<void> {
   if (mjPromise) return mjPromise
@@ -74,17 +78,12 @@ export async function jaxTeXConfig() {
   } else {
     userMacros = {}
   }
-  const numberEqns = await window.atomVars.numberEqns
+  const mathJaxConfig: MathJaxConfig = await window.atomVars.mathJaxConfig
 
   return {
-    extensions: [
-      'AMSmath.js',
-      'AMSsymbols.js',
-      'noErrors.js',
-      'noUndefined.js',
-    ],
+    extensions: mathJaxConfig.texExtensions,
     Macros: userMacros,
-    equationNumbers: numberEqns
+    equationNumbers: mathJaxConfig.numberEquations
       ? {
           autoNumber: 'AMS',
           useLabelIds: false,
@@ -182,14 +181,17 @@ function valueMatchesPattern(value: any) {
 // a few unnecessary features stripped away
 //
 async function configureMathJax() {
+  const mathJaxConfig = await window.atomVars.mathJaxConfig
   MathJax.Hub.Config({
-    jax: ['input/TeX', `output/${defaultRenderer}`],
+    jax: ['input/TeX', `output/${mathJaxConfig.renderer}`],
     extensions: [],
     TeX: await jaxTeXConfig(),
     'HTML-CSS': {
       availableFonts: [],
       webFont: 'TeX',
       imageFont: null as any, // TODO: complain on DT
+      undefinedFamily: mathJaxConfig.undefinedFamily as any, // TODO: complain on DT
+      mtextFontInherit: true,
     },
     messageStyle: 'none',
     showMathMenu: false,
@@ -222,24 +224,22 @@ async function injectScript(scriptSrc: string) {
   })
 }
 
-async function queueTypeset(domElement: Node, renderer: MathJaxRenderer) {
+async function queueTypeset(domElement: Node) {
   const hasUnprocessedMath = Array.from(
     document.querySelectorAll('script[type^="math/tex"]'),
   ).some((x) => !x.id)
   if (!hasUnprocessedMath) return
-  const numberEqns = await window.atomVars.numberEqns
+  const mathJaxConfig: MathJaxConfig = await window.atomVars.mathJaxConfig
   return new Promise<void>((resolve) => {
     if (MathJax.InputJax.TeX) {
       MathJax.Hub.Queue(['resetEquationNumbers', MathJax.InputJax.TeX])
-      if (numberEqns) {
+      if (mathJaxConfig.numberEquations) {
         MathJax.Hub.Queue(['PreProcess', MathJax.Hub])
         MathJax.Hub.Queue(['Reprocess', MathJax.Hub])
       }
     }
 
-    MathJax.Hub.Queue(['setRenderer', MathJax.Hub, renderer])
     MathJax.Hub.Queue(['Typeset', MathJax.Hub, domElement])
-    MathJax.Hub.Queue(['setRenderer', MathJax.Hub, defaultRenderer])
     MathJax.Hub.Queue([resolve])
   })
 }

@@ -4,7 +4,6 @@
   "version": "0.0.0",
   "description": "Provides support for Mercurial source control repositories",
   "author": "NEEDS OWNER",
-  "atomTestRunner": "../../lib/test-runner-entry.js",
   "nuclide": {
     "configMetadata": {
       "pathComponents": [
@@ -20,8 +19,7 @@
         "description": "Comes at the cost of more calls to the repository, potentially slowing things down in a large repository."
       }
     },
-    "packageType": "Atom",
-    "testRunner": "apm"
+    "packageType": "AtomPackage"
   },
   "consumedServices": {
     "nuclide-file-tree.context-menu": {

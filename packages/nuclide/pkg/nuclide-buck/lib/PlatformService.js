@@ -1,22 +1,30 @@
-'use strict';
+"use strict";
 
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.PlatformService = undefined;
+exports.PlatformService = void 0;
 
-var _UniversalDisposable;
+function _UniversalDisposable() {
+  const data = _interopRequireDefault(require("../../../modules/nuclide-commons/UniversalDisposable"));
 
-function _load_UniversalDisposable() {
-  return _UniversalDisposable = _interopRequireDefault(require('../../../modules/nuclide-commons/UniversalDisposable'));
+  _UniversalDisposable = function () {
+    return data;
+  };
+
+  return data;
 }
 
-var _rxjsBundlesRxMinJs = require('rxjs/bundles/Rx.min.js');
+var _rxjsCompatUmdMin = require("rxjs-compat/bundles/rxjs-compat.umd.min.js");
 
-var _log4js;
+function _log4js() {
+  const data = require("log4js");
 
-function _load_log4js() {
-  return _log4js = require('log4js');
+  _log4js = function () {
+    return data;
+  };
+
+  return data;
 }
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
@@ -31,37 +39,41 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
  *  strict-local
  * @format
  */
-
 const PROVIDER_TIMEOUT = 5000; // 5s
 
 class PlatformService {
   constructor() {
     this._registeredProviders = [];
-    this._providersChanged = new _rxjsBundlesRxMinJs.Subject();
+    this._providersChanged = new _rxjsCompatUmdMin.Subject();
   }
 
   register(platformProvider) {
     this._registeredProviders.push(platformProvider);
+
     this._providersChanged.next();
-    return new (_UniversalDisposable || _load_UniversalDisposable()).default(() => {
+
+    return new (_UniversalDisposable().default)(() => {
       const index = this._registeredProviders.indexOf(platformProvider);
+
       this._registeredProviders.splice(index, 1);
+
       this._providersChanged.next();
     });
   }
 
   getPlatformGroups(buckRoot, ruleType, buildTarget) {
     return this._providersChanged.startWith(undefined).switchMap(() => {
-      const observables = this._registeredProviders.map(provider => provider(buckRoot, ruleType, buildTarget).race(_rxjsBundlesRxMinJs.Observable.timer(PROVIDER_TIMEOUT).switchMap(() => _rxjsBundlesRxMinJs.Observable.throw('Timed out'))).catch(error => {
-        (0, (_log4js || _load_log4js()).getLogger)('nuclide-buck').error(`Getting buck platform groups from ${provider.name} failed:`, error);
-        return _rxjsBundlesRxMinJs.Observable.of(null);
+      const observables = this._registeredProviders.map(provider => provider(buckRoot, ruleType, buildTarget).race(_rxjsCompatUmdMin.Observable.timer(PROVIDER_TIMEOUT).switchMap(() => _rxjsCompatUmdMin.Observable.throw('Timed out'))).catch(error => {
+        (0, _log4js().getLogger)('nuclide-buck').error(`Getting buck platform groups from ${provider.name} failed:`, error);
+        return _rxjsCompatUmdMin.Observable.of(null);
       }).defaultIfEmpty(null));
-      return _rxjsBundlesRxMinJs.Observable.from(observables)
-      // $FlowFixMe: type combineAll
-      .combineAll().map(platformGroups => {
-        return platformGroups.filter(p => p != null).sort((a, b) => a.name.toUpperCase().localeCompare(b.name.toUpperCase()));
+
+      return _rxjsCompatUmdMin.Observable.from(observables).combineAll().map(platformGroups => {
+        return platformGroups.filter(Boolean).sort((a, b) => a.name.toUpperCase().localeCompare(b.name.toUpperCase()));
       });
     });
   }
+
 }
+
 exports.PlatformService = PlatformService;

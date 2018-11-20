@@ -1,0 +1,68 @@
+diff --git a/nols_website/wmi/templates/dataentry/form_modal.html b/nols_website/wmi/templates/dataentry/form_modal.html
+index f50397289..d1f21ba20 100644
+--- a/nols_website/wmi/templates/dataentry/form_modal.html
++++ b/nols_website/wmi/templates/dataentry/form_modal.html
+@@ -1,35 +1,31 @@
+-
+ <div id="{{ form_id }}" class="reveal fade" data-reveal tabindex="-1">
+-    <form action="{{ form_action }}{% if redirect_name %}?{{ redirect_name }}={{ redirect }}{% endif %}"
+-          method="post"
+-          class="form-horizontal modal-form">
+-        <div class="modal-dialog">
+-            <div class="modal-content">
+-                <div class="modal-header">
+-                    <button type="button" class="close" data-close aria-hidden="true">x</button>
+-                    <h3 class="modal-title">{{ modal_title }}</h3>
+-                </div>
+-                <div class="modal-body">
++  <div class="modal-dialog">
++    <div class="modal-content">
++      <button type="button" class="close" data-close aria-hidden="true">x</button>
++      <form action="{{ form_action }}{% if redirect_name %}?{{ redirect_name }}={{ redirect }}{% endif %}"
++            method="post"
++            class="form-horizontal modal-form"
++            data-form-url="{% block validation_url %}{% url "validate_core_form" form_id %}{% endblock %}">
++          <div class="form-instructions">{{ instructions }}</div>
++          <div class="modal-body container-fluid  content_container-fluid row">
++              <div class="modal-header">
++                  <div class="modal-header">
++                    <h3 class="modal-title">
++                      {{ modal_title }}
++                    </h3>
++                  </div>
++                  <div class="modal-body column small-12">
+                     {% include "bs_responsive_form_layout.html" %}
+-                </div>
+-                <div class="modal-footer">
+-                    <button type="button" class="button" data-close aria-hidden="true"><span>Cancel</span></button>
+-                    <input type="submit" class="button " value="Submit" />
+-                </div>
+-            </div>
+-        </div>
+-    </form>
++                 </div>
++                  <div class="small-12 medium-8 column modal-buttons">
++                    <button type="button" class="button button--hollow" data-close><span>Cancel</span></button>
++                    <input class="button " type="submit" value="Submit"/>
++                  </div>
++                  {% block below_buttons %}
++                  {% endblock %}
++              </div>
++          </div>
++      </form>
++    </div>
++  </div>
+ </div>
+-<script>
+-    $('#{{ form_id }}>form').submit(function(e) {
+-        {% ifequal form_id 'phone_form' %}
+-        var inputs = $(this).find('[name*="phoneform-"]')
+-        for(var i=0; i<inputs.length; i++) {
+-            var new_name = $(inputs[i]).attr('name').replace(/phoneform-/, '')
+-            $(inputs[i]).attr('name', new_name)
+-        }
+-        {% endifequal %}
+-        return validateCoreForm($(this), '{% url "validate_core_form"  form_id %}');
+-
+-    })
+-</script>

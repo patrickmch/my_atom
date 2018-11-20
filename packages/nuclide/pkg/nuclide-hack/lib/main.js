@@ -1,4 +1,4 @@
-'use strict';
+"use strict";
 
 Object.defineProperty(exports, "__esModule", {
   value: true
@@ -8,48 +8,61 @@ exports.deactivate = deactivate;
 exports.registerQuickOpenProvider = registerQuickOpenProvider;
 exports.registerProjectSymbolSearchProvider = registerProjectSymbolSearchProvider;
 
-var _HackSymbolProvider;
+function _HackSymbolProvider() {
+  const data = require("./HackSymbolProvider");
 
-function _load_HackSymbolProvider() {
-  return _HackSymbolProvider = require('./HackSymbolProvider');
+  _HackSymbolProvider = function () {
+    return data;
+  };
+
+  return data;
 }
 
-var _HackLanguage;
+function _HackLanguage() {
+  const data = require("./HackLanguage");
 
-function _load_HackLanguage() {
-  return _HackLanguage = require('./HackLanguage');
+  _HackLanguage = function () {
+    return data;
+  };
+
+  return data;
 }
 
-var _DashProjectSymbolProvider;
+function _DashProjectSymbolProvider() {
+  const data = _interopRequireDefault(require("./DashProjectSymbolProvider"));
 
-function _load_DashProjectSymbolProvider() {
-  return _DashProjectSymbolProvider = _interopRequireDefault(require('./DashProjectSymbolProvider'));
+  _DashProjectSymbolProvider = function () {
+    return data;
+  };
+
+  return data;
 }
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-function activate() {
-  (_HackLanguage || _load_HackLanguage()).hackLanguageService.then(value => value.activate());
-} /**
-   * Copyright (c) 2015-present, Facebook, Inc.
-   * All rights reserved.
-   *
-   * This source code is licensed under the license found in the LICENSE file in
-   * the root directory of this source tree.
-   *
-   *  strict-local
-   * @format
-   */
-
+/**
+ * Copyright (c) 2015-present, Facebook, Inc.
+ * All rights reserved.
+ *
+ * This source code is licensed under the license found in the LICENSE file in
+ * the root directory of this source tree.
+ *
+ *  strict-local
+ * @format
+ */
 // $FlowFB
+function activate() {
+  _HackLanguage().hackLanguageService.then(value => value.activate());
+}
+
 function deactivate() {
-  (0, (_HackLanguage || _load_HackLanguage()).resetHackLanguageService)();
+  (0, _HackLanguage().resetHackLanguageService)();
 }
 
 function registerQuickOpenProvider() {
-  return (_HackSymbolProvider || _load_HackSymbolProvider()).HackSymbolProvider;
+  return _HackSymbolProvider().HackSymbolProvider;
 }
 
 function registerProjectSymbolSearchProvider() {
-  return (_DashProjectSymbolProvider || _load_DashProjectSymbolProvider()).default;
+  return _DashProjectSymbolProvider().default;
 }

@@ -1,31 +1,48 @@
-'use strict';
+"use strict";
 
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.StreamTransport = undefined;
+exports.StreamTransport = void 0;
 
-var _observable;
+function _observable() {
+  const data = require("../../../modules/nuclide-commons/observable");
 
-function _load_observable() {
-  return _observable = require('../../../modules/nuclide-commons/observable');
+  _observable = function () {
+    return data;
+  };
+
+  return data;
 }
 
-var _stream;
+function _stream() {
+  const data = require("../../../modules/nuclide-commons/stream");
 
-function _load_stream() {
-  return _stream = require('../../../modules/nuclide-commons/stream');
+  _stream = function () {
+    return data;
+  };
+
+  return data;
 }
 
+/**
+ * Copyright (c) 2015-present, Facebook, Inc.
+ * All rights reserved.
+ *
+ * This source code is licensed under the license found in the LICENSE file in
+ * the root directory of this source tree.
+ *
+ *  strict-local
+ * @format
+ */
 class StreamTransport {
-
   constructor(output, input, messageLogger = (direction, message) => {
     return;
   }) {
     this._isClosed = false;
     this._messageLogger = messageLogger;
     this._output = output;
-    this._messages = (0, (_observable || _load_observable()).splitStream)((0, (_stream || _load_stream()).observeStream)(input), false).do(message => {
+    this._messages = (0, _observable().splitStream)((0, _stream().observeStream)(input), false).do(message => {
       this._messageLogger('receive', message);
     });
   }
@@ -51,14 +68,7 @@ class StreamTransport {
   isClosed() {
     return this._isClosed;
   }
+
 }
-exports.StreamTransport = StreamTransport; /**
-                                            * Copyright (c) 2015-present, Facebook, Inc.
-                                            * All rights reserved.
-                                            *
-                                            * This source code is licensed under the license found in the LICENSE file in
-                                            * the root directory of this source tree.
-                                            *
-                                            *  strict-local
-                                            * @format
-                                            */
+
+exports.StreamTransport = StreamTransport;

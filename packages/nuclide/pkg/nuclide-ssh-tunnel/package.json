@@ -4,10 +4,8 @@
   "version": "0.0.0",
   "description": "Adds a panel for managing ssh tunnels from a remote host to localhost",
   "author": "Nuclide : Remote",
-  "atomTestRunner": "../../lib/test-runner-entry.js",
   "nuclide": {
-    "packageType": "Atom",
-    "testRunner": "apm"
+    "packageType": "AtomPackage"
   },
   "activationCommands": {},
   "deserializers": {
@@ -26,9 +24,9 @@
         "0.0.0": "consumeCurrentWorkingDirectory"
       }
     },
-    "DEPRECATED-nuclide-output": {
+    "console": {
       "versions": {
-        "0.0.0": "consumeOutputService"
+        "0.1.0": "consumeConsole"
       }
     }
   }

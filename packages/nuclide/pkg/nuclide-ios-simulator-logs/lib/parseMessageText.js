@@ -1,9 +1,10 @@
-'use strict';
+"use strict";
 
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
 exports.parseMessageText = parseMessageText;
+
 /**
  * Copyright (c) 2015-present, Facebook, Inc.
  * All rights reserved.
@@ -14,9 +15,9 @@ exports.parseMessageText = parseMessageText;
  *  strict-local
  * @format
  */
-
 const TAG_RE = /\[([^[\]]*)]/g;
 const TAG_PATTERN = '\\[[^\\[\\]]*\\]'; // The same as TAG_RE but without capturing, for embedding.
+
 const DATETIME_PATTERN = '\\d{4}-\\d{2}-\\d{2} \\d+:\\d+:\\d+\\.\\d+';
 const PARTS_PATTERN = `${DATETIME_PATTERN}( (?:${TAG_PATTERN})+ ?)?([\\s\\S]*)`;
 const PARTS_RE = new RegExp(PARTS_PATTERN);
@@ -36,8 +37,10 @@ function parseMessageText(raw) {
   const tags = [];
   let level;
   let tagMatch;
+
   while (tagMatch = TAG_RE.exec(tagsPart)) {
     const tag = tagMatch[1];
+
     switch (tag) {
       case 'info':
       case 'log':
@@ -45,15 +48,22 @@ function parseMessageText(raw) {
       case 'debug':
         level = tag;
         break;
+
       case 'warn':
         level = 'warning';
         break;
+
       default:
         if (tag !== '') {
           tags.push(tag);
         }
+
     }
   }
 
-  return { text, level, tags };
+  return {
+    text,
+    level,
+    tags
+  };
 }

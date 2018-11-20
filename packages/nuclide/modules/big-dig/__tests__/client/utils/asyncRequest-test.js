@@ -1,11 +1,15 @@
-'use strict';
+"use strict";
 
-var _http = _interopRequireDefault(require('http'));
+var _http = _interopRequireDefault(require("http"));
 
-var _asyncRequest;
+function _asyncRequest() {
+  const data = _interopRequireDefault(require("../../../src/client/utils/asyncRequest"));
 
-function _load_asyncRequest() {
-  return _asyncRequest = _interopRequireDefault(require('../../../src/client/utils/asyncRequest'));
+  _asyncRequest = function () {
+    return data;
+  };
+
+  return data;
 }
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
@@ -20,27 +24,31 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
  *
  * 
  * @format
+ * @emails oncall+nuclide
  */
-
 describe('asyncRequest', () => {
   let server;
-
   beforeEach(async () => {
     server = _http.default.createServer((req, res) => {
-      res.writeHead(200, { 'Content-Type': 'text/plain' });
+      res.writeHead(200, {
+        'Content-Type': 'text/plain'
+      });
       res.end('okay');
     });
     await new Promise(resolve => {
-      server.listen(36845, '127.0.0.1', 511 /* backlog */, resolve);
+      server.listen(36845, '127.0.0.1', 511
+      /* backlog */
+      , resolve);
     });
   });
-
   afterEach(() => {
     server.close();
   });
-
   it('can do http request in an async way', async () => {
-    const { body, response } = await (0, (_asyncRequest || _load_asyncRequest()).default)({
+    const {
+      body,
+      response
+    } = await (0, _asyncRequest().default)({
       uri: 'http://127.0.0.1:36845/abc'
     });
     expect(body).toBe('okay');

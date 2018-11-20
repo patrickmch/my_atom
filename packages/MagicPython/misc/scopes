@@ -65,6 +65,8 @@ meta.backreference.regexp
 meta.character.set.regexp
 meta.class.inheritance.python
 meta.class.python
+meta.format.brace.python
+meta.format.percent.python
 meta.fstring.python
 meta.function-call.generic.python
 meta.function-call.python
@@ -82,6 +84,7 @@ punctuation.comment.end.regexp
 punctuation.definition.arguments.begin.python
 punctuation.definition.arguments.end.python
 punctuation.definition.comment.python
+punctuation.definition.decorator.python
 punctuation.definition.dict.begin.python
 punctuation.definition.dict.end.python
 punctuation.definition.inheritance.begin.python

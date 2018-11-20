@@ -1,58 +1,91 @@
-'use strict';
+"use strict";
 
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.TunnelsPanelContents = undefined;
+exports.TunnelsPanelContents = void 0;
 
-var _react = _interopRequireWildcard(require('react'));
+function _passesGK() {
+  const data = _interopRequireDefault(require("../../../../modules/nuclide-commons/passesGK"));
 
-var _ManualTunnelSection;
+  _passesGK = function () {
+    return data;
+  };
 
-function _load_ManualTunnelSection() {
-  return _ManualTunnelSection = _interopRequireDefault(require('./ManualTunnelSection'));
+  return data;
 }
 
-var _TunnelsPanelTable;
+var React = _interopRequireWildcard(require("react"));
 
-function _load_TunnelsPanelTable() {
-  return _TunnelsPanelTable = require('./TunnelsPanelTable');
+function _ManualTunnelSection() {
+  const data = _interopRequireDefault(require("./ManualTunnelSection"));
+
+  _ManualTunnelSection = function () {
+    return data;
+  };
+
+  return data;
 }
 
-var _immutable;
+function _TunnelsPanelTable() {
+  const data = require("./TunnelsPanelTable");
 
-function _load_immutable() {
-  return _immutable = require('immutable');
+  _TunnelsPanelTable = function () {
+    return data;
+  };
+
+  return data;
 }
+
+function _immutable() {
+  const data = require("immutable");
+
+  _immutable = function () {
+    return data;
+  };
+
+  return data;
+}
+
+function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) { var desc = Object.defineProperty && Object.getOwnPropertyDescriptor ? Object.getOwnPropertyDescriptor(obj, key) : {}; if (desc.get || desc.set) { Object.defineProperty(newObj, key, desc); } else { newObj[key] = obj[key]; } } } } newObj.default = obj; return newObj; } }
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
-
-class TunnelsPanelContents extends _react.Component {
+/**
+ * Copyright (c) 2015-present, Facebook, Inc.
+ * All rights reserved.
+ *
+ * This source code is licensed under the license found in the LICENSE file in
+ * the root directory of this source tree.
+ *
+ * 
+ * @format
+ */
+class TunnelsPanelContents extends React.Component {
+  constructor() {
+    super();
+    this.state = {
+      allowManualTunnels: false
+    };
+    (0, _passesGK().default)('nuclide_allow_manual_tunnels').then(result => {
+      this.setState({
+        allowManualTunnels: result
+      });
+    });
+  }
 
   render() {
-    return _react.createElement(
-      'div',
-      { className: 'nuclide-ssh-tunnels-panel-contents' },
-      _react.createElement((_TunnelsPanelTable || _load_TunnelsPanelTable()).TunnelsPanelTable, {
-        tunnels: this.props.tunnels,
-        closeTunnel: this.props.closeTunnel
-      }),
-      _react.createElement((_ManualTunnelSection || _load_ManualTunnelSection()).default, {
-        workingDirectoryHost: this.props.workingDirectoryHost,
-        openTunnel: this.props.openTunnel
-      })
-    );
+    return React.createElement("div", {
+      className: "nuclide-ssh-tunnels-panel-contents"
+    }, React.createElement(_TunnelsPanelTable().TunnelsPanelTable, {
+      tunnels: this.props.tunnels,
+      closeTunnel: this.props.closeTunnel
+    }), this.state.allowManualTunnels && React.createElement(_ManualTunnelSection().default, {
+      workingDirectory: this.props.workingDirectory,
+      openTunnel: this.props.openTunnel
+    }));
   }
+
 }
-exports.TunnelsPanelContents = TunnelsPanelContents; /**
-                                                      * Copyright (c) 2015-present, Facebook, Inc.
-                                                      * All rights reserved.
-                                                      *
-                                                      * This source code is licensed under the license found in the LICENSE file in
-                                                      * the root directory of this source tree.
-                                                      *
-                                                      * 
-                                                      * @format
-                                                      */
+
+exports.TunnelsPanelContents = TunnelsPanelContents;

@@ -1,64 +1,100 @@
-'use strict';
+"use strict";
 
-var _querystring = _interopRequireDefault(require('querystring'));
+var _electron = require("electron");
 
-var _nuclideRemoteConnection;
+var _querystring = _interopRequireDefault(require("querystring"));
 
-function _load_nuclideRemoteConnection() {
-  return _nuclideRemoteConnection = require('../../nuclide-remote-connection');
+function _nuclideRemoteConnection() {
+  const data = require("../../nuclide-remote-connection");
+
+  _nuclideRemoteConnection = function () {
+    return data;
+  };
+
+  return data;
 }
 
-var _UniversalDisposable;
+function _UniversalDisposable() {
+  const data = _interopRequireDefault(require("../../../modules/nuclide-commons/UniversalDisposable"));
 
-function _load_UniversalDisposable() {
-  return _UniversalDisposable = _interopRequireDefault(require('../../../modules/nuclide-commons/UniversalDisposable'));
+  _UniversalDisposable = function () {
+    return data;
+  };
+
+  return data;
 }
 
-var _goToLocation;
+function _goToLocation() {
+  const data = require("../../../modules/nuclide-commons-atom/go-to-location");
 
-function _load_goToLocation() {
-  return _goToLocation = require('../../../modules/nuclide-commons-atom/go-to-location');
+  _goToLocation = function () {
+    return data;
+  };
+
+  return data;
 }
 
-var _createPackage;
+function _createPackage() {
+  const data = _interopRequireDefault(require("../../../modules/nuclide-commons-atom/createPackage"));
 
-function _load_createPackage() {
-  return _createPackage = _interopRequireDefault(require('../../../modules/nuclide-commons-atom/createPackage'));
+  _createPackage = function () {
+    return data;
+  };
+
+  return data;
 }
 
-var _featureConfig;
+function _featureConfig() {
+  const data = _interopRequireDefault(require("../../../modules/nuclide-commons-atom/feature-config"));
 
-function _load_featureConfig() {
-  return _featureConfig = _interopRequireDefault(require('../../../modules/nuclide-commons-atom/feature-config'));
+  _featureConfig = function () {
+    return data;
+  };
+
+  return data;
 }
 
-var _log4js;
+function _log4js() {
+  const data = require("log4js");
 
-function _load_log4js() {
-  return _log4js = require('log4js');
+  _log4js = function () {
+    return data;
+  };
+
+  return data;
 }
 
-var _textEditor;
+function _textEditor() {
+  const data = require("../../../modules/nuclide-commons-atom/text-editor");
 
-function _load_textEditor() {
-  return _textEditor = require('../../../modules/nuclide-commons-atom/text-editor');
+  _textEditor = function () {
+    return data;
+  };
+
+  return data;
 }
 
-var _rxjsBundlesRxMinJs = require('rxjs/bundles/Rx.min.js');
+var _rxjsCompatUmdMin = require("rxjs-compat/bundles/rxjs-compat.umd.min.js");
 
-var _nuclideUri;
+function _nuclideUri() {
+  const data = _interopRequireDefault(require("../../../modules/nuclide-commons/nuclideUri"));
 
-function _load_nuclideUri() {
-  return _nuclideUri = _interopRequireDefault(require('../../../modules/nuclide-commons/nuclideUri'));
+  _nuclideUri = function () {
+    return data;
+  };
+
+  return data;
 }
 
-var _nuclideOpenFiles;
+function _nuclideOpenFiles() {
+  const data = require("../../nuclide-open-files");
 
-function _load_nuclideOpenFiles() {
-  return _nuclideOpenFiles = require('../../nuclide-open-files');
+  _nuclideOpenFiles = function () {
+    return data;
+  };
+
+  return data;
 }
-
-var _electron = require('electron');
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -72,26 +108,27 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
  *  strict-local
  * @format
  */
-
 const REMOTE_COMMAND_SERVICE = 'RemoteCommandService';
 const ATOM_URI_ADD_PATH = 'add-path';
 
 class Activation {
-
   constructor() {
-    this._disposables = new (_UniversalDisposable || _load_UniversalDisposable()).default();
+    this._disposables = new (_UniversalDisposable().default)();
     this._commands = {
       openFile(uri, line, column, isWaiting) {
         return openFile(uri, line, column, isWaiting);
       },
+
       openRemoteFile(uri, line, column, isWaiting) {
-        if ((_nuclideRemoteConnection || _load_nuclideRemoteConnection()).ServerConnection.getForUri(uri) == null) {
-          return _rxjsBundlesRxMinJs.Observable.throw(new Error(`Atom is not connected to host for ${uri}`)).publish();
+        if (_nuclideRemoteConnection().ServerConnection.getForUri(uri) == null) {
+          return _rxjsCompatUmdMin.Observable.throw(new Error(`Atom is not connected to host for ${uri}`)).publish();
         }
+
         return openFile(uri, line, column, isWaiting);
       },
+
       async addProject(projectPath, newWindow) {
-        if ((_nuclideUri || _load_nuclideUri()).default.isLocal(projectPath)) {
+        if (_nuclideUri().default.isLocal(projectPath)) {
           atom.applicationDelegate.open({
             pathsToOpen: [projectPath],
             newWindow,
@@ -102,10 +139,15 @@ class Activation {
           let queryParams = {
             path: projectPath
           };
+
           if (newWindow) {
-            queryParams = Object.assign({}, queryParams, { target: '_blank' });
+            queryParams = Object.assign({}, queryParams, {
+              target: '_blank'
+            });
           }
+
           const url = `atom://nuclide/${ATOM_URI_ADD_PATH}?` + _querystring.default.stringify(queryParams);
+
           _electron.shell.openExternal(url);
         }
       },
@@ -117,86 +159,130 @@ class Activation {
       },
 
       addNotification(notification) {
-        const { type, message } = notification;
-        const { description, detail, icon, dismissable } = notification;
-        const options = { description, detail, icon, dismissable };
+        const {
+          type,
+          message
+        } = notification;
+        const {
+          description,
+          detail,
+          icon,
+          dismissable
+        } = notification;
+        const options = {
+          description,
+          detail,
+          icon,
+          dismissable
+        };
         atom.notifications.add(type, message, options);
         return Promise.resolve();
       },
 
+      getClipboardContents() {
+        // $FlowFixMe missing flow def
+        const contents = _electron.clipboard.readText();
+
+        return Promise.resolve(contents.substring(0, 100 * 1024));
+      },
+
+      setClipboardContents(text) {
+        // $FlowFixMe missing flow def
+        _electron.clipboard.writeText(text);
+
+        return Promise.resolve();
+      },
+
       dispose() {}
+
     };
 
-    this._disposables.add(new (_nuclideRemoteConnection || _load_nuclideRemoteConnection()).ConnectionCache(async connection => {
+    this._disposables.add(new (_nuclideRemoteConnection().ConnectionCache)(async connection => {
       // If connection is null, this indicates a local connection. Because usage
       // of the local command server is low and it introduces the cost of
       // starting an extra process when Atom starts up, only enable it if the
       // user has explicitly opted-in.
-      if (connection == null && !(_featureConfig || _load_featureConfig()).default.get('nuclide-remote-atom.enableLocalCommandService')) {
-        return { dispose: () => {} };
+      if (connection == null && !_featureConfig().default.get('nuclide-remote-atom.enableLocalCommandService')) {
+        return {
+          dispose: () => {}
+        };
       }
 
-      const service = (0, (_nuclideRemoteConnection || _load_nuclideRemoteConnection()).getServiceByConnection)(REMOTE_COMMAND_SERVICE, connection);
-      const fileNotifier = await (0, (_nuclideOpenFiles || _load_nuclideOpenFiles()).getNotifierByConnection)(connection);
+      const service = (0, _nuclideRemoteConnection().getServiceByConnection)(REMOTE_COMMAND_SERVICE, connection);
+      const fileNotifier = await (0, _nuclideOpenFiles().getNotifierByConnection)(connection);
       return service.registerAtomCommands(fileNotifier, this._commands);
     }));
   }
 
   consumeRemoteProjectsService(service) {
     this._remoteProjectsService = service;
-    const disposable = new (_UniversalDisposable || _load_UniversalDisposable()).default(() => {
+    const disposable = new (_UniversalDisposable().default)(() => {
       this._remoteProjectsService = null;
     });
+
     this._disposables.add(disposable);
+
     return disposable;
   }
 
   consumeDeepLinkService(service) {
     const disposable = service.subscribeToPath(ATOM_URI_ADD_PATH, async params => {
-      const { path: projectPath } = params;
+      const {
+        path: projectPath
+      } = params;
 
       if (!(typeof projectPath === 'string')) {
-        throw new Error('Invariant violation: "typeof projectPath === \'string\'"');
+        throw new Error("Invariant violation: \"typeof projectPath === 'string'\"");
       }
 
-      if (!(_nuclideUri || _load_nuclideUri()).default.isRemote(projectPath)) {
-        (0, (_log4js || _load_log4js()).getLogger)(`Expected remote Nuclide URI but got ${projectPath}.`);
+      if (!_nuclideUri().default.isRemote(projectPath)) {
+        (0, _log4js().getLogger)(`Expected remote Nuclide URI but got ${projectPath}.`);
         return;
       }
 
       const remoteProjectsService = this._remoteProjectsService;
+
       if (remoteProjectsService == null) {
-        (0, (_log4js || _load_log4js()).getLogger)('No provider for nuclide-remote-projects was found.');
+        (0, _log4js().getLogger)('No provider for nuclide-remote-projects was found.');
         return;
       }
 
-      (0, (_log4js || _load_log4js()).getLogger)().info(`Attempting to addProject(${projectPath}).`);
-      const hostname = (_nuclideUri || _load_nuclideUri()).default.getHostname(projectPath);
+      (0, _log4js().getLogger)().info(`Attempting to addProject(${projectPath}).`);
+
+      const hostname = _nuclideUri().default.getHostname(projectPath);
+
       await remoteProjectsService.createRemoteConnection({
         host: hostname,
-        path: (_nuclideUri || _load_nuclideUri()).default.getPath(projectPath),
+        path: _nuclideUri().default.getPath(projectPath),
         displayTitle: hostname
       });
     });
+
     this._disposables.add(disposable);
+
     return disposable;
   }
 
   dispose() {
     this._disposables.dispose();
   }
+
 }
 
 function openFile(uri, line, column, isWaiting) {
-  return _rxjsBundlesRxMinJs.Observable.fromPromise((0, (_goToLocation || _load_goToLocation()).goToLocation)(uri, { line, column }).then(editor => {
+  return _rxjsCompatUmdMin.Observable.fromPromise((0, _goToLocation().goToLocation)(uri, {
+    line,
+    column
+  }).then(editor => {
     atom.applicationDelegate.focusWindow();
 
-    if (isWaiting && (_featureConfig || _load_featureConfig()).default.get('nuclide-remote-atom.shouldNotifyWhenCommandLineIsWaitingOnFile')) {
-      const notification = atom.notifications.addInfo(`The command line has opened \`${(_nuclideUri || _load_nuclideUri()).default.getPath(uri)}\`` + ' and is waiting for it to be closed.', {
+    if (isWaiting && _featureConfig().default.get('nuclide-remote-atom.shouldNotifyWhenCommandLineIsWaitingOnFile')) {
+      const notification = atom.notifications.addInfo(`The command line has opened \`${_nuclideUri().default.getPath(uri)}\`` + ' and is waiting for it to be closed.', {
         dismissable: true,
         buttons: [{
           onDidClick: () => {
-            (_featureConfig || _load_featureConfig()).default.set('nuclide-remote-atom.shouldNotifyWhenCommandLineIsWaitingOnFile', false);
+            _featureConfig().default.set('nuclide-remote-atom.shouldNotifyWhenCommandLineIsWaitingOnFile', false);
+
             notification.dismiss();
           },
           text: "Don't show again"
@@ -213,7 +299,7 @@ function openFile(uri, line, column, isWaiting) {
     }
 
     return editor;
-  })).switchMap(editor => _rxjsBundlesRxMinJs.Observable.merge(_rxjsBundlesRxMinJs.Observable.of('open'), (0, (_textEditor || _load_textEditor()).observeEditorDestroy)(editor).map(value => 'close'))).publish();
+  })).switchMap(editor => _rxjsCompatUmdMin.Observable.merge(_rxjsCompatUmdMin.Observable.of('open'), (0, _textEditor().observeEditorDestroy)(editor).map(value => 'close'))).publish();
 }
 
-(0, (_createPackage || _load_createPackage()).default)(module.exports, Activation);
+(0, _createPackage().default)(module.exports, Activation);

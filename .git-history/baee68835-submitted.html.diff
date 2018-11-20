@@ -1,0 +1,95 @@
+diff --git a/nols_website/wmi/templates/dataentry/submitted.html b/nols_website/wmi/templates/dataentry/submitted.html
+index 3ec45a2bf..0d02c26d7 100644
+--- a/nols_website/wmi/templates/dataentry/submitted.html
++++ b/nols_website/wmi/templates/dataentry/submitted.html
+@@ -1,88 +1,88 @@
+ {% extends 'dataentry/base.html' %}
+ 
+ {% block title %}Success!{% endblock title %}
+ 
+ {% block large_title %}{{ event }}{% endblock large_title %}
+ {% block small_title %}{{ event }}{% endblock small_title %}
+ 
+ {% block content %}
+ {{ block.super }}
+ <div class="column small-centered small-12 large-8 medium-10">
+     {% if error %}
+         <div data-closable class="callout alert">
+            <button type="button" data-close class="close">x</button>
+             <strong>Error!</strong> There was a problem submitting your form.
+     {% else %}
+         <div data-closable class="callout">
+             <button type="button" data-close class="close" data-dismiss="alert">x</button>
+             <strong>Success!</strong> Your name has been added to the roster.
+     {% endif %}
+     {% if user.is_authenticated %}
+             To protect your information, you will be automatically logged out in <strong><span id="timer">10</span>
+         </strong> seconds. Click the cancel button to stay logged in.
+     {% endif %}
+         </div>
+     <h3 class="lead">
+         {% if error %}
+           {{ error_message }}
+         {% else %}
+           Thank you for filling out this form. Your information has been successfully added to our records.
+         {% endif %}
+     </h3>
+     <div class="row">
+         <div class="small-12 medium-8 column">
+             {% if user.is_authenticated %}
+-            <div class="button-container">
+-              <button type="button" class="button button--hollow" id="cancel-logout">
++            <div class="rollcall-button-container">
++              <button type="button" class="button button--hollow rollcall-buttons" id="cancel-logout">
+                 Cancel
+               </button>
+               <a href="{% url "logout" %}?next={% url "get_started"  event.wmi_course_id %}"
+                  role="button"
+                  id="logout-button"
+                  class="button">
+                 Logout
+               </a>
+             </div>
+             {% else %}
+             <a href="{% url "get_started"  event.wmi_course_id %}"
+                class="button">
+               Return to start page
+             </a>
+             {% endif %}
+         </div>
+     </div>
+ </div>
+ {% endblock content %}
+ 
+ {% block extra_js %}
+    {{ block.super }}
+    {% if user.is_authenticated %}
+    <script>
+        var milliseconds = 10000;
+        var count = milliseconds / 1000;
+        var counter = setInterval(timer, 1000);
+        var getStartedURL = $('#logout-button').attr('href');
+        var timeoutId = window.setTimeout(logout, milliseconds);
+ 
+        $('#cancel-logout').click(function(){
+            window.clearTimeout(timeoutId);
+            clearInterval(counter);
+        });
+ 
+        function timer() {
+            count = count - 1;
+            if(count < 0) {
+                clearInterval(counter);
+                return;
+            }
+            var number = count >= 10 ? count : ("\u00a0") + count + ("\u00a0");
+            $('#timer').text(number).html();
+        }
+ 
+        function logout() {
+            window.location.assign(getStartedURL);
+        }
+ 
+    </script>
+    {% endif %}
+ {% endblock extra_js %}

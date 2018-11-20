@@ -1,71 +1,117 @@
-'use strict';
+"use strict";
 
-var _destroyItemWhere;
+function _destroyItemWhere() {
+  const data = require("../../../../nuclide-commons-atom/destroyItemWhere");
 
-function _load_destroyItemWhere() {
-  return _destroyItemWhere = require('../../../../nuclide-commons-atom/destroyItemWhere');
+  _destroyItemWhere = function () {
+    return data;
+  };
+
+  return data;
 }
 
-var _os = _interopRequireDefault(require('os'));
+function _event() {
+  const data = require("../../../../nuclide-commons/event");
 
-var _nullthrows;
+  _event = function () {
+    return data;
+  };
 
-function _load_nullthrows() {
-  return _nullthrows = _interopRequireDefault(require('nullthrows'));
+  return data;
 }
 
-var _createPackage;
+var _os = _interopRequireDefault(require("os"));
 
-function _load_createPackage() {
-  return _createPackage = _interopRequireDefault(require('../../../../nuclide-commons-atom/createPackage'));
+var _rxjsCompatUmdMin = require("rxjs-compat/bundles/rxjs-compat.umd.min.js");
+
+function _createPackage() {
+  const data = _interopRequireDefault(require("../../../../nuclide-commons-atom/createPackage"));
+
+  _createPackage = function () {
+    return data;
+  };
+
+  return data;
 }
 
-var _getElementFilePath;
+function _getElementFilePath() {
+  const data = _interopRequireDefault(require("../../../../nuclide-commons-atom/getElementFilePath"));
 
-function _load_getElementFilePath() {
-  return _getElementFilePath = _interopRequireDefault(require('../../../../nuclide-commons-atom/getElementFilePath'));
+  _getElementFilePath = function () {
+    return data;
+  };
+
+  return data;
 }
 
-var _goToLocation;
+function _nuclideUri() {
+  const data = _interopRequireDefault(require("../../../../nuclide-commons/nuclideUri"));
 
-function _load_goToLocation() {
-  return _goToLocation = require('../../../../nuclide-commons-atom/go-to-location');
+  _nuclideUri = function () {
+    return data;
+  };
+
+  return data;
 }
 
-var _nuclideUri;
+function _UniversalDisposable() {
+  const data = _interopRequireDefault(require("../../../../nuclide-commons/UniversalDisposable"));
 
-function _load_nuclideUri() {
-  return _nuclideUri = _interopRequireDefault(require('../../../../nuclide-commons/nuclideUri'));
+  _UniversalDisposable = function () {
+    return data;
+  };
+
+  return data;
 }
 
-var _UniversalDisposable;
+function _idbKeyval() {
+  const data = _interopRequireDefault(require("idb-keyval"));
 
-function _load_UniversalDisposable() {
-  return _UniversalDisposable = _interopRequireDefault(require('../../../../nuclide-commons/UniversalDisposable'));
+  _idbKeyval = function () {
+    return data;
+  };
+
+  return data;
 }
 
-var _AtomServiceContainer;
+function _AtomServiceContainer() {
+  const data = require("./AtomServiceContainer");
 
-function _load_AtomServiceContainer() {
-  return _AtomServiceContainer = require('./AtomServiceContainer');
+  _AtomServiceContainer = function () {
+    return data;
+  };
+
+  return data;
 }
 
-var _terminalView;
+function _terminalView() {
+  const data = require("./terminal-view");
 
-function _load_terminalView() {
-  return _terminalView = require('./terminal-view');
+  _terminalView = function () {
+    return data;
+  };
+
+  return data;
 }
 
-var _nuclideTerminalUri;
+function _nuclideTerminalInfo() {
+  const data = require("./nuclide-terminal-info");
 
-function _load_nuclideTerminalUri() {
-  return _nuclideTerminalUri = require('./nuclide-terminal-uri');
+  _nuclideTerminalInfo = function () {
+    return data;
+  };
+
+  return data;
 }
 
-var _FocusManager;
+function _FocusManager() {
+  const data = require("./FocusManager");
 
-function _load_FocusManager() {
-  return _FocusManager = require('./FocusManager');
+  _FocusManager = function () {
+    return data;
+  };
+
+  return data;
 }
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
@@ -81,44 +127,89 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
  * 
  * @format
  */
+// for homedir
+const MOVED_TERMINAL_NUX_SHOWN_KEY = 'atom_ide_terminal_moved_nux';
 
 class Activation {
-
   constructor() {
-    const focusManager = new (_FocusManager || _load_FocusManager()).FocusManager();
-    this._subscriptions = new (_UniversalDisposable || _load_UniversalDisposable()).default(focusManager, atom.workspace.addOpener(uri => {
-      if (uri.startsWith((_nuclideTerminalUri || _load_nuclideTerminalUri()).URI_PREFIX)) {
-        return new (_terminalView || _load_terminalView()).TerminalView(uri);
+    const focusManager = new (_FocusManager().FocusManager)();
+    this._subscriptions = new (_UniversalDisposable().default)(focusManager, atom.workspace.addOpener((uri, options) => {
+      if (uri === _nuclideTerminalInfo().TERMINAL_URI) {
+        // $FlowFixMe this has the merged terminalInfo inside it
+        const info = options.terminalInfo || {};
+
+        if (info.cwd == null || info.cwd === '') {
+          const cwd = this._cwd && this._cwd.getCwd();
+
+          if (cwd != null) {
+            info.cwd = cwd;
+          }
+        }
+
+        return new (_terminalView().TerminalView)(Object.assign({}, _nuclideTerminalInfo().TERMINAL_DEFAULT_INFO, info));
       }
+    }), atom.commands.add('atom-workspace', 'atom-ide-terminal:toggle', () => {
+      const activePane = atom.workspace.getActivePaneItem();
+
+      if (activePane && activePane.getURI && activePane.getURI() === _nuclideTerminalInfo().TERMINAL_URI) {
+        const container = atom.workspace.getActivePaneContainer();
+
+        if (container === atom.workspace.getCenter()) {
+          atom.confirm({
+            message: 'This will destroy the current terminal',
+            detail: 'Toggling active terminals in the center pane closes them.',
+            buttons: ['Keep', 'Destroy'],
+            defaultId: 0,
+            cancelId: 0,
+            type: 'warning'
+          }, response => {
+            if (response === 1) {
+              atom.workspace.toggle(_nuclideTerminalInfo().TERMINAL_URI);
+            }
+          });
+          return;
+        }
+      }
+
+      atom.workspace.toggle(_nuclideTerminalInfo().TERMINAL_URI);
     }), atom.commands.add('atom-workspace', 'atom-ide-terminal:new-terminal', event => {
-      const cwd = this._getPathOrCwd(event);
-      const uri = cwd != null ? (0, (_nuclideTerminalUri || _load_nuclideTerminalUri()).uriFromInfo)({ cwd }) : (0, (_nuclideTerminalUri || _load_nuclideTerminalUri()).uriFromInfo)({});
-      (0, (_goToLocation || _load_goToLocation()).goToLocation)(uri);
-    }), atom.commands.add('atom-workspace', 'atom-ide-terminal:new-local-terminal', event => {
-      const uri = (0, (_nuclideTerminalUri || _load_nuclideTerminalUri()).uriFromInfo)({ cwd: _os.default.homedir() });
-      (0, (_goToLocation || _load_goToLocation()).goToLocation)(uri);
+      // HACK: we pass along the cwd in the opener's options to be able to
+      // read from it above.
+      // eslint-disable-next-line nuclide-internal/atom-apis
+      openTerminalInNewPaneItem({
+        terminalInfo: {
+          cwd: this._getPathOrCwd(event)
+        },
+        searchAllPanes: false
+      });
+    }), atom.commands.add('atom-workspace', 'atom-ide-terminal:new-local-terminal', () => {
+      // HACK: we pass along the cwd in the opener's options to be able to
+      // read from it above.
+      // eslint-disable-next-line nuclide-internal/atom-apis
+      openTerminalInNewPaneItem({
+        terminalInfo: {
+          cwd: _os.default.homedir()
+        }
+      });
     }), atom.commands.add('atom-workspace', 'atom-ide-terminal:toggle-terminal-focus', () => focusManager.toggleFocus()));
   }
 
   provideTerminal() {
     return {
       open: info => {
-        const terminalView = (0, (_goToLocation || _load_goToLocation()).goToLocation)((0, (_nuclideTerminalUri || _load_nuclideTerminalUri()).uriFromInfo)(info));
+        const terminalView = openTerminalInNewPaneItem({
+          terminalInfo: info
+        });
         return terminalView;
       },
       close: key => {
-        (0, (_destroyItemWhere || _load_destroyItemWhere()).destroyItemWhere)(item => {
-          if (item.getURI == null || item.getURI() == null) {
+        (0, _destroyItemWhere().destroyItemWhere)(item => {
+          // $FlowFixMe this is on TerminalViews only
+          if (typeof item.getTerminalKey !== 'function') {
             return false;
           }
 
-          const uri = (0, (_nullthrows || _load_nullthrows()).default)(item.getURI());
-          try {
-            // Only close terminal tabs with the same unique key.
-            const otherInfo = (0, (_nuclideTerminalUri || _load_nuclideTerminalUri()).infoFromUri)(uri);
-            return otherInfo.key === key;
-          } catch (e) {}
-          return false;
+          return item.getTerminalKey() === key;
         });
       }
     };
@@ -128,11 +219,33 @@ class Activation {
     this._subscriptions.dispose();
   }
 
+  consumeToolBar(getToolBar) {
+    const toolBar = getToolBar('nuclide-terminal');
+    toolBar.addButton({
+      icon: 'terminal',
+      callback: {
+        '': 'atom-ide-terminal:toggle',
+        alt: 'atom-ide-terminal:new-terminal'
+      },
+      tooltip: 'Toggle Terminal (alt click for New)',
+      priority: 700
+    });
+    const disposable = new (_UniversalDisposable().default)(() => {
+      toolBar.removeItems();
+    });
+
+    this._subscriptions.add(disposable);
+
+    return disposable;
+  }
+
   consumePasteProvider(provider) {
     const createPaste = provider.createPaste;
-    const disposable = new (_UniversalDisposable || _load_UniversalDisposable()).default(atom.commands.add('.terminal-pane', 'atom-ide-terminal:create-paste', async event => {
+    const disposable = new (_UniversalDisposable().default)(atom.commands.add('.terminal-pane', 'atom-ide-terminal:create-paste', async event => {
       const {
-        currentTarget: { terminal }
+        currentTarget: {
+          terminal
+        }
       } = event;
       const uri = await createPaste(terminal.getSelection(), {
         title: 'Paste from Atom IDE Terminal'
@@ -144,40 +257,55 @@ class Activation {
         command: 'atom-ide-terminal:create-paste',
         shouldDisplay: event => {
           const div = event.target.closest('.terminal-pane');
+
           if (div == null) {
             return false;
           }
-          const { terminal } = div;
+
+          const {
+            terminal
+          } = div;
+
           if (terminal == null) {
             return false;
           }
+
           return terminal.hasSelection();
         }
-      }, { type: 'separator' }]
+      }, {
+        type: 'separator'
+      }]
     }));
+
     this._subscriptions.add(disposable);
-    return new (_UniversalDisposable || _load_UniversalDisposable()).default(() => {
+
+    return new (_UniversalDisposable().default)(() => {
       disposable.dispose();
+
       this._subscriptions.remove(disposable);
     });
   }
 
   initializeCwdApi(cwd) {
     this._cwd = cwd;
-    return new (_UniversalDisposable || _load_UniversalDisposable()).default(() => {
+    return new (_UniversalDisposable().default)(() => {
       this._cwd = null;
     });
   }
 
   consumeRpcService(rpcService) {
-    return (0, (_AtomServiceContainer || _load_AtomServiceContainer()).setRpcService)(rpcService);
+    return (0, _AtomServiceContainer().setRpcService)(rpcService);
+  }
+
+  consumeGatekeeperService(service) {
+    return (0, _AtomServiceContainer().setGkService)(service);
   }
 
   _getPathOrCwd(event) {
-    const editorPath = (0, (_getElementFilePath || _load_getElementFilePath()).default)(event.target, true);
+    const editorPath = (0, _getElementFilePath().default)(event.target, true);
 
     if (editorPath != null) {
-      return (_nuclideUri || _load_nuclideUri()).default.endsWithSeparator(editorPath) ? editorPath : (_nuclideUri || _load_nuclideUri()).default.dirname(editorPath);
+      return _nuclideUri().default.endsWithSeparator(editorPath) ? editorPath : _nuclideUri().default.dirname(editorPath);
     }
 
     if (this._cwd != null) {
@@ -186,14 +314,58 @@ class Activation {
 
     return null;
   }
-}
 
-// eslint-disable-next-line nuclide-internal/no-commonjs
+} // eslint-disable-next-line nuclide-internal/no-commonjs
 
-// for homedir
+
 module.exports = {
   // exported for package.json entry
-  deserializeTerminalView: (_terminalView || _load_terminalView()).deserializeTerminalView
+  deserializeTerminalView: _terminalView().deserializeTerminalView
 };
+(0, _createPackage().default)(module.exports, Activation);
 
-(0, (_createPackage || _load_createPackage()).default)(module.exports, Activation);
+async function openTerminalInNewPaneItem(options) {
+  const existingPane = atom.workspace.paneForURI(_nuclideTerminalInfo().TERMINAL_URI); // TODO: The flow types are wrong. paneForURI returns a nullable pane
+
+  if (!existingPane) {
+    // eslint-disable-next-line nuclide-internal/atom-apis
+    return atom.workspace.open(_nuclideTerminalInfo().TERMINAL_URI, options);
+  }
+
+  const [item, hasShownNux] = await Promise.all([atom.workspace.createItemForURI(_nuclideTerminalInfo().TERMINAL_URI, options), _idbKeyval().default.get(MOVED_TERMINAL_NUX_SHOWN_KEY)]);
+  existingPane.activateItem(item);
+  existingPane.activate();
+
+  if (!hasShownNux) {
+    if (!(item instanceof _terminalView().TerminalView)) {
+      throw new Error("Invariant violation: \"item instanceof TerminalView\"");
+    }
+
+    showTooltipForPaneItem(item);
+
+    _idbKeyval().default.set(MOVED_TERMINAL_NUX_SHOWN_KEY, true);
+  }
+
+  return item;
+}
+
+function showTooltipForPaneItem(paneItem) {
+  return new (_UniversalDisposable().default)(_rxjsCompatUmdMin.Observable.create(() => {
+    const tooltip = atom.tooltips.add(paneItem.getElement(), {
+      title: `
+        <div>
+          <span style="margin-right: 4px">
+            We now open terminals here, but if you move them, new terminals
+            will open in the same location.
+          </span>
+          <button class="btn btn-primary nuclide-moved-terminal-nux-dismiss">
+            Got it
+          </button>
+        </div>
+      `,
+      trigger: 'manual',
+      html: true
+    });
+    return () => tooltip.dispose();
+  }).takeUntil(_rxjsCompatUmdMin.Observable.timer(1000 * 60)).takeUntil((0, _event().observableFromSubscribeFunction)(cb => atom.workspace.onDidDestroyPaneItem(cb)).filter(event => event.item === paneItem)).takeUntil(_rxjsCompatUmdMin.Observable.fromEvent(document.body, 'click').filter(e => e.target.classList.contains('nuclide-moved-terminal-nux-dismiss'))).subscribe());
+}

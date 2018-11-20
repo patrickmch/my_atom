@@ -1,4 +1,4 @@
-'use strict';
+"use strict";
 
 Object.defineProperty(exports, "__esModule", {
   value: true
@@ -9,51 +9,68 @@ exports.provideOutlines = provideOutlines;
 exports.getHyperclickProvider = getHyperclickProvider;
 exports.provideCodeFormat = provideCodeFormat;
 
-var _UniversalDisposable;
+function _UniversalDisposable() {
+  const data = _interopRequireDefault(require("../../../modules/nuclide-commons/UniversalDisposable"));
 
-function _load_UniversalDisposable() {
-  return _UniversalDisposable = _interopRequireDefault(require('../../../modules/nuclide-commons/UniversalDisposable'));
+  _UniversalDisposable = function () {
+    return data;
+  };
+
+  return data;
 }
 
-var _JSONOutlineProvider;
+function _JSONOutlineProvider() {
+  const data = require("./JSONOutlineProvider");
 
-function _load_JSONOutlineProvider() {
-  return _JSONOutlineProvider = require('./JSONOutlineProvider');
+  _JSONOutlineProvider = function () {
+    return data;
+  };
+
+  return data;
 }
 
-var _NPMHyperclickProvider;
+function _NPMHyperclickProvider() {
+  const data = require("./NPMHyperclickProvider");
 
-function _load_NPMHyperclickProvider() {
-  return _NPMHyperclickProvider = require('./NPMHyperclickProvider');
+  _NPMHyperclickProvider = function () {
+    return data;
+  };
+
+  return data;
 }
 
-var _CodeFormatHelpers;
+function _CodeFormatHelpers() {
+  const data = _interopRequireDefault(require("./CodeFormatHelpers"));
 
-function _load_CodeFormatHelpers() {
-  return _CodeFormatHelpers = _interopRequireDefault(require('./CodeFormatHelpers'));
+  _CodeFormatHelpers = function () {
+    return data;
+  };
+
+  return data;
 }
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
+/**
+ * Copyright (c) 2015-present, Facebook, Inc.
+ * All rights reserved.
+ *
+ * This source code is licensed under the license found in the LICENSE file in
+ * the root directory of this source tree.
+ *
+ * 
+ * @format
+ */
 class Activation {
-
   constructor(state) {
-    this._disposables = new (_UniversalDisposable || _load_UniversalDisposable()).default();
+    this._disposables = new (_UniversalDisposable().default)();
   }
 
   dispose() {
     this._disposables.dispose();
   }
-} /**
-   * Copyright (c) 2015-present, Facebook, Inc.
-   * All rights reserved.
-   *
-   * This source code is licensed under the license found in the LICENSE file in
-   * the root directory of this source tree.
-   *
-   * 
-   * @format
-   */
+
+}
 
 let activation = null;
 
@@ -75,22 +92,26 @@ function provideOutlines() {
     grammarScopes: ['source.json'],
     priority: 1,
     name: 'Nuclide JSON',
+
     getOutline(editor) {
-      return Promise.resolve((0, (_JSONOutlineProvider || _load_JSONOutlineProvider()).getOutline)(editor.getText()));
+      return Promise.resolve((0, _JSONOutlineProvider().getOutline)(editor.getText()));
     }
+
   };
 }
 
 function getHyperclickProvider() {
-  return (0, (_NPMHyperclickProvider || _load_NPMHyperclickProvider()).getNPMHyperclickProvider)();
+  return (0, _NPMHyperclickProvider().getNPMHyperclickProvider)();
 }
 
 function provideCodeFormat() {
   return {
     grammarScopes: ['source.json'],
     priority: 1,
+
     formatEntireFile(editor, range) {
-      return (_CodeFormatHelpers || _load_CodeFormatHelpers()).default.formatEntireFile(editor, range);
+      return _CodeFormatHelpers().default.formatEntireFile(editor, range);
     }
+
   };
 }

@@ -1,8 +1,10 @@
-'use strict';
+"use strict";
 
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
+exports.WORKING_SET_PATH_MARKER = void 0;
+
 /**
  * Copyright (c) 2015-present, Facebook, Inc.
  * All rights reserved.
@@ -13,5 +15,5 @@ Object.defineProperty(exports, "__esModule", {
  *  strict
  * @format
  */
-
-const WORKING_SET_PATH_MARKER = exports.WORKING_SET_PATH_MARKER = '#WORKING_SET#';
+const WORKING_SET_PATH_MARKER = '#WORKING_SET#';
+exports.WORKING_SET_PATH_MARKER = WORKING_SET_PATH_MARKER;

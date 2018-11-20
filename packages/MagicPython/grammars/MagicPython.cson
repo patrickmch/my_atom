@@ -129,7 +129,8 @@ repository:
     ]
   "docstring-statement":
     begin: "^(?=\\s*[rR]?(\\'\\'\\'|\\\"\\\"\\\"|\\'|\\\"))"
-    end: "(?<=\\'\\'\\'|\\\"\\\"\\\"|\\'|\\\")"
+    comment: "the string either terminates correctly or by the beginning of a new line (this is for single line docstrings that aren't terminated) AND it's not followed by another docstring"
+    end: "((?<=\\1)|^)(?!\\s*[rR]?(\\'\\'\\'|\\\"\\\"\\\"|\\'|\\\"))"
     patterns: [
       {
         include: "#docstring"
@@ -186,7 +187,7 @@ repository:
       {
         name: "string.quoted.docstring.single.python"
         begin: "(\\'|\\\")"
-        end: "(\\1)|((?<!\\\\)\\n)"
+        end: "(\\1)|(\\n)"
         beginCaptures:
           "1":
             name: "punctuation.definition.string.begin.python"
@@ -207,7 +208,7 @@ repository:
       {
         name: "string.quoted.docstring.raw.single.python"
         begin: "([rR])(\\'|\\\")"
-        end: "(\\2)|((?<!\\\\)\\n)"
+        end: "(\\2)|(\\n)"
         beginCaptures:
           "1":
             name: "storage.type.string.python"
@@ -916,27 +917,32 @@ repository:
     name: "constant.language.python"
     match: "\\\\$"
   "string-formatting":
-    name: "constant.character.format.placeholder.other.python"
+    name: "meta.format.percent.python"
     match: '''
       (?x)
-        % (\\([\\w\\s]*\\))?
-          [-+#0 ]*
-          (\\d+|\\*)? (\\.(\\d+|\\*))?
-          ([hlL])?
-          [diouxXeEfFgGcrsa%]
+        (
+          % (\\([\\w\\s]*\\))?
+            [-+#0 ]*
+            (\\d+|\\*)? (\\.(\\d+|\\*))?
+            ([hlL])?
+            [diouxXeEfFgGcrsab%]
+        )
       
     '''
+    captures:
+      "1":
+        name: "constant.character.format.placeholder.other.python"
   "string-brace-formatting":
     patterns: [
       {
-        name: "constant.character.format.placeholder.other.python"
+        name: "meta.format.brace.python"
         match: '''
           (?x)
-            (?:
+            (
               {{ | }}
               | (?:
                 {
-                  \\w*? (\\.[[:alpha:]_]\\w*? | \\[[^\\]'"]+\\])*?
+                  \\w* (\\.[[:alpha:]_]\\w* | \\[[^\\]'"]+\\])*
                   (![rsa])?
                   ( : \\w? [<>=^]? [-+ ]? \\#?
                     \\d* ,? (\\.\\d+)? [bcdeEfFgGnosxX%]? )?
@@ -945,36 +951,36 @@ repository:
           
         '''
         captures:
-          "2":
-            name: "storage.type.format.python"
+          "1":
+            name: "constant.character.format.placeholder.other.python"
           "3":
+            name: "storage.type.format.python"
+          "4":
             name: "storage.type.format.python"
       }
       {
-        name: "constant.character.format.placeholder.other.python"
-        begin: '''
+        name: "meta.format.brace.python"
+        match: '''
           (?x)
-              \\{
-                \\w*? (\\.[[:alpha:]_]\\w*? | \\[[^\\]'"]+\\])*?
+            (
+              {
+                \\w* (\\.[[:alpha:]_]\\w* | \\[[^\\]'"]+\\])*
                 (![rsa])?
                 (:)
-                  (?=[^'"}\\n]*\\})
+                  [^'"{}\\n]* (?:
+                    \\{ [^'"}\\n]*? \\} [^'"{}\\n]*
+                  )*
+              }
+            )
           
         '''
-        end: "\\}"
-        beginCaptures:
-          "2":
-            name: "storage.type.format.python"
+        captures:
+          "1":
+            name: "constant.character.format.placeholder.other.python"
           "3":
             name: "storage.type.format.python"
-        patterns: [
-          {
-            match: '''
-              (?x) \\{ [^'"}\\n]*? \\} (?=.*?\\})
-              
-            '''
-          }
-        ]
+          "4":
+            name: "storage.type.format.python"
       }
     ]
   "fstring-formatting":
@@ -998,7 +1004,7 @@ repository:
       {
         match: '''
           (?x)
-            \\s* \\b(from)\\b \\s*(\\.+)\\s* (import)?
+            \\s* \\b(from) \\s*(\\.+)\\s* (import\\b)?
           
         '''
         captures:
@@ -1473,7 +1479,7 @@ repository:
     begin: '''
       (?x)
         ^\\s*
-        (@) \\s* (?=[[:alpha:]_]\\w*)
+        ((@)) \\s* (?=[[:alpha:]_]\\w*)
       
     '''
     end: '''
@@ -1487,6 +1493,8 @@ repository:
     beginCaptures:
       "1":
         name: "entity.name.function.decorator.python"
+      "2":
+        name: "punctuation.definition.decorator.python"
     endCaptures:
       "1":
         name: "punctuation.definition.arguments.end.python"
@@ -1512,9 +1520,12 @@ repository:
         name: "entity.name.function.decorator.python"
         match: '''
           (?x)
-            ([[:alpha:]_]\\w*) | \\.
+            ([[:alpha:]_]\\w*) | (\\.)
           
         '''
+        captures:
+          "2":
+            name: "punctuation.separator.period.python"
       }
       {
         include: "#line-continuation"
@@ -1605,35 +1616,25 @@ repository:
       }
     ]
   "function-arguments":
-    begin: '''
-      (?x)
-        (?:
-          (\\()
-          (?:\\s*(\\*\\*|\\*))?
-        )
-      
-    '''
+    begin: "(\\()"
     end: "(?=\\))(?!\\)\\s*\\()"
     beginCaptures:
       "1":
         name: "punctuation.definition.arguments.begin.python"
-      "2":
-        name: "keyword.operator.unpacking.arguments.python"
     contentName: "meta.function-call.arguments.python"
     patterns: [
       {
+        name: "punctuation.separator.arguments.python"
+        match: "(,)"
+      }
+      {
         match: '''
           (?x)
-            (?:
-              (,)
-              (?:\\s*(\\*\\*|\\*))?
-            )
+            (?:(?<=[,(])|^) \\s* (\\*{1,2})
           
         '''
         captures:
           "1":
-            name: "punctuation.separator.arguments.python"
-          "2":
             name: "keyword.operator.unpacking.arguments.python"
       }
       {
@@ -1728,7 +1729,7 @@ repository:
         match: '''
           (?x)
             (?<!\\.) \\b(
-              __import__ | abs | all | any | ascii | bin | callable
+              __import__ | abs | all | any | ascii | bin | breakpoint | callable
               | chr | compile | copyright | credits | delattr | dir | divmod
               | enumerate | eval | exec | exit | filter | format | getattr
               | globals | hasattr | hash | help | hex | id | input
@@ -1809,10 +1810,10 @@ repository:
       (?x)
         \\b(
           __(?:
-            all | bases | builtins | class | code | debug | defaults | dict
-            | doc | file | func | kwdefaults | members
-            | metaclass | methods | module | mro | name
-            | qualname | self | signature | slots | subclasses
+            all | bases | builtins | class | class_getitem | code | debug
+            | defaults | dict | doc | file | func | kwdefaults | members
+            | metaclass | methods | module | mro | mro_entries | name
+            | qualname | post_init | self | signature | slots | subclasses
             | version | weakref | wrapped | annotations | classcell
             | spec | path | package | future | traceback
           )__
@@ -1832,18 +1833,26 @@ repository:
       }
     ]
   "illegal-names":
-    name: "keyword.control.flow.python"
     match: '''
       (?x)
-        \\b(
-          and | as | assert | async | await | break | class | continue | def
-          | del | elif | else | except | exec | finally | for | from | global
-          | if | import | in | is | (?<=\\.)lambda | lambda(?=\\s*[\\.=])
-          | nonlocal | not | or | pass | raise | return | try | while | with
-          | yield
+        \\b(?:
+          (
+            and | as | assert | async | await | break | class | continue | def
+            | del | elif | else | except | finally | for | from | global
+            | if | in | is | (?<=\\.)lambda | lambda(?=\\s*[\\.=])
+            | nonlocal | not | or | pass | raise | return | try | while | with
+            | yield
+          ) | (
+            import
+          )
         )\\b
       
     '''
+    captures:
+      "1":
+        name: "keyword.control.flow.python"
+      "2":
+        name: "keyword.control.import.python"
   "special-variables":
     match: '''
       (?x)
@@ -4177,7 +4186,7 @@ repository:
     ]
   "string-quoted-single-line":
     name: "string.quoted.single.python"
-    begin: "(\\b[rR](?=[uU]))?([uU])?((['\"]))"
+    begin: "(?:\\b([rR])(?=[uU]))?([uU])?((['\"]))"
     end: "(\\3)|((?<!\\\\)\\n)"
     beginCaptures:
       "1":
@@ -4351,7 +4360,7 @@ repository:
     ]
   "string-quoted-multi-line":
     name: "string.quoted.multi.python"
-    begin: "(\\b[rR](?=[uU]))?([uU])?('''|\"\"\")"
+    begin: "(?:\\b([rR])(?=[uU]))?([uU])?('''|\"\"\")"
     end: "(\\3)"
     beginCaptures:
       "1":

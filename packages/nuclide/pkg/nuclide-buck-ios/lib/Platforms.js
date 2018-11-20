@@ -1,4 +1,4 @@
-'use strict';
+"use strict";
 
 Object.defineProperty(exports, "__esModule", {
   value: true
@@ -6,21 +6,41 @@ Object.defineProperty(exports, "__esModule", {
 exports.getSimulatorPlatform = getSimulatorPlatform;
 exports.getDevicePlatform = getDevicePlatform;
 
-var _Tasks;
+function _nullthrows() {
+  const data = _interopRequireDefault(require("nullthrows"));
 
-function _load_Tasks() {
-  return _Tasks = require('./Tasks');
+  _nullthrows = function () {
+    return data;
+  };
+
+  return data;
 }
 
-var _rxjsBundlesRxMinJs = require('rxjs/bundles/Rx.min.js');
+function _Tasks() {
+  const data = require("./Tasks");
 
-var _nuclideFbsimctl;
+  _Tasks = function () {
+    return data;
+  };
 
-function _load_nuclideFbsimctl() {
-  return _nuclideFbsimctl = _interopRequireWildcard(require('../../nuclide-fbsimctl'));
+  return data;
 }
 
-function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
+var _rxjsCompatUmdMin = require("rxjs-compat/bundles/rxjs-compat.umd.min.js");
+
+function fbsimctl() {
+  const data = _interopRequireWildcard(require("../../nuclide-fbsimctl"));
+
+  fbsimctl = function () {
+    return data;
+  };
+
+  return data;
+}
+
+function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) { var desc = Object.defineProperty && Object.getOwnPropertyDescriptor ? Object.getOwnPropertyDescriptor(obj, key) : {}; if (desc.get || desc.set) { Object.defineProperty(newObj, key, desc); } else { newObj[key] = obj[key]; } } } } newObj.default = obj; return newObj; } }
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 /**
  * Copyright (c) 2015-present, Facebook, Inc.
@@ -32,68 +52,58 @@ function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj;
  *  strict-local
  * @format
  */
-
 function getSimulatorPlatform(buckRoot, ruleType, debuggerCallback) {
-  return (_nuclideFbsimctl || _load_nuclideFbsimctl()).getDevices().map(devices => {
-    let simulators;
-    if (devices instanceof Error) {
-      // TODO: Come up with a way to surface the error in UI
-      simulators = [];
-    } else {
-      simulators = devices.filter(device => device.type === 'simulator');
-    }
+  return fbsimctl().observeIosDevices().filter(expected => !expected.isPending).map(expected => {
+    // TODO: Come up with a way to surface the error in UI
+    const simulators = expected.getOrDefault([]).filter(device => device.type === 'simulator');
     let deviceGroups;
+    let devicesForIdentifiers;
+
     if (simulators.length === 0) {
-      deviceGroups = BUILD_ONLY_SIMULATOR_GROUPS;
+      // No simulators installed, at least give user a chance to build.
+      deviceGroups = [BUILD_ONLY_SIMULATORS.deviceGroup];
+      devicesForIdentifiers = BUILD_ONLY_SIMULATORS.devicesForIdentifiers;
     } else {
-      deviceGroups = Array.from(groupByOs(simulators).entries()).map(([os, simsForOs]) => ({
-        name: os,
-        devices: simsForOs.map(simulator => ({
-          name: simulator.name,
-          udid: simulator.udid,
-          arch: simulator.arch,
-          type: 'simulator'
-        }))
-      }));
+      deviceGroups = groupByOs(simulators);
+      devicesForIdentifiers = new Map(simulators.map(s => [s.udid, s]));
     }
 
     return {
       isMobile: true,
       name: 'Simulator',
-      tasksForDevice: device => (0, (_Tasks || _load_Tasks()).getTasks)(buckRoot, ruleType, device, debuggerCallback != null),
-      runTask: (builder, taskType, target, settings, device) => (0, (_Tasks || _load_Tasks()).runTask)(builder, taskType, ruleType, target, settings, device, buckRoot, debuggerCallback),
+      tasksForDevice: device => (0, _Tasks().getTasks)(buckRoot, ruleType, BUILD_ONLY_SIMULATORS.devicesForIdentifiers.has((0, _nullthrows().default)(device).identifier), debuggerCallback != null),
+      runTask: (builder, taskType, target, settings, device) => (0, _Tasks().runTask)(builder, taskType, ruleType, target, settings, (0, _nullthrows().default)(devicesForIdentifiers.get((0, _nullthrows().default)(device).identifier)), buckRoot, debuggerCallback),
       deviceGroups
     };
   });
 }
 
 function getDevicePlatform(buckRoot, ruleType, debuggerCallback) {
-  return (_nuclideFbsimctl || _load_nuclideFbsimctl()).getDevices().map(devices => {
+  return fbsimctl().observeIosDevices().filter(expected => !expected.isPending).map(expected => {
     let deviceGroups = [];
+    const devices = expected.getOrDefault([]);
+    const physicalDevices = devices.filter(device => device.type === 'physical_device');
+    const devicesForIdentifiers = new Map();
 
-    if (devices instanceof Array) {
-      const physicalDevices = devices.filter(device => device.type === 'physical_device');
+    if (physicalDevices.length > 0) {
+      physicalDevices.forEach(d => {
+        devicesForIdentifiers.set(d.udid, d);
+      });
+      deviceGroups = groupByOs(physicalDevices);
+    } // Always give user a chance to build for all architectures.
 
-      if (physicalDevices.length > 0) {
-        deviceGroups = Array.from(groupByOs(physicalDevices).entries()).map(([os, devicesForOs]) => ({
-          name: os,
-          devices: devicesForOs.map(device => ({
-            name: device.name,
-            udid: device.udid,
-            arch: device.arch,
-            type: 'device'
-          }))
-        }));
-      }
-    }
 
-    deviceGroups.push(BUILD_ONLY_DEVICES_GROUP);
-
+    deviceGroups.push(BUILD_ONLY_DEVICES.deviceGroup);
+    BUILD_ONLY_DEVICES.devicesForIdentifiers.forEach(d => {
+      devicesForIdentifiers.set(d.udid, d);
+    });
     return {
       isMobile: true,
       name: 'Device',
-      tasksForDevice: device => (0, (_Tasks || _load_Tasks()).getTasks)(buckRoot, ruleType, device, debuggerCallback != null),
-      runTask: (builder, taskType, target, settings, device) => (0, (_Tasks || _load_Tasks()).runTask)(builder, taskType, ruleType, target, settings, device, buckRoot, debuggerCallback),
+      tasksForDevice: device => (0, _Tasks().getTasks)(buckRoot, ruleType, BUILD_ONLY_DEVICES.devicesForIdentifiers.has((0, _nullthrows().default)(device).identifier), debuggerCallback != null),
+      runTask: (builder, taskType, target, settings, device) => {
+        return (0, _Tasks().runTask)(builder, taskType, ruleType, target, settings, (0, _nullthrows().default)(devicesForIdentifiers.get((0, _nullthrows().default)(device).identifier)), buckRoot, debuggerCallback);
+      },
       deviceGroups
     };
   });
@@ -102,11 +112,16 @@ function getDevicePlatform(buckRoot, ruleType, debuggerCallback) {
 function groupByOs(devices) {
   const devicesByOs = devices.reduce((memo, device) => {
     let devicesForOs = memo.get(device.os);
+
     if (devicesForOs == null) {
       devicesForOs = [];
       memo.set(device.os, devicesForOs);
     }
-    devicesForOs.push(device);
+
+    devicesForOs.push({
+      identifier: device.udid,
+      name: device.name
+    });
     return memo;
   }, new Map());
 
@@ -116,39 +131,63 @@ function groupByOs(devices) {
     });
   }
 
-  return devicesByOs;
+  return Array.from(devicesByOs.entries()).map(([os, devicesForOs]) => ({
+    name: os,
+    devices: devicesForOs
+  }));
 }
 
-const BUILD_ONLY_SIMULATOR_GROUPS = [{
-  name: 'Generic',
-  devices: [{
+const BUILD_ONLY_SIMULATORS = {
+  deviceGroup: {
+    name: 'Generic',
+    devices: [{
+      identifier: 'build-only-x86_64',
+      name: '64-bit'
+    }, {
+      identifier: 'build-only-i386',
+      name: '32-bit'
+    }]
+  },
+  devicesForIdentifiers: new Map([['build-only-x86_64', {
     name: '64-bit',
-    udid: '',
+    udid: 'build-only-x86_64',
     arch: 'x86_64',
     type: 'simulator',
-    buildOnly: true
-  }, {
+    os: '',
+    state: 'Booted'
+  }], ['build-only-i386', {
     name: '32-bit',
-    udid: '',
+    udid: 'build-only-i386',
     arch: 'i386',
     type: 'simulator',
-    buildOnly: true
-  }]
-}];
-
-const BUILD_ONLY_DEVICES_GROUP = {
-  name: 'Generic',
-  devices: [{
+    os: '',
+    state: 'Booted'
+  }]])
+};
+const BUILD_ONLY_DEVICES = {
+  deviceGroup: {
+    name: 'Generic',
+    devices: [{
+      identifier: 'build-only-arm64',
+      name: '64-bit'
+    }, {
+      identifier: 'build-only-armv7',
+      name: '32-bit'
+    }]
+  },
+  devicesForIdentifiers: new Map([['build-only-arm64', {
     name: '64-bit',
-    udid: '',
+    udid: 'build-only-arm64',
     arch: 'arm64',
-    type: 'device',
-    buildOnly: true
-  }, {
+    type: 'physical_device',
+    os: '',
+    state: 'Booted'
+  }], ['build-only-armv7', {
     name: '32-bit',
-    udid: '',
+    udid: 'build-only-armv7',
     arch: 'armv7',
-    type: 'device',
-    buildOnly: true
-  }]
+    type: 'physical_device',
+    os: '',
+    state: 'Booted'
+  }]])
 };

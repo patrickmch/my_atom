@@ -4,7 +4,6 @@
   "version": "0.0.0",
   "description": "Exposes nuclide-ctags-rpc functionality to Atom.",
   "author": "NEEDS OWNER",
-  "atomTestRunner": "../../lib/test-runner-entry.js",
   "nuclide": {
     "configMetadata": {
       "pathComponents": [
@@ -20,8 +19,7 @@
         "description": "Avoid overlap with symbol results from Hack."
       }
     },
-    "packageType": "Atom",
-    "testRunner": "apm"
+    "packageType": "AtomPackage"
   },
   "providedServices": {
     "hyperclick": {

@@ -1,10 +1,11 @@
 import * as fs from 'fs'
-import { Emitter, CompositeDisposable } from 'atom'
+import { Emitter, CompositeDisposable, ConfigValues } from 'atom'
 import { WebviewTag, shell } from 'electron'
 import fileUriToPath = require('file-uri-to-path')
 
-import { handlePromise } from '../util'
+import { handlePromise, atomConfig } from '../util'
 import { RequestReplyMap, ChannelMap } from '../../src-client/ipc'
+import { getPreviewStyles } from './util'
 
 export type ReplyCallbackStruct<
   T extends keyof RequestReplyMap = keyof RequestReplyMap
@@ -50,6 +51,21 @@ export class WebviewHandler {
           case 'did-scroll-preview':
             this.emitter.emit('did-scroll-preview', e.args[0])
             break
+          case 'uncaught-error': {
+            const err = e.args[0]
+            const newErr = new Error()
+            atom.notifications.addFatalError(
+              `Uncaught error ${
+                err.name
+              } in markdown-preview-plus webview client`,
+              {
+                dismissable: true,
+                stack: newErr.stack,
+                detail: `${err.message}\n\nstack:\n${err.stack}`,
+              },
+            )
+            break
+          }
           // replies
           case 'request-reply': {
             const { id, request, result } = e.args[0]
@@ -64,7 +80,11 @@ export class WebviewHandler {
       },
     )
     this._element.addEventListener('will-navigate', async (e) => {
-      if (e.url.startsWith('file://')) {
+      const exts = atomConfig().previewConfig.shellOpenFileExtensions
+      const forceOpenExternal = exts.some((ext) =>
+        e.url.toLowerCase().endsWith(`.${ext.toLowerCase()}`),
+      )
+      if (e.url.startsWith('file://') && !forceOpenExternal) {
         handlePromise(atom.workspace.open(fileUriToPath(e.url)))
       } else {
         shell.openExternal(e.url)
@@ -109,16 +129,11 @@ export class WebviewHandler {
     this._element.remove()
   }
 
-  public async update(
-    html: string,
-    renderLaTeX: boolean,
-    mjrenderer: MathJaxRenderer,
-  ) {
+  public async update(html: string, renderLaTeX: boolean) {
     if (this.destroyed) return undefined
     return this.runRequest('update-preview', {
       html,
       renderLaTeX,
-      mjrenderer,
     })
   }
 
@@ -128,41 +143,73 @@ export class WebviewHandler {
     this._element.send<'set-source-map'>('set-source-map', { map })
   }
 
-  public setUseGitHubStyle(value: boolean) {
-    this._element.send<'use-github-style'>('use-github-style', { value })
-  }
-
   public setBasePath(path?: string) {
     this._element.send<'set-base-path'>('set-base-path', { path })
   }
 
-  public init(atomHome: string, numberEqns: boolean) {
-    this._element.send<'init'>('init', { atomHome, numberEqns })
+  public init(
+    atomHome: string,
+    mathJaxConfig: MathJaxConfig,
+    mathJaxRenderer = atomConfig().mathConfig.latexRenderer,
+  ) {
+    this._element.send<'init'>('init', {
+      atomHome,
+      mathJaxConfig,
+      mathJaxRenderer,
+    })
   }
 
-  public updateImages(oldSource: string, version: number | false) {
+  public updateImages(oldSource: string, version: number | undefined) {
     this._element.send<'update-images'>('update-images', {
       oldsrc: oldSource,
       v: version,
     })
   }
 
-  public saveToPDF(filePath: string) {
-    this._element.printToPDF({}, (error, data) => {
-      if (error) {
-        atom.notifications.addError('Failed saving to PDF', {
-          description: error.toString(),
-          dismissable: true,
-          stack: error.stack,
+  public async saveToPDF(filePath: string) {
+    const opts = atomConfig().saveConfig.saveToPDFOptions
+    const customPageSize = parsePageSize(opts.customPageSize)
+    const pageSize = opts.pageSize === 'Custom' ? customPageSize : opts.pageSize
+    if (pageSize === undefined) {
+      throw new Error(
+        `Failed to parse custom page size: ${opts.customPageSize}`,
+      )
+    }
+    const selection = await this.getSelection()
+    const printSelectionOnly = selection ? opts.printSelectionOnly : false
+    const newOpts = {
+      ...opts,
+      pageSize,
+      printSelectionOnly,
+    }
+    await this.prepareSaveToPDF(newOpts)
+    try {
+      const data = await new Promise<Buffer>((resolve, reject) => {
+        // TODO: Complain on Electron
+        this._element.printToPDF(newOpts as any, (error, data) => {
+          if (error) {
+            reject(error)
+            return
+          }
+          resolve(data)
         })
-        return
-      }
-      fs.writeFileSync(filePath, data)
-    })
+      })
+      await new Promise<void>((resolve, reject) => {
+        fs.writeFile(filePath, data, (error) => {
+          if (error) {
+            reject(error)
+            return
+          }
+          resolve()
+        })
+      })
+    } finally {
+      handlePromise(this.finishSaveToPDF())
+    }
   }
 
-  public sync(line: number) {
-    this._element.send<'sync'>('sync', { line })
+  public sync(line: number, flash: boolean) {
+    this._element.send<'sync'>('sync', { line, flash })
   }
 
   public async syncSource() {
@@ -209,6 +256,14 @@ export class WebviewHandler {
     return this.runRequest('get-tex-config', {})
   }
 
+  public async getSelection() {
+    return this.runRequest('get-selection', {})
+  }
+
+  public updateStyles() {
+    this._element.send<'style'>('style', { styles: getPreviewStyles(true) })
+  }
+
   protected async runRequest<T extends keyof RequestReplyMap>(
     request: T,
     args: { [K in Exclude<keyof ChannelMap[T], 'id'>]: ChannelMap[T][K] },
@@ -227,11 +282,78 @@ export class WebviewHandler {
     })
   }
 
-  private updateStyles() {
-    const styles: string[] = []
-    for (const se of atom.styles.getStyleElements()) {
-      styles.push(se.innerHTML)
+  private async prepareSaveToPDF(opts: {
+    pageSize: PageSize
+    landscape: boolean
+  }): Promise<void> {
+    const [width, height] = getPageWidth(opts.pageSize)
+    return this.runRequest('set-width', {
+      width: opts.landscape ? height : width,
+    })
+  }
+
+  private async finishSaveToPDF(): Promise<void> {
+    return this.runRequest('set-width', { width: undefined })
+  }
+}
+
+type Unit = 'mm' | 'cm' | 'in'
+
+function parsePageSize(size: string) {
+  if (!size) return undefined
+  const rx = /^([\d.,]+)(cm|mm|in)?x([\d.,]+)(cm|mm|in)?$/i
+  const res = size.replace(/\s*/g, '').match(rx)
+  if (res) {
+    const width = parseFloat(res[1])
+    const wunit = res[2] as Unit | undefined
+    const height = parseFloat(res[3])
+    const hunit = res[4] as Unit | undefined
+    return {
+      width: convert(width, wunit),
+      height: convert(height, hunit),
     }
-    this._element.send<'style'>('style', { styles })
+  } else {
+    return undefined
+  }
+}
+
+type PageSize =
+  | Exclude<
+      ConfigValues['markdown-preview-plus.saveConfig.saveToPDFOptions.pageSize'],
+      'Custom'
+    >
+  | { width: number; height: number }
+
+function convert(val: number, unit?: Unit) {
+  return val * unitInMicrons(unit)
+}
+
+function unitInMicrons(unit: Unit = 'mm') {
+  switch (unit) {
+    case 'mm':
+      return 1000
+    case 'cm':
+      return 10000
+    case 'in':
+      return 25400
+  }
+}
+
+function getPageWidth(pageSize: PageSize) {
+  switch (pageSize) {
+    case 'A3':
+      return [297, 420]
+    case 'A4':
+      return [210, 297]
+    case 'A5':
+      return [148, 210]
+    case 'Legal':
+      return [216, 356]
+    case 'Letter':
+      return [216, 279]
+    case 'Tabloid':
+      return [279, 432]
+    default:
+      return [pageSize.width / 1000, pageSize.height / 1000]
   }
 }

@@ -1,4 +1,4 @@
-'use strict';
+"use strict";
 
 Object.defineProperty(exports, "__esModule", {
   value: true
@@ -6,68 +6,84 @@ Object.defineProperty(exports, "__esModule", {
 exports.default = initializeLogging;
 exports.initializeLoggerForWorker = initializeLoggerForWorker;
 
-var _log4js;
+function _log4js() {
+  const data = _interopRequireDefault(require("log4js"));
 
-function _load_log4js() {
-  return _log4js = _interopRequireDefault(require('log4js'));
+  _log4js = function () {
+    return data;
+  };
+
+  return data;
 }
 
-var _nuclideLogging;
+function _nuclideLogging() {
+  const data = require("../../nuclide-logging");
 
-function _load_nuclideLogging() {
-  return _nuclideLogging = require('../../nuclide-logging');
+  _nuclideLogging = function () {
+    return data;
+  };
+
+  return data;
 }
 
-var _nuclideUri;
+function _nuclideUri() {
+  const data = _interopRequireDefault(require("../../../modules/nuclide-commons/nuclideUri"));
 
-function _load_nuclideUri() {
-  return _nuclideUri = _interopRequireDefault(require('../../../modules/nuclide-commons/nuclideUri'));
+  _nuclideUri = function () {
+    return data;
+  };
+
+  return data;
 }
 
-var _os = _interopRequireDefault(require('os'));
+function _vscodeLanguageserver() {
+  const data = require("vscode-languageserver");
 
-var _vscodeLanguageserver;
+  _vscodeLanguageserver = function () {
+    return data;
+  };
 
-function _load_vscodeLanguageserver() {
-  return _vscodeLanguageserver = require('vscode-languageserver');
+  return data;
 }
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-const MAX_LOG_SIZE = 16 * 1024; /**
-                                 * Copyright (c) 2015-present, Facebook, Inc.
-                                 * All rights reserved.
-                                 *
-                                 * This source code is licensed under the license found in the LICENSE file in
-                                 * the root directory of this source tree.
-                                 *
-                                 * 
-                                 * @format
-                                 */
-
+/**
+ * Copyright (c) 2015-present, Facebook, Inc.
+ * All rights reserved.
+ *
+ * This source code is licensed under the license found in the LICENSE file in
+ * the root directory of this source tree.
+ *
+ * 
+ * @format
+ */
+const MAX_LOG_SIZE = 16 * 1024;
 const MAX_LOG_BACKUPS = 1;
-const LOG_FILE_PATH = (_nuclideUri || _load_nuclideUri()).default.join(_os.default.tmpdir(), 'nuclide-js-imports-server.log');
 
-// Configure log4js to not log to console, since
+const LOG_FILE_PATH = _nuclideUri().default.join((0, _nuclideLogging().getPathToLogDir)(), 'nuclide-js-imports-server.log'); // Configure log4js to not log to console, since
 // writing arbitrary data to stdout will break JSON RPC if we're running over
 // stdout.
 //
 // Additionally, add an appender to log over the rpc connection so logging appears
 // in the client environment, independent of stdio, node rpc, socket, etc.
+
+
 function initializeLogging(connection) {
-  (0, (_nuclideLogging || _load_nuclideLogging()).setupLoggingService)();
-  (_log4js || _load_log4js()).default.configure({
+  (0, _nuclideLogging().setupLoggingService)();
+
+  _log4js().default.configure({
     appenders: [{
       type: 'logLevelFilter',
-      level: 'DEBUG',
+      level: 'WARN',
       appender: {
         connection,
-        type: require.resolve('../../nuclide-lsp-implementation-common/connectionConsoleAppender')
+        type: require.resolve("../../nuclide-lsp-implementation-common/connectionConsoleAppender")
       }
     }]
-  });
+  }); // Don't let anything write to the true stdio as it could break JSON RPC
 
-  // Don't let anything write to the true stdio as it could break JSON RPC
+
   global.console.log = connection.console.log.bind(connection.console);
   global.console.error = connection.console.error.bind(connection.console);
   catchUnhandledExceptions();
@@ -75,8 +91,9 @@ function initializeLogging(connection) {
 
 function initializeLoggerForWorker() {
   // TODO: Ideally worker messages would go to the parent, which could send them back to the client.
-  (0, (_nuclideLogging || _load_nuclideLogging()).setupLoggingService)();
-  (_log4js || _load_log4js()).default.configure({
+  (0, _nuclideLogging().setupLoggingService)();
+
+  _log4js().default.configure({
     appenders: [{
       type: 'logLevelFilter',
       level: 'DEBUG',
@@ -94,14 +111,17 @@ function initializeLoggerForWorker() {
       }
     }]
   });
+
   catchUnhandledExceptions();
 }
 
 function catchUnhandledExceptions() {
-  const logger = (_log4js || _load_log4js()).default.getLogger('js-imports-server');
+  const logger = _log4js().default.getLogger('js-imports-server');
+
   process.on('uncaughtException', e => {
     logger.error('uncaughtException', e);
-    (_log4js || _load_log4js()).default.shutdown(() => process.abort());
+
+    _log4js().default.shutdown(() => process.abort());
   });
   process.on('unhandledRejection', e => logger.error('unhandledRejection', e));
 }

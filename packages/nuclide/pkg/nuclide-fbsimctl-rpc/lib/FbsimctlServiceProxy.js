@@ -9,7 +9,7 @@ module.exports = _client => {
         kind: "array",
         type: {
           kind: "named",
-          name: "Device"
+          name: "FbsimctlDevice"
         }
       });
     });
@@ -152,9 +152,6 @@ Object.defineProperty(module.exports, "defs", {
         }, {
           kind: "string-literal",
           value: "Booted"
-        }, {
-          kind: "string-literal",
-          value: "Unknown"
         }]
       }
     },
@@ -163,7 +160,7 @@ Object.defineProperty(module.exports, "defs", {
       location: {
         type: "source",
         fileName: "types.js",
-        line: 30
+        line: 28
       },
       name: "DeviceType",
       definition: {
@@ -177,14 +174,14 @@ Object.defineProperty(module.exports, "defs", {
         }]
       }
     },
-    Device: {
+    FbsimctlDevice: {
       kind: "alias",
       location: {
         type: "source",
         fileName: "types.js",
-        line: 21
+        line: 19
       },
-      name: "Device",
+      name: "FbsimctlDevice",
       definition: {
         kind: "object",
         fields: [{
@@ -250,7 +247,7 @@ Object.defineProperty(module.exports, "defs", {
             kind: "array",
             type: {
               kind: "named",
-              name: "Device"
+              name: "FbsimctlDevice"
             }
           }
         }
@@ -262,13 +259,13 @@ Object.defineProperty(module.exports, "defs", {
       location: {
         type: "source",
         fileName: "FbsimctlService.js",
-        line: 32
+        line: 40
       },
       type: {
         location: {
           type: "source",
           fileName: "FbsimctlService.js",
-          line: 32
+          line: 40
         },
         kind: "function",
         argumentTypes: [{
@@ -297,13 +294,13 @@ Object.defineProperty(module.exports, "defs", {
       location: {
         type: "source",
         fileName: "FbsimctlService.js",
-        line: 40
+        line: 48
       },
       type: {
         location: {
           type: "source",
           fileName: "FbsimctlService.js",
-          line: 40
+          line: 48
         },
         kind: "function",
         argumentTypes: [{
@@ -331,13 +328,13 @@ Object.defineProperty(module.exports, "defs", {
       location: {
         type: "source",
         fileName: "FbsimctlService.js",
-        line: 52
+        line: 60
       },
       type: {
         location: {
           type: "source",
           fileName: "FbsimctlService.js",
-          line: 52
+          line: 60
         },
         kind: "function",
         argumentTypes: [{

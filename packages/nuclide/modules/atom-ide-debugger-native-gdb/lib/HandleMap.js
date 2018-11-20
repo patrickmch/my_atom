@@ -3,6 +3,8 @@
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
+exports.default = void 0;
+
 /**
  * Copyright (c) 2017-present, Facebook, Inc.
  * All rights reserved.
@@ -14,12 +16,9 @@ Object.defineProperty(exports, "__esModule", {
  * 
  * @format
  */
-
 class HandleMap {
-
   constructor(nextHandle) {
     this.DEFAULT_STARTING_HANDLE = 1000;
-
     this._startingHandle = nextHandle == null ? 1000 : nextHandle;
     this.clear();
   }
@@ -37,9 +36,12 @@ class HandleMap {
   put(obj) {
     // maintain 1:1 mapping
     let handle = this._handlesByObject.get(obj);
+
     if (handle == null) {
       handle = this._nextHandle++;
+
       this._objectsByHandle.set(handle, obj);
+
       this._handlesByObject.set(obj, handle);
     }
 
@@ -56,16 +58,20 @@ class HandleMap {
 
   removeHandle(handle) {
     const obj = this._objectsByHandle.get(handle);
+
     if (obj != null) {
       this._handlesByObject.delete(obj);
+
       this._objectsByHandle.delete(handle);
     }
   }
 
   removeObject(obj) {
     const handle = this._handlesByObject.get(obj);
+
     if (handle != null) {
       this._handlesByObject.delete(obj);
+
       this._objectsByHandle.delete(handle);
     }
   }
@@ -73,5 +79,7 @@ class HandleMap {
   toString() {
     return JSON.stringify([...this._objectsByHandle]);
   }
+
 }
+
 exports.default = HandleMap;

@@ -1,50 +1,58 @@
-'use strict';
+"use strict";
 
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
 exports.createEmptyAppState = createEmptyAppState;
 
-var _expected;
+function _expected() {
+  const data = require("../../../../modules/nuclide-commons/expected");
 
-function _load_expected() {
-  return _expected = require('../../../../modules/nuclide-commons/expected');
+  _expected = function () {
+    return data;
+  };
+
+  return data;
 }
 
-var _immutable;
+function Immutable() {
+  const data = _interopRequireWildcard(require("immutable"));
 
-function _load_immutable() {
-  return _immutable = _interopRequireWildcard(require('immutable'));
+  Immutable = function () {
+    return data;
+  };
+
+  return data;
 }
 
-function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
+function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) { var desc = Object.defineProperty && Object.getOwnPropertyDescriptor ? Object.getOwnPropertyDescriptor(obj, key) : {}; if (desc.get || desc.set) { Object.defineProperty(newObj, key, desc); } else { newObj[key] = obj[key]; } } } } newObj.default = obj; return newObj; } }
 
+/**
+ * Copyright (c) 2015-present, Facebook, Inc.
+ * All rights reserved.
+ *
+ * This source code is licensed under the license found in the LICENSE file in
+ * the root directory of this source tree.
+ *
+ *  strict-local
+ * @format
+ */
 function createEmptyAppState() {
   return {
     hosts: [''],
     host: '',
-    devices: (_expected || _load_expected()).Expect.pendingValue([]),
+    devices: _expected().Expect.pending(),
     deviceType: null,
     deviceTypes: [],
     device: null,
-    deviceTasks: [],
-    infoTables: (_expected || _load_expected()).Expect.pendingValue(new Map()),
-    appInfoTables: (_expected || _load_expected()).Expect.pendingValue(new Map()),
-    processes: (_expected || _load_expected()).Expect.pendingValue([]),
+    deviceTasks: new Map(),
+    infoTables: _expected().Expect.pending(),
+    appInfoTables: _expected().Expect.pending(),
+    processes: _expected().Expect.pending(),
     processTasks: [],
     isDeviceConnected: false,
-    supportedPidsPerTask: new Map(),
     deviceTypeTasks: [],
     isPollingDevices: false,
-    deviceTypeComponents: (_immutable || _load_immutable()).Map()
+    deviceTypeComponents: Immutable().Map()
   };
-} /**
-   * Copyright (c) 2015-present, Facebook, Inc.
-   * All rights reserved.
-   *
-   * This source code is licensed under the license found in the LICENSE file in
-   * the root directory of this source tree.
-   *
-   *  strict-local
-   * @format
-   */
+}

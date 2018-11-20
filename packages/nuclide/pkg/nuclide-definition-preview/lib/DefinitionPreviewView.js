@@ -1,65 +1,97 @@
-'use strict';
+"use strict";
 
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.DefinitionPreviewView = undefined;
+exports.DefinitionPreviewView = void 0;
 
-var _Button;
+function _Button() {
+  const data = require("../../../modules/nuclide-commons-ui/Button");
 
-function _load_Button() {
-  return _Button = require('../../../modules/nuclide-commons-ui/Button');
+  _Button = function () {
+    return data;
+  };
+
+  return data;
 }
 
-var _Block;
+function _Block() {
+  const data = require("../../../modules/nuclide-commons-ui/Block");
 
-function _load_Block() {
-  return _Block = require('../../../modules/nuclide-commons-ui/Block');
+  _Block = function () {
+    return data;
+  };
+
+  return data;
 }
 
-var _react = _interopRequireWildcard(require('react'));
+var React = _interopRequireWildcard(require("react"));
 
-var _goToLocation;
+function _goToLocation() {
+  const data = require("../../../modules/nuclide-commons-atom/go-to-location");
 
-function _load_goToLocation() {
-  return _goToLocation = require('../../../modules/nuclide-commons-atom/go-to-location');
+  _goToLocation = function () {
+    return data;
+  };
+
+  return data;
 }
 
-var _nullthrows;
+function _nullthrows() {
+  const data = _interopRequireDefault(require("nullthrows"));
 
-function _load_nullthrows() {
-  return _nullthrows = _interopRequireDefault(require('nullthrows'));
+  _nullthrows = function () {
+    return data;
+  };
+
+  return data;
 }
 
-var _nuclideRemoteConnection;
+function _nuclideRemoteConnection() {
+  const data = require("../../nuclide-remote-connection");
 
-function _load_nuclideRemoteConnection() {
-  return _nuclideRemoteConnection = require('../../nuclide-remote-connection');
+  _nuclideRemoteConnection = function () {
+    return data;
+  };
+
+  return data;
 }
 
-var _AtomTextEditor;
+function _AtomTextEditor() {
+  const data = require("../../../modules/nuclide-commons-ui/AtomTextEditor");
 
-function _load_AtomTextEditor() {
-  return _AtomTextEditor = require('../../../modules/nuclide-commons-ui/AtomTextEditor');
+  _AtomTextEditor = function () {
+    return data;
+  };
+
+  return data;
 }
 
-var _analytics;
+function _analytics() {
+  const data = _interopRequireDefault(require("../../../modules/nuclide-commons/analytics"));
 
-function _load_analytics() {
-  return _analytics = _interopRequireDefault(require('../../../modules/nuclide-commons/analytics'));
+  _analytics = function () {
+    return data;
+  };
+
+  return data;
 }
 
-var _featureConfig;
+function _featureConfig() {
+  const data = _interopRequireDefault(require("../../../modules/nuclide-commons-atom/feature-config"));
 
-function _load_featureConfig() {
-  return _featureConfig = _interopRequireDefault(require('../../../modules/nuclide-commons-atom/feature-config'));
+  _featureConfig = function () {
+    return data;
+  };
+
+  return data;
 }
 
-var _atom = require('atom');
+var _atom = require("atom");
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
+function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) { var desc = Object.defineProperty && Object.getOwnPropertyDescriptor ? Object.getOwnPropertyDescriptor(obj, key) : {}; if (desc.get || desc.set) { Object.defineProperty(newObj, key, desc); } else { newObj[key] = obj[key]; } } } } newObj.default = obj; return newObj; } }
 
 /**
  * Copyright (c) 2015-present, Facebook, Inc.
@@ -71,20 +103,20 @@ function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj;
  * 
  * @format
  */
-
 const MINIMUM_EDITOR_HEIGHT = 10;
 const EDITOR_HEIGHT_DELTA = 10;
 
-class DefinitionPreviewView extends _react.Component {
-
+class DefinitionPreviewView extends React.Component {
   constructor(props) {
     super(props);
 
     this._openCurrentDefinitionInMainEditor = () => {
-      (_analytics || _load_analytics()).default.track('nuclide-definition-preview:openInMainEditor');
+      _analytics().default.track('nuclide-definition-preview:openInMainEditor');
+
       const def = this.props.definition;
+
       if (def != null) {
-        (0, (_goToLocation || _load_goToLocation()).goToLocation)(def.path, {
+        (0, _goToLocation().goToLocation)(def.path, {
           line: def.position.row,
           column: def.position.column,
           center: true
@@ -100,39 +132,48 @@ class DefinitionPreviewView extends _react.Component {
       this._setEditorHeight(this.state.editorHeight - EDITOR_HEIGHT_DELTA);
     };
 
-    const buffer = props.definition != null ? (0, (_nuclideRemoteConnection || _load_nuclideRemoteConnection()).bufferForUri)(props.definition.path) : new _atom.TextBuffer();
-    const heightSetting = (_featureConfig || _load_featureConfig()).default.get('nuclide-definition-preview.editorHeight');
+    const buffer = props.definition != null ? (0, _nuclideRemoteConnection().bufferForUri)(props.definition.path) : new _atom.TextBuffer();
+
+    const heightSetting = _featureConfig().default.get('nuclide-definition-preview.editorHeight');
+
     let height = 50;
+
     if (heightSetting != null) {
       height = heightSetting;
     }
+
     if (height < MINIMUM_EDITOR_HEIGHT) {
       height = MINIMUM_EDITOR_HEIGHT;
     }
+
     this.state = {
       buffer,
       editorHeight: height
     };
-    this._settingsChangeDisposable = (_featureConfig || _load_featureConfig()).default.observe('nuclide-definition-preview.editorHeight', newHeight => this._setEditorHeight(newHeight));
+    this._settingsChangeDisposable = _featureConfig().default.observe('nuclide-definition-preview.editorHeight', newHeight => this._setEditorHeight(newHeight));
   }
 
-  componentWillReceiveProps(newProps) {
+  UNSAFE_componentWillReceiveProps(newProps) {
     if (newProps.definition != null) {
-      const definition = newProps.definition;
-      // The buffer always needs to point to the right file path, so create a new one with
+      const definition = newProps.definition; // The buffer always needs to point to the right file path, so create a new one with
       // the correct path if the new definition prop has a different path than the
       // currently loaded buffer.
+
       if (definition.path !== this.state.buffer.getPath()) {
-        this.setState({ buffer: (0, (_nuclideRemoteConnection || _load_nuclideRemoteConnection()).bufferForUri)(definition.path) });
+        this.setState({
+          buffer: (0, _nuclideRemoteConnection().bufferForUri)(definition.path)
+        });
       }
     } else {
       // A null definition has no associated file path, so make a new TextBuffer()
       // that doesn't have an associated file path.
-      this.setState({ buffer: new _atom.TextBuffer() });
+      this.setState({
+        buffer: new _atom.TextBuffer()
+      });
     }
-  }
+  } // Loads the current buffer in state if it's not already loaded.
 
-  // Loads the current buffer in state if it's not already loaded.
+
   async _loadBuffer() {
     if (!this.state.buffer.loaded) {
       await this.state.buffer.load();
@@ -151,13 +192,14 @@ class DefinitionPreviewView extends _react.Component {
 
   async _finishRendering(definition) {
     await this._loadBuffer();
+
     this._scrollToRow(definition.position.row);
 
     const editor = this.getEditor();
     editor.getDecorations().forEach(decoration => decoration.destroy());
 
     if (!(this.props.definition != null)) {
-      throw new Error('Invariant violation: "this.props.definition != null"');
+      throw new Error("Invariant violation: \"this.props.definition != null\"");
     }
 
     const marker = editor.markBufferPosition(definition.position);
@@ -168,102 +210,86 @@ class DefinitionPreviewView extends _react.Component {
   }
 
   render() {
-    const { ContextViewMessage, definition } = this.props;
-    const atMinHeight = this.state.editorHeight - EDITOR_HEIGHT_DELTA < MINIMUM_EDITOR_HEIGHT;
-    // Show either a "No definition" message or the definition in an editors
-    return definition == null ? _react.createElement(ContextViewMessage, { message: ContextViewMessage.NO_DEFINITION }) : _react.createElement(
-      'div',
-      { className: 'pane-item nuclide-definition-preview' },
-      _react.createElement(
-        'div',
-        {
-          className: 'nuclide-definition-preview-editor',
-          style: { height: `${this.state.editorHeight}em` } },
-        _react.createElement((_AtomTextEditor || _load_AtomTextEditor()).AtomTextEditor, {
-          ref: editor => {
-            this._editor = editor;
-          },
-          gutterHidden: true,
-          lineNumberGutterVisible: false,
-          path: definition.path
-          // Should be readonly, but can't because we can only make buffers readonly,
-          // We can't do readonly on editor granularity.
-          , readOnly: false,
-          textBuffer: this.state.buffer,
-          syncTextContents: false
-        }),
-        _react.createElement(ButtonContainer, {
-          _openCurrentDefinitionInMainEditor: this._openCurrentDefinitionInMainEditor,
-          _increaseEditorHeight: this._increaseEditorHeight,
-          _decreaseEditorHeight: this._decreaseEditorHeight,
-          atMinHeight: atMinHeight
-        })
-      )
-    );
+    const {
+      ContextViewMessage,
+      definition
+    } = this.props;
+    const atMinHeight = this.state.editorHeight - EDITOR_HEIGHT_DELTA < MINIMUM_EDITOR_HEIGHT; // Show either a "No definition" message or the definition in an editors
+
+    return definition == null ? React.createElement(ContextViewMessage, {
+      message: ContextViewMessage.NO_DEFINITION
+    }) : React.createElement("div", {
+      className: "pane-item nuclide-definition-preview"
+    }, React.createElement("div", {
+      className: "nuclide-definition-preview-editor",
+      style: {
+        height: `${this.state.editorHeight}em`
+      }
+    }, React.createElement(_AtomTextEditor().AtomTextEditor, {
+      ref: editor => {
+        this._editor = editor;
+      },
+      gutterHidden: true,
+      lineNumberGutterVisible: false,
+      path: definition.path // Should be readonly, but can't because we can only make buffers readonly,
+      // We can't do readonly on editor granularity.
+      ,
+      readOnly: false,
+      textBuffer: this.state.buffer,
+      syncTextContents: false
+    }), React.createElement(ButtonContainer, {
+      _openCurrentDefinitionInMainEditor: this._openCurrentDefinitionInMainEditor,
+      _increaseEditorHeight: this._increaseEditorHeight,
+      _decreaseEditorHeight: this._decreaseEditorHeight,
+      atMinHeight: atMinHeight
+    })));
   }
 
   // Sets the height of the definition preview editor only if it satisfies the minimum height
   _setEditorHeight(height) {
     if (height !== this.state.editorHeight && height >= MINIMUM_EDITOR_HEIGHT) {
-      (_featureConfig || _load_featureConfig()).default.set('nuclide-definition-preview.editorHeight', height);
-      this.setState({ editorHeight: height });
+      _featureConfig().default.set('nuclide-definition-preview.editorHeight', height);
+
+      this.setState({
+        editorHeight: height
+      });
     }
   }
 
   getEditor() {
-    return (0, (_nullthrows || _load_nullthrows()).default)(this._editor).getModel();
+    return (0, _nullthrows().default)(this._editor).getModel();
   }
 
   _scrollToRow(row) {
-    this.getEditor().scrollToBufferPosition([row, 0], { center: true });
+    this.getEditor().scrollToBufferPosition([row, 0], {
+      center: true
+    });
   }
+
 }
 
 exports.DefinitionPreviewView = DefinitionPreviewView;
 
-
 const ButtonContainer = props => {
-  return _react.createElement(
-    (_Block || _load_Block()).Block,
-    null,
-    _react.createElement(
-      'div',
-      { className: 'nuclide-definition-preview-buttons' },
-      _react.createElement(
-        'div',
-        { className: 'nuclide-definition-preview-buttons-left' },
-        _react.createElement(
-          'span',
-          { style: { paddingRight: '1em' } },
-          'Height:'
-        ),
-        _react.createElement(
-          (_Button || _load_Button()).Button,
-          {
-            onClick: props._decreaseEditorHeight,
-            size: (_Button || _load_Button()).ButtonSizes.SMALL,
-            disabled: props.atMinHeight },
-          '-'
-        ),
-        _react.createElement(
-          (_Button || _load_Button()).Button,
-          {
-            onClick: props._increaseEditorHeight,
-            size: (_Button || _load_Button()).ButtonSizes.SMALL },
-          '+'
-        )
-      ),
-      _react.createElement(
-        'div',
-        { className: 'nuclide-definition-preview-buttons-right' },
-        _react.createElement(
-          (_Button || _load_Button()).Button,
-          {
-            onClick: props._openCurrentDefinitionInMainEditor,
-            size: (_Button || _load_Button()).ButtonSizes.SMALL },
-          'Open in main editor'
-        )
-      )
-    )
-  );
+  return React.createElement(_Block().Block, null, React.createElement("div", {
+    className: "nuclide-definition-preview-buttons"
+  }, React.createElement("div", {
+    className: "nuclide-definition-preview-buttons-left"
+  }, React.createElement("span", {
+    style: {
+      paddingRight: '1em'
+    }
+  }, "Height:"), React.createElement(_Button().Button, {
+    onClick: props._decreaseEditorHeight,
+    size: _Button().ButtonSizes.SMALL,
+    disabled: props.atMinHeight
+  }, "-"), React.createElement(_Button().Button, {
+    onClick: props._increaseEditorHeight,
+    size: _Button().ButtonSizes.SMALL
+  }, "+")), React.createElement("div", {
+    className: "nuclide-definition-preview-buttons-right"
+  }, React.createElement(_Button().Button, {
+    onClick: props._openCurrentDefinitionInMainEditor,
+    size: _Button().ButtonSizes.SMALL
+  }, "Open in main editor"))));
 };

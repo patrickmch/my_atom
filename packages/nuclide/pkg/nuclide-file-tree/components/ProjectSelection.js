@@ -1,33 +1,45 @@
-'use strict';
+"use strict";
 
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.ProjectSelection = undefined;
+exports.default = void 0;
 
-var _react = _interopRequireWildcard(require('react'));
+var React = _interopRequireWildcard(require("react"));
 
-var _UniversalDisposable;
+function _reactRedux() {
+  const data = require("react-redux");
 
-function _load_UniversalDisposable() {
-  return _UniversalDisposable = _interopRequireDefault(require('../../../modules/nuclide-commons/UniversalDisposable'));
+  _reactRedux = function () {
+    return data;
+  };
+
+  return data;
 }
 
-var _FileTreeStore;
+function Selectors() {
+  const data = _interopRequireWildcard(require("../lib/redux/Selectors"));
 
-function _load_FileTreeStore() {
-  return _FileTreeStore = require('../lib/FileTreeStore');
+  Selectors = function () {
+    return data;
+  };
+
+  return data;
 }
 
-var _TruncatedButton;
+function _TruncatedButton() {
+  const data = _interopRequireDefault(require("../../../modules/nuclide-commons-ui/TruncatedButton"));
 
-function _load_TruncatedButton() {
-  return _TruncatedButton = _interopRequireDefault(require('../../../modules/nuclide-commons-ui/TruncatedButton'));
+  _TruncatedButton = function () {
+    return data;
+  };
+
+  return data;
 }
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
+function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) { var desc = Object.defineProperty && Object.getOwnPropertyDescriptor ? Object.getOwnPropertyDescriptor(obj, key) : {}; if (desc.get || desc.set) { Object.defineProperty(newObj, key, desc); } else { newObj[key] = obj[key]; } } } } newObj.default = obj; return newObj; } }
 
 /**
  * Copyright (c) 2015-present, Facebook, Inc.
@@ -39,75 +51,38 @@ function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj;
  * 
  * @format
  */
-
-class ProjectSelection extends _react.Component {
-
-  constructor(props) {
-    super(props);
-    this._store = (_FileTreeStore || _load_FileTreeStore()).FileTreeStore.getInstance();
-    this._disposables = new (_UniversalDisposable || _load_UniversalDisposable()).default();
-    this.state = {
-      extraContent: this.calculateExtraContent()
-    };
-  }
-
-  componentDidMount() {
-    this._processExternalUpdate();
-
-    this._disposables.add(this._store.subscribe(this._processExternalUpdate.bind(this)));
-  }
-
-  componentWillUnmount() {
-    this._disposables.dispose();
-  }
-
-  _processExternalUpdate() {
-    if (this._disposables.disposed) {
-      // If an emitted event results in the disposal of a subscription to that
-      // same emitted event, the disposal will not take effect until the next
-      // emission. This is because event-kit handler arrays are immutable.
-      //
-      // Since this method subscribes to store updates, and store updates can
-      // also cause this component to become unmounted, there is a possiblity
-      // that the subscription disposal in `componentWillUnmount` may not
-      // prevent this method from running on an unmounted instance. So, we
-      // manually check the component's mounted state.
-      return;
-    }
-    this.setState({
-      extraContent: this.calculateExtraContent()
-    });
+class ProjectSelection extends React.PureComponent {
+  componentDidUpdate() {
     this.props.remeasureHeight();
   }
 
-  calculateExtraContent() {
-    const list = this._store.getExtraProjectSelectionContent();
-    if (list.isEmpty()) {
-      return null;
-    }
-    return list.toArray();
-  }
-
   render() {
-    return _react.createElement(
-      'div',
-      { className: 'padded' },
-      _react.createElement((_TruncatedButton || _load_TruncatedButton()).default, {
-        onClick: () => this.runCommand('application:add-project-folder'),
-        icon: 'device-desktop',
-        label: 'Add Local Folder'
-      }),
-      _react.createElement((_TruncatedButton || _load_TruncatedButton()).default, {
-        onClick: () => this.runCommand('nuclide-remote-projects:connect'),
-        icon: 'cloud-upload',
-        label: 'Add Remote Folder'
-      }),
-      this.state.extraContent
-    );
+    // The only time we re-render is when this prop changes, so no need to memoize this. If this
+    // component had a bunch of other props, the story might be different.
+    const renderedExtraContent = this.props.extraContent.isEmpty() ? null : this.props.extraContent.toArray();
+    return React.createElement("div", {
+      className: "padded"
+    }, React.createElement(_TruncatedButton().default, {
+      onClick: () => this.runCommand('application:add-project-folder'),
+      icon: "device-desktop",
+      label: "Add Local Folder"
+    }), React.createElement(_TruncatedButton().default, {
+      onClick: () => this.runCommand('nuclide-remote-projects:connect'),
+      icon: "cloud-upload",
+      label: "Add Remote Folder"
+    }), renderedExtraContent);
   }
 
   runCommand(command) {
     atom.commands.dispatch(atom.views.getView(atom.workspace), command);
   }
+
 }
-exports.ProjectSelection = ProjectSelection;
+
+const mapStateToProps = state => ({
+  extraContent: Selectors().getExtraProjectSelectionContent(state)
+});
+
+var _default = (0, _reactRedux().connect)(mapStateToProps, () => ({}))(ProjectSelection);
+
+exports.default = _default;

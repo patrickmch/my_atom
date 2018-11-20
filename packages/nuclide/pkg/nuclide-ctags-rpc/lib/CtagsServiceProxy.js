@@ -298,7 +298,7 @@ Object.defineProperty(module.exports, "defs", {
           location: {
             type: "source",
             fileName: "CtagsService.js",
-            line: 98
+            line: 97
           },
           kind: "function",
           argumentTypes: [],
@@ -314,13 +314,13 @@ Object.defineProperty(module.exports, "defs", {
       location: {
         type: "source",
         fileName: "CtagsService.js",
-        line: 103
+        line: 102
       },
       type: {
         location: {
           type: "source",
           fileName: "CtagsService.js",
-          line: 103
+          line: 102
         },
         kind: "function",
         argumentTypes: [{

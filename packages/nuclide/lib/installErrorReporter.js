@@ -1,20 +1,28 @@
-'use strict';
+"use strict";
 
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
 exports.default = installErrorReporter;
 
-var _log4js;
+function _log4js() {
+  const data = require("log4js");
 
-function _load_log4js() {
-  return _log4js = require('log4js');
+  _log4js = function () {
+    return data;
+  };
+
+  return data;
 }
 
-var _UniversalDisposable;
+function _UniversalDisposable() {
+  const data = _interopRequireDefault(require("../modules/nuclide-commons/UniversalDisposable"));
 
-function _load_UniversalDisposable() {
-  return _UniversalDisposable = _interopRequireDefault(require('../modules/nuclide-commons/UniversalDisposable'));
+  _UniversalDisposable = function () {
+    return data;
+  };
+
+  return data;
 }
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
@@ -29,16 +37,15 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
  * 
  * @format
  */
-
 let disposable;
 
 function installErrorReporter() {
   if (disposable != null) {
     throw new Error('installErrorReporter was called multiple times.');
   }
-  window.addEventListener('unhandledrejection', onUnhandledRejection);
 
-  disposable = new (_UniversalDisposable || _load_UniversalDisposable()).default(atom.onWillThrowError(onUnhandledException), atom.notifications.onDidAddNotification(handleAtomNotification), () => {
+  window.addEventListener('unhandledrejection', onUnhandledRejection);
+  disposable = new (_UniversalDisposable().default)(atom.onWillThrowError(onUnhandledException), atom.notifications.onDidAddNotification(handleAtomNotification), () => {
     window.removeEventListener('unhandledrejection', onUnhandledRejection);
     disposable = null;
   });
@@ -47,17 +54,15 @@ function installErrorReporter() {
 
 function onUnhandledException(event) {
   try {
-    (0, (_log4js || _load_log4js()).getLogger)('installErrorReporter').error(`Caught unhandled exception: ${event.message}`, event.originalError);
-  } catch (e) {
-    // Ensure we don't recurse forever. Even under worst case scenarios.
+    (0, _log4js().getLogger)('installErrorReporter').error(`Caught unhandled exception: ${event.message}`, event.originalError);
+  } catch (e) {// Ensure we don't recurse forever. Even under worst case scenarios.
   }
 }
 
 function onUnhandledRejection(event) {
   try {
-    (0, (_log4js || _load_log4js()).getLogger)('installErrorReporter').error('Caught unhandled rejection', event.reason);
-  } catch (e) {
-    // Ensure we don't recurse forever. Even under worst case scenarios.
+    (0, _log4js().getLogger)('installErrorReporter').error('Caught unhandled rejection', event.reason);
+  } catch (e) {// Ensure we don't recurse forever. Even under worst case scenarios.
   }
 }
 
@@ -66,6 +71,7 @@ function isNuclideInCallStack(callStack) {
     const fileName = callSite.getFileName();
     return fileName != null && !fileName.includes('installErrorReporter.js');
   };
+
   const containsNuclideWord = callSite => callSite.toString().toLowerCase().includes('nuclide');
 
   return callStack.filter(ignoreCallSitesFromThisFile).some(containsNuclideWord);
@@ -78,17 +84,21 @@ function handleAtomNotification(notification) {
   }
 
   const error = Error(notification.getMessage());
-  const { stack } = notification.getOptions();
+  const {
+    stack
+  } = notification.getOptions();
+
   if (typeof stack === 'string' && stack) {
     error.stack = stack;
   } else {
     // This will exclude handleAtomNotification from the stack.
     Error.captureStackTrace(error, handleAtomNotification);
-  }
+  } // $FlowFixMe: getRawStack() is missing from Error()
 
-  // $FlowFixMe: getRawStack() is missing from Error()
+
   const rawStack = error.getRawStack();
+
   if (rawStack == null || isNuclideInCallStack(rawStack)) {
-    (0, (_log4js || _load_log4js()).getLogger)('atom-error-notification').error(error);
+    (0, _log4js().getLogger)('atom-error-notification').error(error);
   }
 }

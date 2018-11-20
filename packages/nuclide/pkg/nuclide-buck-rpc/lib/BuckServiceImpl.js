@@ -1,4 +1,4 @@
-'use strict';
+"use strict";
 
 Object.defineProperty(exports, "__esModule", {
   value: true
@@ -13,56 +13,106 @@ exports.getOwners = getOwners;
 exports.getRootForPath = getRootForPath;
 exports.runBuckCommandFromProjectRoot = runBuckCommandFromProjectRoot;
 exports.query = query;
-exports._getFbRepoSpecificArgs = _getFbRepoSpecificArgs;
+exports._getPreferredArgsForRepo = _getPreferredArgsForRepo;
 exports.getBuildFile = getBuildFile;
 
-var _process;
+function _process() {
+  const data = require("../../../modules/nuclide-commons/process");
 
-function _load_process() {
-  return _process = require('../../../modules/nuclide-commons/process');
+  _process = function () {
+    return data;
+  };
+
+  return data;
 }
 
-var _promiseExecutors;
+function _promise() {
+  const data = require("../../../modules/nuclide-commons/promise");
 
-function _load_promiseExecutors() {
-  return _promiseExecutors = require('../../commons-node/promise-executors');
+  _promise = function () {
+    return data;
+  };
+
+  return data;
 }
 
-var _os = _interopRequireWildcard(require('os'));
+function _promiseExecutors() {
+  const data = require("../../commons-node/promise-executors");
 
-var _fsPromise;
+  _promiseExecutors = function () {
+    return data;
+  };
 
-function _load_fsPromise() {
-  return _fsPromise = _interopRequireDefault(require('../../../modules/nuclide-commons/fsPromise'));
+  return data;
 }
 
-var _string;
+var os = _interopRequireWildcard(require("os"));
 
-function _load_string() {
-  return _string = require('../../../modules/nuclide-commons/string');
+function _fsPromise() {
+  const data = _interopRequireDefault(require("../../../modules/nuclide-commons/fsPromise"));
+
+  _fsPromise = function () {
+    return data;
+  };
+
+  return data;
 }
 
-var _nuclideUri;
+function _string() {
+  const data = require("../../../modules/nuclide-commons/string");
 
-function _load_nuclideUri() {
-  return _nuclideUri = _interopRequireDefault(require('../../../modules/nuclide-commons/nuclideUri'));
+  _string = function () {
+    return data;
+  };
+
+  return data;
 }
 
-var _log4js;
+function _nuclideUri() {
+  const data = _interopRequireDefault(require("../../../modules/nuclide-commons/nuclideUri"));
 
-function _load_log4js() {
-  return _log4js = require('log4js');
+  _nuclideUri = function () {
+    return data;
+  };
+
+  return data;
 }
 
-var _nuclideAnalytics;
+function _log4js() {
+  const data = require("log4js");
 
-function _load_nuclideAnalytics() {
-  return _nuclideAnalytics = require('../../nuclide-analytics');
+  _log4js = function () {
+    return data;
+  };
+
+  return data;
+}
+
+function _nuclideAnalytics() {
+  const data = require("../../../modules/nuclide-analytics");
+
+  _nuclideAnalytics = function () {
+    return data;
+  };
+
+  return data;
+}
+
+var _rxjsCompatUmdMin = require("rxjs-compat/bundles/rxjs-compat.umd.min.js");
+
+function _types() {
+  const data = require("./types");
+
+  _types = function () {
+    return data;
+  };
+
+  return data;
 }
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
+function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) { var desc = Object.defineProperty && Object.getOwnPropertyDescriptor ? Object.getOwnPropertyDescriptor(obj, key) : {}; if (desc.get || desc.set) { Object.defineProperty(newObj, key, desc); } else { newObj[key] = obj[key]; } } } } newObj.default = obj; return newObj; } }
 
 /**
  * Copyright (c) 2015-present, Facebook, Inc.
@@ -74,11 +124,7 @@ function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj;
  * 
  * @format
  */
-
-const logger = (0, (_log4js || _load_log4js()).getLogger)('nuclide-buck-rpc');
-
-// Tag these Buck calls as coming from Nuclide for analytics purposes.
-const CLIENT_ID_ARGS = ['--config', 'client.id=nuclide'];
+const logger = (0, _log4js().getLogger)('nuclide-buck-rpc');
 
 /**
  * As defined in com.facebook.buck.cli.Command, some of Buck's subcommands are
@@ -90,54 +136,76 @@ const CLIENT_ID_ARGS = ['--config', 'client.id=nuclide'];
  * TODO(hansonw): Buck seems to have some race conditions that prevent us
  * from running things in parallel :(
  */
-const MAX_CONCURRENT_READ_ONLY = 1; // Math.max(1, os.cpus().length - 1);
+const MAX_CONCURRENT_READ_ONLY = 1; // Math.max(1, os.cpus() ? os.cpus().length - 1 : 1);
+
 const pools = new Map();
 
 function getPool(path, readOnly) {
   const key = (readOnly ? 'ro:' : '') + path;
   let pool = pools.get(key);
+
   if (pool != null) {
     return pool;
   }
-  pool = new (_promiseExecutors || _load_promiseExecutors()).PromisePool(readOnly ? MAX_CONCURRENT_READ_ONLY : 1);
+
+  pool = new (_promiseExecutors().PromisePool)(readOnly ? MAX_CONCURRENT_READ_ONLY : 1);
   pools.set(key, pool);
   return pool;
 }
-
 /**
  * @return The path to buck and set of options to be used to run a `buck` command.
  */
+
+
 async function _getBuckCommandAndOptions(rootPath, commandOptions = {}) {
   // $UPFixMe: This should use nuclide-features-config
   let pathToBuck = global.atom && global.atom.config.get('nuclide.nuclide-buck.pathToBuck') || 'buck';
-  if (pathToBuck === 'buck' && _os.platform() === 'win32') {
+
+  if (pathToBuck === 'buck' && os.platform() === 'win32') {
     pathToBuck = 'buck.exe';
   }
-  let env = await (0, (_process || _load_process()).getOriginalEnvironment)();
+
+  let env = await (0, _process().getOriginalEnvironment)();
+
   try {
     // $FlowFB
-    const { getRealUsername } = require('./fb/realUsername');
+    const {
+      getRealUsername
+    } = require("./fb/realUsername");
+
     const username = await getRealUsername(env.USER);
+
     if (username != null) {
-      env = Object.assign({}, env, { USER: username });
+      env = Object.assign({}, env, {
+        USER: username
+      });
     }
   } catch (_) {}
+
   const buckCommandOptions = Object.assign({
     cwd: rootPath,
     // Buck restarts itself if the environment changes, so try to preserve
     // the original environment that Nuclide was started in.
     env
   }, commandOptions);
-  return { pathToBuck, buckCommandOptions };
+  return {
+    pathToBuck,
+    buckCommandOptions
+  };
 }
-
 /**
  * @param options An object describing the desired buck build operation.
  * @return An array of strings that can be passed as `args` to spawn a
  *   process to run the `buck` command.
  */
+
+
 function _translateOptionsToBuckBuildArgs(options) {
-  const { baseOptions, pathToBuildReport, buildTargets } = options;
+  const {
+    baseOptions,
+    pathToBuildReport,
+    buildTargets
+  } = options;
   const {
     install: doInstall,
     run,
@@ -146,17 +214,13 @@ function _translateOptionsToBuckBuildArgs(options) {
     debug,
     extraArguments
   } = baseOptions;
-
   let args = [test ? 'test' : doInstall ? 'install' : run ? 'run' : 'build'];
-  args = args.concat(buildTargets, CLIENT_ID_ARGS);
+  args = args.concat(buildTargets, _types().CLIENT_ID_ARGS); // flowlint-next-line sketchy-null-string:off
 
-  if (!run) {
-    args.push('--keep-going');
-  }
-  // flowlint-next-line sketchy-null-string:off
   if (pathToBuildReport) {
     args = args.concat(['--build-report', pathToBuildReport]);
   }
+
   if (doInstall) {
     // flowlint-next-line sketchy-null-string:off
     if (simulator) {
@@ -166,6 +230,7 @@ function _translateOptionsToBuckBuildArgs(options) {
 
     if (run) {
       args.push('--run');
+
       if (debug) {
         args.push('--wait-for-debugger');
       }
@@ -175,114 +240,134 @@ function _translateOptionsToBuckBuildArgs(options) {
       args.push('--debug');
     }
   }
+
   if (extraArguments != null) {
     args = args.concat(extraArguments);
   }
+
   return args;
 }
 
-async function _build(rootPath, buildTargets, options) {
-  const report = await (_fsPromise || _load_fsPromise()).default.tempfile({ suffix: '.json' });
-  const args = _translateOptionsToBuckBuildArgs({
-    baseOptions: Object.assign({}, options),
-    pathToBuildReport: report,
-    buildTargets
-  });
+function _build(rootPath, buildTargets, options) {
+  return _rxjsCompatUmdMin.Observable.fromPromise(_fsPromise().default.tempfile({
+    suffix: '.json'
+  })).switchMap(report => {
+    const args = _translateOptionsToBuckBuildArgs({
+      baseOptions: Object.assign({}, options),
+      pathToBuildReport: report,
+      buildTargets
+    });
 
-  try {
-    await runBuckCommandFromProjectRoot(rootPath, args, options.commandOptions, false, // Do not add the client ID, since we already do it in the build args.
+    return runBuckCommandFromProjectRoot(rootPath, args, options.commandOptions, false, // Do not add the client ID, since we already do it in the build args.
     true // Build commands are blocking.
-    );
-  } catch (e) {
-    // The build failed. However, because --keep-going was specified, the
-    // build report should have still been written unless any of the target
-    // args were invalid. We check the contents of the report file to be sure.
-    const stat = await (_fsPromise || _load_fsPromise()).default.stat(report).catch(() => null);
-    if (stat == null || stat.size === 0) {
-      throw e;
-    }
-  }
-
-  try {
-    const json = await (_fsPromise || _load_fsPromise()).default.readFile(report, { encoding: 'UTF-8' });
-    try {
-      return JSON.parse(json);
-    } catch (e) {
-      throw Error(`Failed to parse:\n${json}`);
-    }
-  } finally {
-    (_fsPromise || _load_fsPromise()).default.unlink(report);
-  }
+    ).catch(e => {
+      // The build failed. However, because --keep-going was specified, the
+      // build report should have still been written unless any of the target
+      // args were invalid. We check the contents of the report file to be sure.
+      return _rxjsCompatUmdMin.Observable.fromPromise(_fsPromise().default.stat(report).catch(() => null)).filter(stat => stat == null || stat.size === 0).switchMapTo(_rxjsCompatUmdMin.Observable.throw(e));
+    }).ignoreElements().concat(_rxjsCompatUmdMin.Observable.defer(() => _rxjsCompatUmdMin.Observable.fromPromise(_fsPromise().default.readFile(report, {
+      encoding: 'UTF-8'
+    }))).map(json => {
+      try {
+        return JSON.parse(json);
+      } catch (e) {
+        throw new Error(`Failed to parse:\n${json}`);
+      }
+    })).finally(() => _fsPromise().default.unlink(report));
+  });
 }
 
 function build(rootPath, buildTargets, options) {
   return _build(rootPath, buildTargets, options || {});
 }
 
-async function getDefaultPlatform(rootPath, target) {
-  const result = await query(rootPath, target, ['--output-attributes', 'defaults']);
+async function getDefaultPlatform(rootPath, target, extraArguments, appendPreferredArgs = true) {
+  const result = await query(rootPath, target, ['--output-attributes', 'defaults'].concat(extraArguments), appendPreferredArgs).toPromise();
+
   if (result[target] != null && result[target].defaults != null && result[target].defaults.platform != null) {
     return result[target].defaults.platform;
   }
+
   return null;
 }
 
-async function getOwners(rootPath, filePath, extraArguments, kindFilter) {
-  let queryString = `owner("${(0, (_string || _load_string()).shellQuote)([filePath])}")`;
+async function getOwners(rootPath, filePath, extraArguments, kindFilter, appendPreferredArgs = true) {
+  let queryString = `owner("${(0, _string().shellQuote)([filePath])}")`;
+
   if (kindFilter != null) {
     queryString = `kind(${JSON.stringify(kindFilter)}, ${queryString})`;
   }
-  return query(rootPath, queryString, extraArguments);
+
+  return query(rootPath, queryString, extraArguments, appendPreferredArgs).toPromise();
 }
 
 function getRootForPath(file) {
-  return (_fsPromise || _load_fsPromise()).default.findNearestFile('.buckconfig', file);
+  return _fsPromise().default.findNearestFile('.buckconfig', file);
 }
-
 /**
  * @param args Do not include 'buck' as the first argument: it will be added
  *     automatically.
  */
-async function runBuckCommandFromProjectRoot(rootPath, args, commandOptions, addClientId = true, readOnly = true) {
-  const {
+
+
+function runBuckCommandFromProjectRoot(rootPath, args, commandOptions, addClientId = true, readOnly = true) {
+  return _rxjsCompatUmdMin.Observable.fromPromise(_getBuckCommandAndOptions(rootPath, commandOptions)).switchMap(({
     pathToBuck,
     buckCommandOptions: options
-  } = await _getBuckCommandAndOptions(rootPath, commandOptions);
+  }) => {
+    // Create an event name from the first arg, e.g. 'buck.query' or 'buck.build'.
+    const analyticsEvent = `buck.${args.length > 0 ? args[0] : ''}`;
+    const newArgs = addClientId ? args.concat(_types().CLIENT_ID_ARGS) : args;
+    const deferredTimer = new (_promise().Deferred)();
+    logger.debug(`Running \`${pathToBuck} ${(0, _string().shellQuote)(args)}\``);
+    let errored = false;
+    (0, _nuclideAnalytics().trackTiming)(analyticsEvent, () => deferredTimer.promise, {
+      args
+    });
+    return (0, _process().runCommand)(pathToBuck, newArgs, options).catch(e => {
+      // Catch and rethrow exceptions to be tracked in our timer.
+      deferredTimer.reject(e);
+      errored = true;
+      return _rxjsCompatUmdMin.Observable.throw(e);
+    }).finally(() => {
+      if (!errored) {
+        deferredTimer.resolve();
+      }
+    });
+  });
+}
+/** Runs `buck query --json` with the specified query. */
 
-  // Create an event name from the first arg, e.g. 'buck.query' or 'buck.build'.
-  const analyticsEvent = `buck.${args.length > 0 ? args[0] : ''}`;
-  const newArgs = addClientId ? args.concat(CLIENT_ID_ARGS) : args;
-  return getPool(rootPath, readOnly).submit(() => {
-    logger.debug(`Running \`${pathToBuck} ${(0, (_string || _load_string()).shellQuote)(args)}\``);
-    return (0, (_nuclideAnalytics || _load_nuclideAnalytics()).trackTiming)(analyticsEvent, () => (0, (_process || _load_process()).runCommand)(pathToBuck, newArgs, options).toPromise(), { args });
+
+function query(rootPath, queryString, extraArguments, appendPreferredArgs = true) {
+  return _rxjsCompatUmdMin.Observable.fromPromise(_getPreferredArgsForRepo(rootPath)).switchMap(fbRepoSpecificArgs => {
+    const args = ['query', '--json', queryString, ...extraArguments, ...(appendPreferredArgs ? fbRepoSpecificArgs : [])];
+    return runBuckCommandFromProjectRoot(rootPath, args).map(JSON.parse);
   });
 }
 
-/** Runs `buck query --json` with the specified query. */
-async function query(rootPath, queryString, extraArguments) {
-  const fbRepoSpecificArgs = await _getFbRepoSpecificArgs(rootPath);
-  const args = ['query', ...extraArguments, '--json', queryString, ...fbRepoSpecificArgs];
-  const result = await runBuckCommandFromProjectRoot(rootPath, args);
-  return JSON.parse(result);
-}
-
-async function _getFbRepoSpecificArgs(buckRoot) {
+async function _getPreferredArgsForRepo(buckRoot) {
   try {
     // $FlowFB
-    const { getFbRepoSpecificArgs } = require('./fb/repoSpecificArgs');
+    const {
+      getFbRepoSpecificArgs
+    } = require("./fb/repoSpecificArgs");
+
     return await getFbRepoSpecificArgs(buckRoot);
   } catch (e) {
     return [];
   }
 }
 
-async function getBuildFile(rootPath, targetName) {
+async function getBuildFile(rootPath, targetName, extraArguments) {
   try {
-    const result = await query(rootPath, `buildfile(${targetName})`, []);
+    const result = await query(rootPath, `buildfile(${targetName})`, extraArguments).toPromise();
+
     if (result.length === 0) {
       return null;
     }
-    return (_nuclideUri || _load_nuclideUri()).default.join(rootPath, result[0]);
+
+    return _nuclideUri().default.join(rootPath, result[0]);
   } catch (e) {
     logger.error(`No build file for target "${targetName}" ${e}`);
     return null;

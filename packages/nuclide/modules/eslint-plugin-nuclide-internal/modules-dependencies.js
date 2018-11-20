@@ -7,14 +7,11 @@
  * of patent rights can be found in the PATENTS file in the same directory.
  *
  * @noflow
+ * @format
  */
 'use strict';
 
-/* eslint
-  comma-dangle: [1, always-multiline],
-  prefer-object-spread/prefer-object-spread: 0,
-  nuclide-internal/no-commonjs: 0,
-  */
+/* eslint nuclide-internal/no-commonjs: 0 */
 
 const idx = require('idx');
 const path = require('path');
@@ -44,13 +41,12 @@ module.exports = function(context) {
   const moduleName = relativePath.split(path.sep)[0];
   const moduleDir = path.join(MODULES_DIR, moduleName);
   const modulePkg = getPackage(moduleDir);
-  const isSpec = filename.indexOf('/spec/') !== -1 ||
+  const isSpec =
+    filename.indexOf('/spec/') !== -1 ||
     filename.indexOf('/__tests__/') !== -1 ||
     filename.indexOf('/__atom_tests__/') !== -1;
-  const allowDevDependencies = isSpec || idx(
-    context,
-    _ => _.options[0].allowDevDependencies
-  );
+  const allowDevDependencies =
+    isSpec || idx(context, _ => _.options[0].allowDevDependencies);
 
   function checkDependency(node, dep) {
     // Relative imports must be within the root.
@@ -70,26 +66,42 @@ module.exports = function(context) {
     }
 
     if (dep === 'vscode') {
-      if (!(modulePkg.engines instanceof Object) ||
-          !modulePkg.engines.hasOwnProperty('vscode')) {
+      if (
+        !(modulePkg.engines instanceof Object) ||
+        !modulePkg.engines.hasOwnProperty('vscode')
+      ) {
         context.report({
           node,
-          message: 'If "vscode" is an import, must declare vscode in "engines." ',
+          message:
+            'If "vscode" is an import, must declare vscode in "engines." ',
         });
       }
       return;
     }
 
-    const depName = dep.split('/')[0];
+    const depParts = dep.split('/');
+    let depName = depParts[0];
+    if (depName.startsWith('@') && depParts.length > 1) {
+      depName += '/' + depParts[1];
+    }
     if (
       !Object.hasOwnProperty.call(modulePkg.dependencies || {}, depName) &&
       (!allowDevDependencies ||
-        !Object.hasOwnProperty.call(modulePkg.devDependencies || {}, depName))
+        !Object.hasOwnProperty.call(
+          modulePkg.devDependencies || {},
+          depName,
+        )) &&
+      // We rewrite imports from rxjs to be from rxjs-compat
+      !(
+        depName === 'rxjs' &&
+        Object.hasOwnProperty.call(modulePkg.dependencies || {}, 'rxjs-compat')
+      )
     ) {
       context.report({
         node,
         data: {dep: depName, pkg: modulePkg.name},
-        message: 'Dependency "{{dep}}" must be declared in the package.json of module "{{pkg}}".',
+        message:
+          'Dependency "{{dep}}" must be declared in the package.json of module "{{pkg}}".',
       });
     }
   }

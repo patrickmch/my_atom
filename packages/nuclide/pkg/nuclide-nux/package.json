@@ -4,10 +4,8 @@
   "version": "0.0.0",
   "description": "A New User Experience (NUX) framework for Nuclide.",
   "author": "NEEDS OWNER",
-  "atomTestRunner": "../../lib/test-runner-entry.js",
   "nuclide": {
-    "packageType": "Atom",
-    "testRunner": "apm"
+    "packageType": "AtomPackage"
   },
   "providedServices": {
     "nux-register": {

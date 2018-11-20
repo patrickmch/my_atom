@@ -1,9 +1,10 @@
-'use strict';
+"use strict";
 
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
 exports.default = leftPad;
+
 /**
  * Copyright (c) 2017-present, Facebook, Inc.
  * All rights reserved.
@@ -15,7 +16,6 @@ exports.default = leftPad;
  *  strict
  * @format
  */
-
 function leftPad(s, size, pad = ' ') {
   if (s.length >= size) {
     return s;

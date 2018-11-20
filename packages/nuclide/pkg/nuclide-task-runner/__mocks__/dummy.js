@@ -1,29 +1,42 @@
-'use strict';
+"use strict";
 
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.ToolbarStatePreferences = exports.TaskRunner = undefined;
 exports.createTask = createTask;
+exports.ToolbarStatePreferences = exports.TaskRunner = void 0;
 
-var _UniversalDisposable;
+function _UniversalDisposable() {
+  const data = _interopRequireDefault(require("../../../modules/nuclide-commons/UniversalDisposable"));
 
-function _load_UniversalDisposable() {
-  return _UniversalDisposable = _interopRequireDefault(require('../../../modules/nuclide-commons/UniversalDisposable'));
+  _UniversalDisposable = function () {
+    return data;
+  };
+
+  return data;
 }
 
-var _rxjsBundlesRxMinJs = require('rxjs/bundles/Rx.min.js');
+var _rxjsCompatUmdMin = require("rxjs-compat/bundles/rxjs-compat.umd.min.js");
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
+/**
+ * Copyright (c) 2015-present, Facebook, Inc.
+ * All rights reserved.
+ *
+ * This source code is licensed under the license found in the LICENSE file in
+ * the root directory of this source tree.
+ *
+ * 
+ * @format
+ */
 class TaskRunner {
-
   constructor(id) {
     // flowlint-next-line sketchy-null-string:off
-    this.id = id || 'build-system';
-    // flowlint-next-line sketchy-null-string:off
+    this.id = id || 'build-system'; // flowlint-next-line sketchy-null-string:off
+
     this.name = id || 'Build System';
-    this._taskLists = new _rxjsBundlesRxMinJs.Subject();
+    this._taskLists = new _rxjsCompatUmdMin.Subject();
   }
 
   getIcon() {
@@ -31,27 +44,18 @@ class TaskRunner {
   }
 
   setProjectRoot(projectRoot, callback) {
-    return new (_UniversalDisposable || _load_UniversalDisposable()).default();
+    return new (_UniversalDisposable().default)();
   }
 
   runTask(taskName) {
     return null;
   }
+
 }
 
-exports.TaskRunner = TaskRunner; /**
-                                  * Copyright (c) 2015-present, Facebook, Inc.
-                                  * All rights reserved.
-                                  *
-                                  * This source code is licensed under the license found in the LICENSE file in
-                                  * the root directory of this source tree.
-                                  *
-                                  * 
-                                  * @format
-                                  */
+exports.TaskRunner = TaskRunner;
 
 class ToolbarStatePreferences {
-
   constructor(db) {
     this._db = db;
   }
@@ -64,9 +68,11 @@ class ToolbarStatePreferences {
   getEntries() {
     return this._db;
   }
+
 }
 
 exports.ToolbarStatePreferences = ToolbarStatePreferences;
+
 function createTask(type, disabled) {
   return {
     type,

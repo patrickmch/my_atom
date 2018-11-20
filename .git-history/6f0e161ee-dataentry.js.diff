@@ -1,0 +1,106 @@
+diff --git a/nols_website/wmi/static/wmi/js/dataentry.js b/nols_website/wmi/static/wmi/js/dataentry.js
+index 18e4c4ab7..6c6ba4e01 100644
+--- a/nols_website/wmi/static/wmi/js/dataentry.js
++++ b/nols_website/wmi/static/wmi/js/dataentry.js
+@@ -1,51 +1,53 @@
+-function validateCoreForm(core_form, url) {
+-    var valid = false;
+-
+-    var PREFIX = 'phoneform'
+-    var prefix = '';
+-    if(core_form.parent().attr('id') == 'phone_form') {
+-        prefix = PREFIX + '-';
+-    }
+-
+-    $.ajax({
+-        type: "POST",
+-        url: url,
+-        data: core_form.serialize().replace(/phoneform-/g, ''),
+-        async: false
+-    }).done( function( data ) {
+-        if(data.is_valid) {
+-            valid = true;
++$('.modal-form').each(function(){
++  var form = $(this)
++  form.submit(function(e) {
++      e.preventDefault();
++      var url = form.attr('data-form-url');
++      $.ajax({
++          type: "POST",
++          url: url,
++          data: form.serialize().replace(/phoneform-/g, '')
++      }).done(function(response) {
++        if (response.is_valid){
++          form.unbind('submit').submit();
+         } else {
+-            core_form.find('.form-group').removeClass('error');
+-            core_form.find('.errorlist').parent('div').remove();
+-            core_form.find('.group-errors').remove();
+-            if(typeof data == 'string') {
+-                // display the authlockout page
+-                $('html').replaceWith(data);
+-            } else {
+-                for(var field in data) {
+-                    if(field != '__all__') {
+-                        var id = '#id_' + prefix + field;
+-                        var formGroup = $(id).parents('.form-group');
+-                        formGroup.addClass('error');
+-                        formGroup.prepend('<div class="row"><ul class="errorlist column medium-6 column medium-offset-3 fade"><li>'
+-                            + data[field] + '</li></ul></div>')
+-                    } else {
+-                        core_form.find('.form-instructions').after(
+-                            '<div class="form-group error group-errors"><ul class="errorlist fade"><li>'
+-                                + data[field] + '</li></ul></div> '
+-                        );
+-                    }
+-                }
+-            }
+-            valid = false;
++          showErrors(form, response);
+         }
+-    });
+-    window.setTimeout(function(){
+-        $('.errorlist.fade').addClass('in');
+-    }, 100);
+-    if(valid){
+-        core_form.find('input[type="submit"]').attr('disabled', 'disabled');
+-    }
+-    return valid;
++      });
++  });
++});
++
++function showErrors(form, response){
++  // address_form and phone_form both have a`type` field. When they're used in the same place, this causes problems.
++  // To handle this, we've added a prefix on to all of phone_form's attributes.
++  // This requires special treatment here and when serializing the data in the ajax call above.
++  var PREFIX = 'phoneform'
++  var prefix = '';
++  if(form.attr('id') == 'form-phone_form') {
++      prefix = PREFIX + '-';
++  }
++
++  form.find('.form-group').removeClass('error');
++  form.find('.errorlist').parent('div').remove();
++  form.find('.group-errors').remove();
++  if(typeof response == 'string') {
++      // display the authlockout page
++      $('html').replaceWith(response);
++  } else {
++      for(var field in response) {
++          if(field != '__all__') {
++              var id = '#id_' + prefix + field;
++              var formGroup = $(id).parents('.form-group');
++              formGroup.addClass('error');
++              formGroup.prepend('<div class="row"><ul class="errorlist column medium-6 column medium-offset-3 fade"><li>'
++                  + response[field] + '</li></ul></div>')
++          } else {
++              form.find('.error-container').append(
++                  '<div class="form-group error group-errors"><ul class="errorlist fade"><li>'
++                      + response[field] + '</li></ul></div> '
++              );
++          }
++      }
++  }
++  $('.errorlist.fade').addClass('in');
+ }

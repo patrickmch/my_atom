@@ -1,115 +1,177 @@
-'use strict';
+"use strict";
 
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.OpenFilesListComponent = undefined;
+exports.OpenFilesListComponent = void 0;
 
-var _nuclideUri;
+function _DraggableFile() {
+  const data = _interopRequireDefault(require("../../../modules/nuclide-commons-ui/DraggableFile"));
 
-function _load_nuclideUri() {
-  return _nuclideUri = _interopRequireDefault(require('../../../modules/nuclide-commons/nuclideUri'));
+  _DraggableFile = function () {
+    return data;
+  };
+
+  return data;
 }
 
-var _react = _interopRequireWildcard(require('react'));
+function _nuclideUri() {
+  const data = _interopRequireDefault(require("../../../modules/nuclide-commons/nuclideUri"));
 
-var _classnames;
+  _nuclideUri = function () {
+    return data;
+  };
 
-function _load_classnames() {
-  return _classnames = _interopRequireDefault(require('classnames'));
+  return data;
 }
 
-var _PanelComponentScroller;
+var React = _interopRequireWildcard(require("react"));
 
-function _load_PanelComponentScroller() {
-  return _PanelComponentScroller = require('../../../modules/nuclide-commons-ui/PanelComponentScroller');
+function _classnames() {
+  const data = _interopRequireDefault(require("classnames"));
+
+  _classnames = function () {
+    return data;
+  };
+
+  return data;
 }
 
-var _FileTreeActions;
+function _PanelComponentScroller() {
+  const data = require("../../../modules/nuclide-commons-ui/PanelComponentScroller");
 
-function _load_FileTreeActions() {
-  return _FileTreeActions = _interopRequireDefault(require('../lib/FileTreeActions'));
+  _PanelComponentScroller = function () {
+    return data;
+  };
+
+  return data;
 }
 
-var _FileTreeHelpers;
+function FileTreeHelpers() {
+  const data = _interopRequireWildcard(require("../lib/FileTreeHelpers"));
 
-function _load_FileTreeHelpers() {
-  return _FileTreeHelpers = _interopRequireDefault(require('../lib/FileTreeHelpers'));
+  FileTreeHelpers = function () {
+    return data;
+  };
+
+  return data;
 }
 
-var _FileTreeStore;
+function _PathWithFileIcon() {
+  const data = _interopRequireDefault(require("../../../modules/nuclide-commons-ui/PathWithFileIcon"));
 
-function _load_FileTreeStore() {
-  return _FileTreeStore = require('../lib/FileTreeStore');
+  _PathWithFileIcon = function () {
+    return data;
+  };
+
+  return data;
 }
 
-var _PathWithFileIcon;
+function _Tree() {
+  const data = require("../../../modules/nuclide-commons-ui/Tree");
 
-function _load_PathWithFileIcon() {
-  return _PathWithFileIcon = _interopRequireDefault(require('../../nuclide-ui/PathWithFileIcon'));
+  _Tree = function () {
+    return data;
+  };
+
+  return data;
 }
 
-var _Tree;
+function _DragResizeContainer() {
+  const data = require("../../../modules/nuclide-commons-ui/DragResizeContainer");
 
-function _load_Tree() {
-  return _Tree = require('../../../modules/nuclide-commons-ui/Tree');
+  _DragResizeContainer = function () {
+    return data;
+  };
+
+  return data;
 }
 
-var _DragResizeContainer;
+function _nuclideAnalytics() {
+  const data = require("../../../modules/nuclide-analytics");
 
-function _load_DragResizeContainer() {
-  return _DragResizeContainer = require('../../../modules/nuclide-commons-ui/DragResizeContainer');
+  _nuclideAnalytics = function () {
+    return data;
+  };
+
+  return data;
 }
 
-var _nuclideAnalytics;
+function _goToLocation() {
+  const data = require("../../../modules/nuclide-commons-atom/go-to-location");
 
-function _load_nuclideAnalytics() {
-  return _nuclideAnalytics = require('../../nuclide-analytics');
+  _goToLocation = function () {
+    return data;
+  };
+
+  return data;
 }
 
-var _goToLocation;
+function _ChangedFilesList() {
+  const data = require("../../nuclide-ui/ChangedFilesList");
 
-function _load_goToLocation() {
-  return _goToLocation = require('../../../modules/nuclide-commons-atom/go-to-location');
+  _ChangedFilesList = function () {
+    return data;
+  };
+
+  return data;
 }
 
-var _ChangedFilesList;
+function Selectors() {
+  const data = _interopRequireWildcard(require("../lib/redux/Selectors"));
 
-function _load_ChangedFilesList() {
-  return _ChangedFilesList = require('../../nuclide-ui/ChangedFilesList');
+  Selectors = function () {
+    return data;
+  };
+
+  return data;
 }
 
-var _reselect;
+function Actions() {
+  const data = _interopRequireWildcard(require("../lib/redux/Actions"));
 
-function _load_reselect() {
-  return _reselect = require('reselect');
+  Actions = function () {
+    return data;
+  };
+
+  return data;
 }
 
-var _immutable;
+function _reselect() {
+  const data = require("reselect");
 
-function _load_immutable() {
-  return _immutable = _interopRequireDefault(require('immutable'));
+  _reselect = function () {
+    return data;
+  };
+
+  return data;
 }
 
-function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
+function _immutable() {
+  const data = _interopRequireDefault(require("immutable"));
+
+  _immutable = function () {
+    return data;
+  };
+
+  return data;
+}
+
+function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) { var desc = Object.defineProperty && Object.getOwnPropertyDescriptor ? Object.getOwnPropertyDescriptor(obj, key) : {}; if (desc.get || desc.set) { Object.defineProperty(newObj, key, desc); } else { newObj[key] = obj[key]; } } } } newObj.default = obj; return newObj; } }
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-const getActions = (_FileTreeActions || _load_FileTreeActions()).default.getInstance; /**
-                                                                                       * Copyright (c) 2015-present, Facebook, Inc.
-                                                                                       * All rights reserved.
-                                                                                       *
-                                                                                       * This source code is licensed under the license found in the LICENSE file in
-                                                                                       * the root directory of this source tree.
-                                                                                       *
-                                                                                       *  strict-local
-                                                                                       * @format
-                                                                                       */
-
-const store = (_FileTreeStore || _load_FileTreeStore()).FileTreeStore.getInstance();
-
-class OpenFilesListComponent extends _react.PureComponent {
-
+/**
+ * Copyright (c) 2015-present, Facebook, Inc.
+ * All rights reserved.
+ *
+ * This source code is licensed under the license found in the LICENSE file in
+ * the root directory of this source tree.
+ *
+ *  strict-local
+ * @format
+ */
+class OpenFilesListComponent extends React.PureComponent {
   constructor(props) {
     super(props);
 
@@ -123,6 +185,7 @@ class OpenFilesListComponent extends _react.PureComponent {
 
   componentDidUpdate(prevProps) {
     const selectedRow = this._selectedRow;
+
     if (selectedRow != null && this.state.selectedUri !== this.props.activeUri && prevProps.activeUri !== this.props.activeUri) {
       // Our lint rule isn't smart enough to recognize that this is a custom method and not the one
       // on HTMLElements, so we just have to squelch the error.
@@ -133,10 +196,13 @@ class OpenFilesListComponent extends _react.PureComponent {
 
   _onMouseDown(entry, event) {
     event.stopPropagation();
-    const rootNode = store.getRootForPath(entry.uri);
-    if ((_FileTreeHelpers || _load_FileTreeHelpers()).default.getSelectionMode(event) === 'single-select' && !entry.isSelected && rootNode != null) {
-      getActions().setTargetNode(rootNode.rootUri, entry.uri);
-      this.setState({ selectedUri: entry.uri });
+    const rootNode = Selectors().getRootForPath(this.props.store.getState(), entry.uri);
+
+    if (FileTreeHelpers().getSelectionMode(event) === 'single-select' && !entry.isSelected && rootNode != null) {
+      this.props.store.dispatch(Actions().setTargetNode(rootNode.rootUri, entry.uri));
+      this.setState({
+        selectedUri: entry.uri
+      });
     }
   }
 
@@ -149,25 +215,33 @@ class OpenFilesListComponent extends _react.PureComponent {
 
     if (event.button === 1) {
       this._closeFile(uri);
+
       return;
     }
 
-    (0, (_nuclideAnalytics || _load_nuclideAnalytics()).track)('filetree-open-from-open-files', { uri });
-    (0, (_goToLocation || _load_goToLocation()).goToLocation)(uri, { activatePane: false });
+    (0, _nuclideAnalytics().track)('filetree-open-from-open-files', {
+      uri
+    });
+    (0, _goToLocation().goToLocation)(uri, {
+      activatePane: false
+    });
   }
 
   _onConfirm(entry, event) {
-    (0, (_goToLocation || _load_goToLocation()).goToLocation)(entry.uri);
+    (0, _goToLocation().goToLocation)(entry.uri);
   }
 
   _onCloseClick(entry, event) {
     const uri = entry.uri;
     event.preventDefault();
+
     this._closeFile(uri);
   }
 
   _closeFile(uri) {
-    (0, (_nuclideAnalytics || _load_nuclideAnalytics()).track)('filetree-close-from-open-files', { uri });
+    (0, _nuclideAnalytics().track)('filetree-close-from-open-files', {
+      uri
+    });
     atom.workspace.getPanes().forEach(pane => {
       pane.getItems().filter(item => item.getPath && item.getPath() === uri).forEach(item => {
         pane.destroyItem(item);
@@ -183,6 +257,7 @@ class OpenFilesListComponent extends _react.PureComponent {
 
   propsToEntries() {
     const displayPaths = this._getDisplayNames(this.props);
+
     const entries = this.props.uris.map((uri, index) => {
       const isModified = this.props.modifiedUris.indexOf(uri) >= 0;
       const isSelected = uri === this.props.activeUri;
@@ -194,10 +269,9 @@ class OpenFilesListComponent extends _react.PureComponent {
         isSelected,
         generatedType
       };
-    });
+    }); // Sort by file name (see https://fb.facebook.com/groups/nuclideintfeedback/permalink/1883372318378041/)
 
-    // Sort by file name (see https://fb.facebook.com/groups/nuclideintfeedback/permalink/1883372318378041/)
-    entries.sort((e1, e2) => (_nuclideUri || _load_nuclideUri()).default.basename(e1.uri).localeCompare((_nuclideUri || _load_nuclideUri()).default.basename(e2.uri)));
+    entries.sort((e1, e2) => _nuclideUri().default.basename(e1.uri).localeCompare(_nuclideUri().default.basename(e2.uri)));
     return entries;
   }
 
@@ -205,8 +279,10 @@ class OpenFilesListComponent extends _react.PureComponent {
     switch (generatedType) {
       case 'generated':
         return 'generated-fully';
+
       case 'partial':
         return 'generated-partly';
+
       default:
         return null;
     }
@@ -214,59 +290,48 @@ class OpenFilesListComponent extends _react.PureComponent {
 
   render() {
     const sortedEntries = this.propsToEntries();
-
-    return _react.createElement(
-      (_DragResizeContainer || _load_DragResizeContainer()).DragResizeContainer,
-      null,
-      _react.createElement(
-        'div',
-        { className: 'nuclide-file-tree-open-files' },
-        _react.createElement(
-          (_PanelComponentScroller || _load_PanelComponentScroller()).PanelComponentScroller,
-          null,
-          _react.createElement(
-            (_Tree || _load_Tree()).TreeList,
-            { showArrows: true, className: 'nuclide-file-tree-open-files-list' },
-            _react.createElement(
-              (_Tree || _load_Tree()).NestedTreeItem,
-              { hasFlatChildren: true },
-              sortedEntries.map(e => {
-                const isHoveredUri = this.state.hoveredUri === e.uri;
-                return _react.createElement(
-                  (_Tree || _load_Tree()).TreeItem,
-                  {
-                    className: (0, (_classnames || _load_classnames()).default)('file', 'nuclide-path-with-terminal', this._generatedClass(e.generatedType), {
-                      'text-highlight': isHoveredUri
-                    }),
-                    selected: e.isSelected,
-                    key: e.uri,
-                    onConfirm: this._onConfirm.bind(this, e),
-                    onSelect: this._onSelect.bind(this, e),
-                    onMouseEnter: this._onListItemMouseEnter.bind(this, e),
-                    onMouseLeave: this._onListItemMouseLeave,
-                    onMouseDown: this._onMouseDown.bind(this, e),
-                    path: e.uri,
-                    name: e.name
-                    // eslint-disable-next-line nuclide-internal/jsx-simple-callback-refs
-                    , ref: e.isSelected ? this._handleSelectedRow : null },
-                  _react.createElement('span', {
-                    className: (0, (_classnames || _load_classnames()).default)('icon', {
-                      'icon-primitive-dot': e.isModified && !isHoveredUri,
-                      'icon-x': isHoveredUri || !e.isModified,
-                      'text-info': e.isModified
-                    }),
-                    onClick: this._onCloseClick.bind(this, e)
-                  }),
-                  _react.createElement((_PathWithFileIcon || _load_PathWithFileIcon()).default, { path: e.name })
-                );
-              })
-            )
-          )
-        )
-      )
-    );
+    return React.createElement(_DragResizeContainer().DragResizeContainer, null, React.createElement("div", {
+      className: "nuclide-file-tree-open-files"
+    }, React.createElement(_PanelComponentScroller().PanelComponentScroller, null, React.createElement(_Tree().TreeList, {
+      showArrows: true,
+      className: "nuclide-file-tree-open-files-list"
+    }, React.createElement(_Tree().NestedTreeItem, {
+      hasFlatChildren: true
+    }, sortedEntries.map(e => {
+      const isHoveredUri = this.state.hoveredUri === e.uri;
+      return React.createElement(_Tree().TreeItem, {
+        className: (0, _classnames().default)('file', 'nuclide-path-with-terminal', this._generatedClass(e.generatedType), {
+          'text-highlight': isHoveredUri
+        }),
+        selected: e.isSelected,
+        key: e.uri,
+        onConfirm: this._onConfirm.bind(this, e),
+        onSelect: this._onSelect.bind(this, e),
+        onMouseEnter: this._onListItemMouseEnter.bind(this, e),
+        onMouseLeave: this._onListItemMouseLeave,
+        onMouseDown: this._onMouseDown.bind(this, e),
+        path: e.uri,
+        name: e.name // eslint-disable-next-line nuclide-internal/jsx-simple-callback-refs
+        ,
+        ref: e.isSelected ? this._handleSelectedRow : null
+      }, React.createElement(_DraggableFile().default, {
+        uri: e.uri,
+        trackingSource: "open-files"
+      }, React.createElement("span", {
+        className: (0, _classnames().default)('icon', {
+          'icon-primitive-dot': e.isModified && !isHoveredUri,
+          'icon-x': isHoveredUri || !e.isModified,
+          'text-info': e.isModified
+        }),
+        onClick: this._onCloseClick.bind(this, e)
+      }), React.createElement(_PathWithFileIcon().default, {
+        path: e.name
+      })));
+    }))))));
   }
+
 }
+
 exports.OpenFilesListComponent = OpenFilesListComponent;
 
 var _initialiseProps = function () {
@@ -280,7 +345,7 @@ var _initialiseProps = function () {
     this._selectedRow = treeItem;
   };
 
-  this._getDisplayNames = (0, (_reselect || _load_reselect()).createSelector)([props => props.uris], x => {
-    return (0, (_ChangedFilesList || _load_ChangedFilesList()).computeDisplayPaths)(x);
+  this._getDisplayNames = (0, _reselect().createSelector)([props => props.uris], x => {
+    return (0, _ChangedFilesList().computeDisplayPaths)(x);
   });
 };

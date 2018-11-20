@@ -1,11 +1,15 @@
-'use strict';
+"use strict";
 
-var _readline = _interopRequireDefault(require('readline'));
+var _readline = _interopRequireDefault(require("readline"));
 
-var _yargs;
+function _yargs() {
+  const data = _interopRequireDefault(require("yargs"));
 
-function _load_yargs() {
-  return _yargs = _interopRequireDefault(require('yargs'));
+  _yargs = function () {
+    return data;
+  };
+
+  return data;
 }
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
@@ -43,30 +47,31 @@ function listFeatures(positionals, args, token) {
 function respondTo(line) {
   process.stderr.write(`got line ${line}`);
 
-  const args = (_yargs || _load_yargs()).default.parse(line.split(/\s+/));
+  const args = _yargs().default.parse(line.split(/\s+/));
+
   const positionals = args._;
 
   if (positionals.length === 0) {
     return;
   }
 
-  const first = positionals[0].toString();
+  const first = positionals[0].toString(); // is it an MI command with a token?
 
-  // is it an MI command with a token?
   const commandPattern = /^(\d+)-(.*)$/;
   const match = first.match(commandPattern);
+
   if (match == null) {
     // Untokenized commands come back as an error on the log stream
     process.stdout.write(`&"${first}\\n"\n`);
-    process.stdout.write(`&"Undefined command: \\"${first}\\". Try \\"help\\"."\n`);
+    process.stdout.write(`&"Undefined command: \\"${first}\\". Try \\"help\\"."\n`); // ... as well as returning a real error
 
-    // ... as well as returning a real error
     process.stdout.write(`^error,msg="Undefined command: \\"${first}\\". Try \\"help\\"."\n`);
     return;
   }
 
   const [, token, command] = match;
   const handler = handlers.get(command);
+
   if (handler == null) {
     writeResult(token, 'error', 'msg="Undefined command: \\"${command}\\". Try \\"help\\"."');
     return;
@@ -76,5 +81,4 @@ function respondTo(line) {
 }
 
 process.stderr.write('mock server running\n');
-
 rl.on('line', line => respondTo(line)).on('close', _ => process.exit(0));

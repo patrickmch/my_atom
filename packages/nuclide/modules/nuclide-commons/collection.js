@@ -1,4 +1,4 @@
-'use strict';
+"use strict";
 
 Object.defineProperty(exports, "__esModule", {
   value: true
@@ -11,6 +11,7 @@ exports.arrayFlatten = arrayFlatten;
 exports.arrayUnique = arrayUnique;
 exports.arrayFindLastIndex = arrayFindLastIndex;
 exports.findSubArrayIndex = findSubArrayIndex;
+exports.arrayPartition = arrayPartition;
 exports.mapUnion = mapUnion;
 exports.mapCompact = mapCompact;
 exports.mapFilter = mapFilter;
@@ -47,6 +48,9 @@ exports.insideOut = insideOut;
 exports.mapFromObject = mapFromObject;
 exports.lastFromArray = lastFromArray;
 exports.distinct = distinct;
+exports.findTopRanked = findTopRanked;
+exports.DefaultWeakMap = exports.DefaultMap = exports.MultiMap = void 0;
+
 /**
  * Copyright (c) 2017-present, Facebook, Inc.
  * All rights reserved.
@@ -58,13 +62,13 @@ exports.distinct = distinct;
  * 
  * @format
  */
-
 function ensureArray(x) {
   return Array.isArray(x) ? x : [x];
 }
 
 function arrayRemove(array, element) {
   const index = array.indexOf(element);
+
   if (index >= 0) {
     array.splice(index, 1);
   }
@@ -74,107 +78,141 @@ function arrayEqual(array1, array2, equalComparator) {
   if (array1 === array2) {
     return true;
   }
+
   if (array1.length !== array2.length) {
     return false;
   }
+
   const equalFunction = equalComparator || ((a, b) => a === b);
+
   return array1.every((item1, i) => equalFunction(item1, array2[i]));
 }
-
 /**
  * Returns a copy of the input Array with all `null` and `undefined` values filtered out.
  * Allows Flow to typecheck the common `filter(x => x != null)` pattern.
  */
+
+
 function arrayCompact(array) {
   const result = [];
+
   for (const elem of array) {
     if (elem != null) {
       result.push(elem);
     }
   }
+
   return result;
 }
-
 /**
  * Flattens an Array<Array<T>> into just an Array<T>
  */
+
+
 function arrayFlatten(array) {
   const result = [];
+
   for (const subArray of array) {
     result.push(...subArray);
   }
+
   return result;
 }
-
 /**
  * Removes duplicates from Array<T>.
  * Uses SameValueZero for equality purposes, which is like '===' except it deems
  * two NaNs equal. http://www.ecma-international.org/ecma-262/6.0/#sec-samevaluezero
  */
+
+
 function arrayUnique(array) {
   return Array.from(new Set(array));
 }
-
 /**
  * Returns the last index in the input array that matches the predicate.
  * Returns -1 if no match is found.
  */
+
+
 function arrayFindLastIndex(array, predicate, thisArg) {
   for (let i = array.length - 1; i >= 0; i--) {
     if (predicate.call(thisArg, array[i], i, array)) {
       return i;
     }
   }
+
   return -1;
 }
-
 /**
  * Return the first index in array where subarray is equal to the next
  * subarray-sized slice of array. Return -1 if no match is found.
  */
+
+
 function findSubArrayIndex(array, subarr) {
   return array.findIndex((_, offset) => arrayEqual(array.slice(offset, offset + subarr.length), subarr));
 }
+/**
+ * Separates an array into two subarrays -- the first contains all elements that
+ * match the predicate and the latter contains all the rest that fail.
+ */
 
+
+function arrayPartition(array, predicate) {
+  const pass = [];
+  const fail = [];
+  array.forEach(elem => predicate(elem) ? pass.push(elem) : fail.push(elem));
+  return [pass, fail];
+}
 /**
  * Merges a given arguments of maps into one Map, with the latest maps
  * overriding the values of the prior maps.
  */
+
+
 function mapUnion(...maps) {
   const unionMap = new Map();
+
   for (const map of maps) {
     for (const [key, value] of map) {
       unionMap.set(key, value);
     }
   }
+
   return unionMap;
 }
 
 function mapCompact(map) {
   const selected = new Map();
+
   for (const [key, value] of map) {
     if (value != null) {
       selected.set(key, value);
     }
   }
+
   return selected;
 }
 
 function mapFilter(map, selector) {
   const selected = new Map();
+
   for (const [key, value] of map) {
     if (selector(key, value)) {
       selected.set(key, value);
     }
   }
+
   return selected;
 }
 
 function mapTransform(src, transform) {
   const result = new Map();
+
   for (const [key, value] of src) {
     result.set(key, transform(value, key));
   }
+
   return result;
 }
 
@@ -182,12 +220,15 @@ function mapEqual(map1, map2, equalComparator) {
   if (map1.size !== map2.size) {
     return false;
   }
+
   const equalFunction = equalComparator || ((a, b) => a === b);
-  for (const [key1, value1] of map1) {
-    if (!map2.has(key1) || !equalFunction(value1, map2.get(key1))) {
+
+  for (const [key, value1] of map1) {
+    if (!map2.has(key) || !equalFunction(value1, map2.get(key))) {
       return false;
     }
   }
+
   return true;
 }
 
@@ -204,15 +245,16 @@ function mapGetWithDefault(map, key, default_) {
 
 function areSetsEqual(a, b) {
   return a.size === b.size && every(a, element => b.has(element));
-}
+} // Array.every but for any iterable.
 
-// Array.every but for any iterable.
+
 function every(values, predicate) {
   for (const element of values) {
     if (!predicate(element)) {
       return false;
     }
   }
+
   return true;
 }
 
@@ -248,8 +290,11 @@ function setDifference(a, b, hash_) {
   } else if (b.size === 0) {
     return new Set(a);
   }
+
   const result = new Set();
+
   const hash = hash_ || (x => x);
+
   const bHashes = hash_ == null ? b : new Set(Array.from(b.values()).map(hash));
   a.forEach(value => {
     if (!bHashes.has(hash(value))) {
@@ -261,6 +306,7 @@ function setDifference(a, b, hash_) {
 
 function setFilter(set, predicate) {
   const out = new Set();
+
   for (const item of set) {
     if (predicate(item)) {
       out.add(item);
@@ -269,23 +315,26 @@ function setFilter(set, predicate) {
 
   return out;
 }
-
 /**
  * O(1)-check if a given object is empty (has no properties, inherited or not)
  */
+
+
 function isEmpty(obj) {
   for (const key in obj) {
     return false;
   }
+
   return true;
 }
-
 /**
  * Constructs an enumeration with keys equal to their value.
  * e.g. keyMirror({a: null, b: null}) => {a: 'a', b: 'b'}
  *
  * Based off the equivalent function in www.
  */
+
+
 function keyMirror(obj) {
   const ret = {};
   Object.keys(obj).forEach(key => {
@@ -293,30 +342,37 @@ function keyMirror(obj) {
   });
   return ret;
 }
-
 /**
  * Given an array of [key, value] pairs, construct a map where the values for
  * each key are collected into an array of values, in order.
  */
+
+
 function collect(pairs) {
   const result = new Map();
+
   for (const pair of pairs) {
     const [k, v] = pair;
     let list = result.get(k);
+
     if (list == null) {
       list = [];
       result.set(k, list);
     }
+
     list.push(v);
   }
+
   return result;
 }
 
 function objectFromPairs(iterable) {
   const result = {};
+
   for (const [key, value] of iterable) {
     result[key] = value;
   }
+
   return result;
 }
 
@@ -330,77 +386,92 @@ function objectMapValues(object, project) {
 
 class MultiMap {
   // Invariant: no empty sets. They should be removed instead.
+  // TODO may be worth defining a getter but no setter, to mimic Map. But please just behave and
+  // don't mutate this from outside this class.
+  //
+  // Invariant: equal to the sum of the sizes of all the sets contained in this._map
+
+  /* The total number of key-value bindings contained */
   constructor() {
     this._map = new Map();
     this.size = 0;
   }
-
   /*
    * Returns the set of values associated with the given key. Do not mutate the given set. Copy it
    * if you need to store it past the next operation on this MultiMap.
    */
 
 
-  // TODO may be worth defining a getter but no setter, to mimic Map. But please just behave and
-  // don't mutate this from outside this class.
-  //
-  // Invariant: equal to the sum of the sizes of all the sets contained in this._map
-  /* The total number of key-value bindings contained */
   get(key) {
     const set = this._map.get(key);
+
     if (set == null) {
       return new Set();
     }
+
     return set;
   }
-
   /*
    * Mimics the Map.prototype.set interface. Deliberately did not choose "set" as the name since the
    * implication is that it removes the previous binding.
    */
+
+
   add(key, value) {
     let set = this._map.get(key);
+
     if (set == null) {
       set = new Set();
+
       this._map.set(key, set);
     }
+
     if (!set.has(value)) {
       set.add(value);
       this.size++;
     }
+
     return this;
   }
-
   /*
    * Mimics the Map.prototype.set interface. Replaces the previous binding with new values.
    */
+
+
   set(key, values) {
     this.deleteAll(key);
     const newSet = new Set(values);
+
     if (newSet.size !== 0) {
       this._map.set(key, newSet);
+
       this.size += newSet.size;
     }
   }
-
   /*
    * Deletes a single binding. Returns true iff the binding existed.
    */
+
+
   delete(key, value) {
     const set = this.get(key);
     const didRemove = set.delete(value);
+
     if (set.size === 0) {
       this._map.delete(key);
     }
+
     if (didRemove) {
       this.size--;
     }
+
     return didRemove;
   }
-
   /*
    * Deletes all bindings associated with the given key. Returns true iff any bindings were deleted.
    */
+
+
   deleteAll(key) {
     const set = this.get(key);
     this.size -= set.size;
@@ -409,6 +480,7 @@ class MultiMap {
 
   clear() {
     this._map.clear();
+
     this.size = 0;
   }
 
@@ -429,9 +501,11 @@ class MultiMap {
   forEach(callback) {
     this._map.forEach((values, key) => values.forEach(value => callback(value, key, this)));
   }
+
 }
 
 exports.MultiMap = MultiMap;
+
 function objectValues(obj) {
   return Object.keys(obj).map(key => obj[key]);
 }
@@ -440,12 +514,15 @@ function objectEntries(obj) {
   if (obj == null) {
     throw new TypeError();
   }
+
   const entries = [];
+
   for (const key in obj) {
     if (obj.hasOwnProperty(key) && Object.prototype.propertyIsEnumerable.call(obj, key)) {
       entries.push([key, obj[key]]);
     }
   }
+
   return entries;
 }
 
@@ -471,6 +548,7 @@ function someOfIterable(iterable, predicate) {
       return true;
     }
   }
+
   return false;
 }
 
@@ -480,6 +558,7 @@ function findInIterable(iterable, predicate) {
       return element;
     }
   }
+
   return null;
 }
 
@@ -499,15 +578,17 @@ function* mapIterable(iterable, projectorFn) {
 
 function* takeIterable(iterable, limit) {
   let i = 0;
+
   for (const element of iterable) {
     if (++i > limit) {
       break;
     }
+
     yield element;
   }
-}
+} // Return an iterable of the numbers start (inclusive) through stop (exclusive)
 
-// Return an iterable of the numbers start (inclusive) through stop (exclusive)
+
 function* range(start, stop, step = 1) {
   for (let i = start; i < stop; i += step) {
     yield i;
@@ -523,6 +604,7 @@ function iterableIsEmpty(iterable) {
   for (const element of iterable) {
     return false;
   }
+
   return true;
 }
 
@@ -531,19 +613,20 @@ function iterableContains(iterable, value) {
 }
 
 function count(iterable) {
-  let size = 0;
-  // eslint-disable-next-line no-unused-vars
+  let size = 0; // eslint-disable-next-line no-unused-vars
+
   for (const element of iterable) {
     size++;
   }
+
   return size;
 }
 
 function isIterable(obj) {
   return typeof obj[Symbol.iterator] === 'function';
-}
+} // Traverse an array from the inside out, starting at the specified index.
 
-// Traverse an array from the inside out, starting at the specified index.
+
 function* insideOut(arr, startingIndex) {
   if (arr.length === 0) {
     return;
@@ -557,6 +640,7 @@ function* insideOut(arr, startingIndex) {
       yield [arr[i], i];
       i++;
     }
+
     if (j >= 0) {
       yield [arr[j], j];
       j--;
@@ -580,16 +664,17 @@ function distinct(array, keyFn) {
   const seenKeys = new Set();
   return array.filter(elem => {
     const key = keyFn(elem);
+
     if (seenKeys.has(key)) {
       return false;
     }
+
     seenKeys.add(key);
     return true;
   });
 }
 
 class DefaultMap extends Map {
-
   constructor(factory, iterable) {
     super(iterable);
     this._factory = factory;
@@ -598,11 +683,63 @@ class DefaultMap extends Map {
   get(key) {
     if (!this.has(key)) {
       const value = this._factory();
+
       this.set(key, value);
       return value;
-    }
-    // If the key is present we must have a value of type V.
+    } // If the key is present we must have a value of type V.
+
+
     return super.get(key);
   }
+
 }
+
 exports.DefaultMap = DefaultMap;
+
+class DefaultWeakMap extends WeakMap {
+  constructor(factory, iterable) {
+    super(iterable);
+    this._factory = factory;
+  }
+
+  get(key) {
+    if (!this.has(key)) {
+      const value = this._factory();
+
+      this.set(key, value);
+      return value;
+    } // If the key is present we must have a value of type V.
+
+
+    return super.get(key);
+  }
+
+}
+/**
+ * Return the highest ranked item in a list, according to the provided ranking function. A max rank
+ * may optionally be provided so the whole list doesn't have to be iterated. Items with ranks of
+ * zero or less are never returned.
+ */
+
+
+exports.DefaultWeakMap = DefaultWeakMap;
+
+function findTopRanked(items, ranker, maxRank) {
+  let maxSeenRank = 0;
+  let maxRankedItem;
+
+  for (const item of items) {
+    const rank = ranker(item);
+
+    if (rank === maxRank) {
+      return item;
+    }
+
+    if (rank > 0 && rank > maxSeenRank) {
+      maxSeenRank = rank;
+      maxRankedItem = item;
+    }
+  }
+
+  return maxRankedItem;
+}

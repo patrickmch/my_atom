@@ -2194,7 +2194,8 @@ def report_execution_error(exc_text, execution_id):
 
 def report_execution_exception(execution_id, exc_info):
     try:
-        exc_text = str(exc_info[1])
+        exc_type, exc_value, traceback = exc_info
+        exc_text = '{}: {}'.format(get_exception_name(exc_type), exc_value)
     except:
         exc_text = 'An exception was thrown'
 
@@ -2364,7 +2365,14 @@ def attach_process_from_socket(sock, debug_options, report = False, block = Fals
 
     for mod_value in list(sys.modules.values()):
         try:
-            filename = getattr(mod_value, '__file__', None)
+            lazyModule = False
+            try:
+                lazyModule = mod_value.__class__.__name__ == 'LazyImporter'
+            except:
+                lazyModule = False
+            filename = None
+            if not lazyModule:
+                filename = getattr(mod_value, '__file__', None)
             if filename is not None:
                 try:
                     fullpath = path.abspath(filename)
@@ -2598,9 +2606,14 @@ def parse_debug_options(s):
 # Accept current Process id to pass back to debugger
 def debug(file, port_num, debug_id, debug_options, currentPid, run_as = 'script'):
     # remove us from modules so there's no trace of us
-    sys.modules['$visualstudio_py_debugger'] = sys.modules['visualstudio_py_debugger']
-    __name__ = '$visualstudio_py_debugger'
-    del sys.modules['visualstudio_py_debugger']
+    if dict_contains(sys.modules, 'visualstudio_py_debugger'):
+        sys.modules['$visualstudio_py_debugger'] = sys.modules['visualstudio_py_debugger']
+        __name__ = '$visualstudio_py_debugger'
+        del sys.modules['visualstudio_py_debugger']
+    elif dict_contains(sys.modules, 'ptvsd.visualstudio_py_debugger'):
+        sys.modules['$ptvsd.visualstudio_py_debugger'] = sys.modules['ptvsd.visualstudio_py_debugger']
+        __name__ = '$ptvsd.visualstudio_py_debugger'
+        del sys.modules['ptvsd.visualstudio_py_debugger']
 
     wait_on_normal_exit = 'WaitOnNormalExit' in debug_options
 
@@ -2624,6 +2637,8 @@ def debug(file, port_num, debug_id, debug_options, currentPid, run_as = 'script'
         elif run_as == 'code':
             exec_code(file, '<string>', globals_obj)
         else:
+            # fix sys.path to be the script file dir
+            sys.path[0] = ''
             exec_file(file, globals_obj)
     finally:
         sys.settrace(None)

@@ -1,24 +1,44 @@
-'use strict';
+"use strict";
 
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
+exports.default = void 0;
 
-var _nuclideUri;
+function _nuclideUri() {
+  const data = _interopRequireDefault(require("../../../modules/nuclide-commons/nuclideUri"));
 
-function _load_nuclideUri() {
-  return _nuclideUri = _interopRequireDefault(require('../../../modules/nuclide-commons/nuclideUri'));
+  _nuclideUri = function () {
+    return data;
+  };
+
+  return data;
 }
 
-var _UniversalDisposable;
+function _UniversalDisposable() {
+  const data = _interopRequireDefault(require("../../../modules/nuclide-commons/UniversalDisposable"));
 
-function _load_UniversalDisposable() {
-  return _UniversalDisposable = _interopRequireDefault(require('../../../modules/nuclide-commons/UniversalDisposable'));
+  _UniversalDisposable = function () {
+    return data;
+  };
+
+  return data;
 }
 
-var _stream = _interopRequireDefault(require('stream'));
+var _stream = _interopRequireDefault(require("stream"));
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+/**
+ * Copyright (c) 2015-present, Facebook, Inc.
+ * All rights reserved.
+ *
+ * This source code is licensed under the license found in the LICENSE file in
+ * the root directory of this source tree.
+ *
+ * 
+ * @format
+ */
 
 /**
  * A Directory object that returns the bare minimum that's required by Atom.
@@ -26,12 +46,15 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
  * Should be removed ASAP once the remote connection is restored.
  */
 class RemoteDirectoryPlaceholder {
-
   constructor(uri) {
     this.symlink = false;
-
     this._uri = uri;
-    const { hostname, path } = (_nuclideUri || _load_nuclideUri()).default.parse(uri);
+
+    const {
+      hostname,
+      path
+    } = _nuclideUri().default.parse(uri);
+
     this._hostname = hostname;
     this._path = path;
   }
@@ -41,11 +64,11 @@ class RemoteDirectoryPlaceholder {
   }
 
   onDidChange(callback) {
-    return new (_UniversalDisposable || _load_UniversalDisposable()).default();
+    return new (_UniversalDisposable().default)();
   }
 
   onDidChangeFiles(callback) {
-    return new (_UniversalDisposable || _load_UniversalDisposable()).default();
+    return new (_UniversalDisposable().default)();
   }
 
   isFile() {
@@ -73,38 +96,41 @@ class RemoteDirectoryPlaceholder {
   }
 
   getBaseName() {
-    return (_nuclideUri || _load_nuclideUri()).default.basename(this._uri);
+    return _nuclideUri().default.basename(this._uri);
   }
 
   relativize(uri) {
     if (!uri) {
       return uri;
     }
-    const parsedUrl = (_nuclideUri || _load_nuclideUri()).default.parse(uri);
+
+    const parsedUrl = _nuclideUri().default.parse(uri);
+
     if (parsedUrl.hostname !== this._hostname) {
       return uri;
     }
-    return (_nuclideUri || _load_nuclideUri()).default.relative(this._path, parsedUrl.path);
+
+    return _nuclideUri().default.relative(this._path, parsedUrl.path);
   }
 
   onDidRename(callback) {
-    return new (_UniversalDisposable || _load_UniversalDisposable()).default();
+    return new (_UniversalDisposable().default)();
   }
 
   onDidDelete(callback) {
-    return new (_UniversalDisposable || _load_UniversalDisposable()).default();
+    return new (_UniversalDisposable().default)();
   }
 
   getParent() {
-    return new RemoteDirectoryPlaceholder((_nuclideUri || _load_nuclideUri()).default.dirname(this._uri));
+    return new RemoteDirectoryPlaceholder(_nuclideUri().default.dirname(this._uri));
   }
 
   getFile(filename) {
-    return new RemoteFilePlaceholder((_nuclideUri || _load_nuclideUri()).default.join(this._uri, filename));
+    return new RemoteFilePlaceholder(_nuclideUri().default.join(this._uri, filename));
   }
 
   getSubdirectory(dirname) {
-    return new RemoteDirectoryPlaceholder((_nuclideUri || _load_nuclideUri()).default.join(this._uri, dirname));
+    return new RemoteDirectoryPlaceholder(_nuclideUri().default.join(this._uri, dirname));
   }
 
   getEntries(callback) {
@@ -115,45 +141,38 @@ class RemoteDirectoryPlaceholder {
     if (path == null) {
       return false;
     }
-    return (_nuclideUri || _load_nuclideUri()).default.contains(this._uri, path);
-  }
-}
 
-exports.default = RemoteDirectoryPlaceholder; /**
-                                               * In contrast to the directory placeholders, the file placeholders never exist.
-                                               * Atom's Git integration, for example, checks for the existence of .git files.
-                                               */
+    return _nuclideUri().default.contains(this._uri, path);
+  }
+
+}
 /**
- * Copyright (c) 2015-present, Facebook, Inc.
- * All rights reserved.
- *
- * This source code is licensed under the license found in the LICENSE file in
- * the root directory of this source tree.
- *
- * 
- * @format
+ * In contrast to the directory placeholders, the file placeholders never exist.
+ * Atom's Git integration, for example, checks for the existence of .git files.
  */
 
-class RemoteFilePlaceholder {
 
+exports.default = RemoteDirectoryPlaceholder;
+
+class RemoteFilePlaceholder {
   constructor(uri) {
     this._uri = uri;
   }
 
   onDidChange(callback) {
-    return new (_UniversalDisposable || _load_UniversalDisposable()).default();
+    return new (_UniversalDisposable().default)();
   }
 
   onDidRename(callback) {
-    return new (_UniversalDisposable || _load_UniversalDisposable()).default();
+    return new (_UniversalDisposable().default)();
   }
 
   onDidDelete(callback) {
-    return new (_UniversalDisposable || _load_UniversalDisposable()).default();
+    return new (_UniversalDisposable().default)();
   }
 
   onWillThrowWatchError(callback) {
-    return new (_UniversalDisposable || _load_UniversalDisposable()).default();
+    return new (_UniversalDisposable().default)();
   }
 
   isFile() {
@@ -203,7 +222,7 @@ class RemoteFilePlaceholder {
   }
 
   getBaseName() {
-    return (_nuclideUri || _load_nuclideUri()).default.basename(this._uri);
+    return _nuclideUri().default.basename(this._uri);
   }
 
   create() {
@@ -231,7 +250,7 @@ class RemoteFilePlaceholder {
   }
 
   getParent() {
-    return new RemoteDirectoryPlaceholder((_nuclideUri || _load_nuclideUri()).default.dirname(this._uri));
+    return new RemoteDirectoryPlaceholder(_nuclideUri().default.dirname(this._uri));
   }
 
   isSymbolicLink() {
@@ -243,11 +262,13 @@ class RemoteFilePlaceholder {
       read(size) {
         stream.push(null);
       }
+
     });
     return stream;
   }
 
   createWriteStream() {
-    throw Error('Cannot write to a RemoteFilePlaceholder');
+    throw new Error('Cannot write to a RemoteFilePlaceholder');
   }
+
 }

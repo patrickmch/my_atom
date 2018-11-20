@@ -1,35 +1,57 @@
-'use strict';
+"use strict";
 
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
+exports.default = void 0;
 
-var _humanizePath;
+function _humanizePath() {
+  const data = _interopRequireDefault(require("../../../modules/nuclide-commons-atom/humanizePath"));
 
-function _load_humanizePath() {
-  return _humanizePath = _interopRequireDefault(require('../../../modules/nuclide-commons-atom/humanizePath'));
+  _humanizePath = function () {
+    return data;
+  };
+
+  return data;
 }
 
-var _collection;
+function _collection() {
+  const data = require("../../../modules/nuclide-commons/collection");
 
-function _load_collection() {
-  return _collection = require('../../../modules/nuclide-commons/collection');
+  _collection = function () {
+    return data;
+  };
+
+  return data;
 }
 
-var _promise;
+function _promise() {
+  const data = require("../../../modules/nuclide-commons/promise");
 
-function _load_promise() {
-  return _promise = require('../../../modules/nuclide-commons/promise');
+  _promise = function () {
+    return data;
+  };
+
+  return data;
 }
 
-var _react = _interopRequireWildcard(require('react'));
+var React = _interopRequireWildcard(require("react"));
 
-function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
+function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) { var desc = Object.defineProperty && Object.getOwnPropertyDescriptor ? Object.getOwnPropertyDescriptor(obj, key) : {}; if (desc.get || desc.set) { Object.defineProperty(newObj, key, desc); } else { newObj[key] = obj[key]; } } } } newObj.default = obj; return newObj; } }
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
+/**
+ * Copyright (c) 2015-present, Facebook, Inc.
+ * All rights reserved.
+ *
+ * This source code is licensed under the license found in the LICENSE file in
+ * the root directory of this source tree.
+ *
+ * 
+ * @format
+ */
 class QuickOpenProvider {
-
   constructor(languageService) {
     this.providerType = 'GLOBAL';
     this.name = 'JSImportsService';
@@ -38,13 +60,11 @@ class QuickOpenProvider {
       prompt: 'Search JavaScript symbols...',
       action: 'nuclide-js-imports:toggle-provider'
     };
-
     this._languageService = languageService;
   }
 
   async _getDirectoriesByService(directories) {
-    return (0, (_collection || _load_collection()).collect)((0, (_collection || _load_collection()).arrayCompact)((await Promise.all(
-    // Flow's inference engine blows up without the annotation :(
+    return (0, _collection().collect)((0, _collection().arrayCompact)((await Promise.all( // Flow's inference engine blows up without the annotation :(
     directories.map(async directory => {
       const path = directory.getPath();
       const service = await this._languageService.getLanguageServiceForUri(path);
@@ -54,7 +74,7 @@ class QuickOpenProvider {
 
   async isEligibleForDirectories(directories) {
     const directoriesByService = await this._getDirectoriesByService(directories);
-    return (await (0, (_promise || _load_promise()).asyncFind)(Array.from(directoriesByService), ([service, paths]) => service.supportsSymbolSearch(paths))) != null;
+    return (await (0, _promise().asyncFind)(Array.from(directoriesByService), ([service, paths]) => service.supportsSymbolSearch(paths))) != null;
   }
 
   async executeQuery(query, directories) {
@@ -64,42 +84,23 @@ class QuickOpenProvider {
 
     const directoriesByService = await this._getDirectoriesByService(directories);
     const results = await Promise.all(Array.from(directoriesByService).map(([service, paths]) => service.symbolSearch(query, paths)));
-    return (0, (_collection || _load_collection()).arrayFlatten)((0, (_collection || _load_collection()).arrayCompact)(results));
-  }
+    return (0, _collection().arrayFlatten)((0, _collection().arrayCompact)(results));
+  } // TODO: Standardize on a generic SymbolResult renderer.
 
-  // TODO: Standardize on a generic SymbolResult renderer.
+
   getComponentForItem(item) {
-    const name = item.name || '';
+    const name = item.name || ''; // flowlint-next-line sketchy-null-string:off
 
-    // flowlint-next-line sketchy-null-string:off
     const symbolClasses = item.icon ? `file icon icon-${item.icon}` : 'file icon no-icon';
-    return _react.createElement(
-      'div',
-      { title: item.hoverText || '' },
-      _react.createElement(
-        'span',
-        { className: symbolClasses },
-        _react.createElement(
-          'code',
-          null,
-          name
-        )
-      ),
-      _react.createElement(
-        'span',
-        { className: 'omnisearch-symbol-result-filename' },
-        (0, (_humanizePath || _load_humanizePath()).default)(item.path)
-      )
-    );
+    return React.createElement("div", {
+      title: item.hoverText || ''
+    }, React.createElement("span", {
+      className: symbolClasses
+    }, React.createElement("code", null, name)), React.createElement("span", {
+      className: "omnisearch-symbol-result-filename"
+    }, (0, _humanizePath().default)(item.path)));
   }
+
 }
-exports.default = QuickOpenProvider; /**
-                                      * Copyright (c) 2015-present, Facebook, Inc.
-                                      * All rights reserved.
-                                      *
-                                      * This source code is licensed under the license found in the LICENSE file in
-                                      * the root directory of this source tree.
-                                      *
-                                      * 
-                                      * @format
-                                      */
+
+exports.default = QuickOpenProvider;

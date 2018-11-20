@@ -1,72 +1,130 @@
-'use strict';
+"use strict";
 
-var _createPackage;
+function _createPackage() {
+  const data = _interopRequireDefault(require("../../../modules/nuclide-commons-atom/createPackage"));
 
-function _load_createPackage() {
-  return _createPackage = _interopRequireDefault(require('../../../modules/nuclide-commons-atom/createPackage'));
+  _createPackage = function () {
+    return data;
+  };
+
+  return data;
 }
 
-var _UniversalDisposable;
+function _epicHelpers() {
+  const data = require("../../../modules/nuclide-commons/epicHelpers");
 
-function _load_UniversalDisposable() {
-  return _UniversalDisposable = _interopRequireDefault(require('../../../modules/nuclide-commons/UniversalDisposable'));
+  _epicHelpers = function () {
+    return data;
+  };
+
+  return data;
 }
 
-var _react = _interopRequireWildcard(require('react'));
+function _observableFromReduxStore() {
+  const data = _interopRequireDefault(require("../../../modules/nuclide-commons/observableFromReduxStore"));
 
-var _reactDom = _interopRequireDefault(require('react-dom'));
+  _observableFromReduxStore = function () {
+    return data;
+  };
 
-var _RequestEditDialog;
-
-function _load_RequestEditDialog() {
-  return _RequestEditDialog = require('./RequestEditDialog');
+  return data;
 }
 
-var _reduxMin;
+function _UniversalDisposable() {
+  const data = _interopRequireDefault(require("../../../modules/nuclide-commons/UniversalDisposable"));
 
-function _load_reduxMin() {
-  return _reduxMin = require('redux/dist/redux.min.js');
+  _UniversalDisposable = function () {
+    return data;
+  };
+
+  return data;
 }
 
-var _Actions;
+var React = _interopRequireWildcard(require("react"));
 
-function _load_Actions() {
-  return _Actions = _interopRequireWildcard(require('./Actions'));
+var _reactDom = _interopRequireDefault(require("react-dom"));
+
+function _RequestEditDialog() {
+  const data = require("./RequestEditDialog");
+
+  _RequestEditDialog = function () {
+    return data;
+  };
+
+  return data;
 }
 
-var _Epics;
+function _reduxMin() {
+  const data = require("redux/dist/redux.min.js");
 
-function _load_Epics() {
-  return _Epics = _interopRequireWildcard(require('./Epics'));
+  _reduxMin = function () {
+    return data;
+  };
+
+  return data;
 }
 
-var _Reducers;
+function Actions() {
+  const data = _interopRequireWildcard(require("./Actions"));
 
-function _load_Reducers() {
-  return _Reducers = _interopRequireWildcard(require('./Reducers'));
+  Actions = function () {
+    return data;
+  };
+
+  return data;
 }
 
-var _reduxObservable;
+function Epics() {
+  const data = _interopRequireWildcard(require("./Epics"));
 
-function _load_reduxObservable() {
-  return _reduxObservable = require('../../../modules/nuclide-commons/redux-observable');
+  Epics = function () {
+    return data;
+  };
+
+  return data;
 }
 
-var _rxjsBundlesRxMinJs = require('rxjs/bundles/Rx.min.js');
+function Reducers() {
+  const data = _interopRequireWildcard(require("./Reducers"));
 
-var _bindObservableAsProps;
+  Reducers = function () {
+    return data;
+  };
 
-function _load_bindObservableAsProps() {
-  return _bindObservableAsProps = require('../../../modules/nuclide-commons-ui/bindObservableAsProps');
+  return data;
 }
 
-var _nuclideAnalytics;
+function _reduxObservable() {
+  const data = require("../../../modules/nuclide-commons/redux-observable");
 
-function _load_nuclideAnalytics() {
-  return _nuclideAnalytics = require('../../nuclide-analytics');
+  _reduxObservable = function () {
+    return data;
+  };
+
+  return data;
 }
 
-function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
+function _bindObservableAsProps() {
+  const data = require("../../../modules/nuclide-commons-ui/bindObservableAsProps");
+
+  _bindObservableAsProps = function () {
+    return data;
+  };
+
+  return data;
+}
+
+function _nuclideAnalytics() {
+  const data = require("../../../modules/nuclide-analytics");
+
+  _nuclideAnalytics = function () {
+    return data;
+  };
+
+  return data;
+}
+
+function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) { var desc = Object.defineProperty && Object.getOwnPropertyDescriptor ? Object.getOwnPropertyDescriptor(obj, key) : {}; if (desc.get || desc.set) { Object.defineProperty(newObj, key, desc); } else { newObj[key] = obj[key]; } } } } newObj.default = obj; return newObj; } }
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -80,9 +138,7 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
  * 
  * @format
  */
-
 class Activation {
-
   constructor() {
     const initialState = {
       uri: 'example.com',
@@ -91,20 +147,24 @@ class Activation {
         cookie: ''
       },
       body: null,
-      parameters: [{ key: '', value: '' }]
+      parameters: [{
+        key: '',
+        value: ''
+      }]
     };
-    const epics = Object.keys(_Epics || _load_Epics()).map(k => (_Epics || _load_Epics())[k]).filter(epic => typeof epic === 'function');
-    const rootEpic = (0, (_reduxObservable || _load_reduxObservable()).combineEpics)(...epics);
-    this._store = (0, (_reduxMin || _load_reduxMin()).createStore)((_Reducers || _load_Reducers()).app, initialState, (0, (_reduxMin || _load_reduxMin()).applyMiddleware)((0, (_reduxObservable || _load_reduxObservable()).createEpicMiddleware)(rootEpic)));
-    this._actionCreators = (0, (_reduxMin || _load_reduxMin()).bindActionCreators)(_Actions || _load_Actions(), this._store.dispatch);
+    const rootEpic = (0, _epicHelpers().combineEpicsFromImports)(Epics(), 'nuclide-http-request-sender');
+    this._store = (0, _reduxMin().createStore)(Reducers().app, initialState, (0, _reduxMin().applyMiddleware)((0, _reduxObservable().createEpicMiddleware)(rootEpic)));
+    this._actionCreators = (0, _reduxMin().bindActionCreators)(Actions(), this._store.dispatch);
     this._requestEditDialog = null;
-    this._disposables = new (_UniversalDisposable || _load_UniversalDisposable()).default(atom.commands.add('atom-workspace', {
+    this._disposables = new (_UniversalDisposable().default)(atom.commands.add('atom-workspace', {
       'nuclide-http-request-sender:toggle-http-request-edit-dialog': () => {
-        (0, (_nuclideAnalytics || _load_nuclideAnalytics()).track)('nuclide-http-request-sender:toggle-http-request-edit-dialog');
+        (0, _nuclideAnalytics().track)('nuclide-http-request-sender:toggle-http-request-edit-dialog');
+
         this._toggleRequestEditDialog();
       },
       'nuclide-http-request-sender:send-http-request': () => {
-        (0, (_nuclideAnalytics || _load_nuclideAnalytics()).track)('nuclide-http-request-sender:send-http-request');
+        (0, _nuclideAnalytics().track)('nuclide-http-request-sender:send-http-request');
+
         this._actionCreators.sendHttpRequest();
       }
     }));
@@ -112,6 +172,7 @@ class Activation {
 
   _toggleRequestEditDialog() {
     const dialog = this._createModalIfNeeded();
+
     if (dialog.isVisible()) {
       dialog.hide();
     } else {
@@ -123,20 +184,25 @@ class Activation {
     if (this._requestEditDialog != null) {
       return this._requestEditDialog;
     }
-    const BoundEditDialog = (0, (_bindObservableAsProps || _load_bindObservableAsProps()).bindObservableAsProps)(
-    // $FlowFixMe -- Flow doesn't know about the Observable symbol used by from().
-    _rxjsBundlesRxMinJs.Observable.from(this._store), (_RequestEditDialog || _load_RequestEditDialog()).RequestEditDialog);
+
+    const BoundEditDialog = (0, _bindObservableAsProps().bindObservableAsProps)((0, _observableFromReduxStore().default)(this._store), _RequestEditDialog().RequestEditDialog);
     const container = document.createElement('div');
     const requestEditDialog = atom.workspace.addModalPanel({
       item: container,
       visible: false
     });
-    _reactDom.default.render(_react.createElement(BoundEditDialog, { actionCreators: this._actionCreators }), container);
-    this._disposables.add(new (_UniversalDisposable || _load_UniversalDisposable()).default(() => {
+
+    _reactDom.default.render(React.createElement(BoundEditDialog, {
+      actionCreators: this._actionCreators
+    }), container);
+
+    this._disposables.add(new (_UniversalDisposable().default)(() => {
       requestEditDialog.destroy();
       this._requestEditDialog = null;
+
       _reactDom.default.unmountComponentAtNode(container);
     }));
+
     this._requestEditDialog = requestEditDialog;
     return requestEditDialog;
   }
@@ -150,6 +216,7 @@ class Activation {
   dispose() {
     this._disposables.dispose();
   }
+
 }
 
-(0, (_createPackage || _load_createPackage()).default)(module.exports, Activation);
+(0, _createPackage().default)(module.exports, Activation);

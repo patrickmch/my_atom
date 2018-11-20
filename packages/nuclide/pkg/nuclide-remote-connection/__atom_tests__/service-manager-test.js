@@ -1,15 +1,23 @@
-'use strict';
+"use strict";
 
-var _nuclideVersion;
+function _nuclideVersion() {
+  const data = require("../../nuclide-version");
 
-function _load_nuclideVersion() {
-  return _nuclideVersion = require('../../nuclide-version');
+  _nuclideVersion = function () {
+    return data;
+  };
+
+  return data;
 }
 
-var _;
+function _() {
+  const data = require("..");
 
-function _load_() {
-  return _ = require('..');
+  _ = function () {
+    return data;
+  };
+
+  return data;
 }
 
 /**
@@ -21,14 +29,12 @@ function _load_() {
  *
  *  strict-local
  * @format
+ * @emails oncall+nuclide
  */
-
 describe('setUseLocalRpc', () => {
   it('successfully starts up a local RPC server', async () => {
-    await (async () => {
-      const infoService = (0, (_ || _load_()).getInfoServiceByNuclideUri)('');
-      const version = await infoService.getServerVersion();
-      expect(version).toBe((0, (_nuclideVersion || _load_nuclideVersion()).getVersion)());
-    })();
+    const infoService = (0, _().getInfoServiceByNuclideUri)('');
+    const version = await infoService.getServerVersion();
+    expect(version).toBe((0, _nuclideVersion().getVersion)());
   });
 });

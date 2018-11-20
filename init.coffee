@@ -31,6 +31,12 @@
 #       else
 #         panel.item.openSelectedEntry(pending: true, activatePane: false)
 #         return
+# atom.packages.onDidActivatePackage (p) ->
+#   if gitPlus = atom.packages.getActivePackage('git-plus')?.mainModule.provideService()
+#     gitPlus.registerCommand 'atom-text-editor', 'custom-git-commands:reset-add-local.py', ->
+#       gitPlus.getRepo() # If there are multiple repos in the project, you will be prompted to select which to use
+#       .then (repo) -> gitPlus.run repo, 'reset nols_website/nols_website/settings/local.py'
+
 # Adds space chars without moving the cursor
 atom.commands.add 'atom-text-editor',
   'custom:insert-space-keep-cursor-place': ->

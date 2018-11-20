@@ -1,25 +1,38 @@
-'use strict';
+"use strict";
 
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
+exports.default = void 0;
 
-var _common;
+function _common() {
+  const data = require("./common");
 
-function _load_common() {
-  return _common = require('./common');
+  _common = function () {
+    return data;
+  };
+
+  return data;
 }
 
-var _nuclideAnalytics;
+function _nuclideAnalytics() {
+  const data = require("../../../modules/nuclide-analytics");
 
-function _load_nuclideAnalytics() {
-  return _nuclideAnalytics = require('../../nuclide-analytics');
+  _nuclideAnalytics = function () {
+    return data;
+  };
+
+  return data;
 }
 
-var _log4js;
+function _log4js() {
+  const data = require("log4js");
 
-function _load_log4js() {
-  return _log4js = require('log4js');
+  _log4js = function () {
+    return data;
+  };
+
+  return data;
 }
 
 /**
@@ -32,25 +45,25 @@ function _load_log4js() {
  *  strict-local
  * @format
  */
-
-const logger = (0, (_log4js || _load_log4js()).getLogger)('nuclide-blame-provider-hg');
+const logger = (0, _log4js().getLogger)('nuclide-blame-provider-hg');
 
 function canProvideBlameForEditor(editor) {
-  return Boolean((0, (_common || _load_common()).hgRepositoryForEditor)(editor));
+  return Boolean((0, _common().hgRepositoryForEditor)(editor));
 }
 
 function getBlameForEditor(editor) {
-  return (0, (_nuclideAnalytics || _load_nuclideAnalytics()).trackTiming)('blame-provider-hg:getBlameForEditor', () => doGetBlameForEditor(editor));
+  return (0, _nuclideAnalytics().trackTiming)('blame-provider-hg:getBlameForEditor', () => doGetBlameForEditor(editor));
 }
 
 async function doGetBlameForEditor(editor) {
-  const path = editor.getPath();
-  // flowlint-next-line sketchy-null-string:off
+  const path = editor.getPath(); // flowlint-next-line sketchy-null-string:off
+
   if (!path) {
     return Promise.resolve([]);
   }
 
-  const repo = (0, (_common || _load_common()).hgRepositoryForEditor)(editor);
+  const repo = (0, _common().hgRepositoryForEditor)(editor);
+
   if (!repo) {
     const message = `HgBlameProvider could not fetch blame for ${path}: no Hg repo found.`;
     logger.error(message);
@@ -61,16 +74,20 @@ async function doGetBlameForEditor(editor) {
 }
 
 let getUrlForRevision;
+
 try {
   // $FlowFB
-  const { getPhabricatorUrlForRevision } = require('./fb/FbHgBlameProvider');
+  const {
+    getPhabricatorUrlForRevision
+  } = require("./fb/FbHgBlameProvider");
+
   getUrlForRevision = getPhabricatorUrlForRevision;
-} catch (e) {
-  // Ignore case where FbHgBlameProvider is unavailable.
+} catch (e) {// Ignore case where FbHgBlameProvider is unavailable.
 }
 
-exports.default = {
+var _default = {
   canProvideBlameForEditor,
   getBlameForEditor,
   getUrlForRevision
 };
+exports.default = _default;

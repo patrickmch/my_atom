@@ -1,37 +1,38 @@
-'use strict';
+"use strict";
 
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.ZipFileSystem = undefined;
 exports.rejectWrite = rejectWrite;
 exports.rejectWriteSync = rejectWriteSync;
+exports.ZipFileSystem = void 0;
 
-var _fs = _interopRequireDefault(require('fs'));
+var _fs = _interopRequireDefault(require("fs"));
 
-var _nuclideUri;
+function _nuclideUri() {
+  const data = _interopRequireDefault(require("../../../modules/nuclide-commons/nuclideUri"));
 
-function _load_nuclideUri() {
-  return _nuclideUri = _interopRequireDefault(require('../../../modules/nuclide-commons/nuclideUri'));
+  _nuclideUri = function () {
+    return data;
+  };
+
+  return data;
 }
 
-var _rxjsBundlesRxMinJs = require('rxjs/bundles/Rx.min.js');
+var _rxjsCompatUmdMin = require("rxjs-compat/bundles/rxjs-compat.umd.min.js");
 
-var _admZip;
+function _FileSystem() {
+  const data = require("./FileSystem");
 
-function _load_admZip() {
-  return _admZip = _interopRequireDefault(require('adm-zip'));
-}
+  _FileSystem = function () {
+    return data;
+  };
 
-var _FileSystem;
-
-function _load_FileSystem() {
-  return _FileSystem = require('./FileSystem');
+  return data;
 }
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-// adm-zip assumes '/' as the separator on all platforms
 /**
  * Copyright (c) 2015-present, Facebook, Inc.
  * All rights reserved.
@@ -42,11 +43,10 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
  * 
  * @format
  */
-
+// adm-zip assumes '/' as the separator on all platforms
 const ZIP_SEPARATOR = '/';
 
 class ZipFileSystem {
-
   constructor(zip, outerStat, outerLStat) {
     this._zip = zip;
     this._outerStat = outerStat;
@@ -55,10 +55,13 @@ class ZipFileSystem {
 
   getFileOrDirectoryEntry(path) {
     const slashPath = slash(path);
+
     const file = this._zip.getEntry(slashPath);
+
     if (file != null) {
       return file;
     }
+
     return this._zip.getEntry(`${slashPath}${ZIP_SEPARATOR}`);
   }
 
@@ -68,13 +71,16 @@ class ZipFileSystem {
 
   async findNearestFile(name, directory) {
     let check = directory;
+
     while (check !== '') {
       // eslint-disable-next-line no-await-in-loop
-      if (await this.exists((_nuclideUri || _load_nuclideUri()).default.join(check, name))) {
+      if (await this.exists(_nuclideUri().default.join(check, name))) {
         return check;
       }
-      check = (_nuclideUri || _load_nuclideUri()).default.getParent(check);
+
+      check = _nuclideUri().default.getParent(check);
     }
+
     if (await this.exists(name)) {
       return '';
     }
@@ -82,23 +88,29 @@ class ZipFileSystem {
 
   async stat(path) {
     const lstat = await this.lstat(path);
+
     if (!lstat.isSymbolicLink()) {
       return lstat;
     }
 
     const entry = this.getFileOrDirectoryEntry(path);
+
     if (entry == null) {
       throw new Error(`No such file or directory: '${path}'`);
     }
-    const newpath = (_nuclideUri || _load_nuclideUri()).default.normalize((_nuclideUri || _load_nuclideUri()).default.join((_nuclideUri || _load_nuclideUri()).default.getParent(path), entry.getData().toString()));
+
+    const newpath = _nuclideUri().default.normalize(_nuclideUri().default.join(_nuclideUri().default.getParent(path), entry.getData().toString()));
+
     return this.lstat(newpath);
   }
 
   async lstat(path) {
     const entry = this.getFileOrDirectoryEntry(path);
+
     if (entry == null) {
       throw new Error(`No such file or directory: '${path}'`);
     }
+
     return makeZipStats(this._outerLStat, entry);
   }
 
@@ -113,9 +125,10 @@ class ZipFileSystem {
   async readFile(path, options) {
     return new Promise((resolve, reject) => {
       const entry = this._zip.getEntry(slash(path));
+
       if (entry.header.size === 0) {
         resolve(new Buffer(0));
-      } else if (entry.header.size > (_FileSystem || _load_FileSystem()).READFILE_SIZE_LIMIT) {
+      } else if (entry.header.size > _FileSystem().READFILE_SIZE_LIMIT) {
         reject(new Error(`File is too large (${entry.header.size} bytes)`));
       } else {
         entry.getDataAsync((data, err) => {
@@ -130,7 +143,7 @@ class ZipFileSystem {
   }
 
   createReadStream(path, options) {
-    return _rxjsBundlesRxMinJs.Observable.defer(() => _rxjsBundlesRxMinJs.Observable.fromPromise(this.readFile(path, options))).publish();
+    return _rxjsCompatUmdMin.Observable.defer(() => _rxjsCompatUmdMin.Observable.fromPromise(this.readFile(path, options))).publish();
   }
 
   async isNfs(path) {
@@ -174,6 +187,10 @@ class ZipFileSystem {
     return rejectWrite();
   }
 
+  symlink(source, target, type) {
+    return rejectWrite();
+  }
+
   rimraf(path) {
     return rejectWrite();
   }
@@ -185,9 +202,11 @@ class ZipFileSystem {
   writeFile(path, data, options) {
     return rejectWrite();
   }
+
 }
 
 exports.ZipFileSystem = ZipFileSystem;
+
 function rejectWrite() {
   throw new Error('ZipFileSystem does not support write operations');
 }
@@ -210,6 +229,7 @@ async function directoryEntryFromZipEntry(zipFs, entry) {
   const nameStart = entry.entryName.lastIndexOf('/', nameLength - 1) + 1;
   const name = entry.entryName.slice(nameStart, nameLength);
   const lstat = await zipFs.lstat(entry.entryName);
+
   if (!lstat.isSymbolicLink()) {
     return [name, lstat.isFile(), false];
   } else {
@@ -224,7 +244,6 @@ function normalLength(path) {
 function makeZipStats(outer, entry) {
   const header = entry.header;
   const stats = new _fs.default.Stats();
-
   stats.dev = outer.dev;
   stats.ino = outer.ino;
   stats.mode = modeFromZipAttr(header.attr);
@@ -238,7 +257,6 @@ function makeZipStats(outer, entry) {
   stats.atime = header.time;
   stats.mtime = header.time;
   stats.ctime = outer.ctime;
-
   return stats;
 }
 
@@ -248,7 +266,8 @@ function modeFromZipAttr(attr) {
 }
 
 function slash(uri) {
-  const sep = (_nuclideUri || _load_nuclideUri()).default.pathSeparatorFor(uri);
+  const sep = _nuclideUri().default.pathSeparatorFor(uri);
+
   if (sep === '/') {
     return uri;
   } else {

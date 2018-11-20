@@ -1,25 +1,28 @@
-import * as path from 'path'
 import { expect } from 'chai'
+import { activateMe } from './util'
 
 describe('Markdown preview plus package activation', function() {
+  beforeEach(function() {
+    expect(atom.packages.isPackageActive('markdown-preview-plus')).to.be.false
+  })
   afterEach(async function() {
     await atom.packages.deactivatePackage('markdown-preview-plus')
   })
 
   it('activates', async function() {
-    await atom.packages.activatePackage(path.join(__dirname, '..'))
+    await activateMe()
     expect(atom.packages.isPackageActive('markdown-preview-plus')).to.be.true
   })
 
   it('disables markdown-preview package', async function() {
     atom.packages.enablePackage('markdown-preview')
-    await atom.packages.activatePackage(path.join(__dirname, '..'))
+    await activateMe()
     expect(atom.packages.isPackageDisabled('markdown-preview')).to.be.true
   })
 
   it('deactivates markdown-preview package', async function() {
     await atom.packages.activatePackage('markdown-preview')
-    await atom.packages.activatePackage(path.join(__dirname, '..'))
+    await activateMe()
     expect(atom.packages.isPackageActive('markdown-preview')).to.be.false
   })
 
@@ -29,7 +32,7 @@ describe('Markdown preview plus package activation', function() {
 
     it('notifies about deactivation', async function() {
       await atom.packages.activatePackage('markdown-preview')
-      await atom.packages.activatePackage(path.join(__dirname, '..'))
+      await activateMe()
       expect(
         atom.views
           .getView(atom.workspace)

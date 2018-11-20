@@ -1,15 +1,23 @@
-'use strict';
+"use strict";
 
-var _nuclideUri;
+function _nuclideUri() {
+  const data = _interopRequireDefault(require("../../../modules/nuclide-commons/nuclideUri"));
 
-function _load_nuclideUri() {
-  return _nuclideUri = _interopRequireDefault(require('../../../modules/nuclide-commons/nuclideUri'));
+  _nuclideUri = function () {
+    return data;
+  };
+
+  return data;
 }
 
-var _ServiceTester;
+function _ServiceTester() {
+  const data = require("../__mocks__/ServiceTester");
 
-function _load_ServiceTester() {
-  return _ServiceTester = require('../__mocks__/ServiceTester');
+  _ServiceTester = function () {
+    return data;
+  };
+
+  return data;
 }
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
@@ -23,14 +31,15 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
  *
  * 
  * @format
+ * @emails oncall+nuclide
  */
-
 class I1 {
   async m(arg) {
     return 'I1:' + arg;
   }
 
   dispose() {}
+
 }
 
 class I2 {
@@ -39,33 +48,28 @@ class I2 {
   }
 
   dispose() {}
+
 }
 
 describe('BidiService', () => {
   let testHelper;
   let service = null;
   beforeEach(async () => {
-    testHelper = new (_ServiceTester || _load_ServiceTester()).ServiceTester();
+    testHelper = new (_ServiceTester().ServiceTester)();
     await testHelper.start([{
       name: 'BidiService',
-      definition: (_nuclideUri || _load_nuclideUri()).default.join(__dirname, '../__mocks__/BidiService.def'),
-      implementation: (_nuclideUri || _load_nuclideUri()).default.join(__dirname, '../__mocks__/BidiService.js')
+      definition: _nuclideUri().default.join(__dirname, '../__mocks__/BidiService.def'),
+      implementation: _nuclideUri().default.join(__dirname, '../__mocks__/BidiService.js')
     }], 'bidi_protocol');
     service = testHelper.getRemoteService('BidiService');
   });
-
   it('Test calls from server back to client', async () => {
-    await (async () => {
-      const i1 = new I1();
-      const i2 = new I2();
-
-      const r1 = await service.f('call1', i1);
-      const r2 = await service.f('call2', i2);
-
-      expect(r1).toBe('I1:call1');
-      expect(r2).toBe('I2:call2');
-    })();
+    const i1 = new I1();
+    const i2 = new I2();
+    const r1 = await service.f('call1', i1);
+    const r2 = await service.f('call2', i2);
+    expect(r1).toBe('I1:call1');
+    expect(r2).toBe('I2:call2');
   });
-
   afterEach(() => testHelper.stop());
 });

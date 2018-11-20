@@ -6,20 +6,20 @@
  * the root directory of this source tree.
  *
  * @noflow
+ * @format
  */
 'use strict';
 
-/* eslint
-  comma-dangle: [1, always-multiline],
-  prefer-object-spread/prefer-object-spread: 0,
-  nuclide-internal/no-commonjs: 0,
-  */
+/* eslint nuclide-internal/no-commonjs: 0 */
 
 module.exports = {
   rootDir: '../..',
+  filter: '<rootDir>/xplat/js/jest/filter.js',
   projects: [
     '<rootDir>/xplat/nuclide/jest/jest.config.atom.js',
     '<rootDir>/xplat/nuclide/jest/jest.config.node.js',
   ],
   testFailureExitCode: 0,
+  reporters: require('./jest/reporters.config'),
+  forceExit: true,
 };

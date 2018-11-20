@@ -1,36 +1,67 @@
-'use strict';
+"use strict";
 
-var _log4js;
+function _log4js() {
+  const data = require("log4js");
 
-function _load_log4js() {
-  return _log4js = require('log4js');
+  _log4js = function () {
+    return data;
+  };
+
+  return data;
 }
 
-var _createPackage;
+function _createPackage() {
+  const data = _interopRequireDefault(require("../../../modules/nuclide-commons-atom/createPackage"));
 
-function _load_createPackage() {
-  return _createPackage = _interopRequireDefault(require('../../../modules/nuclide-commons-atom/createPackage'));
+  _createPackage = function () {
+    return data;
+  };
+
+  return data;
 }
 
-var _UniversalDisposable;
+function _UniversalDisposable() {
+  const data = _interopRequireDefault(require("../../../modules/nuclide-commons/UniversalDisposable"));
 
-function _load_UniversalDisposable() {
-  return _UniversalDisposable = _interopRequireDefault(require('../../../modules/nuclide-commons/UniversalDisposable'));
+  _UniversalDisposable = function () {
+    return data;
+  };
+
+  return data;
 }
 
-var _nuclideAnalytics;
+function _nuclideAnalytics() {
+  const data = require("../../../modules/nuclide-analytics");
 
-function _load_nuclideAnalytics() {
-  return _nuclideAnalytics = require('../../nuclide-analytics');
+  _nuclideAnalytics = function () {
+    return data;
+  };
+
+  return data;
 }
 
-var _updateKeymap;
+function _updateKeymap() {
+  const data = _interopRequireDefault(require("./updateKeymap"));
 
-function _load_updateKeymap() {
-  return _updateKeymap = _interopRequireDefault(require('./updateKeymap'));
+  _updateKeymap = function () {
+    return data;
+  };
+
+  return data;
 }
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+/**
+ * Copyright (c) 2015-present, Facebook, Inc.
+ * All rights reserved.
+ *
+ * This source code is licensed under the license found in the LICENSE file in
+ * the root directory of this source tree.
+ *
+ * 
+ * @format
+ */
 
 /**
  * Put deprecated commands with their new equivalents here.
@@ -42,17 +73,7 @@ const DEPRECATED_CONSOLE_COMMANDS = {
   'nuclide-console:toggle': 'console:toggle',
   'nuclide-console:clear': 'console:clear',
   'nuclide-console:copy-message': 'console:copy-message'
-}; /**
-    * Copyright (c) 2015-present, Facebook, Inc.
-    * All rights reserved.
-    *
-    * This source code is licensed under the license found in the LICENSE file in
-    * the root directory of this source tree.
-    *
-    * 
-    * @format
-    */
-
+};
 const DEPRECATED_DEBUGGER_COMMANDS = {
   'nuclide-debugger:toggle': 'debugger:toggle',
   'nuclide-debugger:show': 'debugger:show',
@@ -66,7 +87,6 @@ const DEPRECATED_DEBUGGER_COMMANDS = {
   'nuclide-debugger:run-to-location': 'debugger:run-to-location',
   'nuclide-debugger:toggle-breakpoint': 'debugger:toggle-breakpoint'
 };
-
 const DEPRECATED_FILE_TREE_COMMANDS = {
   'nuclide-file-tree:set-current-working-root': 'tree-view:set-current-working-root',
   'nuclide-file-tree:add-file': 'tree-view:add-file',
@@ -168,7 +188,6 @@ const DEPRECATED_FILE_TREE_COMMANDS = {
   'nuclide-file-tree:go-to-letter-z': 'tree-view:go-to-letter-z',
   'nuclide-file-tree:go-to-letter-~': 'tree-view:go-to-letter-~'
 };
-
 const DEPRECATED_TERMINAL_COMMANDS = {
   'nuclide-terminal:new-terminal': 'atom-ide-terminal:new-terminal',
   'nuclide-terminal:toggle-terminal-focus': 'atom-ide-terminal:toggle-terminal-focus',
@@ -176,7 +195,6 @@ const DEPRECATED_TERMINAL_COMMANDS = {
   'nuclide-terminal:create-paste': 'atom-ide-terminal:create-paste',
   'nuclide-terminal:clear': 'atom-ide-terminal:clear'
 };
-
 const DEPRECATED_SOURCE_CONTROL_COMMANDS = {
   'fb-interactive-smartlog:copy-differential-id': 'fb-interactive-smartlog:copy-diff-number',
   'fb-interactive-smartlog:copy-revision-hash': 'fb-interactive-smartlog:copy-commit-hash',
@@ -189,21 +207,23 @@ const DEPRECATED_SOURCE_CONTROL_COMMANDS = {
   'fb-interactive-smartlog:request-revision': 'fb-interactive-smartlog:request-diff',
   'fb-interactive-smartlog:rethink-revision': 'fb-interactive-smartlog:rethink-diff'
 };
-
-const DEPRECATED_COMMANDS = Object.assign({}, DEPRECATED_CONSOLE_COMMANDS, DEPRECATED_DEBUGGER_COMMANDS, DEPRECATED_FILE_TREE_COMMANDS, DEPRECATED_TERMINAL_COMMANDS, DEPRECATED_SOURCE_CONTROL_COMMANDS);
+const DEPRECATED_RELATED_FILES_COMMANDS = {
+  'nuclide-related-files:switch-between-header-source': 'file:open-alternate',
+  'nuclide-related-files:jump-to-next-related-file': 'file:open-alternate',
+  'nuclide-related-files:jump-to-previous-related-file': 'file:open-alternate'
+};
+const DEPRECATED_COMMANDS = Object.assign({}, DEPRECATED_CONSOLE_COMMANDS, DEPRECATED_DEBUGGER_COMMANDS, DEPRECATED_FILE_TREE_COMMANDS, DEPRECATED_TERMINAL_COMMANDS, DEPRECATED_SOURCE_CONTROL_COMMANDS, DEPRECATED_RELATED_FILES_COMMANDS);
 
 class Activation {
-
   constructor() {
     this._warnedCommands = new Set();
-    this._disposables = new (_UniversalDisposable || _load_UniversalDisposable()).default(this._deprecateCommands());
+    this._disposables = new (_UniversalDisposable().default)(this._deprecateCommands()); // $FlowIgnore: private API
 
-    // $FlowIgnore: private API
     const keymapPath = atom.keymaps.getUserKeymapPath();
-    (0, (_updateKeymap || _load_updateKeymap()).default)(keymapPath, DEPRECATED_COMMANDS).catch(err => {
+    (0, _updateKeymap().default)(keymapPath, DEPRECATED_COMMANDS).catch(err => {
       // Nonexistent keymaps are normal.
       if (err.code !== 'ENOENT') {
-        (0, (_log4js || _load_log4js()).getLogger)('nuclide-deprecation-cop').error('Error updating user keymap:', err);
+        (0, _log4js().getLogger)('nuclide-deprecation-cop').error('Error updating user keymap:', err);
       }
     });
   }
@@ -212,19 +232,26 @@ class Activation {
     // Catch any direct invocations of the commands (context menu, dispatch).
     return atom.commands.onWillDispatch(event => {
       const command = event.type;
+
       if (!DEPRECATED_COMMANDS.hasOwnProperty(command)) {
         return;
       }
+
       const newCommand = DEPRECATED_COMMANDS[command];
+
       if (!this._warnedCommands.has(command)) {
-        (0, (_nuclideAnalytics || _load_nuclideAnalytics()).track)('deprecated-command-dispatched', { command });
+        (0, _nuclideAnalytics().track)('deprecated-command-dispatched', {
+          command
+        });
         atom.notifications.addWarning('Nuclide: Deprecated Command', {
           icon: 'nuclicon-nuclide',
           description: `The command \`${command}\` has been deprecated.\n` + `Please use the new command \`${newCommand}\`.`,
           dismissable: true
         });
+
         this._warnedCommands.add(command);
       }
+
       atom.commands.dispatch(event.target, newCommand, event.detail);
     });
   }
@@ -232,6 +259,7 @@ class Activation {
   dispose() {
     this._disposables.dispose();
   }
+
 }
 
-(0, (_createPackage || _load_createPackage()).default)(module.exports, Activation);
+(0, _createPackage().default)(module.exports, Activation);

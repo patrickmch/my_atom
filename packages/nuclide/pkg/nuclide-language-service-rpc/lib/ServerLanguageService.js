@@ -1,23 +1,23 @@
-'use strict';
+"use strict";
 
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.ServerLanguageService = undefined;
 exports.ensureInvalidations = ensureInvalidations;
+exports.ServerLanguageService = void 0;
 
-var _nuclideOpenFilesRpc;
+function _nuclideOpenFilesRpc() {
+  const data = require("../../nuclide-open-files-rpc");
 
-function _load_nuclideOpenFilesRpc() {
-  return _nuclideOpenFilesRpc = require('../../nuclide-open-files-rpc');
+  _nuclideOpenFilesRpc = function () {
+    return data;
+  };
+
+  return data;
 }
 
-var _rxjsBundlesRxMinJs = require('rxjs/bundles/Rx.min.js');
+var _rxjsCompatUmdMin = require("rxjs-compat/bundles/rxjs-compat.umd.min.js");
 
-// This is a version of the LanguageService interface which operates on a
-// single modified file at a time. This provides a simplified interface
-// for LanguageService implementors, at the cost of providing language analysis
-// which can not reflect multiple edited files.
 /**
  * Copyright (c) 2015-present, Facebook, Inc.
  * All rights reserved.
@@ -28,12 +28,10 @@ var _rxjsBundlesRxMinJs = require('rxjs/bundles/Rx.min.js');
  * 
  * @format
  */
-
 class ServerLanguageService {
-
   constructor(fileNotifier, service) {
-    if (!(fileNotifier instanceof (_nuclideOpenFilesRpc || _load_nuclideOpenFilesRpc()).FileCache)) {
-      throw new Error('Invariant violation: "fileNotifier instanceof FileCache"');
+    if (!(fileNotifier instanceof _nuclideOpenFilesRpc().FileCache)) {
+      throw new Error("Invariant violation: \"fileNotifier instanceof FileCache\"");
     }
 
     this._fileCache = fileNotifier;
@@ -46,10 +44,12 @@ class ServerLanguageService {
 
   async getDiagnostics(fileVersion) {
     const filePath = fileVersion.filePath;
-    const buffer = await (0, (_nuclideOpenFilesRpc || _load_nuclideOpenFilesRpc()).getBufferAtVersion)(fileVersion);
+    const buffer = await (0, _nuclideOpenFilesRpc().getBufferAtVersion)(fileVersion);
+
     if (buffer == null) {
       return null;
     }
+
     return this._service.getDiagnostics(filePath, buffer);
   }
 
@@ -59,11 +59,16 @@ class ServerLanguageService {
 
   async getAutocompleteSuggestions(fileVersion, position, request) {
     const filePath = fileVersion.filePath;
-    const buffer = await (0, (_nuclideOpenFilesRpc || _load_nuclideOpenFilesRpc()).getBufferAtVersion)(fileVersion);
+    const buffer = await (0, _nuclideOpenFilesRpc().getBufferAtVersion)(fileVersion);
+
     if (buffer == null) {
       // TODO: this should return null so the empty list doesn't get cached
-      return { isIncomplete: false, items: [] };
+      return {
+        isIncomplete: false,
+        items: []
+      };
     }
+
     return this._service.getAutocompleteSuggestions(filePath, buffer, position, request.activatedManually, request.prefix);
   }
 
@@ -73,20 +78,34 @@ class ServerLanguageService {
 
   async getDefinition(fileVersion, position) {
     const filePath = fileVersion.filePath;
-    const buffer = await (0, (_nuclideOpenFilesRpc || _load_nuclideOpenFilesRpc()).getBufferAtVersion)(fileVersion);
+    const buffer = await (0, _nuclideOpenFilesRpc().getBufferAtVersion)(fileVersion);
+
     if (buffer == null) {
       return null;
     }
+
     return this._service.getDefinition(filePath, buffer, position);
   }
 
   findReferences(fileVersion, position) {
     const filePath = fileVersion.filePath;
-    return _rxjsBundlesRxMinJs.Observable.fromPromise((0, (_nuclideOpenFilesRpc || _load_nuclideOpenFilesRpc()).getBufferAtVersion)(fileVersion)).concatMap(buffer => {
+    return _rxjsCompatUmdMin.Observable.fromPromise((0, _nuclideOpenFilesRpc().getBufferAtVersion)(fileVersion)).concatMap(buffer => {
       if (buffer == null) {
-        return _rxjsBundlesRxMinJs.Observable.of(null);
+        return _rxjsCompatUmdMin.Observable.of(null);
       }
+
       return this._service.findReferences(filePath, buffer, position);
+    }).publish();
+  }
+
+  rename(fileVersion, position, newName) {
+    const filePath = fileVersion.filePath;
+    return _rxjsCompatUmdMin.Observable.fromPromise((0, _nuclideOpenFilesRpc().getBufferAtVersion)(fileVersion)).concatMap(buffer => {
+      if (buffer == null) {
+        return _rxjsCompatUmdMin.Observable.of(null);
+      }
+
+      return this._service.rename(filePath, buffer, position, newName);
     }).publish();
   }
 
@@ -104,16 +123,20 @@ class ServerLanguageService {
   }
 
   async getCodeActions(fileVersion, range, diagnostics) {
-    const { filePath } = fileVersion;
+    const {
+      filePath
+    } = fileVersion;
     return this._service.getCodeActions(filePath, range, diagnostics);
   }
 
   async getOutline(fileVersion) {
     const filePath = fileVersion.filePath;
-    const buffer = await (0, (_nuclideOpenFilesRpc || _load_nuclideOpenFilesRpc()).getBufferAtVersion)(fileVersion);
+    const buffer = await (0, _nuclideOpenFilesRpc().getBufferAtVersion)(fileVersion);
+
     if (buffer == null) {
       return null;
     }
+
     return this._service.getOutline(filePath, buffer);
   }
 
@@ -127,61 +150,72 @@ class ServerLanguageService {
 
   async typeHint(fileVersion, position) {
     const filePath = fileVersion.filePath;
-    const buffer = await (0, (_nuclideOpenFilesRpc || _load_nuclideOpenFilesRpc()).getBufferAtVersion)(fileVersion);
+    const buffer = await (0, _nuclideOpenFilesRpc().getBufferAtVersion)(fileVersion);
+
     if (buffer == null) {
       return null;
     }
+
     return this._service.typeHint(filePath, buffer, position);
   }
 
   async highlight(fileVersion, position) {
     const filePath = fileVersion.filePath;
-    const buffer = await (0, (_nuclideOpenFilesRpc || _load_nuclideOpenFilesRpc()).getBufferAtVersion)(fileVersion);
+    const buffer = await (0, _nuclideOpenFilesRpc().getBufferAtVersion)(fileVersion);
+
     if (buffer == null) {
       return [];
     }
+
     return this._service.highlight(filePath, buffer, position);
   }
 
   async formatSource(fileVersion, range, options) {
     const filePath = fileVersion.filePath;
-    const buffer = await (0, (_nuclideOpenFilesRpc || _load_nuclideOpenFilesRpc()).getBufferAtVersion)(fileVersion);
+    const buffer = await (0, _nuclideOpenFilesRpc().getBufferAtVersion)(fileVersion);
+
     if (buffer == null) {
       return null;
     }
+
     return this._service.formatSource(filePath, buffer, range, options);
   }
 
   async formatEntireFile(fileVersion, range, options) {
     const filePath = fileVersion.filePath;
-    const buffer = await (0, (_nuclideOpenFilesRpc || _load_nuclideOpenFilesRpc()).getBufferAtVersion)(fileVersion);
+    const buffer = await (0, _nuclideOpenFilesRpc().getBufferAtVersion)(fileVersion);
+
     if (buffer == null) {
       return null;
     }
+
     return this._service.formatEntireFile(filePath, buffer, range, options);
   }
 
   async formatAtPosition(fileVersion, position, triggerCharacter, options) {
     const filePath = fileVersion.filePath;
-    const buffer = await (0, (_nuclideOpenFilesRpc || _load_nuclideOpenFilesRpc()).getBufferAtVersion)(fileVersion);
+    const buffer = await (0, _nuclideOpenFilesRpc().getBufferAtVersion)(fileVersion);
+
     if (buffer == null) {
       return null;
     }
+
     return this._service.formatAtPosition(filePath, buffer, position, triggerCharacter, options);
   }
 
   async signatureHelp(fileVersion, position) {
     const filePath = fileVersion.filePath;
-    const buffer = await (0, (_nuclideOpenFilesRpc || _load_nuclideOpenFilesRpc()).getBufferAtVersion)(fileVersion);
+    const buffer = await (0, _nuclideOpenFilesRpc().getBufferAtVersion)(fileVersion);
+
     if (buffer == null) {
       return null;
     }
+
     return this._service.signatureHelp(filePath, buffer, position);
   }
 
   supportsSymbolSearch(directories) {
-    return Promise.resolve(false);
-    // A single-file language service by definition cannot offer
+    return Promise.resolve(false); // A single-file language service by definition cannot offer
     // "project-wide symbol search". If you want your language to offer
     // symbols, you'll have to implement LanguageService directly.
   }
@@ -200,7 +234,8 @@ class ServerLanguageService {
 
   async getExpandedSelectionRange(fileVersion, currentSelection) {
     const filePath = fileVersion.filePath;
-    const buffer = await (0, (_nuclideOpenFilesRpc || _load_nuclideOpenFilesRpc()).getBufferAtVersion)(fileVersion);
+    const buffer = await (0, _nuclideOpenFilesRpc().getBufferAtVersion)(fileVersion);
+
     if (buffer == null) {
       return null;
     }
@@ -210,7 +245,8 @@ class ServerLanguageService {
 
   async getCollapsedSelectionRange(fileVersion, currentSelection, originalCursorPosition) {
     const filePath = fileVersion.filePath;
-    const buffer = await (0, (_nuclideOpenFilesRpc || _load_nuclideOpenFilesRpc()).getBufferAtVersion)(fileVersion);
+    const buffer = await (0, _nuclideOpenFilesRpc().getBufferAtVersion)(fileVersion);
+
     if (buffer == null) {
       return null;
     }
@@ -219,18 +255,33 @@ class ServerLanguageService {
   }
 
   observeStatus(fileVersion) {
-    return _rxjsBundlesRxMinJs.Observable.of({ kind: 'null' }).publish();
+    return _rxjsCompatUmdMin.Observable.of({
+      kind: 'null'
+    }).publish();
+  }
+
+  onWillSave(fileVersion) {
+    return _rxjsCompatUmdMin.Observable.empty().publish();
   }
 
   async clickStatus(fileVersion, id, button) {}
 
+  async sendLspRequest(filePath, method, params) {}
+
+  async sendLspNotification(method, params) {}
+
+  observeLspNotifications(notificationMethod) {
+    return _rxjsCompatUmdMin.Observable.empty().publish();
+  }
+
   dispose() {
     this._service.dispose();
   }
-}
 
-exports.ServerLanguageService = ServerLanguageService; // Assert that ServerLanguageService satisifes the LanguageService interface:
+} // Assert that ServerLanguageService satisifes the LanguageService interface:
 
+
+exports.ServerLanguageService = ServerLanguageService;
 null;
 
 function ensureInvalidations(logger, diagnostics) {
@@ -238,18 +289,18 @@ function ensureInvalidations(logger, diagnostics) {
   const trackedDiagnostics = diagnostics.do(diagnosticMap => {
     for (const [filePath, messages] of diagnosticMap) {
       if (messages.length === 0) {
-        logger.debug(`Removing ${filePath} from files with errors`);
+        logger.trace(`Removing ${filePath} from files with errors`);
         filesWithErrors.delete(filePath);
       } else {
-        logger.debug(`Adding ${filePath} to files with errors`);
+        logger.trace(`Adding ${filePath} to files with errors`);
         filesWithErrors.add(filePath);
       }
     }
   });
 
-  const fileInvalidations = _rxjsBundlesRxMinJs.Observable.defer(() => {
+  const fileInvalidations = _rxjsCompatUmdMin.Observable.defer(() => {
     logger.debug('Clearing errors after stream closed');
-    return _rxjsBundlesRxMinJs.Observable.of(new Map(Array.from(filesWithErrors).map(file => {
+    return _rxjsCompatUmdMin.Observable.of(new Map(Array.from(filesWithErrors).map(file => {
       logger.debug(`Clearing errors for ${file} after connection closed`);
       return [file, []];
     })));

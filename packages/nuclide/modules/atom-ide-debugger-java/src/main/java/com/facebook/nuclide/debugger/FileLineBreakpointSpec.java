@@ -26,7 +26,8 @@ import org.json.JSONObject;
 /** Source line breakpoint spec. Threading: access from both request and event threads. */
 public class FileLineBreakpointSpec extends BreakpointSpec {
   private final FileLineBreakpointRequestInfo _requestInfo;
-  private volatile Optional<ClassPrepareRequest> _classPrepareRequest = Optional.empty();
+  private static final ConcurrentHashMap<String, ClassPrepareRequest>
+      _classNameToClassPrepareRequest = new ConcurrentHashMap<String, ClassPrepareRequest>();
   private String _className;
   private static final ConcurrentHashMap<String, CompilationUnit> _unitCache =
       new ConcurrentHashMap<String, CompilationUnit>();
@@ -41,43 +42,47 @@ public class FileLineBreakpointSpec extends BreakpointSpec {
   }
 
   private String getClassNameForBreakpoint(String filePath) {
-    int targetLine = _requestInfo.getLine();
+    try {
+      int targetLine = _requestInfo.getLine();
 
-    CompilationUnit unit = null;
-    if (_unitCache.contains(filePath)) {
-      unit = _unitCache.get(filePath);
-    } else {
-      try (FileInputStream stream = new FileInputStream(filePath)) {
-        unit = JavaParser.parse(stream);
-        _unitCache.put(filePath, unit);
-      } catch (IOException e) {
-        // TODO log
+      CompilationUnit unit = null;
+      if (_unitCache.contains(filePath)) {
+        unit = _unitCache.get(filePath);
+      } else {
+        try (FileInputStream stream = new FileInputStream(filePath)) {
+          unit = JavaParser.parse(stream);
+          _unitCache.put(filePath, unit);
+        } catch (IOException e) {
+          // TODO log
+        }
       }
-    }
 
-    if (unit == null) {
+      if (unit == null) {
+        return "";
+      }
+
+      // Find the type declaration that contains the breakpoint line.
+      for (TypeDeclaration<?> decl : unit.getTypes()) {
+        Optional<Range> r = decl.getRange();
+        if (!r.isPresent()) {
+          continue;
+        }
+
+        String packagePrefix =
+            unit.getPackageDeclaration()
+                .map(packageDeclaration -> packageDeclaration.getName().toString() + ".")
+                .orElse("");
+        Position begin = r.get().begin;
+        Position end = r.get().end;
+        if (begin.line <= targetLine && end.line >= targetLine) {
+          return packagePrefix + decl.getName().toString();
+        }
+      }
+
+      return "";
+    } catch (ParseProblemException e) {
       return "";
     }
-
-    // Find the type declaration that contains the breakpoint line.
-    for (TypeDeclaration decl : unit.getTypes()) {
-      Optional<Range> r = decl.getRange();
-      if (!r.isPresent()) {
-        continue;
-      }
-
-      String packagePrefix =
-          unit.getPackageDeclaration().isPresent()
-              ? (unit.getPackageDeclaration().get().getName().toString() + ".")
-              : "";
-      Position begin = r.get().begin;
-      Position end = r.get().end;
-      if (begin.line <= targetLine && end.line >= targetLine) {
-        return packagePrefix + decl.getName().toString();
-      }
-    }
-
-    return "";
   }
 
   @Override
@@ -90,16 +95,6 @@ public class FileLineBreakpointSpec extends BreakpointSpec {
 
   @Override
   protected void handleBreakpointResolved() {
-    // No need to watch future class prepare after breakpoint resolved.
-    if (_classPrepareRequest.isPresent()) {
-      _classPrepareRequest.get().disable();
-      getContextManager()
-          .getVirtualMachine()
-          .eventRequestManager()
-          .deleteEventRequest(_classPrepareRequest.get());
-      _classPrepareRequest = Optional.empty();
-    }
-
     // Now that this is resolved, we should have a bound location. Tell the
     // breakpoint manager.
     Optional<Location> location = getBoundLocation();
@@ -110,16 +105,20 @@ public class FileLineBreakpointSpec extends BreakpointSpec {
 
   /** Watch for future class prepare/load if not resolved yet. */
   private void watchForClassPrepare() {
-    EventRequestManager em = getContextManager().getVirtualMachine().eventRequestManager();
-    _classPrepareRequest = Optional.of(em.createClassPrepareRequest());
-    _classPrepareRequest.get().addClassFilter(_className);
-    _classPrepareRequest.get().setSuspendPolicy(EventRequest.SUSPEND_ALL);
-    _classPrepareRequest.get().enable();
+    // one class prepare request per class name
+    if (!_classNameToClassPrepareRequest.containsKey(_className)) {
+      EventRequestManager em = getContextManager().getVirtualMachine().eventRequestManager();
+      ClassPrepareRequest classPrepareRequest = em.createClassPrepareRequest();
+      classPrepareRequest.addClassFilter(_className + "*");
+      classPrepareRequest.setSuspendPolicy(EventRequest.SUSPEND_ALL);
+      classPrepareRequest.enable();
+      _classNameToClassPrepareRequest.put(_className, classPrepareRequest);
+    }
   }
 
   @Override
   protected boolean doesClassMatchBreakpoint(String className) {
-    return className.equals(_className);
+    return className.startsWith(_className);
   }
 
   @Override

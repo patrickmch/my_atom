@@ -4,6 +4,7 @@ Object.defineProperty(exports, "__esModule", {
   value: true
 });
 exports.destroyItemWhere = destroyItemWhere;
+
 /**
  * Copyright (c) 2017-present, Facebook, Inc.
  * All rights reserved.
@@ -15,13 +16,14 @@ exports.destroyItemWhere = destroyItemWhere;
  *  strict
  * @format
  */
-
 function destroyItemWhere(predicate) {
+  const destroyItemStatuses = [];
   atom.workspace.getPanes().forEach(pane => {
     pane.getItems().forEach(item => {
       if (predicate(item)) {
-        pane.destroyItem(item, true);
+        destroyItemStatuses.push(pane.destroyItem(item, true));
       }
     });
   });
+  return Promise.all(destroyItemStatuses);
 }

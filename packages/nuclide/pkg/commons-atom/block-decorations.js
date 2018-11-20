@@ -1,17 +1,28 @@
-'use strict';
+"use strict";
 
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
 exports.syncBlockDecorations = syncBlockDecorations;
 
-var _react = _interopRequireWildcard(require('react'));
+var React = _interopRequireWildcard(require("react"));
 
-var _reactDom = _interopRequireDefault(require('react-dom'));
+var _reactDom = _interopRequireDefault(require("react-dom"));
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
+function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) { var desc = Object.defineProperty && Object.getOwnPropertyDescriptor ? Object.getOwnPropertyDescriptor(obj, key) : {}; if (desc.get || desc.set) { Object.defineProperty(newObj, key, desc); } else { newObj[key] = obj[key]; } } } } newObj.default = obj; return newObj; } }
+
+/**
+ * Copyright (c) 2015-present, Facebook, Inc.
+ * All rights reserved.
+ *
+ * This source code is licensed under the license found in the LICENSE file in
+ * the root directory of this source tree.
+ *
+ * 
+ * @format
+ */
 
 /**
  * Instead of destroying all the decorations and re-rendering them on each edit,
@@ -26,23 +37,15 @@ function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj;
  *
  * @return an array of markers to be destroyed when the decorations are no longer needed.
  */
-/**
- * Copyright (c) 2015-present, Facebook, Inc.
- * All rights reserved.
- *
- * This source code is licensed under the license found in the LICENSE file in
- * the root directory of this source tree.
- *
- * 
- * @format
- */
-
 function syncBlockDecorations(editorElement, diffBlockType, source, shouldUpdate, getElementWithProps, syncWidth = false) {
   const editor = editorElement.getModel();
-  const decorations = editor.getDecorations({ diffBlockType });
+  const decorations = editor.getDecorations({
+    diffBlockType
+  });
   const renderedLineNumbers = new Set();
-  const { component } = editorElement;
-
+  const {
+    component
+  } = editorElement;
   const markers = [];
 
   for (const decoration of decorations) {
@@ -50,28 +53,30 @@ function syncBlockDecorations(editorElement, diffBlockType, source, shouldUpdate
     const lineNumber = marker.getBufferRange().start.row;
     const value = source.get(lineNumber);
     const properties = decoration.getProperties();
-    const item = properties.item;
-
-    // If the decoration should no longer exist or it has already been rendered,
+    const item = properties.item; // If the decoration should no longer exist or it has already been rendered,
     // it needs to be destroyed.
+
     if (value == null || renderedLineNumbers.has(lineNumber)) {
       marker.destroy();
       continue;
     }
 
     if (shouldUpdate(value, properties)) {
-      const { element, customProps } = getElementWithProps(value);
+      const {
+        element,
+        customProps
+      } = getElementWithProps(value);
+
       _reactDom.default.render(element, item);
 
-      Object.assign(properties, customProps);
+      Object.assign(properties, customProps); // Invalidate the block decoration measurements.
 
-      // Invalidate the block decoration measurements.
       if (component != null) {
         component.invalidateBlockDecorationDimensions(decoration);
       }
-    }
+    } // The item is already up to date.
 
-    // The item is already up to date.
+
     markers.push(marker);
     renderedLineNumbers.add(lineNumber);
   }
@@ -81,15 +86,19 @@ function syncBlockDecorations(editorElement, diffBlockType, source, shouldUpdate
       continue;
     }
 
-    const { element, customProps } = getElementWithProps(value);
+    const {
+      element,
+      customProps
+    } = getElementWithProps(value);
     const marker = editor.markBufferPosition([lineNumber, 0], {
       invalidate: 'never'
-    });
+    }); // The position should be `after` if the element is at the end of the file.
 
-    // The position should be `after` if the element is at the end of the file.
     const position = lineNumber >= editor.getLineCount() - 1 ? 'after' : 'before';
     const item = document.createElement('div');
+
     _reactDom.default.render(element, item);
+
     marker.onDidDestroy(() => {
       _reactDom.default.unmountComponentAtNode(item);
     });
@@ -98,7 +107,6 @@ function syncBlockDecorations(editorElement, diffBlockType, source, shouldUpdate
       item,
       position
     }));
-
     markers.push(marker);
   }
 

@@ -92,8 +92,8 @@
     "name": "RemoteCommandService"
   },
   {
-    "implementation": "../nuclide-adb-sdb-rpc/lib/SdbService.js",
-    "name": "SdbService"
+    "implementation": "../nuclide-rsync-rpc/lib/RsyncService.js",
+    "name": "RsyncService"
   },
   {
     "implementation": "../nuclide-socket-rpc/lib/SocketService.js",
@@ -106,10 +106,6 @@
   {
     "implementation": "../nuclide-vscode-language-service-rpc/lib/main.js",
     "name": "VSCodeLanguageService"
-  },
-  {
-    "implementation": "../nuclide-cquery-lsp-rpc/lib/main.js",
-    "name": "CqueryLSPService"
   },
   {
     "implementation": "../../modules/atom-ide-debugger-python/RemoteDebuggerCommandService.js",

@@ -1,4 +1,4 @@
-'use strict';
+"use strict";
 
 /**
  * Copyright (c) 2015-present, Facebook, Inc.
@@ -9,8 +9,8 @@
  *
  *  strict-local
  * @format
+ * @emails oncall+nuclide
  */
-
 test('fake timers are not available yet', () => {
   expect(() => {
     jest.useFakeTimers();

@@ -1,9 +1,8 @@
-'use strict';
+"use strict";
 
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.SET_DEVICE_TYPE_COMPONENTS = exports.SET_DEVICE_TYPE_TASKS = exports.TOGGLE_PROCESS_POLLING = exports.TOGGLE_DEVICE_POLLING = exports.SET_PROCESS_TASKS = exports.SET_PROCESSES = exports.SET_APP_INFO_TABLES = exports.SET_INFO_TABLES = exports.SET_HOST = exports.SET_HOSTS = exports.SET_DEVICE_TASKS = exports.SET_DEVICE = exports.SET_DEVICES = exports.SET_DEVICE_TYPE = exports.SET_DEVICE_TYPES = undefined;
 exports.toggleDevicePolling = toggleDevicePolling;
 exports.toggleProcessPolling = toggleProcessPolling;
 exports.setInfoTables = setInfoTables;
@@ -19,139 +18,192 @@ exports.setDevice = setDevice;
 exports.setDeviceTasks = setDeviceTasks;
 exports.setDeviceTypeTasks = setDeviceTypeTasks;
 exports.setDeviceTypeComponents = setDeviceTypeComponents;
+exports.SET_DEVICE_TYPE_COMPONENTS = exports.SET_DEVICE_TYPE_TASKS = exports.TOGGLE_PROCESS_POLLING = exports.TOGGLE_DEVICE_POLLING = exports.SET_PROCESS_TASKS = exports.SET_PROCESSES = exports.SET_APP_INFO_TABLES = exports.SET_INFO_TABLES = exports.SET_HOST = exports.SET_HOSTS = exports.SET_DEVICE_TASKS = exports.SET_DEVICE = exports.SET_DEVICES = exports.SET_DEVICE_TYPE = exports.SET_DEVICE_TYPES = void 0;
 
-var _immutable;
+function Immutable() {
+  const data = _interopRequireWildcard(require("immutable"));
 
-function _load_immutable() {
-  return _immutable = _interopRequireWildcard(require('immutable'));
+  Immutable = function () {
+    return data;
+  };
+
+  return data;
 }
 
-function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
+function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) { var desc = Object.defineProperty && Object.getOwnPropertyDescriptor ? Object.getOwnPropertyDescriptor(obj, key) : {}; if (desc.get || desc.set) { Object.defineProperty(newObj, key, desc); } else { newObj[key] = obj[key]; } } } } newObj.default = obj; return newObj; } }
 
-const SET_DEVICE_TYPES = exports.SET_DEVICE_TYPES = 'SET_DEVICE_TYPES'; /**
-                                                                         * Copyright (c) 2015-present, Facebook, Inc.
-                                                                         * All rights reserved.
-                                                                         *
-                                                                         * This source code is licensed under the license found in the LICENSE file in
-                                                                         * the root directory of this source tree.
-                                                                         *
-                                                                         *  strict-local
-                                                                         * @format
-                                                                         */
-
-const SET_DEVICE_TYPE = exports.SET_DEVICE_TYPE = 'SET_DEVICE_TYPE';
-const SET_DEVICES = exports.SET_DEVICES = 'SET_DEVICES';
-const SET_DEVICE = exports.SET_DEVICE = 'SET_DEVICE';
-const SET_DEVICE_TASKS = exports.SET_DEVICE_TASKS = 'SET_DEVICE_TASKS';
-const SET_HOSTS = exports.SET_HOSTS = 'SET_HOSTS';
-const SET_HOST = exports.SET_HOST = 'SET_HOST';
-const SET_INFO_TABLES = exports.SET_INFO_TABLES = 'SET_INFO_TABLES';
-const SET_APP_INFO_TABLES = exports.SET_APP_INFO_TABLES = 'SET_APP_INFO_TABLES';
-const SET_PROCESSES = exports.SET_PROCESSES = 'SET_PROCESSES';
-const SET_PROCESS_TASKS = exports.SET_PROCESS_TASKS = 'SET_PROCESS_TASKS';
-const TOGGLE_DEVICE_POLLING = exports.TOGGLE_DEVICE_POLLING = 'TOGGLE_DEVICE_POLLING';
-const TOGGLE_PROCESS_POLLING = exports.TOGGLE_PROCESS_POLLING = 'TOGGLE_PROCESS_POLLING';
-const SET_DEVICE_TYPE_TASKS = exports.SET_DEVICE_TYPE_TASKS = 'SET_DEVICE_TYPE_TASKS';
-const SET_DEVICE_TYPE_COMPONENTS = exports.SET_DEVICE_TYPE_COMPONENTS = 'SET_DEVICE_TYPE_COMPONENTS';
+/**
+ * Copyright (c) 2015-present, Facebook, Inc.
+ * All rights reserved.
+ *
+ * This source code is licensed under the license found in the LICENSE file in
+ * the root directory of this source tree.
+ *
+ *  strict-local
+ * @format
+ */
+const SET_DEVICE_TYPES = 'SET_DEVICE_TYPES';
+exports.SET_DEVICE_TYPES = SET_DEVICE_TYPES;
+const SET_DEVICE_TYPE = 'SET_DEVICE_TYPE';
+exports.SET_DEVICE_TYPE = SET_DEVICE_TYPE;
+const SET_DEVICES = 'SET_DEVICES';
+exports.SET_DEVICES = SET_DEVICES;
+const SET_DEVICE = 'SET_DEVICE';
+exports.SET_DEVICE = SET_DEVICE;
+const SET_DEVICE_TASKS = 'SET_DEVICE_TASKS';
+exports.SET_DEVICE_TASKS = SET_DEVICE_TASKS;
+const SET_HOSTS = 'SET_HOSTS';
+exports.SET_HOSTS = SET_HOSTS;
+const SET_HOST = 'SET_HOST';
+exports.SET_HOST = SET_HOST;
+const SET_INFO_TABLES = 'SET_INFO_TABLES';
+exports.SET_INFO_TABLES = SET_INFO_TABLES;
+const SET_APP_INFO_TABLES = 'SET_APP_INFO_TABLES';
+exports.SET_APP_INFO_TABLES = SET_APP_INFO_TABLES;
+const SET_PROCESSES = 'SET_PROCESSES';
+exports.SET_PROCESSES = SET_PROCESSES;
+const SET_PROCESS_TASKS = 'SET_PROCESS_TASKS';
+exports.SET_PROCESS_TASKS = SET_PROCESS_TASKS;
+const TOGGLE_DEVICE_POLLING = 'TOGGLE_DEVICE_POLLING';
+exports.TOGGLE_DEVICE_POLLING = TOGGLE_DEVICE_POLLING;
+const TOGGLE_PROCESS_POLLING = 'TOGGLE_PROCESS_POLLING';
+exports.TOGGLE_PROCESS_POLLING = TOGGLE_PROCESS_POLLING;
+const SET_DEVICE_TYPE_TASKS = 'SET_DEVICE_TYPE_TASKS';
+exports.SET_DEVICE_TYPE_TASKS = SET_DEVICE_TYPE_TASKS;
+const SET_DEVICE_TYPE_COMPONENTS = 'SET_DEVICE_TYPE_COMPONENTS';
+exports.SET_DEVICE_TYPE_COMPONENTS = SET_DEVICE_TYPE_COMPONENTS;
 
 function toggleDevicePolling(isActive) {
   return {
     type: TOGGLE_DEVICE_POLLING,
-    payload: { isActive }
+    payload: {
+      isActive
+    }
   };
 }
 
 function toggleProcessPolling(isActive) {
   return {
     type: TOGGLE_PROCESS_POLLING,
-    payload: { isActive }
+    payload: {
+      isActive
+    }
   };
 }
 
 function setInfoTables(infoTables) {
   return {
     type: SET_INFO_TABLES,
-    payload: { infoTables }
+    payload: {
+      infoTables
+    }
   };
 }
 
 function setAppInfoTables(appInfoTables) {
   return {
     type: SET_APP_INFO_TABLES,
-    payload: { appInfoTables }
+    payload: {
+      appInfoTables
+    }
   };
 }
 
 function setProcesses(processes) {
   return {
     type: SET_PROCESSES,
-    payload: { processes }
+    payload: {
+      processes
+    }
   };
 }
 
 function setProcessTasks(processTasks) {
   return {
     type: SET_PROCESS_TASKS,
-    payload: { processTasks }
+    payload: {
+      processTasks
+    }
   };
 }
 
 function setDevices(devices) {
   return {
     type: SET_DEVICES,
-    payload: { devices }
+    payload: {
+      devices
+    }
   };
 }
 
 function setHosts(hosts) {
   return {
     type: SET_HOSTS,
-    payload: { hosts }
+    payload: {
+      hosts
+    }
   };
 }
 
 function setHost(host) {
   return {
     type: SET_HOST,
-    payload: { host }
+    payload: {
+      host
+    }
   };
 }
 
 function setDeviceType(deviceType) {
   return {
     type: SET_DEVICE_TYPE,
-    payload: { deviceType }
+    payload: {
+      deviceType
+    }
   };
 }
 
 function setDeviceTypes(deviceTypes) {
   return {
     type: SET_DEVICE_TYPES,
-    payload: { deviceTypes }
+    payload: {
+      deviceTypes
+    }
   };
 }
 
 function setDevice(device) {
   return {
     type: SET_DEVICE,
-    payload: { device }
+    payload: {
+      device
+    }
   };
 }
 
 function setDeviceTasks(deviceTasks) {
   return {
     type: SET_DEVICE_TASKS,
-    payload: { deviceTasks }
+    payload: {
+      deviceTasks
+    }
   };
 }
 
 function setDeviceTypeTasks(deviceTypeTasks) {
   return {
     type: SET_DEVICE_TYPE_TASKS,
-    payload: { deviceTypeTasks }
+    payload: {
+      deviceTypeTasks
+    }
   };
 }
 
 function setDeviceTypeComponents(components) {
-  return { type: SET_DEVICE_TYPE_COMPONENTS, payload: { components } };
+  return {
+    type: SET_DEVICE_TYPE_COMPONENTS,
+    payload: {
+      components
+    }
+  };
 }

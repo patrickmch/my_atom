@@ -1,13 +1,13 @@
-'use strict';
+"use strict";
 
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
 exports.question = question;
 
-var _readline = _interopRequireDefault(require('readline'));
+var _readline = _interopRequireDefault(require("readline"));
 
-var _stream = _interopRequireDefault(require('stream'));
+var _stream = _interopRequireDefault(require("stream"));
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -22,7 +22,6 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
  *  strict
  * @format
  */
-
 function question(query, hideInput) {
   // http://stackoverflow.com/questions/24037545/how-to-hide-password-in-the-nodejs-console
   let output;
@@ -34,8 +33,10 @@ function question(query, hideInput) {
         if (!muted) {
           process.stdout.write(chunk, encoding);
         }
+
         callback();
       }
+
     });
   } else {
     output = process.stdout;
@@ -46,6 +47,7 @@ function question(query, hideInput) {
     output,
     terminal: true
   });
+
   return new Promise(resolve => {
     rl.question(query, answer => {
       rl.close();

@@ -361,7 +361,7 @@
         'patterns': [
           {
             'begin': '(shape\\()'
-            'end': '(=>|\\.\\.\\.)'
+            'end': '((,|\\.\\.\\.)\\s*\\)){1}?'
             'endCaptures':
               '1': 'keyword.operator.key.php'
             'patterns':[
@@ -376,6 +376,9 @@
           {
             'include': '#type-annotation'
           }
+          {
+            'include': '#strings'
+          }
         ]
       }
       {
@@ -389,6 +392,9 @@
       }
       {
         'include': '#class-name'
+      }
+      {
+        'include': '#comments'
       }
     ]
   'function-arguments':
@@ -639,6 +645,9 @@
           {
             'match': '(=)',
             'name': 'keyword.operator.assignment.php'
+          }
+          {
+            'include': '#type-annotation'
           }
         ]
       }
@@ -912,7 +921,7 @@
       }
       {
         'begin': '''(?x)
-          \\s*((?:(?:final|abstract|public|private|protected|static)\\s+)*)
+          \\s*((?:(?:final|abstract|async|public|private|protected|static)\\s+)*)
           (function)
           (?:\\s+|(\\s*&\\s*))
           (?:
@@ -925,7 +934,7 @@
           '1':
             'patterns': [
               {
-                'match': 'final|abstract|public|private|protected|static'
+                'match': 'final|abstract|async|public|private|protected|static'
                 'name': 'storage.modifier.php'
               }
             ]
@@ -1133,8 +1142,12 @@
         'name': 'keyword.operator.arithmetic.php'
       }
       {
-        'match': '(?i)(!|&&|\\|\\|)|\\b(and|or|xor|as)\\b'
+        'match': '(?i)(!|&&|\\|\\|)|\\b(and|or|xor)\\b'
         'name': 'keyword.operator.logical.php'
+      }
+      {
+        'match': '(?i)\\b(is|as)\\b'
+        'name': 'keyword.operator.type.php'
       }
       {
         'include': '#function-call'
@@ -2242,6 +2255,7 @@
         },
         "patterns": [
           { "include": "#xhp-tag-termination" },
+          { "include": "#xhp-html-comments"},
           { "include": "#xhp-tag-attributes" }
         ]
       }
@@ -2252,7 +2266,7 @@
       {
         "comment": "this matches the end > of an opening tag when in the form <tag> </tag>",
         "comment": "uses non consuming search for </ in </tag>",
-        "begin": "(>)",
+        "begin": "(?<!--)(>)",
         "end": "(</)",
         "beginCaptures": {
           "0": { "name": "punctuation.definition.tag.xhp" },

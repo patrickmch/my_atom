@@ -1,10 +1,21 @@
-'use strict';
+"use strict";
 
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-class TestSuiteModel {
+exports.default = void 0;
 
+/**
+ * Copyright (c) 2015-present, Facebook, Inc.
+ * All rights reserved.
+ *
+ * This source code is licensed under the license found in the LICENSE file in
+ * the root directory of this source tree.
+ *
+ *  strict-local
+ * @format
+ */
+class TestSuiteModel {
   constructor(testClasses) {
     this.testClasses = new Map();
     this.testRuns = new Map();
@@ -17,11 +28,12 @@ class TestSuiteModel {
       this.testRuns.set(testRun.test_json.id, testRun);
     }
   }
-
   /**
    * @return `null` if there are no test classes to run, otherwise 0 - 100 indicating percent
    * completion of this test suite.
    */
+
+
   progressPercent() {
     if (this.testClasses.size === 0) {
       return null;
@@ -29,14 +41,7 @@ class TestSuiteModel {
       return this.testRuns.size / this.testClasses.size * 100;
     }
   }
+
 }
-exports.default = TestSuiteModel; /**
-                                   * Copyright (c) 2015-present, Facebook, Inc.
-                                   * All rights reserved.
-                                   *
-                                   * This source code is licensed under the license found in the LICENSE file in
-                                   * the root directory of this source tree.
-                                   *
-                                   *  strict-local
-                                   * @format
-                                   */
+
+exports.default = TestSuiteModel;

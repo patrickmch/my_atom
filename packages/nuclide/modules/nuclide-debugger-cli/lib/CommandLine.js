@@ -1,18 +1,31 @@
-'use strict';
+"use strict";
 
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
+exports.default = void 0;
 
-var _readline = _interopRequireDefault(require('readline'));
+function _LineEditor() {
+  const data = _interopRequireDefault(require("./console/LineEditor"));
 
-var _CommandDispatcher;
+  _LineEditor = function () {
+    return data;
+  };
 
-function _load_CommandDispatcher() {
-  return _CommandDispatcher = _interopRequireDefault(require('./CommandDispatcher'));
+  return data;
 }
 
-var _rxjsBundlesRxMinJs = require('rxjs/bundles/Rx.min.js');
+function _CommandDispatcher() {
+  const data = _interopRequireDefault(require("./CommandDispatcher"));
+
+  _CommandDispatcher = function () {
+    return data;
+  };
+
+  return data;
+}
+
+var _rxjsCompatUmdMin = require("rxjs-compat/bundles/rxjs-compat.umd.min.js");
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -24,42 +37,54 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
  * LICENSE file in the root directory of this source tree. An additional grant
  * of patent rights can be found in the PATENTS file in the same directory.
  *
- *  strict
+ *  strict-local
  * @format
  */
-
 const PROMPT = 'fbdbg> ';
 
 class CommandLine {
-
-  constructor(dispatcher) {
+  constructor(dispatcher, plain, logger) {
     this._inputStopped = false;
+    this._keepPromptWhenStopped = false;
     this._shouldPrompt = false;
     this._lastLine = '';
     this._overridePrompt = null;
     this._subscriptions = [];
-
     this._dispatcher = dispatcher;
-    this._cli = _readline.default.createInterface({
+    let lineEditorArgs = {
       input: process.stdin,
       output: process.stdout
-    });
+    };
 
+    if (plain) {
+      lineEditorArgs = Object.assign({}, lineEditorArgs, {
+        tty: false
+      });
+    }
+
+    this._cli = new (_LineEditor().default)(lineEditorArgs, logger);
     this.setPrompt();
+    this._interrupts = new _rxjsCompatUmdMin.Subject();
 
-    this._interrupts = new _rxjsBundlesRxMinJs.Subject();
-    this._subscriptions.push(_rxjsBundlesRxMinJs.Observable.fromEvent(this._cli, 'SIGINT').subscribe(this._interrupts));
+    this._subscriptions.push(_rxjsCompatUmdMin.Observable.fromEvent(this._cli, 'SIGINT').subscribe(this._interrupts));
 
-    this._lines = new _rxjsBundlesRxMinJs.Subject();
-    this._subscriptions.push(_rxjsBundlesRxMinJs.Observable.fromEvent(this._cli, 'line').takeUntil(_rxjsBundlesRxMinJs.Observable.fromEvent(this._cli, 'close')).subscribe(this._lines));
+    this._lines = new _rxjsCompatUmdMin.Subject();
+
+    this._subscriptions.push(_rxjsCompatUmdMin.Observable.fromEvent(this._cli, 'line').takeUntil(_rxjsCompatUmdMin.Observable.fromEvent(this._cli, 'close')).subscribe(this._lines));
 
     this._subscriptions.push(this._lines.filter(_ => !this._inputStopped).switchMap(_ => {
       this._lastLine = _.trim() === '' ? this._lastLine : _.trim();
-      return this._dispatcher.execute(this._lastLine);
+
+      try {
+        return this._dispatcher.execute(this._lastLine);
+      } catch (err) {
+        return err;
+      }
     }).subscribe(_ => {
       if (_ != null) {
         this.outputLine(_.message);
       }
+
       if (!this._inputStopped) {
         this._cli.prompt();
       } else {
@@ -67,11 +92,21 @@ class CommandLine {
       }
     }));
 
+    this._keys = new _rxjsCompatUmdMin.Subject();
+
+    this._subscriptions.push(_rxjsCompatUmdMin.Observable.fromEvent(this._cli, 'key').takeUntil(_rxjsCompatUmdMin.Observable.fromEvent(this._cli, 'close')).subscribe(this._keys));
+
+    this._subscriptions.push(_rxjsCompatUmdMin.Observable.fromEvent(this._cli, 'close').subscribe(() => process.exit(1)));
+
     this._shouldPrompt = true;
   }
 
   dispose() {
     this._subscriptions.forEach(_ => _.unsubscribe());
+  }
+
+  enterFullScreen() {
+    this._cli.enterFullScreen();
   }
 
   observeInterrupts() {
@@ -82,56 +117,64 @@ class CommandLine {
     return this._lines;
   }
 
+  observeKeys() {
+    return this._keys;
+  }
+
+  isTTY() {
+    return this._cli.isTTY();
+  }
+
   setPrompt(prompt) {
     this._overridePrompt = prompt;
+
     this._updatePrompt();
   }
 
   _updatePrompt() {
-    if (this._inputStopped) {
+    if (this._inputStopped && !this._keepPromptWhenStopped) {
       this._cli.setPrompt('');
     } else {
       this._cli.setPrompt(this._overridePrompt != null ? this._overridePrompt : PROMPT);
     }
   }
 
-  // $TODO handle paging long output (more) if termcap allows us to know the screen height
   output(text) {
-    if (!this._inputStopped) {
-      if (!text.startsWith('\n')) {
-        process.stdout.write('\n');
-      }
-      process.stdout.write(text);
-      this._cli.prompt(true);
-      return;
-    }
-    process.stdout.write(text);
+    this._cli.write(text);
   }
 
   outputLine(line = '') {
-    process.stdout.write(`${line}\n`);
+    this._cli.write(`${line}\n`);
   }
 
   prompt() {
     this._cli.prompt();
   }
 
-  stopInput() {
+  stopInput(keepPromptWhenStopped) {
+    this._keepPromptWhenStopped = keepPromptWhenStopped === true;
     this._inputStopped = true;
+    this._shouldPrompt = true;
+
     this._updatePrompt();
   }
 
   startInput() {
     this._inputStopped = false;
+
     this._updatePrompt();
+
     if (this._shouldPrompt) {
       this._cli.prompt();
+
       this._shouldPrompt = false;
     }
   }
 
-  close() {
-    this._cli.close();
+  close(error) {
+    this._cli.close(error);
   }
+
 }
+
 exports.default = CommandLine;

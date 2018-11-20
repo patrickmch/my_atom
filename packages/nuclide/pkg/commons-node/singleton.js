@@ -1,8 +1,10 @@
-'use strict';
+"use strict";
 
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
+exports.default = void 0;
+
 /**
  * Copyright (c) 2015-present, Facebook, Inc.
  * All rights reserved.
@@ -13,31 +15,35 @@ Object.defineProperty(exports, "__esModule", {
  * 
  * @format
  */
-
 const GLOBAL_MAP_NAME = '__NUCLIDE_SINGLETONS__';
 
 function getMap() {
   let map = global[GLOBAL_MAP_NAME];
+
   if (!map) {
     map = global[GLOBAL_MAP_NAME] = new Map();
   }
+
   return map;
 }
-
 /**
  * Creates a per-global singleton value.
  * constructor will be called exactly once, future invocations will
  * return the result of the constructor call.
  */
+
+
 function get(field, constructor) {
   const map = getMap();
+
   if (!map.has(field)) {
     map.set(field, constructor());
-  }
-  // Cast through `any` because `map.get` can return null/undefined. We know that `field` exists
+  } // Cast through `any` because `map.get` can return null/undefined. We know that `field` exists
   // because we have just checked it above. However, we cannot just call `get` and then check it
   // against null because T may be a nullable type, in which case this would break subtly. So, we
   // circumvent the type system here to maintain the desired runtime behavior.
+
+
   return map.get(field);
 }
 
@@ -50,8 +56,9 @@ function reset(field, constructor) {
   return get(field, constructor);
 }
 
-exports.default = {
+var _default = {
   get,
   clear,
   reset
 };
+exports.default = _default;

@@ -1,0 +1,470 @@
+diff --git a/nols_website/core/views_dataentry.py b/nols_website/core/views_dataentry.py
+index 5e22fa870..399c856ef 100644
+--- a/nols_website/core/views_dataentry.py
++++ b/nols_website/core/views_dataentry.py
+@@ -1,462 +1,456 @@
+ import urllib
+ import json
+ 
+ from django.shortcuts import render
+ from django.template import RequestContext
+ from django.http import HttpResponseRedirect, HttpResponse, HttpResponseBadRequest, HttpResponseNotAllowed
+ from django.core.urlresolvers import reverse
+ from django.core.exceptions import ObjectDoesNotExist
+ from django.contrib.admin.views.decorators import staff_member_required
+ from django.contrib.auth.decorators import login_required
+ from django.views import generic as gcbv
+ from django.conf import settings
+ from django.utils.decorators import method_decorator
+ from django.contrib.auth.forms import AuthenticationForm
+ from django.utils.translation import ugettext_lazy as _
+ 
+ from core.nmc import da
+ from nols.util.django.forms.utils import form_list_is_valid
+ from nols.model.core.entity.interaction import Interaction
+ from wmi.models import RosterEntry
+ from wmi.forms import WmiExtrasForm, RollCallCourseForm
+ from wmi.utils import get_event
+ 
+ from core import formhelp
+ from core.constants import VALID_CREDENTIALS
+ from core.models import PublicEntry
+ from core.decorators import check_write_protect
+ from core.utils_dataentry import build_dataentry_forms, build_initial_form,\
+     build_dataentry_user_forms, connect_user_using_forms, build_dataentry_elog_message
+ from core.match_maker import MatchMaker, CONNECTION_STATUS as STATUS
+ 
+ from axes.decorators import watch_login
+ from honeypot.decorators import check_honeypot
+ 
+ from nols.util.django.views.decorators.http import secure_required
+ 
+ REQUIRED_MESSAGE = u'* This field is required.'
+ AUTHENTICATED_USER = "authenticated user"
+ UNAUTHENTICATED_USER = "unauthenticated user"
+ 
+ 
+ @check_write_protect
+ def submit(request, identifier):
+     """
+     Process this person's data and ensure it gets in the database.
+     @param request: the HttpRequest
+     @param identifier: the course_code or slug associated with the event.
+     @return: The appropriate HttpResponse
+     """
+     context = {}
+ 
+     event = get_event(identifier)
+     context['event'] = event
+ 
+     if 'person_data' in request.session:
+         del request.session['person_data']
+     if 'email_data' in request.session:
+         del request.session['email_data']
+ 
+     if request.method == "POST" and request.session.get('rollcall_got_started', False):
+-        # NOTE this seems not great. It makes it so that you have to update the form fields in two places.
+-        # Not sure quite how to work with this yet- might be worth a refactor while I'm here.
+         forms = build_dataentry_forms(request.POST, extras_form=WmiExtrasForm, phone_required=True,
+-                                      show_citizenship=True, citizenship_required=True, verify_email=False)
++                                      show_citizenship=True, citizenship_required=True)
+         matching_personid = request.session.get('rollcall_personid_match', None)
+ 
+         if form_list_is_valid(forms=forms):
+             # TODO deal with authenticated unconnected user
+             # @TODO refactor these into methods on the core Forms?
+ 
+             if matching_personid:
+                 person_id = matching_personid
+             else:
+                 person_id = forms['person_form'].create_person_entity()
+ 
+                 # only save the email address on a new person. If we matched then the email should
+                 # have already been present on the person record. Furthermore we want to be
+                 # careful about adding email addresses to entities. Our security relies on it.
+                 email = da.entity.get_new_email_address(person_id)
+                 email_data = forms['email_form'].cleaned_data
+                 formhelp.populate_email_attrs(email_data, email)
+                 da.entity.save_email_address(email)
+ 
+             person = da.entity.get_entity(person_id)
+             # TODO update blank name info
+ 
+             address = da.entity.get_new_address(person_id)
+             address_data = forms['address_form'].cleaned_data
+             formhelp.populate_address_attrs(address_data, address)
+             if not person.is_duplicate_address(address, std_before_cmp=True):
+                 da.entity.save_address(address, use_orig_on_error=True)
+ 
+             if forms['phone_form'].cleaned_data['phone_number']:
+                 phone = da.entity.get_new_phone_number(person_id)
+                 phone_data = forms['phone_form'].cleaned_data
+                 formhelp.populate_phone_attrs(phone_data, phone)
+                 if not person.is_duplicate_phone_number(phone):
+                     da.entity.save_phone_number(phone)
+ 
+             request.session.flush()
+             request.session['dataentry_submitted'] = True
+ 
+             validation = event.validate_person_id(person_id)
+             if validation['add_to_event']:
+                 public_entry = PublicEntry(person_id=person_id,
+                                            how_created=UNAUTHENTICATED_USER)
+                 public_entry.dupe = forms['extras_form'].cleaned_data['possible_duplicate']
+                 public_entry.save()
+ 
+                 roster_entry = RosterEntry(public_entry=public_entry, wmi_roster=event)
+                 roster_entry.heard_about = forms['extras_form'].cleaned_data['heard_about']
+                 roster_entry.save()
+ 
+             # Even if we don't add them to the Roster, we still save the data they posted.
+             elif validation['allow_post']:
+                 roster_entry = RosterEntry.objects.get(public_entry__person_id=person_id,
+                                                        wmi_roster=event.wmi_course_id)
+                 roster_entry.heard_about = forms['extras_form'].cleaned_data['heard_about']
+                 roster_entry.present = True
+                 roster_entry.save()
+ 
+             return HttpResponseRedirect(reverse('dataentry_submitted',
+                                                 kwargs={'identifier': identifier}))
+ 
+         else:
+             if forms['honeypot_form'].errors:
+                 return HttpResponseBadRequest()
+ 
+             if matching_personid:
+                 forms = build_dataentry_forms(request.POST, extras_form=WmiExtrasForm,
+                                               show_min_name=True, phone_required=True,
+                                               show_citizenship=True,
+                                               citizenship_required=True)
+                 context['readonly_inputs'] = True
+ 
+             context.update(forms)
+             return render(request, 'dataentry/dataentry_form.html', context=context)
+ 
+     return HttpResponseRedirect(reverse('get_started', args=[identifier]))
+ 
+ 
+ @check_write_protect
+ @login_required
+ def submit_authenticated(request, identifier):
+     """
+     Process rollcall form submission for an authenticated user. This view also assumes that the
+     User is connected. We ensure this in the get started view.
+     @param request:
+     @param identifier:
+     @return:
+     """
+     event = get_event(identifier)
+     context = {}
+     context['event'] = event
+ 
+     if 'person_data' in request.session:
+         del request.session['person_data']
+     if 'email_data' in request.session:
+         del request.session['email_data']
+ 
+     if request.method == 'POST':
+         form = WmiExtrasForm(request.POST)
+         if form.is_valid():
+ 
+             person_id = request.user.entity.id
+ 
+             keys_to_del = ['heard_about_choice', 'got_started']
+             for key in keys_to_del:
+                 try:
+                     del request.session[key]
+                 except KeyError:
+                     pass
+ 
+             # Prevent repeats of the same person_id on a given course/event.
+             try:
+                 existing_roster_entry = RosterEntry.objects.get(public_entry__person_id=person_id,
+                                                                 wmi_roster=event.wmi_course_id)
+             except ObjectDoesNotExist:
+                 existing_roster_entry = None
+ 
+             if existing_roster_entry:
+                 auto_populated = existing_roster_entry.public_entry.how_created == RosterEntry.AUTO_POPULATED
+ 
+                 if (auto_populated and existing_roster_entry.present is None) or\
+                         existing_roster_entry.public_entry.how_created == 'admin':
+                     existing_roster_entry.heard_about = form.cleaned_data['heard_about']
+                     existing_roster_entry.present = True
+                     existing_roster_entry.save()
+ 
+                     return render(request, 'dataentry/submitted.html', context=context)
+ 
+                 else:
+                     custom_message = "It looks like you have already submitted your information to"\
+                         " this roster. If you think that this is incorrect, ensure that you aren't logged"\
+                         " in as someone else, and then let your instructors know."
+                     context['custom_message'] = custom_message
+                     context['error'] = True
+ 
+                     return render(request, 'dataentry/submitted.html', context=context)
+ 
+             else:
+                 public_entry = PublicEntry(person_id=person_id,
+                                            dupe=form.cleaned_data['possible_duplicate'],
+                                            how_created=AUTHENTICATED_USER)
+                 public_entry.save()
+ 
+                 roster_entry = RosterEntry(public_entry=public_entry,
+                                            wmi_roster=event,
+                                            heard_about=form.cleaned_data['heard_about'])
+                 roster_entry.save()
+ 
+                 request.session['dataentry_submitted'] = True
+ 
+                 return HttpResponseRedirect(reverse('dataentry_submitted',
+                                                     kwargs={'identifier': identifier}))
+ 
+         context.update({'extras_form': form,
+                         'allow_post': True})
+         return render(request, 'dataentry/authenticated_form.html', context=context)
+ 
+     else:
+         return HttpResponseRedirect(reverse('get_started', args=[identifier]))
+ 
+ 
+ def get_started(request, identifier):
+     """
+     Displays the bare essentials of the person and email forms. Collect just
+     enough data to decide what to do with this person.
+ 
+     @param request:
+     @param identifier:
+     @return:
+     """
+     event = get_event(identifier)
+     initial_data = {}
+ 
+     context = {'event': event, 'prompt_login': False}
+ 
+     if not event.is_available():
+         return render(request, 'dataentry/closed.html', context=context)
+ 
+     if request.method == 'POST':
+         forms = build_initial_form(request)
+         if form_list_is_valid(forms):
+             # Since we may prompt an unconnected user to login in based on the info they just gave us,
+             # we persist their form data in the session, so that if they do log in and return to this
+             # view with a get request, we have the info we need to connect them.
+             request.session['person_data'] = forms['person_form'].cleaned_data
+             request.session['email_data'] = forms['email_form'].cleaned_data
+ 
+             user = request.user
+             mm = MatchMaker(forms['person_form'], forms['email_form'], user=user)
+             status = mm.status
+ 
+             if user.is_authenticated():
+ 
+                 # TODO do something intelligent with the UNCONNECTED_DUPE (i.e. don't just
+                 # connect another User to that NolsPerson).
+                 if status in [STATUS.UNCONNECTED, STATUS.USER, STATUS.UNCONNECTED_DUPE]:
+                     connect_user_using_forms(request.user,
+                                                 forms['person_form'].cleaned_data,
+                                                 forms['email_form'].cleaned_data)
+ 
+                 forms = build_dataentry_user_forms(user, extras_form=WmiExtrasForm)
+                 context.update(forms)
+ 
+                 validation = event.validate_person_id(user.entity.id)
+                 context.update({'allow_post': validation['allow_post'],
+                                 'validated_message': validation['message']})
+ 
+                 return render(request, 'dataentry/authenticated_form.html', context=context)
+ 
+             pos_dupe = status in [STATUS.NEW_CONTACT, STATUS.NEW_PERSON_OLD_USER]
+ 
+             use_short_name_form = False
+             if mm.person:
+                 request.session['rollcall_personid_match'] = mm.person.id
+                 validation = event.validate_person_id(mm.person.id)
+                 context.update({'disallow_post': not validation['allow_post'],
+                                 'validated_message': validation['message']})
+                 context['readonly_inputs'] = True
+                 use_short_name_form = True
+ 
+             context['prompt_login'] = status in [STATUS.CONNECTED_1_TO_1,
+                                                  STATUS.CONNECTED_1_TO_MANY,
+                                                  STATUS.UNCONNECTED,
+                                                  STATUS.UNCONNECTED_DUPE,
+                                                  STATUS.USER]
+ 
+             if context['prompt_login']:
+                 context['log_in_message'] = "It looks like you have a user account at nols.edu. "\
+                     "Would you like to log-in to edit your information?"
+ 
+             post_data = request.POST.copy()
+             post_data['possible_duplicate'] = pos_dupe
+             forms = build_dataentry_forms(initial_data=post_data, extras_form=WmiExtrasForm,
+                                           show_min_name=use_short_name_form, phone_required=True,
+-                                          show_citizenship=True, citizenship_required=True,
+-                                          verify_email=False)
++                                          show_citizenship=True, citizenship_required=True)
+ 
+             request.session['rollcall_got_started'] = True
+ 
+             context.update(forms)
+             return render(request, 'dataentry/dataentry_form.html', context=context)
+ 
+         else:
+             # invalid form
+             if forms['honeypot_form'].errors:
+                 return HttpResponseBadRequest()
+ 
+             context.update(forms)
+             return render(request, 'dataentry/get_started.html', context=context)
+ 
+     else:
+         # not a post request
+         user = request.user
+ 
+         if user.is_authenticated():
+-            # confirm user if they didn't come through the get started view.
+-            # context['confirm_user'] = not request.session.get('rollcall_got_started', False)
+-
+             # If an unconnected user was prompted to login, they may end up here, but we don't want
+             # to make them POST the get_started form again, so we need to create and connect them,
+             # and send them on their way to the authenticated_form template.
+             if 'person_data' in request.session and 'email_data' in request.session and not user.entity:
+                 # Just in case this session data is getting passed around where we don't expect it, do a
+                 # sanity check before connecting people.
+                 try:
+                     assert user.email == request.session['email_data']['email_address']
+                     assert user.last_name == request.session['person_data']['last_name']
+                     assert user.first_name == request.session['person_data']['first_name']
+                 except AssertionError:
+                     pass
+                 else:
+                     connect_user_using_forms(user,
+                                                 request.session['person_data'],
+                                                 request.session['email_data'])
+ 
+                 del request.session['person_data']
+                 del request.session['email_data']
+ 
+             # TODO UnconnectedUser
+             if user.entity:
+             # The way we are updating name and contact info means we may leave and return to
+             # the form, so we are saving their selection in a cookie.
+                 if 'heard_about_choice' in request.COOKIES:
+                     heard_about_choice = urllib.unquote(request.COOKIES['heard_about_choice'])
+                     request.session['heard_about_choice'] = heard_about_choice
+                 else:
+                     heard_about_choice = request.session.get('heard_about_choice')
+ 
+                 if heard_about_choice is not None:
+                     initial_data['heard_about'] = heard_about_choice
+ 
+                 # build up forms based on their user.
+                 forms = build_dataentry_user_forms(user)
+                 forms['extras_form'] = WmiExtrasForm(initial=initial_data)
+ 
+                 validation = event.validate_person_id(user.entity.id)
+                 context.update({'allow_post': validation['allow_post'],
+                                 'validated_message': validation['message']})
+ 
+                 context.update(forms)
+                 return render(request, 'dataentry/authenticated_form.html', context=context)
+ 
+             # we didn't have their birthday in the session. Make them start at the beginning
+             initial_data = {'first_name': user.first_name,
+                             'last_name': user.last_name,
+                             'email_address': user.email}
+ 
+             # Instructors may forget to log out before allowing students to user their computers
+             # We do it for them,  because this is a dangerous spot (we are connecting users to entities)
+             if user.is_staff and user.groups.filter(name='wmi_instructors').count() > 0:
+                 return HttpResponseRedirect(''.join([reverse('logout'),
+                                                      '?next=',
+                                                      reverse('get_started', args=[identifier])]))
+ 
+ 
+         forms = build_initial_form(initial=initial_data)
+ 
+     context.update(forms)
+ 
+     return render(request, 'dataentry/get_started.html', context=context)
+ 
+ 
+ def submitted(request, identifier):
+     """
+     Return a success message.
+     @param request:
+     @param identifier:
+     @return:
+     """
+     event = get_event(identifier)
+     context = dict(event=event)
+     if request.session.get('dataentry_submitted', False):
+         del request.session['dataentry_submitted']
+         return render(request, 'dataentry/submitted.html', context=context)
+     else:
+         return HttpResponseRedirect(reverse('get_started', args=[identifier]))
+ 
+ 
+ def rollcall_admin(request, identifier):
+     """Convenince view to redirect staff to the proper admin url.
+     @param request:
+     @param identifier:
+     """
+     event = get_event(identifier)
+ 
+     return HttpResponseRedirect(reverse('admin:wmi_roster_change', args=(event.id,)))
+ 
+ 
+ # Ajax
+ 
+ 
+ @watch_login
+ def validate_login_form(request):
+     if request.method == 'POST' and request.is_ajax():
+         form = AuthenticationForm(request=request, data=request.POST)
+         form.error_messages['invalid_login'] = _("Incorrect %(username)s or password. ")
+         valid = False
+         if form.is_valid():
+             data = json.dumps({'is_valid': True})
+             valid = True
+         else:
+             data = json.dumps(dict([(k, [unicode(e) for e in v]) for k,v in form.errors.items()]))
+         response = HttpResponse(data, content_type='application/json')
+         if valid:
+             response['X-Alt-Login'] = VALID_CREDENTIALS
+         return response
+     else:
+         return HttpResponseNotAllowed(['POST'])
+ 
+ 
+ @login_required
+ def validate_core_form(request, form_name):
+     if request.method == 'POST' and request.is_ajax():
+         forms = build_dataentry_user_forms(request.user, data=request.POST, prefix=None)
+-        form = forms[form_name]
++        form = forms[form_name]['form']
+         if form.is_valid():
+             data = json.dumps({'is_valid': True})
+         else:
+             data = json.dumps(dict([(k, [unicode(e) for e in v]) for k,v in form.errors.items()]))
+ 
+         return HttpResponse(data, content_type='application/json')
+ 
+     else:
+         return HttpResponseNotAllowed(['POST'])
+ 
+ 
+ def rollcall_home(request):
+     context = {}
+ 
+     if request.method == 'POST':
+         context['form'] = RollCallCourseForm(request.POST)
+         if context['form'].is_valid():
+             return HttpResponseRedirect(reverse('get_started', args=[context['form'].cleaned_data['course']]))
+         else:
+             return render(request, 'dataentry/rollcall_home.html', context)
+ 
+     context['form'] = RollCallCourseForm()
+ 
+     return render(request, 'dataentry/rollcall_home.html', context)

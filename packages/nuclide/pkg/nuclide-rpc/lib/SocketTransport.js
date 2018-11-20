@@ -1,51 +1,71 @@
-'use strict';
+"use strict";
 
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.SocketTransport = undefined;
+exports.SocketTransport = void 0;
 
-var _StreamTransport;
+function _StreamTransport() {
+  const data = require("./StreamTransport");
 
-function _load_StreamTransport() {
-  return _StreamTransport = require('./StreamTransport');
+  _StreamTransport = function () {
+    return data;
+  };
+
+  return data;
 }
 
-var _eventKit;
+function _eventKit() {
+  const data = require("event-kit");
 
-function _load_eventKit() {
-  return _eventKit = require('event-kit');
+  _eventKit = function () {
+    return data;
+  };
+
+  return data;
 }
 
-var _promise;
+function _promise() {
+  const data = require("../../../modules/nuclide-commons/promise");
 
-function _load_promise() {
-  return _promise = require('../../../modules/nuclide-commons/promise');
+  _promise = function () {
+    return data;
+  };
+
+  return data;
 }
 
-class SocketTransport extends (_StreamTransport || _load_StreamTransport()).StreamTransport {
-
+/**
+ * Copyright (c) 2015-present, Facebook, Inc.
+ * All rights reserved.
+ *
+ * This source code is licensed under the license found in the LICENSE file in
+ * the root directory of this source tree.
+ *
+ *  strict-local
+ * @format
+ */
+class SocketTransport extends _StreamTransport().StreamTransport {
   constructor(socket, messageLogger = (direction, message) => {
     return;
   }) {
     super(socket, socket, messageLogger);
     this._socket = socket;
-    this._emitter = new (_eventKit || _load_eventKit()).Emitter();
-
+    this._emitter = new (_eventKit().Emitter)();
     socket.on('close', () => {
       if (!this.isClosed()) {
         this.close();
       }
+
       this._emitter.emit('close');
     });
-
-    const connectionDeferred = new (_promise || _load_promise()).Deferred();
+    const connectionDeferred = new (_promise().Deferred)();
     socket.on('connect', connectionDeferred.resolve);
     socket.on('error', error => connectionDeferred.reject(error));
     this._onConnect = connectionDeferred;
-  }
+  } // Returns a promise which resolves on connection or rejects if connection fails.
 
-  // Returns a promise which resolves on connection or rejects if connection fails.
+
   onConnected() {
     return this._onConnect.promise;
   }
@@ -55,23 +75,16 @@ class SocketTransport extends (_StreamTransport || _load_StreamTransport()).Stre
   }
 
   close() {
-    super.close();
+    super.close(); // Send the FIN packet ...
 
-    // Send the FIN packet ...
-    this._socket.end();
-    // Then hammer it closed
+    this._socket.end(); // Then hammer it closed
+
+
     this._socket.destroy();
 
     this._emitter.dispose();
   }
+
 }
-exports.SocketTransport = SocketTransport; /**
-                                            * Copyright (c) 2015-present, Facebook, Inc.
-                                            * All rights reserved.
-                                            *
-                                            * This source code is licensed under the license found in the LICENSE file in
-                                            * the root directory of this source tree.
-                                            *
-                                            *  strict-local
-                                            * @format
-                                            */
+
+exports.SocketTransport = SocketTransport;

@@ -1,37 +1,58 @@
-'use strict';
+"use strict";
 
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
+exports.default = void 0;
 
-var _libclang;
+function _libclang() {
+  const data = require("./libclang");
 
-function _load_libclang() {
-  return _libclang = require('./libclang');
+  _libclang = function () {
+    return data;
+  };
+
+  return data;
 }
 
-var _findWholeRangeOfSymbol;
+function _findWholeRangeOfSymbol() {
+  const data = _interopRequireDefault(require("./findWholeRangeOfSymbol"));
 
-function _load_findWholeRangeOfSymbol() {
-  return _findWholeRangeOfSymbol = _interopRequireDefault(require('./findWholeRangeOfSymbol'));
+  _findWholeRangeOfSymbol = function () {
+    return data;
+  };
+
+  return data;
 }
 
-var _range;
+function _range() {
+  const data = require("../../../modules/nuclide-commons-atom/range");
 
-function _load_range() {
-  return _range = require('../../../modules/nuclide-commons-atom/range');
+  _range = function () {
+    return data;
+  };
+
+  return data;
 }
 
-var _nuclideAnalytics;
+function _nuclideAnalytics() {
+  const data = require("../../../modules/nuclide-analytics");
 
-function _load_nuclideAnalytics() {
-  return _nuclideAnalytics = require('../../nuclide-analytics');
+  _nuclideAnalytics = function () {
+    return data;
+  };
+
+  return data;
 }
 
-var _constants;
+function _constants() {
+  const data = require("./constants");
 
-function _load_constants() {
-  return _constants = require('./constants');
+  _constants = function () {
+    return data;
+  };
+
+  return data;
 }
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
@@ -46,43 +67,45 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
  *  strict-local
  * @format
  */
-
 class DefinitionHelpers {
   static getDefinition(editor, position) {
-    return (0, (_nuclideAnalytics || _load_nuclideAnalytics()).trackTiming)('clang.get-definition', () => DefinitionHelpers._getDefinition(editor, position));
+    return (0, _nuclideAnalytics().trackTiming)('clang.get-definition', () => DefinitionHelpers._getDefinition(editor, position));
   }
 
   static async _getDefinition(editor, position) {
-    if (!(_constants || _load_constants()).GRAMMAR_SET.has(editor.getGrammar().scopeName)) {
-      throw new Error('Invariant violation: "GRAMMAR_SET.has(editor.getGrammar().scopeName)"');
+    if (!_constants().GRAMMAR_SET.has(editor.getGrammar().scopeName)) {
+      throw new Error("Invariant violation: \"GRAMMAR_SET.has(editor.getGrammar().scopeName)\"");
     }
 
     const src = editor.getPath();
+
     if (src == null) {
       return null;
     }
 
     const contents = editor.getText();
+    const wordMatch = (0, _range().wordAtPosition)(editor, position, _constants().IDENTIFIER_REGEXP);
 
-    const wordMatch = (0, (_range || _load_range()).wordAtPosition)(editor, position, (_constants || _load_constants()).IDENTIFIER_REGEXP);
     if (wordMatch == null) {
       return null;
     }
 
-    const { range } = wordMatch;
+    const {
+      range
+    } = wordMatch;
+    const result = await (0, _libclang().getDeclaration)(editor, position.row, position.column);
 
-    const result = await (0, (_libclang || _load_libclang()).getDeclaration)(editor, position.row, position.column);
     if (result == null) {
       return null;
     }
 
-    const wholeRange = (0, (_findWholeRangeOfSymbol || _load_findWholeRangeOfSymbol()).default)(editor, contents, range, result.spelling, result.extent);
+    const wholeRange = (0, _findWholeRangeOfSymbol().default)(editor, contents, range, result.spelling, result.extent);
     const definition = {
       path: result.file,
       position: result.point,
       range: result.extent,
-      language: 'clang'
-      // TODO: projectRoot
+      language: 'clang' // TODO: projectRoot
+
     };
 
     if (result.spelling != null) {
@@ -94,5 +117,7 @@ class DefinitionHelpers {
       definitions: [definition]
     };
   }
+
 }
+
 exports.default = DefinitionHelpers;

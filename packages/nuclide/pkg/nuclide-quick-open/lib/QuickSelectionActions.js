@@ -1,13 +1,18 @@
-'use strict';
+"use strict";
 
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
+exports.default = void 0;
 
-var _QuickSelectionDispatcher;
+function _QuickSelectionDispatcher() {
+  const data = require("./QuickSelectionDispatcher");
 
-function _load_QuickSelectionDispatcher() {
-  return _QuickSelectionDispatcher = require('./QuickSelectionDispatcher');
+  _QuickSelectionDispatcher = function () {
+    return data;
+  };
+
+  return data;
 }
 
 /**
@@ -20,25 +25,25 @@ function _load_QuickSelectionDispatcher() {
  *  strict
  * @format
  */
-
 class QuickSelectionActions {
-
   constructor(dispatcher) {
     this._dispatcher = dispatcher;
   }
 
   query(query) {
     this._dispatcher.dispatch({
-      actionType: (_QuickSelectionDispatcher || _load_QuickSelectionDispatcher()).ActionTypes.QUERY,
+      actionType: _QuickSelectionDispatcher().ActionTypes.QUERY,
       query
     });
   }
 
   changeActiveProvider(providerName) {
     this._dispatcher.dispatch({
-      actionType: (_QuickSelectionDispatcher || _load_QuickSelectionDispatcher()).ActionTypes.ACTIVE_PROVIDER_CHANGED,
+      actionType: _QuickSelectionDispatcher().ActionTypes.ACTIVE_PROVIDER_CHANGED,
       providerName
     });
   }
+
 }
+
 exports.default = QuickSelectionActions;

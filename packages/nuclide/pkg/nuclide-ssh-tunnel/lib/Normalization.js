@@ -1,4 +1,4 @@
-'use strict';
+"use strict";
 
 Object.defineProperty(exports, "__esModule", {
   value: true
@@ -7,29 +7,40 @@ exports.resolveTunnel = resolveTunnel;
 exports.getSharedHostUri = getSharedHostUri;
 exports.getSocketServiceByHost = getSocketServiceByHost;
 
-var _nuclideUri;
+function _nuclideUri() {
+  const data = _interopRequireDefault(require("../../../modules/nuclide-commons/nuclideUri"));
 
-function _load_nuclideUri() {
-  return _nuclideUri = _interopRequireDefault(require('../../../modules/nuclide-commons/nuclideUri'));
+  _nuclideUri = function () {
+    return data;
+  };
+
+  return data;
 }
 
-var _nuclideRemoteConnection;
+function _nuclideRemoteConnection() {
+  const data = require("../../nuclide-remote-connection");
 
-function _load_nuclideRemoteConnection() {
-  return _nuclideRemoteConnection = require('../../nuclide-remote-connection');
+  _nuclideRemoteConnection = function () {
+    return data;
+  };
+
+  return data;
 }
 
-var _nuclideSocketRpc;
+function SocketServiceImpl() {
+  const data = _interopRequireWildcard(require("../../nuclide-socket-rpc"));
 
-function _load_nuclideSocketRpc() {
-  return _nuclideSocketRpc = _interopRequireWildcard(require('../../nuclide-socket-rpc'));
+  SocketServiceImpl = function () {
+    return data;
+  };
+
+  return data;
 }
 
-function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
+function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) { var desc = Object.defineProperty && Object.getOwnPropertyDescriptor ? Object.getOwnPropertyDescriptor(obj, key) : {}; if (desc.get || desc.set) { Object.defineProperty(newObj, key, desc); } else { newObj[key] = obj[key]; } } } } newObj.default = obj; return newObj; } }
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-// Normalize host URIs
 /**
  * Copyright (c) 2015-present, Facebook, Inc.
  * All rights reserved.
@@ -40,13 +51,25 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
  * 
  * @format
  */
+// Normalize host URIs
+async function resolveTunnel(tunnel) {
+  const {
+    from,
+    to
+  } = tunnel;
+  const fromHost = getSharedHostUri(from.host);
+  let fromPort;
 
-function resolveTunnel(tunnel) {
-  const { from, to } = tunnel;
+  if (from.port === 'any_available') {
+    fromPort = await getSocketServiceByHost(fromHost).getAvailableServerPort();
+  } else {
+    fromPort = from.port;
+  }
+
   return {
     from: {
       host: getSharedHostUri(from.host),
-      port: from.port,
+      port: fromPort,
       family: from.family || 6
     },
     to: {
@@ -55,26 +78,26 @@ function resolveTunnel(tunnel) {
       family: to.family || 6
     }
   };
-}
+} // From tunneling perspective, host is a "singleton", all roots can reuse the same socket service.
 
-// From tunneling perspective, host is a "singleton", all roots can reuse the same socket service.
+
 function getSharedHostUri(host) {
   if (host === 'localhost' || host === '') {
     return 'localhost';
-  } else if ((_nuclideUri || _load_nuclideUri()).default.isRemote(host)) {
-    return (_nuclideUri || _load_nuclideUri()).default.createRemoteUri((_nuclideUri || _load_nuclideUri()).default.getHostname(host), '/');
+  } else if (_nuclideUri().default.isRemote(host)) {
+    return _nuclideUri().default.createRemoteUri(_nuclideUri().default.getHostname(host), '/');
   } else {
     // We assume that the passed string is a hostname.
-    return (_nuclideUri || _load_nuclideUri()).default.createRemoteUri(host, '/');
+    return _nuclideUri().default.createRemoteUri(host, '/');
   }
-}
+} // We assume `host`  has already been processed by getSharedHostUri
 
-// We assume `host`  has already been processed by getSharedHostUri
+
 function getSocketServiceByHost(host) {
   if (host === 'localhost') {
     // Bypass the RPC framework to avoid extra marshal/unmarshaling.
-    return _nuclideSocketRpc || _load_nuclideSocketRpc();
+    return SocketServiceImpl();
   } else {
-    return (0, (_nuclideRemoteConnection || _load_nuclideRemoteConnection()).getSocketServiceByNuclideUri)(host);
+    return (0, _nuclideRemoteConnection().getSocketServiceByNuclideUri)(host);
   }
 }

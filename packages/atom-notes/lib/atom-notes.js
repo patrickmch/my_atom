@@ -41,13 +41,16 @@ export default {
   * @param {urlObject} parsedUri URI parsed with Node's url.parse(uri, true)
   */
   handleURI (parsedUri) {
-    if (parsedUri.pathname === '/toggle') {
-      this.getNotesView().toggle()
-    } if (parsedUri.pathname === '/toggle/preview') {
-      this.getNotesView().toggle({preview: true})
+    const OPTS = {
+      '/toggle': {},
+      '/toggle/preview': {preview: true}
+    }
+    const pathname = parsedUri.pathname.replace(/\/$/, '')
+    if (OPTS.hasOwnProperty(pathname)) {
+      this.getNotesView().toggle(OPTS[pathname])
     } else {
-      atom.notifications.addError(
-        'Only the URI `atom://atom-notes/toggle` is currently supported')
+      const uris = Object.keys(OPTS).map(p => `atom://atom-notes${p}`)
+      atom.notifications.addError(`Supported URIs: ${uris.join(', ')}`)
     }
   },
 
@@ -245,9 +248,17 @@ function ensureNotesDirectory () {
     return false
   }
 
-  if (!fs.existsSync(notesDirectory)) {
-    fs.makeTreeSync(notesDirectory)
-    fs.copySync(defaultNotesDirectory, notesDirectory)
+  try {
+    if (!fs.existsSync(notesDirectory)) {
+      fs.makeTreeSync(notesDirectory)
+      fs.copySync(defaultNotesDirectory, notesDirectory)
+    }
+  } catch (err) {
+    atom.notifications.addError(
+      `Failed to create notes directory ${notesDirectory}: ${err}`,
+      { dismissable: true }
+    )
+    return false
   }
 
   return true

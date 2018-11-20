@@ -1,15 +1,23 @@
-'use strict';
+"use strict";
 
-var _builtinTypes;
+function _builtinTypes() {
+  const data = require("../lib/builtin-types");
 
-function _load_builtinTypes() {
-  return _builtinTypes = require('../lib/builtin-types');
+  _builtinTypes = function () {
+    return data;
+  };
+
+  return data;
 }
 
-var _location;
+function _location() {
+  const data = require("../lib/location");
 
-function _load_location() {
-  return _location = require('../lib/location');
+  _location = function () {
+    return data;
+  };
+
+  return data;
 }
 
 /**
@@ -21,55 +29,47 @@ function _load_location() {
  *
  *  strict-local
  * @format
+ * @emails oncall+nuclide
  */
-
 const builtin2 = {
   type: 'builtin'
 };
-
 const loc1 = {
   type: 'source',
   fileName: 'file1',
   line: 42
 };
-
 const loc2 = {
   type: 'source',
   fileName: 'file1',
   line: 42
 };
-
 const loc3 = {
   type: 'source',
   fileName: 'file2',
   line: 42
 };
-
 const loc4 = {
   type: 'source',
   fileName: 'file1',
   line: 43
 };
-
 const loc5 = {
   type: 'source',
   fileName: 'file2',
   line: 43
 };
-
 describe('Location', () => {
   it('toString', () => {
-    expect((0, (_location || _load_location()).locationToString)((_builtinTypes || _load_builtinTypes()).builtinLocation)).toBe('<builtin>');
-    expect((0, (_location || _load_location()).locationToString)(loc1)).toBe('file1(42)');
+    expect((0, _location().locationToString)(_builtinTypes().builtinLocation)).toBe('<builtin>');
+    expect((0, _location().locationToString)(loc1)).toBe('file1(42)');
   });
-
   it('equals', () => {
-    expect((0, (_location || _load_location()).locationsEqual)((_builtinTypes || _load_builtinTypes()).builtinLocation, builtin2)).toBe(true);
-    expect((0, (_location || _load_location()).locationsEqual)((_builtinTypes || _load_builtinTypes()).builtinLocation, loc1)).toBe(false);
-
-    expect((0, (_location || _load_location()).locationsEqual)(loc1, loc2)).toBe(true);
-    expect((0, (_location || _load_location()).locationsEqual)(loc1, loc3)).toBe(false);
-    expect((0, (_location || _load_location()).locationsEqual)(loc1, loc4)).toBe(false);
-    expect((0, (_location || _load_location()).locationsEqual)(loc1, loc5)).toBe(false);
+    expect((0, _location().locationsEqual)(_builtinTypes().builtinLocation, builtin2)).toBe(true);
+    expect((0, _location().locationsEqual)(_builtinTypes().builtinLocation, loc1)).toBe(false);
+    expect((0, _location().locationsEqual)(loc1, loc2)).toBe(true);
+    expect((0, _location().locationsEqual)(loc1, loc3)).toBe(false);
+    expect((0, _location().locationsEqual)(loc1, loc4)).toBe(false);
+    expect((0, _location().locationsEqual)(loc1, loc5)).toBe(false);
   });
 });

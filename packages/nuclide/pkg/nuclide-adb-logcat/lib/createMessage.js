@@ -1,14 +1,10 @@
-'use strict';
+"use strict";
 
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
 exports.default = createMessage;
 
-
-/**
- * Convert a structured logcat entry into the format that nuclide-console wants.
- */
 /**
  * Copyright (c) 2015-present, Facebook, Inc.
  * All rights reserved.
@@ -20,6 +16,9 @@ exports.default = createMessage;
  * @format
  */
 
+/**
+ * Convert a structured logcat entry into the format that nuclide-console wants.
+ */
 function createMessage(entry) {
   const priority = entry.metadata && entry.metadata.priority || 'I';
   const tag = entry.metadata && entry.metadata.tag || null;
@@ -35,21 +34,28 @@ function priorityToLevel(priority) {
     case 'W':
       // warn
       return 'warning';
+
     case 'E': // error
+
     case 'F':
       // fatal
       return 'error';
+
     case 'S':
       // silent
       throw new Error('Silent messages should be filtered');
+
     case 'D':
       // debug
       return 'debug';
+
     case 'I':
       // info
       // Even though the console has an "info" level, this is the default for adb, so we use "log."
       return 'log';
+
     case 'V': // verbose
+
     default:
       return 'info';
   }

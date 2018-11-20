@@ -1,19 +1,28 @@
-'use strict';
+"use strict";
 
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
+exports.default = exports.VENDOR_PYTHONPATH = void 0;
 
-var _nuclideUri;
+function _nuclideUri() {
+  const data = _interopRequireDefault(require("../../../modules/nuclide-commons/nuclideUri"));
 
-function _load_nuclideUri() {
-  return _nuclideUri = _interopRequireDefault(require('../../../modules/nuclide-commons/nuclideUri'));
+  _nuclideUri = function () {
+    return data;
+  };
+
+  return data;
 }
 
-var _process;
+function _process() {
+  const data = require("../../../modules/nuclide-commons/process");
 
-function _load_process() {
-  return _process = require('../../../modules/nuclide-commons/process');
+  _process = function () {
+    return data;
+  };
+
+  return data;
 }
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
@@ -28,29 +37,33 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
  * 
  * @format
  */
+const VENDOR_PYTHONPATH = _nuclideUri().default.join(__dirname, '../VendorLib');
 
+exports.VENDOR_PYTHONPATH = VENDOR_PYTHONPATH;
 let fbFindClangServerArgs;
 
-exports.default = async function findClangServerArgs(src, libclangPath = null, configLibclangPath) {
+var findClangServerArgs = async function findClangServerArgs(src, libclangPath = null, configLibclangPath) {
   if (fbFindClangServerArgs === undefined) {
     fbFindClangServerArgs = null;
+
     try {
       // $FlowFB
-      fbFindClangServerArgs = require('./fb/find-clang-server-args').default;
-    } catch (e) {
-      // Ignore.
+      fbFindClangServerArgs = require("./fb/find-clang-server-args").default;
+    } catch (e) {// Ignore.
     }
   }
 
   let libClangLibraryFile;
+
   if (process.platform === 'darwin') {
     try {
-      const stdout = await (0, (_process || _load_process()).runCommand)('xcode-select', ['--print-path']).toPromise();
-      libClangLibraryFile = stdout.trim();
-      // If the user only has Xcode Command Line Tools installed, the path is different.
-      if ((_nuclideUri || _load_nuclideUri()).default.basename(libClangLibraryFile) !== 'CommandLineTools') {
+      const stdout = await (0, _process().runCommand)('xcode-select', ['--print-path']).toPromise();
+      libClangLibraryFile = stdout.trim(); // If the user only has Xcode Command Line Tools installed, the path is different.
+
+      if (_nuclideUri().default.basename(libClangLibraryFile) !== 'CommandLineTools') {
         libClangLibraryFile += '/Toolchains/XcodeDefault.xctoolchain';
       }
+
       libClangLibraryFile += '/usr/lib/libclang.dylib';
     } catch (err) {}
   }
@@ -62,7 +75,7 @@ exports.default = async function findClangServerArgs(src, libclangPath = null, c
   let clangServerArgs = {
     libClangLibraryFile,
     pythonExecutable: 'python2.7',
-    pythonPathEnv: (_nuclideUri || _load_nuclideUri()).default.join(__dirname, '../VendorLib')
+    pythonPathEnv: VENDOR_PYTHONPATH
   };
 
   if (typeof fbFindClangServerArgs === 'function') {
@@ -73,5 +86,8 @@ exports.default = async function findClangServerArgs(src, libclangPath = null, c
   if (libclangPath != null) {
     clangServerArgs.libClangLibraryFile = libclangPath;
   }
+
   return clangServerArgs;
 };
+
+exports.default = findClangServerArgs;

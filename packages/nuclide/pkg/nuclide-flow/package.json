@@ -4,7 +4,6 @@
   "version": "0.0.0",
   "description": "Provides support for Flow in Nuclide",
   "author": "Flow",
-  "atomTestRunner": "../../lib/test-runner-entry.js",
   "nuclide": {
     "configMetadata": {
       "pathComponents": [
@@ -54,12 +53,34 @@
         "type": "boolean",
         "default": true,
         "description": "If unchecked, functions will autocomplete as only their name, and not include their calling parens and arguments."
+      },
+      "liveSyntaxErrors": {
+        "title": "Live syntax errors",
+        "type": "boolean",
+        "default": true,
+        "description": "If checked, Flow will report syntax errors as you type; otherwise, and to see other errors, you have to trigger a flow check by saving any file. (requires restart)"
+      },
+      "logLevel": {
+        "title": "Log Level",
+        "type": "string",
+        "default": "DEBUG",
+        "description": "Specify that level of logging, supported values: ALL | TRACE | DEBUG | INFO | WARN | ERROR | FATAL | OFF.",
+        "enum": [
+          "ALL",
+          "TRACE",
+          "DEBUG",
+          "INFO",
+          "WARN",
+          "ERROR",
+          "FATAL",
+          "OFF"
+        ]
       }
     },
-    "packageType": "Atom",
-    "testRunner": "apm"
+    "packageType": "AtomPackage"
   },
   "activationHooks": [
+    "source.flow:root-scope-used",
     "language-babel:grammar-used",
     "language-javascript-jsx:grammar-used",
     "language-javascript:grammar-used"

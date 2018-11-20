@@ -1,0 +1,440 @@
+diff --git a/nols_website/wmi/gui_tests/page_objects/dataentry_pages.py b/nols_website/wmi/gui_tests/page_objects/dataentry_pages.py
+index 1dc979cb3..adc88a92f 100644
+--- a/nols_website/wmi/gui_tests/page_objects/dataentry_pages.py
++++ b/nols_website/wmi/gui_tests/page_objects/dataentry_pages.py
+@@ -1,432 +1,432 @@
+ import time
+ 
+ from selenium.webdriver.common.by import By
+ from selenium.webdriver.support.ui import WebDriverWait
+ from selenium.webdriver.support import expected_conditions
+ 
+ from django.core.urlresolvers import reverse
+ 
+ from website.gui_tests.page_objects.base_page import BasePage
+ from website.gui_tests.page_objects.page_elements import BaseInput, CheckboxInput, SelectInput,\
+     DisplayElement
+ from website.gui_tests.page_objects import test_tools as tools
+ from core.gui_tests.page_objects.account_pages import AddressForm, NameForm, LoginPage
+ from website.gui_tests.page_objects.django_admin_pages import DjangoAdminBasePage
+ 
+ DEFAULT_COURSE_ID = 4
+ 
+ 
+ class RollCallBasePage(BasePage):
+     """Abstract Class missing required method implementations"""
+     def __init__(self, *args, **kwargs):
+         super(RollCallBasePage, self).__init__(*args, **kwargs)
+         self.cancel_login_modal_button = DisplayElement(
+-            "#auth_form_modal button.close", self.config, By.CSS_SELECTOR)
+-        self.login_modal = DisplayElement('#auth_form_modal', self.config, By.CSS_SELECTOR)
++            "#auth_form button.close", self.config, By.CSS_SELECTOR)
++        self.login_modal = DisplayElement('#auth_form', self.config, By.CSS_SELECTOR)
+         self.username = BaseInput('id_username', self.config)
+         self.password = BaseInput('id_password', self.config)
+         self.nav_bar_button = DisplayElement('a.button-navbar', self.config, By.CSS_SELECTOR)
+         self.user_menu = DisplayElement('#user-menu', self.config, By.CSS_SELECTOR)
+         self.account_login = DisplayElement(
+             '#user-menu + ul.dropdown-menu>li>a', self.config, By.CSS_SELECTOR)
+ 
+     def login_via_modal(self, expect_error=False, expect_captcha=False):
+-        self.config.driver.find_element_by_css_selector('#auth_form_modal form').submit()
++        self.config.driver.find_element_by_css_selector('#auth_form form').submit()
+         if expect_error:
+             return self
+         if expect_captcha:
+             return LoginPage(self.config, arrived_on_click=True)
+         if isinstance(self, RollCallFormPage) or isinstance(self, RollCallStartPage):
+             return RollCallAcctPage(self.config)
+         return self
+ 
+     def display_user_menu(self):
+         self.nav_bar_button.click()
+         WebDriverWait(self.config.driver, 3).until(
+             expected_conditions.visibility_of(self.user_menu.get_element())
+         )
+ 
+     def display_login_modal(self):
+         if not self.user_menu.is_displayed:
+             self.display_user_menu()
+         self.user_menu.click()
+         WebDriverWait(self.config.driver, 3).until(
+             expected_conditions.visibility_of(self.account_login.get_element())
+         )
+         self.account_login.click()
+         WebDriverWait(self.config.driver, 3).until(
+             expected_conditions.visibility_of(self.login_modal.get_element())
+         )
+ 
+     def login_as(self, username, password):
+         if not self.user_menu.is_displayed:
+             self.display_user_menu()
+         self.display_login_modal()
+         self.username.value = username
+         self.password.value = password
+         return self.login_via_modal()
+ 
+     # TODO fix this so it doesn't rely on time.sleep.
+     def get_fade_in_errors(self):
+         time.sleep(.5)
+         return self.errors
+ 
+ 
+ class RollCallStartPage(RollCallBasePage):
+     """
+     The data entry start page.
+     """
+ 
+     def __init__(self, *args, **kwargs):
+         super(RollCallStartPage, self).__init__(*args, **kwargs)
+         self.first_name = BaseInput('id_first_name', self.config)
+         self.last_name = BaseInput('id_last_name', self.config)
+         self.birth_date = BaseInput('id_birth_date', self.config)
+         self.email_address = BaseInput('id_email_address', self.config)
+         self.course_name = DisplayElement('//div[@class="page-header"]/h1', self.config)
+ 
+     @property
+     def url(self):
+         return reverse('get_started', args=[DEFAULT_COURSE_ID])
+ 
+     @property
+     def page_after_submit(self):
+         return RollCallFormPage(self.config)
+ 
+ 
+ class RollCallFormPage(RollCallStartPage):
+     """
+     Model the dataentry_form.html template. In other words the unauthenticated rollcall path.
+     """
+ 
+     def __init__(self, *args, **kwargs):
+         super(RollCallFormPage, self).__init__(*args, **kwargs)
+         self.email_address2 = BaseInput('id_email_address2', self.config)
+         self.gender = SelectInput('id_gender', self.config)
+         self.address_form = AddressForm(self.config)
+         self.phone_type = SelectInput('id_phoneform-type', self.config)
+         self.phone_number = BaseInput('id_phoneform-phone_number', self.config)
+         self.citizenship = SelectInput('id_citizenship', self.config)
+         self.ethnicity = SelectInput('id_ethnicity', self.config)
+ 
+     @property
+     def page_after_submit(self):
+         return RollCallSubmittedPage(self.config)
+ 
+     def ethnicity_is_visible(self):
+         WebDriverWait(self.config.driver, 3).until(
+             expected_conditions.visibility_of(self.ethnicity.get_element())
+         )
+         return self.ethnicity.is_displayed
+ 
+ 
+ class RollCallSubmittedPage(RollCallBasePage):
+ 
+     def __init__(self, *args, **kwargs):
+         super(RollCallSubmittedPage, self).__init__(*args, **kwargs)
+         self.alert_success = DisplayElement('div.alert-success', self.config, By.CSS_SELECTOR)
+ 
+     def logout_via_button(self):
+         self.config.driver.find_element_by_css_selector('a.').click()
+         return RollCallStartPage(self.config)
+ 
+     @property
+     def url(self):
+         return reverse('dataentry_submitted', args=[DEFAULT_COURSE_ID])
+ 
+     @property
+     def page_after_submit(self):
+         return None
+ 
+ 
+ class RollCallAcctPage(RollCallBasePage):
+ 
+     def __init__(self, *args, **kwargs):
+         super(RollCallAcctPage, self).__init__(*args, **kwargs)
+         self.heard_about = SelectInput('id_heard_about', self.config)
+         self.person_info = DisplayElement(
+             '#person_info + div>div>p.entity-info', self.config, By.CSS_SELECTOR)
+         self.more_person_info = DisplayElement(
+             '#person_info + div>div>p.entity-info + p.entity-info', self.config, By.CSS_SELECTOR)
+         self.edit_name_button = DisplayElement(
+             '.person-data div.column small-5>button.button', self.config, By.CSS_SELECTOR)
+         self.person_form_modal = DisplayElement('#person_form', self.config, By.CSS_SELECTOR)
+         self.name_form = NameForm(self.config)
+         self.ethnicity = SelectInput('id_ethnicity', self.config)
+         self.citizenship = SelectInput('id_citizenship', self.config)
+ 
+         self.email_info = DisplayElement(
+             '#email_info + div>div>p.entity-info', self.config, By.CSS_SELECTOR)
+         self.add_email_modal = DisplayElement('#email_form', self.config, By.CSS_SELECTOR)
+         self.email_address = BaseInput('id_email_address', self.config)
+         self.make_email_former = DisplayElement(
+             '#email_info + div>div.column small-5>form>input.button', self.config, By.CSS_SELECTOR)
+         self.former_email = DisplayElement(
+             '#former-emails>div>div>p', self.config, By.CSS_SELECTOR)
+         self.toggle_emails = DisplayElement('#toggle-former-emails', self.config, By.CSS_SELECTOR)
+         self.former_emails = DisplayElement('#former-emails', self.config, By.CSS_SELECTOR)
+         self.account_email = DisplayElement(
+             '#email_info + div>div.column small-5>div>button', self.config, By.CSS_SELECTOR)
+ 
+         self.address_info = DisplayElement(
+             '#address_info + div>div>p.entity-info', self.config, By.CSS_SELECTOR)
+         self.add_address_modal = DisplayElement('#address_form', self.config, By.CSS_SELECTOR)
+         self.address_form = AddressForm(self.config)
+         self.make_address_former = DisplayElement(
+             '#address_info + div>div.column small-5>form>input.button',
+             self.config, By.CSS_SELECTOR)
+         self.former_address = DisplayElement(
+             '#former-addresses>div>div>p.former', self.config, By.CSS_SELECTOR)
+         self.toggle_addresses = DisplayElement(
+             '#toggle-former-addresses', self.config, By.CSS_SELECTOR)
+         self.former_addresses = DisplayElement('#former-addresses', self.config, By.CSS_SELECTOR)
+ 
+         self.phone_info = DisplayElement(
+             '#phone_info + div>div>p.entity-info', self.config, By.CSS_SELECTOR)
+         self.add_phone_modal = DisplayElement('#phone_form', self.config, By.CSS_SELECTOR)
+         self.phone_type = SelectInput('id_phoneform-type', self.config, By.CSS_SELECTOR)
+         self.phone_number = BaseInput('id_phoneform-phone_number', self.config, By.CSS_SELECTOR)
+         self.phone_ext = BaseInput('id_phoneform-extension', self.config, By.CSS_SELECTOR)
+ 
+         self.make_phone_former = DisplayElement(
+             '#phone_info + div>div.column small-5>form>input.button', self.config, By.CSS_SELECTOR)
+         self.former_phone = DisplayElement(
+             '#former-phones>div>div>p.former', self.config, By.CSS_SELECTOR)
+         self.toggle_phones = DisplayElement('#toggle-former-phones', self.config, By.CSS_SELECTOR)
+         self.former_phones = DisplayElement('#former-phones', self.config, By.CSS_SELECTOR)
+         self.add_phone_text = DisplayElement('#phone_info + p>a', self.config, By.CSS_SELECTOR)
+ 
+     @property
+     def url(self):
+         return reverse('get_started', args=[DEFAULT_COURSE_ID])
+ 
+     @property
+     def page_after_submit(self):
+         return RollCallSubmittedPage(self.config)
+ 
+     def add_address(self):
+         if not self.add_address_modal.is_displayed:
+             self.config.driver.find_element_by_css_selector(
+                 '#address_info>div.column small-5>button.button').click()
+         WebDriverWait(self.config.driver, 3).until(
+             expected_conditions.visibility_of(self.add_address_modal.get_element())
+         )
+ 
+     def add_email(self):
+         if not self.add_email_modal.is_displayed:
+             self.config.driver.find_element_by_css_selector(
+                 '#email_info>div.column small-5>button.button').click()
+         WebDriverWait(self.config.driver, 3).until(
+             expected_conditions.visibility_of(self.add_email_modal.get_element())
+         )
+ 
+     def add_phone(self):
+         if not self.add_phone_modal.is_displayed:
+             self.config.driver.find_element_by_css_selector(
+                 '#phone_info>div.column small-5>button.button').click()
+         WebDriverWait(self.config.driver, 3).until(
+             expected_conditions.visibility_of(self.add_phone_modal.get_element())
+         )
+ 
+     def edit_name(self):
+         if not self.person_form_modal.is_displayed:
+             self.edit_name_button.click()
+         WebDriverWait(self.config.driver, 3).until(
+             expected_conditions.visibility_of(self.person_form_modal.get_element())
+         )
+ 
+     def submit_email_form(self):
+         self.config.driver.find_element_by_css_selector('#email_form>form').submit()
+ 
+     def submit_address_form(self):
+         self.config.driver.find_element_by_css_selector('#address_form>form').submit()
+ 
+     def submit_person_form(self):
+         self.config.driver.find_element_by_css_selector('#person_form>form').submit()
+ 
+     def submit_phone_form(self):
+         self.config.driver.find_element_by_css_selector('#phone_form>form').submit()
+ 
+     def toggle_former_addresses(self):
+         self.toggle_addresses.click()
+         WebDriverWait(self.config.driver, 3).until(
+             expected_conditions.visibility_of(self.former_address.get_element())
+         )
+ 
+     def toggle_former_emails(self):
+         self.toggle_emails.click()
+         WebDriverWait(self.config.driver, 3).until(
+             expected_conditions.visibility_of(self.former_email.get_element())
+         )
+ 
+     def toggle_former_phones(self):
+         self.toggle_phones.click()
+         WebDriverWait(self.config.driver, 3).until(
+             expected_conditions.visibility_of(self.former_phone.get_element())
+         )
+ 
+ 
+ class WmiRosterAdminPage(DjangoAdminBasePage):
+     """A page to model the django admin for a wmi roster."""
+     def __init__(self, *args, **kwargs):
+         super(WmiRosterAdminPage, self).__init__(*args, **kwargs)
+         # Override the xpath because this checkbox has no label, but we want the click functionality
+         self.select_all_rows = CheckboxInput('check-all', self.config)
+         self.select_all_rows.xpath = '//input[@id="check-all"]'
+ 
+ 
+     @property
+     def url(self):
+         # use the custom url that instructors will use.
+         return reverse('rollcall_admin', args=[DEFAULT_COURSE_ID])
+ 
+     @property
+     def page_after_submit(self):
+         return self
+ 
+     def count_roster_entries(self):
+         roster_entries = self.config.driver.find_elements_by_css_selector(
+             'tr[id*="rosterentry_fields"] td.original'
+         )
+         return len(roster_entries)
+ 
+     def add_next_student(self):
+         blank_roster_entries = self.config.driver.find_elements_by_css_selector(
+             'tr[id*="rosterentry_fields"] .add-another')
+ 
+         if len(blank_roster_entries) < 1:
+             # FIXME write a custom exception
+             raise Exception('no more roster entries to add')
+ 
+         blank_roster_entries[0].click()
+         time.sleep(1)  # give window time to appear
+         self.config.driver.switch_to_window(self.config.driver.window_handles[-1])
+         pop_up = PublicEntryAddPopUp(self.config, arrived_on_click=True)
+         pop_up.first_name.value = tools.TEST_FIRST_NAME
+         pop_up.last_name.value = tools.TEST_LAST_NAME
+         pop_up.birth_date.value = tools.TEST_BIRTH_DATE.strftime('%m/%d/%Y')
+         pop_up.gender.value = tools.TEST_GENDER
+         pop_up.email.value = tools.TEST_EMAIL
+         pop_up.save_button.click()
+         self.config.driver.switch_to_window(self.config.driver.window_handles[0])
+         time.sleep(0.5)  # give window time to disappear
+ 
+     def count_modified_rows(self):
+         return len(self.config.driver.find_elements_by_class_name('modified'))
+ 
+     def save_and_continue(self):
+         # The sticky rosterentry table header seems to cover the button, so scroll
+         # to the top of the page to get it out of the way.
+         self.config.driver.execute_script('window.scroll(0, 0);')
+         button = self.config.driver.find_element_by_css_selector('[name="_continue"].default')
+         assert button.get_attribute('value') == "Save and continue editing"
+         button.click()
+ 
+     def finalize_roster(self):
+         # The sticky rosterentry table header seems to cover the button, so scroll
+         # to the top of the page to get it out of the way.
+         self.config.driver.execute_script('window.scroll(0, 0);')
+         button = self.config.driver.find_element_by_css_selector(
+             '.submit-row>input[value="Finalize Roster"]')
+         button.click()
+         confirm_finalize = self.config.driver.find_element_by_css_selector(
+             '#confirm_finalize>input[value="Finalize Roster"]'
+         )
+         confirm_finalize.click()
+ 
+     def get_how_created(self, row_num_0):
+         selector = '#row-%d-rosterentry_fields td.how_created' % row_num_0
+         return self.config.driver.find_element_by_css_selector(selector).text
+ 
+     def inlines_displayed(self):
+         inline_groups = self.config.driver.find_elements_by_css_selector('.inline-group')
+         return [inline.is_displayed() for inline in inline_groups]
+ 
+     def get_rosterentry_row_num_by_id(self, re_id):
+         """
+         Given a roster entry id, return the zero based row number the roster entry in the inline
+         admin.
+         @param re_id: The RosterEntry id
+         @return: a zero based row number as an int
+         """
+         elems = self.config.driver.find_elements_by_css_selector('td.original>input[id*="-id"]')
+         for e in elems:
+             if e.get_attribute('value') == str(re_id):
+                 return int(''.join(d for d in e.get_attribute('id') if d.isdigit()))
+ 
+     def set_present_for_all(self, value="No Show", except_for=-1):
+         # The sticky rosterentry table header seems to cover the select all check box, so scroll
+         # to the top of the page to get it out of the way.
+         self.config.driver.execute_script('window.scroll(0, 0);')
+         self.select_all_rows.click()
+         if except_for >= 0:
+             RosterEntryRow(except_for, self.config).select_row.click()
+ 
+         present = SelectInput('id_rosterentry_set-0-present', self.config)
+         present.value = value
+ 
+ 
+ class RosterEntryRow(object):
+     """
+     An inline admin row in the Roll Call admin.
+     """
+     DATA = {'present': 'Yes',
+             'cpr': 'WMI',
+             'cert_to_issue': 'Wilderness First Responder (WFR)',
+             'score': '100',
+             'letter_grade': 'A+',
+             'notes': 'a note'}
+ 
+     def __init__(self, row_num_0, config):
+         self.config = config
+         id_base_str = 'id_rosterentry_set-%d' % row_num_0
+         self.select_row = CheckboxInput('id_batch_modify_row-%d' % row_num_0, self.config)
+         self.present = SelectInput('%s-present' % id_base_str, self.config)
+         self.cpr = SelectInput('%s-cpr' % id_base_str, self.config)
+         self.cert_to_issue = SelectInput('%s-cert_to_issue' % id_base_str, self.config)
+         self.score = BaseInput('%s-score' % id_base_str, self.config)
+         self.letter_grade = SelectInput('%s-letter_grade' % id_base_str, self.config)
+         self.notes = BaseInput('%s-notes' % id_base_str, self.config)
+ 
+         selector = '#row-%d-rosterentry_fields td.how_created' % row_num_0
+         self.how_created = DisplayElement(selector, self.config, By.CSS_SELECTOR)
+ 
+     def enter_data(
+             self, present=DATA['present'], cpr=DATA['cpr'], cert_to_issue=DATA['cert_to_issue'],
+             score=DATA['score'], letter_grade=DATA['letter_grade'], notes=DATA['notes']):
+         self.present.value = present
+         self.cpr.value = cpr
+         self.cert_to_issue.value = cert_to_issue
+         self.score.value = score
+         self.letter_grade.value = letter_grade
+         self.notes.value = notes
+ 
+     def get_data(self):
+         data = {'present': self.present.value,
+                 'cpr': self.cpr.value,
+                 'cert_to_issue': self.cert_to_issue.value,
+                 'score': self.score.value,
+                 'letter_grade': self.letter_grade.value,
+                 'notes': self.notes.value}
+         return data
+ 
+ 
+ class PublicEntryAddPopUp(BasePage):
+     """The Django admin pop up when a student or instructor is added to a wmi roster."""
+     def __init__(self, *args, **kwargs):
+         super(PublicEntryAddPopUp, self).__init__(*args, **kwargs)
+         self.first_name = BaseInput('id_first_name', self.config)
+         self.last_name = BaseInput('id_last_name', self.config)
+         self.birth_date = BaseInput('id_birth_date', self.config)
+         self.gender = SelectInput('id_gender', self.config)
+         self.email = BaseInput('id_email_address', self.config)
+         self.save_button = DisplayElement('_save', self.config, By.NAME)
+ 
+     @property
+     def url(self):
+         return reverse('admin:core_publicentry_add') + '?popup=1'
+ 
+     @property
+     def page_after_submit(self):
+         self.config.driver.close()
+         return None

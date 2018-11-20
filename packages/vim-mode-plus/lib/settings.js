@@ -212,6 +212,22 @@ class Settings {
     // Return disposalbes to dispose config observation and conditional keymap.
     return Object.keys(conditionalKeymaps).map(observeConditionalKeymap)
   }
+
+  observeJSONconfig () {
+    return this.observe('customSurroundPairs', newValue => {
+      try {
+        JSON.parse(newValue)
+      } catch (e) {
+        const message = [
+          'vim-mode-plus: JSON format error in `customSurroundPairs` config.',
+          'Maybe missing comma?',
+          '',
+          '`' + newValue + '`'
+        ].join('<br>')
+        atom.notifications.addWarning(message, {dismissable: true})
+      }
+    })
+  }
 }
 
 module.exports = new Settings('vim-mode-plus', {
@@ -292,12 +308,12 @@ module.exports = new Settings('vim-mode-plus', {
     default: false,
     description: '[Experimental] Automatically disable input method when leaving insert-mode'
   },
-  setCursorToStartOfChangeOnUndoRedo: true,
+  setCursorToStartOfChangeOnUndoRedo: false,
   setCursorToStartOfChangeOnUndoRedoStrategy: {
     default: 'smart',
     enum: ['smart', 'simple'],
     description:
-      'When you think undo/redo cursor position has BUG, set this to `simple`.<br>`smart`: Good accuracy but have cursor-not-updated-on-different-editor limitation<br>`simple`: Always work, but accuracy is not as good as `smart`.<br>'
+      'When you think undo/redo cursor position has BUG, set this to `simple`.<br><br>`smart`: Good accuracy but have cursor-not-updated-on-different-editor limitation<br>`simple`: Always work, but accuracy is not as good as `smart`.<br><br>This configuration is used only when `setCursorToStartOfChangeOnUndoRedo` is enabled'
   },
   groupChangesWhenLeavingInsertMode: true,
   useClipboardAsDefaultRegister: true,
@@ -344,15 +360,21 @@ module.exports = new Settings('vim-mode-plus', {
     description: 'Clear persistent selection on `escape` in normal-mode'
   },
   replaceByDiffOnSurround: {
-    default: false,
+    default: true,
     description:
-      '[EXPERIMENTAL] Replace only changed text by comparing old and new text, affects `surround`, `delete-surround`, `change-surround`'
+      'Replace only changed text by comparing old and new text, affects `surround`, `delete-surround`, `change-surround`'
   },
   charactersToAddSpaceOnSurround: {
     default: [],
     items: {type: 'string'},
     description:
       'Comma separated list of character, which add space around surrounded text.<br>For vim-surround compatible behavior, set `(, {, [, <`.'
+  },
+  customSurroundPairs: {
+    type: 'string',
+    default: '{}',
+    description:
+      'Custom surround in JSON string with following key value pair.<br>- key: character to map<br>- value: array with `[openText:string, closeText:string, addSpace:boolean]`<br><br>Pasting pre-formatted JSON text is way easier than directly edit here.<br><br>e.g. `{"p": ["<?php", "?>", true], "s": ["\\"", "\\""]}`<br>With above example and `y s` is mapped to `surround`, `y s i w p` surround word with PHP tag, also `y s i w s` surround word with double quotes without padding space.'
   },
   sequentialPaste: {
     default: false,

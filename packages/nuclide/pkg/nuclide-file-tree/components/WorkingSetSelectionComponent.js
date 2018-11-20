@@ -1,45 +1,65 @@
-'use strict';
+"use strict";
 
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.WorkingSetSelectionComponent = undefined;
+exports.WorkingSetSelectionComponent = void 0;
 
-var _classnames;
+function _classnames() {
+  const data = _interopRequireDefault(require("classnames"));
 
-function _load_classnames() {
-  return _classnames = _interopRequireDefault(require('classnames'));
+  _classnames = function () {
+    return data;
+  };
+
+  return data;
 }
 
-var _react = _interopRequireWildcard(require('react'));
+var React = _interopRequireWildcard(require("react"));
 
-var _reactDom = _interopRequireDefault(require('react-dom'));
+var _reactDom = _interopRequireDefault(require("react-dom"));
 
-var _UniversalDisposable;
+function _UniversalDisposable() {
+  const data = _interopRequireDefault(require("../../../modules/nuclide-commons/UniversalDisposable"));
 
-function _load_UniversalDisposable() {
-  return _UniversalDisposable = _interopRequireDefault(require('../../../modules/nuclide-commons/UniversalDisposable'));
+  _UniversalDisposable = function () {
+    return data;
+  };
+
+  return data;
 }
 
-var _Button;
+function _Button() {
+  const data = require("../../../modules/nuclide-commons-ui/Button");
 
-function _load_Button() {
-  return _Button = require('../../../modules/nuclide-commons-ui/Button');
+  _Button = function () {
+    return data;
+  };
+
+  return data;
 }
 
-var _ButtonGroup;
+function _ButtonGroup() {
+  const data = require("../../../modules/nuclide-commons-ui/ButtonGroup");
 
-function _load_ButtonGroup() {
-  return _ButtonGroup = require('../../../modules/nuclide-commons-ui/ButtonGroup');
+  _ButtonGroup = function () {
+    return data;
+  };
+
+  return data;
 }
 
-var _HR;
+function _HR() {
+  const data = require("../../../modules/nuclide-commons-ui/HR");
 
-function _load_HR() {
-  return _HR = require('../../../modules/nuclide-commons-ui/HR');
+  _HR = function () {
+    return data;
+  };
+
+  return data;
 }
 
-function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
+function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) { var desc = Object.defineProperty && Object.getOwnPropertyDescriptor ? Object.getOwnPropertyDescriptor(obj, key) : {}; if (desc.get || desc.set) { Object.defineProperty(newObj, key, desc); } else { newObj[key] = obj[key]; } } } } newObj.default = obj; return newObj; } }
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -53,22 +73,23 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
  * 
  * @format
  */
-
-class WorkingSetSelectionComponent extends _react.Component {
-
+class WorkingSetSelectionComponent extends React.Component {
   constructor(props) {
     super(props);
 
     this._setSelectionIndex = selectionIndex => {
-      this.setState({ selectionIndex });
+      this.setState({
+        selectionIndex
+      });
     };
 
     this._checkFocus = event => {
-      const node = _reactDom.default.findDOMNode(this);
-      // If the next active element (`event.relatedTarget`) is not a descendant of this modal, close
+      const node = _reactDom.default.findDOMNode(this); // If the next active element (`event.relatedTarget`) is not a descendant of this modal, close
       // the modal.  In the case of a canceled _deleteWorkingSet, relatedTarget is null
       // and we don't want to close the modal
       // $FlowFixMe
+
+
       if (event.relatedTarget != null && !node.contains(event.relatedTarget)) {
         this.props.onClose();
       }
@@ -87,24 +108,24 @@ class WorkingSetSelectionComponent extends _react.Component {
         message: `Please confirm: delete working set '${name}'?`,
         buttons: ['Delete', 'Cancel']
       });
+
       if (result === 0) {
         this.props.workingSetsStore.deleteWorkingSet(name);
       }
     };
 
     const workingSetsStore = props.workingSetsStore;
-
     this.state = {
       selectionIndex: 0,
-      applicableDefinitions: workingSetsStore.getApplicableDefinitions(),
+      applicableDefinitions: sortApplicableDefinitions(workingSetsStore.getApplicableDefinitions()),
       notApplicableDefinitions: workingSetsStore.getNotApplicableDefinitions()
     };
-
-    this._disposables = new (_UniversalDisposable || _load_UniversalDisposable()).default(workingSetsStore.subscribeToDefinitions(definitions => {
+    this._disposables = new (_UniversalDisposable().default)(workingSetsStore.subscribeToDefinitions(definitions => {
       this.setState({
-        applicableDefinitions: definitions.applicable,
+        applicableDefinitions: sortApplicableDefinitions(definitions.applicable),
         notApplicableDefinitions: definitions.notApplicable
       });
+
       if (definitions.applicable.length + definitions.notApplicable.length === 0) {
         this.props.onClose();
       }
@@ -112,16 +133,18 @@ class WorkingSetSelectionComponent extends _react.Component {
   }
 
   componentDidMount() {
-    const node = _reactDom.default.findDOMNode(this);
-    // $FlowFixMe
+    const node = _reactDom.default.findDOMNode(this); // $FlowFixMe
+
+
     node.focus();
-    this._disposables.add(atom.commands.add(
-    // $FlowFixMe
+
+    this._disposables.add(atom.commands.add( // $FlowFixMe
     node, {
       'core:move-up': () => this._moveSelectionIndex(-1),
       'core:move-down': () => this._moveSelectionIndex(1),
       'core:confirm': () => {
         const def = this.state.applicableDefinitions[this.state.selectionIndex];
+
         this._toggleWorkingSet(def.name, def.active);
       },
       'core:cancel': this.props.onClose
@@ -132,87 +155,90 @@ class WorkingSetSelectionComponent extends _react.Component {
     this._disposables.dispose();
   }
 
-  componentWillUpdate(nextProps, nextState) {
+  UNSAFE_componentWillUpdate(nextProps, nextState) {
     const applicableLength = nextState.applicableDefinitions.length;
 
     if (applicableLength > 0) {
       if (nextState.selectionIndex >= applicableLength) {
-        this.setState({ selectionIndex: applicableLength - 1 });
+        this.setState({
+          selectionIndex: applicableLength - 1
+        });
       } else if (nextState.selectionIndex < 0) {
-        this.setState({ selectionIndex: 0 });
+        this.setState({
+          selectionIndex: 0
+        });
       }
     }
   }
 
   componentDidUpdate() {
-    const node = _reactDom.default.findDOMNode(this);
-    // $FlowFixMe
+    const node = _reactDom.default.findDOMNode(this); // $FlowFixMe
+
+
     node.focus();
   }
 
   render() {
-    const applicableDefinitions = this.state.applicableDefinitions.map((def, index) => {
-      return _react.createElement(ApplicableDefinitionLine, {
-        key: def.name,
-        def: def,
-        index: index,
-        selected: index === this.state.selectionIndex,
-        toggleWorkingSet: this._toggleWorkingSet,
-        onSelect: this._setSelectionIndex,
-        onDeleteWorkingSet: this._deleteWorkingSet,
-        onEditWorkingSet: this.props.onEditWorkingSet
-      });
-    });
-
+    const projectDefinitionRows = this.state.applicableDefinitions.filter(def => def.sourceType === 'project').map((def, index) => this._renderDefinitionRow(def, index));
+    const applicableDefinitionRows = this.state.applicableDefinitions.filter(def => def.sourceType !== 'project').map((def, index) => this._renderDefinitionRow(def, projectDefinitionRows.length + index));
+    const projectSection = projectDefinitionRows.length === 0 ? null : React.createElement("ol", {
+      className: "list-group mark-active"
+    }, projectDefinitionRows);
+    const applicableDefinitionsSection = React.createElement("ol", {
+      className: "list-group mark-active",
+      style: {
+        maxHeight: '80vh'
+      }
+    }, applicableDefinitionRows);
     let notApplicableSection;
+
     if (this.state.notApplicableDefinitions.length > 0) {
       const notApplicableDefinitions = this.state.notApplicableDefinitions.map(def => {
-        return _react.createElement(NonApplicableDefinitionLine, {
+        return React.createElement(NonApplicableDefinitionLine, {
           key: def.name,
           def: def,
           onDeleteWorkingSet: this._deleteWorkingSet
         });
       });
-
-      notApplicableSection = _react.createElement(
-        'div',
-        null,
-        _react.createElement((_HR || _load_HR()).HR, null),
-        _react.createElement(
-          'span',
-          null,
-          'The working sets below are not applicable to your current project folders'
-        ),
-        _react.createElement(
-          'ol',
-          { className: 'list-group' },
-          notApplicableDefinitions
-        )
-      );
+      notApplicableSection = React.createElement("div", null, React.createElement(_HR().HR, null), React.createElement("span", null, "The working sets below are not applicable to your current project folders"), React.createElement("ol", {
+        className: "list-group"
+      }, notApplicableDefinitions));
     }
 
-    return _react.createElement(
-      'div',
-      { className: 'select-list', tabIndex: '0', onBlur: this._checkFocus },
-      _react.createElement(
-        'ol',
-        { className: 'list-group mark-active', style: { 'max-height': '80vh' } },
-        applicableDefinitions
-      ),
-      notApplicableSection
-    );
+    return React.createElement("div", {
+      className: "select-list",
+      tabIndex: "0",
+      onBlur: this._checkFocus
+    }, projectSection, applicableDefinitionsSection, notApplicableSection);
+  }
+
+  _renderDefinitionRow(def, index) {
+    return React.createElement(ApplicableDefinitionLine, {
+      key: def.name,
+      def: def,
+      index: index,
+      selected: index === this.state.selectionIndex,
+      toggleWorkingSet: this._toggleWorkingSet,
+      onSelect: this._setSelectionIndex,
+      onDeleteWorkingSet: this._deleteWorkingSet,
+      onEditWorkingSet: this.props.onEditWorkingSet
+    });
   }
 
   _moveSelectionIndex(step) {
-    this.setState({ selectionIndex: this.state.selectionIndex + step });
+    // TODO: (wbinnssmith) T30771435 this setState depends on current state
+    // and should use an updater function rather than an object
+    // eslint-disable-next-line react/no-access-state-in-setstate
+    this.setState({
+      selectionIndex: this.state.selectionIndex + step
+    });
   }
 
 }
 
 exports.WorkingSetSelectionComponent = WorkingSetSelectionComponent;
 
-
-class ApplicableDefinitionLine extends _react.Component {
+class ApplicableDefinitionLine extends React.Component {
   constructor(...args) {
     var _temp;
 
@@ -233,40 +259,37 @@ class ApplicableDefinitionLine extends _react.Component {
       selected: this.props.selected,
       clearfix: true
     };
+    return React.createElement("li", {
+      className: (0, _classnames().default)(classes),
+      onMouseOver: () => this.props.onSelect(this.props.index),
+      onClick: this._lineOnClick
+    }, this._renderButtons(), React.createElement("span", null, this.props.def.name));
+  }
 
-    return _react.createElement(
-      'li',
-      {
-        className: (0, (_classnames || _load_classnames()).default)(classes),
-        onMouseOver: () => this.props.onSelect(this.props.index),
-        onClick: this._lineOnClick },
-      _react.createElement(
-        (_ButtonGroup || _load_ButtonGroup()).ButtonGroup,
-        { className: 'pull-right' },
-        _react.createElement((_Button || _load_Button()).Button, {
-          icon: 'trashcan',
-          onClick: this._deleteButtonOnClick,
-          tabIndex: '-1',
-          title: 'Delete this working set'
-        }),
-        _react.createElement((_Button || _load_Button()).Button, {
-          icon: 'pencil',
-          onClick: this._editButtonOnClick,
-          tabIndex: '-1',
-          title: 'Edit this working set'
-        })
-      ),
-      _react.createElement(
-        'span',
-        null,
-        this.props.def.name
-      )
-    );
+  _renderButtons() {
+    if (this.props.def.sourceType === 'project') {
+      // Project working set definitions can't be edited or deleted.
+      return null;
+    }
+
+    return React.createElement(_ButtonGroup().ButtonGroup, {
+      className: "pull-right"
+    }, React.createElement(_Button().Button, {
+      icon: "trashcan",
+      onClick: this._deleteButtonOnClick,
+      tabIndex: "-1",
+      title: "Delete this working set"
+    }), React.createElement(_Button().Button, {
+      icon: "pencil",
+      onClick: this._editButtonOnClick,
+      tabIndex: "-1",
+      title: "Edit this working set"
+    }));
   }
 
 }
 
-class NonApplicableDefinitionLine extends _react.Component {
+class NonApplicableDefinitionLine extends React.Component {
   constructor(props) {
     super(props);
 
@@ -279,22 +302,29 @@ class NonApplicableDefinitionLine extends _react.Component {
   }
 
   render() {
-    return _react.createElement(
-      'li',
-      { className: 'clearfix' },
-      _react.createElement((_Button || _load_Button()).Button, {
-        className: 'pull-right',
-        icon: 'trashcan',
-        onClick: this._deleteButtonOnClick,
-        tabIndex: '-1',
-        title: 'Delete this working set'
-      }),
-      _react.createElement(
-        'span',
-        { className: 'text-subtle' },
-        this.props.def.name
-      )
-    );
+    return React.createElement("li", {
+      className: "clearfix"
+    }, React.createElement(_Button().Button, {
+      className: "pull-right",
+      icon: "trashcan",
+      onClick: this._deleteButtonOnClick,
+      tabIndex: "-1",
+      title: "Delete this working set"
+    }), React.createElement("span", {
+      className: "text-subtle"
+    }, this.props.def.name));
   }
 
+} // Since the selection is based on index, we need to make sure these are ordered correctly (i.e.
+// with the project definitions first).
+
+
+function sortApplicableDefinitions(definitions) {
+  return definitions.slice().sort((a, b) => {
+    if (a.sourceType === b.sourceType) {
+      return a.name.localeCompare(b.name);
+    }
+
+    return a.sourceType === 'project' ? -1 : 1;
+  });
 }

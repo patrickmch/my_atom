@@ -1,29 +1,41 @@
-'use strict';
+"use strict";
 
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.CodeHighlightProvider = undefined;
+exports.CodeHighlightProvider = void 0;
 
-var _nuclideAnalytics;
+function _nuclideAnalytics() {
+  const data = require("../../../modules/nuclide-analytics");
 
-function _load_nuclideAnalytics() {
-  return _nuclideAnalytics = require('../../nuclide-analytics');
+  _nuclideAnalytics = function () {
+    return data;
+  };
+
+  return data;
 }
 
-var _nuclideRemoteConnection;
+function _nuclideRemoteConnection() {
+  const data = require("../../nuclide-remote-connection");
 
-function _load_nuclideRemoteConnection() {
-  return _nuclideRemoteConnection = require('../../nuclide-remote-connection');
+  _nuclideRemoteConnection = function () {
+    return data;
+  };
+
+  return data;
 }
 
-var _nuclideOpenFiles;
+function _nuclideOpenFiles() {
+  const data = require("../../nuclide-open-files");
 
-function _load_nuclideOpenFiles() {
-  return _nuclideOpenFiles = require('../../nuclide-open-files');
+  _nuclideOpenFiles = function () {
+    return data;
+  };
+
+  return data;
 }
 
-var _atom = require('atom');
+var _atom = require("atom");
 
 /**
  * Copyright (c) 2015-present, Facebook, Inc.
@@ -35,9 +47,7 @@ var _atom = require('atom');
  * 
  * @format
  */
-
 class CodeHighlightProvider {
-
   constructor(name, grammarScopes, priority, analyticsEventName, connectionToLanguageService) {
     this.name = name;
     this.grammarScopes = grammarScopes;
@@ -47,14 +57,17 @@ class CodeHighlightProvider {
   }
 
   highlight(editor, position) {
-    return (0, (_nuclideAnalytics || _load_nuclideAnalytics()).trackTiming)(this._analyticsEventName, async () => {
-      const fileVersion = await (0, (_nuclideOpenFiles || _load_nuclideOpenFiles()).getFileVersionOfEditor)(editor);
+    return (0, _nuclideAnalytics().trackTiming)(this._analyticsEventName, async () => {
+      const fileVersion = await (0, _nuclideOpenFiles().getFileVersionOfEditor)(editor);
+
       const languageService = this._connectionToLanguageService.getForUri(editor.getPath());
+
       if (languageService == null || fileVersion == null) {
         return null;
       }
 
       const result = await (await languageService).highlight(fileVersion, position);
+
       if (result == null) {
         return null;
       }
@@ -66,6 +79,7 @@ class CodeHighlightProvider {
   static register(name, grammarScopes, config, connectionToLanguageService) {
     return atom.packages.serviceHub.provide('code-highlight', config.version, new CodeHighlightProvider(name, grammarScopes, config.priority, config.analyticsEventName, connectionToLanguageService));
   }
+
 }
 
 exports.CodeHighlightProvider = CodeHighlightProvider;

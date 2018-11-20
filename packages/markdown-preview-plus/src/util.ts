@@ -43,25 +43,27 @@ export async function copyHtml(
   renderLaTeX: boolean,
 ): Promise<void> {
   const view = new WebviewHandler(async () => {
-    view.init(atom.getConfigDirPath(), atomConfig().mathConfig.numberEquations)
-    view.setUseGitHubStyle(
-      atom.config.get('markdown-preview-plus.useGitHubStyle'),
-    )
+    view.init(atom.getConfigDirPath(), atomConfig().mathConfig, 'SVG')
     view.setBasePath(filePath)
 
-    const domDocument = await renderer.render(
+    const domDocument = await renderer.render({
       text,
       filePath,
-      undefined,
       renderLaTeX,
-      'copy',
-    )
+      mode: 'copy',
+    })
     const res = await view.update(
       domDocument.documentElement.outerHTML,
       renderLaTeX,
-      'SVG',
     )
-    if (res) atom.clipboard.write(res)
+    if (res) {
+      if (atom.config.get('markdown-preview-plus.richClipboard')) {
+        const clipboard = await import('./clipboard')
+        clipboard.write({ text: res, html: res })
+      } else {
+        atom.clipboard.write(res)
+      }
+    }
     view.destroy()
   })
   view.element.style.pointerEvents = 'none'

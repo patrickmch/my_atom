@@ -1,58 +1,100 @@
-'use strict';
+"use strict";
 
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
+exports.default = void 0;
 
-var _debuggerRegistry;
+function _debuggerRegistry() {
+  const data = require("../../../nuclide-debugger-common/debugger-registry");
 
-function _load_debuggerRegistry() {
-  return _debuggerRegistry = require('../../../nuclide-debugger-common/debugger-registry');
+  _debuggerRegistry = function () {
+    return data;
+  };
+
+  return data;
 }
 
-var _nuclideUri;
+function _process() {
+  const data = require("../../../nuclide-commons/process");
 
-function _load_nuclideUri() {
-  return _nuclideUri = _interopRequireDefault(require('../../../nuclide-commons/nuclideUri'));
+  _process = function () {
+    return data;
+  };
+
+  return data;
 }
 
-var _constants;
+function _nuclideUri() {
+  const data = _interopRequireDefault(require("../../../nuclide-commons/nuclideUri"));
 
-function _load_constants() {
-  return _constants = require('../../../nuclide-debugger-common/constants');
+  _nuclideUri = function () {
+    return data;
+  };
+
+  return data;
 }
 
-var _VSPOptionsParser;
+function _constants() {
+  const data = require("../../../nuclide-debugger-common/constants");
 
-function _load_VSPOptionsParser() {
-  return _VSPOptionsParser = _interopRequireDefault(require('../VSPOptionsParser'));
+  _constants = function () {
+    return data;
+  };
+
+  return data;
+}
+
+var _rxjsCompatUmdMin = require("rxjs-compat/bundles/rxjs-compat.umd.min.js");
+
+function _VSPOptionsParser() {
+  const data = _interopRequireDefault(require("../VSPOptionsParser"));
+
+  _VSPOptionsParser = function () {
+    return data;
+  };
+
+  return data;
 }
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
+/**
+ * Copyright (c) 2017-present, Facebook, Inc.
+ * All rights reserved.
+ *
+ * This source code is licensed under the BSD-style license found in the
+ * LICENSE file in the root directory of this source tree. An additional grant
+ * of patent rights can be found in the PATENTS file in the same directory.
+ *
+ * 
+ * @format
+ */
 class NativeGdbDebugAdapter {
   constructor() {
-    this.key = (_constants || _load_constants()).VsAdapterTypes.NATIVE_GDB;
+    this.key = _constants().VsAdapterTypes.NATIVE_GDB;
     this.type = 'mi';
     this.excludedOptions = new Set(['arguments', 'debuggerRoot', 'diagnosticLogging', 'stopOnAttach', 'program']);
-    this.extensions = new Set();
+    this.extensions = new Set('.exe');
     this.customArguments = new Map();
+    this.muteOutputCategories = new Set('log');
+    this.asyncStopThread = null;
+    this.supportsCodeBlocks = false;
     this._includedOptions = new Set();
   }
 
   parseArguments(args) {
     const action = args.attach ? 'attach' : 'launch';
-    const root = (0, (_debuggerRegistry || _load_debuggerRegistry()).getAdapterPackageRoot)(this.key);
-    const parser = new (_VSPOptionsParser || _load_VSPOptionsParser()).default(root);
+    const root = (0, _debuggerRegistry().getAdapterPackageRoot)(this.key);
+    const parser = new (_VSPOptionsParser().default)(root);
     const commandLineArgs = parser.parseCommandLine(this.type, action, this.excludedOptions, this._includedOptions, this.customArguments);
 
     if (action === 'launch') {
       const launchArgs = args._;
       const program = launchArgs[0];
-
       commandLineArgs.set('arguments', launchArgs.splice(1));
-      commandLineArgs.set('program', (_nuclideUri || _load_nuclideUri()).default.resolve(program));
-      commandLineArgs.set('cwd', (_nuclideUri || _load_nuclideUri()).default.resolve('.'));
+      commandLineArgs.set('program', _nuclideUri().default.resolve(program));
+      commandLineArgs.set('cwd', _nuclideUri().default.resolve('.'));
       commandLineArgs.set('stopOnAttach', false);
     }
 
@@ -66,15 +108,24 @@ class NativeGdbDebugAdapter {
   transformAttachArguments(args) {
     return args || {};
   }
+
+  transformExpression(exp, isCodeBlock) {
+    return exp;
+  }
+
+  async canDebugFile(file) {
+    return new Promise((resolve, reject) => {
+      try {
+        // eslint-disable-next-line nuclide-internal/unused-subscription
+        (0, _process().runCommand)('file', ['-b', '--mime-type', file], {
+          dontLogInNuclide: true
+        }).catch(_ => _rxjsCompatUmdMin.Observable.of('')).map(stdout => stdout.split(/\n/).filter(line => line.startsWith('application/')).length > 0).subscribe(value => resolve(value));
+      } catch (ex) {
+        reject(ex);
+      }
+    });
+  }
+
 }
-exports.default = NativeGdbDebugAdapter; /**
-                                          * Copyright (c) 2017-present, Facebook, Inc.
-                                          * All rights reserved.
-                                          *
-                                          * This source code is licensed under the BSD-style license found in the
-                                          * LICENSE file in the root directory of this source tree. An additional grant
-                                          * of patent rights can be found in the PATENTS file in the same directory.
-                                          *
-                                          * 
-                                          * @format
-                                          */
+
+exports.default = NativeGdbDebugAdapter;

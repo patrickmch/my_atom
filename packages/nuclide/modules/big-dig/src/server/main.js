@@ -1,42 +1,62 @@
-'use strict';
+"use strict";
 
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
 exports.startServer = startServer;
 
-var _promise;
+function _promise() {
+  const data = require("../../../nuclide-commons/promise");
 
-function _load_promise() {
-  return _promise = require('../../../nuclide-commons/promise');
+  _promise = function () {
+    return data;
+  };
+
+  return data;
 }
 
-var _fs;
+function _fs() {
+  const data = _interopRequireDefault(require("../common/fs"));
 
-function _load_fs() {
-  return _fs = _interopRequireDefault(require('../common/fs'));
+  _fs = function () {
+    return data;
+  };
+
+  return data;
 }
 
-var _child_process = _interopRequireDefault(require('child_process'));
+var _child_process = _interopRequireDefault(require("child_process"));
 
-var _log4js;
+function _log4js() {
+  const data = require("log4js");
 
-function _load_log4js() {
-  return _log4js = require('log4js');
+  _log4js = function () {
+    return data;
+  };
+
+  return data;
 }
 
-var _os = _interopRequireDefault(require('os'));
+var _os = _interopRequireDefault(require("os"));
 
-var _temp;
+function _temp() {
+  const data = _interopRequireDefault(require("temp"));
 
-function _load_temp() {
-  return _temp = _interopRequireDefault(require('temp'));
+  _temp = function () {
+    return data;
+  };
+
+  return data;
 }
 
-var _certificates;
+function _certificates() {
+  const data = require("./certificates");
 
-function _load_certificates() {
-  return _certificates = require('./certificates');
+  _certificates = function () {
+    return data;
+  };
+
+  return data;
 }
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
@@ -52,7 +72,6 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
  * 
  * @format
  */
-
 async function startServer({
   certificateStrategy,
   ports,
@@ -63,11 +82,11 @@ async function startServer({
   absolutePathToServerMain,
   serverParams
 }) {
-  const logger = (0, (_log4js || _load_log4js()).getLogger)();
+  const logger = (0, _log4js().getLogger)();
   logger.info('in startServer()');
-
   let paths;
   let certificateGeneratorOutput = {};
+
   switch (certificateStrategy.type) {
     case 'generate':
       const {
@@ -75,24 +94,26 @@ async function startServer({
         serverCommonName,
         openSSLConfigPath
       } = certificateStrategy;
-      paths = await (0, (_certificates || _load_certificates()).generateCertificates)(clientCommonName, serverCommonName, openSSLConfigPath, expirationDays);
+      paths = await (0, _certificates().generateCertificates)(clientCommonName, serverCommonName, openSSLConfigPath, expirationDays);
       logger.info('generateCertificates() succeeded!');
       certificateGeneratorOutput = {
         hostname: serverCommonName,
-        cert: await (_fs || _load_fs()).default.readFileAsString(paths.clientCert),
-        key: await (_fs || _load_fs()).default.readFileAsString(paths.clientKey)
+        cert: await _fs().default.readFileAsString(paths.clientCert),
+        key: await _fs().default.readFileAsString(paths.clientKey)
       };
       break;
+
     case 'reuse':
       paths = certificateStrategy.paths;
       logger.info('reusing existing certificates');
       break;
+
     default:
       certificateStrategy.type;
-      throw Error('invalid certificate strategy');
+      throw new Error('invalid certificate strategy');
   }
 
-  const [key, cert, ca] = await Promise.all([(_fs || _load_fs()).default.readFileAsBuffer(paths.serverKey), (_fs || _load_fs()).default.readFileAsBuffer(paths.serverCert), (_fs || _load_fs()).default.readFileAsBuffer(paths.caCert)]);
+  const [key, cert, ca] = await Promise.all([_fs().default.readFileAsBuffer(paths.serverKey), _fs().default.readFileAsBuffer(paths.serverCert), _fs().default.readFileAsBuffer(paths.caCert)]);
   const params = {
     key: key.toString(),
     cert: cert.toString(),
@@ -102,50 +123,56 @@ async function startServer({
     exclusive,
     absolutePathToServerMain,
     serverParams
-  };
-
-  // Redirect child stderr to a file so that we can read it.
+  }; // Redirect child stderr to a file so that we can read it.
   // (If we just pipe it, there's no safe way of disconnecting it after.)
-  (_temp || _load_temp()).default.track();
-  const stderrLog = (_temp || _load_temp()).default.openSync('big-dig-stderr');
 
-  const launcherScript = require.resolve('./launchServer-entry.js');
+  _temp().default.track();
+
+  const stderrLog = _temp().default.openSync('big-dig-stderr');
+
+  const launcherScript = require.resolve("./launchServer-entry.js");
+
   logger.info(`About to spawn ${launcherScript} to launch Big Dig server.`);
-  const child = _child_process.default.spawn(process.execPath, [
-  // Increase stack trace limit for better debug logs.
+
+  const child = _child_process.default.spawn(process.execPath, [// Increase stack trace limit for better debug logs.
   // For reference, Atom/Electron does not have a stack trace limit.
-  '--stack-trace-limit=50',
-  // Increase the maximum heap size if we have enough memory.
+  '--stack-trace-limit=50', // Increase the maximum heap size if we have enough memory.
   ...(_os.default.totalmem() > 8 * 1024 * 1024 * 1024 ? ['--max-old-space-size=4096'] : []), launcherScript], {
     detached: true,
     stdio: ['ignore', 'ignore', stderrLog.fd, 'ipc']
   });
-  logger.info(`spawn called for ${launcherScript}`);
-  // Send launch parameters over IPC to avoid making them visible in `ps`.
-  child.send(params);
 
-  const childPort = await (0, (_promise || _load_promise()).timeoutPromise)(new Promise((resolve, reject) => {
-    const onMessage = ({ port: result }) => {
+  logger.info(`spawn called for ${launcherScript}`); // Send launch parameters over IPC to avoid making them visible in `ps`.
+
+  child.send(params);
+  const childPort = await (0, _promise().timeoutPromise)(new Promise((resolve, reject) => {
+    const onMessage = ({
+      port: result
+    }) => {
       resolve(result);
       child.removeAllListeners();
     };
+
     child.on('message', onMessage);
     child.on('error', reject);
     child.on('exit', async code => {
-      const stderr = await (_fs || _load_fs()).default.readFileAsString(stderrLog.path).catch(() => '');
+      const stderr = await _fs().default.readFileAsString(stderrLog.path).catch(() => '');
       reject(Error(`Child exited early with code ${code}.\nstderr: ${stderr}`));
     });
   }), timeout).catch(err => {
     // Make sure we clean up hung children.
-    if (err instanceof (_promise || _load_promise()).TimedOutError) {
+    if (err instanceof _promise().TimedOutError) {
       child.kill('SIGKILL');
     }
+
     return Promise.reject(err);
   });
 
-  const { version } = require('../../package.json');
-  const json = JSON.stringify(
-  // These properties are the ones currently written by nuclide-server.
+  const {
+    version
+  } = require("../../package.json");
+
+  const json = JSON.stringify( // These properties are the ones currently written by nuclide-server.
   Object.assign({}, certificateGeneratorOutput, {
     pid: child.pid,
     version,
@@ -157,7 +184,9 @@ async function startServer({
     protocol_version: 2,
     success: true
   }));
-  await (_fs || _load_fs()).default.writeFile(jsonOutputFile, json, { mode: 0o600 });
+  await _fs().default.writeFile(jsonOutputFile, json, {
+    mode: 0o600
+  });
   logger.info(`Server config written to ${jsonOutputFile}.`);
   child.unref();
 }

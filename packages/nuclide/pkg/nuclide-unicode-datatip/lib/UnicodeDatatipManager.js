@@ -1,27 +1,45 @@
-'use strict';
+"use strict";
 
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
+exports.default = void 0;
 
-var _UniversalDisposable;
+function _UniversalDisposable() {
+  const data = _interopRequireDefault(require("../../../modules/nuclide-commons/UniversalDisposable"));
 
-function _load_UniversalDisposable() {
-  return _UniversalDisposable = _interopRequireDefault(require('../../../modules/nuclide-commons/UniversalDisposable'));
+  _UniversalDisposable = function () {
+    return data;
+  };
+
+  return data;
 }
 
-var _UnescapedUnicodeDatatip;
+function _UnescapedUnicodeDatatip() {
+  const data = _interopRequireDefault(require("./UnescapedUnicodeDatatip"));
 
-function _load_UnescapedUnicodeDatatip() {
-  return _UnescapedUnicodeDatatip = _interopRequireDefault(require('./UnescapedUnicodeDatatip'));
+  _UnescapedUnicodeDatatip = function () {
+    return data;
+  };
+
+  return data;
 }
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
+/**
+ * Copyright (c) 2015-present, Facebook, Inc.
+ * All rights reserved.
+ *
+ * This source code is licensed under the license found in the LICENSE file in
+ * the root directory of this source tree.
+ *
+ * 
+ * @format
+ */
 class UnicodeDatatipManager {
-
   constructor() {
-    this._disposables = new (_UniversalDisposable || _load_UniversalDisposable()).default();
+    this._disposables = new (_UniversalDisposable().default)();
   }
 
   dispose() {
@@ -30,23 +48,17 @@ class UnicodeDatatipManager {
 
   consumeDatatipService(service) {
     const datatipProvider = {
-      datatip: (editor, position) => (0, (_UnescapedUnicodeDatatip || _load_UnescapedUnicodeDatatip()).default)(editor, position),
+      datatip: (editor, position) => (0, _UnescapedUnicodeDatatip().default)(editor, position),
       providerName: 'nuclide-unicode-escapes',
       priority: 1
     };
-
     const disposable = service.addProvider(datatipProvider);
+
     this._disposables.add(disposable);
+
     return disposable;
   }
+
 }
-exports.default = UnicodeDatatipManager; /**
-                                          * Copyright (c) 2015-present, Facebook, Inc.
-                                          * All rights reserved.
-                                          *
-                                          * This source code is licensed under the license found in the LICENSE file in
-                                          * the root directory of this source tree.
-                                          *
-                                          * 
-                                          * @format
-                                          */
+
+exports.default = UnicodeDatatipManager;

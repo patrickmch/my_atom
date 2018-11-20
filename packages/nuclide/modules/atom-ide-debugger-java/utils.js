@@ -1,9 +1,8 @@
-'use strict';
+"use strict";
 
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.NUCLIDE_DEBUGGER_DEV_GK = undefined;
 exports.getJavaConfig = getJavaConfig;
 exports.getCustomControlButtonsForJavaSourcePaths = getCustomControlButtonsForJavaSourcePaths;
 exports.getDefaultSourceSearchPaths = getDefaultSourceSearchPaths;
@@ -17,66 +16,106 @@ exports.resolveConfiguration = resolveConfiguration;
 exports.setSourcePathsService = setSourcePathsService;
 exports.setRpcService = setRpcService;
 exports.getJavaDebuggerHelpersServiceByNuclideUri = getJavaDebuggerHelpersServiceByNuclideUri;
+exports.createJavaAttachConfig = createJavaAttachConfig;
+exports.NUCLIDE_DEBUGGER_DEV_GK = void 0;
 
-var _featureConfig;
+var _assert = _interopRequireDefault(require("assert"));
 
-function _load_featureConfig() {
-  return _featureConfig = _interopRequireDefault(require('../nuclide-commons-atom/feature-config'));
+function _featureConfig() {
+  const data = _interopRequireDefault(require("../nuclide-commons-atom/feature-config"));
+
+  _featureConfig = function () {
+    return data;
+  };
+
+  return data;
 }
 
-var _showModal;
+function _showModal() {
+  const data = _interopRequireDefault(require("../nuclide-commons-ui/showModal"));
 
-function _load_showModal() {
-  return _showModal = _interopRequireDefault(require('../nuclide-commons-ui/showModal'));
+  _showModal = function () {
+    return data;
+  };
+
+  return data;
 }
 
-var _nuclideUri;
+function _nuclideUri() {
+  const data = _interopRequireDefault(require("../nuclide-commons/nuclideUri"));
 
-function _load_nuclideUri() {
-  return _nuclideUri = _interopRequireDefault(require('../nuclide-commons/nuclideUri'));
+  _nuclideUri = function () {
+    return data;
+  };
+
+  return data;
 }
 
-var _rxjsBundlesRxMinJs = require('rxjs/bundles/Rx.min.js');
+var _rxjsCompatUmdMin = require("rxjs-compat/bundles/rxjs-compat.umd.min.js");
 
-var _react = _interopRequireWildcard(require('react'));
+var React = _interopRequireWildcard(require("react"));
 
-var _UniversalDisposable;
+function _UniversalDisposable() {
+  const data = _interopRequireDefault(require("../nuclide-commons/UniversalDisposable"));
 
-function _load_UniversalDisposable() {
-  return _UniversalDisposable = _interopRequireDefault(require('../nuclide-commons/UniversalDisposable'));
+  _UniversalDisposable = function () {
+    return data;
+  };
+
+  return data;
 }
 
-var _constants;
+function _constants() {
+  const data = require("../nuclide-debugger-common/constants");
 
-function _load_constants() {
-  return _constants = require('../nuclide-debugger-common/constants');
+  _constants = function () {
+    return data;
+  };
+
+  return data;
 }
 
-var _JavaDebuggerHelpersService;
+function JavaDebuggerHelpersServiceLocal() {
+  const data = _interopRequireWildcard(require("./JavaDebuggerHelpersService"));
 
-function _load_JavaDebuggerHelpersService() {
-  return _JavaDebuggerHelpersService = _interopRequireWildcard(require('./JavaDebuggerHelpersService'));
+  JavaDebuggerHelpersServiceLocal = function () {
+    return data;
+  };
+
+  return data;
 }
 
-var _nullthrows;
+function _nullthrows() {
+  const data = _interopRequireDefault(require("nullthrows"));
 
-function _load_nullthrows() {
-  return _nullthrows = _interopRequireDefault(require('nullthrows'));
+  _nullthrows = function () {
+    return data;
+  };
+
+  return data;
 }
 
-var _SourceFilePathsModal;
+function _SourceFilePathsModal() {
+  const data = require("./SourceFilePathsModal");
 
-function _load_SourceFilePathsModal() {
-  return _SourceFilePathsModal = require('./SourceFilePathsModal');
+  _SourceFilePathsModal = function () {
+    return data;
+  };
+
+  return data;
 }
 
-var _analytics;
+function _analytics() {
+  const data = require("../nuclide-commons/analytics");
 
-function _load_analytics() {
-  return _analytics = require('../nuclide-commons/analytics');
+  _analytics = function () {
+    return data;
+  };
+
+  return data;
 }
 
-function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
+function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) { var desc = Object.defineProperty && Object.getOwnPropertyDescriptor ? Object.getOwnPropertyDescriptor(obj, key) : {}; if (desc.get || desc.set) { Object.defineProperty(newObj, key, desc); } else { newObj[key] = obj[key]; } } } } newObj.default = obj; return newObj; } }
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -91,11 +130,11 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
  *  strict-local
  * @format
  */
-
 let _sourcePathsService;
-let _rpcService = null;
 
-const NUCLIDE_DEBUGGER_DEV_GK = exports.NUCLIDE_DEBUGGER_DEV_GK = 'nuclide_debugger_dev';
+let _rpcService = null;
+const NUCLIDE_DEBUGGER_DEV_GK = 'nuclide_debugger_dev';
+exports.NUCLIDE_DEBUGGER_DEV_GK = NUCLIDE_DEBUGGER_DEV_GK;
 
 function getJavaConfig() {
   const entryPointClass = {
@@ -112,6 +151,15 @@ function getJavaConfig() {
     required: true,
     visible: true
   };
+  const consoleEnum = {
+    name: 'console',
+    type: 'enum',
+    enums: ['internalConsole', 'integratedTerminal'],
+    description: 'Integrated Terminal means that it will run in a terminal that can interact with standard input and output.',
+    defaultValue: 'internalConsole',
+    required: true,
+    visible: true
+  };
   const javaJdwpPort = {
     name: 'javaJdwpPort',
     type: 'number',
@@ -122,18 +170,26 @@ function getJavaConfig() {
   return {
     launch: {
       launch: true,
-      vsAdapterType: (_constants || _load_constants()).VsAdapterTypes.JAVA,
-      threads: true,
-      properties: [entryPointClass, classPath],
+      vsAdapterType: _constants().VsAdapterTypes.JAVA,
+      properties: [entryPointClass, classPath, consoleEnum],
       cwdPropertyName: 'cwd',
-      header: null
+      header: null,
+
+      getProcessName(values) {
+        return values.entryPointClass;
+      }
+
     },
     attach: {
       launch: false,
-      vsAdapterType: (_constants || _load_constants()).VsAdapterTypes.JAVA,
-      threads: true,
+      vsAdapterType: _constants().VsAdapterTypes.JAVA,
       properties: [javaJdwpPort],
-      header: null
+      header: null,
+
+      getProcessName(values) {
+        return 'Port: ' + values.javaJdwpPort;
+      }
+
     }
   };
 }
@@ -148,45 +204,49 @@ function getCustomControlButtonsForJavaSourcePaths(clickEvents) {
 
 function getDefaultSourceSearchPaths(targetUri) {
   const searchPaths = [];
-  const remote = (_nuclideUri || _load_nuclideUri()).default.isRemote(targetUri);
 
-  // Add all the project root paths as potential source locations the Java debugger server should
-  // check for resolving source.
+  const remote = _nuclideUri().default.isRemote(targetUri); // Add all the project root paths as potential source locations the Java
+  // debugger server should check for resolving source.
   // NOTE: the Java debug server will just ignore any directory path that doesn't exist.
+
+
   atom.project.getPaths().forEach(path => {
-    if (remote && (_nuclideUri || _load_nuclideUri()).default.isRemote(path) || !remote && (_nuclideUri || _load_nuclideUri()).default.isLocal(path)) {
-      const translatedPath = remote ? (_nuclideUri || _load_nuclideUri()).default.getPath(path) : path;
+    if (remote && _nuclideUri().default.isRemote(path) || !remote && _nuclideUri().default.isLocal(path)) {
+      const translatedPath = remote ? _nuclideUri().default.getPath(path) : path;
       searchPaths.push(translatedPath);
 
       if (_sourcePathsService != null) {
-        _sourcePathsService.addKnownSubdirectoryPaths(remote, translatedPath, searchPaths);
+        _sourcePathsService.addKnownJavaSubdirectoryPaths(remote, translatedPath, searchPaths);
       }
     }
   });
-
   return searchPaths;
 }
 
 function getSavedPathsFromConfig() {
-  const paths = (_featureConfig || _load_featureConfig()).default.get('nuclide-debugger-java.sourceFilePaths');
-  // flowlint-next-line sketchy-null-mixed:off
+  const paths = _featureConfig().default.get('nuclide-debugger-java.sourceFilePaths'); // flowlint-next-line sketchy-null-mixed:off
+
+
   if (paths && typeof paths === 'string') {
     return paths.split(';');
   } else {
-    (_featureConfig || _load_featureConfig()).default.set('nuclide-debugger-java.sourceFilePaths', '');
+    _featureConfig().default.set('nuclide-debugger-java.sourceFilePaths', '');
   }
+
   return [];
 }
 
 function persistSourcePathsToConfig(newSourcePaths) {
-  (_featureConfig || _load_featureConfig()).default.set('nuclide-debugger-java.sourceFilePaths', newSourcePaths.join(';'));
+  _featureConfig().default.set('nuclide-debugger-java.sourceFilePaths', newSourcePaths.join(';'));
 }
 
 function getDialogValues(clickEvents) {
   let userSourcePaths = getSavedPathsFromConfig();
   return clickEvents.switchMap(() => {
-    return _rxjsBundlesRxMinJs.Observable.create(observer => {
-      const modalDisposable = (0, (_showModal || _load_showModal()).default)(({ dismiss }) => _react.createElement((_SourceFilePathsModal || _load_SourceFilePathsModal()).SourceFilePathsModal, {
+    return _rxjsCompatUmdMin.Observable.create(observer => {
+      const modalDisposable = (0, _showModal().default)(({
+        dismiss
+      }) => React.createElement(_SourceFilePathsModal().SourceFilePathsModal, {
         initialSourcePaths: userSourcePaths,
         sourcePathsChanged: newPaths => {
           userSourcePaths = newPaths;
@@ -194,9 +254,10 @@ function getDialogValues(clickEvents) {
           observer.next(newPaths);
         },
         onClosed: dismiss
-      }), { className: 'sourcepath-modal-container' });
-
-      (0, (_analytics || _load_analytics()).track)('fb-java-debugger-source-dialog-shown');
+      }), {
+        className: 'sourcepath-modal-container'
+      });
+      (0, _analytics().track)('fb-java-debugger-source-dialog-shown');
       return () => {
         modalDisposable.dispose();
       };
@@ -217,35 +278,31 @@ function getSourcePathClickSubscriptionsOnVspInstance(targetUri, vspInstance, cl
   }), clickEvents];
 }
 
-function getSourcePathClickSubscriptions(targetUri, debugSession, clickEvents, additionalSourcePaths = []) {
+function getSourcePathClickSubscriptions(targetUri, instance, clickEvents, additionalSourcePaths = []) {
   const defaultValues = getDefaultSourceSearchPaths(targetUri).concat(additionalSourcePaths);
   return [getDialogValues(clickEvents).startWith(getSavedPathsFromConfig()).subscribe(userValues => {
-    debugSession.custom('setSourcePath', {
+    instance.customRequest('setSourcePath', {
       sourcePath: getSourcePathString(defaultValues.concat(userValues))
     });
   }), clickEvents];
 }
 
 async function resolveConfiguration(configuration) {
-  const { adapterExecutable, targetUri } = configuration;
-  if (adapterExecutable == null) {
-    throw new Error('Cannot resolve configuration for unset adapterExecutable');
-  }
+  const {
+    targetUri
+  } = configuration; // If the incomming configuration already has a starting callback,
+  // we'd need to combine them. Guard against this bug being introduced
+  // in the future.
 
-  const subscriptions = new (_UniversalDisposable || _load_UniversalDisposable()).default();
-  const clickEvents = new _rxjsBundlesRxMinJs.Subject();
-  const customDisposable = configuration.customDisposable || new (_UniversalDisposable || _load_UniversalDisposable()).default();
-  customDisposable.add(subscriptions);
-
+  (0, _assert.default)(configuration.onDebugStartingCallback == null);
+  const clickEvents = new _rxjsCompatUmdMin.Subject();
   const javaAdapterExecutable = await getJavaDebuggerHelpersServiceByNuclideUri(targetUri).getJavaVSAdapterExecutableInfo(false);
   return Object.assign({}, configuration, {
-    properties: Object.assign({}, configuration.properties, {
-      customControlButtons: getCustomControlButtonsForJavaSourcePaths(clickEvents)
-    }),
+    customControlButtons: getCustomControlButtonsForJavaSourcePaths(clickEvents),
+    servicedFileExtensions: ['java'],
     adapterExecutable: javaAdapterExecutable,
-    customDisposable,
-    onInitializeCallback: async session => {
-      customDisposable.add(...getSourcePathClickSubscriptions(targetUri, session, clickEvents));
+    onDebugStartingCallback: instance => {
+      return new (_UniversalDisposable().default)(...getSourcePathClickSubscriptions(targetUri, instance, clickEvents));
     }
   });
 }
@@ -256,15 +313,30 @@ function setSourcePathsService(sourcePathsService) {
 
 function setRpcService(rpcService) {
   _rpcService = rpcService;
-  return new (_UniversalDisposable || _load_UniversalDisposable()).default(() => {
+  return new (_UniversalDisposable().default)(() => {
     _rpcService = null;
   });
 }
 
 function getJavaDebuggerHelpersServiceByNuclideUri(uri) {
-  if (!(_nuclideUri || _load_nuclideUri()).default.isRemote(uri)) {
-    return _JavaDebuggerHelpersService || _load_JavaDebuggerHelpersService();
+  if (_rpcService == null && !_nuclideUri().default.isRemote(uri)) {
+    return JavaDebuggerHelpersServiceLocal();
   }
 
-  return (0, (_nullthrows || _load_nullthrows()).default)(_rpcService).getServiceByNuclideUri('JavaDebuggerHelpersService', uri);
+  return (0, _nullthrows().default)(_rpcService).getServiceByNuclideUri('JavaDebuggerHelpersService', uri);
+}
+
+function createJavaAttachConfig(targetUri, attachPort, processName) {
+  const debuggerConfig = {
+    javaJdwpPort: attachPort
+  };
+  const processConfig = {
+    targetUri,
+    debugMode: 'attach',
+    adapterType: _constants().VsAdapterTypes.JAVA,
+    config: debuggerConfig,
+    processName: processName != null ? processName : 'JDWP: ' + attachPort + ' (Java)',
+    isRestartable: false
+  };
+  return processConfig;
 }

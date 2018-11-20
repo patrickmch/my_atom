@@ -1,55 +1,83 @@
-'use strict';
+"use strict";
 
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.DevicePanel = undefined;
+exports.DevicePanel = void 0;
 
-var _bindObservableAsProps;
+function _bindObservableAsProps() {
+  const data = require("../../../../modules/nuclide-commons-ui/bindObservableAsProps");
 
-function _load_bindObservableAsProps() {
-  return _bindObservableAsProps = require('../../../../modules/nuclide-commons-ui/bindObservableAsProps');
+  _bindObservableAsProps = function () {
+    return data;
+  };
+
+  return data;
 }
 
-var _Icon;
+function _Icon() {
+  const data = require("../../../../modules/nuclide-commons-ui/Icon");
 
-function _load_Icon() {
-  return _Icon = require('../../../../modules/nuclide-commons-ui/Icon');
+  _Icon = function () {
+    return data;
+  };
+
+  return data;
 }
 
-var _react = _interopRequireWildcard(require('react'));
+var React = _interopRequireWildcard(require("react"));
 
-var _AppInfoTable;
+function _AppInfoTable() {
+  const data = require("./AppInfoTable");
 
-function _load_AppInfoTable() {
-  return _AppInfoTable = require('./AppInfoTable');
+  _AppInfoTable = function () {
+    return data;
+  };
+
+  return data;
 }
 
-var _InfoTable;
+function _InfoTable() {
+  const data = require("./InfoTable");
 
-function _load_InfoTable() {
-  return _InfoTable = require('./InfoTable');
+  _InfoTable = function () {
+    return data;
+  };
+
+  return data;
 }
 
-var _ProcessTable;
+function _ProcessTable() {
+  const data = require("./ProcessTable");
 
-function _load_ProcessTable() {
-  return _ProcessTable = require('./ProcessTable');
+  _ProcessTable = function () {
+    return data;
+  };
+
+  return data;
 }
 
-var _TaskButton;
+function _TaskButton() {
+  const data = require("./TaskButton");
 
-function _load_TaskButton() {
-  return _TaskButton = require('./TaskButton');
+  _TaskButton = function () {
+    return data;
+  };
+
+  return data;
 }
 
-var _LoadingSpinner;
+function _LoadingSpinner() {
+  const data = require("../../../../modules/nuclide-commons-ui/LoadingSpinner");
 
-function _load_LoadingSpinner() {
-  return _LoadingSpinner = require('../../../../modules/nuclide-commons-ui/LoadingSpinner');
+  _LoadingSpinner = function () {
+    return data;
+  };
+
+  return data;
 }
 
-function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
+function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) { var desc = Object.defineProperty && Object.getOwnPropertyDescriptor ? Object.getOwnPropertyDescriptor(obj, key) : {}; if (desc.get || desc.set) { Object.defineProperty(newObj, key, desc); } else { newObj[key] = obj[key]; } } } } newObj.default = obj; return newObj; } }
 
 /**
  * Copyright (c) 2015-present, Facebook, Inc.
@@ -61,25 +89,27 @@ function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj;
  * 
  * @format
  */
-
-class DevicePanel extends _react.Component {
+class DevicePanel extends React.Component {
   _createInfoTables() {
     if (this.props.infoTables.isError) {
-      return [_react.createElement(
-        'div',
-        { className: 'block', key: 'infoTableError' },
-
-        // $FlowFixMe
-        this.props.infoTables.error
-      )];
+      return [React.createElement("div", {
+        className: "block",
+        key: "infoTableError"
+      }, // $FlowFixMe
+      this.props.infoTables.error)];
     } else if (this.props.infoTables.isPending) {
-      return [_react.createElement((_LoadingSpinner || _load_LoadingSpinner()).LoadingSpinner, { size: 'EXTRA_SMALL', key: 'infoTableLoading' })];
+      return [React.createElement(_LoadingSpinner().LoadingSpinner, {
+        size: "EXTRA_SMALL",
+        key: "infoTableLoading"
+      })];
     } else {
-      return Array.from(this.props.infoTables.value.entries()).map(([title, infoTable]) => _react.createElement(
-        'div',
-        { className: 'block', key: title },
-        _react.createElement((_InfoTable || _load_InfoTable()).InfoTable, { title: title, table: infoTable })
-      ));
+      return Array.from(this.props.infoTables.value.entries()).map(([title, infoTable]) => React.createElement("div", {
+        className: "block",
+        key: title
+      }, React.createElement(_InfoTable().InfoTable, {
+        title: title,
+        table: infoTable
+      })));
     }
   }
 
@@ -87,34 +117,36 @@ class DevicePanel extends _react.Component {
     const appInfoTables = this.props.appInfoTables;
 
     if (appInfoTables.isError) {
-      return [_react.createElement(
-        'div',
-        { className: 'block', key: 'infoTableError' },
-
-        // $FlowFixMe
-        appInfoTables.error
-      )];
+      return [React.createElement("div", {
+        className: "block",
+        key: "infoTableError"
+      }, // $FlowFixMe
+      appInfoTables.error)];
     } else if (appInfoTables.isPending) {
-      return [_react.createElement((_LoadingSpinner || _load_LoadingSpinner()).LoadingSpinner, { size: 'EXTRA_SMALL', key: 'infoTableLoading' })];
+      return [React.createElement(_LoadingSpinner().LoadingSpinner, {
+        size: "EXTRA_SMALL",
+        key: "infoTableLoading"
+      })];
     } else {
-      return Array.from(appInfoTables.value.entries()).map(([appName, appInfoRows]) => _react.createElement(
-        'div',
-        { className: 'block', key: appName },
-        _react.createElement((_AppInfoTable || _load_AppInfoTable()).AppInfoTable, { title: appName, rows: appInfoRows })
-      ));
+      return Array.from(appInfoTables.value.entries()).map(([appName, appInfoRows]) => React.createElement("div", {
+        className: "block",
+        key: appName
+      }, React.createElement(_AppInfoTable().AppInfoTable, {
+        title: appName,
+        rows: appInfoRows
+      })));
     }
   }
 
   _createProcessTable() {
-    return _react.createElement(
-      'div',
-      { className: 'block', key: 'process-table' },
-      _react.createElement((_ProcessTable || _load_ProcessTable()).ProcessTable, {
-        processes: this.props.processes,
-        processTasks: this.props.processTasks,
-        toggleProcessPolling: this.props.toggleProcessPolling
-      })
-    );
+    return React.createElement("div", {
+      className: "block",
+      key: "process-table"
+    }, React.createElement(_ProcessTable().ProcessTable, {
+      processes: this.props.processes,
+      processTasks: this.props.processTasks,
+      toggleProcessPolling: this.props.toggleProcessPolling
+    }));
   }
 
   _taskEventsToProps(task, taskEvent) {
@@ -129,36 +161,25 @@ class DevicePanel extends _react.Component {
 
   _getTasks() {
     const tasks = Array.from(this.props.deviceTasks).map(task => {
-      const StreamedTaskButton = (0, (_bindObservableAsProps || _load_bindObservableAsProps()).bindObservableAsProps)(task.getTaskEvents().distinctUntilChanged().map(taskEvent => this._taskEventsToProps(task, taskEvent)), (_TaskButton || _load_TaskButton()).TaskButton);
-      return _react.createElement(StreamedTaskButton, { key: task.getName() });
+      const StreamedTaskButton = (0, _bindObservableAsProps().bindObservableAsProps)(task.getTaskEvents().distinctUntilChanged().map(taskEvent => this._taskEventsToProps(task, taskEvent)), _TaskButton().TaskButton);
+      return React.createElement(StreamedTaskButton, {
+        key: task.getName()
+      });
     });
-    return _react.createElement(
-      'div',
-      { className: 'block nuclide-device-panel-tasks-container' },
-      tasks
-    );
+    return React.createElement("div", {
+      className: "block nuclide-device-panel-tasks-container"
+    }, tasks);
   }
 
   _getBackButton() {
-    return _react.createElement(
-      'div',
-      { className: 'block' },
-      _react.createElement(
-        'span',
-        null,
-        _react.createElement(
-          'a',
-          {
-            className: 'nuclide-device-panel-text-with-icon',
-            onClick: () => this.props.goToRootPanel() },
-          _react.createElement(
-            (_Icon || _load_Icon()).Icon,
-            { icon: 'chevron-left' },
-            'Choose another device'
-          )
-        )
-      )
-    );
+    return React.createElement("div", {
+      className: "block"
+    }, React.createElement("span", null, React.createElement("a", {
+      className: "nuclide-device-panel-text-with-icon",
+      onClick: () => this.props.goToRootPanel()
+    }, React.createElement(_Icon().Icon, {
+      icon: "chevron-left"
+    }, "Choose another device"))));
   }
 
   _getStatus() {
@@ -166,32 +187,19 @@ class DevicePanel extends _react.Component {
       return null;
     }
 
-    return _react.createElement(
-      'div',
-      { className: 'block' },
-      _react.createElement(
-        'span',
-        { className: 'nuclide-device-panel-text-with-icon nuclide-device-panel-disconnected-icon' },
-        _react.createElement(
-          (_Icon || _load_Icon()).Icon,
-          { icon: 'primitive-dot' },
-          'Disconnected'
-        )
-      )
-    );
+    return React.createElement("div", {
+      className: "block"
+    }, React.createElement("span", {
+      className: "nuclide-device-panel-text-with-icon nuclide-device-panel-disconnected-icon"
+    }, React.createElement(_Icon().Icon, {
+      icon: "primitive-dot"
+    }, "Disconnected")));
   }
 
   render() {
-    return _react.createElement(
-      'div',
-      null,
-      this._getBackButton(),
-      this._getStatus(),
-      this._getTasks(),
-      this._createInfoTables(),
-      this._createAppInfoTables(),
-      this._createProcessTable()
-    );
+    return React.createElement("div", null, this._getBackButton(), this._getStatus(), this._getTasks(), this._createInfoTables(), this._createAppInfoTables(), this._createProcessTable());
   }
+
 }
+
 exports.DevicePanel = DevicePanel;

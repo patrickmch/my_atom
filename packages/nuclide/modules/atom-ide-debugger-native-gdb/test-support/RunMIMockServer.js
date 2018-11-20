@@ -1,4 +1,4 @@
-'use strict';
+"use strict";
 
 /**
  * Copyright (c) 2017-present, Facebook, Inc.
@@ -15,7 +15,7 @@
 /* eslint
    nuclide-internal/no-commonjs: 0,
    */
-
 // eslint-disable-next-line nuclide-internal/modules-dependencies
-require('../../nuclide-node-transpiler');
-require('./MockMIServer');
+require("../../nuclide-node-transpiler");
+
+require("./MockMIServer");

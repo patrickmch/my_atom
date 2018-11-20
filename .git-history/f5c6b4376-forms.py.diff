@@ -1,0 +1,1142 @@
+diff --git a/nols_website/core/forms.py b/nols_website/core/forms.py
+index 2b66026ad..72626e233 100644
+--- a/nols_website/core/forms.py
++++ b/nols_website/core/forms.py
+@@ -1,1136 +1,1137 @@
+ "Reusable forms for handling core contact information data"
+ 
+ import datetime
+ import urllib
+ from collections import OrderedDict
+ import logging
+ 
+ import re
+ from django import forms
+ from django.core.urlresolvers import reverse
+ from django.forms.utils import ErrorList
+ from django.utils.safestring import mark_safe
+ from django.conf import settings
+ 
+ from nols.app.common.constants import PROVINCE_CHOICES_MAP, PROVINCE_SEPERATOR_VALUE
+ from core import constants as const
+ from core import utils, formhelp
+ from core.nmc import da
+ from nols.model.core.constants import COUNTRY, COUNTRIES_WITH_MANAGED_PROVINCES
+ from nols.util.django.forms.fields import ReadonlyField, ReadonlyInput
+ from nols.util.django.forms import utils as formutils
+ from nols.util.formatting import attempt_title
+ from nols.util.misc_utils import none_to_blank, diff_in_years
+ from core.models import ApplicationValueTab, NameChangeRequest
+ 
+ log = logging.getLogger(__name__)
+ 
+ 
+ class PhoneForm(forms.Form):
+     "Basic phone input for type, phone number and extension"
+ 
+     def __init__(self, *args, **kwargs):
+         allow_type_update = bool(kwargs.pop("allow_type_update", False))
+         self.phone_required = bool(kwargs.pop("phone_required", False))
+         type_choices = kwargs.pop('type_choices', None)
+         set_type = kwargs.pop('set_type', None)
+ 
+         if set_type is not None:
+             if 'initial' not in kwargs:
+                 kwargs['initial'] = {}
+             kwargs['initial']['type'] = set_type
+ 
+         super(PhoneForm, self).__init__(*args, **kwargs)
+ 
+         if allow_type_update:
+             if type_choices is not None:
+                 _choices = const.BLANK_CHOICES + type_choices
+             else:
+                 _choices = const.BLANK_CHOICES + const.PHONE_TYPE.CHOICES
+             self.fields['type'] = forms.ChoiceField(required=self.phone_required,
+                                                     label="Phone Type",
++                                                    widget=forms.Select(attrs={"id": "phone_type", "name": "phone_type"}),
+                                                     choices=_choices)
+         else:
+             self.fields['type'] = ReadonlyField(required=self.phone_required,
+                                                 label="Phone Type",
+                 widget=ReadonlyInput(attrs={'class': 'phone_type'}))
+ 
+         self.fields['phone_number'] = forms.CharField(
+             required=self.phone_required, max_length=20,
+             widget=forms.TextInput(attrs={'class': 'phone_number'}))
+         self.fields['extension'] = forms.CharField(required=False,
+             max_length=10, widget=forms.TextInput(
+             attrs={'class': 'phone_extension',
+                    'placeholder': 'extension'}))
+ 
+         if set_type is not None:
+             self.fields['type'].widget = forms.HiddenInput()
+ 
+     def clean_phone_number(self):
+         "Strip white space"
+         data = self.cleaned_data['phone_number']
+         return data.strip()
+ 
+     def clean_extension(self):
+         "Strip white space"
+         data = self.cleaned_data['extension']
+         return data.strip()
+ 
+     def clean(self):
+         phone_number = self.cleaned_data.get('phone_number')
+         type = self.cleaned_data.get('type')
+ 
+         if phone_number and not type and not self.phone_required:
+             self._errors["type"] = self.error_class(["This field is required."])
+         return self.cleaned_data
+ 
+ 
+ class FormsetPhoneForm(PhoneForm):
+     "Custom subclass used to build PhoneFormSet."
+ 
+     def __init__(self, *args, **kwargs):
+         kwargs["allow_type_update"] = False
+         super(FormsetPhoneForm, self).__init__(*args, **kwargs)
+ 
+ class BasePhoneFormSet(forms.formsets.BaseFormSet):
+     "Base form for a phone input"
+ 
+     def __init__(self, *args, **kwargs):
+         self.soft_required = kwargs.pop("soft_required", False)
+         #noinspection PyArgumentList
+         super(BasePhoneFormSet, self).__init__(*args, **kwargs)
+ 
+     def clean(self):
+         "Ensure at least one phone number is provided"
+         if self.soft_required:
+             # Don't bother checking required if we don't care about it.
+             return
+ 
+         one_phone_exists = False
+         for form in self.forms:
+             if form.cleaned_data['phone_number']:
+                 one_phone_exists = True
+                 break
+ 
+         if not one_phone_exists:
+             raise forms.ValidationError('You must provide at least one phone.')
+ 
+ PhoneFormSet = forms.formsets.formset_factory(FormsetPhoneForm, extra=0, formset=BasePhoneFormSet)
+ 
+ 
+ class BirthDateWidget(forms.TextInput):
+     """
+     A widget to calculate a person's age as they are typing it into the input.
+     """
+     def __init__(self, *args, **kwargs):
+         self.why_bday = kwargs.pop('why_bday', None)
+         super(BirthDateWidget, self).__init__(*args, **kwargs)
+ 
+     def render(self, name, value, attrs=None):
+         output = super(BirthDateWidget, self).render(name, value, attrs)
+         if self.why_bday:
+             default_msg = "We are asking you for your birthdate to help us ensure we have one," \
+                           " and only one, record in our database for each person. Birthdates help" \
+                           " NOLS differentiate among several people with the same name. Reducing" \
+                           " duplicates helps NOLS consume less paper and ensures that when you" \
+                           " tell us something, you only have to tell us once. NOLS will never" \
+                           " share this information with another organization."
+             tooltip = mark_safe(
+                 u'<span class="fa fa-question t-t" data-toggle="tooltip" '
+                 u'title="%s"></span>' % default_msg)
+         else:
+             tooltip = ''
+         age_span = mark_safe(u'<span class="age-calculation"></span>')
+         return mark_safe('\n'.join([output, tooltip, age_span]))
+ 
+     class Media:
+         # TODO DjangoUpgrade these will automatically be served under STATIC_URL when we upgrade
+         dev_server = hasattr(settings, 'DEVSERVER') and settings.DEVSERVER
+         css = {'all': (''.join(['http://' if dev_server else 'https://',
+                                 settings.NOLS_WEB_HOST,
+                                 settings.STATIC_URL,
+                                 'core/css/birth_date_widget.css']),)}
+         js = (''.join(['http://' if dev_server else 'https://',
+                        settings.NOLS_WEB_HOST,
+                        settings.STATIC_URL,
+                        'core/js/birth_date_widget.js']),)
+ 
+ 
+ class NameChangeForm(forms.ModelForm):
+     def __init__(self, *args, **kwargs):
+         initial = kwargs.setdefault('initial', {})
+         user = kwargs.pop("user", None)
+ 
+         if user:
+             if user.entity:
+                 name = user.entity.name
+                 initial.update({'prefix': name.prefix if name.prefix in const.NAME_PREFIX.VALUES else '',
+                                 'first_name': name.first,
+                                 'preferred_name': name.preferred,
+                                 'middle_name': name.middle,
+                                 'last_name': name.last,
+                                 'suffix': name.suffix,
+                                 'user': user})
+             else:
+                 initial.update({'first_name': user.first_name,
+                                 'last_name': user.last_name,
+                                 'user': user})
+ 
+         super(NameChangeForm, self).__init__(*args, **kwargs)
+         self.fields['user'].widget = forms.HiddenInput()
+ 
+     class Meta:
+         model = NameChangeRequest
+         exclude = ['status', 'declination_reason']
+ 
+     def clean_first_name(self):
+         return attempt_title(self.cleaned_data['first_name'].strip())
+ 
+     def clean_preferred_name(self):
+         return attempt_title(self.cleaned_data['preferred_name'].strip())
+ 
+     def clean_middle_name(self):
+         return attempt_title(self.cleaned_data['middle_name'].strip())
+ 
+     def clean_last_name(self):
+         return attempt_title(self.cleaned_data['last_name'].strip())
+ 
+     def clean_suffix(self):
+         return self.cleaned_data['suffix'].strip()
+ 
+     def clean(self):
+         data = self.cleaned_data
+ 
+         if not self.errors and data['first_name'] == self.initial['first_name'] \
+                 and data['preferred_name'] == self.initial['preferred_name']\
+                 and data['last_name'] == self.initial['last_name']\
+                 and data['middle_name'] == self.initial['middle_name']\
+                 and (data['prefix'] == self.initial['prefix']
+                      or not data['prefix'] and self.initial['prefix'] == '')\
+                 and data['suffix'] == self.initial['suffix']:
+             raise forms.ValidationError('Name change request not submitted, nothing was changed.')
+         return data
+ 
+ 
+ class PersonForm(forms.Form):
+     """Basic person input form that disallows editing of pre-existing data
+ 
+     Please note that passing in show_ethnicity is generally not required.
+ 
+     Our default ethnicity UX will always show ethnicity if-and-only-if we have a valid citizenship
+     entry equal to United States. This is due to our VERY U.S.-centric ethnicity categories.
+ 
+     However, we do have some custom client applications for which we do not want to ask for
+     citizenship (C5) or it can be safely assumed (USNA). In those cases it makes sense to explicitly
+     set the show ethnicity flag since we may choose to hide the citizenship input.
+     """
+ 
+     EXTRA_NAME_FIELDS = ['name_prefix', 'preferred_first_name', 'name_suffix']
+ 
+     def __init__(self, *args, **kwargs):
+         initial = kwargs.setdefault('initial', {})
+ 
+         user = kwargs.pop("user", None)
+ 
+         # There are rare instances where the actual user will be entering in data for someone else,
+         # as when a parent applies for a child (aka Proxy Applications)
+         proxy_entity_id = kwargs.pop("proxy_entity_id", None)
+ 
+         show_birth_date = kwargs.pop('show_birth_date', True)
+         birth_date_required = kwargs.pop("birth_date_required", True)
+ 
+         show_gender = kwargs.pop('show_gender', True)
+         gender_required = kwargs.pop("gender_required", True)
+ 
+         show_minimum_name = kwargs.pop("show_minimum_name", False)
+ 
+         show_name = kwargs.pop("show_name", True)
+ 
+         collapse_extra_name_fields = kwargs.pop("collapse_extra_name_fields", False)
+ 
+         show_ethnicity = kwargs.pop("show_ethnicity", True)
+ 
+         show_citizenship = kwargs.pop("show_citizenship", False)
+         citizenship_required = kwargs.pop("citizenship_required", False)
+ 
+         show_height = kwargs.pop("show_height", False)
+         height_required = kwargs.pop("height_required", False)
+ 
+         show_weight = kwargs.pop("show_weight", False)
+         weight_required = kwargs.pop("weight_required", False)
+ 
+         show_last_school = kwargs.pop("show_last_school", False)
+         last_school_required = kwargs.pop("last_school_required", False)
+ 
+         show_currently_enrolled = kwargs.pop("show_currently_enrolled", False)
+         currently_enrolled_required = kwargs.pop("currently_enrolled_required", False)
+ 
+         show_education_level = kwargs.pop("show_education_level", False)
+         education_level_required = kwargs.pop("education_level_required", False)
+ 
+         use_birthdate_widget = kwargs.pop('use_birthdate_widget', True)
+ 
+         soft_required = kwargs.pop("soft_required", False)
+ 
+         name = None
+         if user or proxy_entity_id:
+             if proxy_entity_id:
+                 entity = da.entity.get_entity(proxy_entity_id)
+             else:
+                 entity = user.entity
+ 
+             if entity:
+                 name = entity.name
+                 dob = entity.birth_date.strftime(const.DATE_FORMAT) if entity.birth_date else ""
+                 initial.update({
+                     'name_prefix': name.prefix if name.prefix in const.NAME_PREFIX.VALUES else '',
+                     'first_name': name.first,
+                     'middle_name': name.middle,
+                     'last_name': name.last,
+                     'preferred_first_name': name.preferred,
+                     'name_suffix': name.suffix,
+                     'birth_date': dob,
+                     'gender': entity.gender,
+                     'ethnicity': "" if entity.ethnicity == "Unknown" else entity.ethnicity,
+                     'height': entity.height,
+                     'weight': entity.weight,
+                     'citizenship': entity.citizenship,
+                     'last_school': entity.last_school,
+                     'currently_enrolled': none_to_blank(entity.currently_enrolled),
+                     'education_level': entity.education_level,
+                 })
+             else:
+                 initial.update({
+                     'first_name': user.first_name,
+                     'last_name': user.last_name,
+                     })
+         else:
+             entity = None
+ 
+         if initial and 'birth_date' in initial and isinstance(initial['birth_date'], datetime.date):
+             initial['birth_date'] = initial['birth_date'].strftime(const.DATE_FORMAT)
+ 
+         super(PersonForm, self).__init__(*args, **kwargs)
+ 
+         if show_minimum_name:
+             show_name = False
+             if not user and not proxy_entity_id:
+                 self.fields['first_name'] = forms.CharField(max_length=30)
+                 self.fields['last_name'] = forms.CharField(max_length=30)
+ 
+             else:
+                 self.fields['first_name'] = ReadonlyField()
+                 self.fields['last_name'] = ReadonlyField()
+ 
+         if show_name:
+             prefix_choices = const.BLANK_CHOICES + const.NAME_PREFIX.CHOICES
+             if not user and not proxy_entity_id:
+                 self.fields['name_prefix'] = forms.ChoiceField(required=False,
+                                                                choices=prefix_choices)
+                 self.fields['first_name'] = forms.CharField(max_length=30)
+                 self.fields['preferred_first_name'] = forms.CharField(required=False,
+                                                                       max_length=30)
+                 self.fields['middle_name'] = forms.CharField(required=False, max_length=20)
+                 self.fields['last_name'] = forms.CharField(max_length=75)
+                 self.fields['name_suffix'] = forms.CharField(required=False, max_length=6)
+ 
+             else:
+                 if name and name.prefix:
+                     self.fields['name_prefix'] = ReadonlyField(required=False)
+                 else:
+                     self.fields['name_prefix'] = forms.ChoiceField(required=False,
+                                                                    choices=prefix_choices)
+ 
+                 self.fields['first_name'] = ReadonlyField()
+ 
+                 if name and name.preferred:
+                     self.fields['preferred_first_name'] = ReadonlyField(required=False)
+                 else:
+                     self.fields['preferred_first_name'] = forms.CharField(required=False,
+                                                                           max_length=30)
+ 
+                 if name and name.middle:
+                     self.fields['middle_name'] = ReadonlyField(required=False)
+                 else:
+                     self.fields['middle_name'] = forms.CharField(required=False, max_length=20)
+ 
+                 self.fields['last_name'] = ReadonlyField()
+ 
+                 if name and name.suffix:
+                     self.fields['name_suffix'] = ReadonlyField(required=False)
+                 else:
+                     self.fields['name_suffix'] = forms.CharField(required=False, max_length=6)
+ 
+         if collapse_extra_name_fields:
+             for field_key in self.EXTRA_NAME_FIELDS:
+                 self.fields[field_key].is_collapsed = True
+ 
+         if show_birth_date:
+             if (not entity) or (not entity.birth_date):
+                 self.fields['birth_date'] = forms.DateField(
+                     required=birth_date_required, help_text="Date format: mm/dd/yyyy")
+                 if use_birthdate_widget:
+                     self.fields['birth_date'].widget = BirthDateWidget(why_bday=False)
+             else:
+                 self.fields['birth_date'] = ReadonlyField()
+ 
+         if show_gender:
+             if (not entity) or entity.gender == "Unknown":
+                 self.fields['gender'] = forms.ChoiceField(required=gender_required,
+                     choices=const.BLANK_CHOICES + const.GENDER.CHOICES)
+             else:
+                 self.fields['gender'] = ReadonlyField()
+ 
+         if show_citizenship:
+             self.fields['citizenship'] = forms.ChoiceField(
+                 required=citizenship_required,
+                 choices=const.BLANK_CHOICES + da.common.country_choices)
+ 
+         if show_ethnicity:
+             self.fields['ethnicity'] = forms.ChoiceField(
+                 required=False, label='Ethnicity',
+                 choices=const.BLANK_CHOICES + ApplicationValueTab.ethnic_origin_choices()
+             )
+         if not show_citizenship and show_ethnicity:
+             classes = 'alwaysDisplay'
+             existing_classes = self.fields['ethnicity'].widget.attrs.get('class')
+             if existing_classes:
+                 classes = '%s %s' % (classes, existing_classes)
+             self.fields['ethnicity'].widget.attrs['class'] = classes
+ 
+         if show_height:
+             self.fields['height'] = forms.ChoiceField(required=height_required,
+                 choices=const.BLANK_CHOICES + const.HEIGHT.CHOICES)
+ 
+         if show_weight:
+             self.fields['weight'] = forms.IntegerField(required=weight_required,
+                 label="Weight (lb)")
+ 
+         if show_last_school:
+             self.fields['last_school'] = forms.CharField(
+                 max_length=60,
+                 required=last_school_required,
+                 label="Most recent school")
+ 
+         if show_currently_enrolled:
+             self.fields['currently_enrolled'] = forms.NullBooleanField(
+                 required=currently_enrolled_required,
+                 label="Currently enrolled" if proxy_entity_id else "Are you currently enrolled",
+             widget=forms.Select(choices=(("", " "), ("True", "Yes"),("False", "No"))),
+                 )
+ 
+         if show_education_level:
+             self.fields['education_level'] = forms.ChoiceField(
+                 required=education_level_required,
+                 label="Education level completed",
+                 choices=const.BLANK_CHOICES + const.EDUCATION_LEVEL.CHOICES)
+ 
+         if soft_required:
+             for key in (
+                     'citizenship',
+                     'height',
+                     'weight',
+                     'last_school',
+                     'currently_enrolled',
+                     'education_level',
+                     ):
+                 if key in self.fields:
+                     self.fields[key] = formutils.soft_required_field(self.fields[key])
+ 
+     def display_data(self):
+         "Compress form data into a concise text display. Useful for printing."
+         # TODO: shouldn't rely on initial, although safe for our current use.
+         # Refactor this when ticket 10427 lands
+ 
+         ret_data = []
+         data = self.initial or self.data or {}
+ 
+         first_name = data.get('first_name','')
+         pref_first_name = data.get('preferred_first_name','')
+         if first_name and pref_first_name and first_name != pref_first_name:
+             first_name_str = '%s (%s)' % (first_name, pref_first_name)
+         else:
+             first_name_str = first_name
+ 
+         middle_name = data.get('middle_name','')
+         middle_name_str = middle_name[0] + '.' if middle_name else ''
+ 
+         name_fields = ' '.join(filter(None, (
+             data.get('name_prefix'),
+             first_name_str,
+             middle_name_str,
+             data.get('last_name'),
+             data.get('name_suffix'),
+             )))
+         ret_data.append(formutils.display_data(label='Name', data=name_fields))
+ 
+         birth_date_val_str = data.get('birth_date')
+         if birth_date_val_str:
+             birth_date = datetime.datetime.strptime(birth_date_val_str, const.DATE_FORMAT)
+             age_str = "%.1f" % diff_in_years(birth_date, datetime.date.today())
+             birth_date_display_str = "DOB: %s, Age: %s" % (birth_date_val_str, age_str)
+         else:
+             birth_date_display_str = ""
+         bio_fields = ', '.join(filter(None, (
+             birth_date_display_str,
+             data.get('gender'),
+             data.get('ethnicity'),
+             )))
+         ret_data.append(formutils.display_data(label='Details', data=bio_fields))
+ 
+         if 'citizenship' in data and data['citizenship']:
+             ret_data.append(formutils.display_data(label='Citizenship', data=data['citizenship']))
+ 
+         if any(('height' in data and data['height'],
+                 'weight' in data and data['weight'],
+                 )):
+             if 'height' in data and data['height']:
+                 ht_desc = dict(const.HEIGHT.CHOICES)[unicode(data['height'])]
+             else:
+                 ht_desc = "Unknown height"
+             if 'weight' in data and data['weight']:
+                 wt_desc = "%s lbs" % data['weight']
+             else:
+                 wt_desc = "Unknown weight"
+             measurement_data = "%s, %s" % (ht_desc, wt_desc)
+             ret_data.append(formutils.display_data(label='Measurements', data=measurement_data))
+ 
+         if any(('last_school' in data and data['last_school'],
+                 'currently_enrolled' in data and data['currently_enrolled'],
+                 'education_level' in data and data['education_level'],
+                 )):
+             school_data = ", ".join(filter(None, (data.get('last_school'), "Currently enrolled"
+                 if data.get('currently_enrolled') else None
+                 )))
+             ret_data.append(formutils.display_data(label='Education', data=school_data))
+ 
+         return mark_safe("".join(ret_data))
+ 
+     def create_person_entity(self):
+         """
+         Create a person (entity) from a bound PersonForm. Intended for use when the form is filled
+         out by an unauthenticated user. Assumes that there is a first name, last name, and birth_date
+         entered in the form.
+         @return: entity id
+         """
+         if self.is_valid():
+             self.cleaned_data.setdefault('gender', 'Unknown')
+             if self.cleaned_data['gender'] == '':
+                 self.cleaned_data['gender'] = 'Unknown'
+ 
+             person = da.entity.get_new_person()
+             formhelp.populate_person_attrs(self.cleaned_data, person)
+             return da.entity.save_entity(person)
+         else:
+             return None
+ 
+     def clean_first_name(self):
+         "Clean first_name."
+         return attempt_title(self.cleaned_data['first_name'].strip())
+ 
+     def clean_preferred_first_name(self):
+         "Clean preferred_first_name."
+         return attempt_title(self.cleaned_data['preferred_first_name'].strip())
+ 
+     def clean_middle_name(self):
+         "Clean middle_name."
+         return attempt_title(self.cleaned_data['middle_name'].strip())
+ 
+     def clean_last_name(self):
+         "Clean last_name."
+         return attempt_title(self.cleaned_data['last_name'].strip())
+ 
+     def clean_name_suffix(self):
+         "Clean name_suffix."
+         return self.cleaned_data['name_suffix'].strip()
+ 
+     def clean_birth_date(self):
+         "Prevent invalid birth dates"
+         value = self.cleaned_data['birth_date']
+         if isinstance(self.fields['birth_date'], forms.DateField) and value:
+             if value > datetime.date.today():
+                 raise forms.ValidationError('Birth date cannot be in the future (ensure that you '
+                                             'enter four digits for the year, e.g. 01/01/1950, '
+                                             'not 01/01/50)')
+ 
+             # Dates before 1900 cause the date.strftime() method to fail.
+             # This causes problems when da.entity.save_entity() is called lower in the stack.
+             if value < datetime.date(1900, 1, 1):
+                 raise forms.ValidationError("Invalid birth year")
+         elif value:
+             df = forms.DateField()
+             return df.to_python(value)
+         return value
+ 
+     def clean_citizenship(self):
+         "Validate citizenship value."
+         data = self.cleaned_data['citizenship'].strip()
+         if data == "-":
+             if self.fields['citizenship'].required:
+                 raise forms.ValidationError("This field is required.")
+             else:
+                 data = ""
+         return data
+ 
+     def clean_last_school(self):
+         "Clean last_school."
+         # Do not use attempt title here, as we may get an acronym
+         data = self.cleaned_data['last_school'].strip()
+         if data.lower() == data:
+             data = data.title()
+         return data
+ 
+     def clean_education_level(self):
+         "Make separator the same as nothing."
+         value = self.cleaned_data['education_level']
+         if value == const.SEP_VALUE:
+             value = ""
+         return value
+ 
+     def clean_weight(self):
+         "Ensure weight makes sense and will fit in the database."
+         value = self.cleaned_data['weight']
+         if value:
+             if len(unicode(value)) > 3:
+                 raise forms.ValidationError("Invalid weight")
+         return value
+ 
+ class AddressTypeForm(forms.Form):
+     "Address type information for a user."
+ 
+     def __init__(self, *args, **kwargs):
+         address_required = kwargs.pop('address_required', True)
+         type_required = kwargs.pop("type_required", True)
+         set_type = kwargs.pop('set_type', None)
+         type_choices = kwargs.pop('type_choices', None)
+ 
+         if set_type is not None:
+             if 'initial' not in kwargs:
+                 kwargs['initial'] = {}
+             kwargs['initial']['type'] = set_type
+ 
+         super(AddressTypeForm, self).__init__(*args, **kwargs)
+ 
+         if type_choices is not None:
+             _choices = const.BLANK_CHOICES + type_choices
+         else:
+             _choices = const.BLANK_CHOICES + const.ADDRESS_TYPE.CHOICES
+ 
+         self.fields['type'] = forms.ChoiceField(required=(type_required and address_required),
+                                                 label="Address type",
+                                                 choices=_choices)
+ 
+         if set_type is not None:
+             self.fields['type'].widget = forms.HiddenInput()
+ 
+ class AddressForm(AddressTypeForm):
+     "Address information for a user."
+ 
+     def __init__(self, *args, **kwargs):
+         self.address_required = kwargs.get('address_required', True)
+         self.soft_required = kwargs.pop("soft_required", False)
+         country_required = kwargs.pop("country_required", True)
+         line_1_required = kwargs.pop("line_1_required", True)
+         show_organization = kwargs.pop('show_organization', True)
+         super(AddressForm, self).__init__(*args, **kwargs)
+ 
+         self.fields['country'] = forms.ChoiceField(
+             required=(country_required and self.address_required),
+             choices=const.BLANK_CHOICES + da.common.country_choices)
+         self.fields['country'].widget.attrs.update({'autocomplete': 'country',
+                                                     'class': 'form-country-selection'})
+ 
+         if show_organization:
+             self.fields['organization'] = forms.CharField(
+                 max_length=75,
+                 label='Organization',
+                 required=False,
+                 help_text="Dorm Room, Mailstop, Mailservice, etc",
+                 widget=forms.TextInput(attrs={'autocomplete': 'organization'}))
+ 
+         self.fields['line_1'] = forms.CharField(
+             required=(line_1_required and self.address_required),
+             max_length=75,
+             label="Address Line 1",
+             help_text="Street address or post office box",
+             widget=forms.TextInput(attrs={'autocomplete': 'address-line1'})
+         )
+         self.fields['line_2'] = forms.CharField(
+             max_length=75,
+             required=False,
+             label="Address Line 2",
+             help_text="Apartment Building, Unit, Floor, Suite, etc",
+             widget=forms.TextInput(attrs={'autocomplete': 'address-line2'}))
+         self.fields['city'] = forms.CharField(
+             max_length=50,
+             required=False,
+             widget=forms.TextInput(attrs={'autocomplete': 'address-level2'}))
+ 
+         if args:
+             if self.prefix:
+                 country = args[0].get('{0}-country'.format(self.prefix), None)
+             else:
+                 country = args[0].get('country', None)
+         elif 'initial' in kwargs:
+             country = kwargs['initial'].get('country')
+         else:
+             country = None
+         province_choices = PROVINCE_CHOICES_MAP.get(country)
+         if province_choices:
+             choices = const.BLANK_CHOICES + province_choices
+             self.fields['state_prov'] = forms.ChoiceField(
+                 choices=choices,
+                 label='State/Prov',
+                 required=False)
+         else:
+             self.fields['state_prov'] = forms.CharField(
+                 max_length=50,
+                 label='State/Prov',
+                 required=False)
+         self.fields['state_prov'].widget.attrs.update({'autocomplete': 'address-level1'})
+ 
+         self.fields['zip_postal'] = forms.CharField(
+                 max_length=10,
+                 label='Zip/Postal',
+                 required=False)
+         self.fields['zip_postal'].widget.attrs.update({'autocomplete': 'postal-code'})
+         if country in COUNTRIES_WITH_MANAGED_PROVINCES:
+             self.fields['state_prov'].required=True
+             self.fields['zip_postal'].required=True
+             self.fields['city'].required=True
+ 
+     def display_data(self):
+         "Compress form data into a concise text display. Useful for printing."
+ 
+         fields = ''
+         data = self.initial or self.data or {}
+         if data.get('type'):
+             fields = data['type'] + ": "
+         # TODO: shouldn't rely on initial, although safe for our current use.
+         # Refactor this when ticket 10427 lands
+         fields += ', '.join(filter(None, (
+             data.get('line_1'),
+             data.get('line_2'),
+             data.get('city'),
+             data.get('state_prov'),
+             attempt_title(data.get('country')),
+             )))
+         return formutils.display_data(label='Address', data=fields)
+ 
+     def clean_country(self):
+         "Validate country value."
+         data = self.cleaned_data['country'].strip()
+         if data == "---":
+             raise forms.ValidationError("This field is required.")
+         return data
+ 
+     def clean_organization(self):
+         "Clean organization."
+         # Do not use attempt title here as many organizations are acronyms; title if all lowercase
+         data = self.cleaned_data['organization'].strip()
+         if data.lower() == data:
+             data = data.title()
+         return data
+ 
+     def clean_line_1(self):
+         "Normalize case if input is all upper/lower"
+         data = self.cleaned_data['line_1'].strip()
+         return attempt_title(data)
+ 
+     def clean_line_2(self):
+         "Normalize case if input is all upper/lower"
+         data = self.cleaned_data['line_2'].strip()
+         return attempt_title(data)
+ 
+     def clean_city(self):
+         "Return line 2, normalizing case if input is all upper/lower"
+         data = self.cleaned_data['city'].strip()
+         return attempt_title(data)
+ 
+     def clean_state_prov(self):
+         "Strip whitespace."
+         return self.cleaned_data['state_prov'].strip()
+ 
+     def clean_zip_postal(self):
+         "Uppercase zip and postal codes."
+         return self.cleaned_data['zip_postal'].strip().upper()
+ 
+     def clean(self):
+         "Perform country specific validation."
+         cleaned_data = self.cleaned_data
+ 
+         # the address is not required, and cleaned data is empty (i.e. they didn't enter data in
+         # address fields) then don't validate the form.
+         if not self.address_required and not cleaned_data.values():
+             return cleaned_data
+ 
+         if all((not self.soft_required, filter(None, cleaned_data.values()))):
+             for field_name in ('type', 'country', 'line_1'):
+                 if not cleaned_data.get(field_name):
+                     self._errors[field_name] = ErrorList(["This field is required."])
+ 
+         country = cleaned_data.get('country','').upper()
+         if country in COUNTRIES_WITH_MANAGED_PROVINCES:
+             city_required = True
+             state_required = True
+             zip_required = True
+         else:
+             city_required = False
+             state_required = False
+             zip_required = False
+ 
+         # TODO: This should probably be live as a constant
+         zip_regex_dict = {
+             COUNTRY.UNITED_STATES: re.compile(r'(^\d{5}$)|(^\d{5}-\d{4}$)'),
+             COUNTRY.AUSTRALIA: re.compile(r'(^\d{4}$)'),
+             COUNTRY.CANADA: re.compile(r'^[A-Z]\d[A-Z] ?\d[A-Z]\d$'),
+             }
+ 
+         city = cleaned_data.get('city','')
+         state = cleaned_data.get('state_prov','')
+         if state == PROVINCE_SEPERATOR_VALUE:
+             state = ""
+ 
+         # If state_prov is not governed by a select input, attempt title on the input
+         if state and (country.upper() not in COUNTRIES_WITH_MANAGED_PROVINCES):
+             state = attempt_title(state)
+             self.cleaned_data['state_prov'] = state
+ 
+         zip_postal = cleaned_data.get('zip_postal','')
+         if not self.soft_required:
+             required_error = ErrorList(['This field is required for %s addresses.'
+                 % attempt_title(country)])
+             if city_required and not city:
+                 self._errors['city'] = required_error
+             if state_required and not state:
+                 self._errors['state_prov'] = required_error
+             if zip_required and not zip_postal:
+                 self._errors['zip_postal'] = required_error
+ 
+         if zip_postal:
+             zip_regex = zip_regex_dict.get(country)
+             if zip_regex:
+                 zip_postal = zip_postal.replace(' ', '')
+                 if zip_regex.match(zip_postal):
+                     if country == COUNTRY.CANADA and len(zip_postal) == 6:
+                         zip_postal = "%s %s" % (zip_postal[:3], zip_postal[3:])
+                     cleaned_data['zip_postal'] = zip_postal
+                 else:
+                     self._errors['zip_postal'] = ErrorList(["Invalid zip/postal."])
+                     del cleaned_data['zip_postal']
+ 
+         addr_block_len = 0
+         for addr_block_field in ('organization', 'line_2', 'line_1'):
+             addr_data = cleaned_data.get(addr_block_field)
+             if addr_data:
+                 if addr_block_field in ('line_2', 'line_1') and addr_block_len > 0:
+                     addr_block_len += 2
+                 addr_block_len += len(addr_data)
+         if addr_block_len > 150:
+             raise forms.ValidationError("Combined length of Organization Name,"
+                 " Line 1, and Line 2 must be shortened by %s characters."
+                 % (addr_block_len - 150))
+ 
+         return cleaned_data
+ 
+ class EmploymentHistoryForm(forms.Form):
+     "Form for gathering current employment information"
+ 
+     def __init__(self, *args, **kwargs):
+         org_name_required = kwargs.pop('org_name_required', True)
+         title_required = kwargs.pop('title_required', True)
+         industry_required = kwargs.pop('industry_required', True)
+         industry_choices = kwargs.pop('industry_choices', const.INDUSTRY.CHOICES)
+         self.soft_required = kwargs.pop('soft_required', False)
+ 
+         super(EmploymentHistoryForm, self).__init__(*args, **kwargs)
+ 
+         self.fields['organization_name'] = forms.CharField(max_length=50,
+             required=org_name_required)
+         self.fields['title'] = forms.CharField(max_length=40, required=title_required)
+         self.fields['industry'] = forms.ChoiceField(required=industry_required,
+             choices=const.BLANK_CHOICES + industry_choices)
+ 
+     def clean(self):
+         "Ensure that a value for C{organization_name} is provided if any other field has a value."
+         data = self.cleaned_data
+         if not self.soft_required:
+             if any((data.get('title'),
+                     data.get('industry')
+                   )) and not data.get('organization_name'):
+                 self._errors['organization_name'] = ErrorList(
+                     ["This field is required when values for other employment"
+                      " fields are provided."])
+         return data
+ 
+     def display_data(self):
+         "Compress form data into a concise text display. Useful for printing."
+         # TOODO: shouldn't rely on initial, although safe for our current use.
+         # Refactor this when ticket 10427 lands
+         data = self.initial or self.data or {}
+         org = data.get('organization_name')
+         title = data.get('title')
+         industry = data.get('industry')
+ 
+         fields = ', '.join(filter(None, (org, title)))
+         label = 'Organization'
+         if title:
+             label += ', Title'
+         if industry:
+             fields += ' (%s)' % industry
+             label += ' (Industry)'
+         return formutils.display_data(label=label, data=fields)
+ 
+ class EmailAddressForm(forms.Form):
+     "Form for collecting an email address."
+ 
+     def __init__(self, *args, **kwargs):
+         email_address_required = kwargs.pop("email_address_required", True)
+         self.ask_twice_to_verify = kwargs.pop("ask_twice_to_verify", False)
+         super(EmailAddressForm, self).__init__(*args, **kwargs)
+ 
+         max_length = 100
+         input_size = 50
+ 
+         self.fields['email_address'] = forms.EmailField(
+             required=email_address_required, max_length=max_length,
+             widget=forms.TextInput(attrs={'size': input_size}))
+ 
+         if self.ask_twice_to_verify:
+             self.fields['email_address2'] = forms.EmailField(
+                 label="Verify email",
+                 help_text="Please verify we have your correct email address.",
+                 required=email_address_required, max_length=max_length,
+                 widget=forms.TextInput(attrs={'size': input_size}))
+ 
+     def clean_email_address(self):
+         data = self.cleaned_data['email_address']
+         return data.lower()
+ 
+     def clean(self):
+         data = self.cleaned_data
+         if self.ask_twice_to_verify:
+             if 'email_address' in data and 'email_address2' in data:
+                 email = data['email_address'].lower().strip()
+                 email2 = data['email_address2'].lower().strip()
+                 if email2 != email:
+                     raise forms.ValidationError('You must type the same email address each time.')
+         return data
+ 
+ class EntityEmailAddressForm(EmailAddressForm):
+     "Form for adding or editing entity email records."
+     def __init__(self, user, existing_email_id, proxy_entity_id=None, *args, **kwargs):
+         allow_status_edit = kwargs.pop("allow_status_edit", False)
+         super(EntityEmailAddressForm, self).__init__(*args, **kwargs)
+         if allow_status_edit:
+             self.fields = OrderedDict(
+                 [('status', forms.ChoiceField(
+                     choices=[(value, value) for value in da.common.email_status_types]
+                 ))] + self.fields.items()
+             )
+         else:
+             self.fields = OrderedDict(
+                 [('status', ReadonlyField())] + self.fields.items()
+             )
+         self._user = user
+         self._existing_email_id = existing_email_id
+         self._proxy_entity_id = proxy_entity_id
+ 
+     def clean_email_address(self):
+         "Normalize email address."
+         email_address = self.cleaned_data['email_address'].strip().lower()
+ 
+         entity_id = self._proxy_entity_id or self._user.entity_id
+         email_list = da.entity.get_email_addresses_for_entity_id(entity_id)
+         for email_item in email_list:
+             if email_item.id == self._existing_email_id:
+                 continue
+             elif email_item.email_address == email_address:
+                 raise forms.ValidationError("Email address already exists")
+ 
+         return email_address
+ 
+ class ContactForm(forms.Form):
+     """Form used by client applications to select address/phone/email.
+ 
+     Must be used in conjunction with @connect_required() decorator."""
+ 
+     def __init__(self, request, user, *args, **kwargs):
+         "Contact form constructor"
+         assert user
+         prefix = kwargs["prefix"]
+         # We might not get a proxy_entity_id and if we do, it might be an empty string
+         proxy_entity_str = kwargs.pop('proxy_entity_id') if 'proxy_entity_id' in kwargs else None
+         proxy_entity_id = int(proxy_entity_str) if proxy_entity_str else None
+         show_fields = kwargs.pop('show_fields', ("email", "address", "phone"))
+         assert set(show_fields).issubset(set(("address", "phone", "email")))
+         when_finished_desc = kwargs.pop('when_finished_desc','')
+         address_label = kwargs.pop('address_label', 'Address')
+         phone_label = kwargs.pop('phone_label', 'Phone')
+         email_label = kwargs.pop('email_label', 'Email')
+         address_status = kwargs.pop('address_status', ())
+         if not isinstance(address_status, (tuple, list)):
+             address_status = (address_status,)
+ 
+         initial = kwargs.setdefault("initial", {})
+         if proxy_entity_id:
+             entity = da.entity.get_entity(proxy_entity_id)
+         elif user:
+             entity = user.entity
+         else:
+             raise Exception("No Entity?")
+             entity = None
+ 
+         blank_choice = [const.BLANK_CHOICE]
+ 
+         when_finished_str = "".join((request.path, '#contact_info_', prefix))
+         get_vars = {
+             const.CONTACT_INFO_REQ_VAR.WHEN_FINISHED: when_finished_str,
+             const.CONTACT_INFO_REQ_VAR.WHEN_FINISHED_DESC: when_finished_desc,
+             const.CONTACT_INFO_REQ_VAR.NAMESPACE: prefix,
+             const.CONTACT_INFO_REQ_VAR.CONTEXT: const.CONTACT_INFO_CONTEXT.CHOOSE_CONTACT_ITEM,
+             }
+         query_str = '?' + urllib.urlencode(get_vars)
+         get_vars.update({const.CONTACT_INFO_REQ_VAR.NEW_CONTACT_ITEM: True})
+         query_str_new = '?' + urllib.urlencode(get_vars)
+ 
+         fields = {}
+         for field_name in show_fields:
+             # Do field type specific stuff
+ 
+             if field_name == "address":
+                 label = address_label
+                 choices = list(blank_choice) #IMPORTANT: Make copy
+                 for item in entity.addresses:
+                     add = False
+                     if address_status:
+                         if item.status in address_status:
+                             add = True
+                     elif item.is_status_current:
+                         add = True
+                     if add:
+                         choices.append((unicode(item.id), item.display))
+                 edit_url_name = "account_addresses"
+ 
+             elif field_name == "phone":
+                 label = phone_label
+                 choices = blank_choice + [
+                     ('%s-%s' % (p.id, p.phone_id), p.display)
+                     for p in entity.phone_numbers if p.is_status_current]
+                 edit_url_name = "account_phones"
+ 
+             elif field_name == "email":
+                 label = email_label
+                 choices = blank_choice + \
+                           [(unicode(e.id), e.email_address) for e in entity.email_addresses if e.is_status_current]
+                 edit_url_name = "account_emails"
+ 
+             else:
+                 label = ""
+                 edit_url_name = ""
+                 choices = list(blank_choice)
+ 
+             # Do stuff common to all field types
+             field_id_name = field_name + "_id"
+ 
+             # Try to set the initial value from the following
+             # locations (use the first one found):
+             #     session data
+             #     initial data
+             #     value of only item in list
+             field_sess_key = utils.build_contact_info_session_key(prefix, field_id_name)
+             proxy_entity_key = const.CONTACT_INFO_SESS_PREFIX + 'proxy_entity_id'
+             request.session[proxy_entity_key] = proxy_entity_id
+             if field_sess_key in request.session:
+                 initial[field_id_name] = request.session[field_sess_key]
+             elif (field_id_name not in initial) and len(choices) == 2:
+                 initial[field_id_name] = choices[1][0]
+ 
+             # Build the field
+             field = forms.ChoiceField(label=label, choices=choices)
+ 
+             # Add some magic attributes that our standard form layout
+             # uses to to add links after the form control.
+             if len(choices) > 1:
+                 field.link_url = reverse(edit_url_name) + query_str
+                 field.link_text = "Edit"
+             else:
+                 field.link_url = reverse("new_" + field_name) + query_str_new
+                 field.link_text = "Add %s" % field_name.title()
+ 
+             # Store the field for later
+             # (after the call to the superclass __init__ creates self.fields).
+             fields[field_name] = field
+ 
+         super(ContactForm, self).__init__(*args, **kwargs)
+ 
+         for field_name in show_fields:
+             self.fields[field_name + "_id"] = fields[field_name]
+             self.fields[field_name + "_id"].widget.attrs.update({'class': 'hide_when_empty'})
+ 
+ 
+ class DateBasedStatusForm(forms.Form):
+     "Form to take start and end dates that will be used for status"
+     start_date = forms.DateField(required=False)
+     end_date = forms.DateField(required=False)
+ 
+     def clean(self):
+         "Validate dates."
+         data = self.cleaned_data
+         start_date = data.get('start_date')
+         end_date = data.get('end_date')
+ 
+         if start_date and end_date and start_date > end_date:
+             raise forms.ValidationError('Start date cannot be greater than End date')
+ 
+         return data
+ 
+ 
+ class RelationshipTypeForm(forms.Form):
+     "Form to collect relationship type."
+ 
+     def __init__(self, *args, **kwargs):
+         type_choices = kwargs.pop("type_choices")
+         type_label = kwargs.pop("type_label", "Relationship type")
+         follow_text = kwargs.pop("follow_text")
+         super(RelationshipTypeForm, self).__init__(*args, **kwargs)
+         self.fields["relationship_type"] = forms.ChoiceField(label=type_label,
+                                                              choices=const.BLANK_CHOICES + type_choices)
+         self.fields["relationship_type"].follow_text = follow_text
+ 
+ 
+ class HoneyPotForm(forms.Form):
+     "A form to catch spam."
+     hp_field = forms.CharField(required=False, label='Leave this field blank.')
+ 
+     def clean_hp_field(self):
+         "Validate that the honey pot field is empty."
+         value = self.cleaned_data["hp_field"]
+         if value:
+             raise forms.ValidationError('You entered something in the honey pot.')
+         else:
+             return value
+ 
+ 
+ class NameChangeRequestAdminForm(forms.ModelForm):
+     def __init__(self, *args, **kwargs):
+         super(NameChangeRequestAdminForm, self).__init__(*args, **kwargs)
+ 
+         if 'instance' in kwargs:
+             self.fields['declination_reason'].help_text = u'Please type a sentence explaining why this request was ' \
+                                                           u'declined. What you type will be included in an email to ' \
+                                                           u'{first}.'.format(first=kwargs['instance'].first_name)
+         # Else Won't be triggered at this point since we disallow adding name change requests
+         # but doesn't hurt to check.
+         else:
+             self.fields['declination_reason'].help_text = 'Please type a sentence explaining why this request was ' \
+                                                           'declined. What you type will be included in an email to ' \
+                                                           'the person who made the request.'
+ 
+     def clean(self):
+         data = self.cleaned_data
+         if data['status'] == 'Declined' and data['declination_reason'] == '':
+             raise forms.ValidationError('You must enter an explanation when declining name change'
+                                         ' requests!')
+ 
+         return data

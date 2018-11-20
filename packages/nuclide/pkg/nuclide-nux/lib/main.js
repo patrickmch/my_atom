@@ -1,4 +1,4 @@
-'use strict';
+"use strict";
 
 Object.defineProperty(exports, "__esModule", {
   value: true
@@ -9,22 +9,34 @@ exports.provideRegisterNuxService = provideRegisterNuxService;
 exports.provideTriggerNuxService = provideTriggerNuxService;
 exports.consumeSyncCompletedNuxService = consumeSyncCompletedNuxService;
 
-var _UniversalDisposable;
+function _UniversalDisposable() {
+  const data = _interopRequireDefault(require("../../../modules/nuclide-commons/UniversalDisposable"));
 
-function _load_UniversalDisposable() {
-  return _UniversalDisposable = _interopRequireDefault(require('../../../modules/nuclide-commons/UniversalDisposable'));
+  _UniversalDisposable = function () {
+    return data;
+  };
+
+  return data;
 }
 
-var _NuxManager;
+function _NuxManager() {
+  const data = require("./NuxManager");
 
-function _load_NuxManager() {
-  return _NuxManager = require('./NuxManager');
+  _NuxManager = function () {
+    return data;
+  };
+
+  return data;
 }
 
-var _NuxStore;
+function _NuxStore() {
+  const data = require("./NuxStore");
 
-function _load_NuxStore() {
-  return _NuxStore = require('./NuxStore');
+  _NuxStore = function () {
+    return data;
+  };
+
+  return data;
 }
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
@@ -39,20 +51,20 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
  *  strict-local
  * @format
  */
-
 class Activation {
-
   constructor() {
-    this._disposables = new (_UniversalDisposable || _load_UniversalDisposable()).default();
-    this._nuxStore = new (_NuxStore || _load_NuxStore()).NuxStore();
-    this._nuxManager = new (_NuxManager || _load_NuxManager()).NuxManager(this._nuxStore, this._syncCompletedNux.bind(this));
+    this._disposables = new (_UniversalDisposable().default)();
+    this._nuxStore = new (_NuxStore().NuxStore)();
+    this._nuxManager = new (_NuxManager().NuxManager)(this._nuxStore, this._syncCompletedNux.bind(this));
 
     this._disposables.add(this._nuxStore);
+
     this._disposables.add(this._nuxManager);
   }
 
   dispose() {
     this._serializeAndPersist();
+
     this._disposables.dispose();
   }
 
@@ -76,8 +88,10 @@ class Activation {
     if (this._syncCompletedNuxService == null) {
       return;
     }
+
     this._syncCompletedNuxService(id);
   }
+
 }
 
 let activation = null;
@@ -100,9 +114,11 @@ function provideRegisterNuxService() {
     if (activation == null) {
       throw new Error('An error occurred when instantiating the NUX package.');
     }
+
     if (nux == null) {
       throw new Error('Cannot register a "null" NuxTour.');
     }
+
     return activation.addNewNux(nux);
   };
 }
@@ -112,13 +128,14 @@ function provideTriggerNuxService() {
     if (activation == null) {
       throw new Error('An error occurred when instantiating the NUX package.');
     }
+
     activation.tryTriggerNux(id);
   };
 }
 
 function consumeSyncCompletedNuxService(syncCompletedNuxService) {
   if (!(activation != null)) {
-    throw new Error('Invariant violation: "activation != null"');
+    throw new Error("Invariant violation: \"activation != null\"");
   }
 
   activation.setSyncCompletedNuxService(syncCompletedNuxService);

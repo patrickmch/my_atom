@@ -1,19 +1,23 @@
-'use strict';
+"use strict";
 
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.ResizableFlexContainerExamples = undefined;
+exports.ResizableFlexContainerExamples = void 0;
 
-var _react = _interopRequireWildcard(require('react'));
+var React = _interopRequireWildcard(require("react"));
 
-var _ResizableFlexContainer;
+function _ResizableFlexContainer() {
+  const data = require("./ResizableFlexContainer");
 
-function _load_ResizableFlexContainer() {
-  return _ResizableFlexContainer = require('./ResizableFlexContainer');
+  _ResizableFlexContainer = function () {
+    return data;
+  };
+
+  return data;
 }
 
-function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
+function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) { var desc = Object.defineProperty && Object.getOwnPropertyDescriptor ? Object.getOwnPropertyDescriptor(obj, key) : {}; if (desc.get || desc.set) { Object.defineProperty(newObj, key, desc); } else { newObj[key] = obj[key]; } } } } newObj.default = obj; return newObj; } }
 
 /**
  * Copyright (c) 2015-present, Facebook, Inc.
@@ -25,56 +29,34 @@ function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj;
  * 
  * @format
  */
+const ResizableFlexContainerExample = () => React.createElement("div", null, React.createElement("div", {
+  style: {
+    display: 'flex',
+    height: 100
+  }
+}, React.createElement(_ResizableFlexContainer().ResizableFlexContainer, {
+  direction: _ResizableFlexContainer().FlexDirections.HORIZONTAL
+}, React.createElement(_ResizableFlexContainer().ResizableFlexItem, {
+  initialFlexScale: 1
+}, "HORIZONTAL Content1 (1 flex scale)"), React.createElement(_ResizableFlexContainer().ResizableFlexItem, {
+  initialFlexScale: 0.5
+}, "HORIZONTAL Content2 (0.5 flex scale)"))), React.createElement("div", {
+  style: {
+    display: 'flex',
+    height: 200
+  }
+}, React.createElement(_ResizableFlexContainer().ResizableFlexContainer, {
+  direction: _ResizableFlexContainer().FlexDirections.VERTICAL,
+  flexScales: [0.5, 1, 0.5]
+}, React.createElement(_ResizableFlexContainer().ResizableFlexItem, {
+  initialFlexScale: 0.5
+}, "VERTICAL Content1 (0.5 flex scale)"), React.createElement(_ResizableFlexContainer().ResizableFlexItem, {
+  initialFlexScale: 1
+}, "VERTICAL Content2 (1 flex scale)"), React.createElement(_ResizableFlexContainer().ResizableFlexItem, {
+  initialFlexScale: 0.5
+}, "VERTICAL Content3 (0.5 flex scale)"))));
 
-const ResizableFlexContainerExample = () => _react.createElement(
-  'div',
-  null,
-  _react.createElement(
-    'div',
-    { style: { display: 'flex', height: 100 } },
-    _react.createElement(
-      (_ResizableFlexContainer || _load_ResizableFlexContainer()).ResizableFlexContainer,
-      { direction: (_ResizableFlexContainer || _load_ResizableFlexContainer()).FlexDirections.HORIZONTAL },
-      _react.createElement(
-        (_ResizableFlexContainer || _load_ResizableFlexContainer()).ResizableFlexItem,
-        { initialFlexScale: 1 },
-        'HORIZONTAL Content1 (1 flex scale)'
-      ),
-      _react.createElement(
-        (_ResizableFlexContainer || _load_ResizableFlexContainer()).ResizableFlexItem,
-        { initialFlexScale: 0.5 },
-        'HORIZONTAL Content2 (0.5 flex scale)'
-      )
-    )
-  ),
-  _react.createElement(
-    'div',
-    { style: { display: 'flex', height: 200 } },
-    _react.createElement(
-      (_ResizableFlexContainer || _load_ResizableFlexContainer()).ResizableFlexContainer,
-      {
-        direction: (_ResizableFlexContainer || _load_ResizableFlexContainer()).FlexDirections.VERTICAL,
-        flexScales: [0.5, 1, 0.5] },
-      _react.createElement(
-        (_ResizableFlexContainer || _load_ResizableFlexContainer()).ResizableFlexItem,
-        { initialFlexScale: 0.5 },
-        'VERTICAL Content1 (0.5 flex scale)'
-      ),
-      _react.createElement(
-        (_ResizableFlexContainer || _load_ResizableFlexContainer()).ResizableFlexItem,
-        { initialFlexScale: 1 },
-        'VERTICAL Content2 (1 flex scale)'
-      ),
-      _react.createElement(
-        (_ResizableFlexContainer || _load_ResizableFlexContainer()).ResizableFlexItem,
-        { initialFlexScale: 0.5 },
-        'VERTICAL Content3 (0.5 flex scale)'
-      )
-    )
-  )
-);
-
-const ResizableFlexContainerExamples = exports.ResizableFlexContainerExamples = {
+const ResizableFlexContainerExamples = {
   sectionName: 'ResizableFlexContainer',
   description: 'Flex container to host resizable elements',
   examples: [{
@@ -82,3 +64,4 @@ const ResizableFlexContainerExamples = exports.ResizableFlexContainerExamples = 
     component: ResizableFlexContainerExample
   }]
 };
+exports.ResizableFlexContainerExamples = ResizableFlexContainerExamples;

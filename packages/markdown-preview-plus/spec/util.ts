@@ -93,18 +93,67 @@ export async function expectPreviewInSplitPane() {
 
 export async function previewText(preview: MarkdownPreviewView) {
   return preview.runJS<string>(
-    `document.querySelector('markdown-preview-plus-view > div').innerText`,
+    `document.querySelector('body > div.update-preview').innerText`,
   )
 }
 
 export async function previewHTML(preview: MarkdownPreviewView) {
   return preview.runJS<string>(
-    `document.querySelector('markdown-preview-plus-view > div').innerHTML`,
+    `document.querySelector('body > div.update-preview').innerHTML`,
   )
 }
 
-export async function previewFragment(preview: MarkdownPreviewView) {
-  const html = await previewHTML(preview)
+export async function previewHeadHTML(preview: MarkdownPreviewView) {
+  return preview.runJS<string>(
+    `document.querySelector('head > original-elements').innerHTML`,
+  )
+}
+
+export async function previewFragment(
+  preview: MarkdownPreviewView,
+  func = previewHTML,
+) {
+  const html = await func(preview)
   const dom = new DOMParser()
   return dom.parseFromString(html, 'text/html')
+}
+
+declare module 'atom' {
+  interface PackageManager {
+    loadPackage(path: string): Package
+  }
+}
+
+import * as path from 'path'
+import { Package } from 'atom'
+export async function activateMe(): Promise<Package> {
+  const pkg = atom.packages.loadPackage(path.join(__dirname, '..'))
+  // TODO: Hack to work around Atom issue with fsevents
+  // tslint:disable-next-line:totality-check
+  if (process.platform === 'darwin') pkg.isCompatible = () => true
+  return atom.packages.activatePackage(pkg.name)
+}
+
+import * as sinon from 'sinon'
+export function stubClipboard() {
+  const result: { stub?: sinon.SinonStub; contents: string } = {
+    stub: undefined,
+    contents: '',
+  }
+  const clipboard = require('../lib/clipboard')
+  before(function() {
+    result.stub = sinon
+      .stub(clipboard, 'write')
+      .callsFake(function(arg: { text: string }) {
+        result.contents = arg.text
+      })
+  })
+  after(function() {
+    result.stub && result.stub.restore()
+  })
+  afterEach(function() {
+    result.contents = ''
+    result.stub && result.stub.resetHistory()
+  })
+  return result
 }

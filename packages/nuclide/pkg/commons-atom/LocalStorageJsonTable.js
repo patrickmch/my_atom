@@ -1,18 +1,33 @@
-'use strict';
+"use strict";
 
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.LocalStorageJsonTable = undefined;
+exports.LocalStorageJsonTable = void 0;
 
-var _observable;
+function _observable() {
+  const data = require("../../modules/nuclide-commons/observable");
 
-function _load_observable() {
-  return _observable = require('../../modules/nuclide-commons/observable');
+  _observable = function () {
+    return data;
+  };
+
+  return data;
 }
 
-class LocalStorageJsonTable {
+/**
+ * Copyright (c) 2015-present, Facebook, Inc.
+ * All rights reserved.
+ *
+ * This source code is licensed under the license found in the LICENSE file in
+ * the root directory of this source tree.
+ *
+ * 
+ * @format
+ */
 
+/* global localStorage */
+class LocalStorageJsonTable {
   constructor(localStorageKey, cacheSize = 100) {
     this._localStorageKey = localStorageKey;
     this._cacheSize = cacheSize;
@@ -22,21 +37,24 @@ class LocalStorageJsonTable {
     if (this._db == null) {
       const json = localStorage.getItem(this._localStorageKey);
       let db;
+
       if (json != null && json !== '') {
         try {
           db = JSON.parse(json);
         } catch (err) {}
       }
-      this._db = Array.isArray(db) ? db : [];
-      // Clear the cache after this frame. We have to do this because other windows might be
+
+      this._db = Array.isArray(db) ? db : []; // Clear the cache after this frame. We have to do this because other windows might be
       // interacting with the database too.
+
       if (this._clearCacheSubscription == null) {
-        this._clearCacheSubscription = (_observable || _load_observable()).nextAnimationFrame.subscribe(() => {
+        this._clearCacheSubscription = _observable().nextAnimationFrame.subscribe(() => {
           this._db = null;
           this._clearCacheSubscription = null;
         });
       }
     }
+
     return this._db;
   }
 
@@ -48,39 +66,42 @@ class LocalStorageJsonTable {
 
   setItem(key, value) {
     let db = this._open();
-    const matchIndex = db.findIndex(({ key: k }) => k === key);
+
+    const matchIndex = db.findIndex(({
+      key: k
+    }) => k === key);
+
     if (matchIndex !== -1) {
-      const previousValue = db[matchIndex].value;
-      // No reason to drop and re-push the most recent value
+      const previousValue = db[matchIndex].value; // No reason to drop and re-push the most recent value
+
       if (value === previousValue && matchIndex === db.length - 1) {
         return;
       }
+
       db.splice(matchIndex, 1);
     }
-    db.push({ key, value });
+
+    db.push({
+      key,
+      value
+    });
     db = db.slice(-this._cacheSize);
     localStorage.setItem(this._localStorageKey, JSON.stringify(db));
   }
 
   getItem(key) {
     const db = this._open();
-    const entry = db.find(({ key: k }) => key === k);
+
+    const entry = db.find(({
+      key: k
+    }) => key === k);
     return entry == null ? null : entry.value;
   }
 
   getEntries() {
     return this._open().slice();
   }
-}
-exports.LocalStorageJsonTable = LocalStorageJsonTable; /**
-                                                        * Copyright (c) 2015-present, Facebook, Inc.
-                                                        * All rights reserved.
-                                                        *
-                                                        * This source code is licensed under the license found in the LICENSE file in
-                                                        * the root directory of this source tree.
-                                                        *
-                                                        * 
-                                                        * @format
-                                                        */
 
-/* global localStorage */
+}
+
+exports.LocalStorageJsonTable = LocalStorageJsonTable;

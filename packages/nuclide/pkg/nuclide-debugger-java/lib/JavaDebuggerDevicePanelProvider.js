@@ -1,39 +1,52 @@
-'use strict';
+"use strict";
 
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.JavaDebuggerDevicePanelProvider = undefined;
+exports.JavaDebuggerDevicePanelProvider = void 0;
 
-var _UniversalDisposable;
+function _nuclideDebuggerCommon() {
+  const data = require("../../../modules/nuclide-debugger-common");
 
-function _load_UniversalDisposable() {
-  return _UniversalDisposable = _interopRequireDefault(require('../../../modules/nuclide-commons/UniversalDisposable'));
+  _nuclideDebuggerCommon = function () {
+    return data;
+  };
+
+  return data;
 }
 
-var _nuclideDebuggerCommon;
+var _rxjsCompatUmdMin = require("rxjs-compat/bundles/rxjs-compat.umd.min.js");
 
-function _load_nuclideDebuggerCommon() {
-  return _nuclideDebuggerCommon = require('../../../modules/nuclide-debugger-common');
+function _debugger() {
+  const data = require("../../../modules/nuclide-commons-atom/debugger");
+
+  _debugger = function () {
+    return data;
+  };
+
+  return data;
 }
 
-var _rxjsBundlesRxMinJs = require('rxjs/bundles/Rx.min.js');
-
-var _debugger;
-
-function _load_debugger() {
-  return _debugger = require('../../../modules/nuclide-commons-atom/debugger');
-}
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-async function _createAndroidDebugAttachConfig(targetUri, device, pid) {
+/**
+ * Copyright (c) 2015-present, Facebook, Inc.
+ * All rights reserved.
+ *
+ * This source code is licensed under the license found in the LICENSE file in
+ * the root directory of this source tree.
+ *
+ *  strict-local
+ * @format
+ */
+function _createAndroidDebugAttachConfig(targetUri, device, proc) {
   const config = {
     deviceAndProcess: {
-      device,
+      // See pkg/nuclide-device-panel-android/lib/Registration.js to see why
+      // serial and identifier are interchangeable
+      deviceSerial: device.identifier,
       selectedProcess: {
-        pid,
-        name: ''
+        user: proc.user,
+        pid: String(proc.pid),
+        name: proc.name
       }
     },
     adbServiceUri: targetUri
@@ -41,26 +54,11 @@ async function _createAndroidDebugAttachConfig(targetUri, device, pid) {
   return {
     targetUri,
     debugMode: 'attach',
-    adapterType: (_nuclideDebuggerCommon || _load_nuclideDebuggerCommon()).VsAdapterTypes.JAVA_ANDROID,
-    adapterExecutable: null,
+    adapterType: _nuclideDebuggerCommon().VsAdapterTypes.JAVA_ANDROID,
     config,
-    capabilities: { threads: true },
-    properties: {
-      customControlButtons: [],
-      threadsComponentTitle: 'Threads'
-    },
-    customDisposable: new (_UniversalDisposable || _load_UniversalDisposable()).default()
+    processName: 'Process ' + proc.pid + ' (Android Java ' + device.displayName + ')'
   };
-} /**
-   * Copyright (c) 2015-present, Facebook, Inc.
-   * All rights reserved.
-   *
-   * This source code is licensed under the license found in the LICENSE file in
-   * the root directory of this source tree.
-   *
-   *  strict-local
-   * @format
-   */
+}
 
 class JavaDebuggerDevicePanelProvider {
   constructor() {}
@@ -74,7 +72,7 @@ class JavaDebuggerDevicePanelProvider {
   }
 
   getSupportedPIDs(host, device, procs) {
-    return _rxjsBundlesRxMinJs.Observable.of(new Set(procs.filter(proc => proc.isJava).map(proc => proc.pid)));
+    return _rxjsCompatUmdMin.Observable.of(new Set(procs.filter(proc => proc.isJava).map(proc => proc.pid)));
   }
 
   getName() {
@@ -82,9 +80,13 @@ class JavaDebuggerDevicePanelProvider {
   }
 
   async run(host, device, proc) {
-    const debuggerService = await (0, (_debugger || _load_debugger()).getDebuggerService)();
-    const config = await _createAndroidDebugAttachConfig(host, device, proc.pid);
+    const debuggerService = await (0, _debugger().getDebuggerService)();
+
+    const config = _createAndroidDebugAttachConfig(host, device, proc);
+
     debuggerService.startVspDebugging(config);
   }
+
 }
+
 exports.JavaDebuggerDevicePanelProvider = JavaDebuggerDevicePanelProvider;

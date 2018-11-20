@@ -4,7 +4,6 @@
   "version": "0.0.0",
   "description": "Metro (JavaScript bundler) Atom-side package",
   "author": "NEEDS OWNER",
-  "atomTestRunner": "../../lib/test-runner-entry.js",
   "nuclide": {
     "configMetadata": {
       "pathComponents": [
@@ -12,13 +11,12 @@
         "React Native"
       ]
     },
-    "packageType": "Atom",
-    "testRunner": "apm"
+    "packageType": "AtomPackage"
   },
   "consumedServices": {
-    "DEPRECATED-nuclide-output": {
+    "console": {
       "versions": {
-        "0.0.0": "consumeOutputService"
+        "0.1.0": "consumeConsole"
       }
     },
     "nuclide-current-working-directory": {

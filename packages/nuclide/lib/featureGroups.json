@@ -16,6 +16,7 @@
     "atom-ide-diagnostics",
     "atom-ide-diagnostics-ui",
     "atom-ide-find-references",
+    "atom-ide-refactor",
     "atom-ide-global",
     "atom-ide-outline-view",
     "atom-ide-signature-help",
@@ -32,12 +33,12 @@
     "nuclide-code-search",
     "nuclide-context-view",
     "nuclide-debugger-vsp",
+    "nuclide-debugger-prepack",
     "nuclide-deep-link",
     "nuclide-definition-preview",
     "nuclide-definition-preview-provider",
     "nuclide-deprecation-cop",
     "nuclide-diagnostics-extras",
-    "nuclide-diff-gutters",
     "nuclide-distraction-free-mode",
     "nuclide-file-family",
     "nuclide-file-family-projectionist",
@@ -51,6 +52,7 @@
     "nuclide-infer-al",
     "nuclide-json",
     "nuclide-key-binding-hint-status",
+    "nuclide-language-service-client",
     "nuclide-language-status",
     "nuclide-move-item-to-available-pane",
     "nuclide-navigation-stack",
@@ -63,8 +65,7 @@
     "nuclide-quick-open",
     "nuclide-recent-files-provider",
     "nuclide-recent-files-service",
-    "nuclide-refactorizer",
-    "nuclide-related-files",
+    "nuclide-scrollbar-style-fix",
     "nuclide-settings",
     "nuclide-ssh-tunnel",
     "nuclide-syntactic-selection",
@@ -95,7 +96,6 @@
   ],
   "android": [
     "nuclide-adb-logcat",
-    "nuclide-adb-sdb",
     "nuclide-buck",
     "nuclide-debugger-native",
     "nuclide-device-panel",
@@ -104,11 +104,9 @@
   "cpp": [
     "nuclide-clang",
     "nuclide-clang-base",
-    "nuclide-cquery-lsp",
     "nuclide-ctags"
   ],
   "flow": ["nuclide-flow"],
-  "graphql": ["nuclide-graphql"],
   "hack": [
     "nuclide-css-lsp-client",
     "nuclide-debugger-php",
@@ -154,7 +152,6 @@
   ],
   "objc": [
     "nuclide-clang",
-    "nuclide-cquery-lsp",
     "nuclide-ctags",
     "nuclide-objc"
   ],

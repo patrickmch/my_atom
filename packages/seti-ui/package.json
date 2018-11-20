@@ -2,39 +2,39 @@
   "_args": [
     [
       {
-        "raw": "/private/var/folders/dp/vj05cwss7pz9mjl62ccqzysm0000gp/T/d-11815-48028-1c0o3lr.5o4v6uhaor/package.tgz",
+        "raw": "/private/var/folders/dp/vj05cwss7pz9mjl62ccqzysm0000gp/T/d-11876-24943-ivq14d.l2g7ujtt9/package.tgz",
         "scope": null,
         "escapedName": null,
         "name": null,
-        "rawSpec": "/private/var/folders/dp/vj05cwss7pz9mjl62ccqzysm0000gp/T/d-11815-48028-1c0o3lr.5o4v6uhaor/package.tgz",
-        "spec": "/private/var/folders/dp/vj05cwss7pz9mjl62ccqzysm0000gp/T/d-11815-48028-1c0o3lr.5o4v6uhaor/package.tgz",
+        "rawSpec": "/private/var/folders/dp/vj05cwss7pz9mjl62ccqzysm0000gp/T/d-11876-24943-ivq14d.l2g7ujtt9/package.tgz",
+        "spec": "/private/var/folders/dp/vj05cwss7pz9mjl62ccqzysm0000gp/T/d-11876-24943-ivq14d.l2g7ujtt9/package.tgz",
         "type": "local"
       },
-      "/private/var/folders/dp/vj05cwss7pz9mjl62ccqzysm0000gp/T/apm-install-dir-11815-48028-1wxpvs7.5a1zepzaor"
+      "/private/var/folders/dp/vj05cwss7pz9mjl62ccqzysm0000gp/T/apm-install-dir-11876-24943-3wpkyu.p4ydzyf1or"
     ]
   ],
-  "_from": "../d-11815-48028-1c0o3lr.5o4v6uhaor/package.tgz",
-  "_id": "seti-ui@1.10.0",
+  "_from": "../d-11876-24943-ivq14d.l2g7ujtt9/package.tgz",
+  "_id": "seti-ui@1.11.0",
   "_inCache": true,
   "_location": "/seti-ui",
   "_phantomChildren": {},
   "_requested": {
-    "raw": "/private/var/folders/dp/vj05cwss7pz9mjl62ccqzysm0000gp/T/d-11815-48028-1c0o3lr.5o4v6uhaor/package.tgz",
+    "raw": "/private/var/folders/dp/vj05cwss7pz9mjl62ccqzysm0000gp/T/d-11876-24943-ivq14d.l2g7ujtt9/package.tgz",
     "scope": null,
     "escapedName": null,
     "name": null,
-    "rawSpec": "/private/var/folders/dp/vj05cwss7pz9mjl62ccqzysm0000gp/T/d-11815-48028-1c0o3lr.5o4v6uhaor/package.tgz",
-    "spec": "/private/var/folders/dp/vj05cwss7pz9mjl62ccqzysm0000gp/T/d-11815-48028-1c0o3lr.5o4v6uhaor/package.tgz",
+    "rawSpec": "/private/var/folders/dp/vj05cwss7pz9mjl62ccqzysm0000gp/T/d-11876-24943-ivq14d.l2g7ujtt9/package.tgz",
+    "spec": "/private/var/folders/dp/vj05cwss7pz9mjl62ccqzysm0000gp/T/d-11876-24943-ivq14d.l2g7ujtt9/package.tgz",
     "type": "local"
   },
   "_requiredBy": [
     "#USER"
   ],
-  "_resolved": "file:../d-11815-48028-1c0o3lr.5o4v6uhaor/package.tgz",
-  "_shasum": "1e57838981d19e24f2f062419268e6aa0f61c9a9",
+  "_resolved": "file:../d-11876-24943-ivq14d.l2g7ujtt9/package.tgz",
+  "_shasum": "dde74a99aeba1d80816fb40544445d39d7c6e043",
   "_shrinkwrap": null,
-  "_spec": "/private/var/folders/dp/vj05cwss7pz9mjl62ccqzysm0000gp/T/d-11815-48028-1c0o3lr.5o4v6uhaor/package.tgz",
-  "_where": "/private/var/folders/dp/vj05cwss7pz9mjl62ccqzysm0000gp/T/apm-install-dir-11815-48028-1wxpvs7.5a1zepzaor",
+  "_spec": "/private/var/folders/dp/vj05cwss7pz9mjl62ccqzysm0000gp/T/d-11876-24943-ivq14d.l2g7ujtt9/package.tgz",
+  "_where": "/private/var/folders/dp/vj05cwss7pz9mjl62ccqzysm0000gp/T/apm-install-dir-11876-24943-3wpkyu.p4ydzyf1or",
   "bugs": {
     "url": "https://github.com/jesseweed/seti-ui/issues"
   },
@@ -136,5 +136,5 @@
     "url": "git+https://github.com/jesseweed/seti-ui.git"
   },
   "theme": "ui",
-  "version": "1.10.0"
+  "version": "1.11.0"
 }

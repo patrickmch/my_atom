@@ -1,0 +1,67 @@
+{
+  "_args": [
+    [
+      {
+        "raw": "/private/var/folders/dp/vj05cwss7pz9mjl62ccqzysm0000gp/T/d-11885-62599-60ymia.p77rpb9/package.tgz",
+        "scope": null,
+        "escapedName": null,
+        "name": null,
+        "rawSpec": "/private/var/folders/dp/vj05cwss7pz9mjl62ccqzysm0000gp/T/d-11885-62599-60ymia.p77rpb9/package.tgz",
+        "spec": "/private/var/folders/dp/vj05cwss7pz9mjl62ccqzysm0000gp/T/d-11885-62599-60ymia.p77rpb9/package.tgz",
+        "type": "local"
+      },
+      "/private/var/folders/dp/vj05cwss7pz9mjl62ccqzysm0000gp/T/apm-install-dir-11885-62599-1jbemmw.zn2d3d6lxr"
+    ]
+  ],
+  "_from": "../d-11885-62599-60ymia.p77rpb9/package.tgz",
+  "_id": "vmp-gutter-annotate-mark@0.3.3",
+  "_inCache": true,
+  "_location": "/vmp-gutter-annotate-mark",
+  "_phantomChildren": {},
+  "_requested": {
+    "raw": "/private/var/folders/dp/vj05cwss7pz9mjl62ccqzysm0000gp/T/d-11885-62599-60ymia.p77rpb9/package.tgz",
+    "scope": null,
+    "escapedName": null,
+    "name": null,
+    "rawSpec": "/private/var/folders/dp/vj05cwss7pz9mjl62ccqzysm0000gp/T/d-11885-62599-60ymia.p77rpb9/package.tgz",
+    "spec": "/private/var/folders/dp/vj05cwss7pz9mjl62ccqzysm0000gp/T/d-11885-62599-60ymia.p77rpb9/package.tgz",
+    "type": "local"
+  },
+  "_requiredBy": [
+    "#USER"
+  ],
+  "_resolved": "file:../d-11885-62599-60ymia.p77rpb9/package.tgz",
+  "_shasum": "a52175157bb59c0ec4cd8fb3f1315db873595b06",
+  "_shrinkwrap": null,
+  "_spec": "/private/var/folders/dp/vj05cwss7pz9mjl62ccqzysm0000gp/T/d-11885-62599-60ymia.p77rpb9/package.tgz",
+  "_where": "/private/var/folders/dp/vj05cwss7pz9mjl62ccqzysm0000gp/T/apm-install-dir-11885-62599-1jbemmw.zn2d3d6lxr",
+  "bugs": {
+    "url": "https://github.com/adityavm/vmp-gutter-annotate-mark/issues"
+  },
+  "consumedServices": {
+    "vim-mode-plus": {
+      "versions": {
+        "^0.1.0": "consumeVimModePlus"
+      }
+    }
+  },
+  "dependencies": {},
+  "description": "Add classes to gutter when using marks that can be styled.",
+  "devDependencies": {},
+  "engines": {
+    "atom": ">=0.174.0 <2.0.0"
+  },
+  "homepage": "https://github.com/adityavm/vmp-gutter-annotate-mark#readme",
+  "keywords": [],
+  "license": "MIT",
+  "main": "./lib/main",
+  "name": "vmp-gutter-annotate-mark",
+  "optionalDependencies": {},
+  "readme": "# vim-mode-plus-gutter-annotate-mark\n\nhttps://atom.io/packages/vmp-gutter-annotate-mark\n\nA plugin for [vim-mode-plus][1] that adds a mark specific class to the gutter so that it can be specially styled.\n\n![Screenshot](https://raw.githubusercontent.com/adityavm/vmp-gutter-annotate-mark/master/screenshot.png)\n\n# Usage\n\nThis plugin needs the excellent [vim-mode-plus][1] plugin. Once you've installed both, set marks as usual (with `m`). Your gutter will now show the name of the mark in orange.\n\nIncluded is a \"literal\" theme which marks the gutter literally, i.e. it puts the name of the mark in the gutter. You can overwrite this in your user stylesheet to suit your preference.\n\n## Additional Notes\n\nCurrently, the plugin only annotates for alphabetical marks (`[a-z]`), as it's clearer when putting the name of the mark in the gutter. Future themes and settings could potentially allow more or all marks to be annotated in the gutter.\n\n## Known Issues\n\n* For lines with multiple marks, it only shows the highest alphabetical value (z > y).\n\n[1]: https://github.com/t9md/atom-vim-mode-plus\n",
+  "readmeFilename": "README.md",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/adityavm/vmp-gutter-annotate-mark.git"
+  },
+  "version": "0.3.3"
+}

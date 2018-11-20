@@ -144,6 +144,10 @@ public class EventThread extends Thread {
       return true;
     }
 
+    DebuggerStopReason stopReason = _contextManager.getStopReason();
+    // In order to evaluate the condition, the evaluation manager must believe that the
+    // debugee is paused, which it is, but the context manager doesn't as of yet know that
+    _contextManager.setStopReason(DebuggerStopReason.BREAKPOINT);
     try {
       ThreadReference thread = _contextManager.getCurrentThread();
       String frameId = Utils.getFrameName(thread.frames().get(0));
@@ -179,6 +183,8 @@ public class EventThread extends Thread {
           true);
 
       return true;
+    } finally {
+      _contextManager.setStopReason(stopReason);
     }
 
     return false;
@@ -251,19 +257,23 @@ public class EventThread extends Thread {
     _contextManager.handleVMDeath();
 
     // There is no more VM to talk to. Kill the debug server.
-    System.exit(-1);
+    System.exit(0);
   }
 
   private void handleVMDisconnectEvent(VMDisconnectEvent event) {
     _connected = false;
     if (!_vmDied) {
+      _contextManager.sendUserMessage(
+          "VM Disconnected. This may be a result of a native crash. Use a Native debugger to investigate.",
+          Utils.UserMessageLevel.INFO);
+
       Utils.logInfo("-- The application has been disconnected --");
 
       Utils.logVerboseException(event != null ? event.toString() : "", new Throwable());
       _contextManager.handleVMDisconnect();
 
       // There is no more VM to talk to. Kill the debug server.
-      System.exit(-1);
+      System.exit(0);
     }
   }
 }

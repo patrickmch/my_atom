@@ -1,23 +1,23 @@
-'use strict';
+"use strict";
 
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
 exports.default = parseLogcatMetadata;
 
-
+/**
+ * Copyright (c) 2015-present, Facebook, Inc.
+ * All rights reserved.
+ *
+ * This source code is licensed under the license found in the LICENSE file in
+ * the root directory of this source tree.
+ *
+ * 
+ * @format
+ */
 // Example: [ 01-14 17:14:44.285   640:  656 E/KernelUidCpuTimeReader ]
 // eslint-disable-next-line max-len
-const METADATA_REGEX = /^\[ (\d{2}-\d{2} \d{2}:\d{2}:\d{2}\.\d{3})\s+(\d+):(?:(0x[a-f0-9]+)|\s*(\d+))\s+(V|D|I|W|E|F|S)\/(.+) ]$/; /**
-                                                                                                                                    * Copyright (c) 2015-present, Facebook, Inc.
-                                                                                                                                    * All rights reserved.
-                                                                                                                                    *
-                                                                                                                                    * This source code is licensed under the license found in the LICENSE file in
-                                                                                                                                    * the root directory of this source tree.
-                                                                                                                                    *
-                                                                                                                                    * 
-                                                                                                                                    * @format
-                                                                                                                                    */
+const METADATA_REGEX = /^\[ (\d{2}-\d{2} \d{2}:\d{2}:\d{2}\.\d{3})\s+(\d+):(?:(0x[a-f0-9]+)|\s*(\d+))\s+(V|D|I|W|E|F|S)\/(.+) ]$/;
 
 function parseLogcatMetadata(line) {
   const match = line.match(METADATA_REGEX);
@@ -27,7 +27,6 @@ function parseLogcatMetadata(line) {
   }
 
   const [, time, pid, hexTid, decTid, priority, tag] = match;
-
   return {
     time,
     pid: parseInt(pid, 10),

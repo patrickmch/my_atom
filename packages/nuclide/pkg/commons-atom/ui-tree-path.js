@@ -1,9 +1,10 @@
-'use strict';
+"use strict";
 
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
 exports.default = uiTreePath;
+
 /**
  * Copyright (c) 2015-present, Facebook, Inc.
  * All rights reserved.
@@ -14,7 +15,6 @@ exports.default = uiTreePath;
  * 
  * @format
  */
-
 const TREE_API_DATA_PATH = 'data-path';
 
 /**
@@ -28,7 +28,7 @@ function uiTreePath(event) {
   const nameElement = target.hasAttribute(TREE_API_DATA_PATH) ? target : target.querySelector(`[${TREE_API_DATA_PATH}]`);
 
   if (!(nameElement != null)) {
-    throw new Error('Invariant violation: "nameElement != null"');
+    throw new Error("Invariant violation: \"nameElement != null\"");
   }
 
   return nameElement.getAttribute(TREE_API_DATA_PATH);

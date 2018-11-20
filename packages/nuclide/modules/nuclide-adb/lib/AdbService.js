@@ -1,11 +1,8 @@
-'use strict';
+"use strict";
 
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.registerAdbPath = registerAdbPath;
-exports.getFullConfig = getFullConfig;
-exports.registerCustomPath = registerCustomPath;
 exports.getDeviceInfo = getDeviceInfo;
 exports.getProcesses = getProcesses;
 exports.stopProcess = stopProcess;
@@ -24,10 +21,9 @@ exports.getJavaProcesses = getJavaProcesses;
 exports.dumpsysPackage = dumpsysPackage;
 exports.touchFile = touchFile;
 exports.removeFile = removeFile;
+exports.getAPIVersion = getAPIVersion;
+exports.getDeviceArchitecture = getDeviceArchitecture;
 exports.getInstalledPackages = getInstalledPackages;
-exports.addAdbPort = addAdbPort;
-exports.removeAdbPort = removeAdbPort;
-exports.getAdbPorts = getAdbPorts;
 exports.killServer = killServer;
 exports.getApkManifest = getApkManifest;
 exports.getVersion = getVersion;
@@ -35,48 +31,56 @@ exports.checkMuxStatus = checkMuxStatus;
 exports.checkInMuxPort = checkInMuxPort;
 exports.checkOutMuxPort = checkOutMuxPort;
 
-var _fsPromise;
+function _fsPromise() {
+  const data = _interopRequireDefault(require("../../nuclide-commons/fsPromise"));
 
-function _load_fsPromise() {
-  return _fsPromise = _interopRequireDefault(require('../../nuclide-commons/fsPromise'));
+  _fsPromise = function () {
+    return data;
+  };
+
+  return data;
 }
 
-var _nuclideUri;
+function _nuclideUri() {
+  const data = _interopRequireDefault(require("../../nuclide-commons/nuclideUri"));
 
-function _load_nuclideUri() {
-  return _nuclideUri = _interopRequireDefault(require('../../nuclide-commons/nuclideUri'));
+  _nuclideUri = function () {
+    return data;
+  };
+
+  return data;
 }
 
-var _Store;
+var _rxjsCompatUmdMin = require("rxjs-compat/bundles/rxjs-compat.umd.min.js");
 
-function _load_Store() {
-  return _Store = require('./common/Store');
+function _Adb() {
+  const data = require("./Adb");
+
+  _Adb = function () {
+    return data;
+  };
+
+  return data;
 }
 
-var _rxjsBundlesRxMinJs = require('rxjs/bundles/Rx.min.js');
+function _Processes() {
+  const data = require("./common/Processes");
 
-var _Adb;
+  _Processes = function () {
+    return data;
+  };
 
-function _load_Adb() {
-  return _Adb = require('./bridges/Adb');
+  return data;
 }
 
-var _Processes;
+function _process() {
+  const data = require("../../nuclide-commons/process");
 
-function _load_Processes() {
-  return _Processes = require('./common/Processes');
-}
+  _process = function () {
+    return data;
+  };
 
-var _Devices;
-
-function _load_Devices() {
-  return _Devices = require('./common/Devices');
-}
-
-var _process;
-
-function _load_process() {
-  return _process = require('../../nuclide-commons/process');
+  return data;
 }
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
@@ -92,123 +96,106 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
  * 
  * @format
  */
-
-const ADB = 'adb';
-
-async function registerAdbPath(id, path, priority = -1) {
-  (0, (_Store || _load_Store()).getStore)(ADB).registerPath(id, { path, priority });
+function getDeviceInfo(serial) {
+  return new (_Adb().Adb)(serial).getDeviceInfo().publish();
 }
 
-async function getFullConfig() {
-  return (0, (_Store || _load_Store()).getStore)(ADB).getFullConfig();
+function getProcesses(serial, timeout) {
+  return new (_Processes().Processes)(new (_Adb().Adb)(serial)).fetch(timeout).publish();
 }
 
-async function registerCustomPath(path) {
-  (0, (_Store || _load_Store()).getStore)(ADB).registerCustomPath(path);
+async function stopProcess(serial, packageName, pid) {
+  return new (_Adb().Adb)(serial).stopProcess(packageName, pid);
 }
 
-function getDeviceInfo(device) {
-  return new (_Adb || _load_Adb()).Adb(device).getDeviceInfo().publish();
+function getDeviceList() {
+  return _Adb().Adb.getDevices();
 }
 
-function getProcesses(device, timeout) {
-  return new (_Processes || _load_Processes()).Processes(new (_Adb || _load_Adb()).Adb(device)).fetch(timeout).publish();
+async function getPidFromPackageName(serial, packageName) {
+  return new (_Processes().Processes)(new (_Adb().Adb)(serial)).getPidFromPackageName(packageName);
 }
 
-async function stopProcess(device, packageName, pid) {
-  return new (_Adb || _load_Adb()).Adb(device).stopProcess(packageName, pid);
+function installPackage(serial, packagePath) {
+  return new (_Adb().Adb)(serial).installPackage(packagePath).publish();
 }
 
-function getDeviceList(options) {
-  return new (_Devices || _load_Devices()).Devices((_Adb || _load_Adb()).Adb).getDeviceList(options).publish();
-}
-
-async function getPidFromPackageName(device, packageName) {
-  return new (_Processes || _load_Processes()).Processes(new (_Adb || _load_Adb()).Adb(device)).getPidFromPackageName(packageName);
-}
-
-function installPackage(device, packagePath) {
+function uninstallPackage(serial, packageName) {
   // TODO(T17463635)
-  return new (_Adb || _load_Adb()).Adb(device).installPackage(packagePath).publish();
+  return new (_Adb().Adb)(serial).uninstallPackage(packageName).publish();
 }
 
-function uninstallPackage(device, packageName) {
-  // TODO(T17463635)
-  return new (_Adb || _load_Adb()).Adb(device).uninstallPackage(packageName).publish();
+async function forwardJdwpPortToPid(serial, tcpPort, pid) {
+  return new (_Adb().Adb)(serial).forwardJdwpPortToPid(tcpPort, pid);
 }
 
-async function forwardJdwpPortToPid(device, tcpPort, pid) {
-  return new (_Adb || _load_Adb()).Adb(device).forwardJdwpPortToPid(tcpPort, pid);
+async function removeJdwpForwardSpec(serial, spec) {
+  return new (_Adb().Adb)(serial).removeJdwpForwardSpec(spec);
 }
 
-async function removeJdwpForwardSpec(device, spec) {
-  return new (_Adb || _load_Adb()).Adb(device).removeJdwpForwardSpec(spec);
+async function launchActivity(serial, packageName, activity, debug, action, parameters) {
+  return new (_Adb().Adb)(serial).launchActivity(packageName, activity, debug, action, parameters);
 }
 
-async function launchActivity(device, packageName, activity, debug, action, parameters) {
-  return new (_Adb || _load_Adb()).Adb(device).launchActivity(packageName, activity, debug, action, parameters);
+async function launchMainActivity(serial, packageName, debug) {
+  return new (_Adb().Adb)(serial).launchMainActivity(packageName, debug);
 }
 
-async function launchMainActivity(device, packageName, debug) {
-  return new (_Adb || _load_Adb()).Adb(device).launchMainActivity(packageName, debug);
+async function launchService(serial, packageName, serviceName, debug) {
+  return new (_Adb().Adb)(serial).launchService(packageName, serviceName, debug);
 }
 
-async function launchService(device, packageName, serviceName, debug) {
-  return new (_Adb || _load_Adb()).Adb(device).launchService(packageName, serviceName, debug);
+async function activityExists(serial, packageName, activity) {
+  return new (_Adb().Adb)(serial).activityExists(packageName, activity);
 }
 
-async function activityExists(device, packageName, activity) {
-  return new (_Adb || _load_Adb()).Adb(device).activityExists(packageName, activity);
+async function getAllAvailablePackages(serial) {
+  return new (_Adb().Adb)(serial).getAllAvailablePackages();
 }
 
-async function getAllAvailablePackages(device) {
-  return new (_Adb || _load_Adb()).Adb(device).getAllAvailablePackages();
+function getJavaProcesses(serial) {
+  return new (_Adb().Adb)(serial).getJavaProcesses().publish();
 }
 
-function getJavaProcesses(device) {
-  return new (_Adb || _load_Adb()).Adb(device).getJavaProcesses().publish();
+async function dumpsysPackage(serial, identifier) {
+  return new (_Adb().Adb)(serial).dumpsysPackage(identifier);
 }
 
-async function dumpsysPackage(device, identifier) {
-  return new (_Adb || _load_Adb()).Adb(device).dumpsysPackage(identifier);
+async function touchFile(serial, path) {
+  return new (_Adb().Adb)(serial).touchFile(path);
 }
 
-async function touchFile(device, path) {
-  return new (_Adb || _load_Adb()).Adb(device).touchFile(path);
+async function removeFile(serial, path) {
+  return new (_Adb().Adb)(serial).removeFile(path);
 }
 
-async function removeFile(device, path) {
-  return new (_Adb || _load_Adb()).Adb(device).removeFile(path);
+async function getAPIVersion(serial) {
+  return new (_Adb().Adb)(serial).getAPIVersion().toPromise();
 }
 
-async function getInstalledPackages(device) {
-  return new (_Adb || _load_Adb()).Adb(device).getInstalledPackages();
+async function getDeviceArchitecture(serial) {
+  return new (_Adb().Adb)(serial).getDeviceArchitecture().toPromise();
 }
 
-function addAdbPort(port) {
-  (0, (_Store || _load_Store()).getStore)('adb').addPort(port);
-}
-
-function removeAdbPort(port) {
-  (0, (_Store || _load_Store()).getStore)('adb').removePort(port);
-}
-
-function getAdbPorts() {
-  return Promise.resolve((0, (_Store || _load_Store()).getStore)('adb').getPorts());
+async function getInstalledPackages(serial) {
+  return new (_Adb().Adb)(serial).getInstalledPackages();
 }
 
 async function killServer() {
-  return (_Adb || _load_Adb()).Adb.killServer();
+  return _Adb().Adb.killServer();
 }
 
 async function getAaptBinary(buildToolsVersion) {
   if (process.env.ANDROID_SDK == null || buildToolsVersion == null) {
     return 'aapt';
   } else {
-    const allBuildToolsPath = (_nuclideUri || _load_nuclideUri()).default.join(process.env.ANDROID_SDK, 'build-tools');
-    const exactBuildToolPath = (_nuclideUri || _load_nuclideUri()).default.join(allBuildToolsPath, buildToolsVersion);
-    const aaptPath = (_nuclideUri || _load_nuclideUri()).default.join(exactBuildToolPath, 'aapt');
-    if (await (_fsPromise || _load_fsPromise()).default.exists(aaptPath)) {
+    const allBuildToolsPath = _nuclideUri().default.join(process.env.ANDROID_SDK, 'build-tools');
+
+    const exactBuildToolPath = _nuclideUri().default.join(allBuildToolsPath, buildToolsVersion);
+
+    const aaptPath = _nuclideUri().default.join(exactBuildToolPath, 'aapt');
+
+    if (await _fsPromise().default.exists(aaptPath)) {
       return aaptPath;
     } else {
       return 'aapt';
@@ -218,26 +205,27 @@ async function getAaptBinary(buildToolsVersion) {
 
 async function getApkManifest(apkPath, buildToolsVersion) {
   const aaptBinary = await getAaptBinary(buildToolsVersion);
-  return (0, (_process || _load_process()).runCommand)(aaptBinary, ['dump', 'badging', apkPath]).toPromise();
+  return (0, _process().runCommand)(aaptBinary, ['dump', 'badging', apkPath]).toPromise();
 }
 
 async function getVersion() {
-  return (_Adb || _load_Adb()).Adb.getVersion();
+  return _Adb().Adb.getVersion();
 }
 
 async function checkMuxStatus() {
   try {
-    await (0, (_process || _load_process()).runCommand)('adbmux', ['status']).ignoreElements().toPromise();
+    await (0, _process().runCommand)('adbmux', ['status']).ignoreElements().toPromise();
   } catch (_) {
     return false;
   }
+
   return true;
 }
 
 function checkInMuxPort(port) {
-  return (0, (_process || _load_process()).runCommand)('adbmux', ['checkin', `${port}`]).ignoreElements().toPromise();
+  return (0, _process().runCommand)('adbmux', ['checkin', `${port}`]).ignoreElements().toPromise();
 }
 
 function checkOutMuxPort(port) {
-  return (0, (_process || _load_process()).runCommand)('adbmux', ['checkout', `${port}`]).ignoreElements().toPromise();
+  return (0, _process().runCommand)('adbmux', ['checkout', `${port}`]).ignoreElements().toPromise();
 }

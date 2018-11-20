@@ -1,9 +1,13 @@
-'use strict';
+"use strict";
 
-var _Encoder;
+function _Encoder() {
+  const data = _interopRequireDefault(require("../Encoder"));
 
-function _load_Encoder() {
-  return _Encoder = _interopRequireDefault(require('../Encoder'));
+  _Encoder = function () {
+    return data;
+  };
+
+  return data;
 }
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
@@ -18,8 +22,8 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
  *
  * 
  * @format
+ * @emails oncall+nuclide
  */
-
 describe('Encoder', () => {
   it('should and decode correctly', () => {
     const test = {
@@ -27,14 +31,15 @@ describe('Encoder', () => {
       number: 5,
       buf: Buffer.from('hello world')
     };
-    const encoded = (_Encoder || _load_Encoder()).default.encode(test);
-    const decoded = (_Encoder || _load_Encoder()).default.decode(encoded);
+
+    const encoded = _Encoder().default.encode(test);
+
+    const decoded = _Encoder().default.decode(encoded);
 
     expect(decoded.name).toEqual(test.name);
     expect(decoded.number).toEqual(test.number);
     expect(decoded.buf).toEqual(test.buf);
   });
-
   it('should work with nested objects', () => {
     const test = {
       name: 'thing',
@@ -46,13 +51,13 @@ describe('Encoder', () => {
       }
     };
 
-    const encoded = (_Encoder || _load_Encoder()).default.encode(test);
-    const decoded = (_Encoder || _load_Encoder()).default.decode(encoded);
+    const encoded = _Encoder().default.encode(test);
+
+    const decoded = _Encoder().default.decode(encoded);
 
     expect(decoded.name).toEqual(test.name);
     expect(decoded.number).toEqual(test.number);
     expect(decoded.buf).toEqual(test.buf);
-
     const subObj = decoded.subObj;
     expect(subObj.name).toEqual(test.subObj.name);
     expect(subObj.anotherBuf).toEqual(test.subObj.anotherBuf);

@@ -1,26 +1,38 @@
-'use strict';
+"use strict";
 
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.Commands = undefined;
+exports.Commands = void 0;
 
-var _constants;
+function _constants() {
+  const data = require("./constants");
 
-function _load_constants() {
-  return _constants = require('./constants');
+  _constants = function () {
+    return data;
+  };
+
+  return data;
 }
 
-var _utils;
+function _utils() {
+  const data = require("./utils");
 
-function _load_utils() {
-  return _utils = require('./utils');
+  _utils = function () {
+    return data;
+  };
+
+  return data;
 }
 
-var _nuclideAnalytics;
+function _nuclideAnalytics() {
+  const data = require("../../../modules/nuclide-analytics");
 
-function _load_nuclideAnalytics() {
-  return _nuclideAnalytics = require('../../nuclide-analytics');
+  _nuclideAnalytics = function () {
+    return data;
+  };
+
+  return data;
 }
 
 /**
@@ -33,36 +45,35 @@ function _load_nuclideAnalytics() {
  *  strict-local
  * @format
  */
-
 class Commands {
-
   constructor(dispatch, getState) {
     this.addProjectRepository = repository => {
       this._dispatch({
         payload: {
           repository
         },
-        type: (_constants || _load_constants()).ActionType.ADD_PROJECT_REPOSITORY
+        type: _constants().ActionType.ADD_PROJECT_REPOSITORY
       });
     };
 
     this.updatePaneItemState = () => {
       this._dispatch({
-        type: (_constants || _load_constants()).ActionType.UPDATE_PANE_ITEM_STATE,
+        type: _constants().ActionType.UPDATE_PANE_ITEM_STATE,
         payload: {
-          repositoryPathToEditors: (0, (_utils || _load_utils()).getRepoPathToEditors)()
+          repositoryPathToEditors: (0, _utils().getRepoPathToEditors)()
         }
       });
     };
 
     this.restorePaneItemState = (repository, newShortHead) => {
-      (0, (_nuclideAnalytics || _load_nuclideAnalytics()).track)('bookshelf-restore-files');
+      (0, _nuclideAnalytics().track)('bookshelf-restore-files');
+
       this._dispatch({
         payload: {
           repository,
           shortHead: newShortHead
         },
-        type: (_constants || _load_constants()).ActionType.RESTORE_PANE_ITEM_STATE
+        type: _constants().ActionType.RESTORE_PANE_ITEM_STATE
       });
     };
 
@@ -71,4 +82,5 @@ class Commands {
   }
 
 }
+
 exports.Commands = Commands;

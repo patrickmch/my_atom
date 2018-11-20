@@ -1,60 +1,92 @@
-'use strict';
+"use strict";
 
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.FsFileSystem = undefined;
+exports.FsFileSystem = void 0;
 
-var _fs = _interopRequireDefault(require('fs'));
+var _fs = _interopRequireDefault(require("fs"));
 
-var _collection;
+function _collection() {
+  const data = require("../../../modules/nuclide-commons/collection");
 
-function _load_collection() {
-  return _collection = require('../../../modules/nuclide-commons/collection');
+  _collection = function () {
+    return data;
+  };
+
+  return data;
 }
 
-var _nuclideUri;
+function _nuclideUri() {
+  const data = _interopRequireDefault(require("../../../modules/nuclide-commons/nuclideUri"));
 
-function _load_nuclideUri() {
-  return _nuclideUri = _interopRequireDefault(require('../../../modules/nuclide-commons/nuclideUri'));
+  _nuclideUri = function () {
+    return data;
+  };
+
+  return data;
 }
 
-var _fsPromise;
+function _fsPromise() {
+  const data = _interopRequireDefault(require("../../../modules/nuclide-commons/fsPromise"));
 
-function _load_fsPromise() {
-  return _fsPromise = _interopRequireDefault(require('../../../modules/nuclide-commons/fsPromise'));
+  _fsPromise = function () {
+    return data;
+  };
+
+  return data;
 }
 
-var _process;
+function _process() {
+  const data = require("../../../modules/nuclide-commons/process");
 
-function _load_process() {
-  return _process = require('../../../modules/nuclide-commons/process');
+  _process = function () {
+    return data;
+  };
+
+  return data;
 }
 
-var _stream;
+function _stream() {
+  const data = require("../../../modules/nuclide-commons/stream");
 
-function _load_stream() {
-  return _stream = require('../../../modules/nuclide-commons/stream');
+  _stream = function () {
+    return data;
+  };
+
+  return data;
 }
 
-var _rxjsBundlesRxMinJs = require('rxjs/bundles/Rx.min.js');
+var _rxjsCompatUmdMin = require("rxjs-compat/bundles/rxjs-compat.umd.min.js");
 
-var _admZip;
+function _admZip() {
+  const data = _interopRequireDefault(require("adm-zip"));
 
-function _load_admZip() {
-  return _admZip = _interopRequireDefault(require('adm-zip'));
+  _admZip = function () {
+    return data;
+  };
+
+  return data;
 }
 
-var _FileSystem;
+function _FileSystem() {
+  const data = require("./FileSystem");
 
-function _load_FileSystem() {
-  return _FileSystem = require('./FileSystem');
+  _FileSystem = function () {
+    return data;
+  };
+
+  return data;
 }
 
-var _ZipFileSystem;
+function _ZipFileSystem() {
+  const data = require("./ZipFileSystem");
 
-function _load_ZipFileSystem() {
-  return _ZipFileSystem = require('./ZipFileSystem');
+  _ZipFileSystem = function () {
+    return data;
+  };
+
+  return data;
 }
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
@@ -75,102 +107,117 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
  * the endpoint: http://your.server:your_port/fs/method where method is one of
  * readFile, writeFile, etc.
  */
-
 class FsFileSystem {
   exists(path) {
-    return (_fsPromise || _load_fsPromise()).default.exists(path);
+    return _fsPromise().default.exists(path);
   }
 
   findNearestFile(name, directory) {
-    return (_fsPromise || _load_fsPromise()).default.findNearestFile(name, directory);
+    return _fsPromise().default.findNearestFile(name, directory);
   }
 
   findInDirectories(name, directories) {
     if (directories.length === 0) {
-      return _rxjsBundlesRxMinJs.Observable.throw(new Error('No directories to search in!')).publish();
+      return _rxjsCompatUmdMin.Observable.throw(new Error('No directories to search in!')).publish();
     }
+
     const findArgs = [...directories, '-type', 'f', '-name', name];
-    return (0, (_process || _load_process()).runCommand)('find', findArgs).map(stdout => stdout.split('\n').filter(filePath => filePath !== '')).publish();
+    return (0, _process().runCommand)('find', findArgs).map(stdout => stdout.split('\n').filter(filePath => filePath !== '')).publish();
   }
 
   stat(path) {
-    return (_fsPromise || _load_fsPromise()).default.stat(path);
+    return _fsPromise().default.stat(path);
   }
 
   lstat(path) {
-    return (_fsPromise || _load_fsPromise()).default.lstat(path);
+    return _fsPromise().default.lstat(path);
   }
 
   mkdir(path) {
-    return (_fsPromise || _load_fsPromise()).default.mkdir(path);
+    return _fsPromise().default.mkdir(path);
   }
 
   mkdirp(path) {
-    return (_fsPromise || _load_fsPromise()).default.mkdirp(path);
+    return _fsPromise().default.mkdirp(path);
   }
 
   chmod(path, mode) {
-    return (_fsPromise || _load_fsPromise()).default.chmod(path, mode);
+    return _fsPromise().default.chmod(path, mode);
   }
 
   chown(path, uid, gid) {
-    return (_fsPromise || _load_fsPromise()).default.chown(path, uid, gid);
+    return _fsPromise().default.chown(path, uid, gid);
   }
 
   async newFile(filePath) {
-    const isExistingFile = await (_fsPromise || _load_fsPromise()).default.exists(filePath);
+    const isExistingFile = await _fsPromise().default.exists(filePath);
+
     if (isExistingFile) {
       return false;
     }
-    await (_fsPromise || _load_fsPromise()).default.mkdirp((_nuclideUri || _load_nuclideUri()).default.dirname(filePath));
-    await (_fsPromise || _load_fsPromise()).default.writeFile(filePath, '');
+
+    await _fsPromise().default.mkdirp(_nuclideUri().default.dirname(filePath));
+    await _fsPromise().default.writeFile(filePath, '');
     return true;
   }
 
   async readdir(path) {
-    const files = await (_fsPromise || _load_fsPromise()).default.readdir(path);
+    const files = await _fsPromise().default.readdir(path);
     const entries = await Promise.all(files.map(async file => {
-      const fullpath = (_nuclideUri || _load_nuclideUri()).default.join(path, file);
-      const lstats = await (_fsPromise || _load_fsPromise()).default.lstat(fullpath);
+      const fullpath = _nuclideUri().default.join(path, file);
+
+      const lstats = await _fsPromise().default.lstat(fullpath);
+
       if (!lstats.isSymbolicLink()) {
-        return { file, stats: lstats, isSymbolicLink: false };
+        return {
+          file,
+          stats: lstats,
+          isSymbolicLink: false
+        };
       } else {
         try {
-          const stats = await (_fsPromise || _load_fsPromise()).default.stat(fullpath);
-          return { file, stats, isSymbolicLink: true };
+          const stats = await _fsPromise().default.stat(fullpath);
+          return {
+            file,
+            stats,
+            isSymbolicLink: true
+          };
         } catch (error) {
           return null;
         }
       }
-    }));
-    // TODO: Return entries directly and change client to handle error.
-    // $FlowFixMe
-    return (0, (_collection || _load_collection()).arrayCompact)(entries).map(entry => {
+    })); // TODO: Return entries directly and change client to handle error.
+
+    return (0, _collection().arrayCompact)(entries).map(entry => {
       return [entry.file, entry.stats.isFile(), entry.isSymbolicLink];
     });
   }
 
   realpath(path) {
-    return (_fsPromise || _load_fsPromise()).default.realpath(path);
+    return _fsPromise().default.realpath(path);
   }
 
   move(sourcePath, destinationPath) {
-    return (_fsPromise || _load_fsPromise()).default.mv(sourcePath, destinationPath, {
+    return _fsPromise().default.mv(sourcePath, destinationPath, {
       mkdirp: true,
       clobber: false
     });
   }
 
   copy(sourcePath, destinationPath) {
-    return (_fsPromise || _load_fsPromise()).default.copy(sourcePath, destinationPath);
+    return _fsPromise().default.copy(sourcePath, destinationPath);
+  }
+
+  symlink(source, target, type) {
+    return _fsPromise().default.symlink(source, target, type);
   }
 
   rimraf(path) {
-    return (_fsPromise || _load_fsPromise()).default.rimraf(path);
+    return _fsPromise().default.rimraf(path);
   }
 
   unlink(path) {
-    return (_fsPromise || _load_fsPromise()).default.unlink(path).catch(error => {
+    return _fsPromise().default.unlink(path).catch(error => {
       if (error.code !== 'ENOENT') {
         throw error;
       }
@@ -178,32 +225,36 @@ class FsFileSystem {
   }
 
   async readFile(path, options) {
-    const stats = await (_fsPromise || _load_fsPromise()).default.stat(path);
-    if (stats.size > (_FileSystem || _load_FileSystem()).READFILE_SIZE_LIMIT) {
+    const stats = await _fsPromise().default.stat(path);
+
+    if (stats.size > _FileSystem().READFILE_SIZE_LIMIT) {
       throw new Error(`File is too large (${stats.size} bytes)`);
     }
-    return (_fsPromise || _load_fsPromise()).default.readFile(path, options);
+
+    return _fsPromise().default.readFile(path, options);
   }
 
   createReadStream(path, options) {
-    return (0, (_stream || _load_stream()).observeRawStream)(_fs.default.createReadStream(path, options)).publish();
+    return (0, _stream().observeRawStream)(_fs.default.createReadStream(path, options)).publish();
   }
 
   writeFile(path, data, options) {
-    return (_fsPromise || _load_fsPromise()).default.writeFile(path, data, options);
+    return _fsPromise().default.writeFile(path, data, options);
   }
 
   isNfs(path) {
-    return (_fsPromise || _load_fsPromise()).default.isNfs(path);
+    return _fsPromise().default.isNfs(path);
   }
 
   isFuse(path) {
-    return (_fsPromise || _load_fsPromise()).default.isFuse(path);
+    return _fsPromise().default.isFuse(path);
   }
 
   async openArchive(path) {
-    const [buffer, stat, lstat] = await Promise.all([(_fsPromise || _load_fsPromise()).default.readFile(path), this.stat(path), this.lstat(path)]);
-    return new (_ZipFileSystem || _load_ZipFileSystem()).ZipFileSystem(new (_admZip || _load_admZip()).default(buffer), stat, lstat);
+    const [buffer, stat, lstat] = await Promise.all([_fsPromise().default.readFile(path), this.stat(path), this.lstat(path)]);
+    return new (_ZipFileSystem().ZipFileSystem)(new (_admZip().default)(buffer), stat, lstat);
   }
+
 }
+
 exports.FsFileSystem = FsFileSystem;

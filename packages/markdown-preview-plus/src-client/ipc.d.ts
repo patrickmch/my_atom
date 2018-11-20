@@ -2,17 +2,19 @@ import * as MarkdownIt from 'markdown-it'
 
 declare interface ChannelMap {
   style: { styles: string[] }
-  'update-images': { oldsrc: string; v: number | false }
-  sync: { line: number }
-  'use-github-style': { value: boolean }
+  'update-images': { oldsrc: string; v: number | undefined }
+  sync: { line: number; flash: boolean }
   'update-preview': {
     id: number
     html: string
     renderLaTeX: boolean
-    mjrenderer: MathJaxRenderer
   }
   error: { msg: string }
-  init: { atomHome: string; numberEqns: boolean }
+  init: {
+    atomHome: string
+    mathJaxConfig: MathJaxConfig
+    mathJaxRenderer: MathJaxRenderer
+  }
   'set-base-path': { path?: string }
   'set-source-map': {
     map: { [line: number]: Array<{ tag: string; index: number }> }
@@ -22,10 +24,13 @@ declare interface ChannelMap {
   'get-tex-config': { id: number }
   'sync-source': { id: number }
   reload: { id: number }
+  'set-width': { id: number; width: number | undefined }
+  'get-selection': { id: number }
 }
 declare interface ReplyMap {
   'zoom-in': void
   'zoom-out': void
+  'uncaught-error': { message: string; name: string; stack?: string }
   'did-scroll-preview': { max: number; min: number }
   // actual replies
   'request-reply': RequestReplyType[keyof RequestReplyMap]
@@ -35,6 +40,8 @@ declare interface RequestReplyMap {
   'get-tex-config': MathJax.TeXInputProcessor
   reload: void
   'sync-source': number | undefined
+  'set-width': void
+  'get-selection': string | undefined
 }
 declare type RequestReplyType = {
   [K in keyof RequestReplyMap]: {
@@ -70,4 +77,10 @@ declare global {
   }
 
   type MathJaxRenderer = 'SVG' | 'HTML-CSS'
+
+  interface MathJaxConfig {
+    numberEquations: boolean
+    texExtensions: string[]
+    undefinedFamily: string
+  }
 }

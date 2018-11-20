@@ -1,4 +1,4 @@
-'use strict';
+"use strict";
 
 Object.defineProperty(exports, "__esModule", {
   value: true
@@ -6,22 +6,34 @@ Object.defineProperty(exports, "__esModule", {
 exports.fetchActiveBookmark = fetchActiveBookmark;
 exports.fetchBookmarks = fetchBookmarks;
 
-var _fsPromise;
+function _fsPromise() {
+  const data = _interopRequireDefault(require("../../../modules/nuclide-commons/fsPromise"));
 
-function _load_fsPromise() {
-  return _fsPromise = _interopRequireDefault(require('../../../modules/nuclide-commons/fsPromise'));
+  _fsPromise = function () {
+    return data;
+  };
+
+  return data;
 }
 
-var _nuclideUri;
+function _nuclideUri() {
+  const data = _interopRequireDefault(require("../../../modules/nuclide-commons/nuclideUri"));
 
-function _load_nuclideUri() {
-  return _nuclideUri = _interopRequireDefault(require('../../../modules/nuclide-commons/nuclideUri'));
+  _nuclideUri = function () {
+    return data;
+  };
+
+  return data;
 }
 
-var _log4js;
+function _log4js() {
+  const data = require("log4js");
 
-function _load_log4js() {
-  return _log4js = require('log4js');
+  _log4js = function () {
+    return data;
+  };
+
+  return data;
 }
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
@@ -36,35 +48,40 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
  *  strict-local
  * @format
  */
-
-const logger = (0, (_log4js || _load_log4js()).getLogger)('nuclide-hg-rpc');
-
+const logger = (0, _log4js().getLogger)('nuclide-hg-rpc');
 /**
  * @param repoPath The full path to the repository directory (.hg).
  * @return A promise that resolves to the current bookmark name, if it exists,
  *   or else an empty string.
  */
+
 async function fetchActiveBookmark(repoPath) {
-  const bookmarkFile = (_nuclideUri || _load_nuclideUri()).default.join(repoPath, 'bookmarks.current');
+  const bookmarkFile = _nuclideUri().default.join(repoPath, 'bookmarks.current');
+
   let result;
+
   try {
-    result = await (_fsPromise || _load_fsPromise()).default.readFile(bookmarkFile, 'utf-8');
+    result = await _fsPromise().default.readFile(bookmarkFile, 'utf-8');
   } catch (e) {
     if (!(e.code === 'ENOENT')) {
       // We expect an error if the bookmark file doesn't exist. Otherwise, the
       // error is unexpected, so log it.
       logger.error(e);
     }
+
     result = '';
   }
+
   return result;
 }
 
 async function fetchBookmarks(repoPath) {
-  const bookmarkFile = (_nuclideUri || _load_nuclideUri()).default.join(repoPath, 'bookmarks');
+  const bookmarkFile = _nuclideUri().default.join(repoPath, 'bookmarks');
+
   let result;
+
   try {
-    const bookmarks = await (_fsPromise || _load_fsPromise()).default.readFile(bookmarkFile, 'utf-8');
+    const bookmarks = await _fsPromise().default.readFile(bookmarkFile, 'utf-8');
     const activeBookmark = await fetchActiveBookmark(repoPath);
     result = bookmarks.split('\n').filter(bookmark => bookmark.length > 0).map(bookmarkEntry => {
       const [node, bookmark] = bookmarkEntry.split(' ');
@@ -80,7 +97,9 @@ async function fetchBookmarks(repoPath) {
       // error is unexpected, so log it.
       logger.error(e);
     }
+
     result = [];
   }
+
   return result;
 }

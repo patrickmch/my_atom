@@ -1,65 +1,91 @@
-'use strict';
+"use strict";
 
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
+exports.default = void 0;
 
-var _MIProxy;
+function _MIProxy() {
+  const data = _interopRequireDefault(require("./MIProxy"));
 
-function _load_MIProxy() {
-  return _MIProxy = _interopRequireDefault(require('./MIProxy'));
+  _MIProxy = function () {
+    return data;
+  };
+
+  return data;
 }
 
-var _MIRegisterValue;
+function _MIRegisterValue() {
+  const data = require("./MIRegisterValue");
 
-function _load_MIRegisterValue() {
-  return _MIRegisterValue = require('./MIRegisterValue');
+  _MIRegisterValue = function () {
+    return data;
+  };
+
+  return data;
 }
 
-var _RegistersVariableReference;
+function _RegistersVariableReference() {
+  const data = _interopRequireDefault(require("./RegistersVariableReference"));
 
-function _load_RegistersVariableReference() {
-  return _RegistersVariableReference = _interopRequireDefault(require('./RegistersVariableReference'));
+  _RegistersVariableReference = function () {
+    return data;
+  };
+
+  return data;
 }
 
-var _MITypes;
+function _MITypes() {
+  const data = require("./MITypes");
 
-function _load_MITypes() {
-  return _MITypes = require('./MITypes');
+  _MITypes = function () {
+    return data;
+  };
+
+  return data;
 }
 
-var _VariableReference;
+function _VariableReference() {
+  const data = _interopRequireDefault(require("./VariableReference"));
 
-function _load_VariableReference() {
-  return _VariableReference = _interopRequireDefault(require('./VariableReference'));
-}
+  _VariableReference = function () {
+    return data;
+  };
 
-var _Variables;
-
-function _load_Variables() {
-  return _Variables = _interopRequireDefault(require('./Variables'));
+  return data;
 }
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-class RegisterElementVariableReference extends (_VariableReference || _load_VariableReference()).default {
-
+/**
+ * Copyright (c) 2017-present, Facebook, Inc.
+ * All rights reserved.
+ *
+ * This source code is licensed under the BSD-style license found in the
+ * LICENSE file in the root directory of this source tree. An additional grant
+ * of patent rights can be found in the PATENTS file in the same directory.
+ *
+ * 
+ * @format
+ */
+class RegisterElementVariableReference extends _VariableReference().default {
   constructor(client, variables, name, expression, value) {
-    super({ client, variables, expression });
+    super({
+      client,
+      variables,
+      expression
+    });
     this._value = value;
     this._name = name;
-
     this._containedVariables = this._value.containedValues().map(v => {
-      return (_RegistersVariableReference || _load_RegistersVariableReference()).default.variableFromRegisterValue(this._variables, v.name, `${this._expression}${v.expressionSuffix}`, v.value);
+      return _RegistersVariableReference().default.variableFromRegisterValue(this._variables, v.name, `${this._expression}${v.expressionSuffix}`, v.value);
     });
-
     this._childrenByName = new Map(this._value.containedValues().map(v => [v.name, v]));
   }
 
   async getVariables(start, count) {
     const resolvedStart = start == null ? 0 : start;
     const resolvedCount = count == null ? await this.getChildCount() : count;
-
     return this._containedVariables.slice(resolvedStart, resolvedStart + resolvedCount);
   }
 
@@ -79,6 +105,7 @@ class RegisterElementVariableReference extends (_VariableReference || _load_Vari
     if (!this._value.isContainer()) {
       return 'int';
     }
+
     return '[]';
   }
 
@@ -94,7 +121,7 @@ class RegisterElementVariableReference extends (_VariableReference || _load_Vari
     const nestedValue = this._childrenByName.get(name);
 
     if (!(nestedValue != null)) {
-      throw new Error('Invariant violation: "nestedValue != null"');
+      throw new Error("Invariant violation: \"nestedValue != null\"");
     }
 
     if (nestedValue.value.isContainer()) {
@@ -102,12 +129,12 @@ class RegisterElementVariableReference extends (_VariableReference || _load_Vari
     }
 
     const result = await this._client.sendCommand(`data-evaluate-expression ${this._expression}${nestedValue.expressionSuffix}=${value}`);
+
     if (result.error) {
-      throw new Error(`Unable to change register value ${(0, (_MITypes || _load_MITypes()).toCommandError)(result).msg}`);
+      throw new Error(`Unable to change register value ${(0, _MITypes().toCommandError)(result).msg}`);
     }
 
-    const newValue = (0, (_MITypes || _load_MITypes()).dataEvaluateExpressionResult)(result).value;
-
+    const newValue = (0, _MITypes().dataEvaluateExpressionResult)(result).value;
     return {
       value: newValue,
       type: await this.getType()
@@ -117,15 +144,7 @@ class RegisterElementVariableReference extends (_VariableReference || _load_Vari
   get needsDeletion() {
     return false;
   }
+
 }
-exports.default = RegisterElementVariableReference; /**
-                                                     * Copyright (c) 2017-present, Facebook, Inc.
-                                                     * All rights reserved.
-                                                     *
-                                                     * This source code is licensed under the BSD-style license found in the
-                                                     * LICENSE file in the root directory of this source tree. An additional grant
-                                                     * of patent rights can be found in the PATENTS file in the same directory.
-                                                     *
-                                                     * 
-                                                     * @format
-                                                     */
+
+exports.default = RegisterElementVariableReference;

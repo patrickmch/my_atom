@@ -1,59 +1,87 @@
-'use strict';
+"use strict";
 
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.AttachUiComponent = undefined;
+exports.AttachUiComponent = void 0;
 
-var _react = _interopRequireWildcard(require('react'));
+var React = _interopRequireWildcard(require("react"));
 
-var _Dropdown;
+function _Dropdown() {
+  const data = require("../../../modules/nuclide-commons-ui/Dropdown");
 
-function _load_Dropdown() {
-  return _Dropdown = require('../../../modules/nuclide-commons-ui/Dropdown');
+  _Dropdown = function () {
+    return data;
+  };
+
+  return data;
 }
 
-var _nuclideRemoteConnection;
+function _nuclideRemoteConnection() {
+  const data = require("../../nuclide-remote-connection");
 
-function _load_nuclideRemoteConnection() {
-  return _nuclideRemoteConnection = require('../../nuclide-remote-connection');
+  _nuclideRemoteConnection = function () {
+    return data;
+  };
+
+  return data;
 }
 
-var _nuclideUri;
+function _nuclideUri() {
+  const data = _interopRequireDefault(require("../../../modules/nuclide-commons/nuclideUri"));
 
-function _load_nuclideUri() {
-  return _nuclideUri = _interopRequireDefault(require('../../../modules/nuclide-commons/nuclideUri'));
+  _nuclideUri = function () {
+    return data;
+  };
+
+  return data;
 }
 
-var _UniversalDisposable;
+function _UniversalDisposable() {
+  const data = _interopRequireDefault(require("../../../modules/nuclide-commons/UniversalDisposable"));
 
-function _load_UniversalDisposable() {
-  return _UniversalDisposable = _interopRequireDefault(require('../../../modules/nuclide-commons/UniversalDisposable'));
+  _UniversalDisposable = function () {
+    return data;
+  };
+
+  return data;
 }
 
-var _nuclideDebuggerCommon;
+function _nuclideDebuggerCommon() {
+  const data = require("../../../modules/nuclide-debugger-common");
 
-function _load_nuclideDebuggerCommon() {
-  return _nuclideDebuggerCommon = require('../../../modules/nuclide-debugger-common');
+  _nuclideDebuggerCommon = function () {
+    return data;
+  };
+
+  return data;
 }
 
-var _Table;
+function _Table() {
+  const data = require("../../../modules/nuclide-commons-ui/Table");
 
-function _load_Table() {
-  return _Table = require('../../../modules/nuclide-commons-ui/Table');
+  _Table = function () {
+    return data;
+  };
+
+  return data;
 }
 
-var _rxjsBundlesRxMinJs = require('rxjs/bundles/Rx.min.js');
+var _rxjsCompatUmdMin = require("rxjs-compat/bundles/rxjs-compat.umd.min.js");
 
-var _expected;
+function _expected() {
+  const data = require("../../../modules/nuclide-commons/expected");
 
-function _load_expected() {
-  return _expected = require('../../../modules/nuclide-commons/expected');
+  _expected = function () {
+    return data;
+  };
+
+  return data;
 }
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
+function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) { var desc = Object.defineProperty && Object.getOwnPropertyDescriptor ? Object.getOwnPropertyDescriptor(obj, key) : {}; if (desc.get || desc.set) { Object.defineProperty(newObj, key, desc); } else { newObj[key] = obj[key]; } } } } newObj.default = obj; return newObj; } }
 
 /**
  * Copyright (c) 2015-present, Facebook, Inc.
@@ -65,7 +93,6 @@ function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj;
  * 
  * @format
  */
-
 function getColumns() {
   return [{
     title: 'PID',
@@ -78,60 +105,62 @@ function getColumns() {
   }];
 }
 
-class AttachUiComponent extends _react.Component {
-
+class AttachUiComponent extends React.Component {
   constructor(props) {
     super(props);
 
     this._handlePathsDropdownChange = newIndex => {
       this.setState({
-        selectedPathIndex: newIndex,
-        pathMenuItems: this._getPathMenuItems()
+        selectedPathIndex: newIndex
       });
     };
 
-    this._disposables = new (_UniversalDisposable || _load_UniversalDisposable()).default();
+    this._disposables = new (_UniversalDisposable().default)();
     this._attachTargetSub = null;
+
     this._disposables.add(() => {
       if (this._attachTargetSub != null) {
         this._attachTargetSub.unsubscribe();
+
         this._attachTargetSub = null;
       }
 
       if (this._gkSub != null) {
         this._gkSub.unsubscribe();
+
         this._gkSub = null;
       }
     });
-    this._handleAttachButtonClick = this._handleAttachButtonClick.bind(this);
 
+    this._handleAttachButtonClick = this._handleAttachButtonClick.bind(this);
     this.state = {
       selectedPathIndex: 0,
-      pathMenuItems: this._getPathMenuItems(),
+      pathMenuItems: _expected().Expect.pending(),
       attachPort: null,
       attachType: 'webserver',
-      attachTargets: (_expected || _load_expected()).Expect.pendingValue([])
+      attachTargets: _expected().Expect.pending()
     };
   }
 
   _getSerializationArgs() {
-    return [(_nuclideUri || _load_nuclideUri()).default.isRemote(this.props.targetUri) ? (_nuclideUri || _load_nuclideUri()).default.getHostname(this.props.targetUri) : 'local', 'attach', 'php'];
+    return [_nuclideUri().default.isRemote(this.props.targetUri) ? _nuclideUri().default.getHostname(this.props.targetUri) : 'local', 'attach', 'php'];
   }
 
   componentDidMount() {
-    (0, (_nuclideDebuggerCommon || _load_nuclideDebuggerCommon()).deserializeDebuggerConfig)(...this._getSerializationArgs(), (transientSettings, savedSettings) => {
-      const savedPath = this.state.pathMenuItems.find(item => item.label === savedSettings.selectedPath);
-      if (savedPath != null) {
+    this._disposables.add(_rxjsCompatUmdMin.Observable.fromPromise(this._getPathMenuItems()).subscribe(pathMenuItems => {
+      (0, _nuclideDebuggerCommon().deserializeDebuggerConfig)(...this._getSerializationArgs(), (transientSettings, savedSettings) => {
+        const items = pathMenuItems.getOrDefault([]);
+        const savedPath = items.find(item => item.label === savedSettings.selectedPath);
+        const savedIndex = items.indexOf(savedPath);
         this.setState({
-          selectedPathIndex: this.state.pathMenuItems.indexOf(savedPath)
+          selectedPathIndex: savedIndex < 0 ? 0 : savedIndex,
+          attachType: savedSettings.attachType != null ? savedSettings.attachType : 'webserver'
         });
-      }
-      this.setState({
-        attachType: savedSettings.attachType != null ? savedSettings.attachType : 'webserver'
       });
-    });
+    }));
 
     this.props.configIsValidChanged(this._debugButtonShouldEnable());
+
     this._disposables.add(atom.commands.add('atom-workspace', {
       'core:confirm': () => {
         if (this._debugButtonShouldEnable()) {
@@ -140,7 +169,7 @@ class AttachUiComponent extends _react.Component {
       }
     }));
 
-    this._attachTargetSub = _rxjsBundlesRxMinJs.Observable.interval(2000).switchMap(async () => {
+    this._attachTargetSub = _rxjsCompatUmdMin.Observable.interval(2000).switchMap(async () => {
       await this._refreshTargetList();
     }).subscribe();
   }
@@ -154,53 +183,39 @@ class AttachUiComponent extends _react.Component {
   }
 
   _debugButtonShouldEnable() {
-    return this.state.attachType === 'webserver' || this.state.attachPort != null;
+    const selectedPath = !this.state.pathMenuItems.isPending && !this.state.pathMenuItems.isError ? this.state.pathMenuItems.value[this.state.selectedPathIndex] : null;
+    return this.state.attachType === 'webserver' && selectedPath != null || this.state.attachPort != null;
   }
 
   async _refreshTargetList() {
-    const service = await (0, (_nuclideRemoteConnection || _load_nuclideRemoteConnection()).getHhvmDebuggerServiceByNuclideUri)(this.props.targetUri);
+    const service = await (0, _nuclideRemoteConnection().getHhvmDebuggerServiceByNuclideUri)(this.props.targetUri);
+
     if (service != null) {
       const attachTargets = await service.getAttachTargetList();
-      this.setState({ attachTargets: (_expected || _load_expected()).Expect.value(attachTargets) });
+      this.setState({
+        attachTargets: _expected().Expect.value(attachTargets)
+      });
     }
   }
 
   render() {
-    const emptyComponent = this.state.attachTargets.isPending ? () => _react.createElement(
-      'div',
-      { className: 'debugger-php-attach-list-empty' },
-      'Loading...'
-    ) : () => _react.createElement(
-      'div',
-      { className: 'debugger-php-attach-list-empty' },
-      'To enable attaching this debugger, pass the arguments:',
-      _react.createElement('br', null),
-      _react.createElement(
-        'b',
-        null,
-        '--mode vsdebug --vsDebugPort <port>'
-      ),
-      _react.createElement('br', null),
-      'and optionally ',
-      _react.createElement(
-        'b',
-        null,
-        '--vsDebugNoWait'
-      ),
-      ' to HHVM when launching your script. The script should then show in this list.'
-    );
-
-    const rows = this.state.attachTargets.isPending || this.state.attachTargets.isError ? [] : this.state.attachTargets.value.map(target => ({
+    const emptyComponent = this.state.attachTargets.isPending ? () => React.createElement("div", {
+      className: "debugger-php-attach-list-empty"
+    }, "Loading...") : () => React.createElement("div", {
+      className: "debugger-php-attach-list-empty"
+    }, "To enable attaching this debugger, pass the arguments:", React.createElement("br", null), React.createElement("b", null, "--mode vsdebug --vsDebugPort <port>"), React.createElement("br", null), "and optionally ", React.createElement("b", null, "--vsDebugNoWait"), " to HHVM when launching your script. The script should then show in this list.");
+    const rows = this.state.attachTargets.getOrDefault([]).map(target => ({
       data: {
         pid: target.pid,
         command: target.command
       }
     }));
-
     let selectedIndex = -1;
+
     if (this.state.attachPort != null) {
       for (let i = 0; i < rows.length; i++) {
         const row = rows[i];
+
         if (this.state.attachPort === this._getPortFromHHVMArgs(row.data.command)) {
           selectedIndex = i;
           break;
@@ -208,89 +223,61 @@ class AttachUiComponent extends _react.Component {
       }
     }
 
-    return _react.createElement(
-      'div',
-      { className: 'block' },
-      _react.createElement(
-        'div',
-        { className: 'nuclide-ui-radiogroup-div' },
-        _react.createElement('input', {
-          className: 'input-radio',
-          type: 'radio',
-          checked: this.state.attachType === 'webserver',
-          name: 'radiogroup-attachtype',
-          onChange: () => this.setState({ attachType: 'webserver', attachPort: null })
-        }),
-        _react.createElement(
-          'label',
-          { className: 'input-label nuclide-ui-radiogroup-label' },
-          _react.createElement(
-            'b',
-            null,
-            'Attach to webserver'
-          )
-        ),
-        _react.createElement(
-          'div',
-          { className: 'debugger-php-launch-attach-ui-select-project' },
-          _react.createElement(
-            'label',
-            null,
-            'Selected Project Directory: '
-          ),
-          _react.createElement((_Dropdown || _load_Dropdown()).Dropdown, {
-            className: 'inline-block debugger-connection-box',
-            options: this.state.pathMenuItems,
-            onChange: this._handlePathsDropdownChange,
-            value: this.state.selectedPathIndex,
-            disabled: this.state.attachType !== 'webserver'
-          })
-        ),
-        _react.createElement(
-          'div',
-          null,
-          _react.createElement('input', {
-            className: 'input-radio',
-            type: 'radio',
-            checked: this.state.attachType === 'script',
-            name: 'radiogroup-attachtype',
-            onChange: () => this.setState({
-              attachType: 'script',
-              attachPort: selectedIndex >= 0 && selectedIndex < rows.length ? this._getPortFromHHVMArgs(rows[selectedIndex].data.command) : null
-            })
-          }),
-          _react.createElement(
-            'label',
-            { className: 'input-label nuclide-ui-radiogroup-label' },
-            _react.createElement(
-              'b',
-              null,
-              'Attach to an already-running PHP/Hack script'
-            )
-          ),
-          _react.createElement(
-            'div',
-            { className: 'debugger-php-launch-attach-ui-select-script' },
-            this.state.attachType === 'script' ? _react.createElement((_Table || _load_Table()).Table, {
-              emptyComponent: emptyComponent,
-              columns: getColumns(),
-              fixedHeader: true,
-              maxBodyHeight: '30em',
-              rows: rows,
-              sortable: false,
-              selectable: true,
-              selectedIndex: selectedIndex,
-              onSelect: item => {
-                this.setState({
-                  attachPort: this._getPortFromHHVMArgs(item.command)
-                });
-              },
-              collapsable: true
-            }) : null
-          )
-        )
-      )
-    );
+    const pathMenuItems = this.state.pathMenuItems.isPending || this.state.pathMenuItems.isError ? [] : this.state.pathMenuItems.value;
+    return React.createElement("div", {
+      className: "block"
+    }, React.createElement("div", {
+      className: "nuclide-ui-radiogroup-div"
+    }, React.createElement("input", {
+      className: "input-radio",
+      type: "radio",
+      checked: this.state.attachType === 'webserver',
+      name: "radiogroup-attachtype",
+      onChange: () => this.setState({
+        attachType: 'webserver',
+        attachPort: null
+      })
+    }), React.createElement("label", {
+      className: "input-label nuclide-ui-radiogroup-label"
+    }, React.createElement("b", null, "Attach to webserver")), React.createElement("div", {
+      className: "debugger-php-launch-attach-ui-select-project"
+    }, React.createElement("label", null, "Selected Project Directory: "), pathMenuItems.length > 0 ? React.createElement(_Dropdown().Dropdown, {
+      className: "inline-block debugger-connection-box",
+      options: pathMenuItems.map(item => Object.assign({}, item, {
+        disabled: false
+      })),
+      onChange: this._handlePathsDropdownChange,
+      value: this.state.selectedPathIndex,
+      disabled: this.state.attachType !== 'webserver'
+    }) : React.createElement("div", null, this.state.pathMenuItems.isPending ? 'Loading project roots...' : 'No Hack roots found! Try adding a directory that contains your .hhconfig file to the file tree!')), React.createElement("div", null, React.createElement("input", {
+      className: "input-radio",
+      type: "radio",
+      checked: this.state.attachType === 'script',
+      name: "radiogroup-attachtype",
+      onChange: () => this.setState({
+        attachType: 'script',
+        attachPort: selectedIndex >= 0 && selectedIndex < rows.length ? this._getPortFromHHVMArgs(rows[selectedIndex].data.command) : null
+      })
+    }), React.createElement("label", {
+      className: "input-label nuclide-ui-radiogroup-label"
+    }, React.createElement("b", null, "Attach to an already-running PHP/Hack script")), React.createElement("div", {
+      className: "debugger-php-launch-attach-ui-select-script"
+    }, this.state.attachType === 'script' ? React.createElement(_Table().Table, {
+      emptyComponent: emptyComponent,
+      columns: getColumns(),
+      fixedHeader: true,
+      maxBodyHeight: "30em",
+      rows: rows,
+      sortable: false,
+      selectable: true,
+      selectedIndex: selectedIndex,
+      onSelect: item => {
+        this.setState({
+          attachPort: this._getPortFromHHVMArgs(item.command)
+        });
+      },
+      collapsable: true
+    }) : null))));
   }
 
   _getPortFromHHVMArgs(command) {
@@ -299,28 +286,62 @@ class AttachUiComponent extends _react.Component {
     return match != null && match.length >= 3 ? parseInt(match[2], 10) : null;
   }
 
-  _getPathMenuItems() {
-    const connections = (_nuclideRemoteConnection || _load_nuclideRemoteConnection()).RemoteConnection.getByHostname((_nuclideUri || _load_nuclideUri()).default.getHostname(this.props.targetUri));
-    return connections.map((connection, index) => {
-      const pathToProject = connection.getPath();
-      return {
-        label: pathToProject,
-        value: index
-      };
+  async _getPathMenuItems() {
+    const connections = _nuclideRemoteConnection().RemoteConnection.getByHostname(_nuclideUri().default.isRemote(this.props.targetUri) ? _nuclideUri().default.getHostname(this.props.targetUri) : 'local');
+
+    const pathMenuItems = [];
+
+    if (_nuclideUri().default.isRemote(this.props.targetUri)) {
+      // $FlowIgnore filter ensures not null
+      pathMenuItems.push(...(await Promise.all(connections.map(async (connection, index) => {
+        const pathToProject = connection.getPath();
+        const fsSvc = (0, _nuclideRemoteConnection().getFileSystemServiceByNuclideUri)(connection.getUri());
+
+        if ((await fsSvc.findNearestAncestorNamed('.hhconfig', pathToProject)) != null) {
+          return {
+            label: pathToProject,
+            value: index
+          };
+        }
+
+        return null;
+      }))).filter(p => p != null));
+    } else {
+      const fsSvc = (0, _nuclideRemoteConnection().getFileSystemServiceByNuclideUri)(this.props.targetUri);
+      await Promise.all(atom.project.getPaths().filter(p => _nuclideUri().default.isLocal(p)).map(async path => {
+        if ((await fsSvc.findNearestAncestorNamed('.hhconfig', path)) != null) {
+          pathMenuItems.push({
+            label: path,
+            value: pathMenuItems.length
+          });
+        }
+      }));
+    } // Flow missing that pathMenuItems[i] is never null due to the filter above.
+
+
+    const val = _expected().Expect.value([...pathMenuItems]);
+
+    this.setState({
+      pathMenuItems: val
     });
+    return val;
   }
 
   async _handleAttachButtonClick() {
     // Start a debug session with the user-supplied information.
-    const { hostname } = (_nuclideUri || _load_nuclideUri()).default.parseRemoteUri(this.props.targetUri);
-    const selectedPath = this.state.attachType === 'webserver' ? this.state.pathMenuItems[this.state.selectedPathIndex].label : '/';
-
-    await this.props.startAttachProcessInfo((_nuclideUri || _load_nuclideUri()).default.createRemoteUri(hostname, selectedPath), this.state.attachPort, this.state.attachType === 'webserver');
-
-    (0, (_nuclideDebuggerCommon || _load_nuclideDebuggerCommon()).serializeDebuggerConfig)(...this._getSerializationArgs(), {
+    const {
+      hostname
+    } = _nuclideUri().default.isRemote(this.props.targetUri) ? _nuclideUri().default.parseRemoteUri(this.props.targetUri) : {
+      hostname: ''
+    };
+    const selectedPath = this.state.attachType === 'webserver' && !this.state.pathMenuItems.isPending && !this.state.pathMenuItems.isError ? this.state.pathMenuItems.value[this.state.selectedPathIndex].label : '/';
+    await this.props.startAttachProcessConfig(_nuclideUri().default.isRemote(this.props.targetUri) ? _nuclideUri().default.createRemoteUri(hostname, selectedPath) : 'local', this.state.attachPort, this.state.attachType === 'webserver');
+    (0, _nuclideDebuggerCommon().serializeDebuggerConfig)(...this._getSerializationArgs(), {
       selectedPath,
       attachType: this.state.attachType
     });
   }
+
 }
+
 exports.AttachUiComponent = AttachUiComponent;

@@ -1,4 +1,4 @@
-'use strict';
+"use strict";
 
 Object.defineProperty(exports, "__esModule", {
   value: true
@@ -10,21 +10,20 @@ exports.get_declaration_info = get_declaration_info;
 exports.get_outline = get_outline;
 exports.get_local_references = get_local_references;
 
-
+/**
+ * Copyright (c) 2015-present, Facebook, Inc.
+ * All rights reserved.
+ *
+ * This source code is licensed under the license found in the LICENSE file in
+ * the root directory of this source tree.
+ *
+ *  strict-local
+ * @format
+ */
 // This file contains RPC definitions for clang_server.py.
-
 function compile(contents) {
   throw new Error('Rpc Stub');
-} /**
-   * Copyright (c) 2015-present, Facebook, Inc.
-   * All rights reserved.
-   *
-   * This source code is licensed under the license found in the LICENSE file in
-   * the root directory of this source tree.
-   *
-   *  strict-local
-   * @format
-   */
+}
 
 function get_completions(contents, line, column, tokenStartColumn, prefix) {
   throw new Error('Rpc Stub');

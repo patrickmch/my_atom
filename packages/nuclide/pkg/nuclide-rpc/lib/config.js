@@ -1,8 +1,10 @@
-'use strict';
+"use strict";
 
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
+exports.SERVICE_FRAMEWORK3_PROTOCOL = void 0;
+
 /**
  * Copyright (c) 2015-present, Facebook, Inc.
  * All rights reserved.
@@ -13,5 +15,5 @@ Object.defineProperty(exports, "__esModule", {
  *  strict
  * @format
  */
-
-const SERVICE_FRAMEWORK3_PROTOCOL = exports.SERVICE_FRAMEWORK3_PROTOCOL = 'service_framework3_rpc';
+const SERVICE_FRAMEWORK3_PROTOCOL = 'service_framework3_rpc';
+exports.SERVICE_FRAMEWORK3_PROTOCOL = SERVICE_FRAMEWORK3_PROTOCOL;

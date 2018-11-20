@@ -153,10 +153,11 @@ class NotesStore extends EventEmitter {
    * @param {DocumentItem} doc
    */
   addDocument (doc) {
-    if (isEmpty(doc)) return
-    this._documents[doc.filePath] = doc
+    if (!doc || isEmpty(doc)) return
+    const key = fs.realpathSync(doc.filePath)
+    this._documents[key] = doc
     let data = {
-      id: doc.filePath,
+      id: key,
       title: doc.title,
       body: doc.body,
       abstract: doc.abstract
@@ -173,10 +174,11 @@ class NotesStore extends EventEmitter {
    * @param {DocumentItem} doc
    */
   updateDocument (doc) {
-    if (isEmpty(doc)) return
-    this._documents[doc.filePath] = doc
+    if (!doc || isEmpty(doc)) return
+    const key = fs.realpathSync(doc.filePath)
+    this._documents[key] = doc
     let data = {
-      id: doc.filePath,
+      id: key,
       title: doc.title,
       body: doc.body,
       abstract: doc.abstract
@@ -193,11 +195,11 @@ class NotesStore extends EventEmitter {
    * @param {DocumentItem} doc
    */
   removeDocument (doc) {
-    if (isEmpty(doc)) return false
-    if (doc === undefined) return false
-    delete this._documents[doc.filePath]
+    if (!doc || isEmpty(doc)) return false
+    const key = doc.filePath
+    delete this._documents[key]
     let data = {
-      id: doc.filePath,
+      id: key,
       title: doc.title,
       body: doc.body,
       abstract: doc.abstract

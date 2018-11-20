@@ -3,6 +3,8 @@
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
+exports.default = void 0;
+
 /**
  * Copyright (c) 2015-present, Facebook, Inc.
  * All rights reserved.
@@ -13,9 +15,10 @@ Object.defineProperty(exports, "__esModule", {
  *  strict
  * @format
  */
-
-exports.default = Object.freeze({
+var _default = Object.freeze({
   NONE: 0,
   CONNECTED: 1,
   DISCONNECTED: 2
 });
+
+exports.default = _default;

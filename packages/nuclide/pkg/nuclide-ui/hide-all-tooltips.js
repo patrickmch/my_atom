@@ -4,6 +4,7 @@ Object.defineProperty(exports, "__esModule", {
   value: true
 });
 exports.default = hideAllTooltips;
+
 /**
  * Copyright (c) 2015-present, Facebook, Inc.
  * All rights reserved.
@@ -14,7 +15,6 @@ exports.default = hideAllTooltips;
  *  strict
  * @format
  */
-
 function hideAllTooltips() {
   atom.tooltips.tooltips.forEach(([tooltip]) => tooltip.hide());
 }

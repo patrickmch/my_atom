@@ -1,4 +1,4 @@
-'use strict';
+"use strict";
 
 Object.defineProperty(exports, "__esModule", {
   value: true
@@ -7,69 +7,109 @@ exports.setRpcService = setRpcService;
 exports.listenToRemoteDebugCommands = listenToRemoteDebugCommands;
 exports.getRemoteDebuggerCommandServiceByNuclideUri = getRemoteDebuggerCommandServiceByNuclideUri;
 
-var _debugger;
+function _debugger() {
+  const data = require("../nuclide-commons-atom/debugger");
 
-function _load_debugger() {
-  return _debugger = require('../nuclide-commons-atom/debugger');
+  _debugger = function () {
+    return data;
+  };
+
+  return data;
 }
 
-var _projects;
+function _projects() {
+  const data = require("../nuclide-commons-atom/projects");
 
-function _load_projects() {
-  return _projects = require('../nuclide-commons-atom/projects');
+  _projects = function () {
+    return data;
+  };
+
+  return data;
 }
 
-var _nuclideUri;
+function _nuclideUri() {
+  const data = _interopRequireDefault(require("../nuclide-commons/nuclideUri"));
 
-function _load_nuclideUri() {
-  return _nuclideUri = _interopRequireDefault(require('../nuclide-commons/nuclideUri'));
+  _nuclideUri = function () {
+    return data;
+  };
+
+  return data;
 }
 
-var _observable;
+function _observable() {
+  const data = require("../nuclide-commons/observable");
 
-function _load_observable() {
-  return _observable = require('../nuclide-commons/observable');
+  _observable = function () {
+    return data;
+  };
+
+  return data;
 }
 
-var _UniversalDisposable;
+function _UniversalDisposable() {
+  const data = _interopRequireDefault(require("../nuclide-commons/UniversalDisposable"));
 
-function _load_UniversalDisposable() {
-  return _UniversalDisposable = _interopRequireDefault(require('../nuclide-commons/UniversalDisposable'));
+  _UniversalDisposable = function () {
+    return data;
+  };
+
+  return data;
 }
 
-var _nuclideDebuggerCommon;
+function _nuclideDebuggerCommon() {
+  const data = require("../nuclide-debugger-common");
 
-function _load_nuclideDebuggerCommon() {
-  return _nuclideDebuggerCommon = require('../nuclide-debugger-common');
+  _nuclideDebuggerCommon = function () {
+    return data;
+  };
+
+  return data;
 }
 
-var _rxjsBundlesRxMinJs = require('rxjs/bundles/Rx.min.js');
+var _rxjsCompatUmdMin = require("rxjs-compat/bundles/rxjs-compat.umd.min.js");
 
-var _analytics;
+function _analytics() {
+  const data = require("../nuclide-commons/analytics");
 
-function _load_analytics() {
-  return _analytics = require('../nuclide-commons/analytics');
+  _analytics = function () {
+    return data;
+  };
+
+  return data;
 }
 
-var _RemoteDebuggerCommandService;
+function RemoteDebuggerCommandServiceLocal() {
+  const data = _interopRequireWildcard(require("./RemoteDebuggerCommandService"));
 
-function _load_RemoteDebuggerCommandService() {
-  return _RemoteDebuggerCommandService = _interopRequireWildcard(require('./RemoteDebuggerCommandService'));
+  RemoteDebuggerCommandServiceLocal = function () {
+    return data;
+  };
+
+  return data;
 }
 
-var _nullthrows;
+function _nullthrows() {
+  const data = _interopRequireDefault(require("nullthrows"));
 
-function _load_nullthrows() {
-  return _nullthrows = _interopRequireDefault(require('nullthrows'));
+  _nullthrows = function () {
+    return data;
+  };
+
+  return data;
 }
 
-var _log4js;
+function _log4js() {
+  const data = require("log4js");
 
-function _load_log4js() {
-  return _log4js = require('log4js');
+  _log4js = function () {
+    return data;
+  };
+
+  return data;
 }
 
-function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
+function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) { var desc = Object.defineProperty && Object.getOwnPropertyDescriptor ? Object.getOwnPropertyDescriptor(obj, key) : {}; if (desc.get || desc.set) { Object.defineProperty(newObj, key, desc); } else { newObj[key] = obj[key]; } } } } newObj.default = obj; return newObj; } }
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -84,11 +124,16 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
  * 
  * @format
  */
-
 let _rpcService = null;
 
-async function getPythonAttachTargetProcessInfo(targetRootUri, target) {
-  return new (_nuclideDebuggerCommon || _load_nuclideDebuggerCommon()).VspProcessInfo(targetRootUri, 'attach', (_nuclideDebuggerCommon || _load_nuclideDebuggerCommon()).VsAdapterTypes.PYTHON, null, getPythonAttachTargetConfig(target), { threads: true });
+function getPythonAttachTargetProcessConfig(targetRootUri, target) {
+  return {
+    targetUri: targetRootUri,
+    debugMode: 'attach',
+    adapterType: _nuclideDebuggerCommon().VsAdapterTypes.PYTHON,
+    config: getPythonAttachTargetConfig(target),
+    servicedFileExtensions: ['py']
+  };
 }
 
 function getPythonAttachTargetConfig(target) {
@@ -102,39 +147,52 @@ function getPythonAttachTargetConfig(target) {
 
 function setRpcService(rpcService) {
   _rpcService = rpcService;
-  return new (_UniversalDisposable || _load_UniversalDisposable()).default(() => {
+  return new (_UniversalDisposable().default)(() => {
     _rpcService = null;
   });
 }
 
 function listenToRemoteDebugCommands() {
-  const addedHostnames = (0, (_projects || _load_projects()).observeAddedHostnames)().startWith('local');
-
+  const addedHostnames = (0, _projects().observeAddedHostnames)().startWith('local');
   const remoteDebuggerServices = addedHostnames.flatMap(hostname => {
-    const rootUri = hostname === 'local' ? '' : (_nuclideUri || _load_nuclideUri()).default.createRemoteUri(hostname, '/');
+    const rootUri = hostname === 'local' ? '' : _nuclideUri().default.createRemoteUri(hostname, '/');
     const service = getRemoteDebuggerCommandServiceByNuclideUri(rootUri);
+
     if (service == null) {
-      (0, (_log4js || _load_log4js()).getLogger)().error('null remote command service for uri:', rootUri);
-      return _rxjsBundlesRxMinJs.Observable.empty();
+      (0, _log4js().getLogger)().error('null remote command service for uri:', rootUri);
+      return _rxjsCompatUmdMin.Observable.empty();
     } else {
-      return _rxjsBundlesRxMinJs.Observable.of({ service, rootUri });
+      return _rxjsCompatUmdMin.Observable.of({
+        service,
+        rootUri
+      });
     }
   });
-
-  return new (_UniversalDisposable || _load_UniversalDisposable()).default(remoteDebuggerServices.flatMap(({ service, rootUri }) => {
+  return new (_UniversalDisposable().default)(remoteDebuggerServices.flatMap(({
+    service,
+    rootUri
+  }) => {
     return service.observeAttachDebugTargets().refCount().map(targets => findDuplicateAttachTargetIds(targets));
-  }).subscribe(duplicateTargetIds => notifyDuplicateDebugTargets(duplicateTargetIds)), remoteDebuggerServices.flatMap(({ service, rootUri }) => {
+  }).subscribe(duplicateTargetIds => notifyDuplicateDebugTargets(duplicateTargetIds)), remoteDebuggerServices.flatMap(({
+    service,
+    rootUri
+  }) => {
     return service.observeRemoteDebugCommands().refCount().catch(error => {
       // eslint-disable-next-line no-console
       console.warn('Failed to listen to remote debug commands - ' + 'You could be running locally with two Atom windows. ' + `IsLocal: ${String(rootUri === '')}`);
-      return _rxjsBundlesRxMinJs.Observable.empty();
-    }).map(command => ({ rootUri, command }));
-  }).let((0, (_observable || _load_observable()).fastDebounce)(500)).subscribe(async ({ rootUri, command }) => {
-    const attachProcessInfo = await getPythonAttachTargetProcessInfo(rootUri, command.target);
-    const debuggerService = await (0, (_debugger || _load_debugger()).getDebuggerService)();
-    (0, (_analytics || _load_analytics()).track)('fb-python-debugger-auto-attach');
-    debuggerService.startDebugging(attachProcessInfo);
-    // Otherwise, we're already debugging that target.
+      return _rxjsCompatUmdMin.Observable.empty();
+    }).map(command => ({
+      rootUri,
+      command
+    }));
+  }).let((0, _observable().fastDebounce)(500)).subscribe(async ({
+    rootUri,
+    command
+  }) => {
+    const attachProcessConfig = getPythonAttachTargetProcessConfig(rootUri, command.target);
+    const debuggerService = await (0, _debugger().getDebuggerService)();
+    (0, _analytics().track)('fb-python-debugger-auto-attach');
+    debuggerService.startVspDebugging(attachProcessConfig); // Otherwise, we're already debugging that target.
   }));
 }
 
@@ -148,6 +206,7 @@ function notifyDuplicateDebugTargets(duplicateTargetIds) {
       buttons: [{
         onDidClick: () => {
           shouldNotifyDuplicateTargets = false;
+
           if (duplicateTargetsNotification != null) {
             duplicateTargetsNotification.dismiss();
           }
@@ -167,10 +226,14 @@ function findDuplicateAttachTargetIds(targets) {
   const targetIds = new Set();
   const duplicateTargetIds = new Set();
   targets.forEach(target => {
-    const { id } = target;
+    const {
+      id
+    } = target;
+
     if (id == null) {
       return;
     }
+
     if (targetIds.has(id)) {
       duplicateTargetIds.add(id);
     } else {
@@ -181,9 +244,9 @@ function findDuplicateAttachTargetIds(targets) {
 }
 
 function getRemoteDebuggerCommandServiceByNuclideUri(uri) {
-  if (!(_nuclideUri || _load_nuclideUri()).default.isRemote(uri)) {
-    return _RemoteDebuggerCommandService || _load_RemoteDebuggerCommandService();
+  if (_rpcService == null && !_nuclideUri().default.isRemote(uri)) {
+    return RemoteDebuggerCommandServiceLocal();
   }
 
-  return (0, (_nullthrows || _load_nullthrows()).default)(_rpcService).getServiceByNuclideUri('RemoteDebuggerCommandService', uri);
+  return (0, _nullthrows().default)(_rpcService).getServiceByNuclideUri('RemoteDebuggerCommandService', uri);
 }

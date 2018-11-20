@@ -1,14 +1,18 @@
-'use strict';
+"use strict";
 
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
 exports.initialize = initialize;
 
-var _FileCache;
+function _FileCache() {
+  const data = require("./FileCache");
 
-function _load_FileCache() {
-  return _FileCache = require('./FileCache');
+  _FileCache = function () {
+    return data;
+  };
+
+  return data;
 }
 
 /**
@@ -21,7 +25,6 @@ function _load_FileCache() {
  *  strict-local
  * @format
  */
-
 async function initialize() {
-  return new (_FileCache || _load_FileCache()).FileCache();
+  return new (_FileCache().FileCache)();
 }

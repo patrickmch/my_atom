@@ -1,14 +1,18 @@
-'use strict';
+"use strict";
 
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
 exports.getHyperclickProvider = getHyperclickProvider;
 
-var _HyperclickProviderHelpers;
+function _HyperclickProviderHelpers() {
+  const data = _interopRequireDefault(require("./HyperclickProviderHelpers"));
 
-function _load_HyperclickProviderHelpers() {
-  return _HyperclickProviderHelpers = _interopRequireDefault(require('./HyperclickProviderHelpers'));
+  _HyperclickProviderHelpers = function () {
+    return data;
+  };
+
+  return data;
 }
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
@@ -23,15 +27,16 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
  *  strict-local
  * @format
  */
-
 function getHyperclickProvider() {
   return {
     providerName: 'url-hyperclick',
     // Allow all language-specific providers to take priority.
-    priority: 5,
+    priority: 99,
     wordRegExp: /[^\s]+/g,
+
     getSuggestionForWord(textEditor, text, range) {
-      return (_HyperclickProviderHelpers || _load_HyperclickProviderHelpers()).default.getSuggestionForWord(textEditor, text, range);
+      return _HyperclickProviderHelpers().default.getSuggestionForWord(textEditor, text, range);
     }
+
   };
 }

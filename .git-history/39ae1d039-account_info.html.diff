@@ -1,0 +1,40 @@
+diff --git a/nols_website/wmi/templates/dataentry/fragments/account_info.html b/nols_website/wmi/templates/dataentry/fragments/account_info.html
+index f081c7fce..a70103a96 100644
+--- a/nols_website/wmi/templates/dataentry/fragments/account_info.html
++++ b/nols_website/wmi/templates/dataentry/fragments/account_info.html
+@@ -1,32 +1,34 @@
+ {% with hide_personal_fieldset=True %}
+   <h3>
+     Account Information
+   </h3>
+     {% for title, info in acct_info.items %}
+       <div class="{{ wrapper_class }}">
+         <div class="panel-heading">
+           <strong>{{ title }}</strong>
+             {% if info.add_link and info.edit_link %}
+               (<a href="{{ info.add_link }}" role="button">Add</a> | <a href="{{ info.edit_link }}">Edit</a>)
++            {% elif info.edit_link %}
++              (<a href="{{ info.edit_link }}">Edit</a>)
+             {% elif info.add_modal %}
+               (<a data-open="{{ info.add_modal }}" role="button">Add</a>)
+             {% elif info.edit_modal %}
+               (<a data-open="{{ info.edit_modal }}">Edit</a>)
+             {% endif %}
+         </div>
+         <div class="panel-body">
+           {% if title == "Personal" %}
+             {% include "core/fragments/personal_info_condensed_display.html" %}
+           {% else %}
+           <ul>
+             {% for item in info.data %}
+             <li>
+-              {{ item|prevent_orphans }}
++              {{ item.display|prevent_orphans }}
+             </li>
+             {% endfor %}
+           </ul>
+           {% endif %}
+         </div>
+       </div>
+     {% endfor %}
+ {% endwith %}

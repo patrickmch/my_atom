@@ -1,0 +1,4 @@
+- See if you can remove some more duplicated javascript from base.html (ie. citizenship stuff)
+- Test out base.html javascript
+- Do you want to re-add the `setTimeout` thingy on dataentry.js?
+- 

@@ -5,7 +5,6 @@
   "description": "Provides support for Infer AL in Nuclide",
   "author": "NEEDS OWNER",
   "activationCommands": {},
-  "atomTestRunner": "../../lib/test-runner-entry.js",
   "nuclide": {
     "configMetadata": {
       "pathComponents": [
@@ -20,8 +19,7 @@
         "default": "infer"
       }
     },
-    "packageType": "Atom",
-    "testRunner": "apm"
+    "packageType": "AtomPackage"
   },
   "providedServices": {
     "linter": {

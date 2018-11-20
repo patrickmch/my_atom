@@ -1,155 +1,273 @@
-'use strict';
+"use strict";
 
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.__test__ = exports.ServerConnection = exports.BIG_DIG_VERSION = undefined;
+exports.__test__ = exports.ServerConnection = exports.BIG_DIG_VERSION = void 0;
 
-var _config;
+function _config() {
+  const data = require("../../nuclide-rpc/lib/config");
 
-function _load_config() {
-  return _config = require('../../nuclide-rpc/lib/config');
+  _config = function () {
+    return data;
+  };
+
+  return data;
 }
 
-var _event;
+function _event() {
+  const data = require("../../../modules/nuclide-commons/event");
 
-function _load_event() {
-  return _event = require('../../../modules/nuclide-commons/event');
+  _event = function () {
+    return data;
+  };
+
+  return data;
 }
 
-var _nuclideRpc;
+function _nuclideRpc() {
+  const data = require("../../nuclide-rpc");
 
-function _load_nuclideRpc() {
-  return _nuclideRpc = require('../../nuclide-rpc');
+  _nuclideRpc = function () {
+    return data;
+  };
+
+  return data;
 }
 
-var _rxjsBundlesRxMinJs = require('rxjs/bundles/Rx.min.js');
+var _rxjsCompatUmdMin = require("rxjs-compat/bundles/rxjs-compat.umd.min.js");
 
-var _servicesConfig;
+function _servicesConfig() {
+  const data = _interopRequireDefault(require("../../nuclide-server/lib/servicesConfig"));
 
-function _load_servicesConfig() {
-  return _servicesConfig = _interopRequireDefault(require('../../nuclide-server/lib/servicesConfig'));
+  _servicesConfig = function () {
+    return data;
+  };
+
+  return data;
 }
 
-var _RemoteConnectionConfigurationManager;
+function _RemoteConnectionConfigurationManager() {
+  const data = require("./RemoteConnectionConfigurationManager");
 
-function _load_RemoteConnectionConfigurationManager() {
-  return _RemoteConnectionConfigurationManager = require('./RemoteConnectionConfigurationManager');
+  _RemoteConnectionConfigurationManager = function () {
+    return data;
+  };
+
+  return data;
 }
 
-var _ConnectionHealthNotifier;
+function _ConnectionHealthNotifier() {
+  const data = require("./ConnectionHealthNotifier");
 
-function _load_ConnectionHealthNotifier() {
-  return _ConnectionHealthNotifier = require('./ConnectionHealthNotifier');
+  _ConnectionHealthNotifier = function () {
+    return data;
+  };
+
+  return data;
 }
 
-var _RemoteFile;
+function _RemoteFile() {
+  const data = require("./RemoteFile");
 
-function _load_RemoteFile() {
-  return _RemoteFile = require('./RemoteFile');
+  _RemoteFile = function () {
+    return data;
+  };
+
+  return data;
 }
 
-var _RemoteDirectory;
+function _RemoteDirectory() {
+  const data = require("./RemoteDirectory");
 
-function _load_RemoteDirectory() {
-  return _RemoteDirectory = require('./RemoteDirectory');
+  _RemoteDirectory = function () {
+    return data;
+  };
+
+  return data;
 }
 
-var _nuclideMarshalersAtom;
+function _nuclideMarshalersClient() {
+  const data = require("../../nuclide-marshalers-client");
 
-function _load_nuclideMarshalersAtom() {
-  return _nuclideMarshalersAtom = require('../../nuclide-marshalers-atom');
+  _nuclideMarshalersClient = function () {
+    return data;
+  };
+
+  return data;
 }
 
-var _atom = require('atom');
+function _nuclideAnalytics() {
+  const data = require("../../../modules/nuclide-analytics");
 
-var _nuclideUri;
+  _nuclideAnalytics = function () {
+    return data;
+  };
 
-function _load_nuclideUri() {
-  return _nuclideUri = _interopRequireDefault(require('../../../modules/nuclide-commons/nuclideUri'));
+  return data;
 }
 
-var _promise;
+function _eventKit() {
+  const data = require("event-kit");
 
-function _load_promise() {
-  return _promise = require('../../../modules/nuclide-commons/promise');
+  _eventKit = function () {
+    return data;
+  };
+
+  return data;
 }
 
-var _SharedObservableCache;
+function _nuclideUri() {
+  const data = _interopRequireDefault(require("../../../modules/nuclide-commons/nuclideUri"));
 
-function _load_SharedObservableCache() {
-  return _SharedObservableCache = _interopRequireDefault(require('../../commons-node/SharedObservableCache'));
+  _nuclideUri = function () {
+    return data;
+  };
+
+  return data;
 }
 
-var _ReliableSocket;
+function _promise() {
+  const data = require("../../../modules/nuclide-commons/promise");
 
-function _load_ReliableSocket() {
-  return _ReliableSocket = require('../../../modules/big-dig/src/socket/ReliableSocket');
+  _promise = function () {
+    return data;
+  };
+
+  return data;
 }
 
-var _NuclideServer;
+function _SharedObservableCache() {
+  const data = _interopRequireDefault(require("../../commons-node/SharedObservableCache"));
 
-function _load_NuclideServer() {
-  return _NuclideServer = require('../../nuclide-server/lib/NuclideServer');
+  _SharedObservableCache = function () {
+    return data;
+  };
+
+  return data;
 }
 
-var _utils;
+function _ReliableSocket() {
+  const data = require("../../../modules/big-dig/src/socket/ReliableSocket");
 
-function _load_utils() {
-  return _utils = require('../../nuclide-server/lib/utils');
+  _ReliableSocket = function () {
+    return data;
+  };
+
+  return data;
 }
 
-var _log4js;
+function _NuclideServer() {
+  const data = require("../../nuclide-server/lib/NuclideServer");
 
-function _load_log4js() {
-  return _log4js = require('log4js');
+  _NuclideServer = function () {
+    return data;
+  };
+
+  return data;
 }
 
-var _nuclideVersion;
+function _utils() {
+  const data = require("../../nuclide-server/lib/utils");
 
-function _load_nuclideVersion() {
-  return _nuclideVersion = require('../../nuclide-version');
+  _utils = function () {
+    return data;
+  };
+
+  return data;
 }
 
-var _lookupPreferIpV;
+function _log4js() {
+  const data = require("log4js");
 
-function _load_lookupPreferIpV() {
-  return _lookupPreferIpV = _interopRequireDefault(require('./lookup-prefer-ip-v6'));
+  _log4js = function () {
+    return data;
+  };
+
+  return data;
 }
 
-var _createBigDigRpcClient;
+function _nuclideVersion() {
+  const data = require("../../nuclide-version");
 
-function _load_createBigDigRpcClient() {
-  return _createBigDigRpcClient = _interopRequireDefault(require('./createBigDigRpcClient'));
+  _nuclideVersion = function () {
+    return data;
+  };
+
+  return data;
 }
 
-var _electron = _interopRequireDefault(require('electron'));
+function _lookupPreferIpV() {
+  const data = _interopRequireDefault(require("./lookup-prefer-ip-v6"));
+
+  _lookupPreferIpV = function () {
+    return data;
+  };
+
+  return data;
+}
+
+function _createBigDigRpcClient() {
+  const data = _interopRequireDefault(require("./createBigDigRpcClient"));
+
+  _createBigDigRpcClient = function () {
+    return data;
+  };
+
+  return data;
+}
+
+function _passesGK() {
+  const data = require("../../../modules/nuclide-commons/passesGK");
+
+  _passesGK = function () {
+    return data;
+  };
+
+  return data;
+}
+
+function _ThriftRfsClientAdapter() {
+  const data = require("./thrift-service-adapters/ThriftRfsClientAdapter");
+
+  _ThriftRfsClientAdapter = function () {
+    return data;
+  };
+
+  return data;
+}
+
+var _electron = _interopRequireDefault(require("electron"));
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-const logger = (0, (_log4js || _load_log4js()).getLogger)('nuclide-remote-connection'); /**
-                                                                                         * Copyright (c) 2015-present, Facebook, Inc.
-                                                                                         * All rights reserved.
-                                                                                         *
-                                                                                         * This source code is licensed under the license found in the LICENSE file in
-                                                                                         * the root directory of this source tree.
-                                                                                         *
-                                                                                         * 
-                                                                                         * @format
-                                                                                         */
-
+/**
+ * Copyright (c) 2015-present, Facebook, Inc.
+ * All rights reserved.
+ *
+ * This source code is licensed under the license found in the LICENSE file in
+ * the root directory of this source tree.
+ *
+ * 
+ * @format
+ */
+const logger = (0, _log4js().getLogger)('nuclide-remote-connection');
+const thriftRfsLogger = (0, _log4js().getLogger)('thrift-rfs-server-connection');
 const remote = _electron.default.remote;
 const ipc = _electron.default.ipcRenderer;
+const THRIFT_RFS_GK = 'nuclide_thrift_rfs';
+const FILE_SYSTEM_PERFORMANCE_SAMPLE_RATE = 10;
 
 if (!remote) {
-  throw new Error('Invariant violation: "remote"');
+  throw new Error("Invariant violation: \"remote\"");
 }
 
 if (!ipc) {
-  throw new Error('Invariant violation: "ipc"');
+  throw new Error("Invariant violation: \"ipc\"");
 }
 
-const BIG_DIG_VERSION = exports.BIG_DIG_VERSION = 2;
+const BIG_DIG_VERSION = 2;
+exports.BIG_DIG_VERSION = BIG_DIG_VERSION;
 
 // ServerConnection represents the client side of a connection to a remote machine.
 // There can be at most one connection to a given remote machine at a time. Clients should
@@ -161,15 +279,18 @@ const BIG_DIG_VERSION = exports.BIG_DIG_VERSION = 2;
 // A ServerConnection keeps a list of RemoteConnections - one for each open directory on the remote
 // machine. Once all RemoteConnections have been closed, then the ServerConnection will close.
 class ServerConnection {
-
   static async getOrCreate(config) {
     const existingConnection = ServerConnection.getByHostname(config.host);
+
     if (existingConnection != null) {
       return existingConnection;
     }
 
     const newConnection = new ServerConnection(config);
+
     try {
+      await (0, _passesGK().onceGkInitializedAsync)(); // wait for GKs to be initialized
+
       await newConnection.initialize();
       return newConnection;
     } catch (e) {
@@ -180,25 +301,25 @@ class ServerConnection {
 
   static cancelConnection(hostname) {
     ServerConnection._emitter.emit('did-cancel', hostname);
-  }
-
-  // WARNING: This shuts down all Nuclide servers _without_ closing their
+  } // WARNING: This shuts down all Nuclide servers _without_ closing their
   // RemoteConnections first! This is extremely unsafe and
   // should only be used to forcibly kill Nuclide servers before restarting.
+
+
   static forceShutdownAllServers() {
     return ServerConnection.closeAll(true);
-  }
-
-  // WARNING: This shuts down all Nuclide servers _without_ closing their
+  } // WARNING: This shuts down all Nuclide servers _without_ closing their
   // RemoteConnections first! This is extremely unsafe and
   // should only be Called during shutdown, reload, or before autoupdate.
+
+
   static async closeAll(shutdown) {
-    await Promise.all(Array.from(ServerConnection._connections).map(([_, connection]) => {
+    await Promise.all(Array.from(ServerConnection._hostToConnection).map(([_, connection]) => {
       return connection._closeServerConnection(shutdown);
     }));
-  }
+  } // Do NOT call this from outside this class. Use ServerConnection.getOrCreate() instead.
 
-  // Do NOT call this from outside this class. Use ServerConnection.getOrCreate() instead.
+
   constructor(config) {
     this._config = config;
     this._closed = false;
@@ -207,30 +328,30 @@ class ServerConnection {
     this._bigDigClient = null;
     this._heartbeat = null;
     this._connections = [];
-    this._fileWatches = new (_SharedObservableCache || _load_SharedObservableCache()).default(path => {
+    this._fileWatches = new (_SharedObservableCache().default)(path => {
       const fileWatcherService = this.getService('FileWatcherService');
       return fileWatcherService.watchFile(path).refCount();
     });
-    this._directoryWatches = new (_SharedObservableCache || _load_SharedObservableCache()).default(path => {
+    this._directoryWatches = new (_SharedObservableCache().default)(path => {
       const fileWatcherService = this.getService('FileWatcherService');
       return fileWatcherService.watchDirectory(path).refCount();
     });
-
-    ipc.on((_RemoteConnectionConfigurationManager || _load_RemoteConnectionConfigurationManager()).SERVER_CONFIG_REQUEST_EVENT, (event, host, id) => {
+    ipc.on(_RemoteConnectionConfigurationManager().SERVER_CONFIG_REQUEST_EVENT, (event, host, id) => {
       logger.info(`received request for server config for ${host} from window ${id}`);
       let response = null;
+
       if (host === this._config.host) {
         logger.info(`found the server config for ${host}, sending it via ipc`);
         response = this._config;
       }
 
-      const window = remote.BrowserWindow.getAllWindows().filter(win => win.id === id)[0];
+      const theWindow = remote.BrowserWindow.getAllWindows().filter(win => win.id === id)[0];
 
-      if (!window) {
-        throw new Error('Invariant violation: "window"');
+      if (!theWindow) {
+        throw new Error("Invariant violation: \"theWindow\"");
       }
 
-      window.send((_RemoteConnectionConfigurationManager || _load_RemoteConnectionConfigurationManager()).SERVER_CONFIG_RESPONSE_EVENT, response);
+      theWindow.webContents.send(_RemoteConnectionConfigurationManager().SERVER_CONFIG_RESPONSE_EVENT, response);
     });
   }
 
@@ -247,15 +368,15 @@ class ServerConnection {
 
   _monitorConnectionHeartbeat() {
     if (!(this._healthNotifier == null)) {
-      throw new Error('Invariant violation: "this._healthNotifier == null"');
+      throw new Error("Invariant violation: \"this._healthNotifier == null\"");
     }
 
-    this._healthNotifier = new (_ConnectionHealthNotifier || _load_ConnectionHealthNotifier()).ConnectionHealthNotifier(this._config.host, this._config.port, this.getHeartbeat());
+    this._healthNotifier = new (_ConnectionHealthNotifier().ConnectionHealthNotifier)(this._config.host, this._config.port, this.getHeartbeat());
   }
 
   setOnHeartbeatError(onHeartbeatError) {
     if (!(this._healthNotifier != null)) {
-      throw new Error('Invariant violation: "this._healthNotifier != null"');
+      throw new Error("Invariant violation: \"this._healthNotifier != null\"");
     }
 
     this._healthNotifier.setOnHeartbeatError(onHeartbeatError);
@@ -266,23 +387,34 @@ class ServerConnection {
   }
 
   createDirectory(uri, hgRepositoryDescription, symlink = false) {
-    let { path } = (_nuclideUri || _load_nuclideUri()).default.parse(uri);
-    path = (_nuclideUri || _load_nuclideUri()).default.normalize(path);
-    return new (_RemoteDirectory || _load_RemoteDirectory()).RemoteDirectory(this, this.getUriOfRemotePath(path), symlink, {
+    let {
+      path
+    } = _nuclideUri().default.parse(uri);
+
+    path = _nuclideUri().default.normalize(path);
+    return new (_RemoteDirectory().RemoteDirectory)(this, this.getUriOfRemotePath(path), symlink, {
       hgRepositoryDescription
     });
   }
 
   createFile(uri, symlink = false) {
-    let { path } = (_nuclideUri || _load_nuclideUri()).default.parse(uri);
-    path = (_nuclideUri || _load_nuclideUri()).default.normalize(path);
-    return new (_RemoteFile || _load_RemoteFile()).RemoteFile(this, this.getUriOfRemotePath(path), symlink);
+    let {
+      path
+    } = _nuclideUri().default.parse(uri);
+
+    path = _nuclideUri().default.normalize(path);
+    return new (_RemoteFile().RemoteFile)(this, this.getUriOfRemotePath(path), symlink);
   }
 
   createFileAsDirectory(uri, hgRepositoryDescription, symlink = false) {
-    let { path } = (_nuclideUri || _load_nuclideUri()).default.parse(uri);
-    path = (_nuclideUri || _load_nuclideUri()).default.normalize(path);
-    return new (_RemoteDirectory || _load_RemoteDirectory()).RemoteDirectory(this, this.getUriOfRemotePath(path), symlink, Object.assign({}, hgRepositoryDescription, { isArchive: true }));
+    let {
+      path
+    } = _nuclideUri().default.parse(uri);
+
+    path = _nuclideUri().default.normalize(path);
+    return new (_RemoteDirectory().RemoteDirectory)(this, this.getUriOfRemotePath(path), symlink, Object.assign({}, hgRepositoryDescription, {
+      isArchive: true
+    }));
   }
 
   getFileWatch(path) {
@@ -295,58 +427,64 @@ class ServerConnection {
 
   async initialize() {
     await this._startRpc();
-    const clientVersion = (0, (_nuclideVersion || _load_nuclideVersion()).getVersion)();
+    const clientVersion = (0, _nuclideVersion().getVersion)();
 
     function throwVersionMismatch(version) {
       const err = new Error(`Version mismatch. Client at ${clientVersion} while server at ${version}.`);
       err.name = 'VersionMismatchError';
       throw err;
-    }
+    } // NOTE: BigDig's version may not actually match Nuclide's
 
-    // NOTE: BigDig's version may not actually match Nuclide's
+
     if (this._config.version !== 2) {
       // Test connection first. First time we get here we're checking to reestablish
       // connection using cached credentials. This will fail fast (faster than infoService)
       // when we don't have cached credentials yet.
       const heartbeatVersion = await this.getHeartbeat().sendHeartBeat();
+
       if (clientVersion !== heartbeatVersion) {
         throwVersionMismatch(heartbeatVersion);
       }
-    }
+    } // Do another version check over the RPC framework.
 
-    // Do another version check over the RPC framework.
-    const [serverVersion, ip] = await Promise.all([this._getInfoService().getServerVersion(), (0, (_lookupPreferIpV || _load_lookupPreferIpV()).default)(this._config.host)]);
+
+    const [serverVersion, ip] = await Promise.all([this._getInfoService().getServerVersion(), (0, _lookupPreferIpV().default)(this._config.host)]);
+
     if (clientVersion !== serverVersion) {
       throwVersionMismatch(serverVersion);
     }
 
     this._monitorConnectionHeartbeat();
 
-    ServerConnection._connections.set(this.getRemoteHostname(), this);
-    await (0, (_RemoteConnectionConfigurationManager || _load_RemoteConnectionConfigurationManager()).setConnectionConfig)(this._config, ip.address);
+    ServerConnection._hostToConnection.set(this.getRemoteHostname(), this);
+
+    await (0, _RemoteConnectionConfigurationManager().setConnectionConfig)(this._config, ip.address);
+
     ServerConnection._emitter.emit('did-add', this);
   }
 
   close() {
     if (this._closed) {
       return;
-    }
+    } // Future getClient calls should fail, if it has a cached ServerConnection instance.
 
-    // Future getClient calls should fail, if it has a cached ServerConnection instance.
-    this._closed = true;
 
-    // The Rpc channel owns the socket.
+    this._closed = true; // The Rpc channel owns the socket.
+
     if (this._client != null) {
       this._client.dispose();
+
       this._client = null;
+
       if (this._heartbeat) {
         this._heartbeat.close();
+
         this._heartbeat = null;
       }
-    }
+    } // Remove from _connections to not be considered in future connection queries.
 
-    // Remove from _connections to not be considered in future connection queries.
-    if (ServerConnection._connections.delete(this.getRemoteHostname())) {
+
+    if (ServerConnection._hostToConnection.delete(this.getRemoteHostname())) {
       ServerConnection._emitter.emit('did-close', this);
     }
 
@@ -354,7 +492,7 @@ class ServerConnection {
       this._healthNotifier.dispose();
     }
 
-    ipc.removeAllListeners((_RemoteConnectionConfigurationManager || _load_RemoteConnectionConfigurationManager()).SERVER_CONFIG_REQUEST_EVENT);
+    ipc.removeAllListeners(_RemoteConnectionConfigurationManager().SERVER_CONFIG_REQUEST_EVENT);
   }
 
   getClient() {
@@ -383,7 +521,10 @@ class ServerConnection {
 
   async _startRpc() {
     if (this._config.version === BIG_DIG_VERSION) {
-      const { bigDigClient, rpcConnection } = await (0, (_createBigDigRpcClient || _load_createBigDigRpcClient()).default)(this._config);
+      const {
+        bigDigClient,
+        rpcConnection
+      } = await (0, _createBigDigRpcClient().default)(this._config);
       this._client = rpcConnection;
       this._bigDigClient = bigDigClient;
       this._heartbeat = bigDigClient.getHeartbeat();
@@ -391,20 +532,19 @@ class ServerConnection {
     }
 
     let uri;
-    let options = {};
+    let options = {}; // Use https if we have key, cert, and ca
 
-    // Use https if we have key, cert, and ca
     if (this._isSecure()) {
       if (!(this._config.certificateAuthorityCertificate != null)) {
-        throw new Error('Invariant violation: "this._config.certificateAuthorityCertificate != null"');
+        throw new Error("Invariant violation: \"this._config.certificateAuthorityCertificate != null\"");
       }
 
       if (!(this._config.clientCertificate != null)) {
-        throw new Error('Invariant violation: "this._config.clientCertificate != null"');
+        throw new Error("Invariant violation: \"this._config.clientCertificate != null\"");
       }
 
       if (!(this._config.clientKey != null)) {
-        throw new Error('Invariant violation: "this._config.clientKey != null"');
+        throw new Error("Invariant violation: \"this._config.clientKey != null\"");
       }
 
       options = Object.assign({}, options, {
@@ -415,14 +555,18 @@ class ServerConnection {
       });
       uri = `https://${this.getRemoteHostname()}:${this.getPort()}`;
     } else {
-      options = Object.assign({}, options, { family: this._config.family });
+      options = Object.assign({}, options, {
+        family: this._config.family
+      });
       uri = `http://${this.getRemoteHostname()}:${this.getPort()}`;
     }
 
-    const socket = new (_ReliableSocket || _load_ReliableSocket()).ReliableSocket(uri, (_NuclideServer || _load_NuclideServer()).HEARTBEAT_CHANNEL, options, (_utils || _load_utils()).protocolLogger);
-    const client = (_nuclideRpc || _load_nuclideRpc()).RpcConnection.createRemote(socket, (0, (_nuclideMarshalersAtom || _load_nuclideMarshalersAtom()).getAtomSideMarshalers)(this.getRemoteHostname()), (_servicesConfig || _load_servicesConfig()).default,
-    // Track calls with a sampling rate of 1/10.
-    { trackSampleRate: 10 }, (_config || _load_config()).SERVICE_FRAMEWORK3_PROTOCOL, socket.id, (_utils || _load_utils()).protocolLogger);
+    const socket = new (_ReliableSocket().ReliableSocket)(uri, _NuclideServer().HEARTBEAT_CHANNEL, options, _utils().protocolLogger);
+
+    const client = _nuclideRpc().RpcConnection.createRemote(socket, (0, _nuclideMarshalersClient().getClientSideMarshalers)(this.getRemoteHostname()), _servicesConfig().default, // Track calls with a sampling rate of 1/10.
+    {
+      trackSampleRate: 10
+    }, _config().SERVICE_FRAMEWORK3_PROTOCOL, socket.id, _utils().protocolLogger);
 
     this._client = client;
     this._heartbeat = socket.getHeartbeat();
@@ -454,11 +598,13 @@ class ServerConnection {
     }
 
     this._connections.splice(this._connections.indexOf(connection), 1);
+
     logger.info('Removed connection.', {
       cwd: connection.getUri(),
       title: connection.getDisplayTitle(),
       remainingConnections: this._connections.length
     });
+
     if (this._connections.length === 0) {
       // The await here is subtle, it ensures that the shutdown call is sent
       // on the socket before the socket is closed on the next line.
@@ -469,12 +615,12 @@ class ServerConnection {
 
   static onDidAddServerConnection(handler) {
     return ServerConnection._emitter.on('did-add', handler);
-  }
-
-  // exposes an Observable of all the ServerConnection additions,
+  } // exposes an Observable of all the ServerConnection additions,
   // including those that have already connected
+
+
   static connectionAdded() {
-    return _rxjsBundlesRxMinJs.Observable.concat(_rxjsBundlesRxMinJs.Observable.from(ServerConnection._connections.values()), (0, (_event || _load_event()).observableFromSubscribeFunction)(ServerConnection.onDidAddServerConnection));
+    return _rxjsCompatUmdMin.Observable.concat(_rxjsCompatUmdMin.Observable.from(ServerConnection._hostToConnection.values()), (0, _event().observableFromSubscribeFunction)(ServerConnection.onDidAddServerConnection));
   }
 
   static onDidCancelServerConnection(handler) {
@@ -483,8 +629,8 @@ class ServerConnection {
 
   static connectionAddedToHost(hostname) {
     const addEvents = ServerConnection.connectionAdded().filter(sc => sc.getRemoteHostname() === hostname);
-    const cancelEvents = (0, (_event || _load_event()).observableFromSubscribeFunction)(ServerConnection.onDidCancelServerConnection).filter(canceledHostname => canceledHostname === hostname);
-    return _rxjsBundlesRxMinJs.Observable.merge(addEvents, cancelEvents.map(x => {
+    const cancelEvents = (0, _event().observableFromSubscribeFunction)(ServerConnection.onDidCancelServerConnection).filter(canceledHostname => canceledHostname === hostname);
+    return _rxjsCompatUmdMin.Observable.merge(addEvents, cancelEvents.map(x => {
       throw new Error('Cancelled server connection to ' + hostname);
     }));
   }
@@ -494,18 +640,20 @@ class ServerConnection {
   }
 
   static getForUri(uri) {
-    if (!(_nuclideUri || _load_nuclideUri()).default.isRemote(uri)) {
+    if (!_nuclideUri().default.isRemote(uri)) {
       return null;
     }
-    return ServerConnection.getByHostname((_nuclideUri || _load_nuclideUri()).default.getHostname(uri));
+
+    return ServerConnection.getByHostname(_nuclideUri().default.getHostname(uri));
   }
 
   static getByHostname(hostname) {
-    return ServerConnection._connections.get(hostname);
+    return ServerConnection._hostToConnection.get(hostname);
   }
 
   static observeConnections(handler) {
-    ServerConnection._connections.forEach(handler);
+    ServerConnection._hostToConnection.forEach(handler);
+
     return ServerConnection.onDidAddServerConnection(handler);
   }
 
@@ -514,7 +662,10 @@ class ServerConnection {
   }
 
   getRemoteConnectionForUri(uri) {
-    const { path } = (_nuclideUri || _load_nuclideUri()).default.parse(uri);
+    const {
+      path
+    } = _nuclideUri().default.parse(uri);
+
     return this.getConnections().filter(connection => {
       return path.startsWith(connection.getPath());
     })[0];
@@ -529,7 +680,68 @@ class ServerConnection {
   }
 
   getService(serviceName) {
-    return this.getClient().getService(serviceName);
+    const rpcService = this.getClient().getService(serviceName);
+
+    if (serviceName === 'FileSystemService') {
+      if ((0, _passesGK().isGkEnabled)(THRIFT_RFS_GK)) {
+        return this._getThriftRfsServiceProxy(rpcService);
+      }
+
+      return this._getLegacyRfsServiceProxy(rpcService);
+    }
+
+    return rpcService;
+  }
+
+  _getLegacyRfsServiceProxy(rpcService) {
+    const handler = {
+      get: (target, propKey, receiver) => {
+        // time function if it has a corresponding thrift call
+        // so the two can be compared
+        if (_ThriftRfsClientAdapter().SUPPORTED_THRIFT_RFS_FUNCTIONS.has(propKey)) {
+          return (...args) => {
+            return (0, _nuclideAnalytics().trackTimingSampled)(`file-system-service:${propKey}`, // eslint-disable-next-line prefer-spread
+            () => target[propKey].apply(target, args), FILE_SYSTEM_PERFORMANCE_SAMPLE_RATE, {
+              serviceProvider: 'rpc'
+            });
+          };
+        }
+
+        return target[propKey];
+      }
+    };
+    return new Proxy(rpcService, handler);
+  }
+
+  _getThriftRfsServiceProxy(rpcService) {
+    const handler = {
+      get: (target, propKey, receiver) => {
+        if (_ThriftRfsClientAdapter().SUPPORTED_THRIFT_RFS_FUNCTIONS.has(propKey)) {
+          return (...args) => {
+            return this._makeThriftRfsCall(propKey, args);
+          };
+        }
+
+        return target[propKey];
+      }
+    };
+    return new Proxy(rpcService, handler);
+  }
+
+  async _makeThriftRfsCall(fsOperation, args) {
+    return (0, _nuclideAnalytics().trackTimingSampled)(`file-system-service:${fsOperation}`, async () => {
+      try {
+        const thriftRfsClient = await (0, _ThriftRfsClientAdapter().getOrCreateRfsClientAdapter)(this.getBigDigClient()); // $FlowFixMe: suppress 'indexer property is missing warning'
+
+        const method = thriftRfsClient[fsOperation];
+        return await method.apply(thriftRfsClient, args);
+      } catch (e) {
+        thriftRfsLogger.error(`failed to run method ${fsOperation} from Thrift client`, e);
+        throw e;
+      }
+    }, FILE_SYSTEM_PERFORMANCE_SAMPLE_RATE, {
+      serviceProvider: 'thrift'
+    });
   }
 
   _getInfoService() {
@@ -542,31 +754,33 @@ class ServerConnection {
       // the closeConnection() call will attempt to disconnect from the Nuclide
       // server forever. This sets a 5 second timeout for it so that the rest
       // of this function and anything calling it can complete.
-      await (0, (_promise || _load_promise()).timeoutPromise)(this._getInfoService().closeConnection(shutdown), 5000);
+      await (0, _promise().timeoutPromise)(this._getInfoService().closeConnection(shutdown), 5000);
     } catch (e) {
-      (0, (_log4js || _load_log4js()).getLogger)('nuclide-remote-connection').error('Failed to close Nuclide server connection.');
+      (0, _log4js().getLogger)('nuclide-remote-connection').error('Failed to close Nuclide server connection.');
     } finally {
       if (shutdown) {
         // Clear the saved connection config so we don't try it again at startup.
-        (0, (_RemoteConnectionConfigurationManager || _load_RemoteConnectionConfigurationManager()).clearConnectionConfig)(this._config.host);
+        (0, _RemoteConnectionConfigurationManager().clearConnectionConfig)(this._config.host);
       }
     }
   }
 
   static observeRemoteConnections() {
     const emitter = ServerConnection._emitter;
-    return _rxjsBundlesRxMinJs.Observable.merge((0, (_event || _load_event()).observableFromSubscribeFunction)(cb => emitter.on('did-add', cb)), (0, (_event || _load_event()).observableFromSubscribeFunction)(cb => emitter.on('did-close', cb)), _rxjsBundlesRxMinJs.Observable.of(null) // so subscribers get a full list immediately
-    ).map(() => Array.from(ServerConnection._connections.values()));
+    return _rxjsCompatUmdMin.Observable.merge((0, _event().observableFromSubscribeFunction)(cb => emitter.on('did-add', cb)), (0, _event().observableFromSubscribeFunction)(cb => emitter.on('did-close', cb)), _rxjsCompatUmdMin.Observable.of(null) // so subscribers get a full list immediately
+    ).map(() => Array.from(ServerConnection._hostToConnection.values()));
   }
 
   static getAllConnections() {
-    return Array.from(ServerConnection._connections.values());
+    return Array.from(ServerConnection._hostToConnection.values());
   }
+
 }
 
 exports.ServerConnection = ServerConnection;
-ServerConnection._connections = new Map();
-ServerConnection._emitter = new _atom.Emitter();
-const __test__ = exports.__test__ = {
-  connections: ServerConnection._connections
+ServerConnection._hostToConnection = new Map();
+ServerConnection._emitter = new (_eventKit().Emitter)();
+const __test__ = {
+  connections: ServerConnection._hostToConnection
 };
+exports.__test__ = __test__;

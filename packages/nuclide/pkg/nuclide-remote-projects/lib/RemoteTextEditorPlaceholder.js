@@ -1,31 +1,43 @@
-'use strict';
+"use strict";
 
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.RemoteTextEditorPlaceholder = exports.TextEditor = undefined;
+exports.RemoteTextEditorPlaceholder = exports.TextEditor = void 0;
 
-var _renderReactRoot;
+function _renderReactRoot() {
+  const data = require("../../../modules/nuclide-commons-ui/renderReactRoot");
 
-function _load_renderReactRoot() {
-  return _renderReactRoot = require('../../../modules/nuclide-commons-ui/renderReactRoot');
+  _renderReactRoot = function () {
+    return data;
+  };
+
+  return data;
 }
 
-var _nuclideUri;
+function _nuclideUri() {
+  const data = _interopRequireDefault(require("../../../modules/nuclide-commons/nuclideUri"));
 
-function _load_nuclideUri() {
-  return _nuclideUri = _interopRequireDefault(require('../../../modules/nuclide-commons/nuclideUri'));
+  _nuclideUri = function () {
+    return data;
+  };
+
+  return data;
 }
 
-var _react = _interopRequireWildcard(require('react'));
+var React = _interopRequireWildcard(require("react"));
 
-var _RemoteTextEditorPlaceholderComponent;
+function _RemoteTextEditorPlaceholderComponent() {
+  const data = _interopRequireDefault(require("./RemoteTextEditorPlaceholderComponent"));
 
-function _load_RemoteTextEditorPlaceholderComponent() {
-  return _RemoteTextEditorPlaceholderComponent = _interopRequireDefault(require('./RemoteTextEditorPlaceholderComponent'));
+  _RemoteTextEditorPlaceholderComponent = function () {
+    return data;
+  };
+
+  return data;
 }
 
-function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
+function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) { var desc = Object.defineProperty && Object.getOwnPropertyDescriptor ? Object.getOwnPropertyDescriptor(obj, key) : {}; if (desc.get || desc.set) { Object.defineProperty(newObj, key, desc); } else { newObj[key] = obj[key]; } } } } newObj.default = obj; return newObj; } }
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -39,13 +51,14 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
  * 
  * @format
  */
-
 class TextEditor {
-
-  constructor({ data }) {
+  constructor({
+    data
+  }) {
     this._uri = data.uri;
     this._contents = data.contents;
     this._isModified = data.isModified;
+    this._repositoryDescription = data.repositoryDescription;
   }
 
   destroy() {}
@@ -57,23 +70,28 @@ class TextEditor {
         uri: this._uri,
         contents: this._contents,
         // If the editor was unsaved, we'll restore the unsaved contents after load.
-        isModified: this._isModified
+        isModified: this._isModified,
+        repositoryDescription: this._repositoryDescription
       }
     };
   }
 
   getTitle() {
-    return (_nuclideUri || _load_nuclideUri()).default.basename(this._uri);
-  }
-
-  // This shouldn't *exactly* match the real URI.
+    return _nuclideUri().default.basename(this._uri);
+  } // This shouldn't *exactly* match the real URI.
   // Otherwise it makes it difficult to swap it out for the real editor.
+
+
   getURI() {
     return this._uri.replace('nuclide://', 'nuclide-placeholder://');
   }
 
   getPath() {
     return this._uri;
+  }
+
+  getRepositoryDescription() {
+    return this._repositoryDescription;
   }
 
   getText() {
@@ -85,15 +103,17 @@ class TextEditor {
   }
 
   getElement() {
-    return (0, (_renderReactRoot || _load_renderReactRoot()).renderReactRoot)(_react.createElement((_RemoteTextEditorPlaceholderComponent || _load_RemoteTextEditorPlaceholderComponent()).default, {
+    return (0, _renderReactRoot().renderReactRoot)(React.createElement(_RemoteTextEditorPlaceholderComponent().default, {
       contents: this._contents,
       uri: this._uri
     }));
   }
-}
 
-exports.TextEditor = TextEditor; // We name the class "TextEditor" because Atom uses the constructor name as the `data-type`
+} // We name the class "TextEditor" because Atom uses the constructor name as the `data-type`
 // attribute of the tab and themes style that. We want to make sure that these themes style our tab
 // like text editor tabs.
 
-const RemoteTextEditorPlaceholder = exports.RemoteTextEditorPlaceholder = TextEditor;
+
+exports.TextEditor = TextEditor;
+const RemoteTextEditorPlaceholder = TextEditor;
+exports.RemoteTextEditorPlaceholder = RemoteTextEditorPlaceholder;

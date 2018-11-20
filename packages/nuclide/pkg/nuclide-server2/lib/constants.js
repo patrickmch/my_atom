@@ -1,8 +1,10 @@
-'use strict';
+"use strict";
 
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
+exports.NUCLIDE_RPC_TAG = void 0;
+
 /**
  * Copyright (c) 2015-present, Facebook, Inc.
  * All rights reserved.
@@ -13,6 +15,6 @@ Object.defineProperty(exports, "__esModule", {
  *  strict
  * @format
  */
-
 // Tag for all nuclide-rpc messages.
-const NUCLIDE_RPC_TAG = exports.NUCLIDE_RPC_TAG = 'nuclide-rpc';
+const NUCLIDE_RPC_TAG = 'nuclide-rpc';
+exports.NUCLIDE_RPC_TAG = NUCLIDE_RPC_TAG;

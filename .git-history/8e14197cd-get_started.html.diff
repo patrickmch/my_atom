@@ -1,0 +1,71 @@
+diff --git a/nols_website/wmi/templates/dataentry/get_started.html b/nols_website/wmi/templates/dataentry/get_started.html
+index f57f660bd..9c52abb2a 100644
+--- a/nols_website/wmi/templates/dataentry/get_started.html
++++ b/nols_website/wmi/templates/dataentry/get_started.html
+@@ -1,65 +1,47 @@
+ {% extends 'dataentry/event_base.html' %}
+ 
+ {% block content %}
+ {{ block.super }}
+-  <div class="row column large-8">
++  <div class="column small-centered small-12 large-8 medium-10">
+     <h3 class="lead">
+         {% if user.is_authenticated %}
+             Hi {{ user.first_name }}.
+         {% endif %}
+         Please
+         {% if not user.is_authenticated %}
+         <a href="#" role="button" data-open="log-in-modal">log-in</a> or
+         {% endif %}
+         enter some basic information and we'll see if we can find you in our records.
+     </h3>
+     <form class="form-horizontal rollcall-form" action="." method="Post">
+         {% if person_form.errors or email_form.errors %}
+             <div class="column medium-12 alert">
+                 <button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
+                 <p class="errorlist">There is an error, please correct the appropriate field(s).<p>
+                 {{ person_form.non_field_errors }}
+                 {{ email_form.non_field_errors }}
+             </div>
+         {% endif %}
+ 
+         {% with user.is_authenticated as readonly %}
+             {% with "True" as hide_form_level_error_header %}
+                 {% with person_form as form %}
+                     {% include "bs_responsive_form_layout.html" %}
+                 {% endwith %}
+ 
+                 {% with email_form as form %}
+                     {% include "bs_responsive_form_layout.html" %}
+                 {% endwith %}
+             {% endwith %}
+         {% endwith %}
+ 
+         {% with honeypot_form as form %}
+             {% include 'honeypot_form.html' %}
+         {% endwith %}
+ 
+         <div>
+             <input class="button float-right" type="submit" value="Next" />
+         </div>
+     </form>
+   </div>
+ {% endblock content %}
+-
+-{% block extra_js %}
+-  {{ block.super }}
+-  {% if IS_TESTDB %}
+-    <script>
+-        // TODO PreRelease delete this before release
+-        $(document).keypress(function(e) {
+-            var opt_m_webkit = e.which == 181 ? 1 : 0;
+-            if(opt_m_webkit) {
+-                $('#id_first_name').val('Matt');
+-                $('#id_last_name').val('Burke');
+-                $('#id_birth_date').val('12/05/1978');
+-                $('#id_email_address').val('matthewcburke@gmail.com');
+-            }
+-        })
+-    </script>
+-  {% endif %}
+-{% endblock extra_js %}

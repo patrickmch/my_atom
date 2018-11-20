@@ -1,46 +1,73 @@
-'use strict';
+"use strict";
 
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.FailedConnectionError = exports.EXIT_CODE_INVALID_ARGUMENTS = exports.EXIT_CODE_CONNECTION_ERROR = exports.EXIT_CODE_APPLICATION_ERROR = exports.EXIT_CODE_UNKNOWN_ERROR = exports.EXIT_CODE_SUCCESS = undefined;
 exports.setupErrorHandling = setupErrorHandling;
 exports.setupLogging = setupLogging;
+exports.trackSuccess = trackSuccess;
+exports.trackError = trackError;
 exports.reportConnectionErrorAndExit = reportConnectionErrorAndExit;
+exports.explainNuclideIsNeededAndExit = explainNuclideIsNeededAndExit;
 exports.reportErrorAndExit = reportErrorAndExit;
+exports.FailedConnectionError = exports.EXIT_CODE_INVALID_ARGUMENTS = exports.EXIT_CODE_CONNECTION_ERROR = exports.EXIT_CODE_APPLICATION_ERROR = exports.EXIT_CODE_UNKNOWN_ERROR = exports.EXIT_CODE_SUCCESS = void 0;
 
-var _log4js;
+function _log4js() {
+  const data = _interopRequireDefault(require("log4js"));
 
-function _load_log4js() {
-  return _log4js = _interopRequireDefault(require('log4js'));
+  _log4js = function () {
+    return data;
+  };
+
+  return data;
 }
 
-var _os = _interopRequireDefault(require('os'));
+var _os = _interopRequireDefault(require("os"));
 
-var _nuclideLogging;
+function _nuclideAnalytics() {
+  const data = require("../../../modules/nuclide-analytics");
 
-function _load_nuclideLogging() {
-  return _nuclideLogging = require('../../nuclide-logging');
+  _nuclideAnalytics = function () {
+    return data;
+  };
+
+  return data;
+}
+
+function _nuclideLogging() {
+  const data = require("../../nuclide-logging");
+
+  _nuclideLogging = function () {
+    return data;
+  };
+
+  return data;
 }
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-const logger = (_log4js || _load_log4js()).default.getLogger('nuclide-remote-atom-rpc'); /**
-                                                                                          * Copyright (c) 2015-present, Facebook, Inc.
-                                                                                          * All rights reserved.
-                                                                                          *
-                                                                                          * This source code is licensed under the license found in the LICENSE file in
-                                                                                          * the root directory of this source tree.
-                                                                                          *
-                                                                                          *  strict-local
-                                                                                          * @format
-                                                                                          */
+/**
+ * Copyright (c) 2015-present, Facebook, Inc.
+ * All rights reserved.
+ *
+ * This source code is licensed under the license found in the LICENSE file in
+ * the root directory of this source tree.
+ *
+ *  strict-local
+ * @format
+ */
+const logger = _log4js().default.getLogger('nuclide-remote-atom-rpc');
 
-const EXIT_CODE_SUCCESS = exports.EXIT_CODE_SUCCESS = 0;
-const EXIT_CODE_UNKNOWN_ERROR = exports.EXIT_CODE_UNKNOWN_ERROR = 1;
-const EXIT_CODE_APPLICATION_ERROR = exports.EXIT_CODE_APPLICATION_ERROR = 2;
-const EXIT_CODE_CONNECTION_ERROR = exports.EXIT_CODE_CONNECTION_ERROR = 3;
-const EXIT_CODE_INVALID_ARGUMENTS = exports.EXIT_CODE_INVALID_ARGUMENTS = 4;
+const EXIT_CODE_SUCCESS = 0;
+exports.EXIT_CODE_SUCCESS = EXIT_CODE_SUCCESS;
+const EXIT_CODE_UNKNOWN_ERROR = 1;
+exports.EXIT_CODE_UNKNOWN_ERROR = EXIT_CODE_UNKNOWN_ERROR;
+const EXIT_CODE_APPLICATION_ERROR = 2;
+exports.EXIT_CODE_APPLICATION_ERROR = EXIT_CODE_APPLICATION_ERROR;
+const EXIT_CODE_CONNECTION_ERROR = 3;
+exports.EXIT_CODE_CONNECTION_ERROR = EXIT_CODE_CONNECTION_ERROR;
+const EXIT_CODE_INVALID_ARGUMENTS = 4;
+exports.EXIT_CODE_INVALID_ARGUMENTS = EXIT_CODE_INVALID_ARGUMENTS;
 
 function setupErrorHandling() {
   process.on('uncaughtException', event => {
@@ -48,7 +75,6 @@ function setupErrorHandling() {
     process.stderr.write(`Unhandled exception: ${event.message}\n`);
     process.exit(EXIT_CODE_UNKNOWN_ERROR);
   });
-
   process.on('unhandledRejection', (error, promise) => {
     logger.error('Caught unhandled rejection', error);
     process.stderr.write(`Unhandled rejection: ${error.message}\n`);
@@ -57,7 +83,22 @@ function setupErrorHandling() {
 }
 
 function setupLogging() {
-  (0, (_nuclideLogging || _load_nuclideLogging()).initializeLogging)();
+  (0, _nuclideLogging().initializeLogging)();
+}
+
+async function trackSuccess(command, args) {
+  await (0, _nuclideAnalytics().trackImmediate)('nuclide-remote-atom-rpc:success', {
+    command,
+    args
+  });
+}
+
+async function trackError(command, args, error) {
+  await (0, _nuclideAnalytics().trackImmediate)('nuclide-remote-atom-rpc:error', {
+    command,
+    args,
+    error
+  });
 }
 
 function reportConnectionErrorAndExit(error) {
@@ -76,6 +117,11 @@ function reportConnectionErrorAndExit(error) {
   process.exit(EXIT_CODE_CONNECTION_ERROR);
 }
 
+function explainNuclideIsNeededAndExit() {
+  process.stderr.write('You need to have a Nuclide connection active. ' + "This command doesn't normally exist on Linux and is powered by Nuclide magic.\n");
+  process.exit(EXIT_CODE_CONNECTION_ERROR);
+}
+
 function reportErrorAndExit(error, exitCode) {
   process.stderr.write(error.stack);
   process.stderr.write('\n');
@@ -83,4 +129,5 @@ function reportErrorAndExit(error, exitCode) {
 }
 
 class FailedConnectionError extends Error {}
+
 exports.FailedConnectionError = FailedConnectionError;

@@ -1,31 +1,38 @@
-'use strict';
+"use strict";
 
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
+exports.default = void 0;
 
-var _idx;
+function _collection() {
+  const data = require("../../nuclide-commons/collection");
 
-function _load_idx() {
-  return _idx = _interopRequireDefault(require('idx'));
+  _collection = function () {
+    return data;
+  };
+
+  return data;
 }
 
-var _collection;
+function _VSPOptionsData() {
+  const data = _interopRequireDefault(require("./VSPOptionsData"));
 
-function _load_collection() {
-  return _collection = require('../../nuclide-commons/collection');
+  _VSPOptionsData = function () {
+    return data;
+  };
+
+  return data;
 }
 
-var _VSPOptionsData;
+function _yargs() {
+  const data = _interopRequireDefault(require("yargs"));
 
-function _load_VSPOptionsData() {
-  return _VSPOptionsData = _interopRequireDefault(require('./VSPOptionsData'));
-}
+  _yargs = function () {
+    return data;
+  };
 
-var _yargs;
-
-function _load_yargs() {
-  return _yargs = _interopRequireDefault(require('yargs'));
+  return data;
 }
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
@@ -41,11 +48,9 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
  * 
  * @format
  */
-
 class VSPOptionsParser {
-
   constructor(packagePath) {
-    this._optionsData = new (_VSPOptionsData || _load_VSPOptionsData()).default(packagePath);
+    this._optionsData = new (_VSPOptionsData().default)(packagePath);
   }
 
   get optionsData() {
@@ -62,6 +67,7 @@ class VSPOptionsParser {
 
     for (const optionKey of optionKeys) {
       const property = properties.get(optionKey);
+
       if (property != null) {
         help = help.concat(this._helpFor(optionKey, property, custom));
       }
@@ -72,8 +78,8 @@ class VSPOptionsParser {
 
   _helpFor(optionKey, property, customArguments) {
     const help = [];
-
     const description = property.description;
+
     if (description != null && description !== '') {
       let spec = '';
       const validValues = property.enum;
@@ -85,26 +91,27 @@ class VSPOptionsParser {
       } else if (custom != null) {
         spec = custom.typeDescription;
       } else if (type != null) {
-        var _ref, _ref2;
+        var _ref;
 
         if (!Array.isArray(type)) {
           type = [type];
         }
-        const itemType = ((_ref = property) != null ? (_ref2 = _ref.items) != null ? _ref2.type : _ref2 : _ref) || null;
+
+        const itemType = ((_ref = property) != null ? (_ref = _ref.items) != null ? _ref.type : _ref : _ref) || null;
         spec = type.map(_ => this._typeToDisplay(_, itemType)).join('|');
       }
 
       help.push(`--${optionKey}: ${spec}\n`);
-
       const maxLineLength = 80;
       const prefix = '  ';
-
       let line = prefix;
+
       for (const word of description.split(/\s+/)) {
         if (line === prefix) {
           line = `${line}${word}`;
         } else {
           const newLine = `${line} ${word}`;
+
           if (newLine.length <= maxLineLength) {
             line = newLine;
           } else {
@@ -113,6 +120,7 @@ class VSPOptionsParser {
           }
         }
       }
+
       if (line !== '') {
         help.push(line);
       }
@@ -125,8 +133,10 @@ class VSPOptionsParser {
     switch (type) {
       case 'boolean':
         return "'true'|'false'";
+
       case 'object':
         return 'json';
+
       case 'array':
         const innerType = itemType == null ? 'arg' : itemType;
         return `${innerType} ${innerType} ...`;
@@ -138,24 +148,25 @@ class VSPOptionsParser {
   parseCommandLine(type, action, exclude, includeDefaults, customArguments) {
     const propertyMap = this._optionsData.adapterPropertiesForAction(type, action);
 
-    let args = (0, (_collection || _load_collection()).mapFilter)(propertyMap, (name, prop) => prop.default != null && name in includeDefaults);
-    args = (0, (_collection || _load_collection()).mapTransform)(args, (prop, name) => [name, prop.default]);
+    let args = (0, _collection().mapFilter)(propertyMap, (name, prop) => prop.default != null && name in includeDefaults);
+    args = (0, _collection().mapTransform)(args, (prop, name) => [name, prop.default]);
 
     const parser = this._yargsFromPropertyMap(propertyMap, customArguments);
 
     this._applyCommandLineToArgs(args, parser.argv, propertyMap, customArguments);
 
     return args;
-  }
+  } // $TODO better flow typing for yargs
 
-  // $TODO better flow typing for yargs
+
   _yargsFromPropertyMap(propertyMap, customArguments) {
-    let parser = (_yargs || _load_yargs()).default;
+    let parser = _yargs().default;
 
     for (const [name, prop] of propertyMap) {
       // If an enum is specified, it gives a list of valid choices, so don't
       // worry about the type
       const validValues = prop.enum;
+
       if (Array.isArray(validValues)) {
         parser = parser.choices(name, validValues.map(_ => _.toString()));
         continue;
@@ -194,11 +205,13 @@ class VSPOptionsParser {
   _applyCommandLineToArgs(args, commandLine, propertyMap, customArguments) {
     for (const [name, prop] of propertyMap) {
       const value = commandLine[name];
+
       if (value == null) {
         continue;
       }
 
       const validValues = prop.enum;
+
       if (Array.isArray(validValues)) {
         // yargs will have already validated the value.
         args.set(name, value);
@@ -206,6 +219,7 @@ class VSPOptionsParser {
       }
 
       const custom = customArguments.get(name);
+
       if (custom != null) {
         const customValue = custom.parser(value);
         args.set(name, customValue);
@@ -215,15 +229,17 @@ class VSPOptionsParser {
       const type = prop.type;
 
       if (!(type != null)) {
-        throw new Error('Invariant violation: "type != null"');
+        throw new Error("Invariant violation: \"type != null\"");
       }
 
       switch (type) {
         case 'number':
           const num = parseInt(value, 10);
+
           if (isNaN(num)) {
             throw new Error(`Value of option --${name} must be numeric.`);
           }
+
           args.set(name, num);
           break;
 
@@ -233,12 +249,14 @@ class VSPOptionsParser {
 
         case 'object':
           let objectData = {};
+
           try {
             // $TODO this is hard to get right on the command line, find a better way
             objectData = JSON.parse(value);
           } catch (error) {
             throw new Error(`Value of option --${name} must be valid JSON.`);
           }
+
           args.set(name, objectData);
           break;
 
@@ -247,5 +265,7 @@ class VSPOptionsParser {
       }
     }
   }
+
 }
+
 exports.default = VSPOptionsParser;

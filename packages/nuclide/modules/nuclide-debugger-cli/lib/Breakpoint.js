@@ -1,46 +1,64 @@
-'use strict';
+"use strict";
 
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
+exports.default = exports.BreakpointState = void 0;
 
-var _nullthrows;
+function _nullthrows() {
+  const data = _interopRequireDefault(require("nullthrows"));
 
-function _load_nullthrows() {
-  return _nullthrows = _interopRequireDefault(require('nullthrows'));
+  _nullthrows = function () {
+    return data;
+  };
+
+  return data;
 }
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
+/**
+ * Copyright (c) 2017-present, Facebook, Inc.
+ * All rights reserved.
+ *
+ * This source code is licensed under the BSD-style license found in the
+ * LICENSE file in the root directory of this source tree. An additional grant
+ * of patent rights can be found in the PATENTS file in the same directory.
+ *
+ * 
+ * @format
+ */
+const BreakpointState = Object.freeze({
+  ENABLED: 'enabled',
+  ONCE: 'once',
+  DISABLED: 'disabled'
+});
+exports.BreakpointState = BreakpointState;
+
 class Breakpoint {
-
-  // The line number of the breakpoint (which may be undefined if we have an
-  // unresolved function breakpoint.)
-
-
-  // enabled tracks if the breakpoint has been enabled or disabled by the user.
-
-
+  // index is the name of the breakpoint we show externally in the UI
   // id is the attached breakpoint in the adapter (if the adapter supports it)
-  constructor(index) {
-    this._index = index;
-    this._verified = false;
-    this._enabled = true;
-  }
-
-  // The function name of the breakpoint (only defined if the breakpoint is
-  // a function breakpoint.)
-
-
-  // The source file of the breakpoint (which may be undefined if we have an
-  // unresolved function breakpoint.)
-
-
   // verified tracks if the breakpoint was successfully set by the adapter.
   // it may not be if the referenced code was not yet loaded
+  // state: enabled, once, or disabled
+  // condition: if the breakpoint is conditional, the condition expression
+  // The source file of the breakpoint (which may be undefined if we have an
+  // unresolved function breakpoint.)
+  // The line number of the breakpoint (which may be undefined if we have an
+  // unresolved function breakpoint.)
+  // The function name of the breakpoint (only defined if the breakpoint is
+  // a function breakpoint.)
+  // If the breakpoint should support the 'once' state
+  constructor(index, allowOnceState) {
+    this._index = index;
+    this._verified = false;
+    this._state = BreakpointState.ENABLED;
+    this._allowOnceState = allowOnceState;
+  }
 
-  // index is the name of the breakpoint we show externally in the UI
-
+  enableSupportsOnce() {
+    this._allowOnceState = true;
+  }
 
   get index() {
     return this._index;
@@ -62,12 +80,46 @@ class Breakpoint {
     return this._verified;
   }
 
-  setEnabled(enabled) {
-    this._enabled = enabled;
+  setState(state) {
+    if (state === BreakpointState.ONCE && !this._allowOnceState) {
+      throw new Error('One-shot breakpoints are not supported.');
+    }
+
+    this._state = state;
   }
 
-  get enabled() {
-    return this._enabled;
+  toggleState() {
+    switch (this._state) {
+      case BreakpointState.DISABLED:
+        this._state = BreakpointState.ENABLED;
+        break;
+
+      case BreakpointState.ENABLED:
+        this._state = this._allowOnceState ? BreakpointState.ONCE : BreakpointState.DISABLED;
+        break;
+
+      case BreakpointState.ONCE:
+        this._state = BreakpointState.ENABLED;
+        break;
+    }
+
+    return this._state;
+  }
+
+  get state() {
+    return this._state;
+  }
+
+  condition() {
+    return this._condition;
+  }
+
+  setCondition(cond) {
+    this._condition = cond;
+  }
+
+  isEnabled() {
+    return this._state !== BreakpointState.DISABLED;
   }
 
   setPath(path) {
@@ -101,20 +153,17 @@ class Breakpoint {
       if (this._path == null || this._line == null) {
         return `${func}()`;
       }
+
       return `${func}() [${this._path}:${this._line}]`;
     }
 
-    return `${(0, (_nullthrows || _load_nullthrows()).default)(this._path)}:${(0, (_nullthrows || _load_nullthrows()).default)(this._line)}`;
+    try {
+      return `${(0, _nullthrows().default)(this._path)}:${(0, _nullthrows().default)(this._line)}`;
+    } catch (_) {
+      throw new Error('Missing path or line in breakpoint description');
+    }
   }
+
 }
-exports.default = Breakpoint; /**
-                               * Copyright (c) 2017-present, Facebook, Inc.
-                               * All rights reserved.
-                               *
-                               * This source code is licensed under the BSD-style license found in the
-                               * LICENSE file in the root directory of this source tree. An additional grant
-                               * of patent rights can be found in the PATENTS file in the same directory.
-                               *
-                               * 
-                               * @format
-                               */
+
+exports.default = Breakpoint;

@@ -49,6 +49,16 @@ module.exports = _client => {
             kind: "boolean"
           },
           optional: false
+        }, {
+          name: "context",
+          type: {
+            kind: "nullable",
+            type: {
+              kind: "named",
+              name: "ClientQueryContext"
+            }
+          },
+          optional: false
         }]
       }
     }])).then(value => {
@@ -62,7 +72,7 @@ module.exports = _client => {
     });
   };
 
-  remoteModule.queryAllExistingFuzzyFile = function (arg0, arg1, arg2) {
+  remoteModule.queryAllExistingFuzzyFile = function (arg0, arg1, arg2, arg3) {
     return _client.callRemoteFunction("FuzzyFileSearchService/queryAllExistingFuzzyFile", "promise", _client.marshalArguments(Array.from(arguments), [{
       name: "queryString",
       type: {
@@ -80,6 +90,15 @@ module.exports = _client => {
       name: "preferCustomSearch",
       type: {
         kind: "boolean"
+      }
+    }, {
+      name: "context",
+      type: {
+        kind: "nullable",
+        type: {
+          kind: "named",
+          name: "ClientQueryContext"
+        }
       }
     }])).then(value => {
       return _client.unmarshal(value, {
@@ -186,7 +205,7 @@ Object.defineProperty(module.exports, "defs", {
       location: {
         type: "source",
         fileName: "rpc-types.js",
-        line: 14
+        line: 15
       },
       name: "FileSearchResult",
       definition: {
@@ -216,19 +235,78 @@ Object.defineProperty(module.exports, "defs", {
         }]
       }
     },
+    ClientQueryContext: {
+      kind: "alias",
+      location: {
+        type: "source",
+        fileName: "ClientQueryContext.js",
+        line: 25
+      },
+      name: "ClientQueryContext",
+      definition: {
+        kind: "object",
+        fields: [{
+          name: "session_id",
+          type: {
+            kind: "string"
+          },
+          optional: false
+        }, {
+          name: "open_arc_projects",
+          type: {
+            kind: "array",
+            type: {
+              kind: "string"
+            }
+          },
+          optional: false
+        }, {
+          name: "working_sets",
+          type: {
+            kind: "array",
+            type: {
+              kind: "string"
+            }
+          },
+          optional: false
+        }, {
+          name: "recent_files",
+          type: {
+            kind: "array",
+            type: {
+              kind: "object",
+              fields: [{
+                name: "path",
+                type: {
+                  kind: "string"
+                },
+                optional: false
+              }, {
+                name: "timestamp",
+                type: {
+                  kind: "number"
+                },
+                optional: false
+              }]
+            }
+          },
+          optional: false
+        }]
+      }
+    },
     queryFuzzyFile: {
       kind: "function",
       name: "queryFuzzyFile",
       location: {
         type: "source",
         fileName: "FuzzyFileSearchService.js",
-        line: 71
+        line: 73
       },
       type: {
         location: {
           type: "source",
           fileName: "FuzzyFileSearchService.js",
-          line: 71
+          line: 73
         },
         kind: "function",
         argumentTypes: [{
@@ -276,6 +354,16 @@ Object.defineProperty(module.exports, "defs", {
                 kind: "boolean"
               },
               optional: false
+            }, {
+              name: "context",
+              type: {
+                kind: "nullable",
+                type: {
+                  kind: "named",
+                  name: "ClientQueryContext"
+                }
+              },
+              optional: false
             }]
           }
         }],
@@ -297,13 +385,13 @@ Object.defineProperty(module.exports, "defs", {
       location: {
         type: "source",
         fileName: "FuzzyFileSearchService.js",
-        line: 102
+        line: 118
       },
       type: {
         location: {
           type: "source",
           fileName: "FuzzyFileSearchService.js",
-          line: 102
+          line: 118
         },
         kind: "function",
         argumentTypes: [{
@@ -324,6 +412,15 @@ Object.defineProperty(module.exports, "defs", {
           type: {
             kind: "boolean"
           }
+        }, {
+          name: "context",
+          type: {
+            kind: "nullable",
+            type: {
+              kind: "named",
+              name: "ClientQueryContext"
+            }
+          }
         }],
         returnType: {
           kind: "promise",
@@ -343,13 +440,13 @@ Object.defineProperty(module.exports, "defs", {
       location: {
         type: "source",
         fileName: "FuzzyFileSearchService.js",
-        line: 130
+        line: 148
       },
       type: {
         location: {
           type: "source",
           fileName: "FuzzyFileSearchService.js",
-          line: 130
+          line: 148
         },
         kind: "function",
         argumentTypes: [{
@@ -373,13 +470,13 @@ Object.defineProperty(module.exports, "defs", {
       location: {
         type: "source",
         fileName: "FuzzyFileSearchService.js",
-        line: 139
+        line: 157
       },
       type: {
         location: {
           type: "source",
           fileName: "FuzzyFileSearchService.js",
-          line: 139
+          line: 157
         },
         kind: "function",
         argumentTypes: [{

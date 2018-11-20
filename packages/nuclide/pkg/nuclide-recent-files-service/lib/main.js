@@ -1,54 +1,50 @@
-'use strict';
+"use strict";
 
-var _UniversalDisposable;
+function _createPackage() {
+  const data = _interopRequireDefault(require("../../../modules/nuclide-commons-atom/createPackage"));
 
-function _load_UniversalDisposable() {
-  return _UniversalDisposable = _interopRequireDefault(require('../../../modules/nuclide-commons/UniversalDisposable'));
+  _createPackage = function () {
+    return data;
+  };
+
+  return data;
 }
 
-var _createPackage;
+function _RecentFilesService() {
+  const data = _interopRequireDefault(require("./RecentFilesService"));
 
-function _load_createPackage() {
-  return _createPackage = _interopRequireDefault(require('../../../modules/nuclide-commons-atom/createPackage'));
-}
+  _RecentFilesService = function () {
+    return data;
+  };
 
-var _RecentFilesService;
-
-function _load_RecentFilesService() {
-  return _RecentFilesService = _interopRequireDefault(require('./RecentFilesService'));
+  return data;
 }
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
+/**
+ * Copyright (c) 2015-present, Facebook, Inc.
+ * All rights reserved.
+ *
+ * This source code is licensed under the license found in the LICENSE file in
+ * the root directory of this source tree.
+ *
+ * 
+ * @format
+ */
 class Activation {
-
-  constructor(state) {
-    this._service = new (_RecentFilesService || _load_RecentFilesService()).default(state);
-    this._subscriptions = new (_UniversalDisposable || _load_UniversalDisposable()).default(this._service);
+  constructor() {
+    this._service = new (_RecentFilesService().default)();
   }
 
   provideRecentFilesService() {
     return this._service;
   }
 
-  serialize() {
-    return {
-      filelist: this._service.getRecentFiles()
-    };
-  }
-
   dispose() {
-    this._subscriptions.dispose();
+    this._service.dispose();
   }
-} /**
-   * Copyright (c) 2015-present, Facebook, Inc.
-   * All rights reserved.
-   *
-   * This source code is licensed under the license found in the LICENSE file in
-   * the root directory of this source tree.
-   *
-   * 
-   * @format
-   */
 
-(0, (_createPackage || _load_createPackage()).default)(module.exports, Activation);
+}
+
+(0, _createPackage().default)(module.exports, Activation);

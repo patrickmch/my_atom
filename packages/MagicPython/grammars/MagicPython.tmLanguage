@@ -184,8 +184,10 @@
       <dict>
         <key>begin</key>
         <string>^(?=\s*[rR]?(\'\'\'|\"\"\"|\'|\"))</string>
+        <key>comment</key>
+        <string>the string either terminates correctly or by the beginning of a new line (this is for single line docstrings that aren't terminated) AND it's not followed by another docstring</string>
         <key>end</key>
-        <string>(?&lt;=\'\'\'|\"\"\"|\'|\")</string>
+        <string>((?&lt;=\1)|^)(?!\s*[rR]?(\'\'\'|\"\"\"|\'|\"))</string>
         <key>patterns</key>
         <array>
           <dict>
@@ -287,7 +289,7 @@
             <key>begin</key>
             <string>(\'|\")</string>
             <key>end</key>
-            <string>(\1)|((?&lt;!\\)\n)</string>
+            <string>(\1)|(\n)</string>
             <key>beginCaptures</key>
             <dict>
               <key>1</key>
@@ -327,7 +329,7 @@
             <key>begin</key>
             <string>([rR])(\'|\")</string>
             <key>end</key>
-            <string>(\2)|((?&lt;!\\)\n)</string>
+            <string>(\2)|(\n)</string>
             <key>beginCaptures</key>
             <dict>
               <key>1</key>
@@ -1409,15 +1411,25 @@
       <key>string-formatting</key>
       <dict>
         <key>name</key>
-        <string>constant.character.format.placeholder.other.python</string>
+        <string>meta.format.percent.python</string>
         <key>match</key>
         <string>(?x)
-  % (\([\w\s]*\))?
-    [-+#0 ]*
-    (\d+|\*)? (\.(\d+|\*))?
-    ([hlL])?
-    [diouxXeEfFgGcrsa%]
+  (
+    % (\([\w\s]*\))?
+      [-+#0 ]*
+      (\d+|\*)? (\.(\d+|\*))?
+      ([hlL])?
+      [diouxXeEfFgGcrsab%]
+  )
 </string>
+        <key>captures</key>
+        <dict>
+          <key>1</key>
+          <dict>
+            <key>name</key>
+            <string>constant.character.format.placeholder.other.python</string>
+          </dict>
+        </dict>
       </dict>
       <key>string-brace-formatting</key>
       <dict>
@@ -1425,14 +1437,14 @@
         <array>
           <dict>
             <key>name</key>
-            <string>constant.character.format.placeholder.other.python</string>
+            <string>meta.format.brace.python</string>
             <key>match</key>
             <string>(?x)
-  (?:
+  (
     {{ | }}
     | (?:
       {
-        \w*? (\.[[:alpha:]_]\w*? | \[[^\]'"]+\])*?
+        \w* (\.[[:alpha:]_]\w* | \[[^\]'"]+\])*
         (![rsa])?
         ( : \w? [&lt;&gt;=^]? [-+ ]? \#?
           \d* ,? (\.\d+)? [bcdeEfFgGnosxX%]? )?
@@ -1441,12 +1453,17 @@
 </string>
             <key>captures</key>
             <dict>
-              <key>2</key>
+              <key>1</key>
+              <dict>
+                <key>name</key>
+                <string>constant.character.format.placeholder.other.python</string>
+              </dict>
+              <key>3</key>
               <dict>
                 <key>name</key>
                 <string>storage.type.format.python</string>
               </dict>
-              <key>3</key>
+              <key>4</key>
               <dict>
                 <key>name</key>
                 <string>storage.type.format.python</string>
@@ -1455,38 +1472,38 @@
           </dict>
           <dict>
             <key>name</key>
-            <string>constant.character.format.placeholder.other.python</string>
-            <key>begin</key>
+            <string>meta.format.brace.python</string>
+            <key>match</key>
             <string>(?x)
-    \{
-      \w*? (\.[[:alpha:]_]\w*? | \[[^\]'"]+\])*?
+  (
+    {
+      \w* (\.[[:alpha:]_]\w* | \[[^\]'"]+\])*
       (![rsa])?
       (:)
-        (?=[^'"}\n]*\})
+        [^'"{}\n]* (?:
+          \{ [^'"}\n]*? \} [^'"{}\n]*
+        )*
+    }
+  )
 </string>
-            <key>end</key>
-            <string>\}</string>
-            <key>beginCaptures</key>
+            <key>captures</key>
             <dict>
-              <key>2</key>
+              <key>1</key>
               <dict>
                 <key>name</key>
-                <string>storage.type.format.python</string>
+                <string>constant.character.format.placeholder.other.python</string>
               </dict>
               <key>3</key>
               <dict>
                 <key>name</key>
                 <string>storage.type.format.python</string>
               </dict>
-            </dict>
-            <key>patterns</key>
-            <array>
+              <key>4</key>
               <dict>
-                <key>match</key>
-                <string>(?x) \{ [^'"}\n]*? \} (?=.*?\})
-</string>
+                <key>name</key>
+                <string>storage.type.format.python</string>
               </dict>
-            </array>
+            </dict>
           </dict>
         </array>
       </dict>
@@ -1521,7 +1538,7 @@
           <dict>
             <key>match</key>
             <string>(?x)
-  \s* \b(from)\b \s*(\.+)\s* (import)?
+  \s* \b(from) \s*(\.+)\s* (import\b)?
 </string>
             <key>captures</key>
             <dict>
@@ -2314,7 +2331,7 @@
         <key>begin</key>
         <string>(?x)
   ^\s*
-  (@) \s* (?=[[:alpha:]_]\w*)
+  ((@)) \s* (?=[[:alpha:]_]\w*)
 </string>
         <key>end</key>
         <string>(?x)
@@ -2329,6 +2346,11 @@
           <dict>
             <key>name</key>
             <string>entity.name.function.decorator.python</string>
+          </dict>
+          <key>2</key>
+          <dict>
+            <key>name</key>
+            <string>punctuation.definition.decorator.python</string>
           </dict>
         </dict>
         <key>endCaptures</key>
@@ -2373,8 +2395,16 @@
             <string>entity.name.function.decorator.python</string>
             <key>match</key>
             <string>(?x)
-  ([[:alpha:]_]\w*) | \.
+  ([[:alpha:]_]\w*) | (\.)
 </string>
+            <key>captures</key>
+            <dict>
+              <key>2</key>
+              <dict>
+                <key>name</key>
+                <string>punctuation.separator.period.python</string>
+              </dict>
+            </dict>
           </dict>
           <dict>
             <key>include</key>
@@ -2509,12 +2539,7 @@
       <key>function-arguments</key>
       <dict>
         <key>begin</key>
-        <string>(?x)
-  (?:
-    (\()
-    (?:\s*(\*\*|\*))?
-  )
-</string>
+        <string>(\()</string>
         <key>end</key>
         <string>(?=\))(?!\)\s*\()</string>
         <key>beginCaptures</key>
@@ -2524,32 +2549,25 @@
             <key>name</key>
             <string>punctuation.definition.arguments.begin.python</string>
           </dict>
-          <key>2</key>
-          <dict>
-            <key>name</key>
-            <string>keyword.operator.unpacking.arguments.python</string>
-          </dict>
         </dict>
         <key>contentName</key>
         <string>meta.function-call.arguments.python</string>
         <key>patterns</key>
         <array>
           <dict>
+            <key>name</key>
+            <string>punctuation.separator.arguments.python</string>
+            <key>match</key>
+            <string>(,)</string>
+          </dict>
+          <dict>
             <key>match</key>
             <string>(?x)
-  (?:
-    (,)
-    (?:\s*(\*\*|\*))?
-  )
+  (?:(?&lt;=[,(])|^) \s* (\*{1,2})
 </string>
             <key>captures</key>
             <dict>
               <key>1</key>
-              <dict>
-                <key>name</key>
-                <string>punctuation.separator.arguments.python</string>
-              </dict>
-              <key>2</key>
               <dict>
                 <key>name</key>
                 <string>keyword.operator.unpacking.arguments.python</string>
@@ -2690,7 +2708,7 @@
             <key>match</key>
             <string>(?x)
   (?&lt;!\.) \b(
-    __import__ | abs | all | any | ascii | bin | callable
+    __import__ | abs | all | any | ascii | bin | breakpoint | callable
     | chr | compile | copyright | credits | delattr | dir | divmod
     | enumerate | eval | exec | exit | filter | format | getattr
     | globals | hasattr | hash | help | hex | id | input
@@ -2780,10 +2798,10 @@ indirectly through syntactic constructs
         <string>(?x)
   \b(
     __(?:
-      all | bases | builtins | class | code | debug | defaults | dict
-      | doc | file | func | kwdefaults | members
-      | metaclass | methods | module | mro | name
-      | qualname | self | signature | slots | subclasses
+      all | bases | builtins | class | class_getitem | code | debug
+      | defaults | dict | doc | file | func | kwdefaults | members
+      | metaclass | methods | module | mro | mro_entries | name
+      | qualname | post_init | self | signature | slots | subclasses
       | version | weakref | wrapped | annotations | classcell
       | spec | path | package | future | traceback
     )__
@@ -2814,18 +2832,33 @@ indirectly through syntactic constructs
       </dict>
       <key>illegal-names</key>
       <dict>
-        <key>name</key>
-        <string>keyword.control.flow.python</string>
         <key>match</key>
         <string>(?x)
-  \b(
-    and | as | assert | async | await | break | class | continue | def
-    | del | elif | else | except | exec | finally | for | from | global
-    | if | import | in | is | (?&lt;=\.)lambda | lambda(?=\s*[\.=])
-    | nonlocal | not | or | pass | raise | return | try | while | with
-    | yield
+  \b(?:
+    (
+      and | as | assert | async | await | break | class | continue | def
+      | del | elif | else | except | finally | for | from | global
+      | if | in | is | (?&lt;=\.)lambda | lambda(?=\s*[\.=])
+      | nonlocal | not | or | pass | raise | return | try | while | with
+      | yield
+    ) | (
+      import
+    )
   )\b
 </string>
+        <key>captures</key>
+        <dict>
+          <key>1</key>
+          <dict>
+            <key>name</key>
+            <string>keyword.control.flow.python</string>
+          </dict>
+          <key>2</key>
+          <dict>
+            <key>name</key>
+            <string>keyword.control.import.python</string>
+          </dict>
+        </dict>
       </dict>
       <key>special-variables</key>
       <dict>
@@ -7365,7 +7398,7 @@ indirectly through syntactic constructs
         <key>name</key>
         <string>string.quoted.single.python</string>
         <key>begin</key>
-        <string>(\b[rR](?=[uU]))?([uU])?((['"]))</string>
+        <string>(?:\b([rR])(?=[uU]))?([uU])?((['"]))</string>
         <key>end</key>
         <string>(\3)|((?&lt;!\\)\n)</string>
         <key>beginCaptures</key>
@@ -7665,7 +7698,7 @@ indirectly through syntactic constructs
         <key>name</key>
         <string>string.quoted.multi.python</string>
         <key>begin</key>
-        <string>(\b[rR](?=[uU]))?([uU])?('''|""")</string>
+        <string>(?:\b([rR])(?=[uU]))?([uU])?('''|""")</string>
         <key>end</key>
         <string>(\3)</string>
         <key>beginCaptures</key>

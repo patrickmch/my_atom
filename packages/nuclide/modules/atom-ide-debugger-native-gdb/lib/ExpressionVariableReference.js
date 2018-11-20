@@ -1,31 +1,42 @@
-'use strict';
+"use strict";
 
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
+exports.default = void 0;
 
-var _MIDebugSession;
+function _Logger() {
+  const data = require("./Logger");
 
-function _load_MIDebugSession() {
-  return _MIDebugSession = require('./MIDebugSession');
+  _Logger = function () {
+    return data;
+  };
+
+  return data;
 }
 
-var _MIProxy;
+function _MIProxy() {
+  const data = _interopRequireDefault(require("./MIProxy"));
 
-function _load_MIProxy() {
-  return _MIProxy = _interopRequireDefault(require('./MIProxy'));
+  _MIProxy = function () {
+    return data;
+  };
+
+  return data;
 }
 
-var _VariableReference;
+function _VariableReference() {
+  const data = _interopRequireDefault(require("./VariableReference"));
 
-function _load_VariableReference() {
-  return _VariableReference = _interopRequireDefault(require('./VariableReference'));
+  _VariableReference = function () {
+    return data;
+  };
+
+  return data;
 }
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-// An ExpressionVariableReference refers to a watch or hover expression rather
-// than a variable rooted in a stack frame scope.
 /**
  * Copyright (c) 2017-present, Facebook, Inc.
  * All rights reserved.
@@ -37,22 +48,26 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
  * 
  * @format
  */
-
-class ExpressionVariableReference extends (_VariableReference || _load_VariableReference()).default {
+// An ExpressionVariableReference refers to a watch or hover expression rather
+// than a variable rooted in a stack frame scope.
+class ExpressionVariableReference extends _VariableReference().default {
   constructor(client, variables, threadId, frameIndex, expression) {
-    super({ client, variables, expression, threadId, frameIndex });
-  }
-
-  // Unlike variable enumeration, getVariables here can only return exactly
+    super({
+      client,
+      variables,
+      expression,
+      threadId,
+      frameIndex
+    });
+  } // Unlike variable enumeration, getVariables here can only return exactly
   // one variable.
+
+
   async getVariables(start, count) {
     const value = await this.getValue();
     const typeClass = await this.getTypeClass(value);
-
     const resolvedType = await this.getType();
-
-    (0, (_MIDebugSession || _load_MIDebugSession()).logVerbose)(`eval name ${this._expression} type ${resolvedType} value ${value} typeClass ${typeClass}`);
-
+    (0, _Logger().logVerbose)(`eval name ${this._expression} type ${resolvedType} value ${value} typeClass ${typeClass}`);
     let variable = {
       name: this._expression,
       value,
@@ -62,6 +77,7 @@ class ExpressionVariableReference extends (_VariableReference || _load_VariableR
 
     if (typeClass !== 'simple') {
       const handle = this._variables.nestedVariableReference(this, this._expression, (await this._getVarName()));
+
       const childCount = await this.getChildCount();
 
       if (typeClass === 'indexed') {
@@ -87,5 +103,7 @@ class ExpressionVariableReference extends (_VariableReference || _load_VariableR
   get qualifiedName() {
     return `eval.${this._expression}`;
   }
+
 }
+
 exports.default = ExpressionVariableReference;

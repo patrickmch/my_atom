@@ -1,117 +1,163 @@
-'use strict';
+"use strict";
 
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.RelatedFileFinder = undefined;
+exports.RelatedFileFinder = void 0;
 
-var _collection;
+function _collection() {
+  const data = require("../../../../modules/nuclide-commons/collection");
 
-function _load_collection() {
-  return _collection = require('../../../../modules/nuclide-commons/collection');
+  _collection = function () {
+    return data;
+  };
+
+  return data;
 }
 
-var _nuclideUri;
+function _nuclideUri() {
+  const data = _interopRequireDefault(require("../../../../modules/nuclide-commons/nuclideUri"));
 
-function _load_nuclideUri() {
-  return _nuclideUri = _interopRequireDefault(require('../../../../modules/nuclide-commons/nuclideUri'));
+  _nuclideUri = function () {
+    return data;
+  };
+
+  return data;
 }
 
-var _SimpleCache;
+function _SimpleCache() {
+  const data = require("../../../../modules/nuclide-commons/SimpleCache");
 
-function _load_SimpleCache() {
-  return _SimpleCache = require('../../../../modules/nuclide-commons/SimpleCache');
+  _SimpleCache = function () {
+    return data;
+  };
+
+  return data;
 }
 
-var _utils;
+function _utils() {
+  const data = require("../utils");
 
-function _load_utils() {
-  return _utils = require('../utils');
+  _utils = function () {
+    return data;
+  };
+
+  return data;
 }
 
-var _common;
+function _common() {
+  const data = require("./common");
 
-function _load_common() {
-  return _common = require('./common');
+  _common = function () {
+    return data;
+  };
+
+  return data;
 }
 
-var _objcFramework;
+function _objcFramework() {
+  const data = require("./objc-framework");
 
-function _load_objcFramework() {
-  return _objcFramework = require('./objc-framework');
+  _objcFramework = function () {
+    return data;
+  };
+
+  return data;
 }
 
-var _grepFinder;
+function _grepFinder() {
+  const data = require("./grep-finder");
 
-function _load_grepFinder() {
-  return _grepFinder = require('./grep-finder');
+  _grepFinder = function () {
+    return data;
+  };
+
+  return data;
 }
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
+/**
+ * Copyright (c) 2015-present, Facebook, Inc.
+ * All rights reserved.
+ *
+ * This source code is licensed under the license found in the LICENSE file in
+ * the root directory of this source tree.
+ *
+ * 
+ * @format
+ */
 // If the source for a header is null, recheck after 10 minutes.
-const SOURCE_FOR_HEADER_RECHECK_INTERVAL = 10 * 60 * 1000; /**
-                                                            * Copyright (c) 2015-present, Facebook, Inc.
-                                                            * All rights reserved.
-                                                            *
-                                                            * This source code is licensed under the license found in the LICENSE file in
-                                                            * the root directory of this source tree.
-                                                            *
-                                                            * 
-                                                            * @format
-                                                            */
+const SOURCE_FOR_HEADER_RECHECK_INTERVAL = 10 * 60 * 1000;
 
 class RelatedFileFinder {
   constructor() {
-    this._sourceForHeaderCache = new (_SimpleCache || _load_SimpleCache()).SimpleCache({ keyFactory: key => JSON.stringify(key) });
+    this._sourceForHeaderCache = new (_SimpleCache().SimpleCache)({
+      keyFactory: key => JSON.stringify(key)
+    });
   }
-  // Finding the source file that relates to header may be very expensive
-  // because we grep for '#include' directives, so cache the results.
-
 
   async getRelatedHeaderForSource(src) {
     // search in folder
-    const header = await (0, (_common || _load_common()).searchFileWithBasename)((_nuclideUri || _load_nuclideUri()).default.dirname(src), (0, (_utils || _load_utils()).getFileBasename)(src), (_utils || _load_utils()).isHeaderFile);
+    const header = await (0, _common().searchFileWithBasename)(_nuclideUri().default.dirname(src), (0, _utils().getFileBasename)(src), _utils().isHeaderFile);
+
     if (header != null) {
       return header;
-    }
-    // special case for obj-c frameworks
-    return (0, (_objcFramework || _load_objcFramework()).getRelatedHeaderForSourceFromFramework)(src);
+    } // special case for obj-c frameworks
+
+
+    return (0, _objcFramework().getRelatedHeaderForSourceFromFramework)(src);
   }
 
   async getRelatedSourceForHeader(header, projectRoot) {
-    const { source, time } = await this._sourceForHeaderCache.getOrCreate({ header, projectRoot }, () => this._getRelatedSourceForHeaderImpl(header, projectRoot).then(src => ({
+    const {
+      source,
+      time
+    } = await this._sourceForHeaderCache.getOrCreate({
+      header,
+      projectRoot
+    }, () => this._getRelatedSourceForHeaderImpl(header, projectRoot).then(src => ({
       source: src,
       time: Date.now()
     })));
     const now = Date.now();
+
     if (source == null && now > time + SOURCE_FOR_HEADER_RECHECK_INTERVAL) {
-      this._sourceForHeaderCache.delete({ header, projectRoot });
+      this._sourceForHeaderCache.delete({
+        header,
+        projectRoot
+      });
+
       return this.getRelatedHeaderForSource(header);
     }
+
     return source;
   }
 
   async _getRelatedSourceForHeaderImpl(header, projectRoot) {
     // search in folder
-    let source = await (0, (_common || _load_common()).searchFileWithBasename)((_nuclideUri || _load_nuclideUri()).default.dirname(header), (0, (_utils || _load_utils()).getFileBasename)(header), (_utils || _load_utils()).isSourceFile);
+    let source = await (0, _common().searchFileWithBasename)(_nuclideUri().default.dirname(header), (0, _utils().getFileBasename)(header), _utils().isSourceFile);
+
     if (source != null) {
       return source;
-    }
-    // special case for obj-c frameworks
-    source = await (0, (_objcFramework || _load_objcFramework()).getRelatedSourceForHeaderFromFramework)(header);
+    } // special case for obj-c frameworks
+
+
+    source = await (0, _objcFramework().getRelatedSourceForHeaderFromFramework)(header);
+
     if (source != null) {
       return source;
     }
 
     if (projectRoot != null) {
-      source = await (0, (_grepFinder || _load_grepFinder()).findIncludingSourceFile)(header, projectRoot).toPromise();
+      source = await (0, _grepFinder().findIncludingSourceFile)(header, projectRoot).toPromise();
+
       if (source != null) {
         return source;
       }
     }
 
-    source = await (0, (_grepFinder || _load_grepFinder()).findIncludingSourceFile)(header, this._inferProjectRoot(header)).toPromise();
+    source = await (0, _grepFinder().findIncludingSourceFile)(header, this._inferProjectRoot(header)).toPromise();
 
     if (source != null) {
       return source;
@@ -119,7 +165,7 @@ class RelatedFileFinder {
 
     try {
       // $FlowFB
-      return require('./fb/fallback-finder').findIncludingSourceFile(header);
+      return require("./fb/fallback-finder").findIncludingSourceFile(header);
     } catch (e) {
       return null;
     }
@@ -128,25 +174,32 @@ class RelatedFileFinder {
   _getFBProjectRoots() {
     try {
       // $FlowFB
-      return require('./fb/project-roots').getFBProjectRoots();
+      return require("./fb/project-roots").getFBProjectRoots();
     } catch (e) {}
+
     return [];
   }
-
   /**
    * Given a file path, find out from the list of registered hardcoded project
    * roots which one is part of it and use it as project root. Otherwise, this
    * uses the file's parent dir as fallback.
    */
+
+
   _inferProjectRoot(file) {
-    const pathParts = (_nuclideUri || _load_nuclideUri()).default.split(file);
+    const pathParts = _nuclideUri().default.split(file);
+
     for (const root of this._getFBProjectRoots()) {
-      const offset = (0, (_collection || _load_collection()).findSubArrayIndex)(pathParts, (_nuclideUri || _load_nuclideUri()).default.split(root));
+      const offset = (0, _collection().findSubArrayIndex)(pathParts, _nuclideUri().default.split(root));
+
       if (offset !== -1) {
-        return (_nuclideUri || _load_nuclideUri()).default.join(...pathParts.slice(0, offset), root);
+        return _nuclideUri().default.join(...pathParts.slice(0, offset), root);
       }
     }
-    return (_nuclideUri || _load_nuclideUri()).default.dirname(file);
+
+    return _nuclideUri().default.dirname(file);
   }
+
 }
+
 exports.RelatedFileFinder = RelatedFileFinder;

@@ -1,0 +1,69 @@
+diff --git a/nols_website/wmi/templates/dataentry/base.html b/nols_website/wmi/templates/dataentry/base.html
+index 46522844b..b7e152bb0 100644
+--- a/nols_website/wmi/templates/dataentry/base.html
++++ b/nols_website/wmi/templates/dataentry/base.html
+@@ -1,64 +1,57 @@
+ {% extends 'bootstrapped/base.html' %}
+ {% load static from staticfiles %}
+ {% block extra_head %}
+   <meta name="robots" content="NONE,NOARCHIVE">
+   <link href="{% static "wmi/css/dataentry.css" %}" rel="stylesheet">
+ {% endblock %}
+ 
+ {% block title %}NOLS Data Entry{% endblock title %}
+ 
+ {% block content_header %}
+   {% with "Wilderness Medicine" as title %}
+   {% with "Rollcall" as subtitle %}
+   {% include "fragments/title_row.html" %}
+   {% endwith %}
+   {% endwith %}
+ {% endblock %}
+ 
+ {% block content %}
+ 
+-  {% with "auth_form" as form_id %}
+     {% with auth_form as form %}
+-        {% url "login"  as form_action %}
+         {% url "get_started"  event.wmi_course_id as redirect %}
+-        {% with "next" as redirect_name %}
+-        {% with "Login" as modal_title %}
+           {% include "dataentry/fragments/login_modal.html" %}
+-        {% endwith %}
+-        {% endwith %}
+     {% endwith %}
+-  {% endwith %}
+ 
+         <div id="user_modal" class="reveal fade" data-reveal tabindex="-1" role="dialog">
+             <div class="modal-dialog">
+                 <div class="modal-content">
+                     <div class="modal-header">
+                         <button type="button" class="close" data-close aria-hidden="true">x</button>
+                         <h3 id="user-modal-header text-center">hi {{ user.first_name }} {{ user.last_name }}!</h3>
+                     </div>
+                     <div class="modal-body">
+                         <p>you are currently logged in as <code>{{ user.username }}</code>.</p>
+                         <p>please
+                             <a href="{% url "django.contrib.auth.views.logout" %}{% if event %}?next={% url "get_started"  event.wmi_course_id %}{% endif %}">
+                                 logout
+                             </a>
+                             if you are not {{ user.first_name }} {{ user.last_name }}.
+                         </p>
+                     </div>
+                     <div class="modal-footer">
+                         <button id="thats-me" class="button " data-close aria-hidden="true"><span>stay logged-in</span></button>
+                         <a class="button button-default" href="{% url "django.contrib.auth.views.logout" %}{% if event %}?next={% url "get_started"  event.wmi_course_id %}{% endif %}">
+                             log-out
+                         </a>
+                     </div>
+                 </div>
+             </div>
+         </div>
+ 
+ {% endblock content %}
+ {% block extra_js %}
+     {{ block.super }}
+     <script src="{% static "wmi/js/dataentry.js" %}"></script>
+     {% include "core/fragments/citizen_ethnicity_toggle_js.html" %}
+ 
+ {% endblock extra_js %}

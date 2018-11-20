@@ -6,6 +6,7 @@ Object.defineProperty(exports, "__esModule", {
 exports.aSingleLineFunctionSignature = aSingleLineFunctionSignature;
 exports.aMultiLineFunctionSignature = aMultiLineFunctionSignature;
 exports.aPoorlyIndentedFunction = aPoorlyIndentedFunction;
+
 /**
  * Copyright (c) 2015-present, Facebook, Inc.
  * All rights reserved.
@@ -18,9 +19,8 @@ exports.aPoorlyIndentedFunction = aPoorlyIndentedFunction;
 // license header above without @format
 // eslint-disable-next-line
 const A_CONSTANT = 42;
-const SOME_OTHER_CONSTANT = 24;
+const SOME_OTHER_CONSTANT = 24; // eslint-disable-next-line
 
-// eslint-disable-next-line
 const A_MULTILINE_CONST = `
   hey look I span
     multiple

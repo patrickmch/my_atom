@@ -1,34 +1,69 @@
-'use strict';
+"use strict";
 
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.ButtonSizes = exports.Dropdown = undefined;
-exports.DropdownButton = DropdownButton;
+Object.defineProperty(exports, "ButtonSizes", {
+  enumerable: true,
+  get: function () {
+    return _Button().ButtonSizes;
+  }
+});
+exports.DropdownButton = exports.Dropdown = void 0;
 
-var _Button;
+function _classnames() {
+  const data = _interopRequireDefault(require("classnames"));
 
-function _load_Button() {
-  return _Button = require('./Button');
+  _classnames = function () {
+    return data;
+  };
+
+  return data;
 }
 
-var _Icon;
+var React = _interopRequireWildcard(require("react"));
 
-function _load_Icon() {
-  return _Icon = require('./Icon');
+function _nullthrows() {
+  const data = _interopRequireDefault(require("nullthrows"));
+
+  _nullthrows = function () {
+    return data;
+  };
+
+  return data;
 }
 
-var _classnames;
+function _Button() {
+  const data = require("./Button");
 
-function _load_classnames() {
-  return _classnames = _interopRequireDefault(require('classnames'));
+  _Button = function () {
+    return data;
+  };
+
+  return data;
 }
 
-var _electron = _interopRequireDefault(require('electron'));
+function _Icon() {
+  const data = require("./Icon");
 
-var _react = _interopRequireWildcard(require('react'));
+  _Icon = function () {
+    return data;
+  };
 
-function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
+  return data;
+}
+
+function _electronRemote() {
+  const data = _interopRequireDefault(require("../nuclide-commons/electron-remote"));
+
+  _electronRemote = function () {
+    return data;
+  };
+
+  return data;
+}
+
+function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) { var desc = Object.defineProperty && Object.getOwnPropertyDescriptor ? Object.getOwnPropertyDescriptor(obj, key) : {}; if (desc.get || desc.set) { Object.defineProperty(newObj, key, desc); } else { newObj[key] = obj[key]; } } } } newObj.default = obj; return newObj; } }
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -43,29 +78,30 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
  * 
  * @format
  */
-
-const { remote } = _electron.default;
-
-if (!(remote != null)) {
-  throw new Error('Invariant violation: "remote != null"');
-}
-
-// For backwards compat, we have to do some conversion here.
+if (!(_electronRemote().default != null)) {
+  throw new Error("Invariant violation: \"remote != null\"");
+} // For backwards compat, we have to do some conversion here.
 
 
-class Dropdown extends _react.Component {
+class Dropdown extends React.Component {
   constructor(...args) {
     var _temp;
 
-    return _temp = super(...args), this._handleDropdownClick = event => {
+    return _temp = super(...args), this._updateButtonRef = button => {
+      this._button = button;
+    }, this._openMenu = event => {
+      const buttonRect = (0, _nullthrows().default)(this._button).getBoundingClientRect();
       this._menu = this._menuFromOptions(this.props.options);
-      this._menu.popup({ x: event.clientX, y: event.clientY, async: true });
+
+      this._menu.popup({
+        x: Math.floor(buttonRect.left),
+        y: Math.floor(buttonRect.bottom),
+        async: true
+      });
+
       event.stopPropagation();
     }, _temp;
   }
-
-  // Make sure that menus don't outlive the dropdown.
-
 
   componentWillUnmount() {
     this._closeMenu();
@@ -78,13 +114,19 @@ class Dropdown extends _react.Component {
   _closeMenu() {
     if (this._menu != null) {
       this._menu.closePopup();
+
       this._menu = null;
     }
   }
 
   render() {
-    const { label: providedLabel, options, placeholder } = this.props;
+    const {
+      label: providedLabel,
+      options,
+      placeholder
+    } = this.props;
     let label;
+
     if (providedLabel != null) {
       label = providedLabel;
     } else {
@@ -101,22 +143,22 @@ class Dropdown extends _react.Component {
       }
     }
 
-    return _react.createElement(
-      DropdownButton,
-      {
-        className: this.props.className,
-        disabled: this.props.disabled,
-        isFlat: this.props.isFlat,
-        buttonComponent: this.props.buttonComponent,
-        onExpand: this._handleDropdownClick,
-        size: this.props.size,
-        tooltip: this.props.tooltip },
-      label
-    );
+    return React.createElement(DropdownButton, {
+      buttonType: this.props.buttonType,
+      className: this.props.className,
+      disabled: this.props.disabled,
+      onButtonDOMNodeChange: this._updateButtonRef,
+      isFlat: this.props.isFlat,
+      buttonComponent: this.props.buttonComponent,
+      onExpand: this._openMenu,
+      size: this.props.size,
+      tooltip: this.props.tooltip
+    }, label);
   }
 
   _renderSelectedLabel(option) {
     let text = null;
+
     if (option == null) {
       text = '';
     } else if (typeof option.selectedLabel === 'string') {
@@ -128,24 +170,27 @@ class Dropdown extends _react.Component {
     if (text == null || text === '') {
       return null;
     }
+
     return text;
   }
 
   _menuFromOptions(options) {
-    const menu = new remote.Menu();
+    const menu = new (_electronRemote().default.Menu)();
     options.forEach(option => {
       if (option.type === 'separator') {
-        menu.append(new remote.MenuItem({ type: 'separator' }));
+        menu.append(new (_electronRemote().default.MenuItem)({
+          type: 'separator'
+        }));
       } else if (option.type === 'submenu') {
         const submenu = option.submenu;
-        menu.append(new remote.MenuItem({
+        menu.append(new (_electronRemote().default.MenuItem)({
           type: 'submenu',
           label: option.label,
           enabled: option.disabled !== true,
           submenu: this._menuFromOptions(submenu)
         }));
-      } else {
-        menu.append(new remote.MenuItem({
+      } else if (!Boolean(option.hidden)) {
+        menu.append(new (_electronRemote().default.MenuItem)({
           type: 'checkbox',
           checked: this._optionIsSelected(this.props.value, option.value),
           label: option.label,
@@ -167,6 +212,7 @@ class Dropdown extends _react.Component {
 
   _findSelectedOption(options) {
     let result = null;
+
     for (const option of options) {
       if (option.type === 'separator') {
         continue;
@@ -181,8 +227,10 @@ class Dropdown extends _react.Component {
         break;
       }
     }
+
     return result;
   }
+
 }
 
 exports.Dropdown = Dropdown;
@@ -195,49 +243,96 @@ Dropdown.defaultProps = {
   title: ''
 };
 
-
 const noop = () => {};
-
 /**
  * Just the button part. This is useful for when you want to customize the dropdown behavior (e.g.)
  * show it asynchronously.
  */
-function DropdownButton(props) {
-  const ButtonComponent = props.buttonComponent || (_Button || _load_Button()).Button;
-  const className = (0, (_classnames || _load_classnames()).default)('nuclide-ui-dropdown', props.className, {
-    'nuclide-ui-dropdown-flat': props.isFlat === true
-  });
 
-  const label = props.children == null ? null : _react.createElement(
-    'span',
-    { className: 'nuclide-dropdown-label-text-wrapper' },
-    props.children
-  );
 
-  return _react.createElement(
-    ButtonComponent,
-    {
-      tooltip: props.tooltip,
-      size: getButtonSize(props.size),
+class DropdownButton extends React.Component {
+  constructor(...args) {
+    var _temp2;
+
+    return _temp2 = super(...args), this._handleButtonDOMNodeChange = button => {
+      this._button = button;
+
+      if (this.props.onButtonDOMNodeChange != null) {
+        this.props.onButtonDOMNodeChange(button);
+      }
+    }, _temp2;
+  }
+
+  componentDidMount() {
+    this._disposable = atom.commands.add((0, _nullthrows().default)(this._button), 'core:move-down', ({
+      originalEvent
+    }) => {
+      if (!(originalEvent instanceof KeyboardEvent)) {
+        throw new Error("Invariant violation: \"originalEvent instanceof KeyboardEvent\"");
+      }
+
+      if (this.props.onExpand != null) {
+        this.props.onExpand(originalEvent);
+      }
+    });
+  }
+
+  componentWillUnmount() {
+    (0, _nullthrows().default)(this._disposable).dispose();
+  }
+
+  render() {
+    const {
+      buttonComponent,
+      buttonType,
+      children,
+      disabled,
+      isFlat,
+      onExpand,
+      size,
+      tooltip
+    } = this.props;
+
+    const ButtonComponent = buttonComponent || _Button().Button;
+
+    const className = (0, _classnames().default)('nuclide-ui-dropdown', this.props.className, {
+      'nuclide-ui-dropdown-flat': isFlat === true
+    });
+    const label = children == null ? React.createElement("span", {
+      className: "sr-only"
+    }, "Open Dropdown") : React.createElement("span", {
+      className: "nuclide-dropdown-label-text-wrapper"
+    }, children);
+    return React.createElement(ButtonComponent, {
+      buttonType: buttonType,
+      onButtonDOMNodeChange: this._handleButtonDOMNodeChange,
+      tooltip: tooltip,
+      size: getButtonSize(size),
       className: className,
-      disabled: props.disabled === true,
-      onClick: props.onExpand || noop },
-    label,
-    _react.createElement((_Icon || _load_Icon()).Icon, { icon: 'triangle-down', className: 'nuclide-ui-dropdown-icon' })
-  );
+      disabled: disabled === true,
+      onClick: onExpand || noop
+    }, label, React.createElement(_Icon().Icon, {
+      icon: "triangle-down",
+      className: "nuclide-ui-dropdown-icon"
+    }));
+  }
+
 }
+
+exports.DropdownButton = DropdownButton;
 
 function getButtonSize(size) {
   switch (size) {
     case 'xs':
       return 'EXTRA_SMALL';
+
     case 'sm':
       return 'SMALL';
+
     case 'lg':
       return 'LARGE';
+
     default:
       return 'SMALL';
   }
 }
-
-exports.ButtonSizes = (_Button || _load_Button()).ButtonSizes;

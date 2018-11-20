@@ -4,7 +4,6 @@
   "version": "0.0.0",
   "description": "Provides support for Python in Nuclide",
   "author": "Python Foundation",
-  "atomTestRunner": "../../lib/test-runner-entry.js",
   "nuclide": {
     "configMetadata": {
       "pathComponents": [
@@ -41,7 +40,11 @@
         "title": "Lint extension blacklist",
         "type": "array",
         "description": "File extensions that should not be linted with flake8.",
-        "default": [".bzl", ".tw", ""],
+        "default": [
+          ".bzl",
+          ".tw",
+          ""
+        ],
         "items": {
           "type": "string"
         }
@@ -65,8 +68,7 @@
         "description": "Display signature help while typing function/method calls. (requires restart)"
       }
     },
-    "packageType": "Atom",
-    "testRunner": "apm"
+    "packageType": "AtomPackage"
   },
   "consumedServices": {
     "linter-indie": {
@@ -87,13 +89,6 @@
     "nuclide-current-working-directory": {
       "versions": {
         "0.0.0": "consumeCwdApi"
-      }
-    }
-  },
-  "providedServices": {
-    "linter": {
-      "versions": {
-        "1.0.0": "provideLint"
       }
     }
   }

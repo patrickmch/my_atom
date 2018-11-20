@@ -1,4 +1,4 @@
-'use strict';
+"use strict";
 
 /**
  * Copyright (c) 2015-present, Facebook, Inc.
@@ -10,6 +10,5 @@
  * 
  * @format
  */
-
 // eslint-disable-next-line nuclide-internal/no-commonjs
 module.exports = () => Promise.resolve('#winning');

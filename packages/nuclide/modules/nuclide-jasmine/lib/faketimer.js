@@ -1,4 +1,4 @@
-'use strict';
+"use strict";
 
 /**
  * Copyright (c) 2017-present, Facebook, Inc.
@@ -18,6 +18,7 @@
  * Timer utils, and using advanceClock to advance the fake timer to trigger timed callback.
  */
 require('jasmine-node'); // eslint-disable-line nuclide-internal/no-commonjs
+
 
 let now = 0;
 let timeoutCount = 0;
@@ -46,10 +47,12 @@ function fakeClearTimeout(idToClear) {
 
 function fakeSetInterval(callback, ms) {
   const id = ++intervalCount;
+
   const action = () => {
     callback();
     intervalTimeouts[id] = fakeSetTimeout(action, ms);
   };
+
   intervalTimeouts[id] = fakeSetTimeout(action, ms);
   return id;
 }
@@ -69,26 +72,28 @@ function advanceClock(deltaMs) {
 
   now = advanceTo;
 }
-
 /**
  * Allows tests to use the non-fake setTimeout and clearTimeout functions.
  */
+
+
 function useRealClock() {
   jasmine.unspy(global, 'setTimeout');
   jasmine.unspy(global, 'clearTimeout');
   jasmine.unspy(Date, 'now');
 }
-
 /**
  * Atom does this half-way mock.
  * https://github.com/atom/atom/blob/v1.12.7/spec/spec-helper.coffee#L169-L174
  */
+
+
 function useMockClock() {
   spyOn(global, 'setInterval').andCallFake(fakeSetInterval);
   spyOn(global, 'clearInterval').andCallFake(fakeClearInterval);
-}
+} // Expose the fake timer utils to global to be used by npm spec tests.
 
-// Expose the fake timer utils to global to be used by npm spec tests.
+
 global.resetTimeouts = resetTimeouts;
 global.fakeSetTimeout = fakeSetTimeout;
 global.fakeClearTimeout = fakeClearTimeout;
@@ -96,15 +101,17 @@ global.fakeSetInterval = fakeSetInterval;
 global.fakeClearInterval = fakeClearInterval;
 global.advanceClock = advanceClock;
 jasmine.useRealClock = useRealClock;
-jasmine.useMockClock = useMockClock;
-// $FlowIssue: https://github.com/facebook/flow/issues/285
-Object.defineProperty(global, 'now', { get: () => now });
+jasmine.useMockClock = useMockClock; // $FlowIssue: https://github.com/facebook/flow/issues/285
 
+Object.defineProperty(global, 'now', {
+  get: () => now
+});
 /**
  * This hook is a the first initialization code that happens before any jasmine test case is
  * executed. This allows to use the fake timing by default and is a direct port from Atom's
  * `spec-helper.coffee`
  */
+
 beforeEach(() => {
   resetTimeouts();
   spyOn(Date, 'now').andCallFake(() => now);

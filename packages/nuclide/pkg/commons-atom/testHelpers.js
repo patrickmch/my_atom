@@ -1,28 +1,43 @@
-'use strict';
+"use strict";
 
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.rangeMatchers = undefined;
 exports.dispatchKeyboardEvent = dispatchKeyboardEvent;
 exports.setLocalProject = setLocalProject;
 exports.waitsForFile = waitsForFile;
 exports.waitsForFilePosition = waitsForFilePosition;
 exports.getMountedReactRootNames = getMountedReactRootNames;
+exports.rangeMatchers = void 0;
 
-var _nuclideUri;
+function _nuclideUri() {
+  const data = _interopRequireDefault(require("../../modules/nuclide-commons/nuclideUri"));
 
-function _load_nuclideUri() {
-  return _nuclideUri = _interopRequireDefault(require('../../modules/nuclide-commons/nuclideUri'));
+  _nuclideUri = function () {
+    return data;
+  };
+
+  return data;
 }
 
-var _react = _interopRequireWildcard(require('react'));
+var React = _interopRequireWildcard(require("react"));
 
-var _reactDom = _interopRequireDefault(require('react-dom'));
+var _reactDom = _interopRequireDefault(require("react-dom"));
 
-function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
+function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) { var desc = Object.defineProperty && Object.getOwnPropertyDescriptor ? Object.getOwnPropertyDescriptor(obj, key) : {}; if (desc.get || desc.set) { Object.defineProperty(newObj, key, desc); } else { newObj[key] = obj[key]; } } } } newObj.default = obj; return newObj; } }
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+/**
+ * Copyright (c) 2015-present, Facebook, Inc.
+ * All rights reserved.
+ *
+ * This source code is licensed under the license found in the LICENSE file in
+ * the root directory of this source tree.
+ *
+ * 
+ * @format
+ */
 
 /**
  * Use this function to simulate keyboard shortcuts or special keys, e.g. cmd-v,
@@ -35,27 +50,20 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
  * @param metaKeys An object denoting which meta keys are pressed for this
  * keyboard event.
  */
-/**
- * Copyright (c) 2015-present, Facebook, Inc.
- * All rights reserved.
- *
- * This source code is licensed under the license found in the LICENSE file in
- * the root directory of this source tree.
- *
- * 
- * @format
- */
-
 function dispatchKeyboardEvent(key, target, metaKeys = {}) {
-  const { alt, cmd, ctrl, shift } = metaKeys;
-  // Atom requires `key` to be uppercase when `shift` is specified.
+  const {
+    alt,
+    cmd,
+    ctrl,
+    shift
+  } = metaKeys; // Atom requires `key` to be uppercase when `shift` is specified.
 
   if (!(shift !== true || key.toUpperCase() === key)) {
-    throw new Error('Invariant violation: "shift !== true || key.toUpperCase() === key"');
+    throw new Error("Invariant violation: \"shift !== true || key.toUpperCase() === key\"");
   }
 
   if (!(target != null)) {
-    throw new Error('Invariant violation: "target != null"');
+    throw new Error("Invariant violation: \"target != null\"");
   }
 
   const event = atom.keymaps.constructor.buildKeydownEvent(key, {
@@ -67,12 +75,13 @@ function dispatchKeyboardEvent(key, target, metaKeys = {}) {
   });
   atom.keymaps.handleKeyboardEvent(event);
 }
-
 /**
  * Custom matchers for jasmine testing, as described in:
  * http://jasmine.github.io/1.3/introduction.html#section-Writing_a_custom_matcher.
  */
-const rangeMatchers = exports.rangeMatchers = {
+
+
+const rangeMatchers = {
   /**
    * Determines if two Ranges are equal. This function should not be called
    * directly, but rather added as a Jasmine custom matcher.
@@ -93,12 +102,14 @@ const rangeMatchers = exports.rangeMatchers = {
    */
   toEqualAtomRanges(expected) {
     let allEqual = true;
+
     if (!this.actual || !expected) {
       return false;
     }
+
     this.actual.some((range, index) => {
       if (!expected) {
-        throw new Error('Invariant violation: "expected"');
+        throw new Error("Invariant violation: \"expected\"");
       } // Tell Flow this is definitely non-null now.
 
 
@@ -111,12 +122,15 @@ const rangeMatchers = exports.rangeMatchers = {
     });
     return allEqual;
   }
-};
 
+};
 /**
  * Set the project. If there are one or more projects set previously, this
  * replaces them all with the one(s) provided as the argument `projectPath`.
  */
+
+exports.rangeMatchers = rangeMatchers;
+
 function setLocalProject(projectPath) {
   if (Array.isArray(projectPath)) {
     atom.project.setPaths(projectPath);
@@ -124,54 +138,68 @@ function setLocalProject(projectPath) {
     atom.project.setPaths([projectPath]);
   }
 }
-
 /**
  * Waits for the specified file to become the active text editor.
  * Can only be used in a Jasmine context.
  */
+
+
 function waitsForFile(filename, timeoutMs = 10000) {
   waitsFor(`${filename} to become active`, timeoutMs, () => {
     const editor = atom.workspace.getActiveTextEditor();
+
     if (editor == null) {
       return false;
     }
+
     const editorPath = editor.getPath();
+
     if (editorPath == null) {
       return false;
     }
-    return (_nuclideUri || _load_nuclideUri()).default.basename(editorPath) === filename;
+
+    return _nuclideUri().default.basename(editorPath) === filename;
   });
 }
 
 function waitsForFilePosition(filename, row, column, timeoutMs = 10000) {
   waitsFor(`${filename} to become active at ${row}:${column}`, timeoutMs, () => {
     const editor = atom.workspace.getActiveTextEditor();
+
     if (editor == null) {
       return false;
     }
+
     const editorPath = editor.getPath();
+
     if (editorPath == null) {
       return false;
     }
+
     const pos = editor.getCursorBufferPosition();
-    return (_nuclideUri || _load_nuclideUri()).default.basename(editorPath) === filename && pos.row === row && pos.column === column;
+    return _nuclideUri().default.basename(editorPath) === filename && pos.row === row && pos.column === column;
   });
 }
-
 /**
  * Patches React's internals to keep record of components that are never
  * unmounted. Having mounted React components after the creator has been
  * disposed is a sign that there are problems in the cleanup logic.
  */
+
+
 const mountedRootComponents = new Map();
 
-const oldReactRender = _reactDom.default.render.bind(_reactDom.default);
+const oldReactRender = _reactDom.default.render.bind(_reactDom.default); // $FlowFixMe Patching for test
+
+
 _reactDom.default.render = function render(element, container, callback) {
   mountedRootComponents.set(container, element);
   return oldReactRender(element, container, callback);
 };
 
-const oldReactUnmountComponentAtNode = _reactDom.default.unmountComponentAtNode.bind(_reactDom.default);
+const oldReactUnmountComponentAtNode = _reactDom.default.unmountComponentAtNode.bind(_reactDom.default); // $FlowFixMe Patching for test
+
+
 _reactDom.default.unmountComponentAtNode = function unmountComponentAtNode(container) {
   mountedRootComponents.delete(container);
   return oldReactUnmountComponentAtNode(container);
@@ -179,8 +207,8 @@ _reactDom.default.unmountComponentAtNode = function unmountComponentAtNode(conta
 
 function getMountedReactRootNames() {
   return Array.from(mountedRootComponents).map(([element, container]) => element).map(element => {
-    const constructor = element.constructor;
-    // $FlowFixMe(>=0.68.0) Flow suppress (T27187857)
+    const constructor = element.constructor; // $FlowFixMe(>=0.68.0) Flow suppress (T27187857)
+
     if (typeof constructor.displayName === 'string') {
       return constructor.displayName;
     } else if (typeof constructor.name === 'string') {

@@ -1,4 +1,4 @@
-'use strict';
+"use strict";
 
 Object.defineProperty(exports, "__esModule", {
   value: true
@@ -6,38 +6,51 @@ Object.defineProperty(exports, "__esModule", {
 exports.getNPMHyperclickProvider = getNPMHyperclickProvider;
 exports.getPackageUrlForRange = getPackageUrlForRange;
 
-var _semver;
+function _semver() {
+  const data = _interopRequireDefault(require("semver"));
 
-function _load_semver() {
-  return _semver = _interopRequireDefault(require('semver'));
+  _semver = function () {
+    return data;
+  };
+
+  return data;
 }
 
-var _nuclideUri;
+function _nuclideUri() {
+  const data = _interopRequireDefault(require("../../../modules/nuclide-commons/nuclideUri"));
 
-function _load_nuclideUri() {
-  return _nuclideUri = _interopRequireDefault(require('../../../modules/nuclide-commons/nuclideUri'));
+  _nuclideUri = function () {
+    return data;
+  };
+
+  return data;
 }
 
-var _electron = require('electron');
+var _electron = require("electron");
 
-var _parsing;
+function _parsing() {
+  const data = require("./parsing");
 
-function _load_parsing() {
-  return _parsing = require('./parsing');
+  _parsing = function () {
+    return data;
+  };
+
+  return data;
 }
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-const DEPENDENCY_PROPERTIES = new Set(['dependencies', 'devDependencies', 'optionalDependencies']); /**
-                                                                                                     * Copyright (c) 2015-present, Facebook, Inc.
-                                                                                                     * All rights reserved.
-                                                                                                     *
-                                                                                                     * This source code is licensed under the license found in the LICENSE file in
-                                                                                                     * the root directory of this source tree.
-                                                                                                     *
-                                                                                                     * 
-                                                                                                     * @format
-                                                                                                     */
+/**
+ * Copyright (c) 2015-present, Facebook, Inc.
+ * All rights reserved.
+ *
+ * This source code is licensed under the license found in the LICENSE file in
+ * the root directory of this source tree.
+ *
+ * 
+ * @format
+ */
+const DEPENDENCY_PROPERTIES = new Set(['dependencies', 'devDependencies', 'optionalDependencies']);
 
 function getNPMHyperclickProvider() {
   return npmHyperclickProvider;
@@ -69,34 +82,32 @@ function getSuggestionForWord(textEditor, text, range) {
     }
   };
   return Promise.resolve(suggestion);
-}
-
-// Exported for testing. We could derive the token from the json text and the range, but since
+} // Exported for testing. We could derive the token from the json text and the range, but since
 // hyperclick provides it we may as well use it.
+
+
 function getPackageUrlForRange(json, token, range) {
   const version = getDependencyVersion(json, range);
+
   if (version == null) {
     return null;
-  }
+  } // Strip off the quotes
 
-  // Strip off the quotes
+
   const packageName = token.substring(1, token.length - 1);
-
   return getPackageUrl(packageName, version);
 }
 
 function isPackageJson(textEditor) {
   const scopeName = textEditor.getGrammar().scopeName;
   const filePath = textEditor.getPath();
-  return scopeName === 'source.json' && filePath != null && (_nuclideUri || _load_nuclideUri()).default.basename(filePath) === 'package.json';
+  return scopeName === 'source.json' && filePath != null && _nuclideUri().default.basename(filePath) === 'package.json';
 }
 
 function getPackageUrl(packageName, version) {
-  if ((_semver || _load_semver()).default.valid(version)) {
+  if (_semver().default.valid(version)) {
     return `https://www.npmjs.com/package/${packageName}/`;
-  }
-
-  // - optionally prefixed with 'github:' (but don't capture that)
+  } // - optionally prefixed with 'github:' (but don't capture that)
   // - all captured together:
   //   - username: alphanumeric characters, plus underscores and dashes
   //   - slash
@@ -104,8 +115,11 @@ function getPackageUrl(packageName, version) {
   // - optionally followed by a revision:
   //   - starts with a hash (not captured)
   //   - then alphanumeric characters, underscores, dashes, periods (captured)
+
+
   const githubRegex = /^(?:github:)?([\w-]+\/[\w-]+)(?:#([\w-.]+))?$/;
   const githubMatch = version.match(githubRegex);
+
   if (githubMatch != null) {
     const commit = githubMatch[2];
     const commitSuffix = commit == null ? '' : `/tree/${commit}`;
@@ -113,52 +127,64 @@ function getPackageUrl(packageName, version) {
   }
 
   return null;
-}
+} // Return the version string, if it exists
 
-// Return the version string, if it exists
+
 function getDependencyVersion(json, range) {
-  const ast = (0, (_parsing || _load_parsing()).parseJSON)(json);
+  const ast = (0, _parsing().parseJSON)(json);
+
   if (ast == null) {
     // parse error
     return null;
   }
+
   const pathToNode = getPathToNodeForRange(ast, range);
 
   if (pathToNode != null && pathToNode.length === 2 && DEPENDENCY_PROPERTIES.has(pathToNode[0].key.value) && isValidVersion(pathToNode[1].value)) {
     const valueNode = pathToNode[1].value;
+
     if (isValidVersion(valueNode)) {
       return valueNode.value;
     } else {
       return null;
     }
   }
+
   return null;
 }
 
 function isValidVersion(valueASTNode) {
   return valueASTNode.type === 'StringLiteral';
-}
+} // return an array of property AST nodes
 
-// return an array of property AST nodes
+
 function getPathToNodeForRange(objectExpression, range) {
   const properties = objectExpression.properties;
+
   if (properties == null) {
     return null;
   }
+
   for (const property of properties) {
-    const propertyRange = (0, (_parsing || _load_parsing()).babelLocToRange)(property.loc);
+    const propertyRange = (0, _parsing().babelLocToRange)(property.loc);
+
     if (propertyRange.containsRange(range)) {
-      const keyRange = (0, (_parsing || _load_parsing()).babelLocToRange)(property.key.loc);
+      const keyRange = (0, _parsing().babelLocToRange)(property.key.loc);
+
       if (keyRange.isEqual(range)) {
         return [property];
       }
+
       const subPath = getPathToNodeForRange(property.value, range);
+
       if (subPath == null) {
         return null;
       }
+
       subPath.unshift(property);
       return subPath;
     }
   }
+
   return null;
 }

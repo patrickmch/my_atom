@@ -1,26 +1,30 @@
-'use strict';
+"use strict";
 
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.ObjectRegistry = undefined;
+exports.ObjectRegistry = void 0;
 
-var _log4js;
+function _log4js() {
+  const data = require("log4js");
 
-function _load_log4js() {
-  return _log4js = require('log4js');
+  _log4js = function () {
+    return data;
+  };
+
+  return data;
 }
 
-var _eventKit;
+function _eventKit() {
+  const data = require("event-kit");
 
-function _load_eventKit() {
-  return _eventKit = require('event-kit');
+  _eventKit = function () {
+    return data;
+  };
+
+  return data;
 }
 
-const logger = (0, (_log4js || _load_log4js()).getLogger)('nuclide-rpc');
-
-// All remotable objects have some set of named functions,
-// and they also have a dispose method.
 /**
  * Copyright (c) 2015-present, Facebook, Inc.
  * All rights reserved.
@@ -31,6 +35,7 @@ const logger = (0, (_log4js || _load_log4js()).getLogger)('nuclide-rpc');
  * 
  * @format
  */
+const logger = (0, _log4js().getLogger)('nuclide-rpc');
 
 // Handles lifetimes of marshalling wrappers remote objects.
 //
@@ -38,9 +43,10 @@ const logger = (0, (_log4js || _load_log4js()).getLogger)('nuclide-rpc');
 // Positive IDs represent objects which live on the server,
 // negative IDs represent objects which live on the client.
 class ObjectRegistry {
-  // Maps service name to proxy
-
+  // These members handle local objects which have been marshalled remotely.
   // These members handle remote objects.
+  // null means the proxy has been disposed.
+  // Maps service name to proxy
   constructor(kind, serviceRegistry, context) {
     this._delta = kind === 'server' ? 1 : -1;
     this._nextObjectId = this._delta;
@@ -52,12 +58,8 @@ class ObjectRegistry {
     this._serviceRegistry = serviceRegistry;
     this._services = new Map();
     this._context = context;
-    this._emitter = new (_eventKit || _load_eventKit()).Emitter();
+    this._emitter = new (_eventKit().Emitter)();
   }
-  // null means the proxy has been disposed.
-
-  // These members handle local objects which have been marshalled remotely.
-
 
   onRegisterLocal(callback) {
     return this._emitter.on('register-local', callback);
@@ -73,10 +75,13 @@ class ObjectRegistry {
 
   getService(serviceName) {
     let service = this._services.get(serviceName);
+
     if (service == null) {
       service = this._serviceRegistry.getService(serviceName).factory(this._context);
+
       this._services.set(serviceName, service);
     }
+
     return service;
   }
 
@@ -85,11 +90,11 @@ class ObjectRegistry {
       return this._unmarshalLocalObject(id);
     } else {
       if (!(proxyClass != null)) {
-        throw new Error('Invariant violation: "proxyClass != null"');
+        throw new Error("Invariant violation: \"proxyClass != null\"");
       }
 
       if (!(interfaceName != null)) {
-        throw new Error('Invariant violation: "interfaceName != null"');
+        throw new Error("Invariant violation: \"interfaceName != null\"");
       }
 
       return this._unmarshalRemoteObject(id, interfaceName, proxyClass);
@@ -102,20 +107,21 @@ class ObjectRegistry {
 
   _unmarshalRemoteObject(remoteId, interfaceName, proxyClass) {
     const existingProxy = this._proxiesById.get(remoteId);
+
     if (existingProxy != null) {
       return existingProxy.object;
     }
 
     if (!(proxyClass != null)) {
-      throw new Error('Invariant violation: "proxyClass != null"');
-    }
-
-    // Generate the proxy by manually setting the prototype of the proxy to be the
+      throw new Error("Invariant violation: \"proxyClass != null\"");
+    } // Generate the proxy by manually setting the prototype of the proxy to be the
     // prototype of the remote proxy constructor.
 
 
     const newProxy = Object.create(proxyClass.prototype);
+
     this._addProxy(newProxy, interfaceName, remoteId);
+
     return newProxy;
   }
 
@@ -135,24 +141,28 @@ class ObjectRegistry {
 
   async disposeObject(remoteId) {
     this._emitter.emit('unregister-local', remoteId);
+
     const registration = this._getRegistration(remoteId);
+
     const object = registration.object;
 
     this._registrationsById.delete(remoteId);
-    this._registrationsByObject.delete(object);
 
-    // Call the object's local dispose function.
+    this._registrationsByObject.delete(object); // Call the object's local dispose function.
+
+
     await object.dispose();
   }
 
   disposeSubscription(id) {
     const subscription = this.removeSubscription(id);
+
     if (subscription != null) {
       subscription.unsubscribe();
     }
-  }
+  } // Put the object in the registry.
 
-  // Put the object in the registry.
+
   marshal(interfaceName, object) {
     if (this._isRemoteObject(object)) {
       return this._marshalRemoteObject(object);
@@ -165,7 +175,7 @@ class ObjectRegistry {
     const result = this._idsByProxy.get(proxy);
 
     if (!(result != null)) {
-      throw new Error('Invariant violation: "result != null"');
+      throw new Error("Invariant violation: \"result != null\"");
     }
 
     return result;
@@ -173,9 +183,10 @@ class ObjectRegistry {
 
   _marshalLocalObject(interfaceName, object) {
     const existingRegistration = this._registrationsByObject.get(object);
+
     if (existingRegistration != null) {
       if (!(existingRegistration.interface === interfaceName)) {
-        throw new Error('Invariant violation: "existingRegistration.interface === interfaceName"');
+        throw new Error("Invariant violation: \"existingRegistration.interface === interfaceName\"");
       }
 
       return existingRegistration.remoteId;
@@ -183,7 +194,6 @@ class ObjectRegistry {
 
     const objectId = this._nextObjectId;
     this._nextObjectId += this._delta;
-
     const registration = {
       interface: interfaceName,
       remoteId: objectId,
@@ -191,7 +201,9 @@ class ObjectRegistry {
     };
 
     this._emitter.emit('register-local', objectId);
+
     this._registrationsById.set(objectId, registration);
+
     this._registrationsByObject.set(object, registration);
 
     return objectId;
@@ -203,17 +215,18 @@ class ObjectRegistry {
 
   removeSubscription(id) {
     const subscription = this._subscriptions.get(id);
+
     if (subscription != null) {
       this._subscriptions.delete(id);
     }
-    return subscription;
-  }
 
-  // Disposes all object in the registry
+    return subscription;
+  } // Disposes all object in the registry
+
+
   async dispose() {
     const ids = Array.from(this._registrationsById.keys());
     logger.info(`Disposing ${ids.length} registrations`);
-
     await Promise.all(ids.map(async id => {
       try {
         await this.disposeObject(id);
@@ -221,9 +234,9 @@ class ObjectRegistry {
         logger.error('Error disposing marshalled object.', e);
       }
     }));
-
     const subscriptions = Array.from(this._subscriptions.keys());
     logger.info(`Disposing ${subscriptions.length} subscriptions`);
+
     for (const id of subscriptions) {
       try {
         this.disposeSubscription(id);
@@ -231,13 +244,15 @@ class ObjectRegistry {
         logger.error('Error disposing subscription', e);
       }
     }
-  }
+  } // Returns null if the object is already disposed.
 
-  // Returns null if the object is already disposed.
+
   disposeProxy(proxy) {
     const objectId = this._idsByProxy.get(proxy);
+
     if (objectId != null) {
       this._idsByProxy.set(proxy, null);
+
       return objectId;
     } else {
       return null;
@@ -246,16 +261,17 @@ class ObjectRegistry {
 
   _addProxy(proxy, interfaceName, id) {
     if (!!this._idsByProxy.has(proxy)) {
-      throw new Error('Invariant violation: "!this._idsByProxy.has(proxy)"');
+      throw new Error("Invariant violation: \"!this._idsByProxy.has(proxy)\"");
     }
 
     this._idsByProxy.set(proxy, id);
 
     if (!!this._proxiesById.has(id)) {
-      throw new Error('Invariant violation: "!this._proxiesById.has(id)"');
+      throw new Error("Invariant violation: \"!this._proxiesById.has(id)\"");
     }
 
     this._emitter.emit('register-remote', id);
+
     this._proxiesById.set(id, {
       interface: interfaceName,
       remoteId: id,
@@ -274,5 +290,7 @@ class ObjectRegistry {
   _isLocalId(id) {
     return id * this._delta > 0;
   }
+
 }
+
 exports.ObjectRegistry = ObjectRegistry;

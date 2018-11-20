@@ -1,0 +1,18 @@
+diff --git a/nols_website/core/contextproc/dataentry.py b/nols_website/core/contextproc/dataentry.py
+index 51fda5705..c0840a3be 100644
+--- a/nols_website/core/contextproc/dataentry.py
++++ b/nols_website/core/contextproc/dataentry.py
+@@ -1,8 +1,9 @@
+-from django.contrib.auth.forms import AuthenticationForm
++# from django.contrib.auth.forms import AuthenticationForm
+ 
+ 
+ def auth_form(request):
+-    if 'rollcall' in request.path and not request.user.is_authenticated():
+-        request.session.set_test_cookie()
+-        return {'auth_form': AuthenticationForm(request=request)}
+     return {}
++    # if 'rollcall' in request.path and not request.user.is_authenticated():
++    #     request.session.set_test_cookie()
++    #     return {'auth_form': AuthenticationForm(request=request)}
++    # return {}

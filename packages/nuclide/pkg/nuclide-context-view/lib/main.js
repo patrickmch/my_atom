@@ -1,4 +1,4 @@
-'use strict';
+"use strict";
 
 Object.defineProperty(exports, "__esModule", {
   value: true
@@ -10,22 +10,34 @@ exports.provideNuclideContextView = provideNuclideContextView;
 exports.getHomeFragments = getHomeFragments;
 exports.deserializeContextViewPanelState = deserializeContextViewPanelState;
 
-var _UniversalDisposable;
+function _UniversalDisposable() {
+  const data = _interopRequireDefault(require("../../../modules/nuclide-commons/UniversalDisposable"));
 
-function _load_UniversalDisposable() {
-  return _UniversalDisposable = _interopRequireDefault(require('../../../modules/nuclide-commons/UniversalDisposable'));
+  _UniversalDisposable = function () {
+    return data;
+  };
+
+  return data;
 }
 
-var _ContextViewManager;
+function _ContextViewManager() {
+  const data = require("./ContextViewManager");
 
-function _load_ContextViewManager() {
-  return _ContextViewManager = require('./ContextViewManager');
+  _ContextViewManager = function () {
+    return data;
+  };
+
+  return data;
 }
 
-var _destroyItemWhere;
+function _destroyItemWhere() {
+  const data = require("../../../modules/nuclide-commons-atom/destroyItemWhere");
 
-function _load_destroyItemWhere() {
-  return _destroyItemWhere = require('../../../modules/nuclide-commons-atom/destroyItemWhere');
+  _destroyItemWhere = function () {
+    return data;
+  };
+
+  return data;
 }
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
@@ -40,36 +52,39 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
  *  strict-local
  * @format
  */
-
 let manager = null;
 let disposables;
 
 function activate() {
-  disposables = new (_UniversalDisposable || _load_UniversalDisposable()).default(_registerCommandAndOpener());
+  disposables = new (_UniversalDisposable().default)(_registerCommandAndOpener());
 }
 
 function deactivate() {
   disposables.dispose();
+
   if (manager != null) {
     manager.dispose();
     manager = null;
   }
 }
-
 /** Returns the singleton ContextViewManager instance of this package, or null
  * if the user doesn't pass the Context View GK check. */
+
+
 function getContextViewManager() {
   if (manager == null) {
-    manager = new (_ContextViewManager || _load_ContextViewManager()).ContextViewManager();
+    manager = new (_ContextViewManager().ContextViewManager)();
   }
+
   return manager;
 }
-
 /**
  * This is the context view service that other Nuclide packages consume when they
  * want to provide context for a definition. A context provider must consume the
  * nuclide-context-view service and register themselves as a provider.
  */
+
+
 const Service = {
   registerProvider(provider) {
     if (!(provider != null)) {
@@ -78,10 +93,11 @@ const Service = {
 
     const contextViewManager = getContextViewManager();
     contextViewManager.registerProvider(provider);
-    return new (_UniversalDisposable || _load_UniversalDisposable()).default(() => {
+    return new (_UniversalDisposable().default)(() => {
       contextViewManager.unregisterProvider(provider.id);
     });
   }
+
 };
 
 function consumeDefinitionProvider(provider) {
@@ -100,7 +116,9 @@ function getHomeFragments() {
       description: 'Easily navigate between symbols and their definitions in your code',
       command: () => {
         // eslint-disable-next-line nuclide-internal/atom-apis
-        atom.workspace.open((_ContextViewManager || _load_ContextViewManager()).WORKSPACE_VIEW_URI, { searchAllPanes: true });
+        atom.workspace.open(_ContextViewManager().WORKSPACE_VIEW_URI, {
+          searchAllPanes: true
+        });
       }
     },
     priority: 2
@@ -112,11 +130,11 @@ function deserializeContextViewPanelState() {
 }
 
 function _registerCommandAndOpener() {
-  return new (_UniversalDisposable || _load_UniversalDisposable()).default(atom.workspace.addOpener(uri => {
-    if (uri === (_ContextViewManager || _load_ContextViewManager()).WORKSPACE_VIEW_URI) {
+  return new (_UniversalDisposable().default)(atom.workspace.addOpener(uri => {
+    if (uri === _ContextViewManager().WORKSPACE_VIEW_URI) {
       return getContextViewManager();
     }
-  }), () => (0, (_destroyItemWhere || _load_destroyItemWhere()).destroyItemWhere)(item => item instanceof (_ContextViewManager || _load_ContextViewManager()).ContextViewManager), atom.commands.add('atom-workspace', 'nuclide-context-view:toggle', () => {
-    atom.workspace.toggle((_ContextViewManager || _load_ContextViewManager()).WORKSPACE_VIEW_URI);
+  }), () => (0, _destroyItemWhere().destroyItemWhere)(item => item instanceof _ContextViewManager().ContextViewManager), atom.commands.add('atom-workspace', 'nuclide-context-view:toggle', () => {
+    atom.workspace.toggle(_ContextViewManager().WORKSPACE_VIEW_URI);
   }));
 }

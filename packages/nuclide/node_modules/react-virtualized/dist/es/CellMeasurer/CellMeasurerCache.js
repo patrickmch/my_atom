@@ -1,6 +1,9 @@
 import _classCallCheck from 'babel-runtime/helpers/classCallCheck';
 import _createClass from 'babel-runtime/helpers/createClass';
+
+
 export var DEFAULT_HEIGHT = 30;
+
 export var DEFAULT_WIDTH = 100;
 
 // Enables more intelligent mapping of a given column and row index to an item ID.
@@ -203,3 +206,4 @@ export default CellMeasurerCache;
 function defaultKeyMapper(rowIndex, columnIndex) {
   return rowIndex + '-' + columnIndex;
 }
+import { bpfrpt_proptype_CellMeasureCache } from './types';

@@ -1,37 +1,58 @@
-'use strict';
+"use strict";
 
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
+exports.default = void 0;
 
-var _nuclideUri;
+function _nuclideUri() {
+  const data = _interopRequireDefault(require("../../../modules/nuclide-commons/nuclideUri"));
 
-function _load_nuclideUri() {
-  return _nuclideUri = _interopRequireDefault(require('../../../modules/nuclide-commons/nuclideUri'));
+  _nuclideUri = function () {
+    return data;
+  };
+
+  return data;
 }
 
-var _nuclideRemoteConnection;
+function _nuclideRemoteConnection() {
+  const data = require("../../nuclide-remote-connection");
 
-function _load_nuclideRemoteConnection() {
-  return _nuclideRemoteConnection = require('../../nuclide-remote-connection');
+  _nuclideRemoteConnection = function () {
+    return data;
+  };
+
+  return data;
 }
 
-var _nuclideAnalytics;
+function _nuclideAnalytics() {
+  const data = require("../../../modules/nuclide-analytics");
 
-function _load_nuclideAnalytics() {
-  return _nuclideAnalytics = require('../../nuclide-analytics');
+  _nuclideAnalytics = function () {
+    return data;
+  };
+
+  return data;
 }
 
-var _diagnosticRange;
+function _diagnosticRange() {
+  const data = require("./diagnostic-range");
 
-function _load_diagnosticRange() {
-  return _diagnosticRange = require('./diagnostic-range');
+  _diagnosticRange = function () {
+    return data;
+  };
+
+  return data;
 }
 
-var _config;
+function _config() {
+  const data = require("./config");
 
-function _load_config() {
-  return _config = require('./config');
+  _config = function () {
+    return data;
+  };
+
+  return data;
 }
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
@@ -46,28 +67,32 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
  *  strict-local
  * @format
  */
-
 class LintHelpers {
   static lint(editor) {
     const src = editor.getPath();
-    if (src == null || !(0, (_config || _load_config()).getEnableLinting)() || (0, (_config || _load_config()).getLintExtensionBlacklist)().includes((_nuclideUri || _load_nuclideUri()).default.extname(src))) {
+
+    if (src == null || !(0, _config().getEnableLinting)() || (0, _config().getLintExtensionBlacklist)().includes(_nuclideUri().default.extname(src))) {
       return Promise.resolve([]);
     }
 
-    return (0, (_nuclideAnalytics || _load_nuclideAnalytics()).trackTiming)('nuclide-python.lint', async () => {
-      const service = (0, (_nuclideRemoteConnection || _load_nuclideRemoteConnection()).getPythonServiceByNuclideUri)(src);
+    return (0, _nuclideAnalytics().trackTiming)('nuclide-python.lint', async () => {
+      const service = (0, _nuclideRemoteConnection().getPythonServiceByNuclideUri)(src);
       const diagnostics = await service.getDiagnostics(src);
+
       if (editor.isDestroyed()) {
         return [];
       }
+
       return diagnostics.map(diagnostic => ({
         name: 'flake8: ' + diagnostic.code,
         type: diagnostic.type,
         text: diagnostic.message,
         filePath: diagnostic.file,
-        range: (0, (_diagnosticRange || _load_diagnosticRange()).getDiagnosticRange)(diagnostic, editor)
+        range: (0, _diagnosticRange().getDiagnosticRange)(diagnostic, editor)
       }));
     });
   }
+
 }
+
 exports.default = LintHelpers;

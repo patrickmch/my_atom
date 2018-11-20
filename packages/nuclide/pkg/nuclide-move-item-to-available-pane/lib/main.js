@@ -1,4 +1,4 @@
-'use strict';
+"use strict";
 
 Object.defineProperty(exports, "__esModule", {
   value: true
@@ -6,16 +6,24 @@ Object.defineProperty(exports, "__esModule", {
 exports.activate = activate;
 exports.deactivate = deactivate;
 
-var _UniversalDisposable;
+function _UniversalDisposable() {
+  const data = _interopRequireDefault(require("../../../modules/nuclide-commons/UniversalDisposable"));
 
-function _load_UniversalDisposable() {
-  return _UniversalDisposable = _interopRequireDefault(require('../../../modules/nuclide-commons/UniversalDisposable'));
+  _UniversalDisposable = function () {
+    return data;
+  };
+
+  return data;
 }
 
-var _move;
+function _move() {
+  const data = require("./move");
 
-function _load_move() {
-  return _move = require('./move');
+  _move = function () {
+    return data;
+  };
+
+  return data;
 }
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
@@ -30,26 +38,25 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
  * 
  * @format
  */
-
 class Activation {
-
   constructor(state) {
-    this._disposables = new (_UniversalDisposable || _load_UniversalDisposable()).default();
+    this._disposables = new (_UniversalDisposable().default)();
   }
 
   activate() {
     this._disposables.add(atom.commands.add('atom-text-editor', {
       // Pass the eta expansion of these functions to defer the loading of move.js.
-      'nuclide-move-item-to-available-pane:right': event => (0, (_move || _load_move()).moveRight)(event.target),
-      'nuclide-move-item-to-available-pane:left': event => (0, (_move || _load_move()).moveLeft)(event.target),
-      'nuclide-move-item-to-available-pane:up': event => (0, (_move || _load_move()).moveUp)(event.target),
-      'nuclide-move-item-to-available-pane:down': event => (0, (_move || _load_move()).moveDown)(event.target)
+      'nuclide-move-item-to-available-pane:right': event => (0, _move().moveRight)(event.target),
+      'nuclide-move-item-to-available-pane:left': event => (0, _move().moveLeft)(event.target),
+      'nuclide-move-item-to-available-pane:up': event => (0, _move().moveUp)(event.target),
+      'nuclide-move-item-to-available-pane:down': event => (0, _move().moveDown)(event.target)
     }));
   }
 
   dispose() {
     this._disposables.dispose();
   }
+
 }
 
 let activation = null;

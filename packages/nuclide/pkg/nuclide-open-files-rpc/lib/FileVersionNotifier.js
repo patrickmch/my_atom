@@ -1,56 +1,86 @@
-'use strict';
+"use strict";
 
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.FileVersionNotifier = undefined;
+exports.FileVersionNotifier = void 0;
 
-var _constants;
+function _constants() {
+  const data = require("./constants");
 
-function _load_constants() {
-  return _constants = require('./constants');
+  _constants = function () {
+    return data;
+  };
+
+  return data;
 }
 
-var _promise;
+function _promise() {
+  const data = require("../../../modules/nuclide-commons/promise");
 
-function _load_promise() {
-  return _promise = require('../../../modules/nuclide-commons/promise');
+  _promise = function () {
+    return data;
+  };
+
+  return data;
 }
 
-var _collection;
+function _collection() {
+  const data = require("../../../modules/nuclide-commons/collection");
 
-function _load_collection() {
-  return _collection = require('../../../modules/nuclide-commons/collection');
+  _collection = function () {
+    return data;
+  };
+
+  return data;
 }
 
+/**
+ * Copyright (c) 2015-present, Facebook, Inc.
+ * All rights reserved.
+ *
+ * This source code is licensed under the license found in the LICENSE file in
+ * the root directory of this source tree.
+ *
+ * 
+ * @format
+ */
 class FileVersionNotifier {
-
   constructor() {
     this._versions = new Map();
-    this._requests = new (_collection || _load_collection()).MultiMap();
-  }
-
-  // If any out of sync state is detected then an Error is thrown.
+    this._requests = new (_collection().MultiMap)();
+  } // If any out of sync state is detected then an Error is thrown.
   // This will force the client to send a 'sync' event to get back on track.
+
+
   onEvent(event) {
     const filePath = event.fileVersion.filePath;
     const changeCount = event.fileVersion.version;
+
     switch (event.kind) {
-      case (_constants || _load_constants()).FileEventKind.OPEN:
+      case _constants().FileEventKind.OPEN:
         this._versions.set(filePath, changeCount);
+
         break;
-      case (_constants || _load_constants()).FileEventKind.CLOSE:
+
+      case _constants().FileEventKind.CLOSE:
         this._versions.delete(filePath);
+
         break;
-      case (_constants || _load_constants()).FileEventKind.EDIT:
+
+      case _constants().FileEventKind.EDIT:
         this._versions.set(filePath, changeCount);
+
         break;
-      case (_constants || _load_constants()).FileEventKind.SAVE:
+
+      case _constants().FileEventKind.SAVE:
         break;
+
       default:
         event.kind;
         throw new Error(`Unexpected LocalFileEvent.kind: ${event.kind}`);
     }
+
     this._checkRequests(filePath);
   }
 
@@ -67,11 +97,11 @@ class FileVersionNotifier {
   isBufferAtVersion(fileVersion) {
     const filePath = fileVersion.filePath;
     const version = fileVersion.version;
-    const currentVersion = this._versions.get(filePath);
-    return currentVersion === version;
-  }
 
-  // waitForBufferAtVersion:
+    const currentVersion = this._versions.get(filePath);
+
+    return currentVersion === version;
+  } // waitForBufferAtVersion:
   // Asynchronously waits until a FileEdit has passed through fileNotifier.onEvent
   // for this particular version of the file. If for whatever reason this precise version
   // doesn't get passed through onEvent then returns false as soon as we discover that.
@@ -91,22 +121,30 @@ class FileVersionNotifier {
   // (4) Network goes back up
   // (5) User types to version N+2 which invokes onEvent for N+2
   // At step 5 we know we will never be able to deliver buffer at version N+1, so we return false.
+
+
   waitForBufferAtVersion(fileVersion) {
     const filePath = fileVersion.filePath;
     const version = fileVersion.version;
+
     const currentVersion = this._versions.get(filePath);
+
     if (currentVersion === version) {
       return Promise.resolve(true);
     } else if (currentVersion != null && currentVersion > version) {
       return Promise.resolve(false);
     }
+
     const request = new Request(filePath, version);
+
     this._requests.add(filePath, request);
+
     return request.promise;
   }
 
   _checkRequests(filePath) {
     const currentVersion = this._versions.get(filePath);
+
     if (currentVersion == null) {
       return;
     }
@@ -115,34 +153,26 @@ class FileVersionNotifier {
     const resolves = requests.filter(request => request.changeCount === currentVersion);
     const rejects = requests.filter(request => request.changeCount < currentVersion);
     const remaining = requests.filter(request => request.changeCount > currentVersion);
+
     this._requests.set(filePath, remaining);
 
     resolves.forEach(request => request.resolve(true));
     rejects.forEach(request => request.resolve(false));
   }
+
 }
 
-exports.FileVersionNotifier = FileVersionNotifier; /**
-                                                    * Copyright (c) 2015-present, Facebook, Inc.
-                                                    * All rights reserved.
-                                                    *
-                                                    * This source code is licensed under the license found in the LICENSE file in
-                                                    * the root directory of this source tree.
-                                                    *
-                                                    * 
-                                                    * @format
-                                                    */
+exports.FileVersionNotifier = FileVersionNotifier;
 
 function createRejectError() {
   return new Error('File modified past requested change');
 }
 
-class Request extends (_promise || _load_promise()).Deferred {
-
+class Request extends _promise().Deferred {
   constructor(filePath, changeCount) {
     super();
-
     this.filePath = filePath;
     this.changeCount = changeCount;
   }
+
 }

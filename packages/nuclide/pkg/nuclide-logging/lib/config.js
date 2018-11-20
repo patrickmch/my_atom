@@ -1,30 +1,43 @@
-'use strict';
+"use strict";
 
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.LOG_FILE_PATH = undefined;
+exports.getPathToLogDir = getPathToLogDir;
 exports.getPathToLogFile = getPathToLogFile;
 exports.getDefaultConfig = getDefaultConfig;
+exports.LOG_FILE_PATH = void 0;
 
-var _systemInfo;
+function _systemInfo() {
+  const data = require("../../../modules/nuclide-commons/system-info");
 
-function _load_systemInfo() {
-  return _systemInfo = require('../../commons-node/system-info');
+  _systemInfo = function () {
+    return data;
+  };
+
+  return data;
 }
 
-var _os = _interopRequireDefault(require('os'));
+var _os = _interopRequireDefault(require("os"));
 
-var _process;
+function _process() {
+  const data = require("../../../modules/nuclide-commons/process");
 
-function _load_process() {
-  return _process = require('../../../modules/nuclide-commons/process');
+  _process = function () {
+    return data;
+  };
+
+  return data;
 }
 
-var _nuclideUri;
+function _nuclideUri() {
+  const data = _interopRequireDefault(require("../../../modules/nuclide-commons/nuclideUri"));
 
-function _load_nuclideUri() {
-  return _nuclideUri = _interopRequireDefault(require('../../../modules/nuclide-commons/nuclideUri'));
+  _nuclideUri = function () {
+    return data;
+  };
+
+  return data;
 }
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
@@ -39,12 +52,17 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
  * 
  * @format
  */
+const LOG_DIRECTORY = _nuclideUri().default.join(_os.default.tmpdir(), `/nuclide-${_os.default.userInfo().username}-logs`);
 
-const LOG_DIRECTORY = (_nuclideUri || _load_nuclideUri()).default.join(_os.default.tmpdir(), `/nuclide-${_os.default.userInfo().username}-logs`);
-const LOG_FILE_PATH = exports.LOG_FILE_PATH = (_nuclideUri || _load_nuclideUri()).default.join(LOG_DIRECTORY, 'nuclide.log');
+const LOG_FILE_PATH = _nuclideUri().default.join(LOG_DIRECTORY, 'nuclide.log');
 
+exports.LOG_FILE_PATH = LOG_FILE_PATH;
 const MAX_LOG_SIZE = 1024 * 1024;
 const MAX_LOG_BACKUPS = 10;
+
+function getPathToLogDir() {
+  return LOG_DIRECTORY;
+}
 
 function getPathToLogFile() {
   return LOG_FILE_PATH;
@@ -52,7 +70,7 @@ function getPathToLogFile() {
 
 function getDefaultConfig() {
   const appenders = [{
-    type: require.resolve('../VendorLib/fileAppender'),
+    type: require.resolve("../VendorLib/fileAppender"),
     filename: LOG_FILE_PATH,
     maxLogSize: MAX_LOG_SIZE,
     backups: MAX_LOG_BACKUPS,
@@ -62,21 +80,21 @@ function getDefaultConfig() {
       // yyyy-MM-dd HH:mm:ss.mil $Level (pid:$pid) $categroy - $message.
       pattern: `%d{ISO8601} %p (pid:${process.pid}) %c - %m`
     }
-  }];
-  // Anything not in Atom doesn't have a visible console.
+  }]; // Anything not in Atom doesn't have a visible console.
+
   if (typeof atom === 'object') {
     appenders.push({
       type: 'logLevelFilter',
       level: 'WARN',
       appender: {
-        type: require.resolve('./consoleAppender')
+        type: require.resolve("./consoleAppender")
       }
     });
     appenders.push({
       type: 'logLevelFilter',
       level: 'ALL',
       appender: {
-        type: require.resolve('./nuclideConsoleAppender')
+        type: require.resolve("./nuclideConsoleAppender")
       }
     });
   } else {
@@ -85,18 +103,21 @@ function getDefaultConfig() {
       type: 'logLevelFilter',
       level: 'FATAL',
       appender: {
-        type: require.resolve('./consoleAppender'),
+        type: require.resolve("./consoleAppender"),
         stderr: true
       }
     });
   }
-  if (!(0, (_systemInfo || _load_systemInfo()).isRunningInTest)()) {
+
+  if (!(0, _systemInfo().isRunningInTest)()) {
     appenders.push({
-      type: require.resolve('./processTrackingAppender'),
-      category: (_process || _load_process()).LOG_CATEGORY
+      type: require.resolve("./processTrackingAppender"),
+      category: _process().LOG_CATEGORY
     });
+
     try {
-      const scribeAppenderPath = require.resolve('../fb/scribeAppender');
+      const scribeAppenderPath = require.resolve("../fb/scribeAppender");
+
       appenders.push({
         type: 'logLevelFilter',
         // Anything less than ERROR is ignored by the backend anyway.
@@ -106,9 +127,11 @@ function getDefaultConfig() {
           scribeCategory: 'errorlog_arsenal'
         }
       });
-    } catch (err) {
-      // We're running in open-source: ignore.
+    } catch (err) {// We're running in open-source: ignore.
     }
   }
-  return { appenders };
+
+  return {
+    appenders
+  };
 }

@@ -5,7 +5,9 @@ type ResolvablePromise<T> = Promise<T> & {
 interface Window {
   atomVars: {
     home: ResolvablePromise<string>
-    numberEqns: ResolvablePromise<boolean>
+    mathJaxConfig: ResolvablePromise<
+      MathJaxConfig & { renderer: MathJaxRenderer }
+    >
     sourceLineMap: Map<number, Element>
     revSourceMap: WeakMap<Element, number[]>
   }

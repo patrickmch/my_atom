@@ -1,9 +1,26 @@
-'use strict';
+"use strict";
 
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-const DiagnosticSeverity = exports.DiagnosticSeverity = {
+exports.WatchKind = exports.FileChangeType = exports.TextDocumentSaveReason = exports.MessageType = exports.SymbolKind = exports.DocumentHighlightKind = exports.CompletionItemKind = exports.InsertTextFormat = exports.TextDocumentSyncKind = exports.ErrorCodes = exports.DiagnosticSeverity = void 0;
+
+/**
+ * Copyright (c) 2015-present, Facebook, Inc.
+ * All rights reserved.
+ *
+ * This source code is licensed under the license found in the LICENSE file in
+ * the root directory of this source tree.
+ *
+ * 
+ * @format
+ */
+// Flow definitions for Microsoft's Language Server Protocol
+// https://github.com/Microsoft/language-server-protocol/blob/master/protocol.md
+// https://github.com/Microsoft/language-server-protocol/blob/master/versions/protocol-2-x.md
+// Structures
+// Nuclide-only.
+const DiagnosticSeverity = {
   // Reports an error.
   Error: 1,
   // Reports a warning.
@@ -12,26 +29,10 @@ const DiagnosticSeverity = exports.DiagnosticSeverity = {
   Information: 3,
   // Reports a hint.
   Hint: 4
-}; /**
-    * Copyright (c) 2015-present, Facebook, Inc.
-    * All rights reserved.
-    *
-    * This source code is licensed under the license found in the LICENSE file in
-    * the root directory of this source tree.
-    *
-    * 
-    * @format
-    */
-
-// Flow definitions for Microsoft's Language Server Protocol
-// https://github.com/Microsoft/language-server-protocol/blob/master/protocol.md
-// https://github.com/Microsoft/language-server-protocol/blob/master/versions/protocol-2-x.md
-
-// Structures
-
+};
+exports.DiagnosticSeverity = DiagnosticSeverity;
 // General
-
-const ErrorCodes = exports.ErrorCodes = {
+const ErrorCodes = {
   ParseError: -32700,
   InvalidRequest: -32600,
   MethodNotFound: -32601,
@@ -44,15 +45,9 @@ const ErrorCodes = exports.ErrorCodes = {
   // eslint-disable-next-line nuclide-internal/api-spelling
   RequestCancelled: -32800
 };
-
-//  Workspace specific client capabilities.
-
-
-//  Text document specific client capabilities.
-
-
+exports.ErrorCodes = ErrorCodes;
 // Defines how the host (editor) should sync document changes to the language server.
-const TextDocumentSyncKind = exports.TextDocumentSyncKind = {
+const TextDocumentSyncKind = {
   //  Documents should not be synced at all.
   None: 0,
   //  Documents are synced by always sending the full content of the document.
@@ -60,36 +55,17 @@ const TextDocumentSyncKind = exports.TextDocumentSyncKind = {
   //  Documents are synced by sending the full content on open. After that only incremental
   //  updates to the document are sent.
   Incremental: 2
-};
+}; // Completion options.
 
-// Completion options.
-
-
-// Signature help options.
-
-
-// Code Lens options.
-
-
-// Format document on type options
-
-
-// Save options.
-
-
-// Document
-
-// Represents a collection of [completion items](#CompletionItem) to be presented in the editor.
-
-
+exports.TextDocumentSyncKind = TextDocumentSyncKind;
 // Defines whether the insert text in a completion item should be interpreted as plain text or a snippet.
-const InsertTextFormat = exports.InsertTextFormat = {
+const InsertTextFormat = {
   PlainText: 1,
   Snippet: 2
 };
-
+exports.InsertTextFormat = InsertTextFormat;
 // The kind of a completion entry.
-const CompletionItemKind = exports.CompletionItemKind = {
+const CompletionItemKind = {
   Text: 1,
   Method: 2,
   Function: 3,
@@ -109,49 +85,8 @@ const CompletionItemKind = exports.CompletionItemKind = {
   File: 17,
   Reference: 18
 };
-
-// The result of a hover request.
-
-
-/**
- * The marked string is rendered:
- * - as markdown if it is represented as a string
- * - as code block of the given language if it is represented as a pair of a language and a value
- *
- * The pair of a language and a value is an equivalent to markdown:
- * ```${language};
- * ${value};
- * ```
- */
-
-
-/**
- * Signature help represents the signature of something
- * callable. There can be multiple signature but only one
- * active and only one active parameter.
- */
-
-
-/**
- * Represents the signature of something callable. A signature
- * can have a label, like a function-name, a doc-comment, and
- * a set of parameters.
- */
-
-
-/**
- * Represents a parameter of a callable-signature. A parameter can
- * have a label and a doc-comment.
- */
-
-
-/**
- * A document highlight is a range inside a text document which deserves
- * special attention. Usually a document highlight is visualized by changing
- * the background color of its range.
- *
- */
-const DocumentHighlightKind = exports.DocumentHighlightKind = {
+exports.CompletionItemKind = CompletionItemKind;
+const DocumentHighlightKind = {
   // A textual occurrence.
   Text: 1,
   // Read-access of a symbol, like reading a variable.
@@ -159,12 +94,8 @@ const DocumentHighlightKind = exports.DocumentHighlightKind = {
   // Write-access of a symbol, like writing to a variable.
   Write: 3
 };
-
-/**
- * Represents information about programming constructs like variables, classes,
- * interfaces etc.
- */
-const SymbolKind = exports.SymbolKind = {
+exports.DocumentHighlightKind = DocumentHighlightKind;
+const SymbolKind = {
   File: 1,
   Module: 2,
   Namespace: 3,
@@ -182,43 +113,19 @@ const SymbolKind = exports.SymbolKind = {
   String: 15,
   Number: 16,
   Boolean: 17,
-  Array: 18
-};
+  Array: 18,
+  Object: 19,
+  Key: 20,
+  Null: 21,
+  EnumMember: 22,
+  Struct: 23,
+  Event: 24,
+  Operator: 25,
+  TypeParameter: 26
+}; // The parameters of a Workspace Symbol Request.
 
-// The parameters of a Workspace Symbol Request.
-
-
-// Params for the CodeActionRequest
-
-
-// Contains additional diagnostic information about the context in which a code action is run.
-
-
-/**
- * A code lens represents a command that should be shown along with
- * source text, like the number of references, a way to run tests, etc.
- *
- * A code lens is _unresolved_ when no command is associated to it. For performance
- * reasons the creation of a code lens and resolving should be done in two stages.
- */
-
-
-/**
- * A document link is a range in a text document that links to an internal or
- * external resource, like another
- * text document or a web site.
- */
-
-
-// Value-object describing what options formatting should use.
-
-
-// TypeCoverageParams: a nuclide-specific way to show type coverage for a file
-
-
-// Window
-
-const MessageType = exports.MessageType = {
+exports.SymbolKind = SymbolKind;
+const MessageType = {
   // An error message.
   Error: 1,
   // A warning message.
@@ -228,31 +135,31 @@ const MessageType = exports.MessageType = {
   // A log message.
   Log: 4
 };
-
-// Workspace
-
-// An event describing a change to a text document. If range and rangeLength are omitted
+exports.MessageType = MessageType;
+const TextDocumentSaveReason = {
+  // Manually triggered, e.g. by the user pressing save, by starting debugging,
+  // or by an API call.
+  Manual: 1,
+  // Automatic after a delay.
+  AfterDelay: 2,
+  // When the editor lost focus.
+  FocusOut: 3
+}; // An event describing a change to a text document. If range and rangeLength are omitted
 // the new text is considered to be the full content of the document.
 
-
-// Describe options to be used when registered for text document change events.
-
-
+exports.TextDocumentSaveReason = TextDocumentSaveReason;
 // The file event type.
-const FileChangeType = exports.FileChangeType = {
+const FileChangeType = {
   // The file got created.
   Created: 1,
   // The file got changed.
   Changed: 2,
   // The file got deleted.
   Deleted: 3
-};
+}; // An event describing a file change.
 
-// An event describing a file change.
-
-
-// Describe options to be used when registered for text document change events.
-const WatchKind = exports.WatchKind = {
+exports.FileChangeType = FileChangeType;
+const WatchKind = {
   // Interested in create events
   Create: 1,
   // Interested in change events
@@ -260,5 +167,4 @@ const WatchKind = exports.WatchKind = {
   // Interested in delete events
   Delete: 4
 };
-
-// Execute command registration options.
+exports.WatchKind = WatchKind;

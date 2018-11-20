@@ -4,10 +4,8 @@
   "version": "0.0.0",
   "description": "Language services for JSON",
   "author": "NEEDS OWNER",
-  "atomTestRunner": "../../lib/test-runner-entry.js",
   "nuclide": {
-    "packageType": "Atom",
-    "testRunner": "apm"
+    "packageType": "AtomPackage"
   },
   "activationHooks": [
     "language-json:grammar-used"

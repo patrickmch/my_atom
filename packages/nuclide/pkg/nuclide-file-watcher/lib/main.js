@@ -1,4 +1,4 @@
-'use strict';
+"use strict";
 
 Object.defineProperty(exports, "__esModule", {
   value: true
@@ -6,16 +6,24 @@ Object.defineProperty(exports, "__esModule", {
 exports.activate = activate;
 exports.deactivate = deactivate;
 
-var _UniversalDisposable;
+function _UniversalDisposable() {
+  const data = _interopRequireDefault(require("../../../modules/nuclide-commons/UniversalDisposable"));
 
-function _load_UniversalDisposable() {
-  return _UniversalDisposable = _interopRequireDefault(require('../../../modules/nuclide-commons/UniversalDisposable'));
+  _UniversalDisposable = function () {
+    return data;
+  };
+
+  return data;
 }
 
-var _FileWatcher;
+function _FileWatcher() {
+  const data = _interopRequireDefault(require("./FileWatcher"));
 
-function _load_FileWatcher() {
-  return _FileWatcher = _interopRequireDefault(require('./FileWatcher'));
+  _FileWatcher = function () {
+    return data;
+  };
+
+  return data;
 }
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
@@ -30,39 +38,33 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
  * 
  * @format
  */
-
 let subscriptions = null;
-let watchers = null;
 
 function activate(state) {
-  const _subscriptions = new (_UniversalDisposable || _load_UniversalDisposable()).default();
-  const _watchers = new Map();
+  const _subscriptions = new (_UniversalDisposable().default)();
+
+  const _watchers = new WeakSet();
 
   _subscriptions.add(atom.workspace.observeTextEditors(editor => {
     if (_watchers.has(editor)) {
       return;
     }
 
-    const fileWatcher = new (_FileWatcher || _load_FileWatcher()).default(editor);
-    _watchers.set(editor, fileWatcher);
+    const fileWatcher = new (_FileWatcher().default)(editor);
 
-    _subscriptions.add(editor.onDidDestroy(() => {
-      fileWatcher.destroy();
-      _watchers.delete(editor);
-    }));
+    _watchers.add(editor);
+
+    _subscriptions.addUntilDestroyed(editor, () => fileWatcher.destroy());
   }));
 
-  watchers = _watchers;
   subscriptions = _subscriptions;
 }
 
 function deactivate() {
-  if (subscriptions == null || watchers == null) {
+  if (subscriptions == null) {
     return;
   }
-  for (const fileWatcher of watchers.values()) {
-    fileWatcher.destroy();
-  }
+
   subscriptions.dispose();
   subscriptions = null;
 }

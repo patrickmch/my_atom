@@ -1,8 +1,10 @@
-'use strict';
+"use strict";
 
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
+exports.config = void 0;
+
 /**
  * Copyright (c) 2015-present, Facebook, Inc.
  * All rights reserved.
@@ -13,24 +15,25 @@ Object.defineProperty(exports, "__esModule", {
  *  strict
  * @format
  */
-
 let generatedTag;
 let partialGeneratedTag;
 let generatedPathRegexes;
+
 try {
   ({
     generatedTag,
     partialGeneratedTag,
-    generatedPathRegexes
-    // $FlowFB
-  } = require('./fb/config'));
+    generatedPathRegexes // $FlowFB
+
+  } = require("./fb/config"));
 } catch (e) {
   // fill in local configuration properties here
   generatedPathRegexes = [];
 }
 
-const config = exports.config = {
+const config = {
   generatedTag,
   partialGeneratedTag,
   generatedPathRegexes
 };
+exports.config = config;

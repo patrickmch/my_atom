@@ -1,4 +1,4 @@
-'use strict';
+"use strict";
 
 Object.defineProperty(exports, "__esModule", {
   value: true
@@ -22,15 +22,16 @@ exports.stoppedEventResult = stoppedEventResult;
 exports.breakpointModifiedEventResult = breakpointModifiedEventResult;
 exports.dataDisassembleResult = dataDisassembleResult;
 
-var _MIRecord;
+function _MIRecord() {
+  const data = require("./MIRecord");
 
-function _load_MIRecord() {
-  return _MIRecord = require('./MIRecord');
+  _MIRecord = function () {
+    return data;
+  };
+
+  return data;
 }
 
-// Type conversions from a generic MI record to command-specfic results
-
-// failure from any command where resultClass is 'error'
 /**
  * Copyright (c) 2017-present, Facebook, Inc.
  * All rights reserved.
@@ -42,163 +43,162 @@ function _load_MIRecord() {
  * 
  * @format
  */
-
 function toCommandError(record) {
   if (!record.error) {
-    throw new Error('Invariant violation: "record.error"');
+    throw new Error("Invariant violation: \"record.error\"");
   }
 
   return record.result;
-}
+} // break-insert
 
-// break-insert
+
 function breakInsertResult(record) {
   if (!!record.error) {
-    throw new Error('Invariant violation: "!record.error"');
+    throw new Error("Invariant violation: \"!record.error\"");
   }
 
   return record.result;
-}
+} // data-evaluate-expression
 
-// data-evaluate-expression
+
 function dataEvaluateExpressionResult(record) {
   if (!!record.error) {
-    throw new Error('Invariant violation: "!record.error"');
+    throw new Error("Invariant violation: \"!record.error\"");
   }
 
   return record.result;
-}
+} // data-list-register-names
 
-// data-list-register-names
+
 function dataListRegisterNamesResult(record) {
   if (!!record.error) {
-    throw new Error('Invariant violation: "!record.error"');
+    throw new Error("Invariant violation: \"!record.error\"");
   }
 
   return record.result;
-}
+} // data-list-register-values
 
-// data-list-register-values
+
 function dataListRegisterValuesResult(record) {
   if (!!record.error) {
-    throw new Error('Invariant violation: "!record.error"');
+    throw new Error("Invariant violation: \"!record.error\"");
   }
 
   return record.result;
-}
+} // thread-info
 
-// thread-info
+
 function threadInfoResult(record) {
   if (!!record.error) {
-    throw new Error('Invariant violation: "!record.error"');
+    throw new Error("Invariant violation: \"!record.error\"");
   }
 
   return record.result;
-}
+} // stack-info-depth
 
-// stack-info-depth
+
 function stackInfoDepthResult(record) {
   if (!!record.error) {
-    throw new Error('Invariant violation: "!record.error"');
+    throw new Error("Invariant violation: \"!record.error\"");
   }
 
   return record.result;
-}
+} // stack-list-frames
 
-// stack-list-frames
+
 function stackListFramesResult(record) {
   if (!!record.error) {
-    throw new Error('Invariant violation: "!record.error"');
+    throw new Error("Invariant violation: \"!record.error\"");
   }
 
   return record.result;
-}
+} // stack-list-variables
 
-// stack-list-variables
+
 function stackListVariablesResult(record) {
   if (!!record.error) {
-    throw new Error('Invariant violation: "!record.error"');
+    throw new Error("Invariant violation: \"!record.error\"");
   }
 
   return record.result;
-}
+} // var-create
 
-// var-create
+
 function varCreateResult(record) {
   if (!!record.error) {
-    throw new Error('Invariant violation: "!record.error"');
+    throw new Error("Invariant violation: \"!record.error\"");
   }
 
   return record.result;
-}
+} // var-list-children
 
-// var-list-children
+
 function varListChildrenResult(record) {
   if (!!record.error) {
-    throw new Error('Invariant violation: "!record.error"');
+    throw new Error("Invariant violation: \"!record.error\"");
   }
 
   return record.result;
-}
+} // var-info-num-children
 
-// var-info-num-children
+
 function varInfoNumChildrenResult(record) {
   if (!!record.error) {
-    throw new Error('Invariant violation: "!record.error"');
+    throw new Error("Invariant violation: \"!record.error\"");
   }
 
   return record.result;
-}
+} // var-info-type
 
-// var-info-type
+
 function varInfoTypeResult(record) {
   if (!!record.error) {
-    throw new Error('Invariant violation: "!record.error"');
+    throw new Error("Invariant violation: \"!record.error\"");
   }
 
   return record.result;
-}
+} // var-evaluate-expression
 
-// var-evaluate-expression
+
 function varEvaluateExpressionResult(record) {
   if (!!record.error) {
-    throw new Error('Invariant violation: "!record.error"');
+    throw new Error("Invariant violation: \"!record.error\"");
   }
 
   return record.result;
-}
+} // var-assign
 
-// var-assign
+
 function varAssignResult(record) {
   if (!!record.error) {
-    throw new Error('Invariant violation: "!record.error"');
+    throw new Error("Invariant violation: \"!record.error\"");
   }
 
   return record.result;
-}
+} // stopped async event
 
-// stopped async event
+
 function stoppedEventResult(record) {
   if (!(record.asyncClass === 'stopped')) {
-    throw new Error('Invariant violation: "record.asyncClass === \'stopped\'"');
+    throw new Error("Invariant violation: \"record.asyncClass === 'stopped'\"");
   }
 
   return record.result;
-}
+} // breakpoint modified event
 
-// breakpoint modified event
+
 function breakpointModifiedEventResult(record) {
   if (!(record.asyncClass === 'breakpoint-modified')) {
-    throw new Error('Invariant violation: "record.asyncClass === \'breakpoint-modified\'"');
+    throw new Error("Invariant violation: \"record.asyncClass === 'breakpoint-modified'\"");
   }
 
   return record.result;
-}
+} // data-disassemble result
 
-// data-disassemble result
+
 function dataDisassembleResult(record) {
   if (!!record.error) {
-    throw new Error('Invariant violation: "!record.error"');
+    throw new Error("Invariant violation: \"!record.error\"");
   }
 
   return record.result;

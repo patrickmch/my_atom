@@ -1,0 +1,15 @@
+diff --git a/nols_website/core/contextproc/dataentry.py b/nols_website/core/contextproc/dataentry.py
+index 316d0ced3..bb7f59dab 100644
+--- a/nols_website/core/contextproc/dataentry.py
++++ b/nols_website/core/contextproc/dataentry.py
+@@ -1,9 +1,8 @@
+ from django.contrib.auth.forms import AuthenticationForm
+ from core.utils_dataentry import build_form_context
+ 
+ 
+ def auth_form(request):
+     if 'rollcall' in request.path and not request.user.is_authenticated():
+-        request.session.set_test_cookie()
+-        return build_form_context(AuthenticationForm(request=request))
++        return {'auth_form': build_form_context(AuthenticationForm(request=request))}
+     return {}

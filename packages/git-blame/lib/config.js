@@ -17,13 +17,21 @@ export default {
     type: 'string',
     default: 'YYYY-MM-DD',
   },
+  gitBinaryPath: {
+    type: 'string',
+    default: 'git',
+  },
   ignoreWhiteSpaceDiffs: {
     type: 'boolean',
     default: false,
   },
-  showOnlyLastNames: {
+  showFirstNames: {
     type: 'boolean',
-    default: false,
+    default: true,
+  },
+  showLastNames: {
+    type: 'boolean',
+    default: true,
   },
   showHash: {
     type: 'boolean',

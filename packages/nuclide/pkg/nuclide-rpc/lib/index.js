@@ -1,113 +1,141 @@
-'use strict';
+"use strict";
 
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.loadServicesConfig = exports.RpcProcess = exports.SocketServer = exports.SocketTransport = exports.StreamTransport = exports.LoopbackTransports = exports.RpcTimeoutError = exports.RpcConnection = exports.ServiceRegistry = undefined;
+Object.defineProperty(exports, "ServiceRegistry", {
+  enumerable: true,
+  get: function () {
+    return _ServiceRegistry().ServiceRegistry;
+  }
+});
+Object.defineProperty(exports, "RpcConnection", {
+  enumerable: true,
+  get: function () {
+    return _RpcConnection().RpcConnection;
+  }
+});
+Object.defineProperty(exports, "RpcTimeoutError", {
+  enumerable: true,
+  get: function () {
+    return _RpcConnection().RpcTimeoutError;
+  }
+});
+Object.defineProperty(exports, "LoopbackTransports", {
+  enumerable: true,
+  get: function () {
+    return _LoopbackTransports().LoopbackTransports;
+  }
+});
+Object.defineProperty(exports, "StreamTransport", {
+  enumerable: true,
+  get: function () {
+    return _StreamTransport().StreamTransport;
+  }
+});
+Object.defineProperty(exports, "SocketTransport", {
+  enumerable: true,
+  get: function () {
+    return _SocketTransport().SocketTransport;
+  }
+});
+Object.defineProperty(exports, "SocketServer", {
+  enumerable: true,
+  get: function () {
+    return _SocketServer().SocketServer;
+  }
+});
+Object.defineProperty(exports, "RpcProcess", {
+  enumerable: true,
+  get: function () {
+    return _RpcProcess().RpcProcess;
+  }
+});
+Object.defineProperty(exports, "loadServicesConfig", {
+  enumerable: true,
+  get: function () {
+    return _loadServicesConfig().default;
+  }
+});
 
-var _ServiceRegistry;
+function _ServiceRegistry() {
+  const data = require("./ServiceRegistry");
 
-function _load_ServiceRegistry() {
-  return _ServiceRegistry = require('./ServiceRegistry');
+  _ServiceRegistry = function () {
+    return data;
+  };
+
+  return data;
 }
 
-Object.defineProperty(exports, 'ServiceRegistry', {
-  enumerable: true,
-  get: function () {
-    return (_ServiceRegistry || _load_ServiceRegistry()).ServiceRegistry;
-  }
-});
+function _RpcConnection() {
+  const data = require("./RpcConnection");
 
-var _RpcConnection;
+  _RpcConnection = function () {
+    return data;
+  };
 
-function _load_RpcConnection() {
-  return _RpcConnection = require('./RpcConnection');
+  return data;
 }
 
-Object.defineProperty(exports, 'RpcConnection', {
-  enumerable: true,
-  get: function () {
-    return (_RpcConnection || _load_RpcConnection()).RpcConnection;
-  }
-});
-Object.defineProperty(exports, 'RpcTimeoutError', {
-  enumerable: true,
-  get: function () {
-    return (_RpcConnection || _load_RpcConnection()).RpcTimeoutError;
-  }
-});
+function _LoopbackTransports() {
+  const data = require("./LoopbackTransports");
 
-var _LoopbackTransports;
+  _LoopbackTransports = function () {
+    return data;
+  };
 
-function _load_LoopbackTransports() {
-  return _LoopbackTransports = require('./LoopbackTransports');
+  return data;
 }
 
-Object.defineProperty(exports, 'LoopbackTransports', {
-  enumerable: true,
-  get: function () {
-    return (_LoopbackTransports || _load_LoopbackTransports()).LoopbackTransports;
-  }
-});
+function _StreamTransport() {
+  const data = require("./StreamTransport");
 
-var _StreamTransport;
+  _StreamTransport = function () {
+    return data;
+  };
 
-function _load_StreamTransport() {
-  return _StreamTransport = require('./StreamTransport');
+  return data;
 }
 
-Object.defineProperty(exports, 'StreamTransport', {
-  enumerable: true,
-  get: function () {
-    return (_StreamTransport || _load_StreamTransport()).StreamTransport;
-  }
-});
+function _SocketTransport() {
+  const data = require("./SocketTransport");
 
-var _SocketTransport;
+  _SocketTransport = function () {
+    return data;
+  };
 
-function _load_SocketTransport() {
-  return _SocketTransport = require('./SocketTransport');
+  return data;
 }
 
-Object.defineProperty(exports, 'SocketTransport', {
-  enumerable: true,
-  get: function () {
-    return (_SocketTransport || _load_SocketTransport()).SocketTransport;
-  }
-});
+function _SocketServer() {
+  const data = require("./SocketServer");
 
-var _SocketServer;
+  _SocketServer = function () {
+    return data;
+  };
 
-function _load_SocketServer() {
-  return _SocketServer = require('./SocketServer');
+  return data;
 }
 
-Object.defineProperty(exports, 'SocketServer', {
-  enumerable: true,
-  get: function () {
-    return (_SocketServer || _load_SocketServer()).SocketServer;
-  }
-});
+function _RpcProcess() {
+  const data = require("./RpcProcess");
 
-var _RpcProcess;
+  _RpcProcess = function () {
+    return data;
+  };
 
-function _load_RpcProcess() {
-  return _RpcProcess = require('./RpcProcess');
+  return data;
 }
 
-Object.defineProperty(exports, 'RpcProcess', {
-  enumerable: true,
-  get: function () {
-    return (_RpcProcess || _load_RpcProcess()).RpcProcess;
-  }
-});
+function _loadServicesConfig() {
+  const data = _interopRequireDefault(require("./loadServicesConfig"));
 
-var _loadServicesConfig;
+  _loadServicesConfig = function () {
+    return data;
+  };
 
-function _load_loadServicesConfig() {
-  return _loadServicesConfig = _interopRequireDefault(require('./loadServicesConfig'));
+  return data;
 }
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-exports.loadServicesConfig = (_loadServicesConfig || _load_loadServicesConfig()).default;

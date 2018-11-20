@@ -1,23 +1,21 @@
-'use strict';
+"use strict";
 
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.HgRepositoryClient = undefined;
+Object.defineProperty(exports, "HgRepositoryClient", {
+  enumerable: true,
+  get: function () {
+    return _HgRepositoryClient().HgRepositoryClient;
+  }
+});
 
-var _HgRepositoryClient;
+function _HgRepositoryClient() {
+  const data = require("./HgRepositoryClient");
 
-function _load_HgRepositoryClient() {
-  return _HgRepositoryClient = require('./HgRepositoryClient');
+  _HgRepositoryClient = function () {
+    return data;
+  };
+
+  return data;
 }
-
-exports.HgRepositoryClient = (_HgRepositoryClient || _load_HgRepositoryClient()).HgRepositoryClient; /**
-                                                                                                      * Copyright (c) 2015-present, Facebook, Inc.
-                                                                                                      * All rights reserved.
-                                                                                                      *
-                                                                                                      * This source code is licensed under the license found in the LICENSE file in
-                                                                                                      * the root directory of this source tree.
-                                                                                                      *
-                                                                                                      *  strict-local
-                                                                                                      * @format
-                                                                                                      */

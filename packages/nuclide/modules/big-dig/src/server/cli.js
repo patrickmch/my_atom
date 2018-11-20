@@ -1,40 +1,60 @@
-'use strict';
+"use strict";
 
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
 exports.parseArgsAndRunMain = parseArgsAndRunMain;
 
-var _log4js;
+function _log4js() {
+  const data = _interopRequireDefault(require("log4js"));
 
-function _load_log4js() {
-  return _log4js = _interopRequireDefault(require('log4js'));
+  _log4js = function () {
+    return data;
+  };
+
+  return data;
 }
 
-var _nuclideUri;
+function _nuclideUri() {
+  const data = _interopRequireDefault(require("../../../nuclide-commons/nuclideUri"));
 
-function _load_nuclideUri() {
-  return _nuclideUri = _interopRequireDefault(require('../../../nuclide-commons/nuclideUri'));
+  _nuclideUri = function () {
+    return data;
+  };
+
+  return data;
 }
 
-var _os = _interopRequireDefault(require('os'));
+var _os = _interopRequireDefault(require("os"));
 
-var _username;
+function _username() {
+  const data = require("../common/username");
 
-function _load_username() {
-  return _username = require('../common/username');
+  _username = function () {
+    return data;
+  };
+
+  return data;
 }
 
-var _main;
+function _main() {
+  const data = require("./main");
 
-function _load_main() {
-  return _main = require('./main');
+  _main = function () {
+    return data;
+  };
+
+  return data;
 }
 
-var _ports;
+function _ports() {
+  const data = require("../common/ports");
 
-function _load_ports() {
-  return _ports = require('../common/ports');
+  _ports = function () {
+    return data;
+  };
+
+  return data;
 }
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
@@ -50,11 +70,10 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
  *  strict-local
  * @format
  */
-
-(_log4js || _load_log4js()).default.configure({
+_log4js().default.configure({
   appenders: [{
     type: 'file',
-    filename: (_nuclideUri || _load_nuclideUri()).default.join(_os.default.tmpdir(), 'big-dig-cli.log')
+    filename: _nuclideUri().default.join(_os.default.tmpdir(), 'big-dig-cli.log')
   }, {
     type: 'console'
   }]
@@ -81,53 +100,67 @@ async function parseArgsAndRunMain(absolutePathToServerMain) {
     serverCertPath,
     serverKeyPath
   } = params;
-  let { ports, timeout } = params;
+  let {
+    ports,
+    timeout
+  } = params;
+
   if (cname != null && (typeof cname !== 'string' || cname.length === 0)) {
-    throw Error(`cname must be a non-empty string but was: '${cname}'`);
-  }
-  if (typeof jsonOutputFile !== 'string') {
-    throw Error('Must specify jsonOutputFile');
+    throw new Error(`cname must be a non-empty string but was: '${cname}'`);
   }
 
-  // port arg validation
+  if (typeof jsonOutputFile !== 'string') {
+    throw new Error('Must specify jsonOutputFile');
+  } // port arg validation
+
+
   if (ports == null) {
     ports = DEFAULT_PORTS;
   }
+
   if (typeof ports !== 'string') {
-    throw Error(`ports must be specified as string but was: '${ports}'`);
-  }
-  // This will throw an exception if the ports string is invalid.
-  (0, (_ports || _load_ports()).parsePorts)(ports);
+    throw new Error(`ports must be specified as string but was: '${ports}'`);
+  } // This will throw an exception if the ports string is invalid.
+
+
+  (0, _ports().parsePorts)(ports);
 
   if (timeout == null) {
     timeout = DEFAULT_TIMEOUT;
   }
+
   if (typeof timeout !== 'number') {
-    throw Error(`timeout must be specified as number but was: '${timeout}'`);
+    throw new Error(`timeout must be specified as number but was: '${timeout}'`);
+  } // expiration arg validation
+
+
+  if (typeof expiration !== 'string') {
+    throw new Error(`expiration must be specified as string but was: '${expiration}'`);
   }
 
-  // expiration arg validation
-  if (typeof expiration !== 'string') {
-    throw Error(`expiration must be specified as string but was: '${expiration}'`);
-  }
   const expirationMatch = expiration.match(/^(\d+)d$/);
+
   if (expirationMatch == null) {
-    throw Error(`expiration must be /(\\d+)d/ but was: '${expiration}'`);
+    throw new Error(`expiration must be /(\\d+)d/ but was: '${expiration}'`);
   }
+
   const expirationDays = parseInt(expirationMatch[1], 10);
+
   if (expirationDays <= 0) {
-    throw Error(`expiration must be >0 but was ${expirationDays}`);
+    throw new Error(`expiration must be >0 but was ${expirationDays}`);
   }
 
   if (exclusive != null && (typeof exclusive !== 'string' || !exclusive.match(/^[\w\d][\w\d-]*$/))) {
-    throw Error(`exclusive must be a valid identifier: '${exclusive}'`);
+    throw new Error(`exclusive must be a valid identifier: '${exclusive}'`);
   }
 
   let certificateStrategy;
+
   if (caPath != null || serverCertPath != null || serverKeyPath != null) {
     if (typeof caPath !== 'string' || typeof serverCertPath !== 'string' || typeof serverKeyPath !== 'string') {
-      throw Error('need either all or none of caPath, serverCertPath and serverKeyPath');
+      throw new Error('need either all or none of caPath, serverCertPath and serverKeyPath');
     }
+
     certificateStrategy = {
       type: 'reuse',
       paths: {
@@ -140,12 +173,12 @@ async function parseArgsAndRunMain(absolutePathToServerMain) {
     certificateStrategy = {
       type: 'generate',
       clientCommonName: 'nuclide',
-      serverCommonName: cname != null ? cname : `${(0, (_username || _load_username()).getUsername)()}.nuclide.${_os.default.hostname()}`,
-      openSSLConfigPath: require.resolve('./openssl.cnf')
+      serverCommonName: cname != null ? cname : `${(0, _username().getUsername)()}.nuclide.${_os.default.hostname()}`,
+      openSSLConfigPath: require.resolve("./openssl.cnf")
     };
   }
 
-  await (0, (_main || _load_main()).startServer)({
+  await (0, _main().startServer)({
     certificateStrategy,
     ports,
     timeout,

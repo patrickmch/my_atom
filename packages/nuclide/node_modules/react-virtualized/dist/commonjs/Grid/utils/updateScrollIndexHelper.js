@@ -9,11 +9,9 @@ var _ScalingCellSizeAndPositionManager = require('./ScalingCellSizeAndPositionMa
 
 var _ScalingCellSizeAndPositionManager2 = _interopRequireDefault(_ScalingCellSizeAndPositionManager);
 
+var _types = require('../types');
+
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-var babelPluginFlowReactPropTypes_proptype_CellSize = require('../types').babelPluginFlowReactPropTypes_proptype_CellSize || require('prop-types').any;
-
-var babelPluginFlowReactPropTypes_proptype_Alignment = require('../types').babelPluginFlowReactPropTypes_proptype_Alignment || require('prop-types').any;
 
 /**
  * Helper function that determines when to update scroll offsets to ensure that a scroll-to-index remains visible.

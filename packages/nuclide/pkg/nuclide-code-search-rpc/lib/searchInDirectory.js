@@ -1,4 +1,4 @@
-'use strict';
+"use strict";
 
 Object.defineProperty(exports, "__esModule", {
   value: true
@@ -6,36 +6,56 @@ Object.defineProperty(exports, "__esModule", {
 exports.searchInDirectory = searchInDirectory;
 exports.searchInDirectories = searchInDirectories;
 
-var _minimatch;
+function _minimatch() {
+  const data = require("minimatch");
 
-function _load_minimatch() {
-  return _minimatch = require('minimatch');
+  _minimatch = function () {
+    return data;
+  };
+
+  return data;
 }
 
-var _fsPromise;
+function _fsPromise() {
+  const data = _interopRequireDefault(require("../../../modules/nuclide-commons/fsPromise"));
 
-function _load_fsPromise() {
-  return _fsPromise = _interopRequireDefault(require('../../../modules/nuclide-commons/fsPromise'));
+  _fsPromise = function () {
+    return data;
+  };
+
+  return data;
 }
 
-var _nuclideUri;
+function _nuclideUri() {
+  const data = _interopRequireDefault(require("../../../modules/nuclide-commons/nuclideUri"));
 
-function _load_nuclideUri() {
-  return _nuclideUri = _interopRequireDefault(require('../../../modules/nuclide-commons/nuclideUri'));
+  _nuclideUri = function () {
+    return data;
+  };
+
+  return data;
 }
 
-var _rxjsBundlesRxMinJs = require('rxjs/bundles/Rx.min.js');
+var _rxjsCompatUmdMin = require("rxjs-compat/bundles/rxjs-compat.umd.min.js");
 
-var _searchTools;
+function _searchTools() {
+  const data = require("./searchTools");
 
-function _load_searchTools() {
-  return _searchTools = require('./searchTools');
+  _searchTools = function () {
+    return data;
+  };
+
+  return data;
 }
 
-var _VcsSearchHandler;
+function _VcsSearchHandler() {
+  const data = require("./VcsSearchHandler");
 
-function _load_VcsSearchHandler() {
-  return _VcsSearchHandler = require('./VcsSearchHandler');
+  _VcsSearchHandler = function () {
+    return data;
+  };
+
+  return data;
 }
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
@@ -50,42 +70,51 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
  * 
  * @format
  */
-
-function searchInDirectory(directory, regex, tool, useVcsSearch) {
-  const params = { regex, directory, recursive: true };
-  return useVcsSearch ? (0, (_VcsSearchHandler || _load_VcsSearchHandler()).search)(directory, regex).catch(() => (0, (_searchTools || _load_searchTools()).searchWithTool)(tool, params)) : (0, (_searchTools || _load_searchTools()).searchWithTool)(tool, params);
+function searchInDirectory(tool, useVcsSearch, params) {
+  return useVcsSearch ? (0, _VcsSearchHandler().search)(params).catch(() => (0, _searchTools().searchWithTool)(tool, params)) : (0, _searchTools().searchWithTool)(tool, params);
 }
 
-function searchInDirectories(directory, regex, subdirs, useVcsSearch, tool) {
-  // Resolve tool once here so we do not call 'which' for each subdir.
-  return _rxjsBundlesRxMinJs.Observable.defer(() => (0, (_searchTools || _load_searchTools()).resolveTool)(tool)).switchMap(actualTool => {
+function searchInDirectories(subdirs, tool, useVcsSearch, options) {
+  const {
+    directory
+  } = options; // Resolve tool once here so we do not call 'which' for each subdir.
+
+  return _rxjsCompatUmdMin.Observable.defer(() => (0, _searchTools().resolveTool)(tool)).switchMap(actualTool => {
     if (!subdirs || subdirs.length === 0) {
       // Since no subdirs were specified, run search on the root directory.
-      return searchInDirectory(directory, regex, actualTool, useVcsSearch);
+      return searchInDirectory(tool, useVcsSearch, options);
     } else if (subdirs.find(subdir => subdir.includes('*'))) {
       // Mimic Atom and use minimatch for glob matching.
       const matchers = subdirs.map(subdir => {
         let pattern = subdir;
+
         if (!pattern.includes('*')) {
           // Automatically glob-ify the non-globs.
-          pattern = (_nuclideUri || _load_nuclideUri()).default.ensureTrailingSeparator(pattern) + '**';
+          pattern = _nuclideUri().default.ensureTrailingSeparator(pattern) + '**';
         }
-        return new (_minimatch || _load_minimatch()).Minimatch(pattern, { matchBase: true, dot: true });
-      });
-      // TODO: This should walk the subdirectories and filter by glob before searching.
-      return searchInDirectory(directory, regex, actualTool, useVcsSearch).filter(result => Boolean(matchers.find(matcher => matcher.match(result.file))));
+
+        return new (_minimatch().Minimatch)(pattern, {
+          matchBase: true,
+          dot: true
+        });
+      }); // TODO: This should walk the subdirectories and filter by glob before searching.
+
+      return searchInDirectory(tool, useVcsSearch, options).filter(result => Boolean(matchers.find(matcher => matcher.match(result.file))));
     } else {
       // Run the search on each subdirectory that exists.
-      return _rxjsBundlesRxMinJs.Observable.from(subdirs).concatMap(async subdir => {
+      return _rxjsCompatUmdMin.Observable.from(subdirs).concatMap(async subdir => {
         try {
-          const stat = await (_fsPromise || _load_fsPromise()).default.lstat((_nuclideUri || _load_nuclideUri()).default.join(directory, subdir));
+          const stat = await _fsPromise().default.lstat(_nuclideUri().default.join(directory, subdir));
+
           if (stat.isDirectory()) {
-            return searchInDirectory((_nuclideUri || _load_nuclideUri()).default.join(directory, subdir), regex, actualTool, useVcsSearch);
+            return searchInDirectory(tool, useVcsSearch, Object.assign({}, options, {
+              directory: _nuclideUri().default.join(directory, subdir)
+            }));
           } else {
-            return _rxjsBundlesRxMinJs.Observable.empty();
+            return _rxjsCompatUmdMin.Observable.empty();
           }
         } catch (e) {
-          return _rxjsBundlesRxMinJs.Observable.empty();
+          return _rxjsCompatUmdMin.Observable.empty();
         }
       }).mergeAll();
     }

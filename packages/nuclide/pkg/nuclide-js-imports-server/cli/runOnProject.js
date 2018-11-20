@@ -1,49 +1,77 @@
-'use strict';
+"use strict";
 
-var _os = _interopRequireDefault(require('os'));
+var _os = _interopRequireDefault(require("os"));
 
-var _rxjsBundlesRxMinJs = require('rxjs/bundles/Rx.min.js');
+var _rxjsCompatUmdMin = require("rxjs-compat/bundles/rxjs-compat.umd.min.js");
 
-var _fsPromise;
+function _fsPromise() {
+  const data = _interopRequireDefault(require("../../../modules/nuclide-commons/fsPromise"));
 
-function _load_fsPromise() {
-  return _fsPromise = _interopRequireDefault(require('../../../modules/nuclide-commons/fsPromise'));
+  _fsPromise = function () {
+    return data;
+  };
+
+  return data;
 }
 
-var _nuclideUri;
+function _nuclideUri() {
+  const data = _interopRequireDefault(require("../../../modules/nuclide-commons/nuclideUri"));
 
-function _load_nuclideUri() {
-  return _nuclideUri = _interopRequireDefault(require('../../../modules/nuclide-commons/nuclideUri'));
+  _nuclideUri = function () {
+    return data;
+  };
+
+  return data;
 }
 
-var _process;
+function _process() {
+  const data = require("../../../modules/nuclide-commons/process");
 
-function _load_process() {
-  return _process = require('../../../modules/nuclide-commons/process');
+  _process = function () {
+    return data;
+  };
+
+  return data;
 }
 
-var _Config;
+function _Config() {
+  const data = require("../src/Config");
 
-function _load_Config() {
-  return _Config = require('../src/Config');
+  _Config = function () {
+    return data;
+  };
+
+  return data;
 }
 
-var _AutoImportsManager;
+function _AutoImportsManager() {
+  const data = require("../src/lib/AutoImportsManager");
 
-function _load_AutoImportsManager() {
-  return _AutoImportsManager = require('../src/lib/AutoImportsManager');
+  _AutoImportsManager = function () {
+    return data;
+  };
+
+  return data;
 }
 
-var _AutoImportsWorker;
+function _AutoImportsWorker() {
+  const data = require("../src/lib/AutoImportsWorker");
 
-function _load_AutoImportsWorker() {
-  return _AutoImportsWorker = require('../src/lib/AutoImportsWorker');
+  _AutoImportsWorker = function () {
+    return data;
+  };
+
+  return data;
 }
 
-var _fileIndex;
+function _fileIndex() {
+  const data = require("../src/lib/file-index");
 
-function _load_fileIndex() {
-  return _fileIndex = require('../src/lib/file-index');
+  _fileIndex = function () {
+    return data;
+  };
+
+  return data;
 }
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
@@ -60,21 +88,23 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
  */
 
 /* eslint-disable no-console */
-
-const DEFAULT_PROJECT_PATH = (_nuclideUri || _load_nuclideUri()).default.join(__dirname, '..', '..', '..');
+const DEFAULT_PROJECT_PATH = _nuclideUri().default.join(__dirname, '..', '..', '..');
 
 let numErrors = 0;
 let numFiles = 0;
 
 async function main() {
   const root = process.argv.length === 3 ? toPath(process.argv[2]) : DEFAULT_PROJECT_PATH;
+  const autoImportsManager = new (_AutoImportsManager().AutoImportsManager)((0, _Config().getEslintGlobals)(root));
+  const configFromFlow = (0, _Config().getConfigFromFlow)(root);
+  const {
+    hasteSettings
+  } = configFromFlow;
+  const index = await (0, _fileIndex().getFileIndex)(root, configFromFlow);
 
-  const autoImportsManager = new (_AutoImportsManager || _load_AutoImportsManager()).AutoImportsManager((0, (_Config || _load_Config()).getEslintGlobals)(root));
-  const configFromFlow = (0, (_Config || _load_Config()).getConfigFromFlow)(root);
-  const { hasteSettings } = configFromFlow;
+  const cpus = _os.default.cpus();
 
-  const index = await (0, (_fileIndex || _load_fileIndex()).getFileIndex)(root, configFromFlow);
-  const indexDirStream = (0, (_AutoImportsWorker || _load_AutoImportsWorker()).indexDirectory)(index, hasteSettings, _os.default.cpus().length).do({
+  const indexDirStream = (0, _AutoImportsWorker().indexDirectory)(index, hasteSettings, cpus ? Math.max(1, cpus.length) : 1).do({
     next: exportForFiles => {
       exportForFiles.forEach(exportForFile => {
         autoImportsManager.handleUpdateForFile(exportForFile);
@@ -87,8 +117,7 @@ async function main() {
       console.log(`Finished indexing source code for ${root}`);
     }
   });
-
-  const indexModulesStream = (0, (_AutoImportsWorker || _load_AutoImportsWorker()).indexNodeModules)(index).do({
+  const indexModulesStream = (0, _AutoImportsWorker().indexNodeModules)(index).do({
     next: exportForFiles => {
       exportForFiles.forEach(exportForFile => {
         autoImportsManager.handleUpdateForFile(exportForFile);
@@ -101,15 +130,13 @@ async function main() {
       console.log(`Finished indexing node modules ${root}`);
     }
   });
+  console.log('Began indexing all files'); // Check all files for missing imports
+  // eslint-disable-next-line nuclide-internal/unused-subscription
 
-  console.log('Began indexing all files');
-
-  // Check all files for missing imports
-  _rxjsBundlesRxMinJs.Observable.merge(indexModulesStream, indexDirStream).concat(
-  // Don't bother checking non-Flow files.
-  (0, (_process || _load_process()).observeProcess)('flow', ['ls', root, '--ignore', '.*/\\(node_modules\\|VendorLib\\|3rdParty\\)/.*']).filter(event => event.kind === 'stdout').mergeMap(event => {
+  _rxjsCompatUmdMin.Observable.merge(indexModulesStream, indexDirStream).concat( // Don't bother checking non-Flow files.
+  (0, _process().observeProcess)('flow', ['ls', root, '--ignore', '.*/\\(node_modules\\|VendorLib\\|3rdParty\\)/.*']).filter(event => event.kind === 'stdout').mergeMap(event => {
     if (!(event.kind === 'stdout')) {
-      throw new Error('Invariant violation: "event.kind === \'stdout\'"');
+      throw new Error("Invariant violation: \"event.kind === 'stdout'\"");
     }
 
     return checkFileForMissingImports(event.data.trim(), autoImportsManager);
@@ -124,10 +151,14 @@ async function main() {
 
 function checkFileForMissingImports(file, autoImportsManager) {
   numFiles++;
-  return (_fsPromise || _load_fsPromise()).default.readFile(file, 'utf8').then(fileContents => {
+  return _fsPromise().default.readFile(file, 'utf8').then(fileContents => {
     const missingImports = autoImportsManager.findMissingImports(file, fileContents).filter(missingImport => missingImport.symbol.type === 'value');
+
     if (missingImports.length > 0) {
-      console.log(JSON.stringify({ file, missingImports }, null, 2));
+      console.log(JSON.stringify({
+        file,
+        missingImports
+      }, null, 2));
     }
   }, err => {
     if (err) {
@@ -138,10 +169,11 @@ function checkFileForMissingImports(file, autoImportsManager) {
 }
 
 function toPath(filename) {
-  if ((_nuclideUri || _load_nuclideUri()).default.isAbsolute(filename)) {
+  if (_nuclideUri().default.isAbsolute(filename)) {
     return filename;
   }
-  return (_nuclideUri || _load_nuclideUri()).default.normalize((_nuclideUri || _load_nuclideUri()).default.join(process.cwd(), filename));
+
+  return _nuclideUri().default.normalize(_nuclideUri().default.join(process.cwd(), filename));
 }
 
 main();

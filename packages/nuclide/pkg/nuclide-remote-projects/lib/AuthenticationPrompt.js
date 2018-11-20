@@ -1,34 +1,46 @@
-'use strict';
+"use strict";
 
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
+exports.default = void 0;
 
-var _UniversalDisposable;
+function _UniversalDisposable() {
+  const data = _interopRequireDefault(require("../../../modules/nuclide-commons/UniversalDisposable"));
 
-function _load_UniversalDisposable() {
-  return _UniversalDisposable = _interopRequireDefault(require('../../../modules/nuclide-commons/UniversalDisposable'));
+  _UniversalDisposable = function () {
+    return data;
+  };
+
+  return data;
 }
 
-var _nullthrows;
+function _nullthrows() {
+  const data = _interopRequireDefault(require("nullthrows"));
 
-function _load_nullthrows() {
-  return _nullthrows = _interopRequireDefault(require('nullthrows'));
+  _nullthrows = function () {
+    return data;
+  };
+
+  return data;
 }
 
-var _react = _interopRequireWildcard(require('react'));
+var React = _interopRequireWildcard(require("react"));
 
-var _AtomNotifications;
+function _AtomNotifications() {
+  const data = require("./AtomNotifications");
 
-function _load_AtomNotifications() {
-  return _AtomNotifications = require('./AtomNotifications');
+  _AtomNotifications = function () {
+    return data;
+  };
+
+  return data;
 }
 
-function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
+function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) { var desc = Object.defineProperty && Object.getOwnPropertyDescriptor ? Object.getOwnPropertyDescriptor(obj, key) : {}; if (desc.get || desc.set) { Object.defineProperty(newObj, key, desc); } else { newObj[key] = obj[key]; } } } } newObj.default = obj; return newObj; } }
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-/** Component to prompt the user for authentication information. */
 /**
  * Copyright (c) 2015-present, Facebook, Inc.
  * All rights reserved.
@@ -40,8 +52,8 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
  * @format
  */
 
-class AuthenticationPrompt extends _react.Component {
-
+/** Component to prompt the user for authentication information. */
+class AuthenticationPrompt extends React.Component {
   constructor(props) {
     super(props);
 
@@ -55,21 +67,22 @@ class AuthenticationPrompt extends _react.Component {
       }
     };
 
-    this._disposables = new (_UniversalDisposable || _load_UniversalDisposable()).default();
+    this._disposables = new (_UniversalDisposable().default)();
   }
 
   componentDidMount() {
     // Hitting enter when this panel has focus should confirm the dialog.
-    this._disposables.add(atom.commands.add((0, (_nullthrows || _load_nullthrows()).default)(this._root), 'core:confirm', event => this.props.onConfirm()));
+    this._disposables.add(atom.commands.add((0, _nullthrows().default)(this._root), 'core:confirm', event => this.props.onConfirm())); // Hitting escape should cancel the dialog.
 
-    // Hitting escape should cancel the dialog.
+
     this._disposables.add(atom.commands.add('atom-workspace', 'core:cancel', event => this.props.onCancel()));
 
-    (0, (_nullthrows || _load_nullthrows()).default)(this._password).focus();
+    (0, _nullthrows().default)(this._password).focus();
+    const raiseNativeNotification = (0, _AtomNotifications().getNotificationService)();
 
-    const raiseNativeNotification = (0, (_AtomNotifications || _load_AtomNotifications()).getNotificationService)();
     if (raiseNativeNotification != null) {
       const pendingNotification = raiseNativeNotification('Nuclide Remote Connection', 'Nuclide requires additional action to authenticate your remote connection', 2000, false);
+
       if (pendingNotification != null) {
         this._disposables.add(pendingNotification);
       }
@@ -81,11 +94,11 @@ class AuthenticationPrompt extends _react.Component {
   }
 
   focus() {
-    (0, (_nullthrows || _load_nullthrows()).default)(this._password).focus();
+    (0, _nullthrows().default)(this._password).focus();
   }
 
   getPassword() {
-    return (0, (_nullthrows || _load_nullthrows()).default)(this._password).value;
+    return (0, _nullthrows().default)(this._password).value;
   }
 
   render() {
@@ -93,27 +106,26 @@ class AuthenticationPrompt extends _react.Component {
     //   enter work
     // * `instructions` are pre-formatted, so apply `whiteSpace: pre` to maintain formatting coming
     //   from the server.
-    return _react.createElement(
-      'div',
-      {
-        ref: el => {
-          this._root = el;
-        } },
-      _react.createElement(
-        'div',
-        { className: 'block', style: { whiteSpace: 'pre' } },
-        this.props.instructions
-      ),
-      _react.createElement('input', {
-        tabIndex: '0',
-        type: 'password',
-        className: 'nuclide-password native-key-bindings',
-        ref: el => {
-          this._password = el;
-        },
-        onKeyPress: this._onKeyUp
-      })
-    );
+    return React.createElement("div", {
+      ref: el => {
+        this._root = el;
+      }
+    }, React.createElement("div", {
+      className: "block",
+      style: {
+        whiteSpace: 'pre'
+      }
+    }, this.props.instructions), React.createElement("input", {
+      tabIndex: "0",
+      type: "password",
+      className: "nuclide-password native-key-bindings",
+      ref: el => {
+        this._password = el;
+      },
+      onKeyPress: this._onKeyUp
+    }));
   }
+
 }
+
 exports.default = AuthenticationPrompt;

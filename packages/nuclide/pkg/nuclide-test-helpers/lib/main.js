@@ -1,61 +1,67 @@
-'use strict';
+"use strict";
 
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
+Object.defineProperty(exports, "generateHgRepo1Fixture", {
+  enumerable: true,
+  get: function () {
+    return _fixtures().generateHgRepo1Fixture;
+  }
+});
+Object.defineProperty(exports, "generateHgRepo2Fixture", {
+  enumerable: true,
+  get: function () {
+    return _fixtures().generateHgRepo2Fixture;
+  }
+});
+Object.defineProperty(exports, "generateHgRepo3Fixture", {
+  enumerable: true,
+  get: function () {
+    return _fixtures().generateHgRepo3Fixture;
+  }
+});
+Object.defineProperty(exports, "copyFixture", {
+  enumerable: true,
+  get: function () {
+    return _fixtures().copyFixture;
+  }
+});
+Object.defineProperty(exports, "copyBuildFixture", {
+  enumerable: true,
+  get: function () {
+    return _fixtures().copyBuildFixture;
+  }
+});
+Object.defineProperty(exports, "overwriteFileWithTestContent", {
+  enumerable: true,
+  get: function () {
+    return _fixtures().overwriteFileWithTestContent;
+  }
+});
+Object.defineProperty(exports, "addMatchers", {
+  enumerable: true,
+  get: function () {
+    return _matchers().addMatchers;
+  }
+});
 
-var _fixtures;
+function _fixtures() {
+  const data = require("./fixtures");
 
-function _load_fixtures() {
-  return _fixtures = require('./fixtures');
+  _fixtures = function () {
+    return data;
+  };
+
+  return data;
 }
 
-Object.defineProperty(exports, 'generateHgRepo1Fixture', {
-  enumerable: true,
-  get: function () {
-    return (_fixtures || _load_fixtures()).generateHgRepo1Fixture;
-  }
-});
-Object.defineProperty(exports, 'generateHgRepo2Fixture', {
-  enumerable: true,
-  get: function () {
-    return (_fixtures || _load_fixtures()).generateHgRepo2Fixture;
-  }
-});
-Object.defineProperty(exports, 'generateHgRepo3Fixture', {
-  enumerable: true,
-  get: function () {
-    return (_fixtures || _load_fixtures()).generateHgRepo3Fixture;
-  }
-});
-Object.defineProperty(exports, 'copyFixture', {
-  enumerable: true,
-  get: function () {
-    return (_fixtures || _load_fixtures()).copyFixture;
-  }
-});
-Object.defineProperty(exports, 'copyBuildFixture', {
-  enumerable: true,
-  get: function () {
-    return (_fixtures || _load_fixtures()).copyBuildFixture;
-  }
-});
-Object.defineProperty(exports, 'overwriteFileWithTestContent', {
-  enumerable: true,
-  get: function () {
-    return (_fixtures || _load_fixtures()).overwriteFileWithTestContent;
-  }
-});
+function _matchers() {
+  const data = require("./matchers");
 
-var _matchers;
+  _matchers = function () {
+    return data;
+  };
 
-function _load_matchers() {
-  return _matchers = require('./matchers');
+  return data;
 }
-
-Object.defineProperty(exports, 'addMatchers', {
-  enumerable: true,
-  get: function () {
-    return (_matchers || _load_matchers()).addMatchers;
-  }
-});

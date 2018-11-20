@@ -49,5 +49,5 @@
 
 '.source.javascrip':
   'debugger':
-    'prefix': 'deb'
+    'prefix': 'db'
     'body': 'debugger;'

@@ -1,27 +1,43 @@
-'use strict';
+"use strict";
 
-var _createPackage;
+function _createPackage() {
+  const data = _interopRequireDefault(require("../nuclide-commons-atom/createPackage"));
 
-function _load_createPackage() {
-  return _createPackage = _interopRequireDefault(require('../nuclide-commons-atom/createPackage'));
+  _createPackage = function () {
+    return data;
+  };
+
+  return data;
 }
 
-var _nuclideDebuggerCommon;
+function _nuclideDebuggerCommon() {
+  const data = require("../nuclide-debugger-common");
 
-function _load_nuclideDebuggerCommon() {
-  return _nuclideDebuggerCommon = require('../nuclide-debugger-common');
+  _nuclideDebuggerCommon = function () {
+    return data;
+  };
+
+  return data;
 }
 
-var _AutoGenLaunchAttachProvider;
+function _AutoGenLaunchAttachProvider() {
+  const data = require("../nuclide-debugger-common/AutoGenLaunchAttachProvider");
 
-function _load_AutoGenLaunchAttachProvider() {
-  return _AutoGenLaunchAttachProvider = _interopRequireDefault(require('../nuclide-debugger-common/AutoGenLaunchAttachProvider'));
+  _AutoGenLaunchAttachProvider = function () {
+    return data;
+  };
+
+  return data;
 }
 
-var _utils;
+function _utils() {
+  const data = require("./utils");
 
-function _load_utils() {
-  return _utils = require('./utils');
+  _utils = function () {
+    return data;
+  };
+
+  return data;
 }
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
@@ -37,34 +53,35 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
  *  strict-local
  * @format
  */
-
 class Activation {
   constructor() {}
+
   dispose() {}
 
   createDebuggerProvider() {
     return {
-      name: 'Java - Desktop',
+      type: _nuclideDebuggerCommon().VsAdapterTypes.JAVA,
       getLaunchAttachProvider: connection => {
-        return new (_AutoGenLaunchAttachProvider || _load_AutoGenLaunchAttachProvider()).default('Java - Desktop', connection, (0, (_utils || _load_utils()).getJavaConfig)());
+        return new (_AutoGenLaunchAttachProvider().AutoGenLaunchAttachProvider)(_nuclideDebuggerCommon().VsAdapterNames.JAVA, connection, (0, _utils().getJavaConfig)());
       }
     };
   }
 
   createDebuggerConfigurator() {
-    return {
-      resolveConfiguration: (_utils || _load_utils()).resolveConfiguration,
-      adapterType: (_nuclideDebuggerCommon || _load_nuclideDebuggerCommon()).VsAdapterTypes.JAVA
-    };
+    return [{
+      resolveConfiguration: _utils().resolveConfiguration,
+      adapterType: _nuclideDebuggerCommon().VsAdapterTypes.JAVA
+    }];
   }
 
   consumeRpcService(rpcService) {
-    return (0, (_utils || _load_utils()).setRpcService)(rpcService);
+    return (0, _utils().setRpcService)(rpcService);
   }
 
   consumeSourcePathsService(sourcePathsService) {
-    return (0, (_utils || _load_utils()).setSourcePathsService)(sourcePathsService);
+    return (0, _utils().setSourcePathsService)(sourcePathsService);
   }
+
 }
 
-(0, (_createPackage || _load_createPackage()).default)(module.exports, Activation);
+(0, _createPackage().default)(module.exports, Activation);

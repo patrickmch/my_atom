@@ -1,31 +1,48 @@
-'use strict';
+"use strict";
 
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
+exports.default = void 0;
 
-var _CwdApi;
+function _CwdApi() {
+  const data = _interopRequireDefault(require("./CwdApi"));
 
-function _load_CwdApi() {
-  return _CwdApi = _interopRequireDefault(require('./CwdApi'));
+  _CwdApi = function () {
+    return data;
+  };
+
+  return data;
 }
 
-var _UniversalDisposable;
+function _UniversalDisposable() {
+  const data = _interopRequireDefault(require("../../../modules/nuclide-commons/UniversalDisposable"));
 
-function _load_UniversalDisposable() {
-  return _UniversalDisposable = _interopRequireDefault(require('../../../modules/nuclide-commons/UniversalDisposable'));
+  _UniversalDisposable = function () {
+    return data;
+  };
+
+  return data;
 }
 
-var _projects;
+function _projects() {
+  const data = require("../../../modules/nuclide-commons-atom/projects");
 
-function _load_projects() {
-  return _projects = require('../../../modules/nuclide-commons-atom/projects');
+  _projects = function () {
+    return data;
+  };
+
+  return data;
 }
 
-var _getElementFilePath;
+function _getElementFilePath() {
+  const data = _interopRequireDefault(require("../../../modules/nuclide-commons-atom/getElementFilePath"));
 
-function _load_getElementFilePath() {
-  return _getElementFilePath = _interopRequireDefault(require('../../../modules/nuclide-commons-atom/getElementFilePath'));
+  _getElementFilePath = function () {
+    return data;
+  };
+
+  return data;
 }
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
@@ -40,22 +57,25 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
  * 
  * @format
  */
-
 class Activation {
-
   constructor(rawState) {
     const state = rawState || {};
-    const { initialCwdPath } = state;
-    this._cwdApi = new (_CwdApi || _load_CwdApi()).default(initialCwdPath);
+    const {
+      initialCwdPath
+    } = state;
+    this._cwdApi = new (_CwdApi().default)(initialCwdPath);
     this._currentWorkingRootDirectory = this._cwdApi.getCwd();
-    this._disposables = new (_UniversalDisposable || _load_UniversalDisposable()).default(this._cwdApi, atom.commands.add('atom-workspace', 'nuclide-current-working-root:set-from-active-file', this._setFromActiveFile.bind(this)), atom.commands.add('atom-workspace', 'nuclide-current-working-root:switch-to-previous', this._switchToLastWorkingRoot.bind(this)), this._cwdApi.observeCwd(newCwd => {
+    this._disposables = new (_UniversalDisposable().default)(this._cwdApi, atom.commands.add('atom-workspace', 'nuclide-current-working-root:set-from-active-file', this._setFromActiveFile.bind(this)), atom.commands.add('atom-workspace', 'nuclide-current-working-root:switch-to-previous', this._switchToLastWorkingRoot.bind(this)), this._cwdApi.observeCwd(newCwd => {
       if (this._currentWorkingRootDirectory != null) {
         const oldCwd = this._currentWorkingRootDirectory;
+
         if (newCwd === oldCwd) {
           return;
         }
+
         this._lastWorkingRootPath = oldCwd;
       }
+
       this._currentWorkingRootDirectory = newCwd;
     }));
   }
@@ -70,6 +90,7 @@ class Activation {
 
   serialize() {
     const cwd = this._cwdApi.getCwd();
+
     return {
       initialCwdPath: cwd
     };
@@ -82,22 +103,26 @@ class Activation {
   }
 
   _setFromActiveFile(event) {
-    let path = (0, (_getElementFilePath || _load_getElementFilePath()).default)(event.target);
+    let path = (0, _getElementFilePath().default)(event.target);
+
     if (path == null) {
       const editor = atom.workspace.getActiveTextEditor();
+
       if (editor == null) {
         atom.notifications.addError('No file is currently active.');
         return;
       }
 
       path = editor.getPath();
+
       if (path == null) {
         atom.notifications.addError('Active file does not have a path.');
         return;
       }
     }
 
-    const projectRoot = (0, (_projects || _load_projects()).getAtomProjectRootPath)(path);
+    const projectRoot = (0, _projects().getAtomProjectRootPath)(path);
+
     if (projectRoot == null) {
       atom.notifications.addError('Active file does not belong to a project.');
       return;
@@ -105,5 +130,7 @@ class Activation {
 
     this._cwdApi.setCwd(projectRoot);
   }
+
 }
+
 exports.default = Activation;

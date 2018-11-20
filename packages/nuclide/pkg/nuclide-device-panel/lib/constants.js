@@ -1,8 +1,10 @@
-'use strict';
+"use strict";
 
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
+exports.AnalyticsActions = void 0;
+
 /**
  * Copyright (c) 2015-present, Facebook, Inc.
  * All rights reserved.
@@ -13,10 +15,8 @@ Object.defineProperty(exports, "__esModule", {
  *  strict
  * @format
  */
-
 const ANALYTICS_PREFIX = 'nuclide-device-panel';
-
-const AnalyticsActions = exports.AnalyticsActions = Object.freeze({
+const AnalyticsActions = Object.freeze({
   APPINFOTABLES_DATA_VALUE: `${ANALYTICS_PREFIX}:app-info-tables.data.value`,
   APPINFOTABLES_DATA_ERROR: `${ANALYTICS_PREFIX}:app-info-tables.data.error`,
   APPINFOTABLES_UI_MOUNT: `${ANALYTICS_PREFIX}:app-info-tables.ui.mount`,
@@ -25,3 +25,4 @@ const AnalyticsActions = exports.AnalyticsActions = Object.freeze({
   APPINFOVALUECELL_UI_ERROR: `${ANALYTICS_PREFIX}:app-info-value-cell.ui.error`,
   APPINFOVALUECELL_UI_EDITINGSTATECHANGE: `${ANALYTICS_PREFIX}:app-info-value-cell.ui.editing-state-change`
 });
+exports.AnalyticsActions = AnalyticsActions;

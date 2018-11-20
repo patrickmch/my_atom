@@ -1,9 +1,13 @@
-'use strict';
+"use strict";
 
-var _IpcTransports;
+function _IpcTransports() {
+  const data = require("../lib/IpcTransports");
 
-function _load_IpcTransports() {
-  return _IpcTransports = require('../lib/IpcTransports');
+  _IpcTransports = function () {
+    return data;
+  };
+
+  return data;
 }
 
 /**
@@ -16,11 +20,10 @@ function _load_IpcTransports() {
  *  strict-local
  * @format
  */
-
-const transport = new (_IpcTransports || _load_IpcTransports()).IpcServerTransport();
+const transport = new (_IpcTransports().IpcServerTransport)();
 
 if (!!transport.isClosed()) {
-  throw new Error('Invariant violation: "!transport.isClosed()"');
+  throw new Error("Invariant violation: \"!transport.isClosed()\"");
 }
 
 transport.onMessage().subscribe(message => {

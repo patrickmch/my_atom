@@ -1,31 +1,43 @@
-'use strict';
+"use strict";
 
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.MultiRootChangedFilesViewExample = undefined;
+exports.MultiRootChangedFilesViewExample = void 0;
 
-var _react = _interopRequireWildcard(require('react'));
+var React = _interopRequireWildcard(require("react"));
 
-var _Block;
+function _Block() {
+  const data = require("../../modules/nuclide-commons-ui/Block");
 
-function _load_Block() {
-  return _Block = require('../../modules/nuclide-commons-ui/Block');
+  _Block = function () {
+    return data;
+  };
+
+  return data;
 }
 
-var _MultiRootChangedFilesView;
+function _MultiRootChangedFilesView() {
+  const data = require("./MultiRootChangedFilesView");
 
-function _load_MultiRootChangedFilesView() {
-  return _MultiRootChangedFilesView = require('./MultiRootChangedFilesView');
+  _MultiRootChangedFilesView = function () {
+    return data;
+  };
+
+  return data;
 }
 
-var _nuclideVcsBase;
+function _nuclideVcsBase() {
+  const data = require("../nuclide-vcs-base");
 
-function _load_nuclideVcsBase() {
-  return _nuclideVcsBase = require('../nuclide-vcs-base');
+  _nuclideVcsBase = function () {
+    return data;
+  };
+
+  return data;
 }
 
-function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
+function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) { var desc = Object.defineProperty && Object.getOwnPropertyDescriptor ? Object.getOwnPropertyDescriptor(obj, key) : {}; if (desc.get || desc.set) { Object.defineProperty(newObj, key, desc); } else { newObj[key] = obj[key]; } } } } newObj.default = obj; return newObj; } }
 
 /**
  * Copyright (c) 2015-present, Facebook, Inc.
@@ -37,31 +49,22 @@ function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj;
  * 
  * @format
  */
-
-function onFileChosen(uri) {
-  atom.notifications.addInfo(`Selected file ${uri}`);
-}
-
 function BasicExample() {
-  const fileChanges = new Map([['nuclide://remote.host/someRemoteDir', new Map([['path/to/some/file/added.js', (_nuclideVcsBase || _load_nuclideVcsBase()).FileChangeStatus.ADDED], ['path/to/some/file/modified.js', (_nuclideVcsBase || _load_nuclideVcsBase()).FileChangeStatus.MODIFIED], ['path/to/some/file/missing.js', (_nuclideVcsBase || _load_nuclideVcsBase()).FileChangeStatus.MISSING], ['path/to/some/file/removed.js', (_nuclideVcsBase || _load_nuclideVcsBase()).FileChangeStatus.REMOVED], ['path/to/some/file/untracked.js', (_nuclideVcsBase || _load_nuclideVcsBase()).FileChangeStatus.UNTRACKED]])], ['someLocalDir', new Map([['file/with/shared/prefix/foo.js', (_nuclideVcsBase || _load_nuclideVcsBase()).FileChangeStatus.MODIFIED], ['file/with/shared/prefix/bar.js', (_nuclideVcsBase || _load_nuclideVcsBase()).FileChangeStatus.MODIFIED], ['file/with/shared/prefix/baz.js', (_nuclideVcsBase || _load_nuclideVcsBase()).FileChangeStatus.MODIFIED], ['file/with/another/prefix/foo.js', (_nuclideVcsBase || _load_nuclideVcsBase()).FileChangeStatus.MODIFIED], ['file/with/another/prefix/bar.js', (_nuclideVcsBase || _load_nuclideVcsBase()).FileChangeStatus.MODIFIED]])]]);
-  return _react.createElement(
-    'div',
-    null,
-    _react.createElement(
-      (_Block || _load_Block()).Block,
-      null,
-      _react.createElement((_MultiRootChangedFilesView || _load_MultiRootChangedFilesView()).MultiRootChangedFilesView, {
-        fileStatuses: fileChanges,
-        commandPrefix: 'nuclide-ui-playground',
-        selectedFile: null,
-        onFileChosen: onFileChosen,
-        openInDiffViewOption: true
-      })
-    )
-  );
+  const fileChanges = new Map([['nuclide://remote.host/someRemoteDir', new Map([['path/to/some/file/added.js', _nuclideVcsBase().FileChangeStatus.ADDED], ['path/to/some/file/modified.js', _nuclideVcsBase().FileChangeStatus.MODIFIED], ['path/to/some/file/missing.js', _nuclideVcsBase().FileChangeStatus.MISSING], ['path/to/some/file/removed.js', _nuclideVcsBase().FileChangeStatus.REMOVED], ['path/to/some/file/untracked.js', _nuclideVcsBase().FileChangeStatus.UNTRACKED]])], ['someLocalDir', new Map([['file/with/shared/prefix/foo.js', _nuclideVcsBase().FileChangeStatus.MODIFIED], ['file/with/shared/prefix/bar.js', _nuclideVcsBase().FileChangeStatus.MODIFIED], ['file/with/shared/prefix/baz.js', _nuclideVcsBase().FileChangeStatus.MODIFIED], ['file/with/another/prefix/foo.js', _nuclideVcsBase().FileChangeStatus.MODIFIED], ['file/with/another/prefix/bar.js', _nuclideVcsBase().FileChangeStatus.MODIFIED]])]]);
+  return React.createElement("div", null, React.createElement(_Block().Block, null, React.createElement(_MultiRootChangedFilesView().MultiRootChangedFilesView, {
+    fileStatuses: fileChanges,
+    commandPrefix: "nuclide-ui-playground",
+    selectedFile: null,
+    onFileChosen: uri => atom.notifications.addInfo(`Selected file ${uri}`),
+    openInDiffViewOption: true,
+    onClickAdd: uri => atom.notifications.addInfo(`Added file ${uri}`),
+    onClickRevert: uri => atom.notifications.addInfo(`Reverted file ${uri}`),
+    onClickDelete: uri => atom.notifications.addInfo(`Deleted file ${uri}`),
+    onClickForget: uri => atom.notifications.addInfo(`Forgot file ${uri}`)
+  })));
 }
 
-const MultiRootChangedFilesViewExample = exports.MultiRootChangedFilesViewExample = {
+const MultiRootChangedFilesViewExample = {
   sectionName: 'MultiRootChangedFilesView',
   description: 'Renders a list of changed files, across one or more directories.',
   examples: [{
@@ -69,3 +72,4 @@ const MultiRootChangedFilesViewExample = exports.MultiRootChangedFilesViewExampl
     component: BasicExample
   }]
 };
+exports.MultiRootChangedFilesViewExample = MultiRootChangedFilesViewExample;

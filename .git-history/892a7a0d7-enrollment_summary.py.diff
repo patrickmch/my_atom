@@ -1,0 +1,113 @@
+diff --git a/nols_website/admissions/management/commands/enrollment_summary.py b/nols_website/admissions/management/commands/enrollment_summary.py
+index f5bb2d34c..310dcfb30 100644
+--- a/nols_website/admissions/management/commands/enrollment_summary.py
++++ b/nols_website/admissions/management/commands/enrollment_summary.py
+@@ -1,105 +1,107 @@
+ import logging
+ import StringIO
+ 
+ from django.core.management.base import BaseCommand
+ from django.template.loader import render_to_string
+ from django.conf import settings
+ 
+ from nols_email.utils import EmailMessage
+ from nols.util.django.core.mail import send_text_email_wrapper
+ 
+ from admissions.models import OpenApp, APP_STATUS_TYPE_ID, ChoiceFullRecord
+ from admissions.utils_apply_open import _get_walked_apps
+ from website.csv_unicode import UnicodeWriter
+ from website.models import MailingListEntry
+ from core.models import CourseTab
+ 
+ from datetime import datetime, timedelta
+ 
+ log = logging.getLogger(__name__)
+ 
+ 
+ class Command(BaseCommand):
+     """
+     Mail a summary of yesterday's online enrollment.
+ 
+     The numbers are all based on OpenApps. We are reporting how many people enrolled, waitlisted, or
+     walked away from the application. We list all csr statuses for a given application.
+     """
+ 
+     def handle(self, *args, **kwargs):
+         now = datetime.now()
+         if now.weekday() == 0:
+             # Monday
+             date_range = (now - timedelta(days=3), now)
+         else:
+             date_range = (now - timedelta(days=1), now)
+ 
+         apps = OpenApp.objects.filter(_status_type_id=APP_STATUS_TYPE_ID.ENROLLED,
+                                       _status_ts__range=date_range)
+ 
+         # Of the OpenApps that were submitted yesterday (or over the weekend) get those that have a
+         # csr status equal to 'W', but not one equal to 'E'. We will display all of the rest in the
+         # `enrolled` grouping.
+         waitlisted = set(apps.filter(core_application__coursestatusrecordtab__status='W').exclude(
+             core_application__coursestatusrecordtab__status='E'
+         ))
+         enrolled = set(apps.exclude(pk__in=[app.pk for app in waitlisted]))
+         app_walked = _get_walked_apps(date_range)
+         choice_full_records = ChoiceFullRecord.objects.filter(created_ts__range=date_range)
+         numbers = {
+             'enrolled': len(enrolled),
+             'waitlisted': len(waitlisted),
+             'saw_message': len(set([r.open_app for r in choice_full_records])),
+             'walked': len(app_walked),
+         }
+         numbers['pressed_on'] = numbers['saw_message'] - numbers['walked']
+ 
+         message = render_to_string('admissions/open_apply/emails/summary_email_to_admissions.txt',
+                                    {'apps_dict': {'spot reserved': enrolled, 'waitlisted': waitlisted},
+                                     'NEXUS_SERVER': settings.NEXUS_SERVER,
+                                     'date_range': date_range,
+                                     'walked': app_walked,
+                                     'numbers': numbers})
+         list_entries = MailingListEntry.objects.filter(list_name='ES')
+         recipient_list = [entry.__unicode__() for entry in list_entries]
+         send_text_email_wrapper(subject='eApp Summary',
+                           message=message,
+                           from_email=None,
+                           recipient_list=recipient_list)
+ 
+         # Build and send walked apps summary
+         results = StringIO.StringIO()
+         writer = UnicodeWriter(results)
+         writer.writerow(['Email Address', 'Person Id', 'Last Name', 'First Name', 'Gender', 'Course Name', 'Course Id',
+                          'Country', 'Timestamp', 'Previously Applied'])
+         for app in app_walked:
+             course = app.course_selections.first()
+             course_tab = CourseTab.objects.filter(course_code=course.course_code, course_date=course.course_date)
+             course_id = ', '.join(str(x.id) for x in course_tab)
++            preferred_address = app.applicant.get_preferred_address()
++            applicant_address = preferred_address if preferred_address is not None else app.applicant.addresses[0]
+             writer.writerow([app.applicant.get_preferred_email_address().email_address,
+                              str(app.applicant.id),
+                              app.applicant.name.last,
+                              app.applicant.name.first,
+                              app.applicant.gender,
+                              course.course_description_full(),
+                              str(course_id),
+-                             app.applicant.get_preferred_address().country,
++                             applicant_address.country,
+                              app.status_ts.strftime('%m/%d/%Y %H:%M:%S'),
+                              'Yes' if app.has_applied else 'No'
+                              ])
+ 
+         subject = 'Walked apps summary for {start_date} - {end_date}'.format(start_date=date_range[0].strftime('%m/%d/%Y'),
+                                                                              end_date=date_range[1].strftime('%m/%d/%Y'))
+         recipient_list = ['john_glazer@nols.edu']
+         attachments = [('Walked apps summary {}'.format(now.strftime('%Y%m%d')), results.getvalue(), 'text/csv')]
+ 
+         email = EmailMessage(subject=subject,
+                              body='',
+                              to=recipient_list,
+                              attachments=attachments)
+         results.close()
+         try:
+             email.send(fail_silently=False)
+         except:
+             log.exception('Email failed to send')

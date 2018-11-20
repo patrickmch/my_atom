@@ -1,4 +1,4 @@
-'use strict';
+"use strict";
 
 /**
  * Copyright (c) 2015-present, Facebook, Inc.
@@ -10,13 +10,12 @@
  * 
  * @format
  */
-
 // eslint-disable-next-line nuclide-internal/no-commonjs
 module.exports = {
   throwsErrorSynchronously() {
     // TODO(mbolin): If throws a string rather than an Error, the unit test
     // fails.
-    throw Error('All I do is fail.');
+    throw new Error('All I do is fail.');
   },
 
   returnsRejectedPromise() {
@@ -28,6 +27,7 @@ module.exports = {
   async asyncFunctionThatThrows() {
     // TODO(mbolin): If throws a string rather than an Error, the unit test
     // fails.
-    throw Error('All I do is fail *asynchronously*.');
+    throw new Error('All I do is fail *asynchronously*.');
   }
+
 };

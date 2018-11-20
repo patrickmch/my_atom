@@ -3,7 +3,7 @@
 import * as path from 'path'
 import * as fs from 'fs'
 import * as temp from 'temp'
-import { waitsFor } from './util'
+import { waitsFor, activateMe } from './util'
 import { expect } from 'chai'
 global.require = require
 import * as mathjaxHelper from '../src-client/mathjax-helper'
@@ -18,6 +18,14 @@ declare global {
   }
 }
 
+function resolve<T>(v: T): ResolvablePromise<T> {
+  const res = Promise.resolve(v) as ResolvablePromise<T>
+  res.resolve = function() {
+    /*noop*/
+  }
+  return res
+}
+
 describe('MathJax helper module', () =>
   describe('loading MathJax TeX macros', function() {
     let configDirPath: string
@@ -25,9 +33,7 @@ describe('MathJax helper module', () =>
     let macros: { [key: string]: any }
     let spans = [] as Element[]
 
-    before(async () => {
-      await atom.packages.activatePackage(path.join(__dirname, '..'))
-    })
+    before(async () => activateMe())
     after(async () => {
       await atom.packages.deactivatePackage('markdown-preview-plus')
     })
@@ -37,8 +43,13 @@ describe('MathJax helper module', () =>
       macrosPath = path.join(configDirPath, 'markdown-preview-plus.cson')
 
       window.atomVars = {
-        home: Promise.resolve(configDirPath) as any,
-        numberEqns: Promise.resolve(false) as any,
+        home: resolve(configDirPath),
+        mathJaxConfig: resolve({
+          numberEquations: false,
+          texExtensions: [] as string[],
+          undefinedFamily: '',
+          renderer: 'SVG' as 'SVG',
+        }),
         revSourceMap: new WeakMap(),
         sourceLineMap: new Map(),
       }
@@ -63,7 +74,7 @@ describe('MathJax helper module', () =>
       span.appendChild(equation)
       atom.views.getView(atom.workspace).appendChild(span)
       spans.push(span)
-      await mathjaxHelper.mathProcessor(span, 'SVG')
+      await mathjaxHelper.mathProcessor(span)
 
       macros = await waitsFor.msg('MathJax macros to be defined', function() {
         try {

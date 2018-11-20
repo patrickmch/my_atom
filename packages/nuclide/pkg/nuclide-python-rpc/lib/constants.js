@@ -3,6 +3,8 @@
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
+exports.IDENTIFIER_REGEXP = void 0;
+
 /**
  * Copyright (c) 2015-present, Facebook, Inc.
  * All rights reserved.
@@ -13,5 +15,5 @@ Object.defineProperty(exports, "__esModule", {
  *  strict
  * @format
  */
-
-const IDENTIFIER_REGEXP = exports.IDENTIFIER_REGEXP = /[a-zA-Z_][a-zA-Z0-9_]*/g;
+const IDENTIFIER_REGEXP = /[a-zA-Z_][a-zA-Z0-9_]*/g;
+exports.IDENTIFIER_REGEXP = IDENTIFIER_REGEXP;

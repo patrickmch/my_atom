@@ -1,27 +1,22 @@
-'use strict';
+"use strict";
 
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.ActionTypes = undefined;
+exports.default = exports.ActionTypes = void 0;
 
-var _Dispatcher;
+function _Dispatcher() {
+  const data = _interopRequireDefault(require("../../../commons-node/Dispatcher"));
 
-function _load_Dispatcher() {
-  return _Dispatcher = _interopRequireDefault(require('../../../commons-node/Dispatcher'));
+  _Dispatcher = function () {
+    return data;
+  };
+
+  return data;
 }
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-const ActionTypes = exports.ActionTypes = Object.freeze({
-  UPDATE_PROJECT_ROOT: 'UPDATE_PROJECT_ROOT',
-  UPDATE_CHDIR: 'UPDATE_CHDIR',
-  UPDATE_SETTINGS: 'UPDATE_SETTINGS',
-  UPDATE_COMPILE_COMMANDS: 'UPDATE_COMPILE_COMMANDS'
-});
-
-// Flow hack: Every SwiftPMTaskRunnerAction actionType must be in ActionTypes.
-// $FlowFixMe(>=0.55.0) Flow suppress
 /**
  * Copyright (c) 2015-present, Facebook, Inc.
  * All rights reserved.
@@ -32,8 +27,17 @@ const ActionTypes = exports.ActionTypes = Object.freeze({
  *  strict
  * @format
  */
+const ActionTypes = Object.freeze({
+  UPDATE_PROJECT_ROOT: 'UPDATE_PROJECT_ROOT',
+  UPDATE_CHDIR: 'UPDATE_CHDIR',
+  UPDATE_SETTINGS: 'UPDATE_SETTINGS',
+  UPDATE_COMPILE_COMMANDS: 'UPDATE_COMPILE_COMMANDS'
+}); // Flow hack: Every SwiftPMTaskRunnerAction actionType must be in ActionTypes.
+// $FlowFixMe(>=0.55.0) Flow suppress
 
+exports.ActionTypes = ActionTypes;
 '';
 
-class SwiftPMTaskRunnerDispatcher extends (_Dispatcher || _load_Dispatcher()).default {}
+class SwiftPMTaskRunnerDispatcher extends _Dispatcher().default {}
+
 exports.default = SwiftPMTaskRunnerDispatcher;

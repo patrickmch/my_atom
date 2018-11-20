@@ -1,22 +1,30 @@
-'use strict';
+"use strict";
 
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.DiagnosticsProviderBase = undefined;
+exports.DiagnosticsProviderBase = void 0;
 
-var _atom = require('atom');
+var _atom = require("atom");
 
-var _textEvent;
+function _textEvent() {
+  const data = require("../../../modules/nuclide-commons-atom/text-event");
 
-function _load_textEvent() {
-  return _textEvent = require('../../../modules/nuclide-commons-atom/text-event');
+  _textEvent = function () {
+    return data;
+  };
+
+  return data;
 }
 
-var _UniversalDisposable;
+function _UniversalDisposable() {
+  const data = _interopRequireDefault(require("../../../modules/nuclide-commons/UniversalDisposable"));
 
-function _load_UniversalDisposable() {
-  return _UniversalDisposable = _interopRequireDefault(require('../../../modules/nuclide-commons/UniversalDisposable'));
+  _UniversalDisposable = function () {
+    return data;
+  };
+
+  return data;
 }
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
@@ -31,47 +39,45 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
  * 
  * @format
  */
-
 const UPDATE_EVENT = 'update';
 const INVALIDATE_EVENT = 'invalidate';
-
 let _textEventDispatcherInstance = null;
 
 function getTextEventDispatcher() {
   if (_textEventDispatcherInstance == null) {
-    _textEventDispatcherInstance = new (_textEvent || _load_textEvent()).TextEventDispatcher();
+    _textEventDispatcherInstance = new (_textEvent().TextEventDispatcher)();
   }
+
   return _textEventDispatcherInstance;
 }
 
 class DiagnosticsProviderBase {
-
+  // callbacks provided by client
   constructor(options, textEventDispatcher = getTextEventDispatcher()) {
     this._textEventDispatcher = textEventDispatcher;
     this._emitter = new _atom.Emitter();
-    this._disposables = new (_UniversalDisposable || _load_UniversalDisposable()).default();
-
+    this._disposables = new (_UniversalDisposable().default)();
     this._textEventCallback = callbackOrNoop(options.onTextEditorEvent);
     this._newUpdateSubscriberCallback = callbackOrNoop(options.onNewUpdateSubscriber);
-    this._newInvalidateSubscriberCallback = callbackOrNoop(options.onNewInvalidateSubscriber);
+    this._newInvalidateSubscriberCallback = callbackOrNoop(options.onNewInvalidateSubscriber); // The Set constructor creates an empty Set if passed null or undefined.
 
-    // The Set constructor creates an empty Set if passed null or undefined.
     this._grammarScopes = new Set(options.grammarScopes);
     this._allGrammarScopes = Boolean(options.enableForAllGrammars);
+
     this._subscribeToTextEditorEvent(Boolean(options.shouldRunOnTheFly));
   }
-
   /**
    * Subscribes to the appropriate event depending on whether we should run on
    * the fly or not.
    */
 
 
-  // callbacks provided by client
   _subscribeToTextEditorEvent(shouldRunOnTheFly) {
     this._disposeEventSubscription();
+
     const dispatcher = this._textEventDispatcher;
     let subscription;
+
     if (shouldRunOnTheFly) {
       if (this._allGrammarScopes) {
         subscription = dispatcher.onAnyFileChange(this._textEventCallback);
@@ -85,6 +91,7 @@ class DiagnosticsProviderBase {
         subscription = dispatcher.onFileSave(this._grammarScopes, this._textEventCallback);
       }
     }
+
     this._currentEventSubscription = subscription;
   }
 
@@ -94,13 +101,16 @@ class DiagnosticsProviderBase {
 
   dispose() {
     this._emitter.dispose();
+
     this._disposables.dispose();
+
     this._disposeEventSubscription();
   }
 
   _disposeEventSubscription() {
     if (this._currentEventSubscription) {
       this._currentEventSubscription.dispose();
+
       this._currentEventSubscription = null;
     }
   }
@@ -108,10 +118,10 @@ class DiagnosticsProviderBase {
   getGrammarScopes() {
     return this._grammarScopes;
   }
-
   /**
    * Clients can call these methods to publish messages
    */
+
 
   publishMessageUpdate(update) {
     this._emitter.emit(UPDATE_EVENT, update);
@@ -120,25 +130,31 @@ class DiagnosticsProviderBase {
   publishMessageInvalidation(message) {
     this._emitter.emit(INVALIDATE_EVENT, message);
   }
-
   /**
    * Clients should delegate to these
    */
 
+
   onMessageUpdate(callback) {
     const disposable = this._emitter.on(UPDATE_EVENT, callback);
+
     this._newUpdateSubscriberCallback(callback);
+
     return disposable;
   }
 
   onMessageInvalidation(callback) {
     const disposable = this._emitter.on(INVALIDATE_EVENT, callback);
+
     this._newInvalidateSubscriberCallback(callback);
+
     return disposable;
   }
+
 }
 
 exports.DiagnosticsProviderBase = DiagnosticsProviderBase;
+
 function callbackOrNoop(callback) {
   return callback ? callback.bind(undefined) : () => {};
 }

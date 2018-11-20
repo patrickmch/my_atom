@@ -1,0 +1,360 @@
+diff --git a/nols_website/wmi/templates/dataentry/authenticated_form.html b/nols_website/wmi/templates/dataentry/authenticated_form.html
+index 8cb2242e7..f8d8be694 100644
+--- a/nols_website/wmi/templates/dataentry/authenticated_form.html
++++ b/nols_website/wmi/templates/dataentry/authenticated_form.html
+@@ -1,355 +1,354 @@
+ {% extends 'dataentry/event_base.html' %}
+ {% load widget_tweaks %}
+ {% load l10n %}
+ {% load static from staticfiles %}
+ 
+ {% block content %}
+ {{ block.super }}
+ <div class="row rollcall-authenticated-form column small-centered large-8 medium-10">
+ {% if allow_post %}
+     <h3 class="lead">
+         Please complete and review the form below.
+     </h3>
+     <form id="extras-form" action="{% url "submit_authenticated"  event.wmi_course_id %}" method="post">
+         {% if extras_form.errors %}
+         <div class="form-group">
+             <div data-closable class="callout column medium-12 alert">
+                 <button type="button" class="close" data-close data-dismiss="alert" aria-hidden="true">&times;</button>
+                 <p class="errorlist">There is an error, please correct the appropriate field(s).<p>
+                 {{ extras_form.non_field_errors }}
+             </div>
+         </div>
+         {% endif %}
+ 
+         {% for field in extras_form %}
+             {% if field.is_hidden %}
+                 {{ field }}
+             {% else %}
+                 <div class="form-group{% if field.errors %} error{% endif %}">
+                     <div class="row">
+                         <div class="column small-12 ">
+                             <label class="control-label" for="id_{{ field.name }}">{{ field.label }}</label>
+                             {{ field.errors }}
+                             {{ field|add_class:"form-control" }}
+                         </div>
+                     </div>
+                     {% if field.help_text %}
+                         <span class="subtle help-block">{{ field.help_text }}</span>
+                     {% endif %}
+                 </div>
+             {% endif %}
+         {% endfor %}
+         {% csrf_token %}
+     </form>
+ {% else %}
+     <div data-closable class="callout warning">
+         <button type="button" class="close" data-close data-dismiss="alert">x</button>
+         {{ validated_message|safe }}
+     </div>
+     <h3 class="lead">Please ensure that your information is up to date.</h3>
+ {% endif %}
+-    {% include "dataentry/fragments/account_info.html" %}
+     {% with user.entity as entity %}
+     <div class="row">
+       <div class="column">
+         <h2 id="person_info" class="clearfix">Personal Information:</h2>
+       </div>
+       {% with "person_form" as form_id %}
+       <div class="column">
+         <a data-open="{{ form_id }}" role="button" class="edit-entity"><span>Edit Personal Information</span></a>
+       </div>
+     </div>
+     <div class="row person-data">
+         <div class="column small-12  ">
+             <p class="entity-info">
+                 {{ entity.name.full_name }}
+                 {% if entity.birth_date %}(DOB: {{ entity.birth_date|date:'N d, Y' }}){% endif %}
+             </p>
+             <p class="entity-info">
+                 {% if entity.ethnicity %}{{ entity.ethnicity }};{% endif %}
+                 {% if entity.gender %}{{ entity.gender }};{% endif %}
+                 {% if entity.citizenship %} Citizen of {{ entity.citizenship }}{% endif %}
+             </p>
+         </div>
+         {% with person_form as form %}
+             {% url "core.views.edit_personal"  as form_action %}
+             {% url "get_started"  event.wmi_course_id as redirect %}
+             {% with "when_finished" as redirect_name %}
+             {% with "Edit Personal Information" as modal_title %}
+                 {% include "dataentry/form_modal.html" %}
+             {% endwith %}
+             {% endwith %}
+         {% endwith %}
+     </div>
+         {% endwith %}
+ 
+         <div id="email_info" class="row info-group">
+             <div class="column">
+                 <h2>Email Addresses:</h2>
+             </div>
+             {% with 'email_form' as form_id %}
+                 <div class="column">
+                     <a data-open="{{ form_id }}" role="button"><span>Add Email Address</span></a>
+                 </div>
+                     {% with email_form as form %}
+                         {% url "core.views.edit_email"  as form_action %}
+                         {% url "get_started"  event.wmi_course_id as redirect %}
+                         {% with "next" as redirect_name %}
+                         {% with "Add Email Address" as modal_title %}
+                             {% include 'dataentry/form_modal.html' %}
+                         {% endwith %}
+                         {% endwith %}
+                     {% endwith %}
+             {% endwith %}
+         </div>
+         {% with "email_form" as form_id %}
+             {% regroup entity.email_addresses by status as email_status_list %}
+             {% for status in email_status_list %}
+                 {% ifnotequal status.grouper 'Former' %}
+                     {% for email in status.list %}
+                         <div class="row contact-datum">
+                             <div class="column small-12  ">
+                                 <p class="entity-info">{{ email.email_address }}</p>
+                             </div>
+                             <div class="column small-12 ">
+                                 {% if email.portal_linked %}
+                                     {% with "This email is associated with your NOLS.edu account. Contact us if you would like to change it." as linked_help %}
+                                     <div>
+                                       <i class="fa fa-question t-t" data-toggle="tooltip" title="{{ linked_help }}"></i>
+                                     </div>
+                                     {% endwith %}
+                                 {% else %}
+                                     {% ifequal user.email email.email_address %}
+                                         {% with "This email is associated with your NOLS.edu account. Contact us if you would like to change it." as linked_help %}
+                                         <div class="">
+                                           <i class="icon-question-sign" title="{{ linked_help }}"></i>
+                                         </div>
+                                         {% endwith %}
+                                     {% else %}
+                                     <form method="post" action="{% url "core.views.account_emails" %}?next={% url "get_started"  event.wmi_course_id %}#email_info">
+                                         <input type="hidden" name="toggle_status" value="{{ email.id|unlocalize }}">
+                                         <input type="submit" class="rollcall--info-status" value="Make Former">
+                                         {% csrf_token %}
+                                     </form>
+                                     {% endifequal %}
+                                 {% endif %}
+                             </div>
+                         </div>
+                     {% endfor %}
+                 {% else %}
+                     {% for email in status.list %}
+                         {% if forloop.first %}
+                             <div class="row column rollcall--former-title">
+                               Former Email Addresses
+                             </div>
+                             <div id="former-emails">
+                         {% endif %}
+                             <div class="row contact-datum">
+                                 <div class="column small-12">
+                                     <p class="entity-info">{{ email.email_address }}</p>
+                                 </div>
+                                 <div class="column">
+                                     <form method="post"
+                                          action="{% url "core.views.account_emails" %}?next={% url "get_started"  event.wmi_course_id %}#email_info">
+                                        <input type="hidden" name="toggle_status" value="{{ email.id|unlocalize }}">
+                                        <input type="submit" class="rollcall--info-status" value="Make Current">
+                                        {% csrf_token %}
+                                     </form>
+                                 </div>
+                             </div>
+                         {% if forloop.last %}
+                         </div>
+                         {% endif %}
+                     {% endfor %}
+                 {% endifnotequal %}
+             {% empty %}
+                 <p>Please <a href="#{{ form_id }}" role="button" data-toggle="modal">add an email address</a>.</p>
+             {% endfor %}
+         {% endwith %}
+ 
+         <div id="address_info" class="row info-group">
+             <div class="column">
+                 <h2>Addresses:</h2>
+             </div>
+             {% with 'address_form' as form_id %}
+                 <div class="column">
+                     <a data-open="{{ form_id }}" role="button"><span>Add Address</span></a>
+                 </div>
+                     {% with address_form as form %}
+                         {% url "core.views.edit_address"  as form_action %}
+                         {% url "get_started"  event.wmi_course_id as redirect %}
+                         {% with "next" as redirect_name %}
+                         {% with "Add Address" as modal_title %}
+                             {% include 'dataentry/form_modal.html' %}
+                         {% endwith %}
+                         {% endwith %}
+                     {% endwith %}
+             {% endwith %}
+         </div>
+         {% with "address_form" as form_id %}
+             {% regroup entity.addresses by status as address_status_list %}
+             {% for status in address_status_list %}
+                 {% ifnotequal status.grouper 'Former' %}
+                     {% for address in status.list %}
+                         <div class="row contact-datum">
+                             <div class="column small-12  ">
+                                 <p class="entity-info"><strong class="float-left">{{ address.type }}:&nbsp</strong> {{ address.display }}</p>
+                             </div>
+                             <div class="column small-12 ">
+                                 <form method="post"
+                                       action="{% url "core.views.account_addresses" %}?next={% url "get_started"  event.wmi_course_id %}#address_info">
+                                     <input type="hidden" name="toggle_status" value="{{ address.id|unlocalize }}">
+                                     <input type="submit" class="rollcall--info-status" value="Make Former">
+                                     {% csrf_token %}
+                                 </form>
+                             </div>
+                         </div>
+                     {% endfor %}
+                 {% else %}
+                     {% for address in status.list %}
+                         {% if forloop.first %}
+                         <div class="row column rollcall--former-title">
+                             Former Addresses
+                         </div>
+                         <div id="former-addresses">
+                         {% endif %}
+                             <div class="row contact-datum">
+                                 <div class="column small-12">
+                                     <p class="entity-info"><strong class="float-left">{{ address.type }}:&nbsp</strong> {{ address.display }}</p>
+                                 </div>
+                                 <div class="column small-12 ">
+                                     <form method="post"
+                                           action="{% url "core.views.account_addresses" %}?next={% url "get_started"  event.wmi_course_id %}#address_info">
+                                         <input type="hidden" name="toggle_status" value="{{ address.id|unlocalize }}">
+                                         <input type="submit" class="rollcall--info-status" value="Make Current">
+                                         {% csrf_token %}
+                                     </form>
+                                 </div>
+                             </div>
+                         {% if forloop.last %}
+                         </div>
+                         {% endif %}
+                     {% endfor %}
+                 {% endifnotequal %}
+             {% empty %}
+                 <p>Please <a href="#{{ form_id }}" role="button" data-toggle="modal">add an address</a>.</p>
+             {% endfor %}
+         {% endwith %}
+         <script src="{% static 'admissions/js/province_update.js' %}"></script>
+         <script>
+           $("#id_country").addClass('form-country-selection');
+           main_update_provinces('{% url 'get_province_choices' %}');
+         </script>
+ 
+         <div id="phone_info" class="row info-group">
+             <div class="column">
+                 <h2>Phones:</h2>
+             </div>
+             {% with 'phone_form' as form_id %}
+                 <div class="column">
+                     <a data-open="{{ form_id }}" role="button"><span>Add Phone</span></a>
+                 </div>
+                     {% with phone_form as form %}
+                         {% url "core.views.edit_phone"  as form_action %}
+                         {% url "get_started"  event.wmi_course_id as redirect %}
+                         {% with "next" as redirect_name %}
+                         {% with "Add Phone Number" as modal_title %}
+                             {% include 'dataentry/form_modal.html' %}
+                         {% endwith %}
+                         {% endwith %}
+                     {% endwith %}
+             {% endwith %}
+         </div>
+         {% with "phone_form" as form_id %}
+             {% regroup entity.phone_numbers by status as phone_status_list %}
+             {% for status in phone_status_list %}
+                 {% ifnotequal status.grouper 'Former' %}
+                     {% for phone in status.list %}
+                         <div class="row contact-datum">
+                             <div class="column small-12  ">
+                                 <p class="entity-info"><strong class="float-left">{{ phone.type }}:&nbsp</strong> {{ phone.display }}</p>
+                             </div>
+                             <div class="column small-12 ">
+                                 <form method="post" action="{% url "core.views.account_phones" %}?next={% url "get_started"  event.wmi_course_id %}#phone_info">
+                                     <input type="hidden" name="address_relation_id" value="{{ phone.id|unlocalize }}">
+                                     <input type="hidden" name="toggle_status" value="{{ phone.phone_id|unlocalize }}">
+                                     <input type="submit" class="rollcall--info-status" value="Make Former">
+                                     {% csrf_token %}
+                                 </form>
+                             </div>
+                         </div>
+                     {% endfor %}
+                 {% else %}
+                     {% for phone in status.list %}
+                         {% if forloop.first %}
+                             <div class="row column rollcall--former-title">
+                                 Former Phone Numbers
+                             </div>
+                             <div id="former-phones">
+                         {% endif %}
+                             <div class="row contact-datum">
+                                 <div class="column small-12">
+                                     <p class="entity-info"><strong class="float-left">{{ phone.type }}:&nbsp</strong>{{ phone.display }}</p>
+                                 </div>
+                                 <div class="column small-12">
+                                     {% if phone.locked or phone.location %}
+                                         <a role="button" disabled><span>Locked</span></a>
+                                     {% else %}
+                                         <form method="post"
+                                               action="{% url "core.views.account_phones" %}?next={% url "get_started"  event.wmi_course_id %}#phone_info">
+                                             <input type="hidden" name="address_relation_id" value="{{ phone.id|unlocalize }}">
+                                             <input type="hidden" name="toggle_status" value="{{ phone.phone_id|unlocalize }}">
+                                             <input type="submit" class="rollcall--info-status" value="Make Current">
+                                             {% csrf_token %}
+                                         </form>
+                                     {% endif %}
+                                 </div>
+                             </div>
+                         {% if forloop.last %}
+                             </div>
+                         {% endif %}
+                     {% endfor %}
+                 {% endifnotequal %}
+             {% empty %}
+                 <p>Please <a href="#{{ form_id }}" role="button" data-toggle="modal">add a phone number</a>.</p>
+             {% endfor %}
+         {% endwith %}
+     {% endwith %}
+ 
+ {% if allow_post %}
+     <div class="row">
+         <div class="column small-12">
+             <button id="heard_about_submit" type="button" class="button float-right" onclick="submitExtras();"><span>Submit</span></button>
+         </div>
+     </div>
+ {% else %}
+     <h3>Thanks for updating your information!</h3>
+     <div class="row">
+         <div class="column small-12">
+             <a href="{% url "logout" %}?next={% url "get_started"  event.wmi_course_id %}"
+                type="button"
+                class="button button-default"><span>Log out</span></a>
+         </div>
+     </div>
+ {% endif %}
+ </div>
+ {% endblock content %}
+ 
+ 
+ {% block extra_js %}
+     {{ block.super }}
+     <script type="text/javascript">
+         {% if allow_post %}
+         $(document).ready(function() {
+         $('#id_heard_about').change(function() {
+                 $.cookie('heard_about_choice', $(this).val());
+             });
+         })
+         {% endif %}
+ 
+         function submitExtras() {
+             $.removeCookie('heard_about_choice');
+             $('#id_heard_about').parents('form').submit();
+         }
+     </script>
+ {% endblock extra_js %}

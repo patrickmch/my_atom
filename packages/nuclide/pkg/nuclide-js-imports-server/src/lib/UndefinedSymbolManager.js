@@ -1,35 +1,38 @@
-'use strict';
+"use strict";
 
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.UndefinedSymbolManager = undefined;
+exports.UndefinedSymbolManager = void 0;
 
-var _traverse;
+function _traverse() {
+  const data = _interopRequireDefault(require("@babel/traverse"));
 
-function _load_traverse() {
-  return _traverse = _interopRequireDefault(require('@babel/traverse'));
+  _traverse = function () {
+    return data;
+  };
+
+  return data;
 }
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-const BUILT_INS = ['Iterator', '__DEV__']; /**
-                                            * Copyright (c) 2015-present, Facebook, Inc.
-                                            * All rights reserved.
-                                            *
-                                            * This source code is licensed under the license found in the LICENSE file in
-                                            * the root directory of this source tree.
-                                            *
-                                            * 
-                                            * @format
-                                            */
-
+/**
+ * Copyright (c) 2015-present, Facebook, Inc.
+ * All rights reserved.
+ *
+ * This source code is licensed under the license found in the LICENSE file in
+ * the root directory of this source tree.
+ *
+ * 
+ * @format
+ */
+const BUILT_INS = ['Iterator', '__DEV__'];
 const FBT_TAG = 'fbt';
 const REACT_MODULE_NAME = 'React';
 const JSX_CSX_PRAGMA_REGEX = /\*?\s*@csx/;
 
 class UndefinedSymbolManager {
-
   constructor(globals) {
     this.globals = new Set(BUILT_INS.concat(globals));
   }
@@ -44,18 +47,23 @@ class UndefinedSymbolManager {
       return [];
     }
   }
+
 }
 
 exports.UndefinedSymbolManager = UndefinedSymbolManager;
+
 function traverseTreeForUndefined(ast, globals) {
   const undefinedSymbols = [];
   const definedTypes = new Set();
   const definedValues = new Set();
-
-  ast.comments.forEach(({ type, value }) => {
+  ast.comments.forEach(({
+    type,
+    value
+  }) => {
     // Parses out /* global a, b, c: true, d: false */
     if (type === 'CommentBlock') {
       const trimmed = value.trim();
+
       if (trimmed.startsWith('global ') || trimmed.startsWith('globals ')) {
         const vars = trimmed.substr(7).trimLeft();
         vars.split(',').forEach(varString => {
@@ -66,9 +74,8 @@ function traverseTreeForUndefined(ast, globals) {
       }
     }
   });
-
   let csx = false;
-  (0, (_traverse || _load_traverse()).default)(ast, {
+  (0, _traverse().default)(ast, {
     ImportDeclaration: path => {
       saveImports(path, definedTypes);
     },
@@ -102,14 +109,18 @@ function traverseTreeForUndefined(ast, globals) {
       // a diagnositc (but Flow would create one)
       saveTypeParameters(path, definedTypes);
     },
+
     ReferencedIdentifier(path) {
       findUndefinedValues(path, undefinedSymbols, globals);
     },
+
     GenericTypeAnnotation: {
       exit(path) {
         findUndefinedTypes(path, undefinedSymbols, globals);
       }
+
     },
+
     Identifier(path) {
       // Allow identifiers on the LHS of an assignment.
       // In non-strict JavaScript, this might just be a declaration.
@@ -117,14 +128,19 @@ function traverseTreeForUndefined(ast, globals) {
         definedValues.add(path.node.name);
       }
     },
+
     Program(path) {
-      csx = csx || path.parent.comments.some(({ value }) => JSX_CSX_PRAGMA_REGEX.test(value));
+      csx = csx || path.parent.comments.some(({
+        value
+      }) => JSX_CSX_PRAGMA_REGEX.test(value));
     },
+
     JSXFragment(path) {
       if (!csx) {
         findUndefinedReact(path, undefinedSymbols, globals);
       }
     },
+
     JSXIdentifier(path) {
       if (!csx && path.parent.type === 'JSXOpeningElement') {
         if (path.node.name === FBT_TAG) {
@@ -134,24 +150,29 @@ function traverseTreeForUndefined(ast, globals) {
         }
       }
     },
+
     LabeledStatement(path) {
       // Create a fake binding for the label.
       if (path.node.label && path.node.label.name) {
         definedValues.add(path.node.label.name);
       }
     }
+
   });
   return undefinedSymbols.filter(symbol => symbol.type === 'value' && !definedValues.has(symbol.id) || symbol.type === 'type' && !definedTypes.has(symbol.id));
 }
 
 function findUndefinedValues(path, undefinedSymbols, globals) {
-  const { node, scope } = path;
-  if (
-  // Type Annotations are considered identifiers, so ignore them
-  isTypeIdentifier(path.parent.type) ||
-  // Other weird cases where we want to ignore identifiers
-  path.parent.type === 'ExportSpecifier' || // export {a} from 'a' (a would be undefined)
-  path.parent.type === 'QualifiedTypeIdentifier' && path.parentKey !== 'qualification' || // SomeModule.SomeType
+  const {
+    node,
+    scope
+  } = path;
+  const type = path.parent.type;
+
+  if ( // Type Annotations are considered identifiers, so ignore them
+  isTypeIdentifier(type) || // Other weird cases where we want to ignore identifiers
+  type === 'ExportSpecifier' || // export {a} from 'a' (a would be undefined)
+  type === 'QualifiedTypeIdentifier' && path.parentKey !== 'qualification' || // SomeModule.SomeType
   globals.has(node.name) || scope.hasBinding(node.name)) {
     return;
   }
@@ -160,14 +181,23 @@ function findUndefinedValues(path, undefinedSymbols, globals) {
     id: node.name,
     type: path.parent.type === 'QualifiedTypeIdentifier' ? 'type' : 'value',
     location: {
-      start: { line: node.loc.start.line, col: node.loc.start.column },
-      end: { line: node.loc.end.line, col: node.loc.end.column }
+      start: {
+        line: node.loc.start.line,
+        col: node.loc.start.column
+      },
+      end: {
+        line: node.loc.end.line,
+        col: node.loc.end.column
+      }
     }
   });
 }
 
 function findUndefinedReact(path, undefinedSymbols, globals) {
-  const { node, scope } = path;
+  const {
+    node,
+    scope
+  } = path;
 
   if (scope.hasBinding(REACT_MODULE_NAME)) {
     return;
@@ -177,14 +207,23 @@ function findUndefinedReact(path, undefinedSymbols, globals) {
     id: REACT_MODULE_NAME,
     type: 'value',
     location: {
-      start: { line: node.loc.start.line, col: node.loc.start.column },
-      end: { line: node.loc.end.line, col: node.loc.end.column }
+      start: {
+        line: node.loc.start.line,
+        col: node.loc.start.column
+      },
+      end: {
+        line: node.loc.end.line,
+        col: node.loc.end.column
+      }
     }
   });
 }
 
 function findUndefinedTypes(path, undefinedSymbols, globals) {
-  const { node, scope } = path;
+  const {
+    node,
+    scope
+  } = path;
 
   if (globals.has(node.id.name) || path.parent.type === 'TypeAlias' || scope.hasBinding(node.id.name)) {
     return;
@@ -196,8 +235,14 @@ function findUndefinedTypes(path, undefinedSymbols, globals) {
       // "typeof" must refer to a value.
       type: path.parent.type === 'TypeofTypeAnnotation' ? 'value' : 'type',
       location: {
-        start: { line: node.loc.start.line, col: node.loc.start.column },
-        end: { line: node.loc.end.line, col: node.loc.end.column }
+        start: {
+          line: node.loc.start.line,
+          col: node.loc.start.column
+        },
+        end: {
+          line: node.loc.end.line,
+          col: node.loc.end.column
+        }
       }
     });
   }

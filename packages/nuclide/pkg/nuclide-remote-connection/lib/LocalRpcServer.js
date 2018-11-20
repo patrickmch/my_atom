@@ -1,47 +1,75 @@
-'use strict';
+"use strict";
 
-var _child_process = _interopRequireDefault(require('child_process'));
+var _child_process = _interopRequireDefault(require("child_process"));
 
-var _log4js;
+function _log4js() {
+  const data = require("log4js");
 
-function _load_log4js() {
-  return _log4js = require('log4js');
+  _log4js = function () {
+    return data;
+  };
+
+  return data;
 }
 
-var _nuclideAnalytics;
+function _nuclideAnalytics() {
+  const data = require("../../../modules/nuclide-analytics");
 
-function _load_nuclideAnalytics() {
-  return _nuclideAnalytics = require('../../nuclide-analytics');
+  _nuclideAnalytics = function () {
+    return data;
+  };
+
+  return data;
 }
 
-var _nuclideMarshalersCommon;
+function _nuclideMarshalersCommon() {
+  const data = require("../../nuclide-marshalers-common");
 
-function _load_nuclideMarshalersCommon() {
-  return _nuclideMarshalersCommon = require('../../nuclide-marshalers-common');
+  _nuclideMarshalersCommon = function () {
+    return data;
+  };
+
+  return data;
 }
 
-var _servicesConfig;
+function _servicesConfig() {
+  const data = _interopRequireDefault(require("../../nuclide-server/lib/servicesConfig"));
 
-function _load_servicesConfig() {
-  return _servicesConfig = _interopRequireDefault(require('../../nuclide-server/lib/servicesConfig'));
+  _servicesConfig = function () {
+    return data;
+  };
+
+  return data;
 }
 
-var _nuclideRpc;
+function _nuclideRpc() {
+  const data = require("../../nuclide-rpc");
 
-function _load_nuclideRpc() {
-  return _nuclideRpc = require('../../nuclide-rpc');
+  _nuclideRpc = function () {
+    return data;
+  };
+
+  return data;
 }
 
-var _nuclideLogging;
+function _nuclideLogging() {
+  const data = require("../../nuclide-logging");
 
-function _load_nuclideLogging() {
-  return _nuclideLogging = require('../../nuclide-logging');
+  _nuclideLogging = function () {
+    return data;
+  };
+
+  return data;
 }
 
-var _IpcTransports;
+function _IpcTransports() {
+  const data = require("./IpcTransports");
 
-function _load_IpcTransports() {
-  return _IpcTransports = require('./IpcTransports');
+  _IpcTransports = function () {
+    return data;
+  };
+
+  return data;
 }
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
@@ -56,27 +84,21 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
  *  strict-local
  * @format
  */
-
-(0, (_nuclideLogging || _load_nuclideLogging()).initializeLogging)();
-
-const logger = (0, (_log4js || _load_log4js()).getLogger)('LocalRpcServer');
-
+(0, _nuclideLogging().initializeLogging)();
+const logger = (0, _log4js().getLogger)('LocalRpcServer');
 process.on('uncaughtException', err => {
   // Log the error and continue the server crash.
   logger.fatal('Uncaught exception in LocalRpcServer', err);
-  (0, (_nuclideLogging || _load_nuclideLogging()).flushLogsAndAbort)();
+  (0, _nuclideLogging().flushLogsAndAbort)();
 });
-
 process.on('unhandledRejection', (error, promise) => {
   logger.error('Unhandled promise rejection in LocalRpcServer', error);
-});
+}); // Make sure that we cleanly exit if the parent (Atom) goes away.
 
-// Make sure that we cleanly exit if the parent (Atom) goes away.
 process.on('disconnect', () => {
   process.exit();
-});
+}); // And when we do exit, make sure that all child processes get cleaned up.
 
-// And when we do exit, make sure that all child processes get cleaned up.
 process.on('exit', () => {
   // $FlowIgnore: Private method.
   process._getActiveHandles().forEach(handle => {
@@ -84,29 +106,35 @@ process.on('exit', () => {
       handle.kill();
     }
   });
-});
+}); // According to https://nodejs.org/api/process.html#process_signal_events,
+// Node.js should ignore SIGPIPE by default.
+// However, we've seen reports in production of users getting SIGPIPE
+// from their LocalRpcServer processes. Let's try to find out why...
 
-// If we started this with --inspect, don't pass that on to the children.
+process.on('SIGPIPE', () => {
+  // Wrap in an Error to get a stack trace.
+  logger.error(Error('Received unexpected SIGPIPE, ignoring...'));
+}); // If we started this with --inspect, don't pass that on to the children.
 // Can be removed once --inspect=0 is usable.
+
 if (process.execArgv.length > 0 && process.execArgv[0].startsWith('--inspect')) {
   process.execArgv.splice(0, 1);
 }
 
-const serviceRegistry = new (_nuclideRpc || _load_nuclideRpc()).ServiceRegistry((_nuclideMarshalersCommon || _load_nuclideMarshalersCommon()).getServerSideMarshalers, (_servicesConfig || _load_servicesConfig()).default);
-const serverTransport = new (_IpcTransports || _load_IpcTransports()).IpcServerTransport();
-(_nuclideRpc || _load_nuclideRpc()).RpcConnection.createServer(serviceRegistry, serverTransport);
+const serviceRegistry = new (_nuclideRpc().ServiceRegistry)(_nuclideMarshalersCommon().getServerSideMarshalers, _servicesConfig().default);
+const serverTransport = new (_IpcTransports().IpcServerTransport)();
+
+_nuclideRpc().RpcConnection.createServer(serviceRegistry, serverTransport);
 
 logger.info('Started local RPC server.');
-
-const HEALTH_INTERVAL = 10 * 60 * 1000;
-
-// Track RPC server memory usage.
+const HEALTH_INTERVAL = 10 * 60 * 1000; // Track RPC server memory usage.
 // $FlowIssue: process.cpuUsage doesn't exist
+
 let lastCpuUsage = process.cpuUsage();
 setInterval(() => {
   // $FlowIssue: process.cpuUsage doesn't exist
   const cpuUsage = process.cpuUsage();
-  (0, (_nuclideAnalytics || _load_nuclideAnalytics()).track)('local-rpc-health', Object.assign({}, process.memoryUsage(), {
+  (0, _nuclideAnalytics().track)('local-rpc-health', Object.assign({}, process.memoryUsage(), {
     // 1) CPU stats are in microseconds. Seconds are more convenient.
     // 2) CPU stats are cumulative, so take the delta. The API is supposed to provide
     //    a diff if given the previous value, but this doesn't work correctly in practice.

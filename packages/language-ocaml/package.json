@@ -1,0 +1,45 @@
+{
+  "_from": "https://www.atom.io/api/packages/language-ocaml/versions/1.9.5/tarball",
+  "_id": "language-ocaml@1.9.5",
+  "_inBundle": false,
+  "_integrity": "sha512-znDWnw6EG49lJtgnvCgpFsMrU0nhLoc4x1h4w8JgqWucNDpDMFYYISDqIvyFcJKHUVU3XMQ3Zwp1fHkdkImoTg==",
+  "_location": "/language-ocaml",
+  "_phantomChildren": {},
+  "_requested": {
+    "type": "remote",
+    "raw": "https://www.atom.io/api/packages/language-ocaml/versions/1.9.5/tarball",
+    "rawSpec": "https://www.atom.io/api/packages/language-ocaml/versions/1.9.5/tarball",
+    "saveSpec": "https://www.atom.io/api/packages/language-ocaml/versions/1.9.5/tarball",
+    "fetchSpec": "https://www.atom.io/api/packages/language-ocaml/versions/1.9.5/tarball"
+  },
+  "_requiredBy": [
+    "#USER",
+    "/"
+  ],
+  "_resolved": "https://www.atom.io/api/packages/language-ocaml/versions/1.9.5/tarball",
+  "_shasum": "4f62193ec75070543e105d674b2cfb9238833192",
+  "_spec": "https://www.atom.io/api/packages/language-ocaml/versions/1.9.5/tarball",
+  "_where": "/private/var/folders/dp/vj05cwss7pz9mjl62ccqzysm0000gp/T/apm-install-dir-1181018-47309-rcm3at.9j02",
+  "bugs": {
+    "url": "https://github.com/toroidal-code/language-ocaml/issues"
+  },
+  "bundleDependencies": false,
+  "dependencies": {},
+  "deprecated": false,
+  "description": "Syntax support for the OCaml language",
+  "devDependencies": {
+    "atom-grammar-test": "^0.6.3"
+  },
+  "engines": {
+    "atom": ">0.50.0"
+  },
+  "homepage": "https://github.com/toroidal-code/language-ocaml#readme",
+  "license": "MIT",
+  "name": "language-ocaml",
+  "private": true,
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/toroidal-code/language-ocaml.git"
+  },
+  "version": "1.9.5"
+}

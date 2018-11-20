@@ -1,18 +1,23 @@
-'use strict';
+"use strict";
 
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
 exports.matchUrl = matchUrl;
+exports.default = void 0;
 
-var _atom = require('atom');
+var _atom = require("atom");
 
-var _electron = require('electron');
+var _electron = require("electron");
 
-var _string;
+function _string() {
+  const data = require("../../../modules/nuclide-commons/string");
 
-function _load_string() {
-  return _string = require('../../../modules/nuclide-commons/string');
+  _string = function () {
+    return data;
+  };
+
+  return data;
 }
 
 /**
@@ -25,16 +30,16 @@ function _load_string() {
  * 
  * @format
  */
+const TRAILING_JUNK_REGEX = /[.,]?$/; // Exported for testing.
 
-const TRAILING_JUNK_REGEX = /[.,]?$/;
-
-// Exported for testing.
 function matchUrl(text) {
-  const match = (_string || _load_string()).URL_REGEX.exec(text);
+  const match = _string().URL_REGEX.exec(text);
+
   if (match == null) {
     return null;
   }
-  (_string || _load_string()).URL_REGEX.lastIndex = 0;
+
+  _string().URL_REGEX.lastIndex = 0;
   return {
     index: match.index,
     url: match[0].replace(TRAILING_JUNK_REGEX, '')
@@ -46,22 +51,28 @@ class HyperclickProviderHelpers {
     // The match is an array that also has an index property, something that
     // Flow does not appear to understand.
     const match = matchUrl(text);
+
     if (match == null) {
       return null;
     }
 
-    const { index, url } = match;
-    const matchLength = url.length;
+    const {
+      index,
+      url
+    } = match;
+    const matchLength = url.length; // Update the range to include only what was matched
 
-    // Update the range to include only what was matched
     const urlRange = new _atom.Range([range.start.row, range.start.column + index], [range.end.row, range.start.column + index + matchLength]);
-
     return {
       range: urlRange,
+
       callback() {
         _electron.shell.openExternal(url);
       }
+
     };
   }
+
 }
+
 exports.default = HyperclickProviderHelpers;

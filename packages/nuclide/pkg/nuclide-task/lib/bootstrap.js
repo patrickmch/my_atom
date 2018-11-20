@@ -1,19 +1,34 @@
-'use strict';
+"use strict";
 
-var _child_process = _interopRequireDefault(require('child_process'));
+var _child_process = _interopRequireDefault(require("child_process"));
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
+/**
+ * Copyright (c) 2015-present, Facebook, Inc.
+ * All rights reserved.
+ *
+ * This source code is licensed under the license found in the LICENSE file in
+ * the root directory of this source tree.
+ *
+ *  strict-local
+ * @format
+ */
 process.on('message', message => {
-  const { id, file, method, args } = message;
+  const {
+    id,
+    file,
+    method,
+    args
+  } = message; // $FlowIgnore
 
-  // $FlowIgnore
   const exports = require(file);
+
   const service = method != null ? exports[method] : exports;
 
   const sendSuccessResponse = result => {
     if (!(process.send != null)) {
-      throw new Error('Invariant violation: "process.send != null"');
+      throw new Error("Invariant violation: \"process.send != null\"");
     }
 
     process.send({
@@ -24,7 +39,7 @@ process.on('message', message => {
 
   const sendErrorResponse = err => {
     if (!(process.send != null && err != null)) {
-      throw new Error('Invariant violation: "process.send != null && err != null"');
+      throw new Error("Invariant violation: \"process.send != null && err != null\"");
     }
 
     process.send({
@@ -34,11 +49,12 @@ process.on('message', message => {
         stack: err.stack || null
       }
     });
-  };
+  }; // Invoke the service.
 
-  // Invoke the service.
+
   let output;
   let error;
+
   try {
     output = service(...(args || []));
   } catch (e) {
@@ -52,23 +68,13 @@ process.on('message', message => {
   } else {
     sendSuccessResponse(output);
   }
-}); /**
-     * Copyright (c) 2015-present, Facebook, Inc.
-     * All rights reserved.
-     *
-     * This source code is licensed under the license found in the LICENSE file in
-     * the root directory of this source tree.
-     *
-     *  strict-local
-     * @format
-     */
-
+});
 process.on('uncaughtException', err => {
   // eslint-disable-next-line no-console
   console.error('uncaughtException:', err);
   process.exit(1);
-});
-// Properly terminate if the parent server crashes.
+}); // Properly terminate if the parent server crashes.
+
 process.on('disconnect', () => {
   process.exit();
 });

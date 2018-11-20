@@ -1,25 +1,21 @@
-'use strict';
+"use strict";
 
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
+exports.default = void 0;
 
-var _electron = require('electron');
+var _electron = require("electron");
 
-var _log4js;
+function _log4js() {
+  const data = require("log4js");
 
-function _load_log4js() {
-  return _log4js = require('log4js');
+  _log4js = function () {
+    return data;
+  };
+
+  return data;
 }
-
-if (!(_electron.remote != null)) {
-  throw new Error('Must be run from renderer');
-}
-
-/**
- * Documented at:
- * https://chromedevtools.github.io/devtools-protocol/tot/Memory/#method-getDOMCounters
- */
 
 /**
  * Copyright (c) 2015-present, Facebook, Inc.
@@ -31,12 +27,22 @@ if (!(_electron.remote != null)) {
  *  strict
  * @format
  */
+if (!(_electron.remote != null)) {
+  throw new Error('Must be run from renderer');
+}
+/**
+ * Documented at:
+ * https://chromedevtools.github.io/devtools-protocol/tot/Memory/#method-getDOMCounters
+ */
 
-exports.default = async function getDOMCounters() {
+
+var getDOMCounters = async function getDOMCounters() {
   const chromeDebugger = _electron.remote.getCurrentWebContents().debugger;
+
   if (chromeDebugger == null) {
     return null;
   }
+
   try {
     chromeDebugger.attach('1.1');
     return await new Promise(resolve => {
@@ -51,7 +57,7 @@ exports.default = async function getDOMCounters() {
             attachedNodes: document.querySelectorAll('*').length
           });
         } else {
-          (0, (_log4js || _load_log4js()).getLogger)().warn('Error from Memory.getDOMCounters', err);
+          (0, _log4js().getLogger)().warn('Error from Memory.getDOMCounters', err);
           resolve(null);
         }
       });
@@ -63,3 +69,5 @@ exports.default = async function getDOMCounters() {
     chromeDebugger.detach();
   }
 };
+
+exports.default = getDOMCounters;

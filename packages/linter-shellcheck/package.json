@@ -2,39 +2,39 @@
   "_args": [
     [
       {
-        "raw": "/private/var/folders/dp/vj05cwss7pz9mjl62ccqzysm0000gp/T/d-118318-61810-122soje.eisylj714i/package.tgz",
+        "raw": "/private/var/folders/dp/vj05cwss7pz9mjl62ccqzysm0000gp/T/d-118724-43437-veh3qm.gcglrqkt9/package.tgz",
         "scope": null,
         "escapedName": null,
         "name": null,
-        "rawSpec": "/private/var/folders/dp/vj05cwss7pz9mjl62ccqzysm0000gp/T/d-118318-61810-122soje.eisylj714i/package.tgz",
-        "spec": "/private/var/folders/dp/vj05cwss7pz9mjl62ccqzysm0000gp/T/d-118318-61810-122soje.eisylj714i/package.tgz",
+        "rawSpec": "/private/var/folders/dp/vj05cwss7pz9mjl62ccqzysm0000gp/T/d-118724-43437-veh3qm.gcglrqkt9/package.tgz",
+        "spec": "/private/var/folders/dp/vj05cwss7pz9mjl62ccqzysm0000gp/T/d-118724-43437-veh3qm.gcglrqkt9/package.tgz",
         "type": "local"
       },
-      "/private/var/folders/dp/vj05cwss7pz9mjl62ccqzysm0000gp/T/apm-install-dir-118318-61810-9h7g12.a1z9wzh0k9"
+      "/private/var/folders/dp/vj05cwss7pz9mjl62ccqzysm0000gp/T/apm-install-dir-118724-43437-djls5f.v18qpeewmi"
     ]
   ],
-  "_from": "../d-118318-61810-122soje.eisylj714i/package.tgz",
-  "_id": "linter-shellcheck@1.4.7",
+  "_from": "../d-118724-43437-veh3qm.gcglrqkt9/package.tgz",
+  "_id": "linter-shellcheck@1.5.0",
   "_inCache": true,
   "_location": "/linter-shellcheck",
   "_phantomChildren": {},
   "_requested": {
-    "raw": "/private/var/folders/dp/vj05cwss7pz9mjl62ccqzysm0000gp/T/d-118318-61810-122soje.eisylj714i/package.tgz",
+    "raw": "/private/var/folders/dp/vj05cwss7pz9mjl62ccqzysm0000gp/T/d-118724-43437-veh3qm.gcglrqkt9/package.tgz",
     "scope": null,
     "escapedName": null,
     "name": null,
-    "rawSpec": "/private/var/folders/dp/vj05cwss7pz9mjl62ccqzysm0000gp/T/d-118318-61810-122soje.eisylj714i/package.tgz",
-    "spec": "/private/var/folders/dp/vj05cwss7pz9mjl62ccqzysm0000gp/T/d-118318-61810-122soje.eisylj714i/package.tgz",
+    "rawSpec": "/private/var/folders/dp/vj05cwss7pz9mjl62ccqzysm0000gp/T/d-118724-43437-veh3qm.gcglrqkt9/package.tgz",
+    "spec": "/private/var/folders/dp/vj05cwss7pz9mjl62ccqzysm0000gp/T/d-118724-43437-veh3qm.gcglrqkt9/package.tgz",
     "type": "local"
   },
   "_requiredBy": [
     "#USER"
   ],
-  "_resolved": "file:../d-118318-61810-122soje.eisylj714i/package.tgz",
-  "_shasum": "d48765b1764972581447229eac501a99053415b7",
+  "_resolved": "file:../d-118724-43437-veh3qm.gcglrqkt9/package.tgz",
+  "_shasum": "4983003b6d9be500217ff37e093fdad36c36e59b",
   "_shrinkwrap": null,
-  "_spec": "/private/var/folders/dp/vj05cwss7pz9mjl62ccqzysm0000gp/T/d-118318-61810-122soje.eisylj714i/package.tgz",
-  "_where": "/private/var/folders/dp/vj05cwss7pz9mjl62ccqzysm0000gp/T/apm-install-dir-118318-61810-9h7g12.a1z9wzh0k9",
+  "_spec": "/private/var/folders/dp/vj05cwss7pz9mjl62ccqzysm0000gp/T/d-118724-43437-veh3qm.gcglrqkt9/package.tgz",
+  "_where": "/private/var/folders/dp/vj05cwss7pz9mjl62ccqzysm0000gp/T/apm-install-dir-118724-43437-djls5f.v18qpeewmi",
   "activationHooks": [
     "language-shellscript:grammar-used"
   ],
@@ -56,6 +56,12 @@
     "enableNotice": {
       "type": "boolean",
       "title": "Enable Notice Messages",
+      "default": false
+    },
+    "useProjectCwd": {
+      "type": "boolean",
+      "title": "Run ShellCheck relative to Project Root",
+      "description": "Enable to run ShellCheck using the project root as its working directory; causes ShellCheck to interpret `source=` paths relative to the project root.  Disable to keep `source=` paths relative to the file.",
       "default": false
     }
   },
@@ -109,7 +115,7 @@
       }
     }
   },
-  "readme": "# linter-shellcheck\n\nThis linter plugin for [Linter][linter] provides an interface to\n[shellcheck][shellcheck]. It will be used with files that have the \"Shell\"\nsyntax.\n\n## Installation\n\nLinter package must be installed in order to use this plugin. If Linter is not\ninstalled, please follow the instructions [here][linter].\n\n### `shellcheck` installation\n\nBefore using this plugin, you must ensure that `shellcheck` is installed on\nyour system. To install `shellcheck`, follow the guide on\n[shellcheck github][shellcheck]\n\n### Plugin installation\n\n```ShellSession\napm install linter-shellcheck\n```\n\n## Settings\n\nYou can configure linter-shellcheck through Atom's Settings menu. If you\ninstead prefer editing the configuration by hand you can get to that by editing\n`~/.atom/config.cson` (choose Open Your Config in Atom menu). The settings\navailable are:\n\n*   `shellcheckExecutablePath`: The full path to the `shellcheck` executable.\nRun `which shellcheck` to find where it is installed on your system.\n\n*   `userParameters`: Any additional executable parameters to pass to\n`shellcheck` when linting your files.\n\n[linter]: https://github.com/atom-community/linter \"Linter\"\n[shellcheck]: https://github.com/koalaman/shellcheck \"ShellCheck\"\n",
+  "readme": "# linter-shellcheck\n\nThis linter plugin for [Linter][linter] provides an interface to\n[shellcheck][shellcheck]. It will be used with files that have the \"Shell\"\nsyntax.\n\n## Installation\n\nLinter package must be installed in order to use this plugin. If Linter is not\ninstalled, please follow the instructions [here][linter].\n\n### `shellcheck` installation\n\nBefore using this plugin, you must ensure that `shellcheck` is installed on\nyour system. To install `shellcheck`, follow the guide on\n[shellcheck github][shellcheck]\n\n### Plugin installation\n\n```ShellSession\napm install linter-shellcheck\n```\n\n## Settings\n\nYou can configure linter-shellcheck through Atom's Settings menu. If you\ninstead prefer editing the configuration by hand you can get to that by editing\n`~/.atom/config.cson` (choose Open Your Config in Atom menu). The settings\navailable are:\n\n-   `shellcheckExecutablePath`: The full path to the `shellcheck` executable.\n    Run `which shellcheck` to find where it is installed on your system.\n\n-   `userParameters`: Any additional executable parameters to pass to\n    `shellcheck` when linting your files.\n\n-   `enableNotice`: Include lesser-importance ShellCheck messages\n    (default: false).\n\n-   `useProjectCwd`: Controls whether the paths used by ShellCheck's\n    [`source=`](https://github.com/koalaman/shellcheck/wiki/Directive#source)\n    directive are relative to the project root or the file (default: false, for\n    file-relative)\n    \n    -   If true, ShellCheck's working directory\n        will be the project's root directory.  Any `source=` directives will be\n        interpreted relative to the project root.\n\n    -   Otherwise, ShellCheck will run relative to the file's directory,\n        making `source=` directives file-relative.\n\n[linter]: https://github.com/atom-community/linter \"Linter\"\n[shellcheck]: https://github.com/koalaman/shellcheck \"ShellCheck\"\n",
   "readmeFilename": "README.md",
   "repository": {
     "type": "git",
@@ -119,5 +125,5 @@
     "lint": "eslint .",
     "test": "apm test"
   },
-  "version": "1.4.7"
+  "version": "1.5.0"
 }

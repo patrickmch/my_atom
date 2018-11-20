@@ -1,65 +1,86 @@
-'use strict';
+"use strict";
 
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.Selectors = undefined;
+exports.Selectors = void 0;
 
-var _nuclideUri;
+var React = _interopRequireWildcard(require("react"));
 
-function _load_nuclideUri() {
-  return _nuclideUri = _interopRequireDefault(require('../../../../modules/nuclide-commons/nuclideUri'));
+function Immutable() {
+  const data = _interopRequireWildcard(require("immutable"));
+
+  Immutable = function () {
+    return data;
+  };
+
+  return data;
 }
 
-var _react = _interopRequireWildcard(require('react'));
+function _nuclideUri() {
+  const data = _interopRequireDefault(require("../../../../modules/nuclide-commons/nuclideUri"));
 
-var _immutable;
+  _nuclideUri = function () {
+    return data;
+  };
 
-function _load_immutable() {
-  return _immutable = _interopRequireWildcard(require('immutable'));
+  return data;
 }
 
-var _Dropdown;
+function _Dropdown() {
+  const data = require("../../../../modules/nuclide-commons-ui/Dropdown");
 
-function _load_Dropdown() {
-  return _Dropdown = require('../../../../modules/nuclide-commons-ui/Dropdown');
+  _Dropdown = function () {
+    return data;
+  };
+
+  return data;
 }
 
-var _Button;
+function _Button() {
+  const data = require("../../../../modules/nuclide-commons-ui/Button");
 
-function _load_Button() {
-  return _Button = require('../../../../modules/nuclide-commons-ui/Button');
+  _Button = function () {
+    return data;
+  };
+
+  return data;
 }
 
-var _ButtonGroup;
+function _ButtonGroup() {
+  const data = require("../../../../modules/nuclide-commons-ui/ButtonGroup");
 
-function _load_ButtonGroup() {
-  return _ButtonGroup = require('../../../../modules/nuclide-commons-ui/ButtonGroup');
+  _ButtonGroup = function () {
+    return data;
+  };
+
+  return data;
 }
-
-function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-const FB_HOST_SUFFIX = '.facebook.com'; /**
-                                         * Copyright (c) 2015-present, Facebook, Inc.
-                                         * All rights reserved.
-                                         *
-                                         * This source code is licensed under the license found in the LICENSE file in
-                                         * the root directory of this source tree.
-                                         *
-                                         * 
-                                         * @format
-                                         */
+function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) { var desc = Object.defineProperty && Object.getOwnPropertyDescriptor ? Object.getOwnPropertyDescriptor(obj, key) : {}; if (desc.get || desc.set) { Object.defineProperty(newObj, key, desc); } else { newObj[key] = obj[key]; } } } } newObj.default = obj; return newObj; } }
 
-class Selectors extends _react.Component {
+/**
+ * Copyright (c) 2015-present, Facebook, Inc.
+ * All rights reserved.
+ *
+ * This source code is licensed under the license found in the LICENSE file in
+ * the root directory of this source tree.
+ *
+ * 
+ * @format
+ */
+class Selectors extends React.Component {
   constructor(...args) {
     var _temp;
 
     return _temp = super(...args), this._getHostSelectorNodes = () => {
       return this.props.hostSelectorComponents.map(component => {
         const Type = component.type;
-        return _react.createElement(Type, { key: component.key });
+        return React.createElement(Type, {
+          key: component.key
+        });
       });
     }, _temp;
   }
@@ -71,35 +92,31 @@ class Selectors extends _react.Component {
   }
 
   _getLabelForHost(host) {
-    if (host === '') {
-      return 'local';
-    }
-    const hostName = (_nuclideUri || _load_nuclideUri()).default.getHostname(host);
-    return hostName.endsWith(FB_HOST_SUFFIX) ? hostName.substring(0, hostName.length - FB_HOST_SUFFIX.length) : hostName;
+    return host === '' ? 'localhost' : _nuclideUri().default.nuclideUriToDisplayHostname(host);
   }
 
   _getHostOptions() {
     return this.props.hosts.map(host => {
-      return { value: host, label: this._getLabelForHost(host) };
+      return {
+        value: host,
+        label: this._getLabelForHost(host)
+      };
     });
   }
 
   _getTypesButtons() {
     return this.props.deviceTypes.map(deviceType => {
       if (deviceType === this.props.deviceType) {
-        return _react.createElement(
-          (_Button || _load_Button()).Button,
-          { key: deviceType, buttonType: (_Button || _load_Button()).ButtonTypes.PRIMARY },
-          deviceType
-        );
-      }
-      return _react.createElement(
-        (_Button || _load_Button()).Button,
-        {
+        return React.createElement(_Button().Button, {
           key: deviceType,
-          onClick: () => this._setDeviceType(deviceType) },
-        deviceType
-      );
+          buttonType: _Button().ButtonTypes.PRIMARY
+        }, deviceType);
+      }
+
+      return React.createElement(_Button().Button, {
+        key: deviceType,
+        onClick: () => this._setDeviceType(deviceType)
+      }, deviceType);
     });
   }
 
@@ -109,28 +126,24 @@ class Selectors extends _react.Component {
   }
 
   _getTypesSelector() {
-    return _react.createElement(
-      (_ButtonGroup || _load_ButtonGroup()).ButtonGroup,
-      { size: (_ButtonGroup || _load_ButtonGroup()).ButtonGroupSizes.SMALL },
-      this._getTypesButtons()
-    );
+    return React.createElement(_ButtonGroup().ButtonGroup, {
+      size: _ButtonGroup().ButtonGroupSizes.SMALL
+    }, this._getTypesButtons());
   }
 
   _getHostSelector() {
-    return _react.createElement(
-      'div',
-      { className: 'nuclide-device-panel-host-selector' },
-      this._getHostSelectorNodes(),
-      _react.createElement((_Dropdown || _load_Dropdown()).Dropdown, {
-        options: this._getHostOptions(),
-        onChange: host => {
-          this.props.setHost(host);
-          this._updateDeviceType();
-        },
-        value: this.props.host,
-        key: 'connection'
-      })
-    );
+    return React.createElement("div", {
+      className: "nuclide-device-panel-host-selector"
+    }, this._getHostSelectorNodes(), React.createElement(_Dropdown().Dropdown, {
+      options: this._getHostOptions(),
+      onChange: host => {
+        this.props.setHost(host);
+
+        this._updateDeviceType();
+      },
+      value: this.props.host,
+      key: "connection"
+    }));
   }
 
   _updateDeviceType() {
@@ -140,12 +153,11 @@ class Selectors extends _react.Component {
   }
 
   render() {
-    return _react.createElement(
-      'div',
-      { className: 'block nuclide-device-panel-navigation-row' },
-      this._getTypesSelector(),
-      this._getHostSelector()
-    );
+    return React.createElement("div", {
+      className: "block nuclide-device-panel-navigation-row"
+    }, this._getTypesSelector(), this._getHostSelector());
   }
+
 }
+
 exports.Selectors = Selectors;

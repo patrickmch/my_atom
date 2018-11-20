@@ -403,69 +403,13 @@ function getTokenizedLineForRow (editor, row) {
   return editor.tokenizedBuffer.tokenizedLineForRow(row)
 }
 
-function getScopesForTokenizedLine (line) {
-  return line.tags.filter(tag => tag < 0 && tag % 2 === -1).map(tag => atom.grammars.scopeForId(tag))
-}
-
-function scanForScopeStart (editor, fromPoint, direction, fn) {
-  fromPoint = Point.fromObject(fromPoint)
-
-  let scanRows, isValidToken
-  if (direction === 'forward') {
-    scanRows = getList(fromPoint.row, editor.getLastBufferRow())
-    isValidToken = ({position}) => position.isGreaterThan(fromPoint)
-  } else if (direction === 'backward') {
-    scanRows = getList(fromPoint.row, 0)
-    isValidToken = ({position}) => position.isLessThan(fromPoint)
-  }
-
-  for (const row of scanRows) {
-    const tokenizedLine = getTokenizedLineForRow(editor, row)
-    if (!tokenizedLine) return
-    let column = 0
-    let results = []
-
-    const tokenIterator = tokenizedLine.getTokenIterator()
-    for (const tag of tokenizedLine.tags) {
-      tokenIterator.next()
-      if (tag >= 0) {
-        // Positive: tag is char length
-        column += tag
-        continue
-      }
-
-      // Negative: start/stop token
-      if (tag % 2 !== 0) {
-        // Odd = scope start (Even = scope stop)
-        results.push({
-          scope: atom.grammars.scopeForId(tag),
-          position: new Point(row, column)
-        })
-      }
-    }
-
-    results = results.filter(isValidToken)
-    if (direction === 'backward') results.reverse()
-
-    let continueScan = true
-    const stop = () => (continueScan = false)
-    for (const result of results) {
-      fn(result, stop)
-      if (!continueScan) return
-    }
-    if (!continueScan) return
-  }
-}
-
-function detectScopeStartPositionForScope (editor, fromPoint, direction, scopeToSearch) {
-  let point = null
-  scanForScopeStart(editor, fromPoint, direction, ({scope, position}, stop) => {
-    if (scope.search(scopeToSearch) >= 0) {
-      point = position
-      stop()
-    }
-  })
-  return point
+function getStartingScopesForTokenizedLine (line) {
+  // Positive integers: Represent tokens with that length
+  // Negative integers: Indicate open/close tags. Odd = start(number can be conveted to scope name), Even = stop.
+  // Filter negative and odd number which indicates start tag.
+  const startTags = line.tags.filter(tag => tag < 0 && tag % 2 === -1)
+  const startingScopes = startTags.map(tag => atom.grammars.scopeForId(tag))
+  return startingScopes
 }
 
 function isIncludeFunctionScopeForRow (editor, row) {
@@ -474,7 +418,7 @@ function isIncludeFunctionScopeForRow (editor, row) {
   // So tokenizedLine is not accessible even if valid row.
   // In that case I simply return empty Array.
   const tokenizedLine = getTokenizedLineForRow(editor, row)
-  return tokenizedLine && getScopesForTokenizedLine(tokenizedLine).some(scope => isFunctionScope(editor, scope))
+  return tokenizedLine && getStartingScopesForTokenizedLine(tokenizedLine).some(scope => isFunctionScope(editor, scope))
 }
 
 // [FIXME] very rough state, need improvement.
@@ -497,6 +441,73 @@ function isFunctionScope (editor, scope) {
     default:
       return match(scope, 'meta.function.', 'meta.class.')
   }
+}
+
+// Determine if TreeSitter's SyntaxNode is function-like node.
+// Parsed "type" field is unieque to each grammar, so need to add more grammars here.
+const FunctionTypesByGrammar = {
+  'source.go': ['function_declaration'],
+  'source.js': ['function', 'method_definition', 'class'],
+  'source.jsx': ['function', 'method_definition', 'class'],
+  'source.flow': ['function', 'method_definition', 'class'],
+  'source.ts': ['function', 'method_definition', 'class', 'abstract_class'],
+  'source.python': ['function_definition', 'class_definition'],
+  'source.shell': ['function_definition'],
+  'source.ruby': ['method', 'class', 'module'],
+  'source.c': ['function_definition', 'preproc_function_def'],
+  'source.cpp': ['function_definition', 'preproc_function_def', 'class_specifier']
+}
+
+function findParentNodeForFunctionType (editor, node, where = () => true) {
+  const types = FunctionTypesByGrammar[editor.getGrammar().scopeName]
+  if (types) {
+    return findClosestNodeByType(node, types, where)
+  }
+}
+
+function findClosestNodeByType (node, types, where) {
+  while (node) {
+    if (node.isNamed && types.some(type => node.type === type) && where(node)) {
+      return node
+    }
+
+    if (node.parent) {
+      node = node.parent
+    } else {
+      break
+    }
+  }
+}
+
+function findFunctionBodyNode (editor, node) {
+  const findChild = childType => node.namedChildren.find(node => node.type === childType)
+  let bodyNode
+
+  switch (editor.getGrammar().scopeName) {
+    case 'source.js':
+    case 'source.jsx':
+    case 'source.ts':
+      if (node.type === 'function') {
+        bodyNode = findChild('statement_block')
+      }
+      break
+    case 'source.c':
+    case 'source.cpp':
+    case 'source.shell':
+      if (node.type === 'function_definition') {
+        bodyNode = findChild('compound_statement')
+      }
+      break
+    case 'source.python':
+      if (node.type === 'function_definition') {
+        const parameterNode = findChild('parameters')
+        bodyNode = {
+          range: new Range(parameterNode.range.end, node.lastChild.range.end)
+        }
+      }
+      break
+  }
+  return bodyNode
 }
 
 // Scroll to bufferPosition with minimum amount to keep original visible area.
@@ -1259,6 +1270,10 @@ function changeCharOrder (text, action) {
   return changeArrayOrder(text.split(''), action).join('')
 }
 
+function isUsingTreeSitter (editor) {
+  return !!editor.languageMode.tree
+}
+
 module.exports = {
   assertWithException,
   getLast,
@@ -1304,8 +1319,9 @@ module.exports = {
   getFirstCharacterPositionForBufferRow,
   getScreenPositionForScreenRow,
   isIncludeFunctionScopeForRow,
-  detectScopeStartPositionForScope,
   getRows,
+  findParentNodeForFunctionType,
+  findFunctionBodyNode,
   smartScrollToBufferPosition,
   matchScopes,
   isSingleLineText,
@@ -1361,5 +1377,6 @@ module.exports = {
   getHunkRangeAtBufferRow,
   replaceTextInRangeViaDiff,
   changeCharOrder,
-  changeArrayOrder
+  changeArrayOrder,
+  isUsingTreeSitter
 }

@@ -1,22 +1,31 @@
-'use strict';
+"use strict";
 
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
+exports.default = void 0;
 
-var _immutable;
+function Immutable() {
+  const data = _interopRequireWildcard(require("immutable"));
 
-function _load_immutable() {
-  return _immutable = _interopRequireWildcard(require('immutable'));
+  Immutable = function () {
+    return data;
+  };
+
+  return data;
 }
 
-var _LazyTreeNode;
+function _LazyTreeNode() {
+  const data = require("../../../nuclide-ui/LazyTreeNode");
 
-function _load_LazyTreeNode() {
-  return _LazyTreeNode = require('../../../nuclide-ui/LazyTreeNode');
+  _LazyTreeNode = function () {
+    return data;
+  };
+
+  return data;
 }
 
-function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
+function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) { var desc = Object.defineProperty && Object.getOwnPropertyDescriptor ? Object.getOwnPropertyDescriptor(obj, key) : {}; if (desc.get || desc.set) { Object.defineProperty(newObj, key, desc); } else { newObj[key] = obj[key]; } } } } newObj.default = obj; return newObj; } }
 
 /**
  * Copyright (c) 2015-present, Facebook, Inc.
@@ -28,14 +37,15 @@ function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj;
  * 
  * @format
  */
-
-class TestClassTreeNode extends (_LazyTreeNode || _load_LazyTreeNode()).LazyTreeNode {
+class TestClassTreeNode extends _LazyTreeNode().LazyTreeNode {
   constructor(testClass) {
-    super(testClass, null, true, async () => (_immutable || _load_immutable()).List.of());
+    super(testClass, null, true, async () => Immutable().List.of());
   }
 
   getLabel() {
     return this.getItem().name;
   }
+
 }
+
 exports.default = TestClassTreeNode;

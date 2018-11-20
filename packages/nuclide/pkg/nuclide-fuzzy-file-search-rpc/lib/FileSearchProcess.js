@@ -1,4 +1,4 @@
-'use strict';
+"use strict";
 
 Object.defineProperty(exports, "__esModule", {
   value: true
@@ -7,28 +7,44 @@ exports.fileSearchForDirectory = fileSearchForDirectory;
 exports.getExistingSearchDirectories = getExistingSearchDirectories;
 exports.disposeSearchForDirectory = disposeSearchForDirectory;
 
-var _log4js;
+function _log4js() {
+  const data = require("log4js");
 
-function _load_log4js() {
-  return _log4js = require('log4js');
+  _log4js = function () {
+    return data;
+  };
+
+  return data;
 }
 
-var _collection;
+function _collection() {
+  const data = require("../../../modules/nuclide-commons/collection");
 
-function _load_collection() {
-  return _collection = require('../../../modules/nuclide-commons/collection');
+  _collection = function () {
+    return data;
+  };
+
+  return data;
 }
 
-var _fsPromise;
+function _fsPromise() {
+  const data = _interopRequireDefault(require("../../../modules/nuclide-commons/fsPromise"));
 
-function _load_fsPromise() {
-  return _fsPromise = _interopRequireDefault(require('../../../modules/nuclide-commons/fsPromise'));
+  _fsPromise = function () {
+    return data;
+  };
+
+  return data;
 }
 
-var _nuclideTask;
+function _nuclideTask() {
+  const data = _interopRequireDefault(require("../../nuclide-task"));
 
-function _load_nuclideTask() {
-  return _nuclideTask = _interopRequireDefault(require('../../nuclide-task'));
+  _nuclideTask = function () {
+    return data;
+  };
+
+  return data;
 }
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
@@ -43,22 +59,20 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
  *  strict-local
  * @format
  */
-
-const logger = (0, (_log4js || _load_log4js()).getLogger)('nuclide-fuzzy-file-search-rpc');
-
+const logger = (0, _log4js().getLogger)('nuclide-fuzzy-file-search-rpc');
 /**
  * This is an object that lives in the main process that delegates calls to the
  * FileSearch in the forked process.
  */
-class FileSearchProcess {
 
+class FileSearchProcess {
   constructor(directory, ignoredNames) {
     this._directory = directory;
     this._ignoredNames = ignoredNames;
   }
 
   async initialize() {
-    const task = new (_nuclideTask || _load_nuclideTask()).default('FileSearchProcess');
+    const task = new (_nuclideTask().default)('FileSearchProcess');
     this._task = task;
     task.onError(buffer => {
       logger.error('File search process crashed with message:', buffer.toString());
@@ -68,7 +82,7 @@ class FileSearchProcess {
 
     try {
       await task.invokeRemoteMethod({
-        file: require.resolve('./process/FileSearch'),
+        file: require.resolve("./process/FileSearch"),
         method: 'initFileSearchForDirectory',
         args: [this._directory, this._ignoredNames]
       });
@@ -80,11 +94,13 @@ class FileSearchProcess {
 
   async query(query, options) {
     const task = this._task;
+
     if (task == null) {
       throw new Error('Task has been disposed');
     }
+
     return task.invokeRemoteMethod({
-      file: require.resolve('./process/FileSearch'),
+      file: require.resolve("./process/FileSearch"),
       method: 'doSearch',
       args: [this._directory, query, options]
     });
@@ -97,21 +113,26 @@ class FileSearchProcess {
   dispose() {
     if (this._task != null) {
       delete processForDirectory[this._directory];
+
       this._task.dispose();
+
       this._task = null;
     }
   }
+
 }
 
 const processForDirectory = {};
 
 async function newFileSearch(directory, ignoredNames) {
-  const exists = await (_fsPromise || _load_fsPromise()).default.exists(directory);
+  const exists = await _fsPromise().default.exists(directory);
+
   if (!exists) {
     throw new Error('Could not find directory to search : ' + directory);
   }
 
-  const stat = await (_fsPromise || _load_fsPromise()).default.stat(directory);
+  const stat = await _fsPromise().default.stat(directory);
+
   if (!stat.isDirectory()) {
     throw new Error('Provided path is not a directory : ' + directory);
   }
@@ -123,12 +144,15 @@ async function newFileSearch(directory, ignoredNames) {
 
 async function fileSearchForDirectory(directory, ignoredNames) {
   const cached = processForDirectory[directory];
+
   if (cached != null) {
     const fileSearch = await cached;
-    if ((0, (_collection || _load_collection()).arrayEqual)(fileSearch.getIgnoredNames(), ignoredNames)) {
+
+    if ((0, _collection().arrayEqual)(fileSearch.getIgnoredNames(), ignoredNames)) {
       return fileSearch;
-    }
-    // In case of a mismatch, dispose and recreate the searcher task.
+    } // In case of a mismatch, dispose and recreate the searcher task.
+
+
     fileSearch.dispose();
   }
 
@@ -147,6 +171,7 @@ function getExistingSearchDirectories() {
 
 async function disposeSearchForDirectory(directory) {
   const cached = processForDirectory[directory];
+
   if (cached != null) {
     const search = await cached;
     search.dispose();

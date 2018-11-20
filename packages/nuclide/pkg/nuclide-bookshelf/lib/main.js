@@ -1,129 +1,182 @@
-'use strict';
+"use strict";
 
-var _accumulateState;
+function _accumulateState() {
+  const data = require("./accumulateState");
 
-function _load_accumulateState() {
-  return _accumulateState = require('./accumulateState');
+  _accumulateState = function () {
+    return data;
+  };
+
+  return data;
 }
 
-var _constants;
+function _constants() {
+  const data = require("./constants");
 
-function _load_constants() {
-  return _constants = require('./constants');
+  _constants = function () {
+    return data;
+  };
+
+  return data;
 }
 
-var _applyActionMiddleware;
+function _applyActionMiddleware() {
+  const data = require("./applyActionMiddleware");
 
-function _load_applyActionMiddleware() {
-  return _applyActionMiddleware = require('./applyActionMiddleware');
+  _applyActionMiddleware = function () {
+    return data;
+  };
+
+  return data;
 }
 
-var _rxjsBundlesRxMinJs = require('rxjs/bundles/Rx.min.js');
+var _rxjsCompatUmdMin = require("rxjs-compat/bundles/rxjs-compat.umd.min.js");
 
-var _Commands;
+function _Commands() {
+  const data = require("./Commands");
 
-function _load_Commands() {
-  return _Commands = require('./Commands');
+  _Commands = function () {
+    return data;
+  };
+
+  return data;
 }
 
-var _createPackage;
+function _createPackage() {
+  const data = _interopRequireDefault(require("../../../modules/nuclide-commons-atom/createPackage"));
 
-function _load_createPackage() {
-  return _createPackage = _interopRequireDefault(require('../../../modules/nuclide-commons-atom/createPackage'));
+  _createPackage = function () {
+    return data;
+  };
+
+  return data;
 }
 
-var _utils;
+function _utils() {
+  const data = require("./utils");
 
-function _load_utils() {
-  return _utils = require('./utils');
+  _utils = function () {
+    return data;
+  };
+
+  return data;
 }
 
-var _nuclideVcsBase;
+function _nuclideVcsBase() {
+  const data = require("../../nuclide-vcs-base");
 
-function _load_nuclideVcsBase() {
-  return _nuclideVcsBase = require('../../nuclide-vcs-base');
+  _nuclideVcsBase = function () {
+    return data;
+  };
+
+  return data;
 }
 
-var _log4js;
+function _log4js() {
+  const data = require("log4js");
 
-function _load_log4js() {
-  return _log4js = require('log4js');
+  _log4js = function () {
+    return data;
+  };
+
+  return data;
 }
 
-var _featureConfig;
+function _featureConfig() {
+  const data = _interopRequireDefault(require("../../../modules/nuclide-commons-atom/feature-config"));
 
-function _load_featureConfig() {
-  return _featureConfig = _interopRequireDefault(require('../../../modules/nuclide-commons-atom/feature-config'));
+  _featureConfig = function () {
+    return data;
+  };
+
+  return data;
 }
 
-var _UniversalDisposable;
+function _UniversalDisposable() {
+  const data = _interopRequireDefault(require("../../../modules/nuclide-commons/UniversalDisposable"));
 
-function _load_UniversalDisposable() {
-  return _UniversalDisposable = _interopRequireDefault(require('../../../modules/nuclide-commons/UniversalDisposable'));
+  _UniversalDisposable = function () {
+    return data;
+  };
+
+  return data;
 }
 
-var _event;
+function _event() {
+  const data = require("../../../modules/nuclide-commons/event");
 
-function _load_event() {
-  return _event = require('../../../modules/nuclide-commons/event');
+  _event = function () {
+    return data;
+  };
+
+  return data;
 }
 
-var _nuclideAnalytics;
+function _nuclideAnalytics() {
+  const data = require("../../../modules/nuclide-analytics");
 
-function _load_nuclideAnalytics() {
-  return _nuclideAnalytics = require('../../nuclide-analytics');
+  _nuclideAnalytics = function () {
+    return data;
+  };
+
+  return data;
 }
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
+/**
+ * Copyright (c) 2015-present, Facebook, Inc.
+ * All rights reserved.
+ *
+ * This source code is licensed under the license found in the LICENSE file in
+ * the root directory of this source tree.
+ *
+ *  strict-local
+ * @format
+ */
 function createStateStream(actions, initialState) {
-  const states = new _rxjsBundlesRxMinJs.BehaviorSubject(initialState);
-  actions.scan((_accumulateState || _load_accumulateState()).accumulateState, initialState).catch(error => {
-    (0, (_log4js || _load_log4js()).getLogger)('nuclide-bookshelf').fatal('bookshelf middleware got broken', error);
+  const states = new _rxjsCompatUmdMin.BehaviorSubject(initialState); // eslint-disable-next-line nuclide-internal/unused-subscription
+
+  actions.scan(_accumulateState().accumulateState, initialState).catch(error => {
+    (0, _log4js().getLogger)('nuclide-bookshelf').fatal('bookshelf middleware got broken', error);
     atom.notifications.addError('Nuclide bookshelf broke, please report a bug to help us fix it!');
-    return _rxjsBundlesRxMinJs.Observable.empty();
+    return _rxjsCompatUmdMin.Observable.empty();
   }).subscribe(states);
   return states;
-} /**
-   * Copyright (c) 2015-present, Facebook, Inc.
-   * All rights reserved.
-   *
-   * This source code is licensed under the license found in the LICENSE file in
-   * the root directory of this source tree.
-   *
-   *  strict-local
-   * @format
-   */
+}
 
 class Activation {
-
   constructor(state) {
     let initialState;
+
     try {
-      initialState = (0, (_utils || _load_utils()).deserializeBookShelfState)(state);
+      initialState = (0, _utils().deserializeBookShelfState)(state);
     } catch (error) {
-      (0, (_log4js || _load_log4js()).getLogger)('nuclide-bookshelf').error('failed to deserialize nuclide-bookshelf state', state, error);
-      initialState = (0, (_utils || _load_utils()).getEmptBookShelfState)();
+      (0, _log4js().getLogger)('nuclide-bookshelf').error('failed to deserialize nuclide-bookshelf state', state, error);
+      initialState = (0, _utils().getEmptBookShelfState)();
     }
 
-    const actions = new _rxjsBundlesRxMinJs.Subject();
-    const states = this._states = createStateStream((0, (_applyActionMiddleware || _load_applyActionMiddleware()).applyActionMiddleware)(actions, () => this._states.getValue()), initialState);
+    const actions = new _rxjsCompatUmdMin.Subject();
+    const states = this._states = createStateStream((0, _applyActionMiddleware().applyActionMiddleware)(actions, () => this._states.getValue()), initialState);
 
     const dispatch = action => {
       actions.next(action);
     };
-    const commands = new (_Commands || _load_Commands()).Commands(dispatch, () => states.getValue());
 
-    const addedRepoSubscription = (0, (_nuclideVcsBase || _load_nuclideVcsBase()).getHgRepositoryStream)().subscribe(repository => {
+    const commands = new (_Commands().Commands)(dispatch, () => states.getValue());
+    const addedRepoSubscription = (0, _nuclideVcsBase().getHgRepositoryStream)().subscribe(repository => {
       // $FlowFixMe wrong repository type
       commands.addProjectRepository(repository);
     });
 
-    const paneStateChangeSubscription = _rxjsBundlesRxMinJs.Observable.merge((0, (_event || _load_event()).observableFromSubscribeFunction)(atom.workspace.onDidAddPaneItem.bind(atom.workspace)), (0, (_event || _load_event()).observableFromSubscribeFunction)(atom.workspace.onDidDestroyPaneItem.bind(atom.workspace))).subscribe(() => {
+    const paneStateChangeSubscription = _rxjsCompatUmdMin.Observable.merge((0, _event().observableFromSubscribeFunction)(atom.workspace.onDidAddPaneItem.bind(atom.workspace)), (0, _event().observableFromSubscribeFunction)(atom.workspace.onDidDestroyPaneItem.bind(atom.workspace))).subscribe(() => {
       commands.updatePaneItemState();
     });
 
-    const shortHeadChangeSubscription = (0, (_utils || _load_utils()).getShortHeadChangesFromStateStream)(states).switchMap(({ repositoryPath, activeShortHead }) => {
+    const shortHeadChangeSubscription = (0, _utils().getShortHeadChangesFromStateStream)(states).switchMap(({
+      repositoryPath,
+      activeShortHead
+    }) => {
       const repository = atom.project.getRepositories().filter(repo => {
         return repo != null && repo.getWorkingDirectory() === repositoryPath;
       })[0];
@@ -132,27 +185,28 @@ class Activation {
         throw new Error('shortHead changed on a non-existing repository!');
       }
 
-      switch ((_featureConfig || _load_featureConfig()).default.get((_constants || _load_constants()).ACTIVE_SHORTHEAD_CHANGE_BEHAVIOR_CONFIG)) {
-        case (_constants || _load_constants()).ActiveShortHeadChangeBehavior.ALWAYS_IGNORE:
-          (0, (_nuclideAnalytics || _load_nuclideAnalytics()).track)('bookshelf-always-ignore');
-          return _rxjsBundlesRxMinJs.Observable.empty();
-        case (_constants || _load_constants()).ActiveShortHeadChangeBehavior.ALWAYS_RESTORE:
-          (0, (_nuclideAnalytics || _load_nuclideAnalytics()).track)('bookshelf-always-restore');
-          // The restore needs to wait for the change shorthead state update to complete
+      switch (_featureConfig().default.get(_constants().ACTIVE_SHORTHEAD_CHANGE_BEHAVIOR_CONFIG)) {
+        case _constants().ActiveShortHeadChangeBehavior.ALWAYS_IGNORE:
+          (0, _nuclideAnalytics().track)('bookshelf-always-ignore');
+          return _rxjsCompatUmdMin.Observable.empty();
+
+        case _constants().ActiveShortHeadChangeBehavior.ALWAYS_RESTORE:
+          (0, _nuclideAnalytics().track)('bookshelf-always-restore'); // The restore needs to wait for the change shorthead state update to complete
           // before triggering a cascaded state update when handling the restore action.
           // TODO(most): move away from `nextTick`.
+
           process.nextTick(() => {
             commands.restorePaneItemState(repository, activeShortHead);
           });
-          return _rxjsBundlesRxMinJs.Observable.empty();
+          return _rxjsCompatUmdMin.Observable.empty();
+
         default:
           // Including ActiveShortHeadChangeBehavior.PROMPT_TO_RESTORE
-          (0, (_nuclideAnalytics || _load_nuclideAnalytics()).track)('bookshelf-prompt-restore');
-          return (0, (_utils || _load_utils()).shortHeadChangedNotification)(repository, activeShortHead, commands.restorePaneItemState);
+          (0, _nuclideAnalytics().track)('bookshelf-prompt-restore');
+          return (0, _utils().shortHeadChangedNotification)(repository, activeShortHead, commands.restorePaneItemState);
       }
     }).subscribe();
-
-    this._disposables = new (_UniversalDisposable || _load_UniversalDisposable()).default(actions.complete.bind(actions), addedRepoSubscription, paneStateChangeSubscription, shortHeadChangeSubscription);
+    this._disposables = new (_UniversalDisposable().default)(actions.complete.bind(actions), addedRepoSubscription, paneStateChangeSubscription, shortHeadChangeSubscription);
   }
 
   dispose() {
@@ -161,12 +215,13 @@ class Activation {
 
   serialize() {
     try {
-      return (0, (_utils || _load_utils()).serializeBookShelfState)(this._states.getValue());
+      return (0, _utils().serializeBookShelfState)(this._states.getValue());
     } catch (error) {
-      (0, (_log4js || _load_log4js()).getLogger)('nuclide-bookshelf').error('failed to serialize nuclide-bookshelf state', error);
+      (0, _log4js().getLogger)('nuclide-bookshelf').error('failed to serialize nuclide-bookshelf state', error);
       return null;
     }
   }
+
 }
 
-(0, (_createPackage || _load_createPackage()).default)(module.exports, Activation);
+(0, _createPackage().default)(module.exports, Activation);

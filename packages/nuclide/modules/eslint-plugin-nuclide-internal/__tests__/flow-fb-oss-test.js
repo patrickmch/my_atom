@@ -7,14 +7,12 @@
  * of patent rights can be found in the PATENTS file in the same directory.
  *
  * @noflow
+ * @emails oncall+nuclide
+ * @format
  */
 'use strict';
 
-/* eslint
-  comma-dangle: [1, always-multiline],
-  prefer-object-spread/prefer-object-spread: 0,
-  nuclide-internal/no-commonjs: 0,
-  */
+/* eslint nuclide-internal/no-commonjs: 0 */
 
 const path = require('path');
 const fs = require('fs');
@@ -80,7 +78,8 @@ function testRule() {
         filename: OSS_FILE_PATH_1,
         errors: [
           {
-            message: 'fb-only requires must have a line comment `// $FlowFB` above',
+            message:
+              'fb-only requires must have a line comment `// $FlowFB` above',
             type: 'CallExpression',
           },
         ],
@@ -90,7 +89,8 @@ function testRule() {
         filename: OSS_FILE_PATH_1,
         errors: [
           {
-            message: 'fb-only requires must have a line comment `// $FlowFB` above',
+            message:
+              'fb-only requires must have a line comment `// $FlowFB` above',
             type: 'CallExpression',
           },
         ],

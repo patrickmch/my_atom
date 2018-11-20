@@ -1,4 +1,4 @@
-'use strict';
+"use strict";
 
 Object.defineProperty(exports, "__esModule", {
   value: true
@@ -8,16 +8,24 @@ exports.consumeTypehintProvider = consumeTypehintProvider;
 exports.consumeDatatipService = consumeDatatipService;
 exports.deactivate = deactivate;
 
-var _UniversalDisposable;
+function _UniversalDisposable() {
+  const data = _interopRequireDefault(require("../../../modules/nuclide-commons/UniversalDisposable"));
 
-function _load_UniversalDisposable() {
-  return _UniversalDisposable = _interopRequireDefault(require('../../../modules/nuclide-commons/UniversalDisposable'));
+  _UniversalDisposable = function () {
+    return data;
+  };
+
+  return data;
 }
 
-var _TypeHintManager;
+function _TypeHintManager() {
+  const data = _interopRequireDefault(require("./TypeHintManager"));
 
-function _load_TypeHintManager() {
-  return _TypeHintManager = _interopRequireDefault(require('./TypeHintManager'));
+  _TypeHintManager = function () {
+    return data;
+  };
+
+  return data;
 }
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
@@ -32,36 +40,19 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
  * 
  * @format
  */
-
 const PACKAGE_NAME = 'nuclide-type-hint';
 
 class Activation {
-
   constructor(state) {
-    this._disposables = new (_UniversalDisposable || _load_UniversalDisposable()).default();
-    if (this.typeHintManager == null) {
-      this.typeHintManager = new (_TypeHintManager || _load_TypeHintManager()).default();
-    }
+    this._disposables = new (_UniversalDisposable().default)();
+    this.typeHintManager = new (_TypeHintManager().default)();
   }
 
   consumeTypehintProvider(provider) {
-    if (!this.typeHintManager) {
-      throw new Error('Invariant violation: "this.typeHintManager"');
-    }
-
-    this.typeHintManager.addProvider(provider);
-    return new (_UniversalDisposable || _load_UniversalDisposable()).default(() => {
-      if (this.typeHintManager != null) {
-        this.typeHintManager.removeProvider(provider);
-      }
-    });
+    return this.typeHintManager.addProvider(provider);
   }
 
   consumeDatatipService(service) {
-    if (!this.typeHintManager) {
-      throw new Error('Invariant violation: "this.typeHintManager"');
-    }
-
     const datatip = this.typeHintManager.datatip.bind(this.typeHintManager);
     const datatipProvider = {
       providerName: PACKAGE_NAME,
@@ -69,13 +60,16 @@ class Activation {
       datatip
     };
     const disposable = service.addProvider(datatipProvider);
+
     this._disposables.add(disposable);
+
     return disposable;
   }
 
   dispose() {
     this._disposables.dispose();
   }
+
 }
 
 let activation = null;
@@ -86,7 +80,7 @@ function activate(state) {
 
 function consumeTypehintProvider(provider) {
   if (!activation) {
-    throw new Error('Invariant violation: "activation"');
+    throw new Error("Invariant violation: \"activation\"");
   }
 
   return activation.consumeTypehintProvider(provider);
@@ -94,7 +88,7 @@ function consumeTypehintProvider(provider) {
 
 function consumeDatatipService(service) {
   if (!activation) {
-    throw new Error('Invariant violation: "activation"');
+    throw new Error("Invariant violation: \"activation\"");
   }
 
   return activation.consumeDatatipService(service);

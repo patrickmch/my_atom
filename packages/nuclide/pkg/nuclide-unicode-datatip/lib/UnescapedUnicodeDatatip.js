@@ -1,35 +1,42 @@
-'use strict';
+"use strict";
 
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
+exports.default = void 0;
 
-var _range;
+function _range() {
+  const data = require("../../../modules/nuclide-commons-atom/range");
 
-function _load_range() {
-  return _range = require('../../../modules/nuclide-commons-atom/range');
+  _range = function () {
+    return data;
+  };
+
+  return data;
 }
 
-var _UnescapedUnicodeDatatipComponent;
+function _UnescapedUnicodeDatatipComponent() {
+  const data = _interopRequireDefault(require("./UnescapedUnicodeDatatipComponent"));
 
-function _load_UnescapedUnicodeDatatipComponent() {
-  return _UnescapedUnicodeDatatipComponent = _interopRequireDefault(require('./UnescapedUnicodeDatatipComponent'));
+  _UnescapedUnicodeDatatipComponent = function () {
+    return data;
+  };
+
+  return data;
 }
 
-var _Unicode;
+function _Unicode() {
+  const data = require("./Unicode");
 
-function _load_Unicode() {
-  return _Unicode = require('./Unicode');
+  _Unicode = function () {
+    return data;
+  };
+
+  return data;
 }
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-// Our "word" for the datatip is a contiguous alphanumeric string
-// containing at least one Unicode escape: \uXXXX, \UXXXXXXXX, or
-// \u{XXXX}.
-// TODO(hansonw): Remove the "[u]" workaround: https://github.com/atom/superstring/issues/52
-//
-// eslint-disable-next-line max-len
 /**
  * Copyright (c) 2015-present, Facebook, Inc.
  * All rights reserved.
@@ -40,18 +47,27 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
  *  strict-local
  * @format
  */
-
+// Our "word" for the datatip is a contiguous alphanumeric string
+// containing at least one Unicode escape: \uXXXX, \UXXXXXXXX, or
+// \u{XXXX}.
+// TODO(hansonw): Remove the "[u]" workaround: https://github.com/atom/superstring/issues/52
+//
+// eslint-disable-next-line max-len
 const WORD_REGEX = /[a-zA-Z0-9_-]*(?:\\[u][0-9a-fA-F]{4}|\\U[0-9a-fA-F]{8}|\\[u]{[0-9a-fA-F]{1,8}})+(?:\\[u][0-9a-fA-F]{4}|\\U[0-9a-fA-F]{8}|\\[u]{[0-9a-fA-F]{1,8}}|[a-zA-Z0-9_-])*/g;
 
-exports.default = async function unescapedUnicodeDatatip(editor, position) {
-  const extractedWord = (0, (_range || _load_range()).wordAtPosition)(editor, position, WORD_REGEX);
+var unescapedUnicodeDatatip = async function unescapedUnicodeDatatip(editor, position) {
+  const extractedWord = (0, _range().wordAtPosition)(editor, position, WORD_REGEX);
+
   if (extractedWord == null) {
     return null;
   }
-  const extractedCodePoints = (0, (_Unicode || _load_Unicode()).extractCodePoints)(extractedWord.wordMatch[0]);
-  const codePoints = (0, (_Unicode || _load_Unicode()).decodeSurrogateCodePoints)(extractedCodePoints);
+
+  const extractedCodePoints = (0, _Unicode().extractCodePoints)(extractedWord.wordMatch[0]);
+  const codePoints = (0, _Unicode().decodeSurrogateCodePoints)(extractedCodePoints);
   return {
-    component: (0, (_UnescapedUnicodeDatatipComponent || _load_UnescapedUnicodeDatatipComponent()).default)(codePoints),
+    component: (0, _UnescapedUnicodeDatatipComponent().default)(codePoints),
     range: extractedWord.range
   };
 };
+
+exports.default = unescapedUnicodeDatatip;

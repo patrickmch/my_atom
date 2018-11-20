@@ -1,29 +1,41 @@
-'use strict';
+"use strict";
 
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
 exports.getAdbServiceByNuclideUri = getAdbServiceByNuclideUri;
 
-var _nuclideUri;
+function _nuclideUri() {
+  const data = _interopRequireDefault(require("../../nuclide-commons/nuclideUri"));
 
-function _load_nuclideUri() {
-  return _nuclideUri = _interopRequireDefault(require('../../nuclide-commons/nuclideUri'));
+  _nuclideUri = function () {
+    return data;
+  };
+
+  return data;
 }
 
-var _AdbService;
+function AdbServiceLocal() {
+  const data = _interopRequireWildcard(require("./AdbService"));
 
-function _load_AdbService() {
-  return _AdbService = _interopRequireWildcard(require('./AdbService'));
+  AdbServiceLocal = function () {
+    return data;
+  };
+
+  return data;
 }
 
-var _nullthrows;
+function _nullthrows() {
+  const data = _interopRequireDefault(require("nullthrows"));
 
-function _load_nullthrows() {
-  return _nullthrows = _interopRequireDefault(require('nullthrows'));
+  _nullthrows = function () {
+    return data;
+  };
+
+  return data;
 }
 
-function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
+function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) { var desc = Object.defineProperty && Object.getOwnPropertyDescriptor ? Object.getOwnPropertyDescriptor(obj, key) : {}; if (desc.get || desc.set) { Object.defineProperty(newObj, key, desc); } else { newObj[key] = obj[key]; } } } } newObj.default = obj; return newObj; } }
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -38,17 +50,17 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
  * 
  * @format
  */
-
 let rpcService;
 atom.packages.serviceHub.consume('nuclide-rpc-services', '0.0.0', provider => {
   rpcService = provider;
 });
 
 function getAdbServiceByNuclideUri(uri) {
-  if (!(_nuclideUri || _load_nuclideUri()).default.isRemote(uri)) {
-    return _AdbService || _load_AdbService();
-  }
-  // nuclide-rpc-services should be available at this point.
+  if (rpcService == null && !_nuclideUri().default.isRemote(uri)) {
+    return AdbServiceLocal();
+  } // nuclide-rpc-services should be available at this point.
   // If it isn't, throw an error.
-  return (0, (_nullthrows || _load_nullthrows()).default)(rpcService).getServiceByNuclideUri('AdbService', uri);
+
+
+  return (0, _nullthrows().default)(rpcService).getServiceByNuclideUri('AdbService', uri);
 }

@@ -1,4 +1,4 @@
-'use strict';
+"use strict";
 
 Object.defineProperty(exports, "__esModule", {
   value: true
@@ -7,11 +7,8 @@ exports.f = f;
 exports.f2 = f2;
 exports.f3 = f3;
 exports.g = g;
-let _NonRpcDefinition = exports._NonRpcDefinition = undefined;
+exports._NonRpcDefinition = void 0;
 
-// We should be able to import types from non-rpc compatible files
-// as long as they are not used in the external interface of the file.
-// $FlowIgnore - Ignore the fact that the file doesn't exist.
 /**
  * Copyright (c) 2015-present, Facebook, Inc.
  * All rights reserved.
@@ -22,6 +19,12 @@ let _NonRpcDefinition = exports._NonRpcDefinition = undefined;
  *  strict
  * @format
  */
+// We should be able to import types from non-rpc compatible files
+// as long as they are not used in the external interface of the file.
+// $FlowIgnore - Ignore the fact that the file doesn't exist.
+let _NonRpcDefinition;
+
+exports._NonRpcDefinition = _NonRpcDefinition;
 
 async function f(t) {
   return t;

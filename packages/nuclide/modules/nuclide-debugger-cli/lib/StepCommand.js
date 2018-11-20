@@ -1,13 +1,18 @@
-'use strict';
+"use strict";
 
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
+exports.default = void 0;
 
-var _DebuggerInterface;
+function _DebuggerInterface() {
+  const data = require("./DebuggerInterface");
 
-function _load_DebuggerInterface() {
-  return _DebuggerInterface = require('./DebuggerInterface');
+  _DebuggerInterface = function () {
+    return data;
+  };
+
+  return data;
 }
 
 /**
@@ -21,18 +26,17 @@ function _load_DebuggerInterface() {
  *  strict-local
  * @format
  */
-
 class StepCommand {
-
   constructor(debug) {
     this.name = 'step';
     this.helpText = 'Step into the current line of code.';
-
     this._debugger = debug;
   }
 
   async execute() {
     this._debugger.stepIn();
   }
+
 }
+
 exports.default = StepCommand;

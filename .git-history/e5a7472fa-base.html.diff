@@ -1,0 +1,111 @@
+diff --git a/nols_website/nols_cms/templates/base.html b/nols_website/nols_cms/templates/base.html
+index 72b116af0..0c7db2716 100644
+--- a/nols_website/nols_cms/templates/base.html
++++ b/nols_website/nols_cms/templates/base.html
+@@ -1,105 +1,106 @@
+ {% load cms_tags menu_tags sekizai_tags %}
+ {% load staticfiles %}
+ {% load canonical_url %}
+ 
+ <!doctype html>
+ <html class="no-js" lang="{{ LANGUAGE_CODE }}">
+   <head>
+     <meta charset="utf-8">
+     <meta http-equiv="x-ua-compatible" content="ie=edge">
+     <title>{% block title %}NOLS{% endblock title %}</title>
+     {% block meta_description %}
+       {% page_attribute "meta_description" as meta_description %}
+       {% if meta_description %}
+         <meta name="description" content="{{ meta_description }}">
+       {% endif %}
+     {% endblock meta_description %}
+     <meta name="viewport" content="width=device-width, initial-scale=1">
+     {% include "includes/fb_meta_tags.html" %}
+     {% include "includes/favicons.html" %}
+ 
+     <!-- Start Visual Website Optimizer Asynchronous Code -->
+     <script type='text/javascript'>
+     var _vwo_code=(function(){
+     var account_id=327994,
+     settings_tolerance=2000,
+     library_tolerance=2500,
+     use_existing_jquery=false,
+     /* DO NOT EDIT BELOW THIS LINE */
+     f=false,d=document;return{use_existing_jquery:function(){return use_existing_jquery;},library_tolerance:function(){return library_tolerance;},finish:function(){if(!f){f=true;var a=d.getElementById('_vis_opt_path_hides');if(a)a.parentNode.removeChild(a);}},finished:function(){return f;},load:function(a){var b=d.createElement('script');b.src=a;b.type='text/javascript';b.innerText;b.onerror=function(){_vwo_code.finish();};d.getElementsByTagName('head')[0].appendChild(b);},init:function(){settings_timer=setTimeout('_vwo_code.finish()',settings_tolerance);var a=d.createElement('style'),b='body{opacity:0 !important;filter:alpha(opacity=0) !important;background:none !important;}',h=d.getElementsByTagName('head')[0];a.setAttribute('id','_vis_opt_path_hides');a.setAttribute('type','text/css');if(a.styleSheet)a.styleSheet.cssText=b;else a.appendChild(d.createTextNode(b));h.appendChild(a);this.load('//dev.visualwebsiteoptimizer.com/j.php?a='+account_id+'&u='+encodeURIComponent(d.URL)+'&r='+Math.random());return settings_timer;}};}());_vwo_settings_timer=_vwo_code.init();
+     </script>
+     <!-- End Visual Website Optimizer Asynchronous Code -->
+ 
+     <link rel="stylesheet" type="text/css" href="https://cloud.typography.com/7148714/7857792/css/fonts.css" />
+     <link rel="stylesheet" href="{% static "css/screen.css" %}"/>
+ 
+     {% get_canonical_url as canonical_url %}
+     {% if canonical_url %}
+         <link rel="canonical" href="{{ canonical_url }}"/>
+     {% endif %}
+ 
+     {% block extra_head %}{% endblock extra_head %}
+     {% render_block "css" %}
+   </head>
+ 
+   <body class="cms {% block extra_body_class %}{% endblock extra_body_class %} {% render_block 'extra_body_classes' %}" >
+     {% render_block "extra_fb_js" %}
+     <!--[if lt IE 8]>
+       <p class="browserupgrade">You are using an <strong>outdated</strong> browser. Please <a href="http://browsehappy.com/">upgrade your browser</a> to improve your experience.</p>
+     <![endif]-->
+     {% cms_toolbar %}
+ 
++    {% include "includes/jagged_edge.html" %}
+     <div class="off-canvas-wrapper">
+ 
+       <div class="off-canvas-wrapper-inner" data-off-canvas-wrapper>
+         <div class="off-canvas position-left" id="offCanvas" data-off-canvas>
+ 
+           <div class="off-canvas-menu" data-close-on-click>
+             <ul class="off-canvas__submenu">
+               {% show_menu 0 100 100 100 "includes/offcanvas_menu.html" %}
+             </ul>
+             <ul class="mobile-menu-meta">
+               {% include "includes/menu_meta.html" %}
+             </ul>
+           </div>
+ 
+         </div>
+ 
+         <div class="off-canvas-content off-canvas__content main_content" data-off-canvas-content>
+           {% block extra_body %}{% endblock extra_body %}
+           {% include "includes/navigation.html" %}
+           {% block base_content %}{% endblock base_content %}
+           {% include "includes/footer.html" %}
+         </div>
+ 
+       </div>
+     </div>
+ 
+     <script src="{% static "js/site.bundle.js" %}"></script>
+     <script type="text/javascript">
+       $ = window.jQuery;
+       // Update the portal login information
+       cookie_regex = /(?:(?:^|.*;\s*)portal_session_id_user_info\s*=\s*([^;]*).*$)|^.*$/;
+       var user_info_cookie = document.cookie.replace(cookie_regex, "$1");
+ 
+       if (user_info_cookie) {
+           $('a:contains("Info Request")').hide();
+           $('.login_info-authenticated').show();
+       }
+       else {
+           $('.login_info-anonymous').show();
+       }
+     </script>
+     {% block extra_js %}{% endblock %}
+ 
+     {% render_block "js" %}
+ 
+     <!-- Go to www.addthis.com/dashboard to customize your tools -->
+     <script type="text/javascript" src="//s7.addthis.com/js/300/addthis_widget.js#pubid=nols" async="async"></script>
+ 
+     <!-- Begin google tag manager tracking script -->
+     <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start': new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0], j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src= 'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f); })(window,document,'script','dataLayer','GTM-TBC5F2');</script>
+     <noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-TBC5F2" height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
+     <!-- End google tag manager tracking script -->
+   </body>
+ </html>

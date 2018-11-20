@@ -1,19 +1,14 @@
-'use strict';
+"use strict";
 
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.READFILE_SIZE_LIMIT = undefined;
+exports.READFILE_SIZE_LIMIT = void 0;
 
-var _fs = _interopRequireDefault(require('fs'));
+var _fs = _interopRequireDefault(require("fs"));
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-// Attempting to read large files just crashes node, so just fail.
-// Atom can't handle files of this scale anyway.
-const READFILE_SIZE_LIMIT = exports.READFILE_SIZE_LIMIT = 10 * 1024 * 1024;
-
-// [localName, isFile, isSymbolicLink]
 /**
  * Copyright (c) 2015-present, Facebook, Inc.
  * All rights reserved.
@@ -30,3 +25,8 @@ const READFILE_SIZE_LIMIT = exports.READFILE_SIZE_LIMIT = 10 * 1024 * 1024;
  * the endpoint: http://your.server:your_port/fs/method where method is one of
  * readFile, writeFile, etc.
  */
+// Attempting to read large files just crashes node, so just fail.
+// Atom can't handle files of this scale anyway.
+const READFILE_SIZE_LIMIT = 10 * 1024 * 1024; // [localName, isFile, isSymbolicLink]
+
+exports.READFILE_SIZE_LIMIT = READFILE_SIZE_LIMIT;

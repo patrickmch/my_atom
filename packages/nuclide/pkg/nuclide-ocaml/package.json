@@ -5,7 +5,6 @@
   "description": "Provides support for OCaml in Nuclide",
   "author": "NEEDS OWNER",
   "activationCommands": {},
-  "atomTestRunner": "../../lib/test-runner-entry.js",
   "nuclide": {
     "configMetadata": {
       "pathComponents": [
@@ -59,10 +58,14 @@
         "title": "Enable copy-on-click for code lenses.",
         "type": "boolean",
         "default": true
+      },
+      "codeLensMultiLine": {
+        "title": "Allow code lenses to display on multiple lines.",
+        "type": "boolean",
+        "default": false
       }
     },
-    "packageType": "Atom",
-    "testRunner": "apm"
+    "packageType": "AtomPackage"
   },
   "activationHooks": [
     "language-ocaml:grammar-used",

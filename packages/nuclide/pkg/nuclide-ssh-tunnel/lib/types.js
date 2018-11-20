@@ -1,7 +1,11 @@
-'use strict';
+"use strict";
 
-var _immutable;
+function _immutable() {
+  const data = require("immutable");
 
-function _load_immutable() {
-  return _immutable = require('immutable');
+  _immutable = function () {
+    return data;
+  };
+
+  return data;
 }

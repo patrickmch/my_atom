@@ -1,50 +1,88 @@
-'use strict';
+"use strict";
 
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.CodeActions = undefined;
+exports.CodeActions = void 0;
 
-var _vscodeLanguageserver;
+function _vscodeLanguageserver() {
+  const data = require("vscode-languageserver");
 
-function _load_vscodeLanguageserver() {
-  return _vscodeLanguageserver = require('vscode-languageserver');
+  _vscodeLanguageserver = function () {
+    return data;
+  };
+
+  return data;
 }
 
-var _AutoImportsManager;
+function _constants() {
+  const data = require("./constants");
 
-function _load_AutoImportsManager() {
-  return _AutoImportsManager = require('./lib/AutoImportsManager');
+  _constants = function () {
+    return data;
+  };
+
+  return data;
 }
 
-var _ImportFormatter;
+function _AutoImportsManager() {
+  const data = require("./lib/AutoImportsManager");
 
-function _load_ImportFormatter() {
-  return _ImportFormatter = require('./lib/ImportFormatter');
+  _AutoImportsManager = function () {
+    return data;
+  };
+
+  return data;
 }
 
-var _collection;
+function _ImportFormatter() {
+  const data = require("./lib/ImportFormatter");
 
-function _load_collection() {
-  return _collection = require('../../../modules/nuclide-commons/collection');
+  _ImportFormatter = function () {
+    return data;
+  };
+
+  return data;
 }
 
-var _Diagnostics;
+function _collection() {
+  const data = require("../../../modules/nuclide-commons/collection");
 
-function _load_Diagnostics() {
-  return _Diagnostics = require('./Diagnostics');
+  _collection = function () {
+    return data;
+  };
+
+  return data;
 }
 
-var _util;
+function _Diagnostics() {
+  const data = require("./Diagnostics");
 
-function _load_util() {
-  return _util = require('./utils/util');
+  _Diagnostics = function () {
+    return data;
+  };
+
+  return data;
 }
 
-var _lspUtils;
+function _util() {
+  const data = require("./utils/util");
 
-function _load_lspUtils() {
-  return _lspUtils = require('../../nuclide-lsp-implementation-common/lsp-utils');
+  _util = function () {
+    return data;
+  };
+
+  return data;
+}
+
+function _lspUtils() {
+  const data = require("../../nuclide-lsp-implementation-common/lsp-utils");
+
+  _lspUtils = function () {
+    return data;
+  };
+
+  return data;
 }
 
 /**
@@ -57,48 +95,53 @@ function _load_lspUtils() {
  * 
  * @format
  */
-
 const CODE_ACTIONS_LIMIT = 10;
-const FLOW_DIAGNOSTIC_SOURCE = 'Flow';
+const FLOW_DIAGNOSTIC_SOURCES = ['Flow', 'Flow: InferError'];
 
 class CodeActions {
-
   constructor(autoImportsManager, importFormatter) {
     this.autoImportsManager = autoImportsManager;
     this.importFormatter = importFormatter;
   }
 
   provideCodeActions(diagnostics, fileUri) {
-    return (0, (_collection || _load_collection()).arrayFlatten)(diagnostics.map(diagnostic => diagnosticToCommands(this.autoImportsManager, this.importFormatter, diagnostic, fileUri)));
+    return (0, _collection().arrayFlatten)(diagnostics.map(diagnostic => diagnosticToCommands(this.autoImportsManager, this.importFormatter, diagnostic, fileUri)));
   }
+
 }
 
 exports.CodeActions = CodeActions;
+
 function diagnosticToCommands(autoImportsManager, importFormatter, diagnostic, fileWithDiagnostic) {
-  if (diagnostic.source === (_Diagnostics || _load_Diagnostics()).DIAGNOSTIC_SOURCE || diagnostic.source === FLOW_DIAGNOSTIC_SOURCE) {
-    return (0, (_collection || _load_collection()).arrayFlatten)(autoImportsManager.getSuggestedImportsForRange(fileWithDiagnostic, diagnostic.range).filter(suggestedImport => {
+  if (diagnostic.source === _Diagnostics().DIAGNOSTIC_SOURCE || FLOW_DIAGNOSTIC_SOURCES.includes(diagnostic.source)) {
+    return (0, _collection().arrayFlatten)(autoImportsManager.getSuggestedImportsForRange(fileWithDiagnostic, diagnostic.range).filter(suggestedImport => {
       // For Flow's diagnostics, only fire for missing types (exact match)
-      if (diagnostic.source === FLOW_DIAGNOSTIC_SOURCE) {
+      if (FLOW_DIAGNOSTIC_SOURCES.includes(diagnostic.source)) {
         if (suggestedImport.symbol.type !== 'type') {
           return false;
         }
-        const range = (0, (_util || _load_util()).babelLocationToAtomRange)(suggestedImport.symbol.location);
-        const diagnosticRange = (0, (_lspUtils || _load_lspUtils()).lspRangeToAtomRange)(diagnostic.range);
+
+        const range = (0, _util().babelLocationToAtomRange)(suggestedImport.symbol.location);
+        const diagnosticRange = (0, _lspUtils().lspRangeToAtomRange)(diagnostic.range);
         return range.isEqual(diagnosticRange);
-      }
-      // Otherwise this has to be a value import.
+      } // Otherwise this has to be a value import.
+
+
       return suggestedImport.symbol.type === 'value';
-    })
-    // Create a CodeAction for each file with an export.
+    }) // Create a CodeAction for each file with an export.
     .map(missingImport => missingImport.filesWithExport.map(jsExport => Object.assign({}, jsExport, {
       // Force this to be imported as a type/value depending on the context.
       isTypeExport: missingImport.symbol.type === 'type'
     })))).map(fileWithExport => ({
       fileWithExport,
       importPath: importFormatter.formatImportFile(fileWithDiagnostic, fileWithExport)
-    })).sort((a, b) => (0, (_util || _load_util()).compareForSuggestion)(a.importPath, b.importPath)).slice(0, CODE_ACTIONS_LIMIT).map(({ fileWithExport, importPath }) => {
+    })).sort((a, b) => (0, _util().compareForSuggestion)(a.importPath, b.importPath)).slice(0, CODE_ACTIONS_LIMIT).map(({
+      fileWithExport,
+      importPath
+    }) => {
       const addImportArgs = [fileWithExport, fileWithDiagnostic];
       let verb;
+
       if (fileWithExport.isTypeExport) {
         verb = 'Import type';
       } else if (importFormatter.useRequire) {
@@ -106,12 +149,14 @@ function diagnosticToCommands(autoImportsManager, importFormatter, diagnostic, f
       } else {
         verb = 'Import';
       }
+
       return {
         title: `${verb} from ${importPath}`,
-        command: 'addImport',
+        command: _constants().ADD_IMPORT_COMMAND_ID,
         arguments: addImportArgs
       };
     });
   }
+
   return [];
 }

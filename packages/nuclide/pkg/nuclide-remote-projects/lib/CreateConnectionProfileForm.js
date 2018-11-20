@@ -1,56 +1,85 @@
-'use strict';
+"use strict";
 
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
+exports.default = void 0;
 
-var _AtomInput;
+function _AtomInput() {
+  const data = require("../../../modules/nuclide-commons-ui/AtomInput");
 
-function _load_AtomInput() {
-  return _AtomInput = require('../../../modules/nuclide-commons-ui/AtomInput');
+  _AtomInput = function () {
+    return data;
+  };
+
+  return data;
 }
 
-var _nullthrows;
+function _nullthrows() {
+  const data = _interopRequireDefault(require("nullthrows"));
 
-function _load_nullthrows() {
-  return _nullthrows = _interopRequireDefault(require('nullthrows'));
+  _nullthrows = function () {
+    return data;
+  };
+
+  return data;
 }
 
-var _react = _interopRequireWildcard(require('react'));
+var React = _interopRequireWildcard(require("react"));
 
-var _reactDom = _interopRequireDefault(require('react-dom'));
+var _reactDom = _interopRequireDefault(require("react-dom"));
 
-var _UniversalDisposable;
+function _UniversalDisposable() {
+  const data = _interopRequireDefault(require("../../../modules/nuclide-commons/UniversalDisposable"));
 
-function _load_UniversalDisposable() {
-  return _UniversalDisposable = _interopRequireDefault(require('../../../modules/nuclide-commons/UniversalDisposable'));
+  _UniversalDisposable = function () {
+    return data;
+  };
+
+  return data;
 }
 
-var _ConnectionDetailsForm;
+function _ConnectionDetailsForm() {
+  const data = _interopRequireDefault(require("./ConnectionDetailsForm"));
 
-function _load_ConnectionDetailsForm() {
-  return _ConnectionDetailsForm = _interopRequireDefault(require('./ConnectionDetailsForm'));
+  _ConnectionDetailsForm = function () {
+    return data;
+  };
+
+  return data;
 }
 
-var _formValidationUtils;
+function _formValidationUtils() {
+  const data = require("./form-validation-utils");
 
-function _load_formValidationUtils() {
-  return _formValidationUtils = require('./form-validation-utils');
+  _formValidationUtils = function () {
+    return data;
+  };
+
+  return data;
 }
 
-var _Button;
+function _Button() {
+  const data = require("../../../modules/nuclide-commons-ui/Button");
 
-function _load_Button() {
-  return _Button = require('../../../modules/nuclide-commons-ui/Button');
+  _Button = function () {
+    return data;
+  };
+
+  return data;
 }
 
-var _ButtonGroup;
+function _ButtonGroup() {
+  const data = require("../../../modules/nuclide-commons-ui/ButtonGroup");
 
-function _load_ButtonGroup() {
-  return _ButtonGroup = require('../../../modules/nuclide-commons-ui/ButtonGroup');
+  _ButtonGroup = function () {
+    return data;
+  };
+
+  return data;
 }
 
-function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
+function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) { var desc = Object.defineProperty && Object.getOwnPropertyDescriptor ? Object.getOwnPropertyDescriptor(obj, key) : {}; if (desc.get || desc.set) { Object.defineProperty(newObj, key, desc); } else { newObj[key] = obj[key]; } } } } newObj.default = obj; return newObj; } }
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -64,39 +93,41 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
  * 
  * @format
  */
-
 const PROFILE_NAME_LABEL = 'Profile Name';
 const DEFAULT_SERVER_COMMAND_PLACEHOLDER = '(DEFAULT)';
 
 const emptyFunction = () => {};
-
 /**
  * A form that is used to create a new connection profile.
  */
-class CreateConnectionProfileForm extends _react.Component {
 
+
+class CreateConnectionProfileForm extends React.Component {
   constructor(props) {
     super(props);
 
     this._clickSave = () => {
       // Validate the form inputs.
       const profileName = this._getProfileName();
-      const connectionDetails = (0, (_nullthrows || _load_nullthrows()).default)(this._connectionDetails).getFormFields();
-      const validationResult = (0, (_formValidationUtils || _load_formValidationUtils()).validateFormInputs)(profileName, connectionDetails, DEFAULT_SERVER_COMMAND_PLACEHOLDER);
+
+      const connectionDetails = (0, _nullthrows().default)(this._connectionDetails).getFormFields();
+      const validationResult = (0, _formValidationUtils().validateFormInputs)(profileName, connectionDetails, DEFAULT_SERVER_COMMAND_PLACEHOLDER);
+
       if (typeof validationResult.errorMessage === 'string') {
         atom.notifications.addError(validationResult.errorMessage);
         return;
       }
 
       if (!(validationResult.validatedProfile != null && typeof validationResult.validatedProfile === 'object')) {
-        throw new Error('Invariant violation: "validationResult.validatedProfile != null &&\\n        typeof validationResult.validatedProfile === \'object\'"');
+        throw new Error("Invariant violation: \"validationResult.validatedProfile != null &&\\n        typeof validationResult.validatedProfile === 'object'\"");
       }
 
-      const newProfile = validationResult.validatedProfile;
-      // Save the validated profile, and show any warning messages.
+      const newProfile = validationResult.validatedProfile; // Save the validated profile, and show any warning messages.
+
       if (typeof validationResult.warningMessage === 'string') {
         atom.notifications.addWarning(validationResult.warningMessage);
       }
+
       this.props.onSave(newProfile);
     };
 
@@ -104,92 +135,69 @@ class CreateConnectionProfileForm extends _react.Component {
       this.props.onCancel();
     };
 
-    this.disposables = new (_UniversalDisposable || _load_UniversalDisposable()).default();
+    this.disposables = new (_UniversalDisposable().default)();
   }
 
   componentDidMount() {
     const root = _reactDom.default.findDOMNode(this);
-    this.disposables.add(
-    // Hitting enter when this panel has focus should confirm the dialog.
+
+    this.disposables.add( // Hitting enter when this panel has focus should confirm the dialog.
     // $FlowFixMe
-    atom.commands.add(root, 'core:confirm', this._clickSave),
-    // Hitting escape when this panel has focus should cancel the dialog.
+    atom.commands.add(root, 'core:confirm', this._clickSave), // Hitting escape when this panel has focus should cancel the dialog.
     // $FlowFixMe
     atom.commands.add(root, 'core:cancel', this._clickCancel));
-    (0, (_nullthrows || _load_nullthrows()).default)(this._profileName).focus();
+    (0, _nullthrows().default)(this._profileName).focus();
   }
 
   componentWillUnmount() {
     this.disposables.dispose();
   }
-
   /**
    * Note: This form displays DEFAULT_SERVER_COMMAND_PLACEHOLDER as the prefilled
    * remote server command. The remote server command will only be saved if the
    * user changes it from this default.
    */
+
+
   render() {
     const initialFields = this.props.initialFormFields;
-
-    return _react.createElement(
-      'div',
-      null,
-      _react.createElement(
-        'div',
-        { className: 'form-group' },
-        _react.createElement(
-          'label',
-          null,
-          PROFILE_NAME_LABEL,
-          ':'
-        ),
-        _react.createElement((_AtomInput || _load_AtomInput()).AtomInput, {
-          initialValue: '',
-          ref: input => {
-            this._profileName = input;
-          },
-          unstyled: true
-        })
-      ),
-      _react.createElement((_ConnectionDetailsForm || _load_ConnectionDetailsForm()).default, {
-        initialUsername: initialFields.username,
-        initialServer: initialFields.server,
-        initialCwd: initialFields.cwd,
-        initialRemoteServerCommand:
-        // flowlint-next-line sketchy-null-string:off
-        initialFields.remoteServerCommand || DEFAULT_SERVER_COMMAND_PLACEHOLDER,
-        initialSshPort: initialFields.sshPort,
-        initialPathToPrivateKey: initialFields.pathToPrivateKey,
-        initialAuthMethod: initialFields.authMethod,
-        initialDisplayTitle: initialFields.displayTitle,
-        profileHosts: this.props.profileHosts,
-        onCancel: emptyFunction,
-        onConfirm: this._clickSave,
-        onDidChange: emptyFunction,
-        needsPasswordValue: false,
-        ref: details => {
-          this._connectionDetails = details;
-        }
-      }),
-      _react.createElement(
-        'div',
-        { style: { display: 'flex', justifyContent: 'flex-end' } },
-        _react.createElement(
-          (_ButtonGroup || _load_ButtonGroup()).ButtonGroup,
-          null,
-          _react.createElement(
-            (_Button || _load_Button()).Button,
-            { onClick: this._clickCancel },
-            'Cancel'
-          ),
-          _react.createElement(
-            (_Button || _load_Button()).Button,
-            { buttonType: (_Button || _load_Button()).ButtonTypes.PRIMARY, onClick: this._clickSave },
-            'Save'
-          )
-        )
-      )
-    );
+    return React.createElement("div", null, React.createElement("div", {
+      className: "form-group"
+    }, React.createElement("label", null, PROFILE_NAME_LABEL, ":"), React.createElement(_AtomInput().AtomInput, {
+      initialValue: "",
+      ref: input => {
+        this._profileName = input;
+      },
+      unstyled: true
+    })), React.createElement(_ConnectionDetailsForm().default, {
+      initialUsername: initialFields.username,
+      initialServer: initialFields.server,
+      initialCwd: initialFields.cwd,
+      initialRemoteServerCommand: // flowlint-next-line sketchy-null-string:off
+      initialFields.remoteServerCommand || DEFAULT_SERVER_COMMAND_PLACEHOLDER,
+      initialSshPort: initialFields.sshPort,
+      initialPathToPrivateKey: initialFields.pathToPrivateKey,
+      initialAuthMethod: initialFields.authMethod,
+      initialDisplayTitle: initialFields.displayTitle,
+      profileHosts: this.props.profileHosts,
+      onCancel: emptyFunction,
+      onConfirm: this._clickSave,
+      onDidChange: emptyFunction,
+      needsPasswordValue: false,
+      ref: details => {
+        this._connectionDetails = details;
+      }
+    }), React.createElement("div", {
+      style: {
+        display: 'flex',
+        justifyContent: 'flex-end'
+      }
+    }, React.createElement(_ButtonGroup().ButtonGroup, null, React.createElement(_Button().Button, {
+      onClick: this._clickCancel
+    }, "Cancel"), React.createElement(_Button().Button, {
+      buttonType: _Button().ButtonTypes.PRIMARY,
+      onClick: this._clickSave
+    }, "Save"))));
   }
 
   _getProfileName() {
@@ -197,4 +205,5 @@ class CreateConnectionProfileForm extends _react.Component {
   }
 
 }
+
 exports.default = CreateConnectionProfileForm;

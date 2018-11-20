@@ -1,38 +1,55 @@
-'use strict';
+"use strict";
 
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
+exports.default = void 0;
 
-var _react = _interopRequireWildcard(require('react'));
+var React = _interopRequireWildcard(require("react"));
 
-var _BasicStatsSectionComponent;
+function _BasicStatsSectionComponent() {
+  const data = _interopRequireDefault(require("./sections/BasicStatsSectionComponent"));
 
-function _load_BasicStatsSectionComponent() {
-  return _BasicStatsSectionComponent = _interopRequireDefault(require('./sections/BasicStatsSectionComponent'));
+  _BasicStatsSectionComponent = function () {
+    return data;
+  };
+
+  return data;
 }
 
-var _ActiveHandlesSectionComponent;
+function _ActiveHandlesSectionComponent() {
+  const data = _interopRequireDefault(require("./sections/ActiveHandlesSectionComponent"));
 
-function _load_ActiveHandlesSectionComponent() {
-  return _ActiveHandlesSectionComponent = _interopRequireDefault(require('./sections/ActiveHandlesSectionComponent'));
+  _ActiveHandlesSectionComponent = function () {
+    return data;
+  };
+
+  return data;
 }
 
-var _ChildProcessTreeComponent;
+function _ChildProcessTreeComponent() {
+  const data = _interopRequireDefault(require("./sections/ChildProcessTreeComponent"));
 
-function _load_ChildProcessTreeComponent() {
-  return _ChildProcessTreeComponent = _interopRequireDefault(require('./sections/ChildProcessTreeComponent'));
+  _ChildProcessTreeComponent = function () {
+    return data;
+  };
+
+  return data;
 }
 
-var _CommandsSectionComponent;
+function _CommandsSectionComponent() {
+  const data = _interopRequireDefault(require("./sections/CommandsSectionComponent"));
 
-function _load_CommandsSectionComponent() {
-  return _CommandsSectionComponent = _interopRequireDefault(require('./sections/CommandsSectionComponent'));
+  _CommandsSectionComponent = function () {
+    return data;
+  };
+
+  return data;
 }
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
+function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) { var desc = Object.defineProperty && Object.getOwnPropertyDescriptor ? Object.getOwnPropertyDescriptor(obj, key) : {}; if (desc.get || desc.set) { Object.defineProperty(newObj, key, desc); } else { newObj[key] = obj[key]; } } } } newObj.default = obj; return newObj; } }
 
 /**
  * Copyright (c) 2015-present, Facebook, Inc.
@@ -44,39 +61,27 @@ function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj;
  *  strict-local
  * @format
  */
-
-class HealthPaneItemComponent extends _react.Component {
+class HealthPaneItemComponent extends React.Component {
   render() {
     const sections = {
-      Stats: _react.createElement((_BasicStatsSectionComponent || _load_BasicStatsSectionComponent()).default, this.props),
-      Subprocesses: _react.createElement((_ChildProcessTreeComponent || _load_ChildProcessTreeComponent()).default, {
+      Stats: React.createElement(_BasicStatsSectionComponent().default, this.props),
+      Subprocesses: React.createElement(_ChildProcessTreeComponent().default, {
         childProcessesTree: this.props.childProcessesTree
       }),
-      Handles: _react.createElement((_ActiveHandlesSectionComponent || _load_ActiveHandlesSectionComponent()).default, {
+      Handles: React.createElement(_ActiveHandlesSectionComponent().default, {
         activeHandlesByType: this.props.activeHandlesByType
       }),
-      Commands: _react.createElement((_CommandsSectionComponent || _load_CommandsSectionComponent()).default, null)
-    };
+      Commands: React.createElement(_CommandsSectionComponent().default, null)
+    }; // For each section, we use settings-view to get a familiar look for table cells.
 
-    // For each section, we use settings-view to get a familiar look for table cells.
-    return _react.createElement(
-      'div',
-      null,
-      Object.keys(sections).map((title, s) => _react.createElement(
-        'div',
-        { className: 'nuclide-health-pane-item-section', key: s },
-        _react.createElement(
-          'h2',
-          null,
-          title
-        ),
-        _react.createElement(
-          'div',
-          { className: 'settings-view' },
-          sections[title]
-        )
-      ))
-    );
+    return React.createElement("div", null, Object.keys(sections).map((title, s) => React.createElement("div", {
+      className: "nuclide-health-pane-item-section",
+      key: s
+    }, React.createElement("h2", null, title), React.createElement("div", {
+      className: "settings-view"
+    }, sections[title]))));
   }
+
 }
+
 exports.default = HealthPaneItemComponent;

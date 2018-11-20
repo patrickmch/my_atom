@@ -1,29 +1,35 @@
-'use strict';
+"use strict";
 
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.getPrepackAutoGenConfig = getPrepackAutoGenConfig;
-exports.resolveConfiguration = resolveConfiguration;
 exports.getNativeAutoGenConfig = getNativeAutoGenConfig;
-exports.getNativeVSPLaunchProcessInfo = getNativeVSPLaunchProcessInfo;
-exports.getNativeVSPAttachProcessInfo = getNativeVSPAttachProcessInfo;
+exports.getNativeVSPLaunchProcessConfig = getNativeVSPLaunchProcessConfig;
+exports.getNativeVSPAttachProcessConfig = getNativeVSPAttachProcessConfig;
 
-var _nuclideUri;
+function _nuclideUri() {
+  const data = _interopRequireDefault(require("../../../modules/nuclide-commons/nuclideUri"));
 
-function _load_nuclideUri() {
-  return _nuclideUri = _interopRequireDefault(require('../../../modules/nuclide-commons/nuclideUri'));
+  _nuclideUri = function () {
+    return data;
+  };
+
+  return data;
 }
 
-var _nuclideDebuggerCommon;
+function _nuclideDebuggerCommon() {
+  const data = require("../../../modules/nuclide-debugger-common");
 
-function _load_nuclideDebuggerCommon() {
-  return _nuclideDebuggerCommon = require('../../../modules/nuclide-debugger-common');
+  _nuclideDebuggerCommon = function () {
+    return data;
+  };
+
+  return data;
 }
 
-var _react = _interopRequireWildcard(require('react'));
+var React = _interopRequireWildcard(require("react"));
 
-function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
+function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) { var desc = Object.defineProperty && Object.getOwnPropertyDescriptor ? Object.getOwnPropertyDescriptor(obj, key) : {}; if (desc.get || desc.set) { Object.defineProperty(newObj, key, desc); } else { newObj[key] = obj[key]; } } } } newObj.default = obj; return newObj; } }
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -37,80 +43,17 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
  * 
  * @format
  */
-
-function getPrepackAutoGenConfig() {
-  const fileToPrepack = {
-    name: 'sourceFile',
-    type: 'string',
-    description: 'Input the file you want to Prepack. Use absolute paths.',
-    required: true,
-    visible: true
-  };
-  const prepackRuntimePath = {
-    name: 'prepackRuntime',
-    type: 'string',
-    description: 'Prepack executable path (e.g. lib/prepack-cli.js). Use absolute paths.',
-    required: false,
-    visible: true
-  };
-  const argumentsProperty = {
-    name: 'prepackArguments',
-    type: 'array',
-    itemType: 'string',
-    description: 'Arguments to start Prepack',
-    required: false,
-    defaultValue: '',
-    visible: true
-  };
-
-  const autoGenLaunchConfig = {
-    launch: true,
-    vsAdapterType: (_nuclideDebuggerCommon || _load_nuclideDebuggerCommon()).VsAdapterTypes.PREPACK,
-    threads: false,
-    properties: [fileToPrepack, prepackRuntimePath, argumentsProperty],
-    scriptPropertyName: 'fileToPrepack',
-    scriptExtension: '.js',
-    cwdPropertyName: null,
-    header: null
-  };
-  return {
-    launch: autoGenLaunchConfig,
-    attach: null
-  };
-}
-
-async function lldbVspAdapterWrapperPath(program) {
-  try {
-    // $FlowFB
-    return require('./fb-LldbVspAdapterPath').getLldbVspAdapterPath(program);
-  } catch (ex) {
-    return 'lldb-vscode';
-  }
-}
-
-async function resolveConfiguration(configuration) {
-  const { adapterExecutable, targetUri } = configuration;
-  if (adapterExecutable == null) {
-    throw new Error('Cannot resolve configuration for unset adapterExecutable');
-  }
-
-  adapterExecutable.command = await lldbVspAdapterWrapperPath(targetUri);
-  return Object.assign({}, configuration, {
-    adapterExecutable
-  });
-}
-
 function getNativeAutoGenConfig(vsAdapterType) {
   const program = {
     name: 'program',
-    type: 'string',
+    type: 'path',
     description: 'Input the program/executable you want to launch',
     required: true,
     visible: true
   };
   const cwd = {
     name: 'cwd',
-    type: 'string',
+    type: 'path',
     description: 'Working directory for the launched executable',
     required: true,
     visible: true
@@ -135,31 +78,50 @@ function getNativeAutoGenConfig(vsAdapterType) {
   };
   const sourcePath = {
     name: 'sourcePath',
-    type: 'string',
+    type: 'path',
     description: 'Optional base path for sources',
     required: false,
     defaultValue: '',
     visible: true
   };
-
-  const debugTypeMessage = `using ${vsAdapterType === (_nuclideDebuggerCommon || _load_nuclideDebuggerCommon()).VsAdapterTypes.NATIVE_GDB ? 'gdb' : 'lldb'}`;
-
+  const corePath = {
+    name: 'coreDumpPath',
+    type: 'path',
+    description: 'Optional path to a core file to load in the debugger',
+    required: false,
+    defaultValue: '',
+    visible: true
+  };
+  const stopOnEntry = {
+    name: 'pauseProgramOnEntry',
+    type: 'boolean',
+    description: 'If true, the debugger will stop the program at entry before starting execution.',
+    required: false,
+    defaultValue: false,
+    visible: true
+  };
+  const debugTypeMessage = `using ${vsAdapterType === _nuclideDebuggerCommon().VsAdapterTypes.NATIVE_GDB ? 'gdb' : 'lldb'}`;
   const autoGenLaunchConfig = {
     launch: true,
     vsAdapterType,
-    threads: true,
-    properties: [program, cwd, args, env, sourcePath],
+    properties: [program, cwd, args, env, sourcePath, stopOnEntry, corePath],
     scriptPropertyName: 'program',
     cwdPropertyName: 'working directory',
-    header: _react.createElement(
-      'p',
-      null,
-      'Debug native programs ',
-      debugTypeMessage,
-      '.'
-    )
-  };
+    header: React.createElement("p", null, "Debug native programs ", debugTypeMessage, "."),
 
+    getProcessName(values) {
+      let processName = values.program;
+      const lastSlash = processName.lastIndexOf('/');
+
+      if (lastSlash >= 0) {
+        processName = processName.substring(lastSlash + 1, processName.length);
+      }
+
+      processName += ' (' + debugTypeMessage + ')';
+      return processName;
+    }
+
+  };
   const pid = {
     name: 'pid',
     type: 'process',
@@ -170,14 +132,13 @@ function getNativeAutoGenConfig(vsAdapterType) {
   const autoGenAttachConfig = {
     launch: false,
     vsAdapterType,
-    threads: true,
     properties: [pid, sourcePath],
-    header: _react.createElement(
-      'p',
-      null,
-      'Attach to a running native process ',
-      debugTypeMessage
-    )
+    header: React.createElement("p", null, "Attach to a running native process ", debugTypeMessage),
+
+    getProcessName(values) {
+      return 'Pid: ' + values.pid + ' (' + debugTypeMessage + ')';
+    }
+
   };
   return {
     launch: autoGenLaunchConfig,
@@ -185,14 +146,22 @@ function getNativeAutoGenConfig(vsAdapterType) {
   };
 }
 
-async function getNativeVSPLaunchProcessInfo(adapter, program, args) {
-  return new (_nuclideDebuggerCommon || _load_nuclideDebuggerCommon()).VspProcessInfo(program, 'launch', adapter, null, Object.assign({
-    program: (_nuclideUri || _load_nuclideUri()).default.getPath(program)
-  }, args), { threads: true });
+function getNativeVSPLaunchProcessConfig(adapterType, program, config) {
+  return {
+    targetUri: program,
+    debugMode: 'launch',
+    adapterType,
+    config: Object.assign({
+      program: _nuclideUri().default.getPath(program)
+    }, config)
+  };
 }
 
-async function getNativeVSPAttachProcessInfo(adapter, targetUri, args) {
-  return new (_nuclideDebuggerCommon || _load_nuclideDebuggerCommon()).VspProcessInfo(targetUri, 'attach', adapter, null, args, {
-    threads: true
-  });
+function getNativeVSPAttachProcessConfig(adapterType, targetUri, config) {
+  return {
+    targetUri,
+    debugMode: 'attach',
+    adapterType,
+    config
+  };
 }

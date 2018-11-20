@@ -103,6 +103,18 @@ describe "Operator TransformString", ->
       set cursor: [0, 1]
       ensure 'g u g u', text: 'abc\nXyZ', cursor: [0, 1]
 
+  describe 'change case for greek character', ->
+    lowerGreek = "α β δ ε θ ι κ λ ο π ρ τ υ φ χ ψ γ ζ η μ ν ξ σ ω"
+    upperGreek = "Α Β Δ Ε Θ Ι Κ Λ Ο Π Ρ Τ Υ Φ Χ Ψ Γ Ζ Η Μ Ν Ξ Σ Ω"
+
+    it "change case to lower-to-upper", ->
+      set text: lowerGreek, cursor: [0, 0]
+      ensure 'g U $', text: upperGreek, cursor: [0, 0]
+
+    it "change case to upper-to-lower", ->
+      set text: upperGreek, cursor: [0, 0]
+      ensure 'g u $', text: lowerGreek, cursor: [0, 0]
+
   describe "the > keybinding", ->
     beforeEach ->
       set text: """
@@ -885,9 +897,9 @@ describe "Operator TransformString", ->
 
       it "surround text for each word in target case-1", ->
         ensureWait 'm s i p (',
-          text: """
+          textC: """
 
-          (apple)
+          (|apple)
           (pairs) (tomato)
           (orange)
           (milk)
@@ -899,7 +911,7 @@ describe "Operator TransformString", ->
           textC: """
 
           apple
-          <|pairs> <tomato>
+          <p|airs> <tomato>
           orange
           milk
 
@@ -912,7 +924,7 @@ describe "Operator TransformString", ->
           "apple"
           "pairs" "tomato"
           "orange"
-          |"milk"
+          "|milk"
 
           """
 
@@ -1045,6 +1057,34 @@ describe "Operator TransformString", ->
             it "case1", -> set textC: '|"apple"';     ensureWait 'c S " `', text: "`apple`"
             it "case2", -> set textC: '|"  apple  "'; ensureWait 'c S " `', text: "`  apple  `"
             it "case3", -> set textC: '|"  apple  "'; ensureWait 'c S " \'', text: "'  apple  '"
+
+      describe 'customSurroundPairs setting', ->
+        beforeEach ->
+          constomSurround = '''
+            {
+              "p": ["<?php", "?>", true],
+              "%": ["<%", "%>", true],
+              "=": ["<%=", "%>", true],
+              "s": ["\\"", "\\""]
+            }
+          '''
+          settings.set('customSurroundPairs', constomSurround)
+
+        describe 'surround', ->
+          it "case1", -> set textC: "ap|ple"; ensureWait 'y s c p', text: "<?php apple ?>"
+          it "case2", -> set textC: "ap|ple"; ensureWait 'y s c %', text: "<% apple %>"
+          it "case2", -> set textC: "ap|ple"; ensureWait 'y s c =', text: "<%= apple %>"
+          it "case2", -> set textC: "ap|ple"; ensureWait 'y s c s', text: '"apple"'
+        describe 'delete-surround', ->
+          it "case1", -> set textC: "<?php ap|ple ?>"; ensureWait 'd S p', text: "apple"
+          it "case2", -> set textC: "<% ap|ple %>";    ensureWait 'd S %', text: "apple"
+          it "case2", -> set textC: "<%= ap|ple %>";   ensureWait 'd S =', text: "apple"
+          it "case2", -> set textC: '"ap|ple"';        ensureWait 'd S s', text: "apple"
+        describe 'change-surround', ->
+          it "case1", -> set textC: "<?php ap|ple ?>"; ensureWait 'c S p %', text: "<% apple %>"
+          it "case2", -> set textC: "<% ap|ple %>";    ensureWait 'c S % =', text: "<%= apple %>"
+          it "case2", -> set textC: "<%= ap|ple %>";   ensureWait 'c S = s', text: '"apple"'
+          it "case2", -> set textC: '"ap|ple"';        ensureWait 'c S s p', text: "<?php apple ?>"
 
     describe 'surround-word', ->
       beforeEach ->

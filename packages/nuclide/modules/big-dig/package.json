@@ -1,6 +1,6 @@
 {
   "name": "big-dig",
-  "version": "0.7.1-dev",
+  "version": "0.7.3-dev",
   "description": "Secure, re-connectable channel for bidirectional communication with a remote host.",
   "author": "Nuclide : Remote",
   "license": "BSD-3-Clause",
@@ -12,19 +12,19 @@
   },
   "dependencies": {
     "double-ended-queue": "2.1.0-0",
+    "escape-string-regexp": "1.0.5",
     "event-kit": "2.2.0",
     "log4js": "1.1.1",
-    "nuclide-commons": "0.7.1-dev",
+    "nuclide-commons": "0.7.3-dev",
+    "nuclide-prebuilt-libs": "0.5.2",
+    "nuclide-watchman-helpers": "0.7.3-dev",
     "request": "2.79.0",
     "rimraf": "2.6.2",
-    "rxjs": "5.5.5",
+    "rxjs-compat": "6.3.3",
     "ssh2": "0.5.4",
     "temp": "0.8.3",
     "thrift": "^0.11.0",
     "uuid": "3.0.1",
     "ws": "3.2.0"
-  },
-  "devDependencies": {
-    "nuclide-jest": "0.7.1-dev"
   }
 }

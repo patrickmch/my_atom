@@ -17,6 +17,9 @@ import {
   expectPreviewInSplitPane,
   previewText,
   previewFragment,
+  activateMe,
+  previewHTML,
+  previewHeadHTML,
 } from './util'
 import { TextEditorElement, TextEditor } from 'atom'
 import { PlaceholderView } from '../lib/placeholder-view'
@@ -42,7 +45,7 @@ describe('MarkdownPreviewView', function() {
     return mpv
   }
 
-  before(async () => atom.packages.activatePackage(path.join(__dirname, '..')))
+  before(async () => activateMe())
   after(async () => atom.packages.deactivatePackage('markdown-preview-plus'))
 
   beforeEach(async function() {
@@ -167,67 +170,57 @@ describe('MarkdownPreviewView', function() {
     })
   })
 
-  describe('code block conversion to atom-text-editor tags', function() {
+  describe('code block conversion to pre tags', function() {
     it('removes a trailing newline but preserves remaining leading and trailing whitespace', async function() {
       const newFilePath = path.join(tempPath, 'subdir/trim-nl.md')
       const newPreview = await createMarkdownPreviewViewFile(newFilePath)
 
       const editor = (await previewFragment(newPreview)).querySelector(
-        'atom-text-editor',
+        'pre.editor-colors',
       ) as TextEditorElement
       expect(editor).to.exist
-      expect(editor.textContent).to.equal(`\
-
-     a
-    b
-   c
-  d
- e
-f
-\
-`)
+      expect(editor.textContent).to.equal(
+        ' \n     a\n    b\n   c\n  d\n e\nf\n ',
+      )
 
       newPreview.destroy()
     })
 
     describe("when the code block's fence name has a matching grammar", () =>
-      it('assigns the grammar on the atom-text-editor', async function() {
+      it('assigns the grammar on the element', async function() {
         const rubyEditor = await waitsFor(
           async () =>
             (await previewFragment(preview)).querySelector(
-              'atom-text-editor.lang-ruby',
+              'pre.editor-colors.lang-ruby',
             ) as TextEditorElement,
         )
         expect(rubyEditor).to.exist
         expect(rubyEditor.textContent).to.equal(`\
 def func
   x = 1
-end
-`)
+end`)
 
         // nested in a list item
         const jsEditor = (await previewFragment(preview)).querySelector(
-          'atom-text-editor.lang-javascript',
+          'pre.editor-colors.lang-javascript',
         ) as TextEditorElement
         expect(jsEditor).to.exist
         expect(jsEditor.textContent).to.equal(`\
 if a === 3 {
   b = 5
-}
-`)
+}`)
       }))
 
     describe("when the code block's fence name doesn't have a matching grammar", function() {
       it('does not assign a specific grammar', async function() {
         const plainEditor = (await previewFragment(preview)).querySelector(
-          'atom-text-editor.lang-text',
+          'pre.editor-colors.lang-text',
         ) as TextEditorElement
         expect(plainEditor).to.exist
         expect(plainEditor.textContent).to.equal(`\
 function f(x) {
   return x++;
-}
-`)
+}`)
       })
     })
 
@@ -251,11 +244,11 @@ var x = 0;
       const jsEditor = await waitsFor(
         async () =>
           (await previewFragment(pv)).querySelector(
-            'atom-text-editor',
+            'pre.editor-colors',
           ) as TextEditorElement,
       )
       expect(jsEditor).to.exist
-      expect(jsEditor.textContent).to.equal('var x = 0;\n')
+      expect(jsEditor.textContent).to.equal('var x = 0;')
       expect(jsEditor.querySelector('.syntax--source.syntax--js')!.className).to
         .be.ok
     })
@@ -610,6 +603,82 @@ var x = 0;
       }))
   })
 
+  describe('css modification', function() {
+    let dirPath: string
+    let css1path: string
+
+    beforeEach(function() {
+      preview.destroy()
+
+      dirPath = temp.mkdirSync('atom')
+      filePath = path.join(dirPath, 'css-modification.md')
+      css1path = path.join(dirPath, 'theme.css')
+
+      fs.writeFileSync(
+        filePath,
+        '<link rel="stylesheet" type="text/css" href="theme.css"><div class="test">Test</div>',
+      )
+      fs.writeFileSync(css1path, '.test { text-decoration: underline; }')
+    })
+
+    const getMediaVersion = function(
+      imagePath: string,
+      imageURL: string,
+    ): string {
+      expect(imageURL).to.startWith(`${imagePath}?v=`)
+      return imageURL.split('?v=')[1]
+    }
+
+    describe('when a local image is modified during a preview #notwercker', () =>
+      it('rerenders the image with a more recent timestamp query', async function() {
+        let mediaURL: string
+        let mediaVer: string
+
+        const editor = await atom.workspace.open(filePath)
+        atom.commands.dispatch(
+          atom.views.getView(editor),
+          'markdown-preview-plus:toggle',
+        )
+        preview = await expectPreviewInSplitPane()
+
+        mediaURL = (await previewFragment(preview, previewHeadHTML))
+          .querySelector('link')!
+          .getAttribute('href')!
+        expect(mediaURL).to.exist
+        mediaVer = getMediaVersion(css1path, mediaURL)
+        console.log(mediaVer)
+        expect(mediaVer).not.to.equal('deleted')
+
+        expect(
+          await preview.runJS<string>(
+            `window.getComputedStyle(document.querySelector('div.test')).textDecoration`,
+          ),
+        ).to.startWith('underline ')
+
+        fs.writeFileSync(css1path, '.test { text-decoration: none; }')
+
+        await waitsFor.msg('link href attribute to update', async function() {
+          mediaURL = (await previewFragment(preview, previewHeadHTML))
+            .querySelector('link')!
+            .getAttribute('href')!
+          console.log(mediaURL)
+          return !mediaURL.endsWith(mediaVer)
+        })
+
+        expect(
+          await preview.runJS<string>(
+            `window.getComputedStyle(document.querySelector('div.test')).textDecoration`,
+          ),
+        ).to.startWith('none ')
+
+        const newImageVer = getMediaVersion(css1path, mediaURL)
+        expect(newImageVer).not.to.equal('deleted')
+        expect(parseInt(newImageVer, 10)).to.be.greaterThan(
+          parseInt(mediaVer, 10),
+        )
+      }))
+  })
+
   describe('gfm newlines', function() {
     describe('when gfm newlines are not enabled', () =>
       it('creates a single paragraph with <br>', async function() {
@@ -664,13 +733,10 @@ var x = 0;
       const expectedOutput = fs.readFileSync(expectedFilePath).toString()
       const expectedOutputArr = expectedOutput.split('\n')
 
-      const markdownPreviewStyles = [
-        'markdown-preview-plus-view { color: orange; }',
-      ]
-
-      const atomTextEditorStyles = [
-        'atom-text-editor .line { color: brown; }\natom-text-editor .number { color: cyan; }',
-        'atom-text-editor .hr { background: url(atom://markdown-preview-plus/assets/hr.png); }',
+      const styles = [
+        'body { color: orange; }',
+        'pre.editor-colors .line { color: brown; }\npre.editor-colors .number { color: cyan; }',
+        'pre.editor-colors .hr { background: url(atom://markdown-preview-plus/assets/hr.png); }',
       ]
 
       expect(fs.existsSync(outputPath)).to.be.false
@@ -695,26 +761,25 @@ var x = 0;
             return outputPath
           }),
       )
-      previewUtil.__setGetStylesOverride((context: string) => {
-        if (context === 'markdown-preview-plus') return markdownPreviewStyles
-        else if (context === 'atom-text-editor') return atomTextEditorStyles
-        else throw new Error(`Unknown style context: ${context}`)
-      })
-      atom.commands.dispatch(preview.element, 'core:save-as')
+      previewUtil.__setGetStylesOverride(() => styles)
+      try {
+        atom.commands.dispatch(preview.element, 'core:save-as')
 
-      await openedPromise
+        await openedPromise
 
-      expect(fs.existsSync(outputPath)).to.be.true
-      expect(fs.realpathSync(textEditor!.getPath()!)).to.equal(
-        fs.realpathSync(outputPath),
-      )
-      const savedHTML: string = textEditor!.getText()
-      savedHTML.split('\n').forEach((s, i) => {
-        expect(s).to.equal(expectedOutputArr[i])
-      })
-      expect(savedHTML).to.equal(expectedOutput)
-      stubs.forEach((stub) => stub.restore())
-      previewUtil.__setGetStylesOverride()
+        expect(fs.existsSync(outputPath)).to.be.true
+        expect(fs.realpathSync(textEditor!.getPath()!)).to.equal(
+          fs.realpathSync(outputPath),
+        )
+        const savedHTML: string = textEditor!.getText()
+        savedHTML.split('\n').forEach((s, i) => {
+          expect(s).to.equal(expectedOutputArr[i])
+        })
+        expect(savedHTML).to.equal(expectedOutput)
+        stubs.forEach((stub) => stub.restore())
+      } finally {
+        previewUtil.__setGetStylesOverride()
+      }
     })
     // fs.writeFileSync(expectedFilePath, savedHTML, encoding: 'utf8')
 
@@ -722,21 +787,34 @@ var x = 0;
       let extractedStyles: string[]
 
       const textEditorStyle = '.editor-style .extraction-test { color: blue; }'
+      const replacementTextEditorStyle =
+        'atom-text-editor .extraction-test { color: green; }'
+      const replacementTextEditorStyleExpected =
+        'pre.editor-colors .extraction-test { color: green; }'
       const unrelatedStyle = '.something else { color: red; }'
 
       beforeEach(function() {
         atom.styles.addStyleSheet(textEditorStyle, {
           context: 'atom-text-editor',
         })
+        atom.styles.addStyleSheet(replacementTextEditorStyle, {
+          context: 'atom-text-editor',
+        })
         atom.styles.addStyleSheet(unrelatedStyle, {
           context: 'unrelated-context',
         })
 
-        extractedStyles = previewUtil.getStyles('atom-text-editor')
+        extractedStyles = previewUtil.getPreviewStyles(false)
       })
 
       it('returns an array containing atom-text-editor css style strings', function() {
         expect(extractedStyles.indexOf(textEditorStyle)).to.be.greaterThan(-1)
+      })
+
+      it('replaces atom-text-editor selector with pre.editor-colors', function() {
+        expect(
+          extractedStyles.indexOf(replacementTextEditorStyleExpected),
+        ).to.be.greaterThan(-1)
       })
 
       it('does not return other styles', function() {
@@ -762,45 +840,12 @@ var x = 0;
 
       expect(atom.clipboard.read()).to.equal(`\
 <h1>Code Block</h1>
-<pre class="editor-colors lang-javascript"><span class="syntax--source syntax--js"><span class="syntax--keyword syntax--control syntax--js"><span>if</span></span><span> a </span><span class="syntax--keyword syntax--operator syntax--comparison syntax--js"><span>===</span></span><span> </span><span class="syntax--constant syntax--numeric syntax--decimal syntax--js"><span>3</span></span><span> </span><span class="syntax--meta syntax--brace syntax--curly syntax--js"><span>{</span></span></span>
-<span class="syntax--source syntax--js"><span>  b </span><span class="syntax--keyword syntax--operator syntax--assignment syntax--js"><span>=</span></span><span> </span><span class="syntax--constant syntax--numeric syntax--decimal syntax--js"><span>5</span></span></span>
-<span class="syntax--source syntax--js"><span class="syntax--meta syntax--brace syntax--curly syntax--js"><span>}</span></span></span>
-</pre>
+<pre class="editor-colors lang-javascript"><span><span class="syntax--source syntax--js"><span class="syntax--keyword syntax--control">if</span> a <span class="syntax--keyword syntax--operator syntax--js">===</span> <span class="syntax--constant syntax--numeric">3</span> <span class="syntax--punctuation syntax--definition syntax--function syntax--body syntax--begin syntax--bracket syntax--curly">{</span></span></span>
+<span class=""><span class="syntax--source syntax--js"><span class="leading-whitespace">  </span>b <span class="syntax--keyword syntax--operator syntax--js">=</span> <span class="syntax--constant syntax--numeric">5</span></span></span>
+<span><span class="syntax--source syntax--js"><span class="syntax--punctuation syntax--definition syntax--function syntax--body syntax--end syntax--bracket syntax--curly">}</span></span></span></pre>
 <p>encoding → issue</p>
 `)
     }))
-
-  describe('when maths rendering is enabled by default', function() {
-    xit('notifies the user MathJax is loading when first preview is opened', async function() {
-      preview.destroy()
-
-      await atom.packages.activatePackage('notifications')
-
-      const editor = await atom.workspace.open(filePath)
-
-      atom.config.set(
-        'markdown-preview-plus.mathConfig.enableLatexRenderingByDefault',
-        true,
-      )
-      atom.commands.dispatch(
-        atom.views.getView(editor),
-        'markdown-preview-plus:toggle',
-      )
-
-      preview = await expectPreviewInSplitPane()
-
-      const workspaceElement = atom.views.getView(atom.workspace)
-
-      await waitsFor.msg('notification', () =>
-        workspaceElement.querySelector('atom-notification'),
-      )
-
-      const notification = workspaceElement.querySelector(
-        'atom-notification.info',
-      )
-      expect(notification).to.exist
-    })
-  })
 
   describe('checkbox lists', function() {
     it('renders checkbox lists', async function() {
@@ -833,6 +878,56 @@ var x = 0;
         expect(p.split(path.sep)).includes('svg')
         expect(p.endsWith('.svg')).to.be.true
       }
+    })
+  })
+
+  describe('imsize', function() {
+    beforeEach(() => {
+      atom.config.set('markdown-preview-plus.markdownItConfig.useImsize', true)
+    })
+    afterEach(() => {
+      atom.config.unset('markdown-preview-plus.markdownItConfig.useImsize')
+    })
+    it('allows specifying image size', async function() {
+      const editor = (await atom.workspace.open('nonexistent.md')) as TextEditor
+      editor.setText(`![Some Image](img.png "title" =100x200)`)
+      const pv = await createMarkdownPreviewViewEditor(editor)
+      const [height, width, title] = await pv.runJS<[number, number, string]>(
+        `{ let img = document.querySelector('img'); [img.height, img.width, img.title]; }`,
+      )
+      expect(width).to.equal(100)
+      expect(height).to.equal(200)
+      expect(title).to.equal('title')
+    })
+  })
+
+  describe('Critic Markup', function() {
+    beforeEach(() => {
+      atom.config.set(
+        'markdown-preview-plus.markdownItConfig.useCriticMarkup',
+        true,
+      )
+    })
+    afterEach(() => {
+      atom.config.unset(
+        'markdown-preview-plus.markdownItConfig.useCriticMarkup',
+      )
+    })
+    it('renders it', async function() {
+      const pv = await createMarkdownPreviewViewFile(
+        path.join(tempPath, 'subdir/criticMarkup.md'),
+      )
+      const html = await previewHTML(pv)
+      expect(html).to.equal(
+        '<p>Don’t go around saying<del> to people that</del> the' +
+          ' world owes you a living. The world owes you nothing. ' +
+          'It was here first. <del>One</del><ins>Only one</ins> thing ' +
+          'is impossible for God: To find <ins>any</ins> sense in any ' +
+          'copyright law on the planet. <mark>Truth is stranger than ' +
+          'fiction</mark><span tabindex="-1" class="critic comment">' +
+          '<span>strange but true</span></span>, but it is because ' +
+          'Fiction is obliged to stick to possibilities; Truth isn’t.</p>\n',
+      )
     })
   })
 
@@ -959,6 +1054,69 @@ $$
           pv.runJS<string>(`document.querySelector('#math-ref').innerText`),
         )
         expect(res).to.equal('(???)')
+      })
+    })
+  })
+
+  describe('configurable tab width', function() {
+    let pv: MarkdownPreviewView
+    let ed: TextEditor
+    beforeEach(async function() {
+      ed = (await atom.workspace.open()) as TextEditor
+      ed.setText('```\ndef func():\n\treturn\n```')
+      atom.grammars.assignLanguageMode(ed.getBuffer(), 'source.python')
+      pv = await createMarkdownPreviewViewEditor(ed)
+    })
+    afterEach(async function() {
+      pv.destroy()
+      const pane = atom.workspace.paneForItem(ed)
+      if (pane) {
+        await pane.destroyItem(ed, true)
+      }
+    })
+    async function checkTabWidth(expectedWidth: number) {
+      const frag = await previewFragment(pv)
+      console.log(frag)
+      const tab: HTMLSpanElement | null = frag.querySelector('.hard-tab')
+      if (!tab) throw new Error('No hard tab found')
+      expect(tab.innerText.length).to.equal(expectedWidth)
+    }
+    it('by default uses 2-space tabs', async function() {
+      await checkTabWidth(2)
+    })
+    describe('When Atom core setting changed', function() {
+      before(function() {
+        atom.config.set('editor.tabLength', 4)
+      })
+      after(function() {
+        atom.config.unset('editor.tabLength')
+      })
+      it('respects that', async function() {
+        await checkTabWidth(4)
+      })
+    })
+    describe('When MPP setting changed', function() {
+      before(function() {
+        atom.config.set('markdown-preview-plus.codeTabWidth', 8)
+      })
+      after(function() {
+        atom.config.unset('markdown-preview-plus.codeTabWidth')
+      })
+      it('respects that', async function() {
+        await checkTabWidth(8)
+      })
+    })
+    describe('When both settings changed', function() {
+      before(function() {
+        atom.config.set('editor.tabLength', 4)
+        atom.config.set('markdown-preview-plus.codeTabWidth', 8)
+      })
+      after(function() {
+        atom.config.unset('markdown-preview-plus.codeTabWidth')
+        atom.config.unset('editor.tabLength')
+      })
+      it('MPP overrides', async function() {
+        await checkTabWidth(8)
       })
     })
   })

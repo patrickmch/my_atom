@@ -1,4 +1,4 @@
-'use strict';
+"use strict";
 
 Object.defineProperty(exports, "__esModule", {
   value: true
@@ -7,26 +7,16 @@ exports.onceEvent = onceEvent;
 exports.onceEventOrError = onceEventOrError;
 exports.onceEventArray = onceEventArray;
 
-var _promise;
+function _promise() {
+  const data = require("../../../nuclide-commons/promise");
 
-function _load_promise() {
-  return _promise = require('../../../nuclide-commons/promise');
+  _promise = function () {
+    return data;
+  };
+
+  return data;
 }
 
-/**
- * Creates a promise to await a single firing of `event` from `emitter`. This function only returns
- * the first argument from the event.
- */
-function onceEvent(emitter, event) {
-  return new Promise(resolve => {
-    emitter.once(event, resolve);
-  });
-}
-
-/**
- * Creates a promise to await a single firing of `event` from `emitter`. This function only returns
- * the first argument from the event.
- */
 /**
  * Copyright (c) 2017-present, Facebook, Inc.
  * All rights reserved.
@@ -39,20 +29,40 @@ function onceEvent(emitter, event) {
  * @format
  */
 
+/**
+ * Creates a promise to await a single firing of `event` from `emitter`. This function only returns
+ * the first argument from the event.
+ */
+function onceEvent(emitter, event) {
+  return new Promise(resolve => {
+    emitter.once(event, resolve);
+  });
+}
+/**
+ * Creates a promise to await a single firing of `event` from `emitter`. This function only returns
+ * the first argument from the event.
+ */
+
+
 function onceEventOrError(emitter, event) {
-  const { promise, resolve, reject } = new (_promise || _load_promise()).Deferred();
+  const {
+    promise,
+    resolve,
+    reject
+  } = new (_promise().Deferred)();
   emitter.once(event, resolve);
   emitter.once('error', reject);
-  return (0, (_promise || _load_promise()).lastly)(promise, () => {
+  return (0, _promise().lastly)(promise, () => {
     emitter.removeListener(event, resolve);
     emitter.removeListener('error', reject);
   });
 }
-
 /**
  * Creates a promise to await a single firing of `event` from `emitter`. This function returns an
  * array of all arguments from the event.
  */
+
+
 function onceEventArray(emitter, event) {
   return new Promise(resolve => {
     emitter.once(event, (...args) => resolve(args));

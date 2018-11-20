@@ -1,21 +1,42 @@
-'use strict';
+"use strict";
 
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
 exports.getServerVersion = getServerVersion;
+exports.getServerPlatform = getServerPlatform;
+exports.getOriginalEnvironment = getOriginalEnvironment;
+exports.getServerEnvironment = getServerEnvironment;
 exports.closeConnection = closeConnection;
 
-var _nuclideVersion;
+function _process() {
+  const data = require("../../../../modules/nuclide-commons/process");
 
-function _load_nuclideVersion() {
-  return _nuclideVersion = require('../../../nuclide-version');
+  _process = function () {
+    return data;
+  };
+
+  return data;
 }
 
-var _NuclideServer;
+function _nuclideVersion() {
+  const data = require("../../../nuclide-version");
 
-function _load_NuclideServer() {
-  return _NuclideServer = _interopRequireDefault(require('../NuclideServer'));
+  _nuclideVersion = function () {
+    return data;
+  };
+
+  return data;
+}
+
+function _NuclideServer() {
+  const data = _interopRequireDefault(require("../NuclideServer"));
+
+  _NuclideServer = function () {
+    return data;
+  };
+
+  return data;
 }
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
@@ -30,20 +51,35 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
  * 
  * @format
  */
-
 function getServerVersion() {
-  return Promise.resolve((0, (_nuclideVersion || _load_nuclideVersion()).getVersion)());
+  return Promise.resolve((0, _nuclideVersion().getVersion)());
 }
 
-// Mark this as async so the client can wait for an acknowledgement.
+async function getServerPlatform() {
+  return process.platform;
+}
+
+async function getOriginalEnvironment() {
+  return (0, _process().getOriginalEnvironmentArray)();
+}
+
+async function getServerEnvironment() {
+  return (0, _process().getEnvironment)();
+} // Mark this as async so the client can wait for an acknowledgement.
 // However, we can't close the connection right away, as otherwise the response never gets sent!
 // Add a small delay to allow the return message to go through.
+
+
 function closeConnection(shutdownServer) {
   const client = this;
   setTimeout(() => {
-    (_NuclideServer || _load_NuclideServer()).default.closeConnection(client);
+    // TODO(T29368542): Remove references to NuclideServer here.
+    _NuclideServer().default.closeConnection(client);
+
+    client.dispose();
+
     if (shutdownServer) {
-      (_NuclideServer || _load_NuclideServer()).default.shutdown();
+      _NuclideServer().default.shutdown();
     }
   }, 1000);
   return Promise.resolve();

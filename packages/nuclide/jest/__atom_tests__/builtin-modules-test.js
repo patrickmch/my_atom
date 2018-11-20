@@ -1,4 +1,4 @@
-'use strict';
+"use strict";
 
 /**
  * Copyright (c) 2015-present, Facebook, Inc.
@@ -9,10 +9,11 @@
  *
  *  strict-local
  * @format
+ * @emails oncall+nuclide
  */
-
 test('pass', () => {
   const atom = require('atom');
+
   const electron = require('electron');
 
   expect(atom).toBeDefined();

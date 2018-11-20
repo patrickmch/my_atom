@@ -1,46 +1,67 @@
-'use strict';
+"use strict";
 
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
+exports.default = void 0;
 
-var _AtomInput;
+function _AtomInput() {
+  const data = require("../../modules/nuclide-commons-ui/AtomInput");
 
-function _load_AtomInput() {
-  return _AtomInput = require('../../modules/nuclide-commons-ui/AtomInput');
+  _AtomInput = function () {
+    return data;
+  };
+
+  return data;
 }
 
-var _classnames;
+function _classnames() {
+  const data = _interopRequireDefault(require("classnames"));
 
-function _load_classnames() {
-  return _classnames = _interopRequireDefault(require('classnames'));
+  _classnames = function () {
+    return data;
+  };
+
+  return data;
 }
 
-var _event;
+function _event() {
+  const data = require("../../modules/nuclide-commons/event");
 
-function _load_event() {
-  return _event = require('../../modules/nuclide-commons/event');
+  _event = function () {
+    return data;
+  };
+
+  return data;
 }
 
-var _observable;
+function _observable() {
+  const data = require("../../modules/nuclide-commons/observable");
 
-function _load_observable() {
-  return _observable = require('../../modules/nuclide-commons/observable');
+  _observable = function () {
+    return data;
+  };
+
+  return data;
 }
 
-var _react = _interopRequireWildcard(require('react'));
+var React = _interopRequireWildcard(require("react"));
 
-var _reactDom = _interopRequireDefault(require('react-dom'));
+var _reactDom = _interopRequireDefault(require("react-dom"));
 
-var _rxjsBundlesRxMinJs = require('rxjs/bundles/Rx.min.js');
+var _rxjsCompatUmdMin = require("rxjs-compat/bundles/rxjs-compat.umd.min.js");
 
-var _UniversalDisposable;
+function _UniversalDisposable() {
+  const data = _interopRequireDefault(require("../../modules/nuclide-commons/UniversalDisposable"));
 
-function _load_UniversalDisposable() {
-  return _UniversalDisposable = _interopRequireDefault(require('../../modules/nuclide-commons/UniversalDisposable'));
+  _UniversalDisposable = function () {
+    return data;
+  };
+
+  return data;
 }
 
-function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
+function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) { var desc = Object.defineProperty && Object.getOwnPropertyDescriptor ? Object.getOwnPropertyDescriptor(obj, key) : {}; if (desc.get || desc.set) { Object.defineProperty(newObj, key, desc); } else { newObj[key] = obj[key]; } } } } newObj.default = obj; return newObj; } }
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -54,20 +75,17 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
  * 
  * @format
  */
-
 const UP = -1;
 const DOWN = 1;
-
 /**
  * A dumb component that just takes a list of dropdown results, and renders
  * a rect beneath a given AtomInput ref. Default onSelect of an item will
  * populate the AtomInput, but it can be overriden to do anything else.
  */
-class DropdownResults extends _react.Component {
 
+class DropdownResults extends React.Component {
   constructor(props) {
     super(props);
-
     this.state = {
       optionsVisible: false,
       optionsRect: null,
@@ -76,7 +94,6 @@ class DropdownResults extends _react.Component {
 
     this._onSelect = (option, fromConfirm = false) => {
       this._shouldShowOnChange = false;
-
       this.setState({
         optionsVisible: false,
         selectedIndex: -1
@@ -86,9 +103,9 @@ class DropdownResults extends _react.Component {
         this.props.onSelect(option);
       } else {
         this.props.atomInput.setText(option);
-      }
+      } // Re-focusing only needs to happen when mouse clicking results.
 
-      // Re-focusing only needs to happen when mouse clicking results.
+
       if (!fromConfirm) {
         this._keepFocus = true;
         this._shouldShowOnFocus = false;
@@ -96,7 +113,9 @@ class DropdownResults extends _react.Component {
     };
 
     this._setSelectedIndex = selectedIndex => {
-      this.setState({ selectedIndex });
+      this.setState({
+        selectedIndex
+      });
     };
 
     this._recalculateRect = () => {
@@ -161,7 +180,10 @@ class DropdownResults extends _react.Component {
         // Also, add one entry for nothing selected (default dropdown behavior).
         const optionsSize = this.props.options.length + 1;
         this.setState({
-          selectedIndex: (this.state.selectedIndex + increment + optionsSize + 1) % optionsSize - 1
+          selectedIndex: // TODO: (wbinnssmith) T30771435 this setState depends on current state
+          // and should use an updater function rather than an object
+          // eslint-disable-next-line react/no-access-state-in-setstate
+          (this.state.selectedIndex + increment + optionsSize + 1) % optionsSize - 1
         });
       }
     };
@@ -169,11 +191,14 @@ class DropdownResults extends _react.Component {
     this._handleConfirm = event => {
       if (this.state.optionsVisible) {
         if (event.key === 'Enter' && this.state.selectedIndex >= 0) {
-          this._onSelect(this.props.options[this.state.selectedIndex], true /* fromConfirm */
+          this._onSelect(this.props.options[this.state.selectedIndex], true
+          /* fromConfirm */
           );
+
           event.stopPropagation();
         } else if (event.key === 'Escape') {
           this._handleCancel();
+
           event.stopPropagation();
         }
       }
@@ -182,12 +207,11 @@ class DropdownResults extends _react.Component {
     const workspaceElement = atom.views.getView(atom.workspace);
 
     if (!(workspaceElement != null)) {
-      throw new Error('Invariant violation: "workspaceElement != null"');
+      throw new Error("Invariant violation: \"workspaceElement != null\"");
     }
 
     this._optionsElement = document.createElement('div');
     workspaceElement.appendChild(this._optionsElement);
-
     this._shouldShowOnChange = true;
     this._shouldShowOnFocus = true;
     this._keepFocus = false;
@@ -196,10 +220,9 @@ class DropdownResults extends _react.Component {
   componentDidMount() {
     const editorElement = this.props.atomInput.getTextEditorElement();
     const editor = this.props.atomInput.getTextEditor();
-
-    this._disposables = new (_UniversalDisposable || _load_UniversalDisposable()).default(() => {
+    this._disposables = new (_UniversalDisposable().default)(() => {
       this._optionsElement.remove();
-    }, _rxjsBundlesRxMinJs.Observable.fromEvent(window, 'resize').let((0, (_observable || _load_observable()).fastDebounce)(200)).subscribe(this._recalculateRect), _rxjsBundlesRxMinJs.Observable.fromEvent(editorElement, 'focus').subscribe(this._handleInputFocus), _rxjsBundlesRxMinJs.Observable.fromEvent(editorElement, 'blur').subscribe(this._handleInputBlur), atom.commands.add(editorElement, 'core:move-up', () => this._handleMove(UP)), atom.commands.add(editorElement, 'core:move-down', () => this._handleMove(DOWN)), _rxjsBundlesRxMinJs.Observable.fromEvent(editorElement, 'keydown').subscribe(this._handleConfirm), (0, (_event || _load_event()).observableFromSubscribeFunction)(editor.onDidChange.bind(editor)).subscribe(this._handleInputChange));
+    }, _rxjsCompatUmdMin.Observable.fromEvent(window, 'resize').let((0, _observable().fastDebounce)(200)).subscribe(this._recalculateRect), _rxjsCompatUmdMin.Observable.fromEvent(editorElement, 'focus').subscribe(this._handleInputFocus), _rxjsCompatUmdMin.Observable.fromEvent(editorElement, 'blur').subscribe(this._handleInputBlur), atom.commands.add(editorElement, 'core:move-up', () => this._handleMove(UP)), atom.commands.add(editorElement, 'core:move-down', () => this._handleMove(DOWN)), _rxjsCompatUmdMin.Observable.fromEvent(editorElement, 'keydown').subscribe(this._handleConfirm), (0, _event().observableFromSubscribeFunction)(editor.onDidChange.bind(editor)).subscribe(this._handleInputChange));
 
     this._recalculateRect();
   }
@@ -214,59 +237,45 @@ class DropdownResults extends _react.Component {
     }
 
     let options = [];
+
     if (this.props.errorMessage != null && this.props.errorMessage.length > 0) {
-      options.push(_react.createElement(
-        'li',
-        { key: 'error-text', className: 'error' },
-        _react.createElement(
-          'span',
-          { className: 'error-message' },
-          this.props.errorMessage
-        )
-      ));
+      options.push(React.createElement("li", {
+        key: "error-text",
+        className: "error"
+      }, React.createElement("span", {
+        className: "error-message"
+      }, this.props.errorMessage)));
     } else if (this.props.isLoading) {
-      options.push(_react.createElement(
-        'li',
-        { key: 'loading-text', className: 'loading' },
-        _react.createElement(
-          'span',
-          { className: 'loading-message' },
-          this.props.loadingMessage
-        )
-      ));
+      options.push(React.createElement("li", {
+        key: "loading-text",
+        className: "loading"
+      }, React.createElement("span", {
+        className: "loading-message"
+      }, this.props.loadingMessage)));
     } else {
-      options = this.props.options.map((option, i) => _react.createElement(
-        'li',
-        {
-          key: 'option-' + option,
-          className: (0, (_classnames || _load_classnames()).default)({
-            selected: i === this.state.selectedIndex,
-            'nuclide-dropdown-result': true
-          }),
-          onMouseDown: () => this._onSelect(option),
-          onMouseOver: () => this._setSelectedIndex(i) },
-        option
-      ));
+      options = this.props.options.map((option, i) => React.createElement("li", {
+        key: 'option-' + option,
+        className: (0, _classnames().default)({
+          selected: i === this.state.selectedIndex,
+          'nuclide-dropdown-result': true
+        }),
+        onMouseDown: () => this._onSelect(option),
+        onMouseOver: () => this._setSelectedIndex(i)
+      }, option));
     }
 
-    return _reactDom.default.createPortal(_react.createElement(
-      'div',
-      {
-        className: 'nuclide-combobox-options nuclide-dropdown-results',
-        style: this.state.optionsRect },
-      _react.createElement(
-        'div',
-        { className: 'select-list' },
-        _react.createElement(
-          'ol',
-          { className: 'nuclide-combobox-list-group list-group' },
-          options
-        )
-      )
-    ), this._optionsElement);
+    return _reactDom.default.createPortal(React.createElement("div", {
+      className: "nuclide-combobox-options nuclide-dropdown-results",
+      style: this.state.optionsRect
+    }, React.createElement("div", {
+      className: "select-list"
+    }, React.createElement("ol", {
+      className: "nuclide-combobox-list-group list-group"
+    }, options))), this._optionsElement);
   }
 
 }
+
 exports.default = DropdownResults;
 DropdownResults.defaultProps = {
   displayOnFocus: false,

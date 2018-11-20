@@ -25,65 +25,23 @@ module.exports = _client => {
     });
   };
 
-  remoteModule.prepareForTerminalLaunch = function (arg0) {
-    return _client.callRemoteFunction("JavaDebuggerHelpersService/prepareForTerminalLaunch", "promise", _client.marshalArguments(Array.from(arguments), [{
-      name: "config",
-      type: {
-        kind: "named",
-        name: "JavaLaunchTargetConfig"
-      }
-    }])).then(value => {
-      return _client.unmarshal(value, {
-        kind: "named",
-        name: "TerminalLaunchInfo"
-      });
-    });
-  };
-
-  remoteModule.javaDebugWaitForJdwpProcessStart = function (arg0) {
-    return _client.callRemoteFunction("JavaDebuggerHelpersService/javaDebugWaitForJdwpProcessStart", "promise", _client.marshalArguments(Array.from(arguments), [{
-      name: "jvmSuspendArgs",
-      type: {
-        kind: "string"
-      }
-    }])).then(value => {
-      return _client.unmarshal(value, {
-        kind: "void"
-      });
-    });
-  };
-
-  remoteModule.javaDebugWaitForJdwpProcessExit = function (arg0) {
-    return _client.callRemoteFunction("JavaDebuggerHelpersService/javaDebugWaitForJdwpProcessExit", "promise", _client.marshalArguments(Array.from(arguments), [{
-      name: "jvmSuspendArgs",
-      type: {
-        kind: "string"
-      }
-    }])).then(value => {
-      return _client.unmarshal(value, {
-        kind: "void"
-      });
-    });
-  };
-
-  remoteModule.getAndroidSDKVersionFromApk = function (arg0) {
-    return _client.callRemoteFunction("JavaDebuggerHelpersService/getAndroidSDKVersionFromApk", "promise", _client.marshalArguments(Array.from(arguments), [{
-      name: "apkPath",
-      type: {
-        kind: "string"
-      }
-    }])).then(value => {
-      return _client.unmarshal(value, {
-        kind: "string"
-      });
-    });
-  };
-
-  remoteModule.getSdkVersionSourcePath = function (arg0) {
+  remoteModule.getSdkVersionSourcePath = function (arg0, arg1) {
     return _client.callRemoteFunction("JavaDebuggerHelpersService/getSdkVersionSourcePath", "promise", _client.marshalArguments(Array.from(arguments), [{
       name: "sdkVersion",
       type: {
         kind: "string"
+      }
+    }, {
+      name: "options",
+      type: {
+        kind: "object",
+        fields: [{
+          name: "useSdkManager",
+          type: {
+            kind: "boolean"
+          },
+          optional: false
+        }]
       }
     }])).then(value => {
       return _client.unmarshal(value, {
@@ -162,7 +120,7 @@ Object.defineProperty(module.exports, "defs", {
       location: {
         type: "source",
         fileName: "JavaDebuggerHelpersService.js",
-        line: 24
+        line: 23
       },
       name: "JavaLaunchTargetConfig",
       definition: {
@@ -206,7 +164,7 @@ Object.defineProperty(module.exports, "defs", {
       location: {
         type: "source",
         fileName: "JavaDebuggerHelpersService.js",
-        line: 31
+        line: 30
       },
       name: "JavaAttachPortTargetConfig",
       definition: {
@@ -230,6 +188,18 @@ Object.defineProperty(module.exports, "defs", {
             kind: "number"
           },
           optional: false
+        }, {
+          name: "packageName",
+          type: {
+            kind: "string"
+          },
+          optional: false
+        }, {
+          name: "deviceSerial",
+          type: {
+            kind: "string"
+          },
+          optional: false
         }]
       }
     },
@@ -238,7 +208,7 @@ Object.defineProperty(module.exports, "defs", {
       location: {
         type: "source",
         fileName: "JavaDebuggerHelpersService.js",
-        line: 37
+        line: 38
       },
       name: "JavaTargetConfig",
       definition: {
@@ -298,6 +268,18 @@ Object.defineProperty(module.exports, "defs", {
               kind: "number"
             },
             optional: false
+          }, {
+            name: "packageName",
+            type: {
+              kind: "string"
+            },
+            optional: false
+          }, {
+            name: "deviceSerial",
+            type: {
+              kind: "string"
+            },
+            optional: false
           }]
         }],
         discriminantField: "debugMode"
@@ -308,7 +290,7 @@ Object.defineProperty(module.exports, "defs", {
       location: {
         type: "source",
         fileName: "JavaDebuggerHelpersService.js",
-        line: 41
+        line: 42
       },
       name: "TerminalLaunchInfo",
       definition: {
@@ -363,13 +345,13 @@ Object.defineProperty(module.exports, "defs", {
       location: {
         type: "source",
         fileName: "JavaDebuggerHelpersService.js",
-        line: 56
+        line: 53
       },
       type: {
         location: {
           type: "source",
           fileName: "JavaDebuggerHelpersService.js",
-          line: 56
+          line: 53
         },
         kind: "function",
         argumentTypes: [],
@@ -386,7 +368,7 @@ Object.defineProperty(module.exports, "defs", {
       location: {
         type: "source",
         fileName: "types.js",
-        line: 38
+        line: 35
       },
       name: "VSAdapterExecutableInfo",
       definition: {
@@ -406,6 +388,19 @@ Object.defineProperty(module.exports, "defs", {
             }
           },
           optional: false
+        }, {
+          name: "cwd",
+          type: {
+            kind: "string"
+          },
+          optional: true
+        }, {
+          name: "env",
+          type: {
+            kind: "object",
+            fields: []
+          },
+          optional: true
         }]
       }
     },
@@ -415,13 +410,13 @@ Object.defineProperty(module.exports, "defs", {
       location: {
         type: "source",
         fileName: "JavaDebuggerHelpersService.js",
-        line: 60
+        line: 57
       },
       type: {
         location: {
           type: "source",
           fileName: "JavaDebuggerHelpersService.js",
-          line: 60
+          line: 57
         },
         kind: "function",
         argumentTypes: [{
@@ -439,143 +434,37 @@ Object.defineProperty(module.exports, "defs", {
         }
       }
     },
-    prepareForTerminalLaunch: {
-      kind: "function",
-      name: "prepareForTerminalLaunch",
-      location: {
-        type: "source",
-        fileName: "JavaDebuggerHelpersService.js",
-        line: 69
-      },
-      type: {
-        location: {
-          type: "source",
-          fileName: "JavaDebuggerHelpersService.js",
-          line: 69
-        },
-        kind: "function",
-        argumentTypes: [{
-          name: "config",
-          type: {
-            kind: "named",
-            name: "JavaLaunchTargetConfig"
-          }
-        }],
-        returnType: {
-          kind: "promise",
-          type: {
-            kind: "named",
-            name: "TerminalLaunchInfo"
-          }
-        }
-      }
-    },
-    javaDebugWaitForJdwpProcessStart: {
-      kind: "function",
-      name: "javaDebugWaitForJdwpProcessStart",
-      location: {
-        type: "source",
-        fileName: "JavaDebuggerHelpersService.js",
-        line: 97
-      },
-      type: {
-        location: {
-          type: "source",
-          fileName: "JavaDebuggerHelpersService.js",
-          line: 97
-        },
-        kind: "function",
-        argumentTypes: [{
-          name: "jvmSuspendArgs",
-          type: {
-            kind: "string"
-          }
-        }],
-        returnType: {
-          kind: "promise",
-          type: {
-            kind: "void"
-          }
-        }
-      }
-    },
-    javaDebugWaitForJdwpProcessExit: {
-      kind: "function",
-      name: "javaDebugWaitForJdwpProcessExit",
-      location: {
-        type: "source",
-        fileName: "JavaDebuggerHelpersService.js",
-        line: 117
-      },
-      type: {
-        location: {
-          type: "source",
-          fileName: "JavaDebuggerHelpersService.js",
-          line: 117
-        },
-        kind: "function",
-        argumentTypes: [{
-          name: "jvmSuspendArgs",
-          type: {
-            kind: "string"
-          }
-        }],
-        returnType: {
-          kind: "promise",
-          type: {
-            kind: "void"
-          }
-        }
-      }
-    },
-    getAndroidSDKVersionFromApk: {
-      kind: "function",
-      name: "getAndroidSDKVersionFromApk",
-      location: {
-        type: "source",
-        fileName: "JavaDebuggerHelpersService.js",
-        line: 231
-      },
-      type: {
-        location: {
-          type: "source",
-          fileName: "JavaDebuggerHelpersService.js",
-          line: 231
-        },
-        kind: "function",
-        argumentTypes: [{
-          name: "apkPath",
-          type: {
-            kind: "string"
-          }
-        }],
-        returnType: {
-          kind: "promise",
-          type: {
-            kind: "string"
-          }
-        }
-      }
-    },
     getSdkVersionSourcePath: {
       kind: "function",
       name: "getSdkVersionSourcePath",
       location: {
         type: "source",
         fileName: "JavaDebuggerHelpersService.js",
-        line: 273
+        line: 131
       },
       type: {
         location: {
           type: "source",
           fileName: "JavaDebuggerHelpersService.js",
-          line: 273
+          line: 131
         },
         kind: "function",
         argumentTypes: [{
           name: "sdkVersion",
           type: {
             kind: "string"
+          }
+        }, {
+          name: "options",
+          type: {
+            kind: "object",
+            fields: [{
+              name: "useSdkManager",
+              type: {
+                kind: "boolean"
+              },
+              optional: false
+            }]
           }
         }],
         returnType: {

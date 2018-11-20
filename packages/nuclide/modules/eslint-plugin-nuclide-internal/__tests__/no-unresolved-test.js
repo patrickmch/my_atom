@@ -7,14 +7,12 @@
  * of patent rights can be found in the PATENTS file in the same directory.
  *
  * @noflow
+ * @emails oncall+nuclide
+ * @format
  */
 'use strict';
 
-/* eslint
-  comma-dangle: [1, always-multiline],
-  prefer-object-spread/prefer-object-spread: 0,
-  nuclide-internal/no-commonjs: 0,
-  */
+/* eslint nuclide-internal/no-commonjs: 0 */
 
 const rule = require('../no-unresolved');
 const RuleTester = require('eslint').RuleTester;
@@ -41,10 +39,13 @@ ruleTester.run('no-unresolved', rule, {
   invalid: [
     {
       code: 'var test = require("unresolvable")',
-      errors: [{
-        message: '"unresolvable" must be a dependency in the root package.json',
-        type: 'VariableDeclarator',
-      }],
+      errors: [
+        {
+          message:
+            '"unresolvable" must be a dependency in the root package.json',
+          type: 'VariableDeclarator',
+        },
+      ],
     },
   ],
 });

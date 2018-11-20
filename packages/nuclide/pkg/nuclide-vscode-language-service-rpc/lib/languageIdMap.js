@@ -1,9 +1,10 @@
-'use strict';
+"use strict";
 
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
 exports.mapAtomLanguageIdToVsCode = mapAtomLanguageIdToVsCode;
+
 /**
  * Copyright (c) 2015-present, Facebook, Inc.
  * All rights reserved.
@@ -14,7 +15,6 @@ exports.mapAtomLanguageIdToVsCode = mapAtomLanguageIdToVsCode;
  *  strict
  * @format
  */
-
 const languageIdMap = {
   'source.c': 'c',
   'source.clojure': 'clojure',

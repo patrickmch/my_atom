@@ -1,4 +1,4 @@
-'use strict';
+"use strict";
 
 Object.defineProperty(exports, "__esModule", {
   value: true
@@ -14,11 +14,6 @@ exports.createDisposeMessage = createDisposeMessage;
 exports.createUnsubscribeMessage = createUnsubscribeMessage;
 exports.createErrorResponseMessage = createErrorResponseMessage;
 
-
-// Encodes the structure of messages that can be sent from the server to the client.
-const ERROR_MESSAGE_LIMIT = 1000;
-
-// TODO: This should be a custom marshaller registered in the TypeRegistry
 /**
  * Copyright (c) 2015-present, Facebook, Inc.
  * All rights reserved.
@@ -29,17 +24,22 @@ const ERROR_MESSAGE_LIMIT = 1000;
  * 
  * @format
  */
-
 // Encodes the structure of messages that can be sent from the client to the server.
+// Encodes the structure of messages that can be sent from the server to the client.
+const ERROR_MESSAGE_LIMIT = 1000; // TODO: This should be a custom marshaller registered in the TypeRegistry
+
 function decodeError(message, encodedError) {
   if (encodedError != null && typeof encodedError === 'object') {
-    const resultError = new Error();
     let messageStr = JSON.stringify(message);
+
     if (messageStr.length > ERROR_MESSAGE_LIMIT) {
       messageStr = messageStr.substr(0, ERROR_MESSAGE_LIMIT) + `<${messageStr.length - ERROR_MESSAGE_LIMIT} bytes>`;
     }
-    resultError.message = `Remote Error: ${encodedError.message} processing message ${messageStr}\n` + JSON.stringify(encodedError.stack);
-    // $FlowIssue - some Errors (notably file operations) have a code.
+
+    const resultError = new Error(encodedError.message); // $FlowIssue - attach RPC message onto the created error
+
+    resultError.rpcMessage = messageStr; // $FlowIssue - some Errors (notably file operations) have a code.
+
     resultError.code = encodedError.code;
     resultError.stack = encodedError.stack;
     return resultError;
@@ -134,11 +134,12 @@ function createErrorResponseMessage(protocol, id, responseId, error) {
     error: formatError(error)
   };
 }
-
 /**
  * Format the error before sending over the web socket.
  * TODO: This should be a custom marshaller registered in the TypeRegistry
  */
+
+
 function formatError(error) {
   if (error instanceof Error) {
     return {

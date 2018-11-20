@@ -1,0 +1,60 @@
+diff --git a/nols_website/wmi/templates/dataentry/form_modal.html b/nols_website/wmi/templates/dataentry/form_modal.html
+index d7cedf457..b3e292064 100644
+--- a/nols_website/wmi/templates/dataentry/form_modal.html
++++ b/nols_website/wmi/templates/dataentry/form_modal.html
+@@ -1,49 +1,43 @@
+-<div id="{{ form_id }}_modal" class="reveal fade" data-overlay="false" data-reveal tabindex="-1" role="dialog" aria-hidden="true">
+-{% block modal_content %}
++<div id="{{ form_id }}" class="reveal fade" data-reveal tabindex="-1">
+   <div class="modal-dialog">
+     <div class="modal-content">
+       <button type="button" class="close" data-close aria-hidden="true">x</button>
+-      {% block form_tag %}
+       <form action="{{ form_action }}{% if redirect_name %}?{{ redirect_name }}={{ redirect }}{% endif %}"
+             method="post"
+             class="form-horizontal modal-form">
+-      {% endblock %}
+           <div class="modal-body container-fluid  content_container-fluid row">
+               <div class="modal-header">
+                   <div class="modal-header">
+                     <h3 class="modal-title">
+-                      {% block title %}
+-                        {{ modal_title }}
+-                      {% endblock %}
++                      {{ modal_title }}
+                     </h3>
+                   </div>
+                   <div class="modal-body column small-12">
+-                    {% block form_type  %}
+-                      {% include "bs_responsive_form_layout.html" %}
+-                    {% endblock %}
++                    {% include "bs_responsive_form_layout.html" %}
+                  </div>
+-                  <div class="small-12 medium-8 column" id="login-modal-buttons">
++                  <div class="small-12 medium-8 column modal-buttons">
+                     <button type="button" class="button button--hollow" data-close><span>Cancel</span></button>
+                     <input class="button " type="submit" value="Submit"/>
+                   </div>
+                   {% block below_buttons %}
+                   {% endblock %}
+               </div>
+           </div>
+       </form>
+     </div>
+   </div>
+-{% endblock %}
+ </div>
++{% block extra_js %}
+ <script>
+     $('#{{ form_id }}>form').submit(function(e) {
+         {% ifequal form_id 'phone_form' %}
+         var inputs = $(this).find('[name*="phoneform-"]')
+         for(var i=0; i<inputs.length; i++) {
+             var new_name = $(inputs[i]).attr('name').replace(/phoneform-/, '')
+             $(inputs[i]).attr('name', new_name)
+         }
+         {% endifequal %}
+         return validateCoreForm($(this), '{% url "validate_core_form"  form_id %}');
+       });
+ </script>
++{% endblock %}

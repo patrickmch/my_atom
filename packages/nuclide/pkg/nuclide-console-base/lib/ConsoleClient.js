@@ -1,15 +1,20 @@
-'use strict';
+"use strict";
 
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
+exports.default = void 0;
 
-var _rxjsBundlesRxMinJs = require('rxjs/bundles/Rx.min.js');
+var _rxjsCompatUmdMin = require("rxjs-compat/bundles/rxjs-compat.umd.min.js");
 
-var _main;
+function _main() {
+  const data = require("./main");
 
-function _load_main() {
-  return _main = require('./main');
+  _main = function () {
+    return data;
+  };
+
+  return data;
 }
 
 /**
@@ -22,11 +27,9 @@ function _load_main() {
  * 
  * @format
  */
-
 const SHOW_CONSOLE_ON_PROCESS_EVENTS = ['stdout', 'stderr', 'error'];
 
 class ConsoleClient {
-
   constructor(processName, progressUpdates, showNotificationOnCompletion = true) {
     this._processName = processName;
     this._progressUpdates = progressUpdates;
@@ -34,13 +37,17 @@ class ConsoleClient {
     this._showNotificationOnCompletion = showNotificationOnCompletion;
   }
 
-  enableAndPipeProcessMessagesToConsole(processMessage /* TODO(T17463635) */
+  enableAndPipeProcessMessagesToConsole(processMessage
+  /* TODO(T17463635) */
   ) {
-    (0, (_main || _load_main()).pipeProcessMessagesToConsole)(this._processName, this._progressUpdates, this._showNotificationOnCompletion, processMessage);
+    (0, _main().pipeProcessMessagesToConsole)(this._processName, this._progressUpdates, this._showNotificationOnCompletion, processMessage);
+
     if (!this._consoleShown && SHOW_CONSOLE_ON_PROCESS_EVENTS.includes(processMessage.kind)) {
-      (0, (_main || _load_main()).changeConsoleVisibility)(true);
+      (0, _main().changeConsoleVisibility)(true);
       this._consoleShown = true;
     }
   }
+
 }
+
 exports.default = ConsoleClient;

@@ -1,30 +1,42 @@
-'use strict';
+"use strict";
 
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
+exports.default = void 0;
 
-var _MIProxy;
+function _MIProxy() {
+  const data = _interopRequireDefault(require("./MIProxy"));
 
-function _load_MIProxy() {
-  return _MIProxy = _interopRequireDefault(require('./MIProxy'));
+  _MIProxy = function () {
+    return data;
+  };
+
+  return data;
 }
 
-var _MITypes;
+function _MITypes() {
+  const data = require("./MITypes");
 
-function _load_MITypes() {
-  return _MITypes = require('./MITypes');
+  _MITypes = function () {
+    return data;
+  };
+
+  return data;
 }
 
-var _VariableReference;
+function _VariableReference() {
+  const data = _interopRequireDefault(require("./VariableReference"));
 
-function _load_VariableReference() {
-  return _VariableReference = _interopRequireDefault(require('./VariableReference'));
+  _VariableReference = function () {
+    return data;
+  };
+
+  return data;
 }
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-// a ScopeVariableReference refers to a set of variables in a stack frame
 /**
  * Copyright (c) 2017-present, Facebook, Inc.
  * All rights reserved.
@@ -36,8 +48,8 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
  * 
  * @format
  */
-
-class ScopeVariableReference extends (_VariableReference || _load_VariableReference()).default {
+// a ScopeVariableReference refers to a set of variables in a stack frame
+class ScopeVariableReference extends _VariableReference().default {
   constructor(client, variables, threadId, frameIndex) {
     super({
       client,
@@ -53,24 +65,23 @@ class ScopeVariableReference extends (_VariableReference || _load_VariableRefere
   async getVariables(start, count) {
     // By definition, a scope variable must have a stack frame.
     if (!(this.threadId != null)) {
-      throw new Error('Invariant violation: "this.threadId != null"');
+      throw new Error("Invariant violation: \"this.threadId != null\"");
     }
 
     if (!(this.frameIndex != null)) {
-      throw new Error('Invariant violation: "this.frameIndex != null"');
+      throw new Error("Invariant violation: \"this.frameIndex != null\"");
     }
 
     const command = `stack-list-variables --thread ${this.threadId} --frame ${this.frameIndex} --no-values`;
     const result = await this._client.sendCommand(command);
+
     if (result.error) {
-      throw new Error(`Error retrieving variables for stack frame (${(0, (_MITypes || _load_MITypes()).toCommandError)(result).msg})`);
+      throw new Error(`Error retrieving variables for stack frame (${(0, _MITypes().toCommandError)(result).msg})`);
     }
 
-    const miVariables = (0, (_MITypes || _load_MITypes()).stackListVariablesResult)(result).variables;
-
+    const miVariables = (0, _MITypes().stackListVariablesResult)(result).variables;
     const resolvedStart = start == null ? 0 : start;
     const resolvedEnd = count == null ? miVariables.length - resolvedStart : start + count;
-
     return Promise.all(miVariables.slice(resolvedStart, resolvedEnd).map(async _ => {
       const handle = this._variables.nestedVariableReference(this, _.name);
 
@@ -80,21 +91,20 @@ class ScopeVariableReference extends (_VariableReference || _load_VariableRefere
 
   async setChildValue(name, value) {
     const varResult = await this._client.sendCommand(`var-create - * ${name}`);
+
     if (varResult.error) {
-      throw new Error(`Could not get variable ${name} to set: ${(0, (_MITypes || _load_MITypes()).toCommandError)(varResult).msg}`);
+      throw new Error(`Could not get variable ${name} to set: ${(0, _MITypes().toCommandError)(varResult).msg}`);
     }
 
-    const varInfo = (0, (_MITypes || _load_MITypes()).varCreateResult)(varResult);
-
+    const varInfo = (0, _MITypes().varCreateResult)(varResult);
     const assignResult = await this._client.sendCommand(`var-assign ${varInfo.name} ${value}`);
+
     if (assignResult.error) {
-      throw new Error(`Unable to set ${name} to {value}: ${(0, (_MITypes || _load_MITypes()).toCommandError)(assignResult).msg}`);
+      throw new Error(`Unable to set ${name} to {value}: ${(0, _MITypes().toCommandError)(assignResult).msg}`);
     }
 
-    const assign = (0, (_MITypes || _load_MITypes()).varAssignResult)(assignResult);
-
+    const assign = (0, _MITypes().varAssignResult)(assignResult);
     await this._client.sendCommand(`var-delete ${varInfo.name}`);
-
     return {
       value: assign.value,
       type: varInfo.type,
@@ -119,5 +129,7 @@ class ScopeVariableReference extends (_VariableReference || _load_VariableRefere
     this._childCount = variables.length;
     return variables.length;
   }
+
 }
+
 exports.default = ScopeVariableReference;

@@ -1,68 +1,101 @@
-'use strict';
+"use strict";
 
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
+exports.default = void 0;
 
-var _rxjsBundlesRxMinJs = require('rxjs/bundles/Rx.min.js');
+var _rxjsCompatUmdMin = require("rxjs-compat/bundles/rxjs-compat.umd.min.js");
 
-var _nuclideUri;
+function _nuclideUri() {
+  const data = _interopRequireDefault(require("../../../modules/nuclide-commons/nuclideUri"));
 
-function _load_nuclideUri() {
-  return _nuclideUri = _interopRequireDefault(require('../../../modules/nuclide-commons/nuclideUri'));
+  _nuclideUri = function () {
+    return data;
+  };
+
+  return data;
 }
 
-var _UniversalDisposable;
+function _UniversalDisposable() {
+  const data = _interopRequireDefault(require("../../../modules/nuclide-commons/UniversalDisposable"));
 
-function _load_UniversalDisposable() {
-  return _UniversalDisposable = _interopRequireDefault(require('../../../modules/nuclide-commons/UniversalDisposable'));
+  _UniversalDisposable = function () {
+    return data;
+  };
+
+  return data;
 }
 
-var _nuclideRemoteConnection;
+function _nuclideRemoteConnection() {
+  const data = require("../../nuclide-remote-connection");
 
-function _load_nuclideRemoteConnection() {
-  return _nuclideRemoteConnection = require('../../nuclide-remote-connection');
+  _nuclideRemoteConnection = function () {
+    return data;
+  };
+
+  return data;
 }
 
-var _nuclideProjectionist;
+function _nuclideProjectionist() {
+  const data = _interopRequireDefault(require("../../nuclide-projectionist"));
 
-function _load_nuclideProjectionist() {
-  return _nuclideProjectionist = _interopRequireDefault(require('../../nuclide-projectionist'));
+  _nuclideProjectionist = function () {
+    return data;
+  };
+
+  return data;
 }
 
-var _event;
+function _event() {
+  const data = require("../../../modules/nuclide-commons/event");
 
-function _load_event() {
-  return _event = require('../../../modules/nuclide-commons/event');
+  _event = function () {
+    return data;
+  };
+
+  return data;
 }
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
+/**
+ * Copyright (c) 2015-present, Facebook, Inc.
+ * All rights reserved.
+ *
+ * This source code is licensed under the license found in the LICENSE file in
+ * the root directory of this source tree.
+ *
+ *  strict-local
+ * @format
+ */
 class ProjectionistFileFamilyProvider {
-
   constructor(cwdApis) {
-    this._disposables = new (_UniversalDisposable || _load_UniversalDisposable()).default(cwdApis.switchMap(cwdApi => cwdApi == null ? _rxjsBundlesRxMinJs.Observable.of(null) : (0, (_event || _load_event()).observableFromSubscribeFunction)(cwdApi.observeCwd.bind(cwdApi))).switchMap(cwd => {
+    this._disposables = new (_UniversalDisposable().default)(cwdApis.switchMap(cwdApi => cwdApi == null ? _rxjsCompatUmdMin.Observable.of(null) : (0, _event().observableFromSubscribeFunction)(cwdApi.observeCwd.bind(cwdApi))).switchMap(cwd => {
       if (cwd == null) {
-        return _rxjsBundlesRxMinJs.Observable.of([null, null]);
+        return _rxjsCompatUmdMin.Observable.of([null, null]);
       }
 
-      return Promise.all([(0, (_nuclideRemoteConnection || _load_nuclideRemoteConnection()).getFileSystemServiceByNuclideUri)(cwd), cwd]);
+      return Promise.all([(0, _nuclideRemoteConnection().getFileSystemServiceByNuclideUri)(cwd), cwd]);
     }).switchMap(([fsService, cwd]) => {
       if (fsService == null || cwd == null) {
-        return _rxjsBundlesRxMinJs.Observable.of([null, null, null]);
+        return _rxjsCompatUmdMin.Observable.of([null, null, null]);
       }
 
       return Promise.all([fsService.findNearestAncestorNamed('.projections.json', cwd), fsService, cwd]);
-    }).switchMap(([configPath, fsService, cwd]) => configPath == null || fsService == null ? _rxjsBundlesRxMinJs.Observable.of([null, cwd]) : Promise.all([fsService.readFile(configPath), cwd])).subscribe(([rulesStr, cwd]) => {
+    }).switchMap(([configPath, fsService, cwd]) => configPath == null || fsService == null ? _rxjsCompatUmdMin.Observable.of([null, cwd]) : Promise.all([fsService.readFile(configPath), cwd])).subscribe(([rulesStr, cwd]) => {
       if (rulesStr != null) {
         let rules;
+
         try {
           rules = JSON.parse(rulesStr.toString());
         } catch (e) {}
+
         if (rules != null) {
-          this._projectionist = new (_nuclideProjectionist || _load_nuclideProjectionist()).default(rules);
+          this._projectionist = new (_nuclideProjectionist().default)(rules);
         }
       }
+
       this._cwd = cwd;
     }));
   }
@@ -70,49 +103,58 @@ class ProjectionistFileFamilyProvider {
   async getRelatedFiles(path) {
     const projectionist = this._projectionist;
     const cwd = this._cwd;
-    if (projectionist == null || cwd == null) {
+
+    if (projectionist == null || cwd == null || !_nuclideUri().default.contains(cwd, path)) {
       return {
         files: new Map(),
         relations: []
       };
     }
 
-    const alternates = projectionist.getAlternates((_nuclideUri || _load_nuclideUri()).default.relative(cwd, path));
+    const alternates = await Promise.all(projectionist.getAlternates(_nuclideUri().default.relative(cwd, path)).map(async uri => {
+      const fullUri = _nuclideUri().default.join(cwd, uri);
 
-    const files = new Map([[path, { labels: new Set() }], ...alternates.map(alternate => {
-      const type = projectionist.getType(alternate);
-      return [(_nuclideUri || _load_nuclideUri()).default.resolve(cwd, alternate), {
-        labels: type == null ? new Set() : new Set([type])
+      const fsService = (0, _nuclideRemoteConnection().getFileSystemServiceByNuclideUri)(fullUri);
+      return {
+        uri,
+        exists: await fsService.exists(fullUri)
+      };
+    }));
+    const files = new Map([[path, {
+      labels: new Set()
+    }], ...alternates.map(({
+      uri,
+      exists
+    }) => {
+      const type = projectionist.getType(uri);
+      return [_nuclideUri().default.resolve(cwd, uri), {
+        labels: type == null ? new Set() : new Set([type]),
+        exists
       }];
     })]);
-
-    const relations = alternates.map(alternate => {
+    const relations = alternates.map(({
+      uri
+    }) => {
       const labels = new Set(['alternate']);
-      const type = projectionist.getType(alternate);
+      const type = projectionist.getType(uri);
+
       if (type != null) {
         labels.add(type);
       }
+
       return {
         from: path,
-        to: (_nuclideUri || _load_nuclideUri()).default.resolve(cwd, alternate),
+        to: _nuclideUri().default.resolve(cwd, uri),
         labels,
         directed: true
       };
     });
-
     return {
       files,
       relations
     };
   }
+
 }
-exports.default = ProjectionistFileFamilyProvider; /**
-                                                    * Copyright (c) 2015-present, Facebook, Inc.
-                                                    * All rights reserved.
-                                                    *
-                                                    * This source code is licensed under the license found in the LICENSE file in
-                                                    * the root directory of this source tree.
-                                                    *
-                                                    *  strict-local
-                                                    * @format
-                                                    */
+
+exports.default = ProjectionistFileFamilyProvider;

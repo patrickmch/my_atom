@@ -1,4 +1,4 @@
-'use strict';
+"use strict";
 
 Object.defineProperty(exports, "__esModule", {
   value: true
@@ -12,22 +12,22 @@ exports.observableErrorString = observableErrorString;
 exports.observableErrorUndefined = observableErrorUndefined;
 exports.observableErrorCode = observableErrorCode;
 
-var _rxjsBundlesRxMinJs = require('rxjs/bundles/Rx.min.js');
+var _rxjsCompatUmdMin = require("rxjs-compat/bundles/rxjs-compat.umd.min.js");
 
+/**
+ * Copyright (c) 2015-present, Facebook, Inc.
+ * All rights reserved.
+ *
+ * This source code is licensed under the license found in the LICENSE file in
+ * the root directory of this source tree.
+ *
+ * 
+ * @format
+ */
 // Contains services that let us test marshalling of Errors.
-
 async function promiseError(message) {
   throw new Error(message);
-} /**
-   * Copyright (c) 2015-present, Facebook, Inc.
-   * All rights reserved.
-   *
-   * This source code is licensed under the license found in the LICENSE file in
-   * the root directory of this source tree.
-   *
-   * 
-   * @format
-   */
+}
 
 async function promiseErrorString(message) {
   throw message;
@@ -59,14 +59,14 @@ function observableErrorCode(code) {
 }
 
 function createErrorObservable(error) {
-  return _rxjsBundlesRxMinJs.Observable.create(observer => {
+  return _rxjsCompatUmdMin.Observable.create(observer => {
     observer.error(error);
   }).publish();
 }
 
 function createErrorCode(code) {
-  const e = new Error();
-  // $FlowIssue - Error should have a code
+  const e = new Error(); // $FlowIssue - Error should have a code
+
   e.code = code;
   return e;
 }

@@ -4,6 +4,7 @@ Object.defineProperty(exports, "__esModule", {
   value: true
 });
 exports.default = destroyPaneItemWithTitle;
+
 /**
  * Copyright (c) 2015-present, Facebook, Inc.
  * All rights reserved.
@@ -14,11 +15,11 @@ exports.default = destroyPaneItemWithTitle;
  *  strict
  * @format
  */
-
 function destroyPaneItemWithTitle(title) {
   for (const item of atom.workspace.getPaneItems()) {
     if (item.getTitle() === title) {
       const pane = atom.workspace.paneForItem(item);
+
       if (pane != null) {
         pane.destroyItem(item);
         return;

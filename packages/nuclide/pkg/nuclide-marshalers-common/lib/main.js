@@ -1,58 +1,71 @@
-'use strict';
+"use strict";
 
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.getServerSideMarshalers = exports.localNuclideUriMarshalers = undefined;
 exports.getRemoteNuclideUriMarshalers = getRemoteNuclideUriMarshalers;
+exports.getServerSideMarshalers = exports.localNuclideUriMarshalers = void 0;
 
-var _nuclideUri;
+function _nuclideUri() {
+  const data = _interopRequireDefault(require("../../../modules/nuclide-commons/nuclideUri"));
 
-function _load_nuclideUri() {
-  return _nuclideUri = _interopRequireDefault(require('../../../modules/nuclide-commons/nuclideUri'));
+  _nuclideUri = function () {
+    return data;
+  };
+
+  return data;
 }
 
-var _simpleTextBuffer;
+function _simpleTextBuffer() {
+  const data = require("simple-text-buffer");
 
-function _load_simpleTextBuffer() {
-  return _simpleTextBuffer = require('simple-text-buffer');
+  _simpleTextBuffer = function () {
+    return data;
+  };
+
+  return data;
 }
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
+/**
+ * Copyright (c) 2015-present, Facebook, Inc.
+ * All rights reserved.
+ *
+ * This source code is licensed under the license found in the LICENSE file in
+ * the root directory of this source tree.
+ *
+ *  strict-local
+ * @format
+ */
 function getRemoteNuclideUriMarshalers(hostname) {
   return {
-    typeName: (_nuclideUri || _load_nuclideUri()).default.NUCLIDE_URI_TYPE_NAME,
-    marshaller: remoteUri => (_nuclideUri || _load_nuclideUri()).default.getPath(remoteUri),
-    unmarshaller: path => (_nuclideUri || _load_nuclideUri()).default.createRemoteUri(hostname, path)
+    typeName: _nuclideUri().default.NUCLIDE_URI_TYPE_NAME,
+    marshaller: remoteUri => _nuclideUri().default.getPath(remoteUri),
+    unmarshaller: path => _nuclideUri().default.createRemoteUri(hostname, path)
   };
-} /**
-   * Copyright (c) 2015-present, Facebook, Inc.
-   * All rights reserved.
-   *
-   * This source code is licensed under the license found in the LICENSE file in
-   * the root directory of this source tree.
-   *
-   *  strict-local
-   * @format
-   */
+}
 
-const localNuclideUriMarshalers = exports.localNuclideUriMarshalers = {
-  typeName: (_nuclideUri || _load_nuclideUri()).default.NUCLIDE_URI_TYPE_NAME,
+const localNuclideUriMarshalers = {
+  typeName: _nuclideUri().default.NUCLIDE_URI_TYPE_NAME,
   marshaller: uri => {
-    (_nuclideUri || _load_nuclideUri()).default.validate(uri, false);
+    _nuclideUri().default.validate(uri, false);
+
     return uri;
   },
   unmarshaller: remotePath => {
-    (_nuclideUri || _load_nuclideUri()).default.validate(remotePath, false);
+    _nuclideUri().default.validate(remotePath, false);
+
     return remotePath;
   }
 };
+exports.localNuclideUriMarshalers = localNuclideUriMarshalers;
 
-const jsonToServerPoint = json => new (_simpleTextBuffer || _load_simpleTextBuffer()).Point(json.row, json.column);
-const jsonToServerRange = json => new (_simpleTextBuffer || _load_simpleTextBuffer()).Range(jsonToServerPoint(json.start), jsonToServerPoint(json.end));
+const jsonToServerPoint = json => new (_simpleTextBuffer().Point)(json.row, json.column);
 
-const getServerSideMarshalers = exports.getServerSideMarshalers = [localNuclideUriMarshalers, {
+const jsonToServerRange = json => new (_simpleTextBuffer().Range)(jsonToServerPoint(json.start), jsonToServerPoint(json.end));
+
+const getServerSideMarshalers = [localNuclideUriMarshalers, {
   typeName: 'atom$Point',
   marshaller: point => point,
   unmarshaller: jsonToServerPoint
@@ -61,3 +74,4 @@ const getServerSideMarshalers = exports.getServerSideMarshalers = [localNuclideU
   marshaller: range => range,
   unmarshaller: jsonToServerRange
 }];
+exports.getServerSideMarshalers = getServerSideMarshalers;

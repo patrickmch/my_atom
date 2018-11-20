@@ -1,15 +1,30 @@
-'use strict';
+"use strict";
 
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
 exports.validateFormInputs = validateFormInputs;
 
-var _nuclideRemoteConnection;
+function _nuclideRemoteConnection() {
+  const data = require("../../nuclide-remote-connection");
 
-function _load_nuclideRemoteConnection() {
-  return _nuclideRemoteConnection = require('../../nuclide-remote-connection');
+  _nuclideRemoteConnection = function () {
+    return data;
+  };
+
+  return data;
 }
+
+/**
+ * Copyright (c) 2015-present, Facebook, Inc.
+ * All rights reserved.
+ *
+ * This source code is licensed under the license found in the LICENSE file in
+ * the root directory of this source tree.
+ *
+ *  strict-local
+ * @format
+ */
 
 /*
  * This function checks that the required inputs to a connection profile are non-empty
@@ -33,21 +48,25 @@ function validateFormInputs(profileName, connectionDetails, defaultRemoteServerC
   } else {
     profileParams.displayTitle = profileName;
   }
+
   if (!connectionDetails.username) {
     missingFields.push('Username');
   } else {
     profileParams.username = connectionDetails.username;
   }
+
   if (!connectionDetails.server) {
     missingFields.push('Server');
   } else {
     profileParams.server = connectionDetails.server;
   }
+
   if (!connectionDetails.cwd) {
     missingFields.push('Initial Directory');
   } else {
     profileParams.cwd = connectionDetails.cwd;
   }
+
   if (!connectionDetails.sshPort) {
     missingFields.push('SSH Port');
   } else {
@@ -55,38 +74,43 @@ function validateFormInputs(profileName, connectionDetails, defaultRemoteServerC
   }
 
   const authMethod = connectionDetails.authMethod;
+
   if (!authMethod) {
     missingFields.push('Authentication Method');
   } else {
     profileParams.authMethod = authMethod;
   }
-  if (authMethod === (_nuclideRemoteConnection || _load_nuclideRemoteConnection()).SshHandshake.SupportedMethods.PRIVATE_KEY && !connectionDetails.pathToPrivateKey) {
+
+  if (authMethod === _nuclideRemoteConnection().SshHandshake.SupportedMethods.PRIVATE_KEY && !connectionDetails.pathToPrivateKey) {
     missingFields.push('Private Key File (required for the authentication method you selected)');
   } else {
     profileParams.pathToPrivateKey = connectionDetails.pathToPrivateKey;
-  }
+  } // Do not proceed if there are any missing fields.
 
-  // Do not proceed if there are any missing fields.
+
   if (missingFields.length) {
     const missingFieldsString = missingFields.join(', ');
     const errorMessage = `You must fill out all fields. Currently missing:\n${missingFieldsString}`;
-    return { errorMessage };
-  }
-
-  // If all the fields are filled out, there are some additional checks we
+    return {
+      errorMessage
+    };
+  } // If all the fields are filled out, there are some additional checks we
   // want to do.
-  let warningMessage = '';
 
-  // 1. If a password is provided, all parts of the profile will be save except the password.
-  if (authMethod === (_nuclideRemoteConnection || _load_nuclideRemoteConnection()).SshHandshake.SupportedMethods.PASSWORD && connectionDetails.password) {
+
+  let warningMessage = ''; // 1. If a password is provided, all parts of the profile will be save except the password.
+
+  if (authMethod === _nuclideRemoteConnection().SshHandshake.SupportedMethods.PASSWORD && connectionDetails.password) {
     warningMessage += '* You provided a password for this profile. ' + 'For security, Nuclide will save the other parts of this profile, ' + 'but not the password.\n';
-  }
-  // 2. Save the remote server command only if it is changed.
+  } // 2. Save the remote server command only if it is changed.
+
+
   if (connectionDetails.remoteServerCommand && connectionDetails.remoteServerCommand !== defaultRemoteServerCommand) {
     profileParams.remoteServerCommand = connectionDetails.remoteServerCommand;
   } else {
     profileParams.remoteServerCommand = '';
   }
+
   const validatedProfile = {
     deletable: true,
     displayTitle: profileName,
@@ -96,15 +120,8 @@ function validateFormInputs(profileName, connectionDetails, defaultRemoteServerC
   const validationResult = warningMessage.length > 0 ? {
     validatedProfile,
     warningMessage
-  } : { validatedProfile };
+  } : {
+    validatedProfile
+  };
   return validationResult;
-} /**
-   * Copyright (c) 2015-present, Facebook, Inc.
-   * All rights reserved.
-   *
-   * This source code is licensed under the license found in the LICENSE file in
-   * the root directory of this source tree.
-   *
-   *  strict-local
-   * @format
-   */
+}

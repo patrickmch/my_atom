@@ -1,116 +1,138 @@
-'use strict';
+"use strict";
 
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
+exports.default = void 0;
 
-var _react = _interopRequireWildcard(require('react'));
+var React = _interopRequireWildcard(require("react"));
 
-var _featureConfig;
+function _featureConfig() {
+  const data = _interopRequireDefault(require("../../../modules/nuclide-commons-atom/feature-config"));
 
-function _load_featureConfig() {
-  return _featureConfig = _interopRequireDefault(require('../../../modules/nuclide-commons-atom/feature-config'));
+  _featureConfig = function () {
+    return data;
+  };
+
+  return data;
 }
 
-var _goToLocation;
+function _goToLocation() {
+  const data = require("../../../modules/nuclide-commons-atom/go-to-location");
 
-function _load_goToLocation() {
-  return _goToLocation = require('../../../modules/nuclide-commons-atom/go-to-location');
+  _goToLocation = function () {
+    return data;
+  };
+
+  return data;
 }
 
-var _HackLanguage;
+function _HackLanguage() {
+  const data = require("../../nuclide-hack/lib/HackLanguage");
 
-function _load_HackLanguage() {
-  return _HackLanguage = require('../../nuclide-hack/lib/HackLanguage');
+  _HackLanguage = function () {
+    return data;
+  };
+
+  return data;
 }
 
-var _nuclideRemoteConnection;
+function _nuclideRemoteConnection() {
+  const data = require("../../nuclide-remote-connection");
 
-function _load_nuclideRemoteConnection() {
-  return _nuclideRemoteConnection = require('../../nuclide-remote-connection');
+  _nuclideRemoteConnection = function () {
+    return data;
+  };
+
+  return data;
 }
 
-var _nuclideUri;
+function _nuclideUri() {
+  const data = _interopRequireDefault(require("../../../modules/nuclide-commons/nuclideUri"));
 
-function _load_nuclideUri() {
-  return _nuclideUri = _interopRequireDefault(require('../../../modules/nuclide-commons/nuclideUri'));
+  _nuclideUri = function () {
+    return data;
+  };
+
+  return data;
 }
 
-var _utils;
+function _utils() {
+  const data = require("./utils");
 
-function _load_utils() {
-  return _utils = require('./utils');
+  _utils = function () {
+    return data;
+  };
+
+  return data;
 }
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
+function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) { var desc = Object.defineProperty && Object.getOwnPropertyDescriptor ? Object.getOwnPropertyDescriptor(obj, key) : {}; if (desc.get || desc.set) { Object.defineProperty(newObj, key, desc); } else { newObj[key] = obj[key]; } } } } newObj.default = obj; return newObj; } }
 
-// ctags doesn't have a true limit API, so having too many results slows down Nuclide.
-
+/**
+ * Copyright (c) 2015-present, Facebook, Inc.
+ * All rights reserved.
+ *
+ * This source code is licensed under the license found in the LICENSE file in
+ * the root directory of this source tree.
+ *
+ * 
+ * @format
+ */
 // eslint-disable-next-line nuclide-internal/no-cross-atom-imports
-const MIN_QUERY_LENGTH = 2; /**
-                             * Copyright (c) 2015-present, Facebook, Inc.
-                             * All rights reserved.
-                             *
-                             * This source code is licensed under the license found in the LICENSE file in
-                             * the root directory of this source tree.
-                             *
-                             * 
-                             * @format
-                             */
-
+// ctags doesn't have a true limit API, so having too many results slows down Nuclide.
+const MIN_QUERY_LENGTH = 2;
 const RESULTS_LIMIT = 10;
 const DEFAULT_ICON = 'icon-squirrel';
 
 async function getCtagsService(directory) {
   // The tags package looks in the directory, so give it a sample file.
-  const path = (_nuclideUri || _load_nuclideUri()).default.join(directory.getPath(), 'file');
-  const service = (0, (_nuclideRemoteConnection || _load_nuclideRemoteConnection()).getServiceByNuclideUri)('CtagsService', path);
+  const path = _nuclideUri().default.join(directory.getPath(), 'file');
+
+  const service = (0, _nuclideRemoteConnection().getServiceByNuclideUri)('CtagsService', path);
+
   if (service == null) {
     return null;
   }
+
   return service.getCtagsService(path);
 }
 
 class QuickOpenHelpers {
   static async isEligibleForDirectory(directory) {
     const svc = await getCtagsService(directory);
+
     if (svc != null) {
       svc.dispose();
       return true;
     }
+
     return false;
   }
 
   static getComponentForItem(uncastedItem) {
     const item = uncastedItem;
-    const path = (_nuclideUri || _load_nuclideUri()).default.relative(item.dir, item.path);
+
+    const path = _nuclideUri().default.relative(item.dir, item.path);
+
     let kind;
     let icon;
+
     if (item.kind != null) {
-      kind = (_utils || _load_utils()).CTAGS_KIND_NAMES[item.kind];
-      icon = (_utils || _load_utils()).CTAGS_KIND_ICONS[item.kind];
+      kind = _utils().CTAGS_KIND_NAMES[item.kind];
+      icon = _utils().CTAGS_KIND_ICONS[item.kind];
     }
+
     icon = icon || DEFAULT_ICON;
-    return _react.createElement(
-      'div',
-      { title: kind },
-      _react.createElement(
-        'span',
-        { className: `file icon ${icon}` },
-        _react.createElement(
-          'code',
-          null,
-          item.name
-        )
-      ),
-      _react.createElement(
-        'span',
-        { className: 'omnisearch-symbol-result-filename' },
-        path
-      )
-    );
+    return React.createElement("div", {
+      title: kind
+    }, React.createElement("span", {
+      className: `file icon ${icon}`
+    }, React.createElement("code", null, item.name)), React.createElement("span", {
+      className: "omnisearch-symbol-result-filename"
+    }, path));
   }
 
   static async executeQuery(query, directory) {
@@ -120,16 +142,18 @@ class QuickOpenHelpers {
 
     const dir = directory.getPath();
     const service = await getCtagsService(directory);
+
     if (service == null) {
       return [];
-    }
-
-    // HACK: Ctags results typically just duplicate Hack results when they're present.
+    } // HACK: Ctags results typically just duplicate Hack results when they're present.
     // Filter out results from PHP files when the Hack service is available.
     // TODO(hansonw): Remove this when quick-open has proper ranking/de-duplication.
+
+
     let isHackProject;
-    if ((_featureConfig || _load_featureConfig()).default.get('nuclide-ctags.disableWithHack') !== false) {
-      isHackProject = await (0, (_HackLanguage || _load_HackLanguage()).isFileInHackProject)(directory.getPath());
+
+    if (_featureConfig().default.get('nuclide-ctags.disableWithHack') !== false) {
+      isHackProject = await (0, _HackLanguage().isFileInHackProject)(directory.getPath());
     }
 
     try {
@@ -138,21 +162,26 @@ class QuickOpenHelpers {
         partialMatch: true,
         limit: RESULTS_LIMIT
       });
-
       return results.filter(tag => !isHackProject || !tag.file.endsWith('.php')).map(tag => {
         return Object.assign({}, tag, {
           resultType: 'FILE',
           path: tag.file,
           dir,
+
           async callback() {
-            const line = await (0, (_utils || _load_utils()).getLineNumberForTag)(tag);
-            (0, (_goToLocation || _load_goToLocation()).goToLocation)(tag.file, { line });
+            const line = await (0, _utils().getLineNumberForTag)(tag);
+            (0, _goToLocation().goToLocation)(tag.file, {
+              line
+            });
           }
+
         });
       });
     } finally {
       service.dispose();
     }
   }
+
 }
+
 exports.default = QuickOpenHelpers;

@@ -1,4 +1,4 @@
-'use strict';
+"use strict";
 
 Object.defineProperty(exports, "__esModule", {
   value: true
@@ -10,9 +10,6 @@ exports.get_hover = get_hover;
 exports.get_outline = get_outline;
 exports.get_signature_help = get_signature_help;
 
-
-// This file contains RPC definitions for jediserver.py.
-
 /**
  * Copyright (c) 2015-present, Facebook, Inc.
  * All rights reserved.
@@ -23,7 +20,7 @@ exports.get_signature_help = get_signature_help;
  * 
  * @format
  */
-
+// This file contains RPC definitions for jediserver.py.
 async function get_completions(src, contents, sysPath, line, column) {
   throw new Error('RPC Stub');
 }
@@ -36,8 +33,7 @@ async function get_references(src, contents, sysPath, line, column) {
   throw new Error('RPC Stub');
 }
 
-async function get_hover(src, contents, sysPath,
-// It's much easier to get the current word from JavaScript.
+async function get_hover(src, contents, sysPath, // It's much easier to get the current word from JavaScript.
 word, line, column) {
   throw new Error('RPC Stub');
 }

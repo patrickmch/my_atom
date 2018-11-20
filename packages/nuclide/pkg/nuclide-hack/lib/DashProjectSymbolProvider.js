@@ -1,21 +1,30 @@
-'use strict';
+"use strict";
 
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
+exports.default = void 0;
 
-var _rxjsBundlesRxMinJs = require('rxjs/bundles/Rx.min.js');
+var _rxjsCompatUmdMin = require("rxjs-compat/bundles/rxjs-compat.umd.min.js");
 
-var _UniversalDisposable;
+function _UniversalDisposable() {
+  const data = _interopRequireDefault(require("../../../modules/nuclide-commons/UniversalDisposable"));
 
-function _load_UniversalDisposable() {
-  return _UniversalDisposable = _interopRequireDefault(require('../../../modules/nuclide-commons/UniversalDisposable'));
+  _UniversalDisposable = function () {
+    return data;
+  };
+
+  return data;
 }
 
-var _HackLanguage;
+function _HackLanguage() {
+  const data = require("./HackLanguage");
 
-function _load_HackLanguage() {
-  return _HackLanguage = require('./HackLanguage');
+  _HackLanguage = function () {
+    return data;
+  };
+
+  return data;
 }
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
@@ -30,15 +39,15 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
  * 
  * @format
  */
-
 const DashProjectSymbolProvider = {
   searchSymbolsForDirectory(query, directory, callback) {
     const directoryPath = directory.getPath();
 
-    const results = _rxjsBundlesRxMinJs.Observable.defer(() => (0, (_HackLanguage || _load_HackLanguage()).getHackLanguageForUri)(directoryPath)).switchMap(service => service == null ? _rxjsBundlesRxMinJs.Observable.of([]) : service.symbolSearch(query, [directoryPath])).map(searchResults => searchResults || []).catch(() => _rxjsBundlesRxMinJs.Observable.of([]));
+    const results = _rxjsCompatUmdMin.Observable.defer(() => (0, _HackLanguage().getHackLanguageForUri)(directoryPath)).switchMap(service => service == null ? _rxjsCompatUmdMin.Observable.of([]) : service.symbolSearch(query, [directoryPath])).map(searchResults => searchResults || []).catch(() => _rxjsCompatUmdMin.Observable.of([]));
 
-    return new (_UniversalDisposable || _load_UniversalDisposable()).default(results.subscribe(callback));
+    return new (_UniversalDisposable().default)(results.subscribe(callback));
   }
-};
 
-exports.default = DashProjectSymbolProvider;
+};
+var _default = DashProjectSymbolProvider;
+exports.default = _default;

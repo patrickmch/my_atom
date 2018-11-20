@@ -1,8 +1,32 @@
-'use strict';
+"use strict";
 
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
+exports.MIRegisterValueParser = exports.MIRegisterIndexedValues = exports.MIRegisterNamedValues = exports.MIRegisterSimpleValue = exports.MIRegisterValue = void 0;
+
+/**
+ * Copyright (c) 2017-present, Facebook, Inc.
+ * All rights reserved.
+ *
+ * This source code is licensed under the BSD-style license found in the
+ * LICENSE file in the root directory of this source tree. An additional grant
+ * of patent rights can be found in the PATENTS file in the same directory.
+ *
+ * 
+ * @format
+ */
+// The MI documentation doesn't cover this, but gdb will return structured values
+// for registers which contain packed arrays of simple types (MMX et al.)
+// Furthermore, if the register can hold different widths of values, then
+// there is an intermediate node for each possible representation it can hold.
+//
+// The syntax is similar to MI result record values:
+// value => simple_value | named_list | indexed_list
+// simple_value => float-value | integer-value
+// named_list => '{' identifer '=' value ( ',' identifier '=' value ) * '}'
+// indexed_list => '{' value ( ',' value ) *  '}'
+//
 class MIRegisterValue {
   toString() {
     return '';
@@ -27,34 +51,12 @@ class MIRegisterValue {
   valueAt(index) {
     return null;
   }
+
 }
 
-exports.MIRegisterValue = MIRegisterValue; /**
-                                            * Copyright (c) 2017-present, Facebook, Inc.
-                                            * All rights reserved.
-                                            *
-                                            * This source code is licensed under the BSD-style license found in the
-                                            * LICENSE file in the root directory of this source tree. An additional grant
-                                            * of patent rights can be found in the PATENTS file in the same directory.
-                                            *
-                                            * 
-                                            * @format
-                                            */
-
-// The MI documentation doesn't cover this, but gdb will return structured values
-// for registers which contain packed arrays of simple types (MMX et al.)
-// Furthermore, if the register can hold different widths of values, then
-// there is an intermediate node for each possible representation it can hold.
-//
-// The syntax is similar to MI result record values:
-// value => simple_value | named_list | indexed_list
-// simple_value => float-value | integer-value
-// named_list => '{' identifer '=' value ( ',' identifier '=' value ) * '}'
-// indexed_list => '{' value ( ',' value ) *  '}'
-//
+exports.MIRegisterValue = MIRegisterValue;
 
 class MIRegisterSimpleValue extends MIRegisterValue {
-
   constructor(value) {
     super();
     this._value = value;
@@ -67,11 +69,12 @@ class MIRegisterSimpleValue extends MIRegisterValue {
   toString() {
     return this._value;
   }
+
 }
 
 exports.MIRegisterSimpleValue = MIRegisterSimpleValue;
-class MIRegisterNamedValues extends MIRegisterValue {
 
+class MIRegisterNamedValues extends MIRegisterValue {
   constructor(values) {
     super();
     this._values = values;
@@ -110,11 +113,12 @@ class MIRegisterNamedValues extends MIRegisterValue {
   toString() {
     return `{${[...this._values].map(([k, v]) => `${k}:${v.toString()}`).join(',')}}`;
   }
+
 }
 
 exports.MIRegisterNamedValues = MIRegisterNamedValues;
-class MIRegisterIndexedValues extends MIRegisterValue {
 
+class MIRegisterIndexedValues extends MIRegisterValue {
   constructor(values) {
     super();
     this._values = values;
@@ -149,27 +153,27 @@ class MIRegisterIndexedValues extends MIRegisterValue {
   toString() {
     return `[${this._values.map(_ => _.toString()).join(',')}]`;
   }
+
 }
 
 exports.MIRegisterIndexedValues = MIRegisterIndexedValues;
-class MIRegisterValueParser {
 
+class MIRegisterValueParser {
+  // matches name = something
   constructor(expression) {
     this._namePattern = /^\s*([a-zA-Z_][a-zA-Z_0-9]*)\s*=(.*)/;
-
     this._originalExpression = expression;
   }
-
-  // matches name = something
-
 
   parse() {
     this._expression = this._originalExpression;
 
     const value = this._parse();
+
     if (this._expression !== '') {
       throw new Error('Extra characters at end of expression');
     }
+
     return value;
   }
 
@@ -185,19 +189,17 @@ class MIRegisterValueParser {
       const match = this._expression.match(/^([^,}]*)(.*)$/);
 
       if (!(match != null)) {
-        throw new Error('Invariant violation: "match != null"');
+        throw new Error("Invariant violation: \"match != null\"");
       }
 
       const [, value, rest] = match;
-
       this._expression = rest;
       return new MIRegisterSimpleValue(value.trim());
     }
 
-    this._expression = this._expression.substr(1);
-
-    // if we have "name = " then we have a named list; otherwise, an indexed
+    this._expression = this._expression.substr(1); // if we have "name = " then we have a named list; otherwise, an indexed
     // list.
+
     if (this._expression.match(this._namePattern) != null) {
       return this._parseNamedList();
     }
@@ -214,27 +216,31 @@ class MIRegisterValueParser {
       if (!this._expandArrayInto(value, values)) {
         values.push(value);
       }
+
       if (this._checkEndOfList()) {
         break;
       }
     }
 
     return new MIRegisterIndexedValues(values);
-  }
-
-  // gdb/MI will sometimes reformat an array if it contains multiple repeated
+  } // gdb/MI will sometimes reformat an array if it contains multiple repeated
   // values. This is great for saving space in displayable output, but we want
   // the expansion to be available to be expanded in tree display.
+
+
   _expandArrayInto(value, values) {
     if (value instanceof MIRegisterSimpleValue) {
       const repeatedValuePattern = /^(.*) <repeats (\d+) times>$/;
       const match = value.value.match(repeatedValuePattern);
+
       if (match != null) {
         const [, repeatedValue, countStr] = match;
         const count = parseInt(countStr, 10);
+
         for (let i = 0; i < count; i++) {
           values.push(new MIRegisterSimpleValue(repeatedValue));
         }
+
         return true;
       }
     }
@@ -247,9 +253,11 @@ class MIRegisterValueParser {
 
     while (true) {
       const match = this._expression.match(this._namePattern);
+
       if (match != null) {
         const [, name, rest] = match;
         this._expression = rest;
+
         const value = this._parse();
 
         values.set(name, value);
@@ -266,6 +274,7 @@ class MIRegisterValueParser {
 
   _checkEndOfList() {
     this._expression = this._expression.trim();
+
     if (this._expression !== '') {
       const sepChar = this._expression[0];
       this._expression = this._expression.substr(1);
@@ -276,7 +285,10 @@ class MIRegisterValueParser {
         return false;
       }
     }
+
     throw new Error('Improperly formatted list in register value');
   }
+
 }
+
 exports.MIRegisterValueParser = MIRegisterValueParser;

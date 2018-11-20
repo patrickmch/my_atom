@@ -1,16 +1,32 @@
-'use strict';
+"use strict";
 
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
+exports.default = void 0;
 
-var _fsPromise;
+function _fsPromise() {
+  const data = _interopRequireDefault(require("../../modules/nuclide-commons/fsPromise"));
 
-function _load_fsPromise() {
-  return _fsPromise = _interopRequireDefault(require('../../modules/nuclide-commons/fsPromise'));
+  _fsPromise = function () {
+    return data;
+  };
+
+  return data;
 }
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+/**
+ * Copyright (c) 2015-present, Facebook, Inc.
+ * All rights reserved.
+ *
+ * This source code is licensed under the license found in the LICENSE file in
+ * the root directory of this source tree.
+ *
+ * 
+ * @format
+ */
 
 /**
  * A simple cache that has the ability to persist itself from/to disk.
@@ -32,23 +48,25 @@ class DiskCache {
   getPath() {
     return this._cachePath;
   }
-
   /**
    * Returns the size, in bytes, of the most recently serialized value.
    */
+
+
   getByteSize() {
     return this._byteSize;
   }
-
   /**
    * Attempts to load the cache from disk.
    * Returns false if the cache no longer exists, or is corrupt.
    */
+
+
   async load() {
     try {
-      const data = await (_fsPromise || _load_fsPromise()).default.readFile(this._cachePath, 'utf8');
-      this._byteSize = data.length;
-      // Make sure we don't pick up any Object prototype methods.
+      const data = await _fsPromise().default.readFile(this._cachePath, 'utf8');
+      this._byteSize = data.length; // Make sure we don't pick up any Object prototype methods.
+
       this._cache = Object.assign(Object.create(null), JSON.parse(data));
       return true;
     } catch (err) {
@@ -60,7 +78,7 @@ class DiskCache {
     try {
       const data = JSON.stringify(this._cache);
       this._byteSize = data.length;
-      await (_fsPromise || _load_fsPromise()).default.writeFileAtomic(this._cachePath, data);
+      await _fsPromise().default.writeFileAtomic(this._cachePath, data);
       return true;
     } catch (err) {
       return false;
@@ -74,14 +92,7 @@ class DiskCache {
   set(key, value) {
     this._cache[this._cacheKeyFunc(key)] = value;
   }
+
 }
-exports.default = DiskCache; /**
-                              * Copyright (c) 2015-present, Facebook, Inc.
-                              * All rights reserved.
-                              *
-                              * This source code is licensed under the license found in the LICENSE file in
-                              * the root directory of this source tree.
-                              *
-                              * 
-                              * @format
-                              */
+
+exports.default = DiskCache;

@@ -1,0 +1,355 @@
+diff --git a/nols_website/core/templates/core/account_home.html b/nols_website/core/templates/core/account_home.html
+index 6c5eeb686..905e2e924 100644
+--- a/nols_website/core/templates/core/account_home.html
++++ b/nols_website/core/templates/core/account_home.html
+@@ -1,310 +1,348 @@
+ {% extends "bootstrapped/base.html" %}
+ {% load formatting_tools %}
+ {% load payment_tools %}
+ {% load humanize %}
+ {% load dashboard %}
+ {% load static from staticfiles %}
+ {% block title %}{{ block.super }} - Your Account{% endblock %}
+ 
+ {% block content_header %}
+   {% include "fragments/title_row.html" with title="Your Account" subtitle=request.user.get_full_name %}
+ {% endblock %}
+ 
+ {% block content %}
+ {% if current_csrs %}
+ <div class="account-home row">
+   <div class="column small-12">
+     <h2>Upcoming Course{% if current_csrs.count > 1 %}s{% endif %}</h2>
+     <p class="subtle">Go to the dashboard to complete your course paperwork</p>
+     <br/>
+     <div class="open-app-list">
+ 
+       {% for csr in current_csrs %}
+       <div class="row account-current-courses">
+         <div class="column medium-4 column small-5 hide-for-small-only">
+           <img class="img-responsive float-left" src="{% if csr.course.is_ic_application %}{% with cms_session_details=csr|get_ic_session_details %}{{ cms_session_details.host }}{{ cms_session_details.course.hero_thumbnail_small }}{% endwith %}{% else %}{{ csr.course.cms_session_details.host }}{{ csr.course.cms_session_details.course.hero_thumbnail_small }}{% endif %}"/>
+         </div>
+         <div class="column medium-8 column small-12 float-right">
+           <div class="row">
+             <p><h5>{% if csr.application.person != request.user.nols_person %}{{ csr.application.person.name.preferred }}'s {% endif %}{{ csr.course.course_title }} ({{ csr.course.course_code }}){% if csr.status == 'W' and csr.course.course_code != csr.course.ICAP and csr.course.course_code != csr.course.ICRV and csr.course.branch.code != 'PTI' %} (Waitlisted){% endif %}</h5></p>
+             <p class="date">
+               <h5>
+                 {% if csr.course.is_ic_application or csr.course.course_code == 'DENR' %}
+                     &nbsp;
+                 {% elif csr.course.firm_dates %}
+                     {{ csr.course.course_date|date:"N d, Y" }} - {{ csr.course.end_date|date:"N d, Y" }}
+                 {% else %}
+                     (Dates To Be Determined)
+                 {% endif %}
+               </h5>
+             </p>
+             {% if csr.course.course_date >= today %}
+           </div>
+           <p class="readiness">{{ csr.percent_ready }}% Expedition Ready</p>
+           <div class="progress secondary">
+             <div class="progress-meter" role="progressbar" aria-valuenow="{{ csr.percent_ready }}" aria-valuemin="{{ csr.percent_ready }}" aria-valuemax="100" style="width: {{ csr.percent_ready }}%;">
+             </div>
+           </div>
+           <div class="course-action-button">
+             <a class="button float-right " href="{% url 'dashboard:csr_detail' csr.pk %}"><span>Go to Dashboard</span></a>
+           </div>
+             {% elif csr.application.account_balance > 0 %}
+             <div class="column small-6">
+               <a class="button float-right " href="{% url 'dashboard:balance_payment' csr.id %}"><span>Make a Payment</span></a>
+             </div>
+           </div>
+           <div class="in-progress-spacer"></div>
+             {% else %}
+           </div>
+           <p style="font-style:italic;">In Progress</p>
+             {% endif %}
+         </div>
+       </div>
+       {% endfor %}
+     </div>
+   </div>
+ </div>
+ {% endif %}
+ 
+ {#  started OpenApp  #}
+ {% with started_app=apps_in_progress.open_admissions %}
+ {% if started_app %}
+ <div class="row">
+   <div class="column small-12">
+     <h2>Started Application</h2>
+     <br/>
+     <div class="open-app-list">
+       <div class="row">
+         <div class="column medium-4 column small-5 hide-for-small-only">
+           <img class="img-responsive float-left" src="{{ started_app.course_selections.all.0.cms_session_details.host }}{{ started_app.course_selections.all.0.cms_session_details.course.hero_thumbnail_small }}"/>
+         </div>
+         <div class="column medium-8 column small-12 float-right">
+           <div class="row">
+             <p><h5>{% if started_app.applicant.id != request.user.entity.id %}{{ started_app.applicant.name.preferred }}'s {% endif %}{{ started_app.course_selections.all.0.course_description }} ({{ started_app.course_selections.all.0.course_code }})</h5></p>
+             <p class="date"><h5>{{ started_app.course_selections.all.0.course_date|date:"N d, Y" }}</h5></p>
+           </div>
+           <p class="readiness">8% Expedition Ready</p>
+           <div class="progress">
+             <div class="progress-meter" aria-valuenow="8" aria-valuemin="8" aria-valuemax="100" style="width: 8%;">
+             </div>
+           </div>
+           <a class="button" href="{% url 'open_apply' %}"><span>Complete Application</span></a>
+           <script type="text/javascript">
+             function registerConfirmCloseModal() {
+                 var confirmCloseModal = new Foundation.Reveal($('#confirm-close-modal'));
+                 confirmCloseModal.open();
+                 register_close_modal('#confirm-close-modal', confirmCloseModal);
+             }
+           </script>
+           <a class="button button--hollow" onclick="registerConfirmCloseModal();"><span>Close Application</span></a>
+         </div>
+       </div>
+     </div>
+   </div>
+ </div>
+ {% endif %}
+ {% endwith %}
+ <div class="row account-home--links">
+   <div class="column small-12 large-12">
+     {% if not request.user.entity %}
+     {% if request.user.might_have_active_app %}
+     <div class="panel panel-account">
+       <div class="panel-heading">
+         Have An Existing Application?
+       </div>
+       <div class="panel-body">
+         <a class="link-arrow" href="{% url 'account_connect' %}">
+           <button class="">
+             Search For Applications
+           </button>
+         </a>
+       </div>
+     </div>
+     {% endif %}
+     {% endif %}
+     {% if balances_due_wmi or balances_due %}
+     <div class="callout warning text-center">
+       <h2>
+         Pay for your course
+       </h2>
+       <div>
+         {% for balance in balances_due_wmi %}
+         <a href="{% url 'wmi_balance_payment'  balance.nols_course_id %}">{{ balance.description }} &nbsp; | &nbsp;
+           Balance due: ${{ balance.total_due|hidezerofrac|intcomma }}</a><br/>
+         {% endfor %}
+         {% for balance in balances_due %}
+           <a href="{% url 'pmt_pay_balance'  balance.id %}">{{ balance.course.name }} ({{ balance.course.description }}) &nbsp; | &nbsp;
+           Balance due: ${{ balance.balance|hidezerofrac|intcomma }}</a><br/>
+         {% endfor %}
+ 
+       </div>
+     </div>
+     {% endif %}
+-    <div class="column small-4">
+-      {% include "dataentry/fragments/account_info.html" %}
++    <div class="account-information column small-12 medium-4" id="account-information">
++      {% with hide_personal_fieldset=True %}
++        <h3>
++          Account Information
++        </h3>
++        <div class="list-content">
++          <div class="panel-heading">
++            <strong>Personal</strong> (<a href="{% url 'edit_personal' %}">Edit</a>)
++          </div>
++          <div class="panel-body">
++            {% include "core/fragments/personal_info_condensed_display.html" %}
++          </div>
++        </div>
++        {% with user.entity.addresses as items %}
++        {% with "Addresses" as title %}
++        {% with "address_form" as form_id%}
++        {% url "core.views.edit_address" as url_edit %}
++          {% include "dataentry/fragments/account_info_module.html" %}
++        {% endwith %}
++        {% endwith %}
++        {% endwith %}
++
++        {% with user.entity.phone_numbers as items %}
++        {% with "Phone" as title %}
++        {% with "phone_form" as form_id%}
++        {% url "core.views.account_phones" as url_edit %}
++          {% include "dataentry/fragments/account_info_module.html" %}
++        {% endwith %}
++        {% endwith %}
++        {% endwith %}
++
++        {% with user.entity.email_addresses as items %}
++        {% with "Emails" as title %}
++        {% with "email_form" as form_id%}
++        {% url "core.views.account_emails" as url_edit %}
++          {% include "dataentry/fragments/email_item_name.html" %}
++        {% endwith %}
++        {% endwith %}
++        {% endwith %}
++      {% endwith %}
+     </div>
+     <div class="column small-12 medium-5">
+       <div class="new-application panel panel-account">
+         <h2>
+           Start a New Application
+         </h2>
+         <div class="list-links">
+           <ul>
+             {% if apps_in_progress.usna %}
+             {% with apps_in_progress.usna as started_app %}
+             <li>
+               <a href="{% url 'usna_apply' %}">
+                 Continue USNA course application<br/>
+                 <span class="subtle">modified on&nbsp;{{ started_app.modified_ts|date:"M d, Y" }}</span>
+               </a>
+             </li>
+             {% endwith %}
+             {% endif %}
+             {% with apps_in_progress.open_admissions as started_app %}
+             <li>
+               <a href="{% url 'open_apply' %}">
+                 {% if started_app %}
+                 Continue NOLS course application<br/>
+                 <span class="subtle">{% if started_app.is_proxy_application %}for
+                   {{ started_app.applicant.name.short_name }},{% endif %} modified on
+                   {{ started_app.modified_ts|date:"M d, Y"|prevent_orphans }}
+                 </span>
+                 {% else %}
+                 Apply for a NOLS Expedition&nbsp;course
+                 {% endif %}
+               </a>
+             </li>
+             {% endwith %}
+             <li>
+               <a href="{{ WMI_COURSE_LIST }}">
+                 Apply for a NOLS Wilderness Medicine&nbsp;course
+               </a>
+             </li>
+             <li>
+               <a href="{% url 'wrmc_choose_options' %}">
+                 Apply for the Wilderness Risk Management&nbsp;Conference</a>
+             </li>
+           </ul>
+         </div>
+       </div>
+ 
+       <div class="give-to-nols panel panel-account">
+         <h2>
+           Give to NOLS
+         </h2>
+         <div class="list-links">
+           <ul>
+             <li>
+               <a href="{% url 'gift_type' %}">
+                 Give now
+               </a>
+             </li>
+             {% if has_recurring_gifts %}
+             <li>
+               <a href="{% url 'gift_manage_recurring' %}">
+                 Manage recurring gifts
+               </a>
+             </li>
+             {% endif %}
+           </ul>
+         </div>
+       </div>
+       <div class="manage-account panel panel-account">
+         <h2>
+           Manage Account<span class="subtle"> ({{ request.user.username }})</span>
+         </h2>
+         <div class="list-links">
+           <ul>
+             <li>
+               <a href="{% url 'django.contrib.auth.views.password_change' %}">
+                 Change password
+               </a>
+             </li>
+           </ul>
+         </div>
+       </div>
+       <div class="manage-account panel panel-account">
+         <h2>
+           Graduate Benefits
+         </h2>
+         {% if request.user.is_graduate %}
+         <div class="list-links">
+           <ul>
+             <li>
+               <a href="{% url 'create_jobs_account' %}">
+                 Register for Jobsnetwork
+               </a>
+             </li>
+             <li>
+               <a href="https://jobsnetwork.nols.edu/log-in/" target="_blank">
+                 Go to Jobsnetwork
+               </a>
+             </li>
+             <li>
+               <a href="{% url 'discounts' %}">
+                 Alumni Discounts
+               </a>
+             </li>
+           </ul>
+         </div>
+         {% elif not request.user.entity_id %}
+         <div>
+           You are not currently marked as a graduate in our system.
+           If you believe that you have successfully graduated from a
+           NOLS course, click <a href="{% url 'account_connect' %}">this&nbsp;link</a>
+           and enter your information. If that does not work, please contact the
+           NOLS Alumni department at alumni@nols.edu or 1-800-332-4280.
+         </div>
+         {% else %}
+         <div>
+           You are not currently marked as a graduate in our system. If you have just
+           completed a course, please allow up to 31 days to receive your graduate
+           classification. If you have any questions you can contact the NOLS Alumni
+           department at alumni@nols.edu or 1-800-332-4280.
+         </div>
+         {% endif %}
+       </div>
+     </div>
+   </div>
+ </div>
+ 
+ <div class="row">
+   <div class="column small-12 small-centered staffing-wrapper">
+     {% include 'staffing/fragments/instructor_dashboard.html' %}
+   </div>
+ </div>
+ 
+ 
+ <div class="clearfix"></div>
+ {% if apps_in_progress.open_admissions %}
+ <div class="reveal fade" data-reveal id="confirm-close-modal" tabindex="-1" role="dialog" aria-labelledby="success-title" aria-hidden="true">
+   <div class="modal-dialog">
+     <div class="modal-content collapse in">
+       <div class="modal-header confirm">
+         <button type="button" class="close" data-close aria-hidden="true">&times;</button>
+         <h4 class="modal-title">
+           {% block confirm_title %}
+           Close Application
+           {% endblock confirm_title %}
+         </h4>
+       </div>
+       <div class="modal-body confirm">
+         {% block confirm_body %}
+         Are you sure you want to close this application?
+         {% endblock %}
+       </div>
+       <div class="modal-footer centered-buttons confirm">
+         <a type="button"
+            class="button sink float-left give-space"
+            href="{% url 'close_application' apps_in_progress.open_admissions.pk %}">
+           <span>
+             Yes
+           </span>
+         </a>
+         <button class="button button--hollow sink float-left close" data-close><span>No</span></button>
+       </div>
+     </div>
+   </div>
+ </div>
+ {% endif %}
+ {% endblock %}

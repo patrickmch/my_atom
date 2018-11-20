@@ -23,6 +23,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Objects;
 import java.util.Set;
+import java.util.function.Consumer;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 import org.json.JSONArray;
@@ -31,6 +32,24 @@ import org.json.JSONObject;
 
 public class JavaDebuggerServer extends CommandInterpreterBase {
   private static final String UNKNOWN = "Unknown";
+  private static final Comparator<Variable> VARIABLE_COMPARATOR =
+      ((Variable v1, Variable v2) -> {
+        String n1 = v1.getName();
+        String n2 = v2.getName();
+        try {
+          if (n1.startsWith("[") && n2.startsWith("[") && n1.endsWith("]") && n2.endsWith("]")) {
+            // n1 and n2 are of the form \[.*\]
+            String subString1 = n1.substring(1, n1.length() - 1);
+            String subString2 = n2.substring(1, n2.length() - 1);
+            Integer arrayIndex1 = Integer.valueOf(subString1);
+            Integer arrayIndex2 = Integer.valueOf(subString2);
+            return arrayIndex1 - arrayIndex2;
+          }
+        } catch (NumberFormatException ex) {
+          // default to natural order compare
+        }
+        return n1.compareTo(n2);
+      });
   private InputStream inputStream = System.in;
   private OutputStream outputStream = System.out;
   private int stackFrameSeq = 0;
@@ -40,6 +59,8 @@ public class JavaDebuggerServer extends CommandInterpreterBase {
   private final HashMap<String, BreakpointSpec> registeredBreakpoints =
       new HashMap<String, BreakpointSpec>();
   private final HashMap<String, Source> breakpointIdToSource = new HashMap<String, Source>();
+  private final HashMap<Integer, Consumer<base$Response>> pendingRequests =
+      new HashMap<Integer, Consumer<base$Response>>();
   private final Utils utilsInstance = new Utils();
   private boolean linesStartAt1 = true;
 
@@ -67,6 +88,13 @@ public class JavaDebuggerServer extends CommandInterpreterBase {
     VsDebugAdapterChannelManager channelManager =
         (VsDebugAdapterChannelManager) getContextManager().getNotificationChannel();
     channelManager.sendProtocolMessage(message);
+  }
+
+  public void send(base$Request request, Consumer<base$Response> callback) {
+    pendingRequests.put(request.seq, callback);
+    VsDebugAdapterChannelManager channelManager =
+        (VsDebugAdapterChannelManager) getContextManager().getNotificationChannel();
+    channelManager.sendProtocolMessage(request);
   }
 
   private int getNextStackFrameId() {
@@ -114,6 +142,7 @@ public class JavaDebuggerServer extends CommandInterpreterBase {
             .put("exceptionBreakpointFilters", exceptionBreakpointFilters)
             .put("supportsConditionalBreakpoints", true)
             .put("supportsConfigurationDoneRequest", true)
+            .put("supportsDelayedStackTraceLoading", true)
             .put("supportsEvaluateForHovers", true)
             .put("supportsSetVariable", true)
             .put("supportTerminateDebuggee", false);
@@ -139,6 +168,8 @@ public class JavaDebuggerServer extends CommandInterpreterBase {
     try {
       port = arguments.getInt("javaJdwpPort");
     } catch (Exception ex) {
+      // We used to use port in the config but now we use javaJdwpPort.
+      // This line is here just in case we missed a spot when switching to using javaJdwpPort.
       port = arguments.getInt("port");
     }
     try {
@@ -153,20 +184,55 @@ public class JavaDebuggerServer extends CommandInterpreterBase {
   }
 
   private void handleLaunchRequest(JSONObject arguments, LaunchResponse response) {
-    JSONArray runArgsNullable = arguments.optJSONArray("runArgs");
-    JSONArray runArgs = runArgsNullable != null ? runArgsNullable : new JSONArray();
     try {
-      getContextManager()
-          .getBootstrapDomain()
-          .launch(
-              arguments.getString("entryPointClass"),
-              arguments.getString("classPath"),
-              runArgs,
-              "" /* sourcePath */);
-      send(response);
-      send(new InitializedEvent());
+      String console = arguments.optString("console");
+      JSONArray runArgsNullable = arguments.optJSONArray("runArgs");
+      JSONArray runArgs = runArgsNullable != null ? runArgsNullable : new JSONArray();
+      String entryPointClass = arguments.getString("entryPointClass");
+      String classPath = arguments.getString("classPath");
+      if (console != null
+          && (console.equals("integratedTerminal") || console.equals("externalConsole"))) {
+        String args = BootstrapDomain.getArgStringFromArgs(runArgs);
+        // set class path to insert class path into process command list
+        getContextManager().setClassPath(classPath);
+        List<String> processCommandList =
+            JVMConnector.getProcessCommandList(getContextManager(), entryPointClass, args);
+        String title = "Java Debug Console - " + entryPointClass;
+        RunInTerminalRequest runInTerminalRequest =
+            (new RunInTerminalRequest(console.equals("integratedTerminal")))
+                .setTitle(title)
+                .setCWD(classPath)
+                .setArgs(processCommandList);
+        send(
+            runInTerminalRequest,
+            runInTerminalResponse -> {
+              if (runInTerminalResponse.success) {
+                getContextManager().receivedVMStartEvent();
+                try {
+                  getContextManager().getBootstrapDomain().attachPort(JVMConnector.TARGET_PORT, "");
+                  send(new InitializedEvent());
+                } catch (DomainHandlerException ex) {
+                  response.setSuccess(false);
+                  response.setMessage(ex.toString());
+                }
+                send(response);
+              } else {
+                response.setSuccess(false);
+                response.setMessage("Run In Terminal Failed.");
+                send(response);
+              }
+            });
+      } else {
+        getContextManager()
+            .getBootstrapDomain()
+            .launch(entryPointClass, classPath, runArgs, "" /* sourcePath */);
+        send(new InitializedEvent());
+        send(response);
+      }
     } catch (JSONException | DomainHandlerException ex) {
-      Utils.logException("Error trying to launch:", ex);
+      response.setSuccess(false);
+      response.setMessage(ex.toString());
+      send(response);
     }
   }
 
@@ -182,56 +248,66 @@ public class JavaDebuggerServer extends CommandInterpreterBase {
       registeredBreakpointsByFileName.put(path, new ArrayList<BreakpointSpec>());
     }
 
-    Set<Integer> linesToAdd =
+    Set<String> hashOfBreakpointsToAdd =
         arguments
             .breakpoints
-            .parallelStream()
-            .map(newSourceBreakpoint -> newSourceBreakpoint.line)
+            .stream()
+            .map(
+                sourceBreakpoint ->
+                    String.valueOf(sourceBreakpoint.line) + sourceBreakpoint.condition)
             .collect(Collectors.toSet());
     ArrayList<BreakpointSpec> registeredBreakpointsForCurrentPath =
         registeredBreakpointsByFileName.get(path);
     Set<BreakpointSpec> breakpointSpecsToRemove =
         registeredBreakpointsForCurrentPath
-            .parallelStream()
-            .filter(breakpointSpec -> !linesToAdd.contains(breakpointSpec.getLine()))
+            .stream()
+            .filter(
+                breakpointSpec ->
+                    !hashOfBreakpointsToAdd.contains(
+                        String.valueOf(breakpointSpec.getLine()) + breakpointSpec.getCondition()))
             .collect(Collectors.toSet());
 
     List<JSONObject> responseBreakpointsList =
-        arguments
-            .breakpoints
-            .stream()
-            .map(
-                newSourceBreakpoint -> {
-                  // see if we already have this breakpoint
-                  BreakpointSpec breakpointSpec =
-                      registeredBreakpointsForCurrentPath
-                          .stream()
-                          .filter(
-                              oldBreakpointSpec ->
-                                  oldBreakpointSpec.getLine() == newSourceBreakpoint.line)
-                          .filter(
-                              oldBreakpointSpec ->
-                                  oldBreakpointSpec
-                                      .getCondition()
-                                      .equals(newSourceBreakpoint.condition))
-                          .findAny()
-                          .orElse(null);
-                  // otherwise, create a new breakpoint
-                  if (breakpointSpec == null) {
-                    String breakpointId =
-                        bm.setFileLineBreakpoint(
-                            path, newSourceBreakpoint.line, hint, newSourceBreakpoint.condition);
-                    breakpointSpec = bm.getBreakpointFromId(breakpointId);
+        path.endsWith(".java")
+            ? arguments
+                .breakpoints
+                .stream()
+                .map(
+                    newSourceBreakpoint -> {
+                      // see if we already have this breakpoint
+                      BreakpointSpec breakpointSpec =
+                          registeredBreakpointsForCurrentPath
+                              .stream()
+                              .filter(
+                                  oldBreakpointSpec ->
+                                      oldBreakpointSpec.getLine() == newSourceBreakpoint.line)
+                              .filter(
+                                  oldBreakpointSpec ->
+                                      oldBreakpointSpec
+                                          .getCondition()
+                                          .equals(newSourceBreakpoint.condition))
+                              .findAny()
+                              .orElse(null);
+                      // otherwise, create a new breakpoint
+                      if (breakpointSpec == null) {
+                        String breakpointId =
+                            bm.setFileLineBreakpoint(
+                                path,
+                                newSourceBreakpoint.line,
+                                hint,
+                                newSourceBreakpoint.condition);
+                        breakpointSpec = bm.getBreakpointFromId(breakpointId);
 
-                    breakpointIdToSource.put(breakpointId, source);
-                    registeredBreakpoints.put(breakpointId, breakpointSpec);
-                    registeredBreakpointsForCurrentPath.add(breakpointSpec);
-                  }
-                  return breakpointSpec;
-                })
-            .map(this::breakpointSpecToBreakpoint)
-            .map(Breakpoint::toJSON)
-            .collect(Collectors.toList());
+                        breakpointIdToSource.put(breakpointId, source);
+                        registeredBreakpoints.put(breakpointId, breakpointSpec);
+                        registeredBreakpointsForCurrentPath.add(breakpointSpec);
+                      }
+                      return breakpointSpec;
+                    })
+                .map(this::breakpointSpecToBreakpoint)
+                .map(Breakpoint::toJSON)
+                .collect(Collectors.toList())
+            : new ArrayList<JSONObject>();
 
     breakpointSpecsToRemove
         .stream()
@@ -259,62 +335,70 @@ public class JavaDebuggerServer extends CommandInterpreterBase {
               .filter(t -> t.uniqueID() == arguments.threadId)
               .findFirst()
               .orElse(null);
-      JSONArray stackFrames = new JSONArray();
       try {
         List<com.sun.jdi.StackFrame> jdiStackFrames = thread.frames();
-        stackFrames =
-            new JSONArray(
-                IntStream.range(0, jdiStackFrames.size())
-                    .mapToObj(
-                        stackFrameIndex -> {
-                          com.sun.jdi.StackFrame frame = jdiStackFrames.get(stackFrameIndex);
-                          String name;
-                          try {
-                            name = frame.location().sourceName();
-                          } catch (AbsentInformationException ex) {
-                            // This seems to happen for one particular stack frame in the Android
-                            //   internals but since VsDebugSessionTranslator doesn't actually use
-                            //   the stack frame's source's name, this value is ultimately ignored
-                            name = UNKNOWN;
-                          }
-                          String relativePath;
-                          try {
-                            relativePath = frame.location().sourcePath();
-                          } catch (AbsentInformationException ex) {
-                            relativePath = null;
-                          }
-                          try {
-                            String path =
-                                relativePath != null
-                                    ? getContextManager()
-                                        .getSourceLocator()
-                                        .findSourceFile(relativePath)
-                                        .map(file -> file.getAbsolutePath())
-                                        .orElse(null)
-                                    : null;
-                            Source frameSource = new Source(name, path);
-                            int stackFrameId = getNextStackFrameId();
-                            populateMapsForNewStackFrame(stackFrameId, stackFrameIndex, thread);
-                            return new StackFrame(
-                                stackFrameId,
-                                frame.location().method().name(),
-                                frameSource,
-                                frame.location().lineNumber() - (linesStartAt1 ? 0 : 1),
-                                1 /* column */);
-                          } catch (InvalidStackFrameException ex) {
-                            Utils.logVerboseException(frame.toString(), ex);
-                            return null;
-                          }
-                        })
-                    .filter(Objects::nonNull)
-                    .map(StackFrame::toJSON)
-                    .collect(Collectors.toList()));
-      } catch (IncompatibleThreadStateException | NullPointerException ex) {
-        Utils.logException("Error in trying to get stackframes:", ex);
+        int totalFrames = jdiStackFrames.size();
+        int endExclusive =
+            arguments.levels != 0
+                ? Math.min(arguments.startFrame + arguments.levels, jdiStackFrames.size())
+                : jdiStackFrames.size();
+        List<JSONObject> stackFrames =
+            IntStream.range(arguments.startFrame, endExclusive)
+                .mapToObj(
+                    stackFrameIndex -> {
+                      com.sun.jdi.StackFrame frame = jdiStackFrames.get(stackFrameIndex);
+                      String name;
+                      try {
+                        name = frame.location().sourceName();
+                      } catch (AbsentInformationException ex) {
+                        // This seems to happen for one particular stack frame in the Android
+                        //   internals but since VsDebugSessionTranslator doesn't actually use
+                        //   the stack frame's source's name, this value is ultimately ignored
+                        name = UNKNOWN;
+                      }
+                      String relativePath;
+                      try {
+                        relativePath = frame.location().sourcePath();
+                      } catch (AbsentInformationException ex) {
+                        relativePath = null;
+                      }
+                      try {
+                        String path =
+                            relativePath != null
+                                ? getContextManager()
+                                    .getSourceLocator()
+                                    .findSourceFile(relativePath)
+                                    .map(file -> file.getAbsolutePath())
+                                    .orElse(null)
+                                : null;
+                        Source frameSource = new Source(name, path);
+                        int stackFrameId = getNextStackFrameId();
+                        populateMapsForNewStackFrame(stackFrameId, stackFrameIndex, thread);
+                        return new StackFrame(
+                            stackFrameId,
+                            frame.location().method().name(),
+                            frameSource,
+                            frame.location().lineNumber() - (linesStartAt1 ? 0 : 1),
+                            1 /* column */);
+                      } catch (InvalidStackFrameException ex) {
+                        Utils.logVerboseException(frame.toString(), ex);
+                        return null;
+                      }
+                    })
+                .filter(Objects::nonNull)
+                .map(StackFrame::toJSON)
+                .collect(Collectors.toList());
+        JSONObject body =
+            new JSONObject()
+                .put("stackFrames", new JSONArray(stackFrames))
+                .put("totalFrames", totalFrames);
+        response.setBody(body);
+      } catch (Exception ex) {
+        Utils.logVerboseException("Error in trying to get stackframes:", ex);
+        response.setSuccess(false);
+        response.setMessage(ex.toString());
       }
-      JSONObject body =
-          new JSONObject().put("stackFrames", stackFrames).put("totalFrames", stackFrames.length());
-      send(response.setBody(body));
+      send(response);
     } catch (VMDisconnectedException ex) {
       // sometimes we get stackTraceRequests after program execution is done
       // this seems to happen on small, trivial programs
@@ -431,15 +515,17 @@ public class JavaDebuggerServer extends CommandInterpreterBase {
   private void handleVariablesRequest(VariablesArguments arguments, VariablesResponse response) {
     RemoteObject remoteObject =
         getContextManager().getRemoteObjectManager().getObject(arguments.variablesReference);
-    List<JSONObject> variables =
+    JSONArray remoteObjectProperties =
         remoteObject != null
-            ? Utils.jsonObjectArrayListFrom(remoteObject.getProperties().optJSONArray("result"))
-                .parallelStream()
-                .map(Variable::new)
-                .sorted(Comparator.comparing(Variable::getName))
-                .map(Variable::toJSON)
-                .collect(Collectors.toList())
-            : new ArrayList<JSONObject>();
+            ? remoteObject.getProperties().optJSONArray("result")
+            : new JSONArray();
+    List<JSONObject> variables =
+        Utils.jsonObjectArrayListFrom(remoteObjectProperties)
+            .stream()
+            .map(Variable::new)
+            .sorted(VARIABLE_COMPARATOR)
+            .map(Variable::toJSON)
+            .collect(Collectors.toList());
     send(response.setVariables(variables));
   }
 
@@ -596,20 +682,67 @@ public class JavaDebuggerServer extends CommandInterpreterBase {
     return true;
   }
 
-  public boolean handleRequest(String request) {
+  private boolean dispatchResponse(String command, JSONObject requestJSON) {
+    switch (command) {
+      case "runInTerminal":
+        {
+          RunInTerminalResponse response = new RunInTerminalResponse(requestJSON);
+          pendingRequests.get(response.request_seq).accept(response);
+          break;
+        }
+      default:
+        return false;
+    }
+    return true;
+  }
+
+  public boolean handleMessage(String message) {
     try {
-      JSONObject requestJSON = new JSONObject(request);
-      String command = requestJSON.getString("command");
+      JSONObject messageJSON = new JSONObject(message);
+      // private String type;
+      String type = messageJSON.optString("type");
+      if (type != null && type.equals("request")) {
+        return handleRequest(messageJSON);
+      } else if (type != null && type.equals("response")) {
+        return handleResponse(messageJSON);
+      }
+
+    } catch (Exception ex) {
+      return false;
+    }
+    return true;
+  }
+
+  public boolean handleRequest(JSONObject request) {
+    try {
+      String command = request.getString("command");
       // uncomment the following line for easier debugging
       // Utils.logVerbose("COMMAND: " + command + ", REQUEST: " + requestJSON.toString(2));
-      if (!dispatchRequest(command, requestJSON)) {
-        Utils.logException("Request: " + request, new Throwable());
+      if (!dispatchRequest(command, request)) {
+        Utils.logException("Request: " + request.toString(2), new Throwable());
         Utils.logError(
             "If you see this, please file a bug using the bugnub (bottom left in Nuclide).");
       }
       return true;
     } catch (Exception ex) {
-      Utils.logException("Request: " + request, ex);
+      Utils.logException("Request: " + request.toString(2), ex);
+      Utils.logError(
+          "If you see this, please file a bug using the bugnub (bottom left in Nuclide).");
+    }
+    return true;
+  }
+
+  public boolean handleResponse(JSONObject request) {
+    try {
+      String command = request.getString("command");
+      if (!dispatchResponse(command, request)) {
+        Utils.logException("Request: " + request.toString(2), new Throwable());
+        Utils.logError(
+            "If you see this, please file a bug using the bugnub (bottom left in Nuclide).");
+      }
+      return true;
+    } catch (Exception ex) {
+      Utils.logException("Request: " + request.toString(2), ex);
       Utils.logError(
           "If you see this, please file a bug using the bugnub (bottom left in Nuclide).");
     }
@@ -676,6 +809,10 @@ public class JavaDebuggerServer extends CommandInterpreterBase {
   public void sendUserMessage(String message, Utils.UserMessageLevel level) {
     String category = Utils.userMessageLevelToOutputEventCategory(level);
     send(new OutputEvent().setCategory(category).setOutput(message + "\n"));
+  }
+
+  public void sendTelemetryEvent(String eventName, JSONObject values) {
+    send(new OutputEvent().setCategory("nuclide_track").setOutput(eventName).setData(values));
   }
 
   public void sendContinuedEvent(long threadId) {

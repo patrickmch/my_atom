@@ -4,7 +4,6 @@
   "version": "0.0.0",
   "description": "Saves/Restores open files / tabs when switching between source control bookmarks/branches",
   "author": "Nuclide : Source Control",
-  "atomTestRunner": "../../lib/test-runner-entry.js",
   "nuclide": {
     "configMetadata": {
       "pathComponents": [
@@ -25,9 +24,7 @@
         ]
       }
     },
-    "packageType": "Atom",
-    "testRunner": "apm"
+    "packageType": "AtomPackage"
   },
-  "activationCommands": {
-  }
+  "activationCommands": {}
 }

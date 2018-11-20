@@ -1,32 +1,48 @@
-'use strict';
+"use strict";
 
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.WorkingSet = undefined;
+exports.WorkingSet = void 0;
 
-var _collection;
+function _collection() {
+  const data = require("../../../modules/nuclide-commons/collection");
 
-function _load_collection() {
-  return _collection = require('../../../modules/nuclide-commons/collection');
+  _collection = function () {
+    return data;
+  };
+
+  return data;
 }
 
-var _uri;
+function _uri() {
+  const data = require("./uri");
 
-function _load_uri() {
-  return _uri = require('./uri');
+  _uri = function () {
+    return data;
+  };
+
+  return data;
 }
 
-var _log4js;
+function _log4js() {
+  const data = require("log4js");
 
-function _load_log4js() {
-  return _log4js = require('log4js');
+  _log4js = function () {
+    return data;
+  };
+
+  return data;
 }
 
-var _nuclideUri;
+function _nuclideUri() {
+  const data = _interopRequireDefault(require("../../../modules/nuclide-commons/nuclideUri"));
 
-function _load_nuclideUri() {
-  return _nuclideUri = _interopRequireDefault(require('../../../modules/nuclide-commons/nuclideUri'));
+  _nuclideUri = function () {
+    return data;
+  };
+
+  return data;
 }
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
@@ -41,8 +57,7 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
  * 
  * @format
  */
-
-const logger = (0, (_log4js || _load_log4js()).getLogger)('nuclide-working-sets-common');
+const logger = (0, _log4js().getLogger)('nuclide-working-sets-common');
 
 /**
  * WorkingSet is an implementation of a filter for files and directories.
@@ -61,11 +76,10 @@ const logger = (0, (_log4js || _load_log4js()).getLogger)('nuclide-working-sets-
  *   This kind of test is performed by the .containsDir() method.
  */
 class WorkingSet {
-
   constructor(uris = []) {
     try {
-      this._absoluteUris = (0, (_uri || _load_uri()).dedupeUris)(uris);
-      this._uris = this._absoluteUris.map((_nuclideUri || _load_nuclideUri()).default.getPath);
+      this._absoluteUris = (0, _uri().dedupeUris)(uris);
+      this._uris = this._absoluteUris.map(_nuclideUri().default.getPath);
       this._root = this._buildDirTree(this._uris);
     } catch (e) {
       logger.error('Failed to initialize a WorkingSet with URIs ' + uris.join(',') + '. ' + e.message);
@@ -80,7 +94,7 @@ class WorkingSet {
     }
 
     try {
-      return this.containsFileBySplitPath((_nuclideUri || _load_nuclideUri()).default.split(uri));
+      return this.containsFileBySplitPath(_nuclideUri().default.split(uri));
     } catch (e) {
       logger.error(e);
       return true;
@@ -92,8 +106,10 @@ class WorkingSet {
       return true;
     }
 
-    const uriTokens = tokens.map((_nuclideUri || _load_nuclideUri()).default.getPath);
-    return this._containsPathFor(uriTokens, /* mustHaveLeaf */true);
+    const uriTokens = tokens.map(_nuclideUri().default.getPath);
+    return this._containsPathFor(uriTokens,
+    /* mustHaveLeaf */
+    true);
   }
 
   containsDir(uri) {
@@ -102,7 +118,7 @@ class WorkingSet {
     }
 
     try {
-      return this.containsDirBySplitPath((_nuclideUri || _load_nuclideUri()).default.split(uri));
+      return this.containsDirBySplitPath(_nuclideUri().default.split(uri));
     } catch (e) {
       logger.error(e);
       return true;
@@ -114,8 +130,10 @@ class WorkingSet {
       return true;
     }
 
-    const uriTokens = tokens.map((_nuclideUri || _load_nuclideUri()).default.getPath);
-    return this._containsPathFor(uriTokens, /* mustHaveLeaf */false);
+    const uriTokens = tokens.map(_nuclideUri().default.getPath);
+    return this._containsPathFor(uriTokens,
+    /* mustHaveLeaf */
+    false);
   }
 
   isEmpty() {
@@ -136,8 +154,10 @@ class WorkingSet {
 
   remove(rootUri) {
     try {
-      const uriPath = (_nuclideUri || _load_nuclideUri()).default.getPath(rootUri);
-      const uris = this._uris.filter(uri => !(_nuclideUri || _load_nuclideUri()).default.contains(uriPath, uri));
+      const uriPath = _nuclideUri().default.getPath(rootUri);
+
+      const uris = this._uris.filter(uri => !_nuclideUri().default.contains(uriPath, uri));
+
       return new WorkingSet(uris);
     } catch (e) {
       logger.error(e);
@@ -146,7 +166,7 @@ class WorkingSet {
   }
 
   equals(other) {
-    return (0, (_collection || _load_collection()).arrayEqual)(this._uris, other._uris);
+    return (0, _collection().arrayEqual)(this._uris, other._uris);
   }
 
   _buildDirTree(uris) {
@@ -157,7 +177,8 @@ class WorkingSet {
     const root = newInnerNode();
 
     for (const uri of uris) {
-      const tokens = (_nuclideUri || _load_nuclideUri()).default.split(uri);
+      const tokens = _nuclideUri().default.split(uri);
+
       if (tokens.length === 0) {
         continue;
       }
@@ -173,7 +194,7 @@ class WorkingSet {
           currentNode = tokenNode;
         } else {
           if (!(tokenNode.kind === 'inner')) {
-            throw new Error('Invariant violation: "tokenNode.kind === \'inner\'"');
+            throw new Error("Invariant violation: \"tokenNode.kind === 'inner'\"");
           }
 
           currentNode = tokenNode;
@@ -189,6 +210,7 @@ class WorkingSet {
 
   _containsPathFor(tokens, mustHaveLeaf) {
     let currentNode = this._root;
+
     if (currentNode == null) {
       // Empty set actually contains everything
       return true;
@@ -196,6 +218,7 @@ class WorkingSet {
 
     for (const token of tokens) {
       const tokenNode = currentNode.children.get(token);
+
       if (tokenNode == null) {
         return false;
       } else if (tokenNode.kind === 'leaf') {
@@ -207,13 +230,20 @@ class WorkingSet {
 
     return !mustHaveLeaf;
   }
+
 }
 
 exports.WorkingSet = WorkingSet;
+
 function newInnerNode() {
-  return { kind: 'inner', children: new Map() };
+  return {
+    kind: 'inner',
+    children: new Map()
+  };
 }
 
 function newLeafNode() {
-  return { kind: 'leaf' };
+  return {
+    kind: 'leaf'
+  };
 }

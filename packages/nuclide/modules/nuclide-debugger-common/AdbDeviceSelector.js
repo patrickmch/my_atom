@@ -1,57 +1,65 @@
-'use strict';
+"use strict";
 
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.AdbDeviceSelector = undefined;
+exports.AdbDeviceSelector = void 0;
 
-var _AdbDevicePoller;
+function _nuclideAdb() {
+  const data = require("../nuclide-adb");
 
-function _load_AdbDevicePoller() {
-  return _AdbDevicePoller = require('../nuclide-adb/lib/AdbDevicePoller');
+  _nuclideAdb = function () {
+    return data;
+  };
+
+  return data;
 }
 
-var _DebugBridge;
+var React = _interopRequireWildcard(require("react"));
 
-function _load_DebugBridge() {
-  return _DebugBridge = require('../nuclide-adb/lib/common/DebugBridge');
+function _Dropdown() {
+  const data = require("../nuclide-commons-ui/Dropdown");
+
+  _Dropdown = function () {
+    return data;
+  };
+
+  return data;
 }
 
-var _react = _interopRequireWildcard(require('react'));
+function _UniversalDisposable() {
+  const data = _interopRequireDefault(require("../nuclide-commons/UniversalDisposable"));
 
-var _Dropdown;
+  _UniversalDisposable = function () {
+    return data;
+  };
 
-function _load_Dropdown() {
-  return _Dropdown = require('../nuclide-commons-ui/Dropdown');
+  return data;
 }
 
-var _UniversalDisposable;
+function _expected() {
+  const data = require("../nuclide-commons/expected");
 
-function _load_UniversalDisposable() {
-  return _UniversalDisposable = _interopRequireDefault(require('../nuclide-commons/UniversalDisposable'));
+  _expected = function () {
+    return data;
+  };
+
+  return data;
 }
 
-var _expected;
+function _LoadingSpinner() {
+  const data = require("../nuclide-commons-ui/LoadingSpinner");
 
-function _load_expected() {
-  return _expected = require('../nuclide-commons/expected');
-}
+  _LoadingSpinner = function () {
+    return data;
+  };
 
-var _LoadingSpinner;
-
-function _load_LoadingSpinner() {
-  return _LoadingSpinner = require('../nuclide-commons-ui/LoadingSpinner');
-}
-
-var _collection;
-
-function _load_collection() {
-  return _collection = require('../nuclide-commons/collection');
+  return data;
 }
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
+function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) { var desc = Object.defineProperty && Object.getOwnPropertyDescriptor ? Object.getOwnPropertyDescriptor(obj, key) : {}; if (desc.get || desc.set) { Object.defineProperty(newObj, key, desc); } else { newObj[key] = obj[key]; } } } } newObj.default = obj; return newObj; } }
 
 /**
  * Copyright (c) 2017-present, Facebook, Inc.
@@ -64,42 +72,22 @@ function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj;
  * 
  * @format
  */
-
 const NO_DEVICES_MSG = 'No adb devices attached!';
 
-class AdbDeviceSelector extends _react.Component {
-
+class AdbDeviceSelector extends React.Component {
   constructor(props) {
     super(props);
-    this._disposables = new (_UniversalDisposable || _load_UniversalDisposable()).default();
-
+    this._disposables = new (_UniversalDisposable().default)();
     this._handleDeviceListChange = this._handleDeviceListChange.bind(this);
     this._handleDeviceDropdownChange = this._handleDeviceDropdownChange.bind(this);
-
     this.state = {
-      deviceList: (_expected || _load_expected()).Expect.pendingValue([]),
+      deviceList: _expected().Expect.pending(),
       selectedDevice: null
     };
   }
 
   componentDidMount() {
-    this._disposables.add((0, (_AdbDevicePoller || _load_AdbDevicePoller()).observeAndroidDevicesX)(this.props.targetUri).startWith((_expected || _load_expected()).Expect.pendingValue([])).distinctUntilChanged((a, b) => {
-      if (a.isPending || b.isPending) {
-        return a.isPending === b.isPending;
-      }
-
-      if (a.isError || b.isError) {
-        return a.isError === b.isError;
-      }
-
-      if (!(!a.isPending && !b.isPending && !a.isError && !b.isError)) {
-        throw new Error('Invariant violation: "!a.isPending && !b.isPending && !a.isError && !b.isError"');
-      }
-
-      return (0, (_collection || _load_collection()).arrayEqual)(a.value != null ? a.value : [], b.value != null ? b.value : [], (x, y) => {
-        return x.name === y.name && x.port === y.port;
-      });
-    }).subscribe(deviceList => this._handleDeviceListChange(deviceList)));
+    this._disposables.add((0, _nuclideAdb().observeAndroidDevices)(this.props.targetUri).startWith(_expected().Expect.pending()).subscribe(deviceList => this._handleDeviceListChange(deviceList)));
   }
 
   componentWillUnmount() {
@@ -108,9 +96,9 @@ class AdbDeviceSelector extends _react.Component {
 
   _handleDeviceListChange(deviceList) {
     const previousDevice = this.state.selectedDevice;
-    let selectedDevice = deviceList.isError || deviceList.isPending || previousDevice == null ? null : deviceList.value.find(device => device.name === previousDevice.name);
+    let selectedDevice = previousDevice == null ? null : deviceList.getOrDefault([]).find(device => device.serial === previousDevice.serial);
 
-    if (selectedDevice == null && !deviceList.isError && !deviceList.isPending) {
+    if (selectedDevice == null && deviceList.isValue) {
       selectedDevice = deviceList.value[0];
     }
 
@@ -122,35 +110,39 @@ class AdbDeviceSelector extends _react.Component {
   }
 
   _getDeviceItems() {
-    if (!(!this.state.deviceList.isError && !this.state.deviceList.isPending)) {
-      throw new Error('Invariant violation: "!this.state.deviceList.isError && !this.state.deviceList.isPending"');
+    if (!this.state.deviceList.isValue) {
+      throw new Error("Invariant violation: \"this.state.deviceList.isValue\"");
     }
 
     if (this.state.deviceList.value.length === 0) {
-      return [{ value: null, label: NO_DEVICES_MSG }];
+      return [{
+        value: null,
+        label: NO_DEVICES_MSG
+      }];
     }
 
     return this.state.deviceList.value.map(device => ({
       value: device,
-      label: device.port === (_DebugBridge || _load_DebugBridge()).DEFAULT_ADB_PORT ? device.displayName : `${device.displayName} on ADB port ${device.port}`
+      label: device.displayName
     }));
   }
 
   render() {
     if (this.state.deviceList.isPending) {
-      return _react.createElement((_LoadingSpinner || _load_LoadingSpinner()).LoadingSpinner, { size: 'EXTRA_SMALL' });
+      return React.createElement(_LoadingSpinner().LoadingSpinner, {
+        size: "EXTRA_SMALL"
+      });
     }
 
     if (this.state.deviceList.isError) {
-      return _react.createElement(
-        'div',
-        { className: 'nuclide-ui-message-error' },
-        this.state.deviceList.error.toString()
-      );
+      return React.createElement("div", {
+        className: "nuclide-ui-message-error"
+      }, this.state.deviceList.error.toString());
     }
 
     const deviceItems = this._getDeviceItems();
-    return _react.createElement((_Dropdown || _load_Dropdown()).Dropdown, {
+
+    return React.createElement(_Dropdown().Dropdown, {
       options: deviceItems,
       onChange: this._handleDeviceDropdownChange,
       value: this.state.selectedDevice
@@ -163,5 +155,7 @@ class AdbDeviceSelector extends _react.Component {
     });
     this.props.onChange(selectedDevice);
   }
+
 }
+
 exports.AdbDeviceSelector = AdbDeviceSelector;

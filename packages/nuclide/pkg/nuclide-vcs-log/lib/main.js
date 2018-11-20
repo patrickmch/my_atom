@@ -1,114 +1,156 @@
-'use strict';
+"use strict";
 
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.shortNameForAuthor = undefined;
 exports.activate = activate;
 exports.deactivate = deactivate;
 exports.addItemsToFileTreeContextMenu = addItemsToFileTreeContextMenu;
+exports.shortNameForAuthor = void 0;
 
-var _featureConfig;
+function _featureConfig() {
+  const data = _interopRequireDefault(require("../../../modules/nuclide-commons-atom/feature-config"));
 
-function _load_featureConfig() {
-  return _featureConfig = _interopRequireDefault(require('../../../modules/nuclide-commons-atom/feature-config'));
+  _featureConfig = function () {
+    return data;
+  };
+
+  return data;
 }
 
-var _VcsLogComponent;
+function _VcsLogComponent() {
+  const data = _interopRequireDefault(require("./VcsLogComponent"));
 
-function _load_VcsLogComponent() {
-  return _VcsLogComponent = _interopRequireDefault(require('./VcsLogComponent'));
+  _VcsLogComponent = function () {
+    return data;
+  };
+
+  return data;
 }
 
-var _VcsLogGadget;
+function _VcsLogGadget() {
+  const data = _interopRequireDefault(require("./VcsLogGadget"));
 
-function _load_VcsLogGadget() {
-  return _VcsLogGadget = _interopRequireDefault(require('./VcsLogGadget'));
+  _VcsLogGadget = function () {
+    return data;
+  };
+
+  return data;
 }
 
-var _rxjsBundlesRxMinJs = require('rxjs/bundles/Rx.min.js');
+var _rxjsCompatUmdMin = require("rxjs-compat/bundles/rxjs-compat.umd.min.js");
 
-var _projects;
+function _projects() {
+  const data = require("../../../modules/nuclide-commons-atom/projects");
 
-function _load_projects() {
-  return _projects = require('../../../modules/nuclide-commons-atom/projects');
+  _projects = function () {
+    return data;
+  };
+
+  return data;
 }
 
-var _bindObservableAsProps;
+function _bindObservableAsProps() {
+  const data = require("../../../modules/nuclide-commons-ui/bindObservableAsProps");
 
-function _load_bindObservableAsProps() {
-  return _bindObservableAsProps = require('../../../modules/nuclide-commons-ui/bindObservableAsProps');
+  _bindObservableAsProps = function () {
+    return data;
+  };
+
+  return data;
 }
 
-var _string;
+function _string() {
+  const data = require("../../../modules/nuclide-commons/string");
 
-function _load_string() {
-  return _string = require('../../../modules/nuclide-commons/string');
+  _string = function () {
+    return data;
+  };
+
+  return data;
 }
 
-var _querystring = _interopRequireDefault(require('querystring'));
+var _querystring = _interopRequireDefault(require("querystring"));
 
-var _nuclideVcsBase;
+function _nuclideVcsBase() {
+  const data = require("../../nuclide-vcs-base");
 
-function _load_nuclideVcsBase() {
-  return _nuclideVcsBase = require('../../nuclide-vcs-base');
+  _nuclideVcsBase = function () {
+    return data;
+  };
+
+  return data;
 }
 
-var _util;
+function _util() {
+  const data = require("./util");
 
-function _load_util() {
-  return _util = require('./util');
+  _util = function () {
+    return data;
+  };
+
+  return data;
 }
 
-var _nuclideAnalytics;
+function _nuclideAnalytics() {
+  const data = require("../../../modules/nuclide-analytics");
 
-function _load_nuclideAnalytics() {
-  return _nuclideAnalytics = require('../../nuclide-analytics');
+  _nuclideAnalytics = function () {
+    return data;
+  };
+
+  return data;
 }
 
-var _UniversalDisposable;
+function _UniversalDisposable() {
+  const data = _interopRequireDefault(require("../../../modules/nuclide-commons/UniversalDisposable"));
 
-function _load_UniversalDisposable() {
-  return _UniversalDisposable = _interopRequireDefault(require('../../../modules/nuclide-commons/UniversalDisposable'));
+  _UniversalDisposable = function () {
+    return data;
+  };
+
+  return data;
 }
 
-var _url = _interopRequireDefault(require('url'));
+var _url = _interopRequireDefault(require("url"));
 
-var _react = _interopRequireWildcard(require('react'));
+var React = _interopRequireWildcard(require("react"));
 
-var _viewableFromReactElement;
+function _viewableFromReactElement() {
+  const data = require("../../commons-atom/viewableFromReactElement");
 
-function _load_viewableFromReactElement() {
-  return _viewableFromReactElement = require('../../commons-atom/viewableFromReactElement');
+  _viewableFromReactElement = function () {
+    return data;
+  };
+
+  return data;
 }
 
-function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
+function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) { var desc = Object.defineProperty && Object.getOwnPropertyDescriptor ? Object.getOwnPropertyDescriptor(obj, key) : {}; if (desc.get || desc.set) { Object.defineProperty(newObj, key, desc); } else { newObj[key] = obj[key]; } } } } newObj.default = obj; return newObj; } }
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-const SHOW_LOG_FILE_TREE_CONTEXT_MENU_PRIORITY = 500; /**
-                                                       * Copyright (c) 2015-present, Facebook, Inc.
-                                                       * All rights reserved.
-                                                       *
-                                                       * This source code is licensed under the license found in the LICENSE file in
-                                                       * the root directory of this source tree.
-                                                       *
-                                                       * 
-                                                       * @format
-                                                       */
-
+/**
+ * Copyright (c) 2015-present, Facebook, Inc.
+ * All rights reserved.
+ *
+ * This source code is licensed under the license found in the LICENSE file in
+ * the root directory of this source tree.
+ *
+ * 
+ * @format
+ */
 // TODO: Make it possible to move or split a pane with a VcsLogPaneItem.
-
+const SHOW_LOG_FILE_TREE_CONTEXT_MENU_PRIORITY = 500;
 const NUM_LOG_RESULTS = 100;
-
 const CONTEXT_MENU_LABEL = 'Show history';
 const VCS_LOG_URI_PREFIX = 'atom://nucide-vcs-log/view';
 const VCS_LOG_URI_PATHS_QUERY_PARAM = 'path';
 
 class Activation {
-
   constructor() {
-    this._subscriptions = new (_UniversalDisposable || _load_UniversalDisposable()).default();
+    this._subscriptions = new (_UniversalDisposable().default)();
+
     this._registerOpener();
   }
 
@@ -118,29 +160,31 @@ class Activation {
         return;
       }
 
-      const { query } = _url.default.parse(uriToOpen, /* parseQueryString */true);
+      const {
+        query
+      } = _url.default.parse(uriToOpen,
+      /* parseQueryString */
+      true);
 
       if (!query) {
-        throw new Error('Invariant violation: "query"');
-      }
-
-      // Make sure a non-zero number of paths have been specified.
+        throw new Error("Invariant violation: \"query\"");
+      } // Make sure a non-zero number of paths have been specified.
 
 
       const path = query[VCS_LOG_URI_PATHS_QUERY_PARAM];
       const component = createLogPaneForPath(path);
-      return component ? (0, (_viewableFromReactElement || _load_viewableFromReactElement()).viewableFromReactElement)(component) : null;
-    }));
-
-    // TODO(mbolin): Once the nuclide-file-tree.context-menu is generalized to automatically add
+      return component ? (0, _viewableFromReactElement().viewableFromReactElement)(component) : null;
+    })); // TODO(mbolin): Once the nuclide-file-tree.context-menu is generalized to automatically add
     // menu items to the editor context menu, as appropriate, it should be possible to eliminate
     // (or at least reduce) the logic here.
 
+
     this._subscriptions.add(atom.commands.add('atom-text-editor', 'nuclide-vcs-log:show-log-for-active-editor', () => {
       const uri = getActiveTextEditorURI();
+
       if (uri != null) {
         openLogPaneForURI(uri);
-        (0, (_nuclideAnalytics || _load_nuclideAnalytics()).track)('nuclide-vcs-log:open-from-text-editor');
+        (0, _nuclideAnalytics().track)('nuclide-vcs-log:open-from-text-editor');
       }
     }), atom.contextMenu.add({
       'atom-text-editor': [{
@@ -148,10 +192,12 @@ class Activation {
         submenu: [{
           label: CONTEXT_MENU_LABEL,
           command: 'nuclide-vcs-log:show-log-for-active-editor',
+
           shouldDisplay() {
             const uri = getActiveTextEditorURI();
             return getRepositoryWithLogMethodForPath(uri) != null;
           }
+
         }]
       }]
     }));
@@ -160,42 +206,51 @@ class Activation {
   addItemsToFileTreeContextMenu(contextMenu) {
     const contextDisposable = contextMenu.addItemToSourceControlMenu({
       label: CONTEXT_MENU_LABEL,
+
       callback() {
         const node = contextMenu.getSingleSelectedNode();
+
         if (node == null) {
           return;
         }
 
-        const { uri } = node;
+        const {
+          uri
+        } = node;
         const repository = getRepositoryWithLogMethodForPath(uri);
+
         if (repository == null) {
           return;
         }
 
         openLogPaneForURI(uri);
-        (0, (_nuclideAnalytics || _load_nuclideAnalytics()).track)('nuclide-vcs-log:open-from-file-tree');
+        (0, _nuclideAnalytics().track)('nuclide-vcs-log:open-from-file-tree');
       },
+
       shouldDisplay() {
         const node = contextMenu.getSingleSelectedNode();
+
         if (node == null) {
           return false;
         }
 
         return getRepositoryWithLogMethodForPath(node.uri) != null;
       }
+
     }, SHOW_LOG_FILE_TREE_CONTEXT_MENU_PRIORITY);
 
-    this._subscriptions.add(contextDisposable);
-
-    // We don't need to dispose of the contextDisposable when the provider is disabled -
+    this._subscriptions.add(contextDisposable); // We don't need to dispose of the contextDisposable when the provider is disabled -
     // it needs to be handled by the provider itself. We only should remove it from the list
     // of the disposables we maintain.
-    return new (_UniversalDisposable || _load_UniversalDisposable()).default(() => this._subscriptions.remove(contextDisposable));
+
+
+    return new (_UniversalDisposable().default)(() => this._subscriptions.remove(contextDisposable));
   }
 
   dispose() {
     this._subscriptions.dispose();
   }
+
 }
 
 function getRepositoryWithLogMethodForPath(path) {
@@ -203,9 +258,9 @@ function getRepositoryWithLogMethodForPath(path) {
     return null;
   }
 
-  const repository = (0, (_nuclideVcsBase || _load_nuclideVcsBase()).repositoryForPath)(path);
-  // For now, we only expect HgRepository to work. We should also find a way to
+  const repository = (0, _nuclideVcsBase().repositoryForPath)(path); // For now, we only expect HgRepository to work. We should also find a way to
   // make this work for Git.
+
   if (repository != null && repository.getType() === 'hg') {
     return repository;
   } else {
@@ -215,11 +270,13 @@ function getRepositoryWithLogMethodForPath(path) {
 
 function getActiveTextEditorURI() {
   const editor = atom.workspace.getActiveTextEditor();
+
   if (editor == null) {
     return null;
   }
 
   const filePath = editor.getPath();
+
   if (filePath == null) {
     return null;
   }
@@ -228,12 +285,14 @@ function getActiveTextEditorURI() {
 }
 
 function openLogPaneForURI(uri) {
-  (0, (_nuclideAnalytics || _load_nuclideAnalytics()).track)('nuclide-vcs-log:open');
+  (0, _nuclideAnalytics().track)('nuclide-vcs-log:open');
+
   const openerURI = VCS_LOG_URI_PREFIX + '?' + _querystring.default.stringify({
     [VCS_LOG_URI_PATHS_QUERY_PARAM]: uri
-  });
-  // Not a file URI
+  }); // Not a file URI
   // eslint-disable-next-line nuclide-internal/atom-apis
+
+
   atom.workspace.open(openerURI);
 }
 
@@ -243,22 +302,25 @@ function createLogPaneForPath(path) {
   }
 
   const repository = getRepositoryWithLogMethodForPath(path);
+
   if (repository == null) {
     return null;
   }
 
-  const { showDifferentialRevision } = (_featureConfig || _load_featureConfig()).default.get('nuclide-vcs-log');
+  const {
+    showDifferentialRevision
+  } = _featureConfig().default.get('nuclide-vcs-log');
 
   if (!(typeof showDifferentialRevision === 'boolean')) {
-    throw new Error('Invariant violation: "typeof showDifferentialRevision === \'boolean\'"');
+    throw new Error("Invariant violation: \"typeof showDifferentialRevision === 'boolean'\"");
   }
 
-  const title = `${repository.getType()} log ${(0, (_string || _load_string()).maybeToString)((0, (_projects || _load_projects()).getAtomProjectRelativePath)(path))}`;
-
-  const currentDiff = new _rxjsBundlesRxMinJs.BehaviorSubject({
+  const title = `${repository.getType()} log ${(0, _string().maybeToString)((0, _projects().getAtomProjectRelativePath)(path))}`;
+  const currentDiff = new _rxjsCompatUmdMin.BehaviorSubject({
     oldId: null,
     newId: null
   });
+
   const onDiffClick = (oldId, newId) => {
     currentDiff.next({
       oldId: null,
@@ -271,27 +333,51 @@ function createLogPaneForPath(path) {
   };
 
   const contentLoader = currentDiff.switchMap(ids => {
-    const { oldId, newId } = ids;
+    const {
+      oldId,
+      newId
+    } = ids;
+
     if (oldId == null || newId == null) {
-      return _rxjsBundlesRxMinJs.Observable.of({ oldContent: null, newContent: null });
+      return _rxjsCompatUmdMin.Observable.of({
+        oldContent: null,
+        newContent: null,
+        error: null
+      });
     }
-    return _rxjsBundlesRxMinJs.Observable.forkJoin(oldId !== '' ? repository.fetchFileContentAtRevision(path, oldId) : _rxjsBundlesRxMinJs.Observable.of(''), newId !== '' ? repository.fetchFileContentAtRevision(path, newId) : _rxjsBundlesRxMinJs.Observable.of('')).startWith([null, null]).map(([oldContent, newContent]) => ({ oldContent, newContent }));
+
+    return _rxjsCompatUmdMin.Observable.forkJoin(oldId !== '' ? repository.fetchFileContentAtRevision(path, oldId) : _rxjsCompatUmdMin.Observable.of(''), newId !== '' ? repository.fetchFileContentAtRevision(path, newId) : _rxjsCompatUmdMin.Observable.of('')).startWith([null, null]).map(([oldContent, newContent]) => ({
+      oldContent,
+      newContent,
+      error: null
+    })).catch(error => {
+      return _rxjsCompatUmdMin.Observable.of({
+        oldContent: null,
+        newContent: null,
+        error: error.toString()
+      });
+    });
   });
 
-  const props = _rxjsBundlesRxMinJs.Observable.combineLatest(_rxjsBundlesRxMinJs.Observable.fromPromise(repository.log([path], NUM_LOG_RESULTS)).map(log => log.entries).startWith(null), contentLoader).map(([logEntries, content]) => {
+  const props = _rxjsCompatUmdMin.Observable.combineLatest(_rxjsCompatUmdMin.Observable.fromPromise(repository.log([path], NUM_LOG_RESULTS)).map(log => log.entries).startWith(null), contentLoader).map(([logEntries, content]) => {
     return {
       files: [path],
       showDifferentialRevision,
       repository,
       onDiffClick,
       logEntries,
+      fileLoadingError: content.error,
       oldContent: content.oldContent,
       newContent: content.newContent
     };
   });
 
-  const component = (0, (_bindObservableAsProps || _load_bindObservableAsProps()).bindObservableAsProps)(props, (_VcsLogComponent || _load_VcsLogComponent()).default);
-  return _react.createElement((_VcsLogGadget || _load_VcsLogGadget()).default, { iconName: 'repo', title: title, component: component });
+  const component = (0, _bindObservableAsProps().bindObservableAsProps)(props, _VcsLogComponent().default);
+  return React.createElement(_VcsLogGadget().default, {
+    iconName: "repo",
+    title: title,
+    component: component
+  });
 }
 
 let activation;
@@ -311,10 +397,12 @@ function deactivate() {
 
 function addItemsToFileTreeContextMenu(contextMenu) {
   if (!activation) {
-    throw new Error('Invariant violation: "activation"');
+    throw new Error("Invariant violation: \"activation\"");
   }
 
   return activation.addItemsToFileTreeContextMenu(contextMenu);
 }
 
-const shortNameForAuthor = exports.shortNameForAuthor = (_util || _load_util()).shortNameForAuthor;
+const shortNameForAuthor = _util().shortNameForAuthor;
+
+exports.shortNameForAuthor = shortNameForAuthor;

@@ -1,11 +1,11 @@
-'use strict';
+"use strict";
 
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.NavigationStack = undefined;
+exports.NavigationStack = void 0;
 
-var _rxjsBundlesRxMinJs = require('rxjs/bundles/Rx.min.js');
+var _rxjsCompatUmdMin = require("rxjs-compat/bundles/rxjs-compat.umd.min.js");
 
 /**
  * Copyright (c) 2015-present, Facebook, Inc.
@@ -17,10 +17,7 @@ var _rxjsBundlesRxMinJs = require('rxjs/bundles/Rx.min.js');
  *  strict-local
  * @format
  */
-
-const MAX_STACK_DEPTH = 100;
-
-// Provides a navigation stack abstraction, useful for going forward/backwards
+const MAX_STACK_DEPTH = 100; // Provides a navigation stack abstraction, useful for going forward/backwards
 // while browsing code.
 //
 // Stack entries include the file (as uri for closed files and as
@@ -45,12 +42,12 @@ const MAX_STACK_DEPTH = 100;
 //
 // filter can be used to remove entries from the stack. This is done when
 // closing unnamed editors and when closing remote directories.
-class NavigationStack {
 
+class NavigationStack {
   constructor() {
     this._elements = [];
     this._index = -1;
-    this._changes = new _rxjsBundlesRxMinJs.Subject();
+    this._changes = new _rxjsCompatUmdMin.Subject();
   }
 
   observeChanges() {
@@ -67,7 +64,7 @@ class NavigationStack {
 
   getCurrent() {
     if (!(this._index >= 0 && this._index < this._elements.length)) {
-      throw new Error('Invariant violation: "this._index >= 0 && this._index < this._elements.length"');
+      throw new Error("Invariant violation: \"this._index >= 0 && this._index < this._elements.length\"");
     }
 
     return this._elements[this._index];
@@ -77,13 +74,15 @@ class NavigationStack {
     if (!this.hasCurrent()) {
       return null;
     }
+
     const location = this.getCurrent();
     return location.type === 'editor' ? location.editor : null;
-  }
+  } // Removes any elements below current, then pushes newTop onto the stack.
 
-  // Removes any elements below current, then pushes newTop onto the stack.
+
   push(newTop) {
     this._elements.splice(this._index + 1);
+
     this._elements.push(newTop);
 
     if (this._elements.length > MAX_STACK_DEPTH) {
@@ -91,15 +90,16 @@ class NavigationStack {
     }
 
     if (!(this._elements.length <= MAX_STACK_DEPTH)) {
-      throw new Error('Invariant violation: "this._elements.length <= MAX_STACK_DEPTH"');
+      throw new Error("Invariant violation: \"this._elements.length <= MAX_STACK_DEPTH\"");
     }
 
     this._index = this._elements.length - 1;
-    this._hasChanged();
-  }
 
-  // Updates the current location if the editors match.
+    this._hasChanged();
+  } // Updates the current location if the editors match.
   // If the editors don't match then push a new top.
+
+
   attemptUpdate(newTop) {
     if (this.getCurrentEditor() === newTop.editor) {
       const current = this.getCurrent();
@@ -115,23 +115,25 @@ class NavigationStack {
 
   hasPrevious() {
     return this._index > 0;
-  }
-
-  // Moves current to the previous entry.
+  } // Moves current to the previous entry.
   // Returns null if there is no previous entry.
+
+
   previous() {
     if (this.hasPrevious()) {
       this._index -= 1;
       const result = this.getCurrent();
+
       this._hasChanged();
+
       return result;
     } else {
       return null;
     }
-  }
-
-  // Moves to the next entry.
+  } // Moves to the next entry.
   // Returns null if already at the last entry.
+
+
   next() {
     if (!this.hasNext()) {
       return null;
@@ -139,14 +141,17 @@ class NavigationStack {
 
     this._index += 1;
     const result = this.getCurrent();
-    this._hasChanged();
-    return result;
-  }
 
-  // When opening a new editor, convert all Uri locations on the stack to editor
+    this._hasChanged();
+
+    return result;
+  } // When opening a new editor, convert all Uri locations on the stack to editor
   // locations.
+
+
   editorOpened(editor) {
     const uri = editor.getPath();
+
     if (uri == null) {
       return;
     }
@@ -160,11 +165,12 @@ class NavigationStack {
         };
       }
     });
-  }
+  } // When closing editors, convert all locations for that editor to URI locations.
 
-  // When closing editors, convert all locations for that editor to URI locations.
+
   editorClosed(editor) {
     const uri = editor.getPath();
+
     if (uri === '' || uri == null) {
       this.filter(location => location.type !== 'editor' || editor !== location.editor);
     } else {
@@ -178,20 +184,23 @@ class NavigationStack {
         }
       });
     }
-  }
+  } // Removes all entries which do not match the predicate.
 
-  // Removes all entries which do not match the predicate.
+
   filter(predicate) {
     const originalSize = this._elements.length;
     let newIndex = this._index;
     this._elements = this._elements.filter((location, index) => {
       const result = predicate(location);
+
       if (!result && index <= this._index) {
         newIndex -= 1;
       }
+
       return result;
     });
     this._index = Math.min(Math.max(newIndex, 0), this._elements.length - 1);
+
     if (originalSize !== this._elements.length) {
       this._hasChanged();
     }
@@ -199,9 +208,9 @@ class NavigationStack {
 
   _hasChanged() {
     this._changes.next(this);
-  }
+  } // For testing ...
 
-  // For testing ...
+
   getLocations() {
     return this._elements;
   }
@@ -209,5 +218,7 @@ class NavigationStack {
   getIndex() {
     return this._index;
   }
+
 }
+
 exports.NavigationStack = NavigationStack;

@@ -1,12 +1,22 @@
-'use strict';
+"use strict";
 
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.NullLanguageService = undefined;
+exports.NullLanguageService = void 0;
 
-var _rxjsBundlesRxMinJs = require('rxjs/bundles/Rx.min.js');
+var _rxjsCompatUmdMin = require("rxjs-compat/bundles/rxjs-compat.umd.min.js");
 
+/**
+ * Copyright (c) 2015-present, Facebook, Inc.
+ * All rights reserved.
+ *
+ * This source code is licensed under the license found in the LICENSE file in
+ * the root directory of this source tree.
+ *
+ * 
+ * @format
+ */
 // An implementation of LanguageService which always returns no results.
 // Useful for implementing aggregate language services.
 class NullLanguageService {
@@ -15,7 +25,7 @@ class NullLanguageService {
   }
 
   observeDiagnostics() {
-    return _rxjsBundlesRxMinJs.Observable.empty().publish();
+    return _rxjsCompatUmdMin.Observable.empty().publish();
   }
 
   getAutocompleteSuggestions(fileVersion, position, request) {
@@ -35,7 +45,11 @@ class NullLanguageService {
   }
 
   findReferences(fileVersion, position) {
-    return _rxjsBundlesRxMinJs.Observable.of(null).publish();
+    return _rxjsCompatUmdMin.Observable.of(null).publish();
+  }
+
+  rename(fileVersion, position, newName) {
+    return _rxjsCompatUmdMin.Observable.of(null).publish();
   }
 
   getCoverage(filePath) {
@@ -111,24 +125,29 @@ class NullLanguageService {
   }
 
   observeStatus(fileVersion) {
-    return _rxjsBundlesRxMinJs.Observable.of({ kind: 'null' }).publish();
+    return _rxjsCompatUmdMin.Observable.of({
+      kind: 'null'
+    }).publish();
   }
 
   async clickStatus(fileVersion, id, button) {}
 
+  onWillSave(fileVersion) {
+    return _rxjsCompatUmdMin.Observable.empty().publish();
+  }
+
+  async sendLspRequest(filePath, method, params) {}
+
+  async sendLspNotification(method, params) {}
+
+  observeLspNotifications(notificationMethod) {
+    return _rxjsCompatUmdMin.Observable.empty().publish();
+  }
+
   dispose() {}
-}
 
-exports.NullLanguageService = NullLanguageService; // Assert that NullLanguageService satisifes the LanguageService interface:
-/**
- * Copyright (c) 2015-present, Facebook, Inc.
- * All rights reserved.
- *
- * This source code is licensed under the license found in the LICENSE file in
- * the root directory of this source tree.
- *
- * 
- * @format
- */
+} // Assert that NullLanguageService satisifes the LanguageService interface:
 
+
+exports.NullLanguageService = NullLanguageService;
 null;

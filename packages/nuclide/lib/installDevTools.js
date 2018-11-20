@@ -1,38 +1,54 @@
-'use strict';
+"use strict";
 
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
 exports.default = installDevTools;
 
-var _electron = _interopRequireDefault(require('electron'));
+var _electron = _interopRequireDefault(require("electron"));
 
-var _os = _interopRequireDefault(require('os'));
+var _os = _interopRequireDefault(require("os"));
 
-var _nuclideUri;
+function _nuclideUri() {
+  const data = _interopRequireDefault(require("../modules/nuclide-commons/nuclideUri"));
 
-function _load_nuclideUri() {
-  return _nuclideUri = _interopRequireDefault(require('../modules/nuclide-commons/nuclideUri'));
+  _nuclideUri = function () {
+    return data;
+  };
+
+  return data;
 }
 
-var _fs = _interopRequireDefault(require('fs'));
+var _fs = _interopRequireDefault(require("fs"));
 
-var _nullthrows;
+function _nullthrows() {
+  const data = _interopRequireDefault(require("nullthrows"));
 
-function _load_nullthrows() {
-  return _nullthrows = _interopRequireDefault(require('nullthrows'));
+  _nullthrows = function () {
+    return data;
+  };
+
+  return data;
 }
 
-var _UniversalDisposable;
+function _UniversalDisposable() {
+  const data = _interopRequireDefault(require("../modules/nuclide-commons/UniversalDisposable"));
 
-function _load_UniversalDisposable() {
-  return _UniversalDisposable = _interopRequireDefault(require('../modules/nuclide-commons/UniversalDisposable'));
+  _UniversalDisposable = function () {
+    return data;
+  };
+
+  return data;
 }
 
-var _ReactPerfMonitor;
+function _ReactDevPerfMonitor() {
+  const data = _interopRequireDefault(require("./ReactDevPerfMonitor"));
 
-function _load_ReactPerfMonitor() {
-  return _ReactPerfMonitor = _interopRequireDefault(require('./ReactPerfMonitor'));
+  _ReactDevPerfMonitor = function () {
+    return data;
+  };
+
+  return data;
 }
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
@@ -47,17 +63,14 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
  * 
  * @format
  */
+const extensionIDsToLoad = [// React DevTools
+'fmkadmapgofadopljbjfkapdkoienihi']; // eslint-disable-next-line no-console
 
-const extensionIDsToLoad = [
-// React DevTools
-'fmkadmapgofadopljbjfkapdkoienihi'];
-
-// eslint-disable-next-line no-console
 const log = console.debug || console.log;
-
 let installed;
+
 function installDevTools() {
-  const disposable = new (_UniversalDisposable || _load_UniversalDisposable()).default(new (_ReactPerfMonitor || _load_ReactPerfMonitor()).default());
+  const disposable = new (_UniversalDisposable().default)(new (_ReactDevPerfMonitor().default)());
 
   if (installed) {
     return disposable;
@@ -65,8 +78,8 @@ function installDevTools() {
 
   const chromeHome = getChromeHomeDir();
   const profileDirs = getProfileDirs(chromeHome);
-  (0, (_nullthrows || _load_nullthrows()).default)(_electron.default.webFrame).registerURLSchemeAsBypassingCSP('chrome-extension');
-  const remote = (0, (_nullthrows || _load_nullthrows()).default)(_electron.default.remote);
+  (0, _nullthrows().default)(_electron.default.webFrame).registerURLSchemeAsBypassingCSP('chrome-extension');
+  const remote = (0, _nullthrows().default)(_electron.default.remote);
 
   for (const extensionID of extensionIDsToLoad) {
     remote.BrowserWindow.removeDevToolsExtension(extensionID);
@@ -80,18 +93,22 @@ function installDevTools() {
     const namesWithTimes = extensionVersions.map(dirname => Object.assign({}, _fs.default.statSync(dirname), {
       dirname
     }));
-
     const latest = namesWithTimes.sort((a, b) => a.mtimeMs - b.mtimeMs)[0];
     let latestManifest;
+
     try {
-      latestManifest = JSON.parse(_fs.default.readFileSync((_nuclideUri || _load_nuclideUri()).default.join(latest.dirname, 'manifest.json'), 'utf-8'));
+      latestManifest = JSON.parse(_fs.default.readFileSync(_nuclideUri().default.join(latest.dirname, 'manifest.json'), 'utf-8'));
     } catch (e) {
       log(`Unable to read or parse a valid manifest for extension ${extensionID}`);
     }
 
     if (latest != null && latestManifest != null) {
-      remote.BrowserWindow.addDevToolsExtension(latest.dirname);
-      log(`Successfully loaded Chrome extension "${latestManifest.name}"`);
+      try {
+        remote.BrowserWindow.addDevToolsExtension(latest.dirname);
+        log(`Successfully loaded Chrome extension "${latestManifest.name} - ${latest.dirname}"`);
+      } catch (e) {// the above call to `addDevToolsExtension` seems to frequently throw after
+        // a recent Electron upgrade, despite the extension actually being added
+      }
     }
   }
 
@@ -102,27 +119,31 @@ function installDevTools() {
 function getChromeHomeDir() {
   switch (process.platform) {
     case 'darwin':
-      return (_nuclideUri || _load_nuclideUri()).default.join(_os.default.homedir(), 'Library', 'Application Support', 'Google', 'Chrome');
+      return _nuclideUri().default.join(_os.default.homedir(), 'Library', 'Application Support', 'Google', 'Chrome');
+
     case 'win32':
       if (!(process.env.LOCALAPPDATA != null)) {
-        throw new Error('Invariant violation: "process.env.LOCALAPPDATA != null"');
+        throw new Error("Invariant violation: \"process.env.LOCALAPPDATA != null\"");
       }
 
-      return (_nuclideUri || _load_nuclideUri()).default.join(process.env.LOCALAPPDATA, 'Google', 'Chrome', 'User Data');
+      return _nuclideUri().default.join(process.env.LOCALAPPDATA, 'Google', 'Chrome', 'User Data');
+
     default:
-      return (_nuclideUri || _load_nuclideUri()).default.join(_os.default.homedir(), '.config', 'google-chrome');
+      return _nuclideUri().default.join(_os.default.homedir(), '.config', 'google-chrome');
   }
 }
 
 function getProfileDirs(chromeHome) {
-  const profileDirs = [(_nuclideUri || _load_nuclideUri()).default.join(chromeHome, 'Default')];
-
+  const profileDirs = [_nuclideUri().default.join(chromeHome, 'Default')];
   let done;
   let profileNum = 1;
+
   while (!done) {
     try {
-      const profilePath = (_nuclideUri || _load_nuclideUri()).default.join(chromeHome, `Profile ${profileNum}`);
+      const profilePath = _nuclideUri().default.join(chromeHome, `Profile ${profileNum}`);
+
       _fs.default.statSync(profilePath);
+
       profileDirs.push(profilePath);
       profileNum++;
     } catch (e) {
@@ -135,10 +156,11 @@ function getProfileDirs(chromeHome) {
 
 function getVersionDirsForExtension(profileDirs, extensionID) {
   for (const profileDir of profileDirs) {
-    const extensionPath = (_nuclideUri || _load_nuclideUri()).default.join(profileDir, 'Extensions', extensionID);
+    const extensionPath = _nuclideUri().default.join(profileDir, 'Extensions', extensionID);
+
     try {
       return _fs.default.readdirSync(extensionPath).filter(base => !base.startsWith('.')) // Remove .DS_Store and others
-      .map(base => (_nuclideUri || _load_nuclideUri()).default.join(extensionPath, base));
+      .map(base => _nuclideUri().default.join(extensionPath, base));
     } catch (e) {}
   }
 }

@@ -1,29 +1,44 @@
-'use strict';
+"use strict";
 
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.MemoizedFieldsDeriver = undefined;
+exports.MemoizedFieldsDeriver = void 0;
 
-var _nuclideUri;
+function _nuclideUri() {
+  const data = _interopRequireDefault(require("../../../modules/nuclide-commons/nuclideUri"));
 
-function _load_nuclideUri() {
-  return _nuclideUri = _interopRequireDefault(require('../../../modules/nuclide-commons/nuclideUri'));
+  _nuclideUri = function () {
+    return data;
+  };
+
+  return data;
 }
 
-var _FileTreeHelpers;
+function FileTreeHelpers() {
+  const data = _interopRequireWildcard(require("./FileTreeHelpers"));
 
-function _load_FileTreeHelpers() {
-  return _FileTreeHelpers = _interopRequireDefault(require('./FileTreeHelpers'));
+  FileTreeHelpers = function () {
+    return data;
+  };
+
+  return data;
 }
 
-var _hgConstants;
-
-function _load_hgConstants() {
-  return _hgConstants = require('../../nuclide-hg-rpc/lib/hg-constants');
-}
+function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) { var desc = Object.defineProperty && Object.getOwnPropertyDescriptor ? Object.getOwnPropertyDescriptor(obj, key) : {}; if (desc.get || desc.set) { Object.defineProperty(newObj, key, desc); } else { newObj[key] = obj[key]; } } } } newObj.default = obj; return newObj; } }
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+/**
+ * Copyright (c) 2015-present, Facebook, Inc.
+ * All rights reserved.
+ *
+ * This source code is licensed under the license found in the LICENSE file in
+ * the root directory of this source tree.
+ *
+ * 
+ * @format
+ */
 
 /**
  * This is a support class for FileTreeNode.
@@ -41,38 +56,19 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
  * single property. There are dependencies between some of the properties, so it's possible that
  * one memoized getter will call another.
  *
- * Each getter has a separate store instance which it is using for the memoization.
+ * Each getter has a separate cache instance which it is using for the memoization.
  * In this class' memoization strategy only the last value (and all its params, of course) are
  * stored.
  *
  */
-/**
- * Copyright (c) 2015-present, Facebook, Inc.
- * All rights reserved.
- *
- * This source code is licensed under the license found in the LICENSE file in
- * the root directory of this source tree.
- *
- * 
- * @format
- */
-
 class MemoizedFieldsDeriver {
-
   // These properties do not depend on the conf instance and can be calculated right away.
   constructor(uri, rootUri) {
     this._uri = uri;
     this._rootUri = rootUri;
-
-    this._isRoot = uri === rootUri;
-    this._name = (_FileTreeHelpers || _load_FileTreeHelpers()).default.keyToName(uri);
-    this._isContainer = (_FileTreeHelpers || _load_FileTreeHelpers()).default.isDirOrArchiveKey(uri);
-    this._relativePath = (_nuclideUri || _load_nuclideUri()).default.relative(rootUri, uri);
-    this._localPath = (_FileTreeHelpers || _load_FileTreeHelpers()).default.keyToPath((_nuclideUri || _load_nuclideUri()).default.isRemote(uri) ? (_nuclideUri || _load_nuclideUri()).default.parse(uri).path : uri);
-    this._splitPath = (_nuclideUri || _load_nuclideUri()).default.split(uri);
-
+    this._isContainer = FileTreeHelpers().isDirOrArchiveKey(uri);
+    this._splitPath = _nuclideUri().default.split(uri);
     this._getRepo = memoize(this._repoGetter.bind(this));
-    this._getVcsStatusCode = memoize(this._vcsStatusCodeGetter.bind(this));
     this._getIsIgnored = memoize(this._isIgnoredGetter.bind(this));
     this._getCheckedStatus = memoize(this._checkedStatusGetter.bind(this));
     this._getContainedInWorkingSet = memoize(this._containedInWorkingSetGetter.bind(this));
@@ -81,155 +77,140 @@ class MemoizedFieldsDeriver {
     this._getShouldBeSoftened = memoize(this._shouldBeSoftenedGetter.bind(this));
   }
 
-  _repoGetter(conf, store) {
-    if (store.reposByRoot !== conf.reposByRoot) {
-      store.reposByRoot = conf.reposByRoot;
-
-      store.repo = store.reposByRoot[this._rootUri];
+  _repoGetter(conf, cache) {
+    if (cache.reposByRoot !== conf.reposByRoot) {
+      cache.reposByRoot = conf.reposByRoot;
+      cache.repo = cache.reposByRoot[this._rootUri];
     }
 
-    return store.repo;
+    return cache.repo;
   }
 
-  _vcsStatusCodeGetter(conf, store) {
-    if (store.vcsStatuses !== conf.vcsStatuses) {
-      store.vcsStatuses = conf.vcsStatuses;
-
-      const rootVcsStatuses = store.vcsStatuses.get(this._rootUri) || new Map();
-      store.vcsStatusCode = rootVcsStatuses.get(this._uri) || (_hgConstants || _load_hgConstants()).StatusCodeNumber.CLEAN;
-    }
-
-    return store.vcsStatusCode;
-  }
-
-  _isIgnoredGetter(conf, store) {
+  _isIgnoredGetter(conf, cache) {
     const repo = this._getRepo(conf);
-    if (store.repo !== repo) {
-      store.repo = repo;
 
-      store.isIgnored = store.repo != null && store.repo.isProjectAtRoot() && store.repo.isPathIgnored(this._uri);
+    if (cache.repo !== repo) {
+      cache.repo = repo;
+      cache.isIgnored = cache.repo != null && cache.repo.isProjectAtRoot() && cache.repo.isPathIgnored(this._uri);
     }
 
-    return store.isIgnored;
+    return cache.isIgnored;
   }
 
-  _checkedStatusGetter(conf, store) {
-    if (store.editedWorkingSet !== conf.editedWorkingSet) {
-      store.editedWorkingSet = conf.editedWorkingSet;
+  _checkedStatusGetter(conf, cache) {
+    if (cache.editedWorkingSet !== conf.editedWorkingSet) {
+      cache.editedWorkingSet = conf.editedWorkingSet;
 
-      if (store.editedWorkingSet.isEmpty()) {
-        store.checkedStatus = 'clear';
+      if (cache.editedWorkingSet.isEmpty()) {
+        cache.checkedStatus = 'clear';
       } else {
         if (this._isContainer) {
-          if (store.editedWorkingSet.containsFileBySplitPath(this._splitPath)) {
-            store.checkedStatus = 'checked';
-          } else if (store.editedWorkingSet.containsDirBySplitPath(this._splitPath)) {
-            store.checkedStatus = 'partial';
+          if (cache.editedWorkingSet.containsFileBySplitPath(this._splitPath)) {
+            cache.checkedStatus = 'checked';
+          } else if (cache.editedWorkingSet.containsDirBySplitPath(this._splitPath)) {
+            cache.checkedStatus = 'partial';
           } else {
-            store.checkedStatus = 'clear';
+            cache.checkedStatus = 'clear';
           }
         } else {
-          store.checkedStatus = store.editedWorkingSet.containsFileBySplitPath(this._splitPath) ? 'checked' : 'clear';
+          cache.checkedStatus = cache.editedWorkingSet.containsFileBySplitPath(this._splitPath) ? 'checked' : 'clear';
         }
       }
     }
 
-    return store.checkedStatus;
+    return cache.checkedStatus;
   }
 
-  _containedInWorkingSetGetter(conf, store) {
-    if (store.workingSet !== conf.workingSet) {
-      store.workingSet = conf.workingSet;
-
-      store.containedInWorkingSet = this._isContainer ? store.workingSet.containsDirBySplitPath(this._splitPath) : store.workingSet.containsFileBySplitPath(this._splitPath);
+  _containedInWorkingSetGetter(conf, cache) {
+    if (cache.workingSet !== conf.workingSet) {
+      cache.workingSet = conf.workingSet;
+      cache.containedInWorkingSet = this._isContainer ? cache.workingSet.containsDirBySplitPath(this._splitPath) : cache.workingSet.containsFileBySplitPath(this._splitPath);
     }
 
-    return store.containedInWorkingSet;
+    return cache.containedInWorkingSet;
   }
 
-  _containedInOpenFilesWorkingSetGetter(conf, store) {
-    if (store.openFilesWorkingSet !== conf.openFilesWorkingSet) {
-      store.openFilesWorkingSet = conf.openFilesWorkingSet;
+  _containedInOpenFilesWorkingSetGetter(conf, cache) {
+    if (cache.openFilesWorkingSet !== conf.openFilesWorkingSet) {
+      cache.openFilesWorkingSet = conf.openFilesWorkingSet;
 
-      if (store.openFilesWorkingSet.isEmpty()) {
-        store.containedInOpenFilesWorkingSet = false;
+      if (cache.openFilesWorkingSet.isEmpty()) {
+        cache.containedInOpenFilesWorkingSet = false;
       } else {
-        store.containedInOpenFilesWorkingSet = this._isContainer ? store.openFilesWorkingSet.containsDirBySplitPath(this._splitPath) : store.openFilesWorkingSet.containsFileBySplitPath(this._splitPath);
+        cache.containedInOpenFilesWorkingSet = this._isContainer ? cache.openFilesWorkingSet.containsDirBySplitPath(this._splitPath) : cache.openFilesWorkingSet.containsFileBySplitPath(this._splitPath);
       }
     }
 
-    return store.containedInOpenFilesWorkingSet;
+    return cache.containedInOpenFilesWorkingSet;
   }
 
-  _shouldBeShownGetter(conf, store) {
+  _shouldBeShownGetter(conf, cache) {
     const isIgnored = this._getIsIgnored(conf);
+
     const containedInWorkingSet = this._getContainedInWorkingSet(conf);
+
     const containedInOpenFilesWorkingSet = this._getContainedInOpenFilesWorkingSet(conf);
 
-    if (store.isIgnored !== isIgnored || store.excludeVcsIgnoredPaths !== conf.excludeVcsIgnoredPaths || store.hideVcsIgnoredPaths !== conf.hideVcsIgnoredPaths || store.hideIgnoredNames !== conf.hideIgnoredNames || store.ignoredPatterns !== conf.ignoredPatterns || store.isEditingWorkingSet !== conf.isEditingWorkingSet || store.containedInWorkingSet !== containedInWorkingSet || store.containedInOpenFilesWorkingSet !== containedInOpenFilesWorkingSet) {
-      store.isIgnored = isIgnored;
-      store.excludeVcsIgnoredPaths = conf.excludeVcsIgnoredPaths;
-      store.hideVcsIgnoredPaths = conf.hideVcsIgnoredPaths;
-      store.hideIgnoredNames = conf.hideIgnoredNames;
-      store.ignoredPatterns = conf.ignoredPatterns;
-      store.isEditingWorkingSet = conf.isEditingWorkingSet;
-      store.containedInWorkingSet = containedInWorkingSet;
-      store.containedInOpenFilesWorkingSet = containedInOpenFilesWorkingSet;
+    if (cache.isIgnored !== isIgnored || cache.excludeVcsIgnoredPaths !== conf.excludeVcsIgnoredPaths || cache.hideVcsIgnoredPaths !== conf.hideVcsIgnoredPaths || cache.hideIgnoredNames !== conf.hideIgnoredNames || cache.ignoredPatterns !== conf.ignoredPatterns || cache.isEditingWorkingSet !== conf.isEditingWorkingSet || cache.containedInWorkingSet !== containedInWorkingSet || cache.containedInOpenFilesWorkingSet !== containedInOpenFilesWorkingSet) {
+      cache.isIgnored = isIgnored;
+      cache.excludeVcsIgnoredPaths = conf.excludeVcsIgnoredPaths;
+      cache.hideVcsIgnoredPaths = conf.hideVcsIgnoredPaths;
+      cache.hideIgnoredNames = conf.hideIgnoredNames;
+      cache.ignoredPatterns = conf.ignoredPatterns;
+      cache.isEditingWorkingSet = conf.isEditingWorkingSet;
+      cache.containedInWorkingSet = containedInWorkingSet;
+      cache.containedInOpenFilesWorkingSet = containedInOpenFilesWorkingSet;
 
-      if (store.isIgnored && store.excludeVcsIgnoredPaths && store.hideVcsIgnoredPaths) {
-        store.shouldBeShown = false;
-      } else if (store.hideIgnoredNames && store.ignoredPatterns.some(p => p.match(this._uri))) {
-        store.shouldBeShown = false;
-      } else if (store.isEditingWorkingSet) {
-        store.shouldBeShown = true;
+      if (cache.isIgnored && cache.excludeVcsIgnoredPaths && cache.hideVcsIgnoredPaths) {
+        cache.shouldBeShown = false;
+      } else if (cache.hideIgnoredNames && cache.ignoredPatterns.some(p => p.match(this._uri))) {
+        cache.shouldBeShown = false;
+      } else if (cache.isEditingWorkingSet) {
+        cache.shouldBeShown = true;
       } else {
-        store.shouldBeShown = store.containedInWorkingSet || store.containedInOpenFilesWorkingSet;
+        cache.shouldBeShown = cache.containedInWorkingSet || cache.containedInOpenFilesWorkingSet;
       }
     }
 
-    return store.shouldBeShown;
+    return cache.shouldBeShown;
   }
 
-  _shouldBeSoftenedGetter(conf, store) {
+  _shouldBeSoftenedGetter(conf, cache) {
     const containedInWorkingSet = this._getContainedInWorkingSet(conf);
+
     const containedInOpenFilesWorkingSet = this._getContainedInOpenFilesWorkingSet(conf);
 
-    if (store.isEditingWorkingSet !== conf.isEditingWorkingSet || store.containedInWorkingSet !== containedInWorkingSet || store.containedInOpenFilesWorkingSet !== containedInOpenFilesWorkingSet) {
-      store.isEditingWorkingSet = conf.isEditingWorkingSet;
-      store.containedInWorkingSet = containedInWorkingSet;
-      store.containedInOpenFilesWorkingSet = containedInOpenFilesWorkingSet;
+    if (cache.isEditingWorkingSet !== conf.isEditingWorkingSet || cache.containedInWorkingSet !== containedInWorkingSet || cache.containedInOpenFilesWorkingSet !== containedInOpenFilesWorkingSet) {
+      cache.isEditingWorkingSet = conf.isEditingWorkingSet;
+      cache.containedInWorkingSet = containedInWorkingSet;
+      cache.containedInOpenFilesWorkingSet = containedInOpenFilesWorkingSet;
 
-      if (store.isEditingWorkingSet) {
-        store.shouldBeSoftened = false;
+      if (cache.isEditingWorkingSet) {
+        cache.shouldBeSoftened = false;
       } else {
-        store.shouldBeSoftened = !store.containedInWorkingSet && store.containedInOpenFilesWorkingSet;
+        cache.shouldBeSoftened = !cache.containedInWorkingSet && cache.containedInOpenFilesWorkingSet;
       }
     }
 
-    return store.shouldBeSoftened;
+    return cache.shouldBeSoftened;
   }
 
   buildDerivedFields(conf) {
     return {
-      isRoot: this._isRoot,
-      name: this._name,
       isContainer: this._isContainer,
-      relativePath: this._relativePath,
-      localPath: this._localPath,
-
       repo: this._getRepo(conf),
-      vcsStatusCode: this._getVcsStatusCode(conf),
       isIgnored: this._getIsIgnored(conf),
       checkedStatus: this._getCheckedStatus(conf),
       shouldBeShown: this._getShouldBeShown(conf),
       shouldBeSoftened: this._getShouldBeSoftened(conf)
     };
   }
+
 }
 
 exports.MemoizedFieldsDeriver = MemoizedFieldsDeriver;
-function memoize(getter) {
-  const store = {};
 
-  return conf => getter(conf, store);
+function memoize(getter) {
+  const cache = {};
+  return conf => getter(conf, cache);
 }

@@ -1,6 +1,6 @@
 {
   "name": "atom-ide-debugger-java",
-  "version": "0.7.1-dev",
+  "version": "0.7.3-dev",
   "main": "./main.js",
   "description": "Desktop Java Debugger for Atom IDE.",
   "author": "NEEDS OWNER",
@@ -9,6 +9,7 @@
   "repository": "https://github.com/facebook/nuclide/tree/master/modules/atom-ide-debugger-java",
   "scripts": {
     "prepublish": "../scripts/prepublish.sh",
+    "postinstall": "./javaDebuggerPostInstallSetup.sh",
     "test": "node ../nuclide-jasmine/bin/jasmine-node-transpiled spec",
     "lint": "../../node_modules/.bin/eslint .",
     "flow": "../../node_modules/.bin/flow"
@@ -36,27 +37,27 @@
         "0.0.0": "consumeRpcService"
       }
     },
-    "consumedServices": {
-      "debugger.sourcePaths": {
-        "versions": {
-          "0.0.0": "consumeSourcePathsService"
-        }
+    "debugger.sourcePaths": {
+      "versions": {
+        "0.0.0": "consumeSourcePathsService"
       }
     }
   },
   "dependencies": {
     "log4js": "1.1.1",
-    "nuclide-commons": "0.7.1-dev",
-    "nuclide-commons-atom": "0.7.1-dev",
-    "nuclide-commons-ui": "0.7.1-dev",
-    "nuclide-debugger-common": "0.7.1-dev",
+    "nuclide-commons": "0.7.3-dev",
+    "nuclide-commons-atom": "0.7.3-dev",
+    "nuclide-commons-ui": "0.7.3-dev",
+    "nuclide-debugger-common": "0.7.3-dev",
     "nullthrows": "1.0.0",
-    "react": "16.3.2",
-    "rxjs": "5.5.5",
+    "react": "16.5.2",
+    "rxjs-compat": "6.3.3",
     "vscode-chrome-debug-core": "3.17.10",
     "vscode-debugadapter": "1.24.0",
     "vscode-debugprotocol": "1.24.0",
     "vscode-nls": "2.0.2"
   },
-  "package-deps": ["atom-ide-ui"]
+  "package-deps": [
+    "atom-ide-ui"
+  ]
 }

@@ -11,8 +11,7 @@
     "TerminalView": "deserializeTerminalView"
   },
   "nuclide": {
-    "packageType": "Atom",
-    "testRunner": "apm",
+    "packageType": "AtomPackage",
     "configMetadata": {
       "pathComponents": [
         "IDE",
@@ -49,7 +48,13 @@
     },
     "allowTransparency": {
       "title": "Allow Transparency",
-      "description": "Enables transparent terminal foreground or background theme colors. Also disables subpixel anti-aliasing.",
+      "description": "Enables transparent terminal foreground or background theme colors. Also disables subpixel anti-aliasing. Warning: can reduce performance.",
+      "type": "boolean",
+      "default": false
+    },
+    "copyOnSelect": {
+      "title": "Copy on Select",
+      "description": "Selecting text in terminal also copies it to the clipboard. (Macos and Linux only)",
       "type": "boolean",
       "default": false
     },
@@ -58,9 +63,37 @@
       "type": "string",
       "default": "dynamic",
       "enum": [
-        {"value": "none", "description": "None (No character atlas, not recommended)"},
-        {"value": "static", "description": "Static (Generate a small character atlas on instantiation)"},
-        {"value": "dynamic", "description": "Dynamic (Experimental; Use an LRU cache to improve the cache hit rate)"}
+        {
+          "value": "none",
+          "description": "None (No character atlas, not recommended)"
+        },
+        {
+          "value": "static",
+          "description": "Static (Generate a small character atlas on instantiation)"
+        },
+        {
+          "value": "dynamic",
+          "description": "Dynamic (Experimental; Use an LRU cache to improve the cache hit rate)"
+        }
+      ]
+    },
+    "renderer": {
+      "title": "Terminal renderer implementation",
+      "type": "string",
+      "default": "auto",
+      "enum": [
+        {
+          "value": "auto",
+          "description": "Automatically select best setting"
+        },
+        {
+          "value": "canvas",
+          "description": "Canvas (normally faster)"
+        },
+        {
+          "value": "dom",
+          "description": "DOM (Experimental fallback; may work better on some hardware)"
+        }
       ]
     },
     "fontFamily": {
@@ -72,7 +105,7 @@
       "title": "Font Scale",
       "description": "The scale of the font used in the terminal relative to the editor font size.",
       "type": "number",
-      "default": 1.0,
+      "default": 1,
       "minimum": 0.1
     },
     "lineHeight": {
@@ -208,10 +241,15 @@
     }
   },
   "styleSheets": [
-    "../../../../../node_modules/xterm/dist/xterm.css",
+    "../../../../../node_modules/vscode-xterm/lib/xterm.css",
     "nuclide-terminal-view.less"
   ],
   "consumedServices": {
+    "fb-gatekeeper": {
+      "versions": {
+        "0.0.0": "consumeGatekeeperService"
+      }
+    },
     "nuclide-current-working-directory": {
       "versions": {
         "0.0.0": "initializeCwdApi"
@@ -225,6 +263,11 @@
     "nuclide-paste": {
       "versions": {
         "0.0.0": "consumePasteProvider"
+      }
+    },
+    "tool-bar": {
+      "versions": {
+        "^1.0.0": "consumeToolBar"
       }
     }
   },

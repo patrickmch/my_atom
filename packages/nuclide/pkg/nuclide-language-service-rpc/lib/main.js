@@ -1,76 +1,91 @@
-'use strict';
+"use strict";
 
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
+Object.defineProperty(exports, "ServerLanguageService", {
+  enumerable: true,
+  get: function () {
+    return _ServerLanguageService().ServerLanguageService;
+  }
+});
+Object.defineProperty(exports, "ensureInvalidations", {
+  enumerable: true,
+  get: function () {
+    return _ServerLanguageService().ensureInvalidations;
+  }
+});
+Object.defineProperty(exports, "NullLanguageService", {
+  enumerable: true,
+  get: function () {
+    return _NullLanguageService().NullLanguageService;
+  }
+});
+Object.defineProperty(exports, "MultiProjectLanguageService", {
+  enumerable: true,
+  get: function () {
+    return _MultiProjectLanguageService().MultiProjectLanguageService;
+  }
+});
+Object.defineProperty(exports, "forkHostServices", {
+  enumerable: true,
+  get: function () {
+    return _HostServicesAggregator().forkHostServices;
+  }
+});
+Object.defineProperty(exports, "typeHintFromSnippet", {
+  enumerable: true,
+  get: function () {
+    return _TypeHintFromSnippet().typeHintFromSnippet;
+  }
+});
 
-var _ServerLanguageService;
+function _ServerLanguageService() {
+  const data = require("./ServerLanguageService");
 
-function _load_ServerLanguageService() {
-  return _ServerLanguageService = require('./ServerLanguageService');
+  _ServerLanguageService = function () {
+    return data;
+  };
+
+  return data;
 }
 
-Object.defineProperty(exports, 'ServerLanguageService', {
-  enumerable: true,
-  get: function () {
-    return (_ServerLanguageService || _load_ServerLanguageService()).ServerLanguageService;
-  }
-});
-Object.defineProperty(exports, 'ensureInvalidations', {
-  enumerable: true,
-  get: function () {
-    return (_ServerLanguageService || _load_ServerLanguageService()).ensureInvalidations;
-  }
-});
+function _NullLanguageService() {
+  const data = require("./NullLanguageService");
 
-var _NullLanguageService;
+  _NullLanguageService = function () {
+    return data;
+  };
 
-function _load_NullLanguageService() {
-  return _NullLanguageService = require('./NullLanguageService');
+  return data;
 }
 
-Object.defineProperty(exports, 'NullLanguageService', {
-  enumerable: true,
-  get: function () {
-    return (_NullLanguageService || _load_NullLanguageService()).NullLanguageService;
-  }
-});
+function _MultiProjectLanguageService() {
+  const data = require("./MultiProjectLanguageService");
 
-var _MultiProjectLanguageService;
+  _MultiProjectLanguageService = function () {
+    return data;
+  };
 
-function _load_MultiProjectLanguageService() {
-  return _MultiProjectLanguageService = require('./MultiProjectLanguageService');
+  return data;
 }
 
-Object.defineProperty(exports, 'MultiProjectLanguageService', {
-  enumerable: true,
-  get: function () {
-    return (_MultiProjectLanguageService || _load_MultiProjectLanguageService()).MultiProjectLanguageService;
-  }
-});
+function _HostServicesAggregator() {
+  const data = require("./HostServicesAggregator");
 
-var _HostServicesAggregator;
+  _HostServicesAggregator = function () {
+    return data;
+  };
 
-function _load_HostServicesAggregator() {
-  return _HostServicesAggregator = require('./HostServicesAggregator');
+  return data;
 }
 
-Object.defineProperty(exports, 'forkHostServices', {
-  enumerable: true,
-  get: function () {
-    return (_HostServicesAggregator || _load_HostServicesAggregator()).forkHostServices;
-  }
-});
+function _TypeHintFromSnippet() {
+  const data = require("./TypeHintFromSnippet");
 
-var _TypeHintFromSnippet;
+  _TypeHintFromSnippet = function () {
+    return data;
+  };
 
-function _load_TypeHintFromSnippet() {
-  return _TypeHintFromSnippet = require('./TypeHintFromSnippet');
+  return data;
 }
-
-Object.defineProperty(exports, 'typeHintFromSnippet', {
-  enumerable: true,
-  get: function () {
-    return (_TypeHintFromSnippet || _load_TypeHintFromSnippet()).typeHintFromSnippet;
-  }
-});

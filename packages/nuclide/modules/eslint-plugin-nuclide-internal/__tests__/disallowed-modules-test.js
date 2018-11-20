@@ -7,22 +7,20 @@
  * of patent rights can be found in the PATENTS file in the same directory.
  *
  * @noflow
+ * @emails oncall+nuclide
+ * @format
  */
 'use strict';
 
-/* eslint
-  comma-dangle: [1, always-multiline],
-  prefer-object-spread/prefer-object-spread: 0,
-  nuclide-internal/no-commonjs: 0,
-  */
+/* eslint nuclide-internal/no-commonjs: 0 */
 
 const rule = require('../disallowed-modules');
 const RuleTester = require('eslint').RuleTester;
 
 const ruleTester = new RuleTester({
   parser: 'babel-eslint',
-  'parserOptions': {
-    'sourceType': 'module',
+  parserOptions: {
+    sourceType: 'module',
   },
 });
 

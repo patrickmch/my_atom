@@ -1,33 +1,42 @@
-'use strict';
+"use strict";
 
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
+exports.default = void 0;
 
-var _SwiftPMTaskRunnerStore;
+function _SwiftPMTaskRunnerStore() {
+  const data = _interopRequireDefault(require("../SwiftPMTaskRunnerStore"));
 
-function _load_SwiftPMTaskRunnerStore() {
-  return _SwiftPMTaskRunnerStore = _interopRequireDefault(require('../SwiftPMTaskRunnerStore'));
+  _SwiftPMTaskRunnerStore = function () {
+    return data;
+  };
+
+  return data;
 }
 
-var _SourceKitten;
+function _SourceKitten() {
+  const data = require("../../sourcekitten/SourceKitten");
 
-function _load_SourceKitten() {
-  return _SourceKitten = require('../../sourcekitten/SourceKitten');
+  _SourceKitten = function () {
+    return data;
+  };
+
+  return data;
 }
 
-var _Complete;
+function _Complete() {
+  const data = _interopRequireDefault(require("../../sourcekitten/Complete"));
 
-function _load_Complete() {
-  return _Complete = _interopRequireDefault(require('../../sourcekitten/Complete'));
+  _Complete = function () {
+    return data;
+  };
+
+  return data;
 }
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-/**
- * An autocompletion provider that uses the compile commands in a built Swift
- * package's debug.yaml or release.yaml.
- */
 /**
  * Copyright (c) 2015-present, Facebook, Inc.
  * All rights reserved.
@@ -39,33 +48,39 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
  * @format
  */
 
+/**
+ * An autocompletion provider that uses the compile commands in a built Swift
+ * package's debug.yaml or release.yaml.
+ */
 class SwiftPMAutocompletionProvider {
-
   constructor(store) {
     this._store = store;
   }
 
   async getAutocompleteSuggestions(request) {
     const filePath = request.editor.getPath();
-    let compilerArgs;
-    // flowlint-next-line sketchy-null-string:off
+    let compilerArgs; // flowlint-next-line sketchy-null-string:off
+
     if (filePath) {
       const commands = await this._store.getCompileCommands();
       compilerArgs = commands.get(filePath);
     }
 
-    const { bufferPosition, editor, prefix } = request;
+    const {
+      bufferPosition,
+      editor,
+      prefix
+    } = request;
     const offset = editor.getBuffer().characterIndexForPosition(bufferPosition) - prefix.length;
-    const result = await (0, (_SourceKitten || _load_SourceKitten()).asyncExecuteSourceKitten)('complete', ['--text', request.editor.getText(), '--offset', String(offset), '--',
-    // flowlint-next-line sketchy-null-string:off
-    compilerArgs ? compilerArgs : '']);
+    const result = await (0, _SourceKitten().asyncExecuteSourceKitten)('complete', ['--text', request.editor.getText(), '--offset', String(offset), '--'].concat(compilerArgs ? compilerArgs : [])); // flowlint-next-line sketchy-null-string:off
 
-    // flowlint-next-line sketchy-null-string:off
     if (!result) {
       return [];
     }
 
-    return JSON.parse(result).filter(completion => completion.name.startsWith(prefix)).map((_Complete || _load_Complete()).default);
+    return JSON.parse(result).filter(completion => completion.name.startsWith(prefix)).map(_Complete().default);
   }
+
 }
+
 exports.default = SwiftPMAutocompletionProvider;

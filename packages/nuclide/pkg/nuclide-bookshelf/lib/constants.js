@@ -1,19 +1,10 @@
-'use strict';
+"use strict";
 
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-const ActionType = exports.ActionType = Object.freeze({
-  ADD_PROJECT_REPOSITORY: 'add-project-repository',
-  COMPLETE_RESTORING_REPOSITORY_STATE: 'complete-restoring-repository-state',
-  REMOVE_PROJECT_REPOSITORY: 'remove-project-repository',
-  RESTORE_PANE_ITEM_STATE: 'restore-pane-item-state',
-  START_RESTORING_REPOSITORY_STATE: 'start-restoring-repository-state',
-  UPDATE_PANE_ITEM_STATE: 'update-pane-item-state',
-  UPDATE_REPOSITORY_BOOKMARKS: 'update-repository-bookmarks'
-});
+exports.EMPTY_SHORTHEAD = exports.ACTIVE_SHORTHEAD_CHANGE_BEHAVIOR_CONFIG = exports.ActiveShortHeadChangeBehavior = exports.ActionType = void 0;
 
-// This is to work around flow's missing support of enums.
 /**
  * Copyright (c) 2015-present, Facebook, Inc.
  * All rights reserved.
@@ -24,17 +15,26 @@ const ActionType = exports.ActionType = Object.freeze({
  *  strict-local
  * @format
  */
+const ActionType = Object.freeze({
+  ADD_PROJECT_REPOSITORY: 'add-project-repository',
+  COMPLETE_RESTORING_REPOSITORY_STATE: 'complete-restoring-repository-state',
+  REMOVE_PROJECT_REPOSITORY: 'remove-project-repository',
+  RESTORE_PANE_ITEM_STATE: 'restore-pane-item-state',
+  START_RESTORING_REPOSITORY_STATE: 'start-restoring-repository-state',
+  UPDATE_PANE_ITEM_STATE: 'update-pane-item-state',
+  UPDATE_REPOSITORY_BOOKMARKS: 'update-repository-bookmarks'
+}); // This is to work around flow's missing support of enums.
 
+exports.ActionType = ActionType;
 ActionType;
-
-const ActiveShortHeadChangeBehavior = exports.ActiveShortHeadChangeBehavior = Object.freeze({
+const ActiveShortHeadChangeBehavior = Object.freeze({
   ALWAYS_IGNORE: 'Always Ignore',
   ALWAYS_RESTORE: 'Always Restore',
   PROMPT_TO_RESTORE: 'Prompt to Restore'
 });
-
+exports.ActiveShortHeadChangeBehavior = ActiveShortHeadChangeBehavior;
 ActiveShortHeadChangeBehavior;
-
-const ACTIVE_SHORTHEAD_CHANGE_BEHAVIOR_CONFIG = exports.ACTIVE_SHORTHEAD_CHANGE_BEHAVIOR_CONFIG = 'nuclide-bookshelf.changeActiveBookmarkBehavior';
-
-const EMPTY_SHORTHEAD = exports.EMPTY_SHORTHEAD = '';
+const ACTIVE_SHORTHEAD_CHANGE_BEHAVIOR_CONFIG = 'nuclide-bookshelf.changeActiveBookmarkBehavior';
+exports.ACTIVE_SHORTHEAD_CHANGE_BEHAVIOR_CONFIG = ACTIVE_SHORTHEAD_CHANGE_BEHAVIOR_CONFIG;
+const EMPTY_SHORTHEAD = '';
+exports.EMPTY_SHORTHEAD = EMPTY_SHORTHEAD;

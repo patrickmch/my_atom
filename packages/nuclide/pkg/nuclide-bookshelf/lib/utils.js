@@ -1,4 +1,4 @@
-'use strict';
+"use strict";
 
 Object.defineProperty(exports, "__esModule", {
   value: true
@@ -10,47 +10,71 @@ exports.getRepoPathToEditors = getRepoPathToEditors;
 exports.shortHeadChangedNotification = shortHeadChangedNotification;
 exports.getShortHeadChangesFromStateStream = getShortHeadChangesFromStateStream;
 
-var _constants;
+function _constants() {
+  const data = require("./constants");
 
-function _load_constants() {
-  return _constants = require('./constants');
+  _constants = function () {
+    return data;
+  };
+
+  return data;
 }
 
-var _immutable;
+function Immutable() {
+  const data = _interopRequireWildcard(require("immutable"));
 
-function _load_immutable() {
-  return _immutable = _interopRequireWildcard(require('immutable'));
+  Immutable = function () {
+    return data;
+  };
+
+  return data;
 }
 
-var _rxjsBundlesRxMinJs = require('rxjs/bundles/Rx.min.js');
+var _rxjsCompatUmdMin = require("rxjs-compat/bundles/rxjs-compat.umd.min.js");
 
-var _featureConfig;
+function _featureConfig() {
+  const data = _interopRequireDefault(require("../../../modules/nuclide-commons-atom/feature-config"));
 
-function _load_featureConfig() {
-  return _featureConfig = _interopRequireDefault(require('../../../modules/nuclide-commons-atom/feature-config'));
+  _featureConfig = function () {
+    return data;
+  };
+
+  return data;
 }
 
-var _nuclideUri;
+function _nuclideUri() {
+  const data = _interopRequireDefault(require("../../../modules/nuclide-commons/nuclideUri"));
 
-function _load_nuclideUri() {
-  return _nuclideUri = _interopRequireDefault(require('../../../modules/nuclide-commons/nuclideUri'));
+  _nuclideUri = function () {
+    return data;
+  };
+
+  return data;
 }
 
-var _nuclideVcsBase;
+function _nuclideVcsBase() {
+  const data = require("../../nuclide-vcs-base");
 
-function _load_nuclideVcsBase() {
-  return _nuclideVcsBase = require('../../nuclide-vcs-base');
+  _nuclideVcsBase = function () {
+    return data;
+  };
+
+  return data;
 }
 
-var _nuclideAnalytics;
+function _nuclideAnalytics() {
+  const data = require("../../../modules/nuclide-analytics");
 
-function _load_nuclideAnalytics() {
-  return _nuclideAnalytics = require('../../nuclide-analytics');
+  _nuclideAnalytics = function () {
+    return data;
+  };
+
+  return data;
 }
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
+function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) { var desc = Object.defineProperty && Object.getOwnPropertyDescriptor ? Object.getOwnPropertyDescriptor(obj, key) : {}; if (desc.get || desc.set) { Object.defineProperty(newObj, key, desc); } else { newObj[key] = obj[key]; } } } } newObj.default = obj; return newObj; } }
 
 /**
  * Copyright (c) 2015-present, Facebook, Inc.
@@ -62,16 +86,17 @@ function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj;
  *  strict-local
  * @format
  */
-
 function getEmptBookShelfState() {
   return {
-    repositoryPathToState: (_immutable || _load_immutable()).Map()
+    repositoryPathToState: Immutable().Map()
   };
-}
+} // Maps are serialized as key/value pairs array to match Map `enries` format.
 
-// Maps are serialized as key/value pairs array to match Map `enries` format.
+
 function serializeBookShelfState(bookShelfState) {
-  const { repositoryPathToState } = bookShelfState;
+  const {
+    repositoryPathToState
+  } = bookShelfState;
   const serializedRepositoryPathToState = Array.from(repositoryPathToState.entries()).map(([repositoryPath, repositoryState]) => {
     const serializedShortHeadToFileList = {
       activeShortHead: repositoryState.activeShortHead,
@@ -88,11 +113,12 @@ function deserializeBookShelfState(serializedBookShelfState) {
   if (serializedBookShelfState == null || serializedBookShelfState.repositoryPathToState == null) {
     return getEmptBookShelfState();
   }
-  const repositoryPathToState = (_immutable || _load_immutable()).Map(serializedBookShelfState.repositoryPathToState.map(([repositoryPath, repositoryState]) => {
+
+  const repositoryPathToState = Immutable().Map(serializedBookShelfState.repositoryPathToState.map(([repositoryPath, repositoryState]) => {
     return [repositoryPath, {
       activeShortHead: repositoryState.activeShortHead,
       isRestoring: false,
-      shortHeadsToFileList: (_immutable || _load_immutable()).Map(repositoryState.shortHeadsToFileList)
+      shortHeadsToFileList: Immutable().Map(repositoryState.shortHeadsToFileList)
     }];
   }));
   return {
@@ -104,10 +130,15 @@ function getRepoPathToEditors() {
   const reposToEditors = new Map();
   atom.workspace.getTextEditors().filter(textEditor => textEditor.getPath() != null && textEditor.getPath() !== '').map(textEditor => ({
     textEditor,
-    repository: (0, (_nuclideVcsBase || _load_nuclideVcsBase()).repositoryForPath)(textEditor.getPath() || '')
-  })).filter(({ repository }) => repository != null).forEach(({ repository, textEditor }) => {
+    repository: (0, _nuclideVcsBase().repositoryForPath)(textEditor.getPath() || '')
+  })).filter(({
+    repository
+  }) => repository != null).forEach(({
+    repository,
+    textEditor
+  }) => {
     if (!repository) {
-      throw new Error('Invariant violation: "repository"');
+      throw new Error("Invariant violation: \"repository\"");
     }
 
     const repositoryPath = repository.getWorkingDirectory();
@@ -117,12 +148,11 @@ function getRepoPathToEditors() {
 }
 
 function shortHeadChangedNotification(repository, newShortHead, restorePaneItemState) {
-  return _rxjsBundlesRxMinJs.Observable.create(observer => {
-    const workingDirectoryName = (_nuclideUri || _load_nuclideUri()).default.basename(repository.getWorkingDirectory());
+  return _rxjsCompatUmdMin.Observable.create(observer => {
+    const workingDirectoryName = _nuclideUri().default.basename(repository.getWorkingDirectory()); // TODO(most): Should we handle empty bookmark switches differently?
 
-    // TODO(most): Should we handle empty bookmark switches differently?
+
     const newShortHeadDisplayText = newShortHead.length > 0 ? `to \`${newShortHead}\`` : '';
-
     const shortHeadChangeNotification = atom.notifications.addInfo(`\`${workingDirectoryName}\`'s active bookmark has changed ${newShortHeadDisplayText}`, {
       detail: 'Would you like to open the files you had active then?\n \n' + "ProTip: Change the default behavior from 'Nuclide Settings>Nuclide-bookshelf'",
       dismissable: true,
@@ -134,18 +164,17 @@ function shortHeadChangedNotification(repository, newShortHead, restorePaneItemS
         text: 'Open files'
       }, {
         onDidClick: () => {
-          (_featureConfig || _load_featureConfig()).default.set((_constants || _load_constants()).ACTIVE_SHORTHEAD_CHANGE_BEHAVIOR_CONFIG, (_constants || _load_constants()).ActiveShortHeadChangeBehavior.ALWAYS_IGNORE);
+          _featureConfig().default.set(_constants().ACTIVE_SHORTHEAD_CHANGE_BEHAVIOR_CONFIG, _constants().ActiveShortHeadChangeBehavior.ALWAYS_IGNORE);
+
           observer.complete();
         },
         text: 'Always ignore'
       }]
     });
-
     const dismissSubscription = shortHeadChangeNotification.onDidDismiss(() => {
-      (0, (_nuclideAnalytics || _load_nuclideAnalytics()).track)('bookshelf-dismiss-restore-prompt');
+      (0, _nuclideAnalytics().track)('bookshelf-dismiss-restore-prompt');
       observer.complete();
     });
-
     return function unsubscribe() {
       dismissSubscription.dispose();
       shortHeadChangeNotification.dismiss();
@@ -158,12 +187,13 @@ function getShortHeadChangesFromStateStream(states) {
     const {
       repositoryPathToState: oldRepositoryPathToState
     } = oldBookShelfState;
-
-    return _rxjsBundlesRxMinJs.Observable.from(Array.from(newBookShelfState.repositoryPathToState.entries()).filter(([repositoryPath, newRepositoryState]) => {
+    return _rxjsCompatUmdMin.Observable.from(Array.from(newBookShelfState.repositoryPathToState.entries()).filter(([repositoryPath, newRepositoryState]) => {
       const oldRepositoryState = oldRepositoryPathToState.get(repositoryPath);
       return oldRepositoryState != null && oldRepositoryState.activeShortHead !== newRepositoryState.activeShortHead;
     }).map(([repositoryPath, newRepositoryState]) => {
-      const { activeShortHead } = newRepositoryState;
+      const {
+        activeShortHead
+      } = newRepositoryState;
       return {
         repositoryPath,
         activeShortHead

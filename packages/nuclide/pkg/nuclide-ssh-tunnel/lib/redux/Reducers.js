@@ -1,4 +1,4 @@
-'use strict';
+"use strict";
 
 Object.defineProperty(exports, "__esModule", {
   value: true
@@ -7,36 +7,59 @@ exports.tunnels = tunnels;
 exports.currentWorkingDirectory = currentWorkingDirectory;
 exports.consoleOutput = consoleOutput;
 
-var _ActiveTunnels;
+function _ActiveTunnels() {
+  const data = require("../ActiveTunnels");
 
-function _load_ActiveTunnels() {
-  return _ActiveTunnels = require('../ActiveTunnels');
+  _ActiveTunnels = function () {
+    return data;
+  };
+
+  return data;
 }
 
-var _Actions;
+function Actions() {
+  const data = _interopRequireWildcard(require("./Actions"));
 
-function _load_Actions() {
-  return _Actions = _interopRequireWildcard(require('./Actions'));
+  Actions = function () {
+    return data;
+  };
+
+  return data;
 }
 
-var _immutable;
+function _immutable() {
+  const data = require("immutable");
 
-function _load_immutable() {
-  return _immutable = require('immutable');
+  _immutable = function () {
+    return data;
+  };
+
+  return data;
 }
 
-var _rxjsBundlesRxMinJs = require('rxjs/bundles/Rx.min.js');
+var _rxjsCompatUmdMin = require("rxjs-compat/bundles/rxjs-compat.umd.min.js");
 
-function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
+function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) { var desc = Object.defineProperty && Object.getOwnPropertyDescriptor ? Object.getOwnPropertyDescriptor(obj, key) : {}; if (desc.get || desc.set) { Object.defineProperty(newObj, key, desc); } else { newObj[key] = obj[key]; } } } } newObj.default = obj; return newObj; } }
 
-function tunnels(state = new (_ActiveTunnels || _load_ActiveTunnels()).ActiveTunnels(), action) {
+/**
+ * Copyright (c) 2015-present, Facebook, Inc.
+ * All rights reserved.
+ *
+ * This source code is licensed under the license found in the LICENSE file in
+ * the root directory of this source tree.
+ *
+ *  strict-local
+ * @format
+ */
+function tunnels(state = new (_ActiveTunnels().ActiveTunnels)(), action) {
   switch (action.type) {
-    case (_Actions || _load_Actions()).SUBSCRIBE_TO_TUNNEL:
+    case Actions().SUBSCRIBE_TO_TUNNEL:
       let existing = state.get(action.payload.tunnel);
+
       if (existing == null) {
         existing = {
           tunnel: action.payload.tunnel,
-          subscriptions: (0, (_immutable || _load_immutable()).Set)(),
+          subscriptions: (0, _immutable().Set)(),
           state: 'initializing'
         };
       }
@@ -45,57 +68,50 @@ function tunnels(state = new (_ActiveTunnels || _load_ActiveTunnels()).ActiveTun
         subscriptions: existing.subscriptions.add(action.payload.subscription)
       }));
 
-    case (_Actions || _load_Actions()).UNSUBSCRIBE_FROM_TUNNEL:
+    case Actions().UNSUBSCRIBE_FROM_TUNNEL:
       return state.update(action.payload.tunnel, value => Object.assign({}, value, {
         subscriptions: value.subscriptions.remove(action.payload.subscription)
       }));
 
-    case (_Actions || _load_Actions()).OPEN_TUNNEL:
+    case Actions().OPEN_TUNNEL:
       const toOpen = state.get(action.payload.tunnel);
       return state.set(action.payload.tunnel, Object.assign({}, toOpen, {
         close: action.payload.close
       }));
 
-    case (_Actions || _load_Actions()).SET_TUNNEL_STATE:
+    case Actions().SET_TUNNEL_STATE:
       return state.update(action.payload.tunnel, value => Object.assign({}, value, {
         state: action.payload.state
       }));
 
-    case (_Actions || _load_Actions()).CLOSE_TUNNEL:
+    case Actions().CLOSE_TUNNEL:
       if (state.get(action.payload.tunnel) === undefined) {
         return state;
       }
+
       return state.update(action.payload.tunnel, value => Object.assign({}, value, {
         error: action.payload.error,
         state: 'closing'
       }));
 
-    case (_Actions || _load_Actions()).DELETE_TUNNEL:
+    case Actions().DELETE_TUNNEL:
       return state.delete(action.payload.tunnel);
 
     default:
       return state;
   }
-} /**
-   * Copyright (c) 2015-present, Facebook, Inc.
-   * All rights reserved.
-   *
-   * This source code is licensed under the license found in the LICENSE file in
-   * the root directory of this source tree.
-   *
-   *  strict-local
-   * @format
-   */
+}
 
 function currentWorkingDirectory(state = null, action) {
   switch (action.type) {
-    case (_Actions || _load_Actions()).SET_CURRENT_WORKING_DIRECTORY:
+    case Actions().SET_CURRENT_WORKING_DIRECTORY:
       return action.payload.directory;
+
     default:
       return state;
   }
 }
 
-function consoleOutput(state = new _rxjsBundlesRxMinJs.Subject(), action) {
+function consoleOutput(state = new _rxjsCompatUmdMin.Subject(), action) {
   return state;
 }

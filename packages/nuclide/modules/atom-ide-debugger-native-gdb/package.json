@@ -1,6 +1,6 @@
 {
   "name": "atom-ide-debugger-native-gdb",
-  "version": "0.7.1-dev",
+  "version": "0.7.3-dev",
   "main": "./main.js",
   "description": "GDB Native Debugger for Atom IDE.",
   "author": "NEEDS OWNER",
@@ -23,19 +23,19 @@
   },
   "dependencies": {
     "big-integer": "1.6.17",
-    "nuclide-commons": "0.7.1-dev",
-    "nuclide-commons-atom": "0.7.1-dev",
-    "nuclide-debugger-common": "0.7.1-dev",
-    "nuclide-prebuilt-libs": "0.5.1",
+    "nuclide-commons": "0.7.3-dev",
+    "nuclide-commons-atom": "0.7.3-dev",
+    "nuclide-debugger-common": "0.7.3-dev",
+    "nuclide-prebuilt-libs": "0.5.2",
     "nullthrows": "1.0.0",
-    "react": "16.3.2",
-    "rxjs": "5.5.5",
+    "react": "16.5.2",
+    "rxjs-compat": "6.3.3",
     "vscode-debugadapter": "1.24.0",
     "vscode-debugprotocol": "1.24.0",
     "yargs": "3.32.0"
   },
   "devDependencies": {
-    "nuclide-node-transpiler": "0.7.1-dev"
+    "nuclide-node-transpiler": "0.7.3-dev"
   },
   "package-deps": [
     "atom-ide-ui"
@@ -88,13 +88,13 @@
                 "type": "string",
                 "description": "Path to search for source files"
               },
+              "sourcePaths": {
+                "type": "array",
+                "description": "An array of paths to search for source files. If present, overrides the single 'sourcePath' parameter."
+              },
               "env": {
                 "type": "string",
                 "description": "Environment variables to start process with"
-              },
-              "debuggerRoot": {
-                "type": "string",
-                "description": "Optional directory to spawn the debugger in"
               }
             }
           },
@@ -111,9 +111,9 @@
                 "type": "string",
                 "description": "Path to search for source files"
               },
-              "debuggerRoot": {
-                "type": "string",
-                "description": "Optional directory to spawn the debugger in"
+              "sourcePaths": {
+                "type": "array",
+                "description": "An array of paths to search for source files. If present, overrides the single 'sourcePath' parameter."
               },
               "stopOnAttach": {
                 "type": "boolean",

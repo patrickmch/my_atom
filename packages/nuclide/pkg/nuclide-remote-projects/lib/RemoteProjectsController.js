@@ -1,69 +1,99 @@
-'use strict';
+"use strict";
 
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
 exports._observeConnectionState = _observeConnectionState;
+exports.default = void 0;
 
-var _bindObservableAsProps;
+function _bindObservableAsProps() {
+  const data = require("../../../modules/nuclide-commons-ui/bindObservableAsProps");
 
-function _load_bindObservableAsProps() {
-  return _bindObservableAsProps = require('../../../modules/nuclide-commons-ui/bindObservableAsProps');
+  _bindObservableAsProps = function () {
+    return data;
+  };
+
+  return data;
 }
 
-var _renderReactRoot;
+function _renderReactRoot() {
+  const data = require("../../../modules/nuclide-commons-ui/renderReactRoot");
 
-function _load_renderReactRoot() {
-  return _renderReactRoot = require('../../../modules/nuclide-commons-ui/renderReactRoot');
+  _renderReactRoot = function () {
+    return data;
+  };
+
+  return data;
 }
 
-var _event;
+function _event() {
+  const data = require("../../../modules/nuclide-commons/event");
 
-function _load_event() {
-  return _event = require('../../../modules/nuclide-commons/event');
+  _event = function () {
+    return data;
+  };
+
+  return data;
 }
 
-var _observable;
+function _observable() {
+  const data = require("../../../modules/nuclide-commons/observable");
 
-function _load_observable() {
-  return _observable = require('../../../modules/nuclide-commons/observable');
+  _observable = function () {
+    return data;
+  };
+
+  return data;
 }
 
-var _UniversalDisposable;
+function _UniversalDisposable() {
+  const data = _interopRequireDefault(require("../../../modules/nuclide-commons/UniversalDisposable"));
 
-function _load_UniversalDisposable() {
-  return _UniversalDisposable = _interopRequireDefault(require('../../../modules/nuclide-commons/UniversalDisposable'));
+  _UniversalDisposable = function () {
+    return data;
+  };
+
+  return data;
 }
 
-var _react = _interopRequireWildcard(require('react'));
+var React = _interopRequireWildcard(require("react"));
 
-var _rxjsBundlesRxMinJs = require('rxjs/bundles/Rx.min.js');
+var _rxjsCompatUmdMin = require("rxjs-compat/bundles/rxjs-compat.umd.min.js");
 
-var _nuclideRemoteConnection;
+function _nuclideRemoteConnection() {
+  const data = require("../../nuclide-remote-connection");
 
-function _load_nuclideRemoteConnection() {
-  return _nuclideRemoteConnection = require('../../nuclide-remote-connection');
+  _nuclideRemoteConnection = function () {
+    return data;
+  };
+
+  return data;
 }
 
-var _ConnectionState;
+function _ConnectionState() {
+  const data = _interopRequireDefault(require("./ConnectionState"));
 
-function _load_ConnectionState() {
-  return _ConnectionState = _interopRequireDefault(require('./ConnectionState'));
+  _ConnectionState = function () {
+    return data;
+  };
+
+  return data;
 }
 
-var _StatusBarTile;
+function _StatusBarTile() {
+  const data = _interopRequireDefault(require("./StatusBarTile"));
 
-function _load_StatusBarTile() {
-  return _StatusBarTile = _interopRequireDefault(require('./StatusBarTile'));
+  _StatusBarTile = function () {
+    return data;
+  };
+
+  return data;
 }
 
-function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
+function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) { var desc = Object.defineProperty && Object.getOwnPropertyDescriptor ? Object.getOwnPropertyDescriptor(obj, key) : {}; if (desc.get || desc.set) { Object.defineProperty(newObj, key, desc); } else { newObj[key] = obj[key]; } } } } newObj.default = obj; return newObj; } }
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-const THROTTLE_TIME_MS = 500;
-
-// Exported for testing.
 /**
  * Copyright (c) 2015-present, Facebook, Inc.
  * All rights reserved.
@@ -74,18 +104,19 @@ const THROTTLE_TIME_MS = 500;
  * 
  * @format
  */
+const THROTTLE_TIME_MS = 500; // Exported for testing.
 
 function _observeConnectionState(connectionStream) {
   return connectionStream.switchMap(connections => {
     if (connections.length === 0) {
-      return _rxjsBundlesRxMinJs.Observable.of([]);
-    }
-    // Observe the connection states of all connections simultaneously.
+      return _rxjsCompatUmdMin.Observable.of([]);
+    } // Observe the connection states of all connections simultaneously.
     // $FlowFixMe: add array signature to combineLatest
-    return _rxjsBundlesRxMinJs.Observable.combineLatest(connections.map(conn => {
+
+
+    return _rxjsCompatUmdMin.Observable.combineLatest(connections.map(conn => {
       const heartbeat = conn.getHeartbeat();
-      return _rxjsBundlesRxMinJs.Observable.of(heartbeat.isAway() ? (_ConnectionState || _load_ConnectionState()).default.DISCONNECTED : (_ConnectionState || _load_ConnectionState()).default.CONNECTED).concat(_rxjsBundlesRxMinJs.Observable.merge((0, (_event || _load_event()).observableFromSubscribeFunction)(cb => heartbeat.onHeartbeat(cb)).mapTo((_ConnectionState || _load_ConnectionState()).default.CONNECTED), (0, (_event || _load_event()).observableFromSubscribeFunction)(cb => heartbeat.onHeartbeatError(cb)).mapTo((_ConnectionState || _load_ConnectionState()).default.DISCONNECTED))).distinctUntilChanged()
-      // Key the connection states by hostname.
+      return _rxjsCompatUmdMin.Observable.of(heartbeat.isAway() ? _ConnectionState().default.DISCONNECTED : _ConnectionState().default.CONNECTED).concat(_rxjsCompatUmdMin.Observable.merge((0, _event().observableFromSubscribeFunction)(cb => heartbeat.onHeartbeat(cb)).mapTo(_ConnectionState().default.CONNECTED), (0, _event().observableFromSubscribeFunction)(cb => heartbeat.onHeartbeatError(cb)).mapTo(_ConnectionState().default.DISCONNECTED))).distinctUntilChanged() // Key the connection states by hostname.
       .map(state => [conn.getRemoteHostname(), state]);
     }));
   }).map(states => ({
@@ -94,22 +125,23 @@ function _observeConnectionState(connectionStream) {
 }
 
 class RemoteProjectsController {
-
   constructor() {
-    this._disposables = new (_UniversalDisposable || _load_UniversalDisposable()).default();
+    this._disposables = new (_UniversalDisposable().default)();
   }
 
   consumeStatusBar(statusBar) {
-    const BoundStatusBarTile = (0, (_bindObservableAsProps || _load_bindObservableAsProps()).bindObservableAsProps)(_observeConnectionState((_nuclideRemoteConnection || _load_nuclideRemoteConnection()).ServerConnection.observeRemoteConnections()).let((0, (_observable || _load_observable()).throttle)(THROTTLE_TIME_MS)), (_StatusBarTile || _load_StatusBarTile()).default);
-    const item = (0, (_renderReactRoot || _load_renderReactRoot()).renderReactRoot)(_react.createElement(BoundStatusBarTile, null));
+    const BoundStatusBarTile = (0, _bindObservableAsProps().bindObservableAsProps)(_observeConnectionState(_nuclideRemoteConnection().ServerConnection.observeRemoteConnections()).let((0, _observable().throttle)(THROTTLE_TIME_MS)), _StatusBarTile().default);
+    const item = (0, _renderReactRoot().renderReactRoot)(React.createElement(BoundStatusBarTile, null));
     item.className = 'inline-block';
     const statusBarTile = statusBar.addLeftTile({
       item,
       priority: -99
     });
-    const disposable = new (_UniversalDisposable || _load_UniversalDisposable()).default(() => statusBarTile.destroy());
+    const disposable = new (_UniversalDisposable().default)(() => statusBarTile.destroy());
+
     this._disposables.add(disposable);
-    return new (_UniversalDisposable || _load_UniversalDisposable()).default(() => {
+
+    return new (_UniversalDisposable().default)(() => {
       this._disposables.remove(disposable);
     });
   }
@@ -117,5 +149,7 @@ class RemoteProjectsController {
   dispose() {
     this._disposables.dispose();
   }
+
 }
+
 exports.default = RemoteProjectsController;

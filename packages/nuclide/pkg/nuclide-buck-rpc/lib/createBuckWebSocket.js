@@ -1,22 +1,30 @@
-'use strict';
+"use strict";
 
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
 exports.default = createBuckWebSocket;
 
-var _rxjsBundlesRxMinJs = require('rxjs/bundles/Rx.min.js');
+var _rxjsCompatUmdMin = require("rxjs-compat/bundles/rxjs-compat.umd.min.js");
 
-var _log4js;
+function _log4js() {
+  const data = require("log4js");
 
-function _load_log4js() {
-  return _log4js = require('log4js');
+  _log4js = function () {
+    return data;
+  };
+
+  return data;
 }
 
-var _ws;
+function _ws() {
+  const data = _interopRequireDefault(require("ws"));
 
-function _load_ws() {
-  return _ws = _interopRequireDefault(require('ws'));
+  _ws = function () {
+    return data;
+  };
+
+  return data;
 }
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
@@ -31,52 +39,34 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
  *  strict-local
  * @format
  */
-
 function createBuckWebSocket(httpPort) {
-  return _rxjsBundlesRxMinJs.Observable.create(observer => {
+  return _rxjsCompatUmdMin.Observable.create(observer => {
     const uri = `ws://localhost:${httpPort}/ws/build`;
-    const socket = new (_ws || _load_ws()).default(uri);
-    let buildId = null;
-
+    const socket = new (_ws().default)(uri);
     socket.on('open', () => {
       // Emit a message so the client knows the socket is ready for Buck events.
-      observer.next({ type: 'SocketConnected' });
+      observer.next({
+        type: 'SocketConnected'
+      });
     });
-
     socket.on('message', data => {
       let message;
+
       try {
         message = JSON.parse(data);
       } catch (err) {
-        (0, (_log4js || _load_log4js()).getLogger)('nuclide-buck-rpc').error('Error parsing Buck websocket message', err);
-        return;
-      }
-
-      const type = message.type;
-      // eslint-disable-next-line eqeqeq
-      if (buildId === null) {
-        if (type === 'BuildStarted') {
-          buildId = message.buildId;
-        } else {
-          return;
-        }
-      }
-
-      if (buildId !== message.buildId) {
+        (0, _log4js().getLogger)('nuclide-buck-rpc').error('Error parsing Buck websocket message', err);
         return;
       }
 
       observer.next(message);
     });
-
     socket.on('error', e => {
       observer.error(e);
     });
-
     socket.on('close', () => {
       observer.complete();
     });
-
     return () => {
       socket.removeAllListeners();
       socket.close();

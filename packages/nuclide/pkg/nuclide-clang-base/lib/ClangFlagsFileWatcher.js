@@ -1,28 +1,40 @@
-'use strict';
+"use strict";
 
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.ClangFlagsFileWatcher = undefined;
+exports.ClangFlagsFileWatcher = void 0;
 
-var _SimpleCache;
+function _SimpleCache() {
+  const data = require("../../../modules/nuclide-commons/SimpleCache");
 
-function _load_SimpleCache() {
-  return _SimpleCache = require('../../../modules/nuclide-commons/SimpleCache');
+  _SimpleCache = function () {
+    return data;
+  };
+
+  return data;
 }
 
-var _rxjsBundlesRxMinJs = require('rxjs/bundles/Rx.min.js');
+var _rxjsCompatUmdMin = require("rxjs-compat/bundles/rxjs-compat.umd.min.js");
 
-var _SharedObservableCache;
+function _SharedObservableCache() {
+  const data = _interopRequireDefault(require("../../commons-node/SharedObservableCache"));
 
-function _load_SharedObservableCache() {
-  return _SharedObservableCache = _interopRequireDefault(require('../../commons-node/SharedObservableCache'));
+  _SharedObservableCache = function () {
+    return data;
+  };
+
+  return data;
 }
 
-var _nuclideRemoteConnection;
+function _nuclideRemoteConnection() {
+  const data = require("../../nuclide-remote-connection");
 
-function _load_nuclideRemoteConnection() {
-  return _nuclideRemoteConnection = require('../../nuclide-remote-connection');
+  _nuclideRemoteConnection = function () {
+    return data;
+  };
+
+  return data;
 }
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
@@ -37,24 +49,24 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
  * 
  * @format
  */
-
 class ClangFlagsFileWatcher {
-
   constructor(host) {
-    this._flagsFileForSourceCache = new (_SimpleCache || _load_SimpleCache()).SimpleCache();
-    this._watchedFilesCache = new (_SimpleCache || _load_SimpleCache()).SimpleCache({
+    this._flagsFileForSourceCache = new (_SimpleCache().SimpleCache)();
+    this._watchedFilesCache = new (_SimpleCache().SimpleCache)({
       dispose: subscription => subscription.unsubscribe()
     });
-
-    this._watchedFilesObservablesCache = new (_SharedObservableCache || _load_SharedObservableCache()).default(buildFile => (0, (_nuclideRemoteConnection || _load_nuclideRemoteConnection()).getFileWatcherServiceByNuclideUri)(host).watchWithNode(buildFile).refCount().share().take(1));
+    this._watchedFilesObservablesCache = new (_SharedObservableCache().default)(buildFile => (0, _nuclideRemoteConnection().getFileWatcherServiceByNuclideUri)(host).watchWithNode(buildFile).refCount().share().take(1));
   }
 
   watch(flagsFile, src, onChange) {
     const watchedFile = this._flagsFileForSourceCache.get(src);
+
     if (watchedFile != null) {
       return;
     }
+
     this._flagsFileForSourceCache.set(src, flagsFile);
+
     this._watchedFilesCache.set(src, this._watchedFilesObservablesCache.get(flagsFile).subscribe(() => {
       try {
         onChange();
@@ -64,12 +76,16 @@ class ClangFlagsFileWatcher {
 
   reset() {
     this._flagsFileForSourceCache.clear();
+
     this._watchedFilesCache.clear();
   }
 
   resetForSource(src) {
     this._flagsFileForSourceCache.delete(src);
+
     this._watchedFilesCache.delete(src);
   }
+
 }
+
 exports.ClangFlagsFileWatcher = ClangFlagsFileWatcher;

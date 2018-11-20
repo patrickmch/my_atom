@@ -1,15 +1,24 @@
-'use strict';
+"use strict";
 
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
 exports.default = findWholeRangeOfSymbol;
 
-var _atom = require('atom');
+var _atom = require("atom");
 
+/**
+ * Copyright (c) 2015-present, Facebook, Inc.
+ * All rights reserved.
+ *
+ * This source code is licensed under the license found in the LICENSE file in
+ * the root directory of this source tree.
+ *
+ *  strict
+ * @format
+ */
 // Matches something like: textA: or textA:textB:
 const OBJC_SELECTOR_NAME_REGEX = /([^\s:]+:)+$/g;
-
 /**
  * libclang doesn't seem to be able to return multiple ranges to define the location
  * of a symbol, which is necessary for Obj-C selectors. (At least, this functionality
@@ -26,16 +35,6 @@ const OBJC_SELECTOR_NAME_REGEX = /([^\s:]+:)+$/g;
  *   null if libclang reports no spelling (e.g. for C++ files).
  * @param extent The 'extent' of the symbol, as returned by libclang's Cursor.extent.
  * @return The true range of the symbol, which may extend beyond the `text` word.
- */
-/**
- * Copyright (c) 2015-present, Facebook, Inc.
- * All rights reserved.
- *
- * This source code is licensed under the license found in the LICENSE file in
- * the root directory of this source tree.
- *
- *  strict
- * @format
  */
 
 function findWholeRangeOfSymbol(textEditor, text, textRange, spelling, extent) {
@@ -54,30 +53,38 @@ function findWholeRangeOfSymbol(textEditor, text, textRange, spelling, extent) {
     // `[aThing doFoo:[anotherThing withBar:aBar] withBar:aBar]`.
     // TODO (t8131986) Improve this implementation.
     const ranges = [];
-
     const selectorSegments = spelling.split(':');
-    const iterator = ({ match, matchText, range, stop, replace }) => {
+
+    const iterator = ({
+      match,
+      matchText,
+      range,
+      stop,
+      replace
+    }) => {
       if (!matchText) {
         return;
       }
+
       ranges.push(range);
       stop();
     };
+
     for (const selectorSegment of selectorSegments) {
       if (selectorSegment.length === 0) {
         // The last segment broken may be an empty string.
         continue;
-      }
-      // 'split' removes the colon, but we want to underline the colon too.
+      } // 'split' removes the colon, but we want to underline the colon too.
+
+
       const segmentWithColon = selectorSegment + ':';
       const regex = new RegExp(segmentWithColon);
-
       const rangeOfPreviousSegment = ranges[ranges.length - 1];
       const rangeStart = rangeOfPreviousSegment ? rangeOfPreviousSegment.end : extent.start;
       const rangeToScan = new _atom.Range(rangeStart, extent.end);
-
       textEditor.scanInBufferRange(regex, rangeToScan, iterator);
     }
+
     return ranges;
   } else {
     return [textRange];

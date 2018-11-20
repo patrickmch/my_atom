@@ -1,44 +1,73 @@
-'use strict';
+"use strict";
 
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.ProcessTable = undefined;
+exports.ProcessTable = void 0;
 
-var _ProcessTaskButton;
+function _ProcessTaskButton() {
+  const data = require("./ProcessTaskButton");
 
-function _load_ProcessTaskButton() {
-  return _ProcessTaskButton = require('./ProcessTaskButton');
+  _ProcessTaskButton = function () {
+    return data;
+  };
+
+  return data;
 }
 
-var _react = _interopRequireWildcard(require('react'));
+var React = _interopRequireWildcard(require("react"));
 
-var _Table;
+function _Table() {
+  const data = require("../../../../modules/nuclide-commons-ui/Table");
 
-function _load_Table() {
-  return _Table = require('../../../../modules/nuclide-commons-ui/Table');
+  _Table = function () {
+    return data;
+  };
+
+  return data;
 }
 
-var _AtomInput;
+function _AtomInput() {
+  const data = require("../../../../modules/nuclide-commons-ui/AtomInput");
 
-function _load_AtomInput() {
-  return _AtomInput = require('../../../../modules/nuclide-commons-ui/AtomInput');
+  _AtomInput = function () {
+    return data;
+  };
+
+  return data;
 }
 
-var _LoadingSpinner;
+function _LoadingSpinner() {
+  const data = require("../../../../modules/nuclide-commons-ui/LoadingSpinner");
 
-function _load_LoadingSpinner() {
-  return _LoadingSpinner = require('../../../../modules/nuclide-commons-ui/LoadingSpinner');
+  _LoadingSpinner = function () {
+    return data;
+  };
+
+  return data;
 }
 
-function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
+function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) { var desc = Object.defineProperty && Object.getOwnPropertyDescriptor ? Object.getOwnPropertyDescriptor(obj, key) : {}; if (desc.get || desc.set) { Object.defineProperty(newObj, key, desc); } else { newObj[key] = obj[key]; } } } } newObj.default = obj; return newObj; } }
 
-class ProcessTable extends _react.Component {
+/**
+ * Copyright (c) 2015-present, Facebook, Inc.
+ * All rights reserved.
+ *
+ * This source code is licensed under the license found in the LICENSE file in
+ * the root directory of this source tree.
+ *
+ * 
+ * @format
+ */
+class ProcessTable extends React.Component {
   constructor(props) {
     super(props);
 
     this._handleSort = (sortedColumn, sortDescending) => {
-      this.setState({ sortedColumn, sortDescending });
+      this.setState({
+        sortedColumn,
+        sortDescending
+      });
     };
 
     this._handleFilterTextChange = text => {
@@ -79,64 +108,57 @@ class ProcessTable extends _react.Component {
   _sortProcesses(processes, sortedColumnName, sortDescending) {
     if (sortedColumnName == null) {
       return processes;
-    }
-    // compare numerically the following fields
+    } // compare numerically the following fields
+
+
     const compare = ['cpuUsage', 'memUsage', 'pid', 'debug'].includes(sortedColumnName) ? (a, b, isAsc) => {
-      const cmp =
-      // flowlint-next-line sketchy-null-number:off
+      const cmp = // flowlint-next-line sketchy-null-number:off
       (a || Number.NEGATIVE_INFINITY) - (b || Number.NEGATIVE_INFINITY);
       return isAsc ? cmp : -cmp;
     } : (a, b, isAsc) => {
       const cmp = a.toLowerCase().localeCompare(b.toLowerCase());
       return isAsc ? cmp : -cmp;
     };
-
-    return processes.sort((a, b) =>
-    // $FlowFixMe: Process doesn't have a debug field.
+    return processes.sort((a, b) => // $FlowFixMe: Process doesn't have a debug field.
     compare(a[sortedColumnName], b[sortedColumnName], !sortDescending));
   }
 
   render() {
     const filterRegex = new RegExp(this.state.filterText, 'i');
-
     let processComponent;
+
     if (this.props.processes.isError) {
-      processComponent = _react.createElement(
-        'div',
-        null,
-        this.props.processes.error.toString()
-      );
+      processComponent = React.createElement("div", null, this.props.processes.error.toString());
     } else if (this.props.processes.isPending) {
-      processComponent = _react.createElement((_LoadingSpinner || _load_LoadingSpinner()).LoadingSpinner, { size: 'EXTRA_SMALL', key: 'infoTableLoading' });
+      processComponent = React.createElement(_LoadingSpinner().LoadingSpinner, {
+        size: "EXTRA_SMALL",
+        key: "infoTableLoading"
+      });
     } else {
       const rows = this._sortProcesses(this.props.processes.value.filter(item => filterRegex.test(item.user) || filterRegex.test(`${item.pid}`) || filterRegex.test(item.name)), this.state.sortedColumn, this.state.sortDescending).map(item => ({
         data: {
-          pid: _react.createElement(
-            'div',
-            null,
-            _react.createElement((_ProcessTaskButton || _load_ProcessTaskButton()).ProcessTaskButton, {
-              icon: 'x',
-              proc: item,
-              taskType: 'KILL',
-              nameIfManyTasks: 'Kill process',
-              tasks: this.props.processTasks
-            }),
-            item.pid
-          ),
+          pid: React.createElement("div", null, React.createElement(_ProcessTaskButton().ProcessTaskButton, {
+            icon: "x",
+            proc: item,
+            taskType: "KILL",
+            nameIfManyTasks: "Kill process",
+            tasks: this.props.processTasks
+          }), item.pid),
           user: item.user,
           name: item.name,
           cpuUsage: this._formatCpuUsage(item.cpuUsage),
           memUsage: this._formatMemUsage(item.memUsage),
-          debug: _react.createElement((_ProcessTaskButton || _load_ProcessTaskButton()).ProcessTaskButton, {
-            icon: 'nuclicon-debugger',
-            className: 'nuclide-device-panel-debug-button',
+          debug: React.createElement(_ProcessTaskButton().ProcessTaskButton, {
+            icon: "nuclicon-debugger",
+            className: "nuclide-device-panel-debug-button",
             proc: item,
-            taskType: 'DEBUG',
-            nameIfManyTasks: 'Debug process',
+            taskType: "DEBUG",
+            nameIfManyTasks: "Debug process",
             tasks: this.props.processTasks
           })
         }
       }));
+
       const columns = [{
         key: 'pid',
         title: 'PID',
@@ -162,46 +184,33 @@ class ProcessTable extends _react.Component {
         title: 'Debug',
         width: 0.08
       }];
-      const emptyComponent = () => _react.createElement(
-        'div',
-        { className: 'padded' },
-        'No information'
-      );
-      processComponent = _react.createElement((_Table || _load_Table()).Table, {
+
+      const emptyComponent = () => React.createElement("div", {
+        className: "padded"
+      }, "No information");
+
+      processComponent = React.createElement(_Table().Table, {
         collapsable: false,
         columns: columns,
-        maxBodyHeight: '99999px',
+        maxBodyHeight: "99999px",
         emptyComponent: emptyComponent,
         rows: rows,
         sortable: true,
         onSort: this._handleSort,
         sortedColumn: this.state.sortedColumn,
         sortDescending: this.state.sortDescending,
-        className: 'nuclide-device-panel-process-table'
+        className: "nuclide-device-panel-process-table"
       });
     }
 
-    return _react.createElement(
-      'div',
-      null,
-      _react.createElement((_AtomInput || _load_AtomInput()).AtomInput, {
-        placeholderText: 'Filter process...',
-        initialValue: this.state.filterText,
-        onDidChange: this._handleFilterTextChange,
-        size: 'sm'
-      }),
-      processComponent
-    );
+    return React.createElement("div", null, React.createElement(_AtomInput().AtomInput, {
+      placeholderText: "Filter process...",
+      initialValue: this.state.filterText,
+      onDidChange: this._handleFilterTextChange,
+      size: "sm"
+    }), processComponent);
   }
 
 }
-exports.ProcessTable = ProcessTable; /**
-                                      * Copyright (c) 2015-present, Facebook, Inc.
-                                      * All rights reserved.
-                                      *
-                                      * This source code is licensed under the license found in the LICENSE file in
-                                      * the root directory of this source tree.
-                                      *
-                                      * 
-                                      * @format
-                                      */
+
+exports.ProcessTable = ProcessTable;

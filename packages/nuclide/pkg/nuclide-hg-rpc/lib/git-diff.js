@@ -1,72 +1,86 @@
-'use strict';
+"use strict";
 
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
 exports.gitDiffStrings = gitDiffStrings;
 
-var _fsPromise;
+function _fsPromise() {
+  const data = _interopRequireDefault(require("../../../modules/nuclide-commons/fsPromise"));
 
-function _load_fsPromise() {
-  return _fsPromise = _interopRequireDefault(require('../../../modules/nuclide-commons/fsPromise'));
+  _fsPromise = function () {
+    return data;
+  };
+
+  return data;
 }
 
-var _rxjsBundlesRxMinJs = require('rxjs/bundles/Rx.min.js');
+var _rxjsCompatUmdMin = require("rxjs-compat/bundles/rxjs-compat.umd.min.js");
 
-var _process;
+function _process() {
+  const data = require("../../../modules/nuclide-commons/process");
 
-function _load_process() {
-  return _process = require('../../../modules/nuclide-commons/process');
+  _process = function () {
+    return data;
+  };
+
+  return data;
 }
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
+/**
+ * Copyright (c) 2015-present, Facebook, Inc.
+ * All rights reserved.
+ *
+ * This source code is licensed under the license found in the LICENSE file in
+ * the root directory of this source tree.
+ *
+ * 
+ * @format
+ */
 function gitDiffStrings(oldString, newString) {
-  return makeTempFiles(oldString, newString).switchMap(([oldTempFile, newTempFile]) => (0, (_process || _load_process()).runCommandDetailed)('git', ['diff', '--unified=0', '--no-index', oldTempFile, newTempFile], {
+  return makeTempFiles(oldString, newString).switchMap(([oldTempFile, newTempFile]) => (0, _process().runCommandDetailed)('git', ['diff', '--unified=0', '--no-index', oldTempFile, newTempFile], {
     killTreeWhenDone: true
-  }).map(({ stdout }) => stdout).catch(e => {
+  }).map(({
+    stdout
+  }) => stdout).catch(e => {
     // git diff returns with exit code 1 if there was a difference between
     // the files being compared
-    return _rxjsBundlesRxMinJs.Observable.of(e.stdout);
+    return _rxjsCompatUmdMin.Observable.of(e.stdout);
   }).finally(() => {
-    (_fsPromise || _load_fsPromise()).default.unlink(oldTempFile);
-    (_fsPromise || _load_fsPromise()).default.unlink(newTempFile);
+    _fsPromise().default.unlink(oldTempFile);
+
+    _fsPromise().default.unlink(newTempFile);
   }));
-} /**
-   * Copyright (c) 2015-present, Facebook, Inc.
-   * All rights reserved.
-   *
-   * This source code is licensed under the license found in the LICENSE file in
-   * the root directory of this source tree.
-   *
-   * 
-   * @format
-   */
+}
 
 function makeTempFiles(oldString, newString) {
   let oldFilePath;
   let newFilePath;
-  return _rxjsBundlesRxMinJs.Observable.forkJoin(_rxjsBundlesRxMinJs.Observable.fromPromise((_fsPromise || _load_fsPromise()).default.tempfile()).map(filePath => {
+  return _rxjsCompatUmdMin.Observable.forkJoin(_rxjsCompatUmdMin.Observable.fromPromise(_fsPromise().default.tempfile()).map(filePath => {
     oldFilePath = filePath.trim();
     return oldFilePath;
   }).switchMap(filePath => {
     return writeContentsToFile(oldString, filePath).map(() => filePath);
-  }), _rxjsBundlesRxMinJs.Observable.fromPromise((_fsPromise || _load_fsPromise()).default.tempfile()).map(filePath => {
+  }), _rxjsCompatUmdMin.Observable.fromPromise(_fsPromise().default.tempfile()).map(filePath => {
     newFilePath = filePath.trim();
     return newFilePath;
   }).switchMap(filePath => {
     return writeContentsToFile(newString, filePath).map(() => filePath);
   })).catch(error => {
     if (oldFilePath != null) {
-      (_fsPromise || _load_fsPromise()).default.unlink(oldFilePath);
+      _fsPromise().default.unlink(oldFilePath);
     }
+
     if (newFilePath != null) {
-      (_fsPromise || _load_fsPromise()).default.unlink(newFilePath);
+      _fsPromise().default.unlink(newFilePath);
     }
-    return _rxjsBundlesRxMinJs.Observable.throw(error);
+
+    return _rxjsCompatUmdMin.Observable.throw(error);
   });
 }
 
 function writeContentsToFile(contents, filePath) {
-  return _rxjsBundlesRxMinJs.Observable.fromPromise((_fsPromise || _load_fsPromise()).default.writeFile(filePath, contents));
+  return _rxjsCompatUmdMin.Observable.fromPromise(_fsPromise().default.writeFile(filePath, contents));
 }

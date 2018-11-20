@@ -1,68 +1,72 @@
-'use strict';
+"use strict";
 
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-const builtinLocation = exports.builtinLocation = {
-  type: 'builtin'
-}; /**
-    * Copyright (c) 2015-present, Facebook, Inc.
-    * All rights reserved.
-    *
-    * This source code is licensed under the license found in the LICENSE file in
-    * the root directory of this source tree.
-    *
-    *  strict
-    * @format
-    */
+exports.namedBuiltinTypes = exports.fsStatsType = exports.bufferType = exports.regExpType = exports.dateType = exports.objectType = exports.numberType = exports.booleanType = exports.stringType = exports.mixedType = exports.anyType = exports.voidType = exports.builtinLocation = void 0;
 
-const voidType = exports.voidType = {
+/**
+ * Copyright (c) 2015-present, Facebook, Inc.
+ * All rights reserved.
+ *
+ * This source code is licensed under the license found in the LICENSE file in
+ * the root directory of this source tree.
+ *
+ *  strict-local
+ * @format
+ */
+const builtinLocation = {
+  type: 'builtin'
+};
+exports.builtinLocation = builtinLocation;
+const voidType = {
   kind: 'void'
 };
-
-const anyType = exports.anyType = {
+exports.voidType = voidType;
+const anyType = {
   kind: 'any'
 };
-
-const mixedType = exports.mixedType = {
+exports.anyType = anyType;
+const mixedType = {
   kind: 'mixed'
 };
-
-const stringType = exports.stringType = {
+exports.mixedType = mixedType;
+const stringType = {
   kind: 'string'
 };
-
-const booleanType = exports.booleanType = {
+exports.stringType = stringType;
+const booleanType = {
   kind: 'boolean'
 };
-
-const numberType = exports.numberType = {
+exports.booleanType = booleanType;
+const numberType = {
   kind: 'number'
 };
-
-const objectType = exports.objectType = {
+exports.numberType = numberType;
+const objectType = {
   kind: 'named',
   name: 'Object'
 };
-
-const dateType = exports.dateType = {
+exports.objectType = objectType;
+const dateType = {
   kind: 'named',
   name: 'Date'
 };
-
-const regExpType = exports.regExpType = {
+exports.dateType = dateType;
+const regExpType = {
   kind: 'named',
   name: 'RegExp'
 };
-
-const bufferType = exports.bufferType = {
+exports.regExpType = regExpType;
+const bufferType = {
   kind: 'named',
   name: 'Buffer'
 };
-
-const fsStatsType = exports.fsStatsType = {
+exports.bufferType = bufferType;
+const fsStatsType = {
   kind: 'named',
   name: 'fs.Stats'
 };
-
-const namedBuiltinTypes = exports.namedBuiltinTypes = [objectType.name, dateType.name, regExpType.name, bufferType.name, fsStatsType.name];
+exports.fsStatsType = fsStatsType;
+const namedBuiltinTypes = [objectType.name, dateType.name, regExpType.name, bufferType.name, fsStatsType.name];
+exports.namedBuiltinTypes = namedBuiltinTypes;

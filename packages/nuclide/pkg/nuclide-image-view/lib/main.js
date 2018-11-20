@@ -1,71 +1,95 @@
-'use strict';
+"use strict";
 
-var _disablePackage;
+function _disablePackage() {
+  const data = _interopRequireWildcard(require("../../commons-atom/disablePackage"));
 
-function _load_disablePackage() {
-  return _disablePackage = _interopRequireDefault(require('../../commons-atom/disablePackage'));
+  _disablePackage = function () {
+    return data;
+  };
+
+  return data;
 }
 
-var _disablePackage2;
+function _createPackage() {
+  const data = _interopRequireDefault(require("../../../modules/nuclide-commons-atom/createPackage"));
 
-function _load_disablePackage2() {
-  return _disablePackage2 = require('../../commons-atom/disablePackage');
+  _createPackage = function () {
+    return data;
+  };
+
+  return data;
 }
 
-var _createPackage;
+function _nuclideUri() {
+  const data = _interopRequireDefault(require("../../../modules/nuclide-commons/nuclideUri"));
 
-function _load_createPackage() {
-  return _createPackage = _interopRequireDefault(require('../../../modules/nuclide-commons-atom/createPackage'));
+  _nuclideUri = function () {
+    return data;
+  };
+
+  return data;
 }
 
-var _nuclideUri;
+function _UniversalDisposable() {
+  const data = _interopRequireDefault(require("../../../modules/nuclide-commons/UniversalDisposable"));
 
-function _load_nuclideUri() {
-  return _nuclideUri = _interopRequireDefault(require('../../../modules/nuclide-commons/nuclideUri'));
+  _UniversalDisposable = function () {
+    return data;
+  };
+
+  return data;
 }
 
-var _UniversalDisposable;
+function _ImageEditor() {
+  const data = _interopRequireDefault(require("./ImageEditor"));
 
-function _load_UniversalDisposable() {
-  return _UniversalDisposable = _interopRequireDefault(require('../../../modules/nuclide-commons/UniversalDisposable'));
-}
+  _ImageEditor = function () {
+    return data;
+  };
 
-var _ImageEditor;
-
-function _load_ImageEditor() {
-  return _ImageEditor = _interopRequireDefault(require('./ImageEditor'));
+  return data;
 }
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-class Activation {
+function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) { var desc = Object.defineProperty && Object.getOwnPropertyDescriptor ? Object.getOwnPropertyDescriptor(obj, key) : {}; if (desc.get || desc.set) { Object.defineProperty(newObj, key, desc); } else { newObj[key] = obj[key]; } } } } newObj.default = obj; return newObj; } }
 
+/**
+ * Copyright (c) 2015-present, Facebook, Inc.
+ * All rights reserved.
+ *
+ * This source code is licensed under the license found in the LICENSE file in
+ * the root directory of this source tree.
+ *
+ * 
+ * @format
+ */
+class Activation {
   constructor(state) {
-    this._disposables = new (_UniversalDisposable || _load_UniversalDisposable()).default(atom.workspace.addOpener(openUri),
-    // If you enable this package, we need to disable image-view.
-    (0, (_disablePackage || _load_disablePackage()).default)('image-view', { reason: (_disablePackage2 || _load_disablePackage2()).DisabledReason.REIMPLEMENTED }));
+    this._disposables = new (_UniversalDisposable().default)(atom.workspace.addOpener(openUri), // If you enable this package, we need to disable image-view.
+    (0, _disablePackage().default)('image-view', {
+      reason: _disablePackage().DisabledReason.REIMPLEMENTED
+    }));
+  }
+
+  consumeRemoteFileOpenerService(service) {
+    service.register(file => {
+      return openUri(file.getPath());
+    });
   }
 
   deserializeImageEditor(state) {
-    return new (_ImageEditor || _load_ImageEditor()).default(state.filePath);
+    return new (_ImageEditor().default)(state.filePath);
   }
 
   dispose() {
     this._disposables.dispose();
   }
-} /**
-   * Copyright (c) 2015-present, Facebook, Inc.
-   * All rights reserved.
-   *
-   * This source code is licensed under the license found in the LICENSE file in
-   * the root directory of this source tree.
-   *
-   * 
-   * @format
-   */
 
-(0, (_createPackage || _load_createPackage()).default)(module.exports, Activation);
+}
+
+(0, _createPackage().default)(module.exports, Activation);
 
 function openUri(uri) {
-  return (_nuclideUri || _load_nuclideUri()).default.looksLikeImageUri(uri) ? new (_ImageEditor || _load_ImageEditor()).default(uri) : null;
+  return _nuclideUri().default.looksLikeImageUri(uri) ? new (_ImageEditor().default)(uri) : null;
 }

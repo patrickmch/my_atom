@@ -1,44 +1,156 @@
-'use strict';
+"use strict";
 
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
 exports.observeAndroidDevices = observeAndroidDevices;
-exports.observeAndroidDevicesX = observeAndroidDevicesX;
+exports.adbDeviceForIdentifier = adbDeviceForIdentifier;
 
-var _DevicePoller;
+function _log4js() {
+  const data = require("log4js");
 
-function _load_DevicePoller() {
-  return _DevicePoller = require('./DevicePoller');
+  _log4js = function () {
+    return data;
+  };
+
+  return data;
 }
 
-var _utils;
+function _collection() {
+  const data = require("../../nuclide-commons/collection");
 
-function _load_utils() {
-  return _utils = require('./utils');
+  _collection = function () {
+    return data;
+  };
+
+  return data;
 }
 
-const ADB_PLATFORM = {
-  name: 'Android',
-  type: 'adb',
-  command: 'adb',
-  getService: (_utils || _load_utils()).getAdbServiceByNuclideUri
-}; /**
-    * Copyright (c) 2017-present, Facebook, Inc.
-    * All rights reserved.
-    *
-    * This source code is licensed under the BSD-style license found in the
-    * LICENSE file in the root directory of this source tree. An additional grant
-    * of patent rights can be found in the PATENTS file in the same directory.
-    *
-    *  strict-local
-    * @format
-    */
+function _SimpleCache() {
+  const data = require("../../nuclide-commons/SimpleCache");
 
+  _SimpleCache = function () {
+    return data;
+  };
+
+  return data;
+}
+
+function _shallowequal() {
+  const data = _interopRequireDefault(require("shallowequal"));
+
+  _shallowequal = function () {
+    return data;
+  };
+
+  return data;
+}
+
+var _rxjsCompatUmdMin = require("rxjs-compat/bundles/rxjs-compat.umd.min.js");
+
+function _expected() {
+  const data = require("../../nuclide-commons/expected");
+
+  _expected = function () {
+    return data;
+  };
+
+  return data;
+}
+
+function _nuclideUri() {
+  const data = _interopRequireDefault(require("../../nuclide-commons/nuclideUri"));
+
+  _nuclideUri = function () {
+    return data;
+  };
+
+  return data;
+}
+
+function _analytics() {
+  const data = require("../../nuclide-commons/analytics");
+
+  _analytics = function () {
+    return data;
+  };
+
+  return data;
+}
+
+function _utils() {
+  const data = require("./utils");
+
+  _utils = function () {
+    return data;
+  };
+
+  return data;
+}
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+/**
+ * Copyright (c) 2017-present, Facebook, Inc.
+ * All rights reserved.
+ *
+ * This source code is licensed under the BSD-style license found in the
+ * LICENSE file in the root directory of this source tree. An additional grant
+ * of patent rights can be found in the PATENTS file in the same directory.
+ *
+ *  strict-local
+ * @format
+ */
+// $FlowIgnore untyped import
 function observeAndroidDevices(host) {
-  return observeAndroidDevicesX(host).map(devices => devices.getOrDefault([]));
+  const serviceUri = _nuclideUri().default.isRemote(host) ? _nuclideUri().default.createRemoteUri(_nuclideUri().default.getHostname(host), '/') : '';
+  return pollersForUris.getOrCreate(serviceUri, () => {
+    return _rxjsCompatUmdMin.Observable.interval(2000).startWith(0).exhaustMap(() => {
+      const service = (0, _utils().getAdbServiceByNuclideUri)(serviceUri);
+
+      if (service == null) {
+        // Gracefully handle a lost remote connection
+        return _rxjsCompatUmdMin.Observable.of(_expected().Expect.pending());
+      }
+
+      return _rxjsCompatUmdMin.Observable.fromPromise(service.getDeviceList()).map(devices => _expected().Expect.value(devices)).catch(error => {
+        let message;
+
+        if (error.code === 'ENOENT') {
+          message = "'adb' not found in $PATH.";
+        } else if ( // RPC call timed out
+        error.name === 'RpcTimeoutError' || // RPC call succeeded, but the adb call itself timed out
+        error.message === 'Timeout has occurred') {
+          message = 'Request timed out, retrying...';
+        } else if (error.message === 'Connection Closed') {
+          return _rxjsCompatUmdMin.Observable.of(_expected().Expect.pending());
+        } else {
+          message = error.message;
+        }
+
+        const newError = new Error("Can't fetch Android devices. " + message); // $FlowIgnore
+
+        newError.originalError = error;
+        return _rxjsCompatUmdMin.Observable.of(_expected().Expect.error(newError));
+      });
+    }).distinctUntilChanged((a, b) => (0, _expected().expectedEqual)(a, b, (v1, v2) => (0, _collection().arrayEqual)(v1, v2, _shallowequal().default), (e1, e2) => e1.message === e2.message)).do(value => {
+      if (value.isError) {
+        const logger = (0, _log4js().getLogger)('nuclide-adb');
+        logger.warn(value.error.message);
+        (0, _analytics().track)('nuclide-adb:device-poller:error', {
+          error: value.error,
+          host: serviceUri
+        });
+      }
+    }).publishReplay(1).refCount();
+  });
+} // This is a convenient way for any device panel plugins of type Android to get from Device to
+// to the strongly typed AdbDevice.
+
+
+async function adbDeviceForIdentifier(host, identifier) {
+  const devices = await observeAndroidDevices(host).take(1).toPromise();
+  return devices.getOrDefault([]).find(d => d.serial === identifier);
 }
 
-function observeAndroidDevicesX(host) {
-  return (_DevicePoller || _load_DevicePoller()).DevicePoller.observeDevices(ADB_PLATFORM, host);
-}
+const pollersForUris = new (_SimpleCache().SimpleCache)();

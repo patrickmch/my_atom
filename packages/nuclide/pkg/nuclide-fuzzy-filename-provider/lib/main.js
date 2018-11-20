@@ -1,57 +1,93 @@
-'use strict';
+"use strict";
 
-var _UniversalDisposable;
+function _UniversalDisposable() {
+  const data = _interopRequireDefault(require("../../../modules/nuclide-commons/UniversalDisposable"));
 
-function _load_UniversalDisposable() {
-  return _UniversalDisposable = _interopRequireDefault(require('../../../modules/nuclide-commons/UniversalDisposable'));
+  _UniversalDisposable = function () {
+    return data;
+  };
+
+  return data;
 }
 
-var _createPackage;
+function _createPackage() {
+  const data = _interopRequireDefault(require("../../../modules/nuclide-commons-atom/createPackage"));
 
-function _load_createPackage() {
-  return _createPackage = _interopRequireDefault(require('../../../modules/nuclide-commons-atom/createPackage'));
+  _createPackage = function () {
+    return data;
+  };
+
+  return data;
 }
 
-var _scheduleIdleCallback;
+function _scheduleIdleCallback() {
+  const data = _interopRequireDefault(require("../../../modules/nuclide-commons/scheduleIdleCallback"));
 
-function _load_scheduleIdleCallback() {
-  return _scheduleIdleCallback = _interopRequireDefault(require('../../commons-node/scheduleIdleCallback'));
+  _scheduleIdleCallback = function () {
+    return data;
+  };
+
+  return data;
 }
 
-var _nuclideRemoteConnection;
+function _nuclideRemoteConnection() {
+  const data = require("../../nuclide-remote-connection");
 
-function _load_nuclideRemoteConnection() {
-  return _nuclideRemoteConnection = require('../../nuclide-remote-connection');
+  _nuclideRemoteConnection = function () {
+    return data;
+  };
+
+  return data;
 }
 
-var _nuclideRpc;
+function _nuclideRpc() {
+  const data = require("../../nuclide-rpc");
 
-function _load_nuclideRpc() {
-  return _nuclideRpc = require('../../nuclide-rpc');
+  _nuclideRpc = function () {
+    return data;
+  };
+
+  return data;
 }
 
-var _log4js;
+function _log4js() {
+  const data = require("log4js");
 
-function _load_log4js() {
-  return _log4js = require('log4js');
+  _log4js = function () {
+    return data;
+  };
+
+  return data;
 }
 
-var _FuzzyFileNameProvider;
+function _FuzzyFileNameProvider() {
+  const data = _interopRequireDefault(require("./FuzzyFileNameProvider"));
 
-function _load_FuzzyFileNameProvider() {
-  return _FuzzyFileNameProvider = _interopRequireDefault(require('./FuzzyFileNameProvider'));
+  _FuzzyFileNameProvider = function () {
+    return data;
+  };
+
+  return data;
 }
 
-var _utils;
+function _utils() {
+  const data = require("./utils");
 
-function _load_utils() {
-  return _utils = require('./utils');
+  _utils = function () {
+    return data;
+  };
+
+  return data;
 }
 
-var _passesGK;
+function _passesGK() {
+  const data = require("../../../modules/nuclide-commons/passesGK");
 
-function _load_passesGK() {
-  return _passesGK = require('../../commons-node/passesGK');
+  _passesGK = function () {
+    return data;
+  };
+
+  return data;
 }
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
@@ -66,24 +102,19 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
  * 
  * @format
  */
-
-const logger = (0, (_log4js || _load_log4js()).getLogger)('nuclide-fuzzy-filename-provider');
-
+const logger = (0, _log4js().getLogger)('nuclide-fuzzy-filename-provider');
 /**
  * A fallback provider for when the initial query hasn't come back yet.
  */
 
-
 class Activation {
-
   constructor() {
     this._readySearch = this._readySearch.bind(this);
+    this._subscriptions = new (_UniversalDisposable().default)();
+    this._subscriptionsByRoot = new Map(); // Do search preprocessing for all existing and future root directories.
 
-    this._subscriptions = new (_UniversalDisposable || _load_UniversalDisposable()).default();
-    this._subscriptionsByRoot = new Map();
-
-    // Do search preprocessing for all existing and future root directories.
     this._readySearch(atom.project.getPaths());
+
     this._subscriptions.add(atom.project.onDidChangePaths(this._readySearch));
   }
 
@@ -91,24 +122,27 @@ class Activation {
     // Add new project roots.
     for (const projectPath of projectPaths) {
       if (!this._subscriptionsByRoot.has(projectPath)) {
-        const disposables = new (_UniversalDisposable || _load_UniversalDisposable()).default(
-        // Wait a bit before starting the initial search, since it's a heavy op.
-        (0, (_scheduleIdleCallback || _load_scheduleIdleCallback()).default)(() => {
+        const disposables = new (_UniversalDisposable().default)( // Wait a bit before starting the initial search, since it's a heavy op.
+        (0, _scheduleIdleCallback().default)(() => {
           this._initialSearch(projectPath).catch(err => {
             // RPC timeout errors can often happen here, but don't dispose the search.
-            if (err instanceof (_nuclideRpc || _load_nuclideRpc()).RpcTimeoutError) {
+            if (err instanceof _nuclideRpc().RpcTimeoutError) {
               logger.warn(`Warmup fuzzy filename search for ${projectPath} hit the RPC timeout.`);
             } else {
               logger.error(`Error starting fuzzy filename search for ${projectPath}:`, err);
+
               this._disposeSearch(projectPath);
             }
           });
-        }, { timeout: 5000 }));
+        }, {
+          timeout: 5000
+        }));
+
         this._subscriptionsByRoot.set(projectPath, disposables);
       }
-    }
+    } // Clean up removed project roots.
 
-    // Clean up removed project roots.
+
     for (const [projectPath] of this._subscriptionsByRoot) {
       if (!projectPaths.includes(projectPath)) {
         this._disposeSearch(projectPath);
@@ -117,8 +151,9 @@ class Activation {
   }
 
   async _initialSearch(projectPath) {
-    const service = (0, (_nuclideRemoteConnection || _load_nuclideRemoteConnection()).getFuzzyFileSearchServiceByNuclideUri)(projectPath);
+    const service = (0, _nuclideRemoteConnection().getFuzzyFileSearchServiceByNuclideUri)(projectPath);
     const isAvailable = await service.isFuzzySearchAvailableFor(projectPath);
+
     if (!isAvailable) {
       throw new Error('Nonexistent directory');
     }
@@ -126,23 +161,23 @@ class Activation {
     const disposables = this._subscriptionsByRoot.get(projectPath);
 
     if (!(disposables != null)) {
-      throw new Error('Invariant violation: "disposables != null"');
+      throw new Error("Invariant violation: \"disposables != null\"");
     }
 
-    const busySignalDisposable = this._busySignalService == null ? new (_UniversalDisposable || _load_UniversalDisposable()).default() : this._busySignalService.reportBusy(`File search: indexing ${projectPath}`);
-    disposables.add(busySignalDisposable);
-
-    // It doesn't matter what the search term is. Empirically, doing an initial
+    const busySignalDisposable = this._busySignalService == null ? new (_UniversalDisposable().default)() : this._busySignalService.reportBusy(`File search: indexing ${projectPath}`);
+    disposables.add(busySignalDisposable); // It doesn't matter what the search term is. Empirically, doing an initial
     // search speeds up the next search much more than simply doing the setup
     // kicked off by 'fileSearchForDirectory'.
     //
     // We use an unlikely queryString so it is easy to filter out from metrics.
+
     try {
       await service.queryFuzzyFile({
         rootDirectory: projectPath,
         queryString: '^^^',
-        ignoredNames: (0, (_utils || _load_utils()).getIgnoredNames)(),
-        preferCustomSearch: Boolean((0, (_passesGK || _load_passesGK()).isGkEnabled)('nuclide_prefer_myles_search'))
+        ignoredNames: (0, _utils().getIgnoredNames)(),
+        preferCustomSearch: Boolean((0, _passesGK().isGkEnabled)('nuclide_prefer_myles_search')),
+        context: null
       });
     } catch (err) {
       throw err;
@@ -153,54 +188,61 @@ class Activation {
 
   _disposeSearch(projectPath) {
     try {
-      const service = (0, (_nuclideRemoteConnection || _load_nuclideRemoteConnection()).getFuzzyFileSearchServiceByNuclideUri)(projectPath);
+      const service = (0, _nuclideRemoteConnection().getFuzzyFileSearchServiceByNuclideUri)(projectPath);
       service.disposeFuzzySearch(projectPath);
-    } catch (err) {
-      // Ignore errors here; this is pretty best-effort anyway.
+    } catch (err) {// Ignore errors here; this is pretty best-effort anyway.
     } finally {
       const disposables = this._subscriptionsByRoot.get(projectPath);
+
       if (disposables != null) {
         disposables.dispose();
+
         this._subscriptionsByRoot.delete(projectPath);
       }
     }
   }
 
   registerProvider() {
-    return Object.assign({}, (_FuzzyFileNameProvider || _load_FuzzyFileNameProvider()).default, {
+    return Object.assign({}, _FuzzyFileNameProvider().default, {
       executeQuery: async (query, directory) => {
-        const initialDisposable = this._subscriptionsByRoot.get(directory.getPath());
-        // If the initial query is still executing, use the fallback provider.
+        const initialDisposable = this._subscriptionsByRoot.get(directory.getPath()); // If the initial query is still executing, use the fallback provider.
+
+
         if (initialDisposable != null && !initialDisposable.disposed && this._fallbackProvider != null) {
           const results = await this._fallbackProvider.executeQuery(query, directory);
+
           if (results != null && results.length > 0) {
             return results;
           }
         }
-        return (_FuzzyFileNameProvider || _load_FuzzyFileNameProvider()).default.executeQuery(query, directory);
+
+        return _FuzzyFileNameProvider().default.executeQuery(query, directory);
       }
     });
   }
 
   consumeBusySignal(service) {
     this._busySignalService = service;
-    return new (_UniversalDisposable || _load_UniversalDisposable()).default(() => {
+    return new (_UniversalDisposable().default)(() => {
       this._busySignalService = null;
     });
   }
 
   consumeFallbackProvider(provider) {
     this._fallbackProvider = provider;
-    return new (_UniversalDisposable || _load_UniversalDisposable()).default(() => {
+    return new (_UniversalDisposable().default)(() => {
       this._fallbackProvider = null;
     });
   }
 
   dispose() {
     this._subscriptions.dispose();
+
     this._subscriptionsByRoot.forEach(disposables => disposables.dispose());
+
     this._subscriptionsByRoot.clear();
   }
+
 }
 
-(0, (_createPackage || _load_createPackage()).default)(module.exports, Activation);
+(0, _createPackage().default)(module.exports, Activation);

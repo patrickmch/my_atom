@@ -1,32 +1,48 @@
-'use strict';
+"use strict";
 
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.ServiceTester = undefined;
+exports.ServiceTester = void 0;
 
-var _LoopbackTransports;
+function _LoopbackTransports() {
+  const data = require("../lib/LoopbackTransports");
 
-function _load_LoopbackTransports() {
-  return _LoopbackTransports = require('../lib/LoopbackTransports');
+  _LoopbackTransports = function () {
+    return data;
+  };
+
+  return data;
 }
 
-var _RpcConnection;
+function _RpcConnection() {
+  const data = require("../lib/RpcConnection");
 
-function _load_RpcConnection() {
-  return _RpcConnection = require('../lib/RpcConnection');
+  _RpcConnection = function () {
+    return data;
+  };
+
+  return data;
 }
 
-var _ServiceRegistry;
+function _ServiceRegistry() {
+  const data = require("../lib/ServiceRegistry");
 
-function _load_ServiceRegistry() {
-  return _ServiceRegistry = require('../lib/ServiceRegistry');
+  _ServiceRegistry = function () {
+    return data;
+  };
+
+  return data;
 }
 
-var _nuclideMarshalersCommon;
+function _nuclideMarshalersCommon() {
+  const data = require("../../nuclide-marshalers-common");
 
-function _load_nuclideMarshalersCommon() {
-  return _nuclideMarshalersCommon = require('../../nuclide-marshalers-common');
+  _nuclideMarshalersCommon = function () {
+    return data;
+  };
+
+  return data;
 }
 
 /**
@@ -39,19 +55,17 @@ function _load_nuclideMarshalersCommon() {
  * 
  * @format
  */
-
 class ServiceTester {
-
   async start(customServices, protocol) {
-    const transports = new (_LoopbackTransports || _load_LoopbackTransports()).LoopbackTransports();
-    this._serviceRegistry = new (_ServiceRegistry || _load_ServiceRegistry()).ServiceRegistry([(_nuclideMarshalersCommon || _load_nuclideMarshalersCommon()).localNuclideUriMarshalers], customServices, protocol);
-    this._clientConnection = (_RpcConnection || _load_RpcConnection()).RpcConnection.createServer(this._serviceRegistry, transports.serverTransport);
-
-    this._client = (_RpcConnection || _load_RpcConnection()).RpcConnection.createRemote(transports.clientTransport, [(0, (_nuclideMarshalersCommon || _load_nuclideMarshalersCommon()).getRemoteNuclideUriMarshalers)('localhost')], customServices, {}, protocol);
+    const transports = new (_LoopbackTransports().LoopbackTransports)();
+    this._serviceRegistry = new (_ServiceRegistry().ServiceRegistry)([_nuclideMarshalersCommon().localNuclideUriMarshalers], customServices, protocol);
+    this._clientConnection = _RpcConnection().RpcConnection.createServer(this._serviceRegistry, transports.serverTransport);
+    this._client = _RpcConnection().RpcConnection.createRemote(transports.clientTransport, [(0, _nuclideMarshalersCommon().getRemoteNuclideUriMarshalers)('localhost')], customServices, {}, protocol);
   }
 
   stop() {
     this._client.dispose();
+
     this._clientConnection.dispose();
   }
 
@@ -62,5 +76,7 @@ class ServiceTester {
   getUriOfRemotePath(remotePath) {
     return `nuclide://localhost${remotePath}`;
   }
+
 }
+
 exports.ServiceTester = ServiceTester;

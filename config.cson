@@ -5,6 +5,8 @@
       accentColor: "#ff781a"
       genAccent: true
       paintCursor: true
+  "autocomplete-plus":
+    confirmCompletion: "tab always, enter when suggestion explicitly selected"
   core:
     allowPendingPaneItems: false
     customFileTypes:
@@ -23,12 +25,27 @@
       "tree-view"
       "symbols-view"
       "language-gfm"
-      "busy-signal"
-      "linter-ui-default"
-      "linter"
       "markdown-preview"
       "image-view"
       "python-tools"
+      "language-shellscript"
+      "nuclide-format-js"
+      "linter"
+      "git-diff"
+      "language-python"
+      "highlight-selected"
+      "ide-python"
+      "language-vue"
+      "language-graphql"
+      "language-haskell"
+      "language-ini"
+      "language-kotlin"
+      "language-lua"
+      "language-ocaml"
+      "language-rust"
+      "language-scala"
+      "language-swift"
+      "language-thrift"
     ]
     projectHome: "/Users/mchey/code"
     telemetryConsent: "limited"
@@ -38,11 +55,13 @@
     ]
   "cursor-history": {}
   editor:
-    fontSize: 9
     preferredLineLength: 120
+    scrollPastEnd: true
     showInvisibles: true
   "exception-reporting":
     userId: "611dacae-fc64-40e3-822b-3fac24dd8229"
+  "git-blame":
+    columnWidth: 220
   "git-diff": {}
   "ide-css":
     lessSupport: false
@@ -50,12 +69,34 @@
     pylsPlugins:
       pycodestyle:
         maxLineLength: 120
+  "linter-eslint":
+    disableWhenNoEslintConfig: false
+    eslintrcPath: "~/.eslintrc.json"
+    globalNodePath: "/usr/local"
+    showRuleIdInMessage: false
+    useGlobalEslint: true
+  "linter-flake8":
+    maxLineLength: 120
+  "linter-js-standard":
+    showEslintRules: true
+    style: "standard-flow"
+  "linter-jshint":
+    lintInlineJavaScript: true
+    scopes: [
+      "source.js"
+      "source.js-semantic"
+      "string.quoted.single.js"
+      "source.js.jsx"
+      "meta.method-call.with-arguments.js"
+      "meta.function.method.js"
+    ]
   "linter-ui-default":
     panelHeight: 300
   nuclide:
     "atom-ide-diagnostics-ui": {}
     hyperclick:
       darwinTriggerKeys: "altKey,metaKey"
+    installRecommendedPackages: true
     "nuclide-home":
       showHome: false
     "nuclide-python":
@@ -64,18 +105,35 @@
     use:
       "atom-ide-console": "never"
       "atom-ide-debugger-python": "never"
+      hyperclick: "always"
+  "project-manager":
+    environmentSpecificProjects: true
+    includeGitRepositories: true
+    sortBy: "title"
   "split-diff":
     ignoreWhitespace: true
     leftEditorColor: "red"
     rightEditorColor: "green"
+  "tool-bar":
+    visible: false
   "vim-mode":
     useClipboardAsDefaultRegister: true
   "vim-mode-plus":
+    automaticallyEscapeInsertModeOnActivePaneItemChange: true
+    customSurroundPairs: "{\"d\": [\"{%\", \"%}\", true], \"D\": [\"{{\", \"}}\", true]}"
     ignoreCaseForSearch: true
     keymapBackslashToInnerCommentOrParagraphWhenToggleLineCommentsIsPending: true
     keymapIAndAToInsertAtTargetWhenHasOccurrence: true
     keymapSemicolonToInnerAnyPairInOperatorPendingMode: true
     keymapSemicolonToInnerAnyPairInVisualMode: true
+    sequentialPaste: true
+    smoothScrollOnFullScrollMotion: true
+    smoothScrollOnFullScrollMotionDuration: 300
+    smoothScrollOnHalfScrollMotion: true
+    smoothScrollOnHalfScrollMotionDuration: 300
+    smoothScrollOnMiniScroll: true
+    smoothScrollOnRedrawCursorLine: true
+    smoothScrollOnRedrawCursorLineDuration: 100
   welcome:
     showOnStartup: false
 ".hack.html.text":

@@ -4,7 +4,6 @@
   "version": "0.0.0",
   "description": "Manages remote projects",
   "author": "Nuclide : Remote",
-  "atomTestRunner": "../../lib/test-runner-entry.js",
   "nuclide": {
     "configMetadata": {
       "pathComponents": [
@@ -28,8 +27,7 @@
         "default": false
       }
     },
-    "packageType": "Atom",
-    "testRunner": "apm"
+    "packageType": "AtomPackage"
   },
   "providedServices": {
     "atom.directory-provider": {
@@ -55,6 +53,11 @@
     "nuclide-rpc-services": {
       "versions": {
         "0.0.0": "provideRpcServices"
+      }
+    },
+    "nuclide-remote-file-opener": {
+      "versions": {
+        "0.0.0": "provideRemoteFileOpenerService"
       }
     }
   },

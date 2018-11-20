@@ -8,7 +8,6 @@
     "language-css:grammar-used",
     "language-less:grammar-used"
   ],
-  "atomTestRunner": "../../lib/test-runner-entry.js",
   "atomConfig": {
     "logLevel": {
       "title": "Log Level",
@@ -28,14 +27,6 @@
     }
   },
   "nuclide": {
-    "packageType": "Atom",
-    "testRunner": "apm"
-  },
-  "providedServices": {
-    "nuclide-project-symbol-search-service": {
-      "versions": {
-        "0.0.0": "provideProjectSymbolSearch"
-      }
-    }
+    "packageType": "AtomPackage"
   }
 }

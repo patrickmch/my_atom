@@ -1,47 +1,69 @@
-'use strict';
+"use strict";
 
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.OutlineViewProvider = undefined;
+exports.OutlineViewProvider = void 0;
 
-var _nuclideRemoteConnection;
+function _nuclideRemoteConnection() {
+  const data = require("../../nuclide-remote-connection");
 
-function _load_nuclideRemoteConnection() {
-  return _nuclideRemoteConnection = require('../../nuclide-remote-connection');
+  _nuclideRemoteConnection = function () {
+    return data;
+  };
+
+  return data;
 }
 
-var _nuclideOpenFiles;
+function _nuclideOpenFiles() {
+  const data = require("../../nuclide-open-files");
 
-function _load_nuclideOpenFiles() {
-  return _nuclideOpenFiles = require('../../nuclide-open-files');
+  _nuclideOpenFiles = function () {
+    return data;
+  };
+
+  return data;
 }
 
-var _nuclideAnalytics;
+function _nuclideAnalytics() {
+  const data = require("../../../modules/nuclide-analytics");
 
-function _load_nuclideAnalytics() {
-  return _nuclideAnalytics = require('../../nuclide-analytics');
+  _nuclideAnalytics = function () {
+    return data;
+  };
+
+  return data;
 }
 
+/**
+ * Copyright (c) 2015-present, Facebook, Inc.
+ * All rights reserved.
+ *
+ * This source code is licensed under the license found in the LICENSE file in
+ * the root directory of this source tree.
+ *
+ * 
+ * @format
+ */
 class OutlineViewProvider {
-
-  constructor(name, grammarScopes, priority, analyticsEventName, updateOnEdit, connectionToLanguageService) {
+  constructor(name, grammarScopes, priority, analyticsEventName, connectionToLanguageService) {
     this.name = name;
     this.grammarScopes = grammarScopes;
     this.priority = priority;
-    this.updateOnEdit = updateOnEdit == null ? undefined : updateOnEdit;
     this._analyticsEventName = analyticsEventName;
     this._connectionToLanguageService = connectionToLanguageService;
   }
 
   static register(name, grammarScopes, config, connectionToLanguageService) {
-    return atom.packages.serviceHub.provide('outline-view', config.version, new OutlineViewProvider(name, grammarScopes, config.priority, config.analyticsEventName, config.updateOnEdit, connectionToLanguageService));
+    return atom.packages.serviceHub.provide('outline-view', config.version, new OutlineViewProvider(name, grammarScopes, config.priority, config.analyticsEventName, connectionToLanguageService));
   }
 
   getOutline(editor) {
-    return (0, (_nuclideAnalytics || _load_nuclideAnalytics()).trackTiming)(this._analyticsEventName, async () => {
-      const fileVersion = await (0, (_nuclideOpenFiles || _load_nuclideOpenFiles()).getFileVersionOfEditor)(editor);
+    return (0, _nuclideAnalytics().trackTiming)(this._analyticsEventName, async () => {
+      const fileVersion = await (0, _nuclideOpenFiles().getFileVersionOfEditor)(editor);
+
       const languageService = this._connectionToLanguageService.getForUri(editor.getPath());
+
       if (languageService == null || fileVersion == null) {
         return null;
       }
@@ -49,17 +71,8 @@ class OutlineViewProvider {
       return (await languageService).getOutline(fileVersion);
     });
   }
+
 }
 
-exports.OutlineViewProvider = OutlineViewProvider; /**
-                                                    * Copyright (c) 2015-present, Facebook, Inc.
-                                                    * All rights reserved.
-                                                    *
-                                                    * This source code is licensed under the license found in the LICENSE file in
-                                                    * the root directory of this source tree.
-                                                    *
-                                                    * 
-                                                    * @format
-                                                    */
-
+exports.OutlineViewProvider = OutlineViewProvider;
 null;

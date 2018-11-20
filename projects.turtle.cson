@@ -1,0 +1,48 @@
+[
+  {
+    title: "Tools (dev-install)"
+    group: "NOLS"
+    paths: [
+      "/Users/mchey/code/tools"
+    ]
+    icon: "icon-tools"
+  }
+  {
+    title: "Dotfiles"
+    paths: [
+      "/Users/mchey/dotfiles"
+    ]
+    icon: "icon-home"
+  }
+  {
+    title: "Virtualenvs"
+    paths: [
+      "/Users/mchey/code/virtualenvs"
+    ]
+    icon: "icon-terminal"
+  }
+  {
+    title: "Core"
+    group: "NOLS"
+    paths: [
+      "/Users/mchey/code/website_core"
+    ]
+    icon: "icon-alert"
+  }
+  {
+    title: "Plsql"
+    group: "NOLS"
+    paths: [
+      "/Users/mchey/code/plsql"
+    ]
+    icon: "icon-database"
+  }
+  {
+    title: "Intranet"
+    group: "NOLS"
+    paths: [
+      "/Users/mchey/code/intranet"
+    ]
+    icon: "icon-rocket"
+  }
+]

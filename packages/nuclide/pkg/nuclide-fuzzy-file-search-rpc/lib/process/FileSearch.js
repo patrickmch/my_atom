@@ -1,4 +1,4 @@
-'use strict';
+"use strict";
 
 Object.defineProperty(exports, "__esModule", {
   value: true
@@ -7,34 +7,54 @@ exports.fileSearchForDirectory = fileSearchForDirectory;
 exports.initFileSearchForDirectory = initFileSearchForDirectory;
 exports.doSearch = doSearch;
 
-var _fsPromise;
+function _fsPromise() {
+  const data = _interopRequireDefault(require("../../../../modules/nuclide-commons/fsPromise"));
 
-function _load_fsPromise() {
-  return _fsPromise = _interopRequireDefault(require('../../../../modules/nuclide-commons/fsPromise'));
+  _fsPromise = function () {
+    return data;
+  };
+
+  return data;
 }
 
-var _log4js;
+function _log4js() {
+  const data = require("log4js");
 
-function _load_log4js() {
-  return _log4js = require('log4js');
+  _log4js = function () {
+    return data;
+  };
+
+  return data;
 }
 
-var _PathSet;
+function _PathSet() {
+  const data = require("./PathSet");
 
-function _load_PathSet() {
-  return _PathSet = require('./PathSet');
+  _PathSet = function () {
+    return data;
+  };
+
+  return data;
 }
 
-var _PathSetFactory;
+function _PathSetFactory() {
+  const data = require("./PathSetFactory");
 
-function _load_PathSetFactory() {
-  return _PathSetFactory = require('./PathSetFactory');
+  _PathSetFactory = function () {
+    return data;
+  };
+
+  return data;
 }
 
-var _PathSetUpdater;
+function _PathSetUpdater() {
+  const data = _interopRequireDefault(require("./PathSetUpdater"));
 
-function _load_PathSetUpdater() {
-  return _PathSetUpdater = _interopRequireDefault(require('./PathSetUpdater'));
+  _PathSetUpdater = function () {
+    return data;
+  };
+
+  return data;
 }
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
@@ -49,29 +69,27 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
  *  strict-local
  * @format
  */
-
-const logger = (0, (_log4js || _load_log4js()).getLogger)('nuclide-fuzzy-file-search-rpc');
-
+const logger = (0, _log4js().getLogger)('nuclide-fuzzy-file-search-rpc');
 const fileSearchCache = {};
 
 async function fileSearchForDirectory(directory, pathSetUpdater, ignoredNames = []) {
   // Note: races are not an issue here since initialization is managed in
   // FileSearchProcess (which protects against simultaneous inits).
   const cached = fileSearchCache[directory];
+
   if (cached) {
     return cached;
   }
 
-  const realpath = await (_fsPromise || _load_fsPromise()).default.realpath(directory);
-  const paths = await (0, (_PathSetFactory || _load_PathSetFactory()).getPaths)(realpath);
-  const pathSet = new (_PathSet || _load_PathSet()).PathSet(paths, ignoredNames || [], directory);
-
+  const realpath = await _fsPromise().default.realpath(directory);
+  const paths = await (0, _PathSetFactory().getPaths)(realpath);
+  const pathSet = new (_PathSet().PathSet)(paths, ignoredNames || [], directory);
   const thisPathSetUpdater = pathSetUpdater || getPathSetUpdater();
+
   try {
     await thisPathSetUpdater.startUpdatingPathSet(pathSet, realpath);
   } catch (e) {
-    logger.warn(`Could not update path sets for ${realpath}. Searches may be stale`, e);
-    // TODO(hansonw): Fall back to manual refresh or node watches
+    logger.warn(`Could not update path sets for ${realpath}. Searches may be stale`, e); // TODO(hansonw): Fall back to manual refresh or node watches
   }
 
   fileSearchCache[directory] = pathSet;
@@ -82,13 +100,13 @@ let pathSetUpdater;
 
 function getPathSetUpdater() {
   if (!pathSetUpdater) {
-    pathSetUpdater = new (_PathSetUpdater || _load_PathSetUpdater()).default();
+    pathSetUpdater = new (_PathSetUpdater().default)();
   }
-  return pathSetUpdater;
-}
 
-// The return values of the following functions must be JSON-serializable so they
+  return pathSetUpdater;
+} // The return values of the following functions must be JSON-serializable so they
 // can be sent across a process boundary.
+
 
 async function initFileSearchForDirectory(directory, ignoredNames) {
   await fileSearchForDirectory(directory, null, ignoredNames);

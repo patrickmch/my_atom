@@ -1,49 +1,78 @@
-'use strict';
+"use strict";
 
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
+exports.default = void 0;
 
-var _client;
+function _client() {
+  const data = require("../../../modules/big-dig/src/client");
 
-function _load_client() {
-  return _client = require('../../../modules/big-dig/src/client');
+  _client = function () {
+    return data;
+  };
+
+  return data;
 }
 
-var _nuclideMarshalersAtom;
+function _nuclideMarshalersClient() {
+  const data = require("../../nuclide-marshalers-client");
 
-function _load_nuclideMarshalersAtom() {
-  return _nuclideMarshalersAtom = require('../../nuclide-marshalers-atom');
+  _nuclideMarshalersClient = function () {
+    return data;
+  };
+
+  return data;
 }
 
-var _nuclideRpc;
+function _nuclideRpc() {
+  const data = require("../../nuclide-rpc");
 
-function _load_nuclideRpc() {
-  return _nuclideRpc = require('../../nuclide-rpc');
+  _nuclideRpc = function () {
+    return data;
+  };
+
+  return data;
 }
 
-var _config;
+function _config() {
+  const data = require("../../nuclide-rpc/lib/config");
 
-function _load_config() {
-  return _config = require('../../nuclide-rpc/lib/config');
+  _config = function () {
+    return data;
+  };
+
+  return data;
 }
 
-var _servicesConfig;
+function _servicesConfig() {
+  const data = _interopRequireDefault(require("../../nuclide-server/lib/servicesConfig"));
 
-function _load_servicesConfig() {
-  return _servicesConfig = _interopRequireDefault(require('../../nuclide-server/lib/servicesConfig'));
+  _servicesConfig = function () {
+    return data;
+  };
+
+  return data;
 }
 
-var _utils;
+function _utils() {
+  const data = require("../../nuclide-server/lib/utils");
 
-function _load_utils() {
-  return _utils = require('../../nuclide-server/lib/utils');
+  _utils = function () {
+    return data;
+  };
+
+  return data;
 }
 
-var _constants;
+function _constants() {
+  const data = require("../../nuclide-server2/lib/constants");
 
-function _load_constants() {
-  return _constants = require('../../nuclide-server2/lib/constants');
+  _constants = function () {
+    return data;
+  };
+
+  return data;
 }
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
@@ -58,27 +87,35 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
  *  strict-local
  * @format
  */
-
-exports.default = async function createBigDigRpcClient(config) {
-  const bigDigClient = await (0, (_client || _load_client()).createBigDigClient)(Object.assign({}, config, {
-    ignoreIntransientErrors: true
+var createBigDigRpcClient = async function createBigDigRpcClient(config) {
+  const bigDigClient = await (0, _client().createBigDigClient)(Object.assign({}, config, {
+    ignoreIntransientErrors: true,
+    protocolLogger: _utils().protocolLogger
   }));
   const bigDigTransport = {
     send(message) {
-      bigDigClient.sendMessage((_constants || _load_constants()).NUCLIDE_RPC_TAG, message);
+      bigDigClient.sendMessage(_constants().NUCLIDE_RPC_TAG, message);
     },
+
     onMessage() {
-      return bigDigClient.onMessage((_constants || _load_constants()).NUCLIDE_RPC_TAG);
+      return bigDigClient.onMessage(_constants().NUCLIDE_RPC_TAG);
     },
+
     close() {
       bigDigClient.close();
     },
+
     isClosed() {
       return bigDigClient.isClosed();
     }
+
   };
   return {
     bigDigClient,
-    rpcConnection: (_nuclideRpc || _load_nuclideRpc()).RpcConnection.createRemote(bigDigTransport, (0, (_nuclideMarshalersAtom || _load_nuclideMarshalersAtom()).getAtomSideMarshalers)(config.host), (_servicesConfig || _load_servicesConfig()).default, { trackSampleRate: 10 }, (_config || _load_config()).SERVICE_FRAMEWORK3_PROTOCOL, null, (_utils || _load_utils()).protocolLogger)
+    rpcConnection: _nuclideRpc().RpcConnection.createRemote(bigDigTransport, (0, _nuclideMarshalersClient().getClientSideMarshalers)(config.host), _servicesConfig().default, {
+      trackSampleRate: 10
+    }, _config().SERVICE_FRAMEWORK3_PROTOCOL, null, _utils().protocolLogger)
   };
 };
+
+exports.default = createBigDigRpcClient;

@@ -4,19 +4,22 @@
   "version": "0.0.0",
   "description": "Provides support for JS auto-imports in nuclide ",
   "author": "NEEDS OWNER",
-  "atomTestRunner": "../../lib/test-runner-entry.js",
   "atomConfig": {
     "diagnosticsWhitelist": {
       "title": "Directories for which the JS-Autoimports server should provide diagnostics",
       "type": "array",
-      "items": {"type": "string"},
+      "items": {
+        "type": "string"
+      },
       "default": [],
       "description": "If the working directory matches any of these regexes, then diagnostics will be provided. If the array is empty, diagnostics will be provided for all directories."
     },
     "requiresWhitelist": {
       "title": "Directories for which the JS-Autoimports server should use requires, not imports",
       "type": "array",
-      "items": {"type": "string"},
+      "items": {
+        "type": "string"
+      },
       "default": [],
       "description": "If the working directory matches any of these regexes, then suggestions will use requires rather than imports."
     },
@@ -35,11 +38,16 @@
         "FATAL",
         "OFF"
       ]
+    },
+    "componentModulePathFilter": {
+      "title": "Component Module Path Filter",
+      "type": "string",
+      "default": "js/components",
+      "description": "Only React components with paths containing this substring will be indexed by Component Tools."
     }
   },
   "nuclide": {
-    "packageType": "Atom",
-    "testRunner": "apm"
+    "packageType": "AtomPackage"
   },
   "providedServices": {
     "nuclide-quick-open-register-provider": {
@@ -64,5 +72,8 @@
         "^0.0.1": "consumeOrganizeRequiresService"
       }
     }
-  }
+  },
+  "activationHooks": [
+    "!nuclide_fb_js_imports_vscode_ext:gk:nuclide"
+  ]
 }

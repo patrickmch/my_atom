@@ -1,4 +1,4 @@
-'use strict';
+"use strict";
 
 Object.defineProperty(exports, "__esModule", {
   value: true
@@ -6,24 +6,42 @@ Object.defineProperty(exports, "__esModule", {
 exports.readCompilationFlags = readCompilationFlags;
 exports.fallbackReadCompilationFlags = fallbackReadCompilationFlags;
 
-var _fs = _interopRequireDefault(require('fs'));
+var _fs = _interopRequireDefault(require("fs"));
 
-var _fsPromise;
+function _fsPromise() {
+  const data = _interopRequireDefault(require("../../../modules/nuclide-commons/fsPromise"));
 
-function _load_fsPromise() {
-  return _fsPromise = _interopRequireDefault(require('../../../modules/nuclide-commons/fsPromise'));
+  _fsPromise = function () {
+    return data;
+  };
+
+  return data;
 }
 
-var _rxjsBundlesRxMinJs = require('rxjs/bundles/Rx.min.js');
+var _rxjsCompatUmdMin = require("rxjs-compat/bundles/rxjs-compat.umd.min.js");
 
-var _stream;
+function _stream() {
+  const data = require("../../../modules/nuclide-commons/stream");
 
-function _load_stream() {
-  return _stream = require('../../../modules/nuclide-commons/stream');
+  _stream = function () {
+    return data;
+  };
+
+  return data;
 }
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
+/**
+ * Copyright (c) 2015-present, Facebook, Inc.
+ * All rights reserved.
+ *
+ * This source code is licensed under the license found in the LICENSE file in
+ * the root directory of this source tree.
+ *
+ * 
+ * @format
+ */
 // Remark: this approach will fail if a { or }
 // appears in a string (e.g. in a filename), fall back to JSON.parse otherwise.
 function readCompilationFlags(flagsFile) {
@@ -34,20 +52,24 @@ function readCompilationFlags(flagsFile) {
   // 2. 434 MB compilation db with 660 entries,
   //    -  full read: "Error: toString() failed"
   //    -  chunked read: 4500ms
-  return _rxjsBundlesRxMinJs.Observable.create(subscriber => {
+  return _rxjsCompatUmdMin.Observable.create(subscriber => {
     let chunk = '';
+
     function emitChunk() {
       try {
         subscriber.next(JSON.parse(chunk));
       } catch (e) {
         subscriber.error(e);
       }
+
       chunk = '';
     }
+
     function handleChunk(data) {
       if (chunk.length === 0) {
         // If the chunk is empty we look for the opening brace.
         const start = data.indexOf('{');
+
         if (start !== -1) {
           chunk = '{';
           return handleChunk(data.slice(start + 1));
@@ -55,6 +77,7 @@ function readCompilationFlags(flagsFile) {
       } else {
         // We are currently in a chunk so look for the end.
         const end = data.indexOf('}');
+
         if (end !== -1) {
           chunk += data.slice(0, end + 1);
           emitChunk();
@@ -64,20 +87,12 @@ function readCompilationFlags(flagsFile) {
         }
       }
     }
-    return (0, (_stream || _load_stream()).observeStream)(_fs.default.createReadStream(flagsFile)).subscribe(handleChunk, subscriber.error.bind(subscriber), subscriber.complete.bind(subscriber));
+
+    return (0, _stream().observeStream)(_fs.default.createReadStream(flagsFile)).subscribe(handleChunk, subscriber.error.bind(subscriber), subscriber.complete.bind(subscriber));
   });
-} /**
-   * Copyright (c) 2015-present, Facebook, Inc.
-   * All rights reserved.
-   *
-   * This source code is licensed under the license found in the LICENSE file in
-   * the root directory of this source tree.
-   *
-   * 
-   * @format
-   */
+}
 
 async function fallbackReadCompilationFlags(flagsFile) {
-  const contents = await (_fsPromise || _load_fsPromise()).default.readFile(flagsFile);
+  const contents = await _fsPromise().default.readFile(flagsFile);
   return JSON.parse(contents.toString());
 }

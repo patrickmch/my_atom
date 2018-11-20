@@ -1,28 +1,40 @@
-'use strict';
+"use strict";
 
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
 exports.search = search;
 
-var _rxjsBundlesRxMinJs = require('rxjs/bundles/Rx.min.js');
+var _rxjsCompatUmdMin = require("rxjs-compat/bundles/rxjs-compat.umd.min.js");
 
-var _process;
+function _process() {
+  const data = require("../../../modules/nuclide-commons/process");
 
-function _load_process() {
-  return _process = require('../../../modules/nuclide-commons/process');
+  _process = function () {
+    return data;
+  };
+
+  return data;
 }
 
-var _handlerCommon;
+function _handlerCommon() {
+  const data = require("./handlerCommon");
 
-function _load_handlerCommon() {
-  return _handlerCommon = require('./handlerCommon');
+  _handlerCommon = function () {
+    return data;
+  };
+
+  return data;
 }
 
-var _parser;
+function _parser() {
+  const data = require("./parser");
 
-function _load_parser() {
-  return _parser = require('./parser');
+  _parser = function () {
+    return data;
+  };
+
+  return data;
 }
 
 /**
@@ -35,24 +47,48 @@ function _load_parser() {
  * 
  * @format
  */
+function search({
+  regex,
+  directory,
+  leadingLines,
+  trailingLines
+}) {
+  const sharedArgs = [];
 
-function search(directory, regex) {
-  const sharedArgs = (regex.ignoreCase ? ['-i'] : []).concat([
-  // print line number
-  '-n', '-E', regex.source, directory]);
+  if (regex.ignoreCase) {
+    sharedArgs.push('-i');
+  } // hg grep actually requires no space between A/B and the parameter!
+  // git grep doesn't seem to mind.
+
+
+  if (leadingLines != null) {
+    sharedArgs.push('-B' + String(leadingLines));
+  }
+
+  if (trailingLines != null) {
+    sharedArgs.push('-A' + String(trailingLines));
+  } // TODO: handle limit in params
+
+
+  sharedArgs.push( // print line number
+  '-n', '-E', regex.source, directory);
+
   const observeVcsGrepProcess = (command, subcommand) => {
-    return (0, (_process || _load_process()).observeProcess)(command, [subcommand].concat(sharedArgs), {
+    return (0, _process().observeProcess)(command, [subcommand].concat(sharedArgs), {
       cwd: directory,
       // An exit code of 0 or 1 is perfectly normal for grep (1 = no results).
       // `hg grep` can sometimes have an exit code of 123, since it uses xargs.
-      isExitError: ({ exitCode, signal }) => {
-        return (
-          // flowlint-next-line sketchy-null-string:off
+      isExitError: ({
+        exitCode,
+        signal
+      }) => {
+        return (// flowlint-next-line sketchy-null-string:off
           !signal && (exitCode == null || exitCode > 1 && exitCode !== 123)
         );
       }
     });
-  };
-  // Try running search commands, falling through to the next if there is an error.
-  return (0, (_handlerCommon || _load_handlerCommon()).mergeOutputToResults)(observeVcsGrepProcess('git', 'grep').catch(() => observeVcsGrepProcess('hg', 'wgrep')), event => (0, (_parser || _load_parser()).parseVcsGrepLine)(event, directory, regex), regex, 0, 0);
+  }; // Try running search commands, falling through to the next if there is an error.
+
+
+  return (0, _handlerCommon().mergeOutputToResults)(observeVcsGrepProcess('git', 'grep').catch(() => observeVcsGrepProcess('hg', 'wgrep')), event => (0, _parser().parseVcsGrepLine)(event, directory, regex), regex, leadingLines || 0, trailingLines || 0);
 }

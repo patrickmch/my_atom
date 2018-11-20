@@ -1,156 +1,188 @@
-'use strict';
+"use strict";
 
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.NotifiersByConnection = undefined;
+exports.NotifiersByConnection = void 0;
 
-var _nuclideRemoteConnection;
+function _nuclideRemoteConnection() {
+  const data = require("../../nuclide-remote-connection");
 
-function _load_nuclideRemoteConnection() {
-  return _nuclideRemoteConnection = require('../../nuclide-remote-connection');
+  _nuclideRemoteConnection = function () {
+    return data;
+  };
+
+  return data;
 }
 
-var _UniversalDisposable;
+function _UniversalDisposable() {
+  const data = _interopRequireDefault(require("../../../modules/nuclide-commons/UniversalDisposable"));
 
-function _load_UniversalDisposable() {
-  return _UniversalDisposable = _interopRequireDefault(require('../../../modules/nuclide-commons/UniversalDisposable'));
+  _UniversalDisposable = function () {
+    return data;
+  };
+
+  return data;
 }
 
-var _nuclideOpenFilesRpc;
+function _nuclideOpenFilesRpc() {
+  const data = require("../../nuclide-open-files-rpc");
 
-function _load_nuclideOpenFilesRpc() {
-  return _nuclideOpenFilesRpc = require('../../nuclide-open-files-rpc');
+  _nuclideOpenFilesRpc = function () {
+    return data;
+  };
+
+  return data;
 }
 
-var _log4js;
+function _log4js() {
+  const data = require("log4js");
 
-function _load_log4js() {
-  return _log4js = require('log4js');
+  _log4js = function () {
+    return data;
+  };
+
+  return data;
 }
 
-var _nuclideUri;
+function _nuclideUri() {
+  const data = _interopRequireDefault(require("../../../modules/nuclide-commons/nuclideUri"));
 
-function _load_nuclideUri() {
-  return _nuclideUri = _interopRequireDefault(require('../../../modules/nuclide-commons/nuclideUri'));
+  _nuclideUri = function () {
+    return data;
+  };
+
+  return data;
 }
 
-var _event;
+function _event() {
+  const data = require("../../../modules/nuclide-commons/event");
 
-function _load_event() {
-  return _event = require('../../../modules/nuclide-commons/event');
+  _event = function () {
+    return data;
+  };
+
+  return data;
 }
 
-var _collection;
+function _collection() {
+  const data = require("../../../modules/nuclide-commons/collection");
 
-function _load_collection() {
-  return _collection = require('../../../modules/nuclide-commons/collection');
+  _collection = function () {
+    return data;
+  };
+
+  return data;
 }
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-const logger = (0, (_log4js || _load_log4js()).getLogger)('nuclide-open-files'); /**
-                                                                                  * Copyright (c) 2015-present, Facebook, Inc.
-                                                                                  * All rights reserved.
-                                                                                  *
-                                                                                  * This source code is licensed under the license found in the LICENSE file in
-                                                                                  * the root directory of this source tree.
-                                                                                  *
-                                                                                  * 
-                                                                                  * @format
-                                                                                  */
-
+/**
+ * Copyright (c) 2015-present, Facebook, Inc.
+ * All rights reserved.
+ *
+ * This source code is licensed under the license found in the LICENSE file in
+ * the root directory of this source tree.
+ *
+ * 
+ * @format
+ */
+const logger = (0, _log4js().getLogger)('nuclide-open-files');
 const RESYNC_TIMEOUT_MS = 2000;
 
 function getOpenFilesService(connection) {
-  return (0, (_nuclideRemoteConnection || _load_nuclideRemoteConnection()).getServiceByConnection)((_nuclideOpenFilesRpc || _load_nuclideOpenFilesRpc()).OPEN_FILES_SERVICE, connection);
+  return (0, _nuclideRemoteConnection().getServiceByConnection)(_nuclideOpenFilesRpc().OPEN_FILES_SERVICE, connection);
 }
 
 function uriMatchesConnection(uri, connection) {
   if (connection == null) {
-    return (_nuclideUri || _load_nuclideUri()).default.isLocal(uri);
+    return _nuclideUri().default.isLocal(uri);
   } else {
-    return connection.getRemoteHostname() === (_nuclideUri || _load_nuclideUri()).default.getHostnameOpt(uri);
+    return connection.getRemoteHostname() === _nuclideUri().default.getHostnameOpt(uri);
   }
-}
-
-// Keeps a FileNotifier around per ServerConnection.
+} // Keeps a FileNotifier around per ServerConnection.
 //
 // Also handles sending 'close' events to the FileNotifier so that
 // the per-Buffer BufferSubscription does not need to live past
 // the buffer being destroyed.
-class NotifiersByConnection {
 
+
+class NotifiersByConnection {
   constructor(getService = getOpenFilesService) {
     this._getService = getService;
+
     const filterByConnection = (connection, dirs) => new Set(dirs.filter(dir => uriMatchesConnection(dir, connection)));
-    this._notifiers = new (_nuclideRemoteConnection || _load_nuclideRemoteConnection()).ConnectionCache(connection => {
-      const result = this._getService(connection).initialize();
-      // NOTE: It's important to use `await` here rather than .then.
+
+    this._notifiers = new (_nuclideRemoteConnection().ConnectionCache)(connection => {
+      const result = this._getService(connection).initialize(); // NOTE: It's important to use `await` here rather than .then.
       // v8's native async/await implementation treats .then and await differently.
       // See: https://stackoverflow.com/questions/46254408/promise-resolution-order-and-await
+
+
       async function onDirectoriesChanged() {
         const notifier = await result;
         const dirs = filterByConnection(connection, atom.project.getPaths());
         notifier.onDirectoriesChanged(dirs);
       }
+
       onDirectoriesChanged();
       return result;
     });
-    this._subscriptions = new (_nuclideRemoteConnection || _load_nuclideRemoteConnection()).ConnectionCache(connection => {
-      const subscription = (0, (_event || _load_event()).observableFromSubscribeFunction)(cb => atom.project.onDidChangePaths(cb)).map(dirs => filterByConnection(connection, dirs)).distinctUntilChanged((_collection || _load_collection()).areSetsEqual).subscribe(async dirs => {
+    this._subscriptions = new (_nuclideRemoteConnection().ConnectionCache)(connection => {
+      const subscription = (0, _event().observableFromSubscribeFunction)(cb => atom.project.onDidChangePaths(cb)).map(dirs => filterByConnection(connection, dirs)).distinctUntilChanged(_collection().areSetsEqual).subscribe(async dirs => {
         const notifier = await this._notifiers.get(connection);
         notifier.onDirectoriesChanged(dirs);
       });
-      return Promise.resolve(new (_UniversalDisposable || _load_UniversalDisposable()).default(() => subscription.unsubscribe()));
+      return Promise.resolve(new (_UniversalDisposable().default)(() => subscription.unsubscribe()));
     });
   }
 
   dispose() {
     this._notifiers.dispose();
-    this._subscriptions.dispose();
-  }
 
-  // Returns null for a buffer to a file on a closed remote connection
+    this._subscriptions.dispose();
+  } // Returns null for a buffer to a file on a closed remote connection
   // or a new buffer which has not been saved.
+
+
   get(buffer) {
     return this.getForUri(buffer.getPath());
   }
 
   getForConnection(connection) {
     return this._notifiers.get(connection);
-  }
-
-  // Returns null for a buffer to a file on a closed remote connection
+  } // Returns null for a buffer to a file on a closed remote connection
   // or a new buffer which has not been saved.
+
+
   getForUri(path) {
     return this._notifiers.getForUri(path);
-  }
-
-  // Sends the close message to the appropriate FileNotifier.
+  } // Sends the close message to the appropriate FileNotifier.
   // Will keep trying to send until the send succeeds or
   // the corresponding ServerConnection is closed.
+
+
   sendClose(filePath, version) {
     if (filePath === '') {
       return;
-    }
-
-    // Keep trying until either the close completes, or
+    } // Keep trying until either the close completes, or
     // the remote connection goes away
+
+
     const sendMessage = async () => {
       const notifier = this.getForUri(filePath);
+
       if (notifier != null) {
         try {
           const n = await notifier;
           const message = {
-            kind: (_nuclideOpenFilesRpc || _load_nuclideOpenFilesRpc()).FileEventKind.CLOSE,
+            kind: _nuclideOpenFilesRpc().FileEventKind.CLOSE,
             fileVersion: {
               notifier: n,
               filePath,
               version
             }
           };
-
           await message.fileVersion.notifier.onFileEvent(message);
         } catch (e) {
           logger.error(`Error sending file close event: ${filePath} ${version}`, e);
@@ -161,5 +193,7 @@ class NotifiersByConnection {
 
     sendMessage();
   }
+
 }
+
 exports.NotifiersByConnection = NotifiersByConnection;

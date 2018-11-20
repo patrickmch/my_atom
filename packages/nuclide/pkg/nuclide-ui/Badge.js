@@ -1,25 +1,33 @@
-'use strict';
+"use strict";
 
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.Badge = exports.BadgeColors = exports.BadgeSizes = undefined;
+exports.Badge = exports.BadgeColors = exports.BadgeSizes = void 0;
 
-var _classnames;
+function _classnames() {
+  const data = _interopRequireDefault(require("classnames"));
 
-function _load_classnames() {
-  return _classnames = _interopRequireDefault(require('classnames'));
+  _classnames = function () {
+    return data;
+  };
+
+  return data;
 }
 
-var _react = _interopRequireWildcard(require('react'));
+var React = _interopRequireWildcard(require("react"));
 
-var _string;
+function _string() {
+  const data = require("../../modules/nuclide-commons/string");
 
-function _load_string() {
-  return _string = require('../../modules/nuclide-commons/string');
+  _string = function () {
+    return data;
+  };
+
+  return data;
 }
 
-function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
+function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) { var desc = Object.defineProperty && Object.getOwnPropertyDescriptor ? Object.getOwnPropertyDescriptor(obj, key) : {}; if (desc.get || desc.set) { Object.defineProperty(newObj, key, desc); } else { newObj[key] = obj[key]; } } } } newObj.default = obj; return newObj; } }
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -33,26 +41,24 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
  * 
  * @format
  */
-
-const BadgeSizes = exports.BadgeSizes = Object.freeze({
+const BadgeSizes = Object.freeze({
   medium: 'medium',
   small: 'small',
   large: 'large'
 });
-
-const BadgeColors = exports.BadgeColors = Object.freeze({
+exports.BadgeSizes = BadgeSizes;
+const BadgeColors = Object.freeze({
   info: 'info',
   success: 'success',
   warning: 'warning',
   error: 'error'
 });
-
+exports.BadgeColors = BadgeColors;
 const BadgeSizeClassNames = Object.freeze({
   small: 'badge-small',
   medium: 'badge-medium',
   large: 'badge-large'
 });
-
 const BadgeColorClassNames = Object.freeze({
   info: 'badge-info',
   success: 'badge-success',
@@ -60,18 +66,24 @@ const BadgeColorClassNames = Object.freeze({
   error: 'badge-error'
 });
 
-const Badge = exports.Badge = props => {
-  const { className, color, icon, size, value } = props;
+const Badge = props => {
+  const {
+    className,
+    color,
+    icon,
+    size,
+    value
+  } = props;
   const sizeClassName = size == null ? '' : BadgeSizeClassNames[size] || '';
   const colorClassName = color == null ? '' : BadgeColorClassNames[color] || '';
-  const newClassName = (0, (_classnames || _load_classnames()).default)(className, 'badge', {
+  const newClassName = (0, _classnames().default)(className, 'badge', {
     [sizeClassName]: size != null,
     [colorClassName]: color != null,
-    [`icon icon-${(0, (_string || _load_string()).maybeToString)(icon)}`]: icon != null
+    [`icon icon-${(0, _string().maybeToString)(icon)}`]: icon != null
   });
-  return _react.createElement(
-    'span',
-    { className: newClassName },
-    value
-  );
+  return React.createElement("span", {
+    className: newClassName
+  }, value);
 };
+
+exports.Badge = Badge;

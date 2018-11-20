@@ -1,12 +1,10 @@
-'use strict';
+"use strict";
 
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-class MIRecord {}
+exports.MIResultRecord = exports.MIAsyncRecord = exports.MICommandResponseRecord = exports.MIStreamRecord = exports.MIRecord = void 0;
 
-exports.MIRecord = MIRecord; // A stream record represents output. It is not tied to a particular
-// command sent by the client.
 /**
  * Copyright (c) 2017-present, Facebook, Inc.
  * All rights reserved.
@@ -18,12 +16,15 @@ exports.MIRecord = MIRecord; // A stream record represents output. It is not tie
  * 
  * @format
  */
+class MIRecord {} // A stream record represents output. It is not tied to a particular
+// command sent by the client.
+
+
+exports.MIRecord = MIRecord;
 
 class MIStreamRecord extends MIRecord {
-
   constructor(streamTarget, text) {
     super();
-
     this._streamTarget = streamTarget;
     this._text = text;
   }
@@ -35,17 +36,17 @@ class MIStreamRecord extends MIRecord {
   get text() {
     return this._text;
   }
-}
 
-exports.MIStreamRecord = MIStreamRecord; // A command response record represents an event initiated by a command the
+} // A command response record represents an event initiated by a command the
 // client issued, either directly or indirectly. Command responses optionally
 // have a numeric token specified by the client when the command was issued.
 
-class MICommandResponseRecord extends MIRecord {
 
+exports.MIStreamRecord = MIStreamRecord;
+
+class MICommandResponseRecord extends MIRecord {
   constructor(token, result) {
     super();
-
     this._token = token;
     this._result = result;
   }
@@ -57,16 +58,16 @@ class MICommandResponseRecord extends MIRecord {
   get result() {
     return this._result;
   }
-}
 
-exports.MICommandResponseRecord = MICommandResponseRecord; // An async record represents an event that happened as a side effect of
+} // An async record represents an event that happened as a side effect of
 // a command, but is not the actual command result.
 
-class MIAsyncRecord extends MICommandResponseRecord {
 
+exports.MICommandResponseRecord = MICommandResponseRecord;
+
+class MIAsyncRecord extends MICommandResponseRecord {
   constructor(token, result, asyncClass, recordType) {
     super(token, result);
-
     this._asyncClass = asyncClass;
     this._recordType = recordType;
   }
@@ -78,15 +79,15 @@ class MIAsyncRecord extends MICommandResponseRecord {
   get recordType() {
     return this._recordType;
   }
-}
 
-exports.MIAsyncRecord = MIAsyncRecord; // A result record is the direct result of a command sent from the client
+} // A result record is the direct result of a command sent from the client
+
+
+exports.MIAsyncRecord = MIAsyncRecord;
 
 class MIResultRecord extends MICommandResponseRecord {
-
   constructor(token, result, resultClass) {
     super(token, result);
-
     this._resultClass = resultClass;
   }
 
@@ -105,5 +106,7 @@ class MIResultRecord extends MICommandResponseRecord {
   get running() {
     return this._resultClass === 'running';
   }
+
 }
+
 exports.MIResultRecord = MIResultRecord;

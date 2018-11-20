@@ -1,8 +1,10 @@
-'use strict';
+"use strict";
 
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
+exports.PACKAGE_NAME = exports.GRAMMAR_SET = exports.GRAMMARS = void 0;
+
 /**
  * Copyright (c) 2015-present, Facebook, Inc.
  * All rights reserved.
@@ -13,7 +15,9 @@ Object.defineProperty(exports, "__esModule", {
  *  strict
  * @format
  */
-
-const GRAMMARS = exports.GRAMMARS = ['source.python', 'python'];
-const GRAMMAR_SET = exports.GRAMMAR_SET = new Set(GRAMMARS);
-const PACKAGE_NAME = exports.PACKAGE_NAME = 'nuclide-python';
+const GRAMMARS = ['source.python', 'python'];
+exports.GRAMMARS = GRAMMARS;
+const GRAMMAR_SET = new Set(GRAMMARS);
+exports.GRAMMAR_SET = GRAMMAR_SET;
+const PACKAGE_NAME = 'nuclide-python';
+exports.PACKAGE_NAME = PACKAGE_NAME;

@@ -1,35 +1,62 @@
-'use strict';
+"use strict";
 
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.BigDigClient = undefined;
+exports.BigDigClient = void 0;
 
-var _rxjsBundlesRxMinJs = require('rxjs/bundles/Rx.min.js');
+var _rxjsCompatUmdMin = require("rxjs-compat/bundles/rxjs-compat.umd.min.js");
 
-var _log4js;
+function _log4js() {
+  const data = require("log4js");
 
-function _load_log4js() {
-  return _log4js = require('log4js');
+  _log4js = function () {
+    return data;
+  };
+
+  return data;
 }
 
-var _BigDigServer;
+function _BigDigServer() {
+  const data = require("../server/BigDigServer");
 
-function _load_BigDigServer() {
-  return _BigDigServer = require('../server/BigDigServer');
+  _BigDigServer = function () {
+    return data;
+  };
+
+  return data;
 }
 
-var _TunnelManager;
+function _types() {
+  const data = require("../services/thrift/types");
 
-function _load_TunnelManager() {
-  return _TunnelManager = require('../services/tunnel/TunnelManager');
+  _types = function () {
+    return data;
+  };
+
+  return data;
 }
 
-/**
- * This class is responsible for talking to a Big Dig server, which enables the
- * client to launch a remote process and communication with its stdin, stdout,
- * and stderr.
- */
+function _TunnelManager() {
+  const data = require("../services/tunnel/TunnelManager");
+
+  _TunnelManager = function () {
+    return data;
+  };
+
+  return data;
+}
+
+function _ThriftClientManager() {
+  const data = require("../services/thrift/ThriftClientManager");
+
+  _ThriftClientManager = function () {
+    return data;
+  };
+
+  return data;
+}
+
 /**
  * Copyright (c) 2017-present, Facebook, Inc.
  * All rights reserved.
@@ -42,13 +69,17 @@ function _load_TunnelManager() {
  * @format
  */
 
+/**
+ * This class is responsible for talking to a Big Dig server, which enables the
+ * client to launch a remote process and communication with its stdin, stdout,
+ * and stderr.
+ */
 class BigDigClient {
-
   constructor(reliableSocketTransport) {
-    this._logger = (0, (_log4js || _load_log4js()).getLogger)();
+    this._logger = (0, _log4js().getLogger)();
     this._transport = reliableSocketTransport;
     this._tagToSubject = new Map();
-    this._tunnelManager = new (_TunnelManager || _load_TunnelManager()).TunnelManager({
+    this._tunnelManager = new (_TunnelManager().TunnelManager)({
       onMessage: () => {
         return this.onMessage('tunnel');
       },
@@ -56,14 +87,24 @@ class BigDigClient {
         this.sendMessage('tunnel', message);
       }
     });
+    this._thriftClientManager = new (_ThriftClientManager().ThriftClientManager)({
+      onMessage: () => {
+        return this.onMessage(_types().THRIFT_SERVICE_TAG);
+      },
+      send: message => {
+        this.sendMessage(_types().THRIFT_SERVICE_TAG, message);
+      }
+    }, this._tunnelManager);
+    const observable = reliableSocketTransport.onMessage(); // eslint-disable-next-line nuclide-internal/unused-subscription
 
-    const observable = reliableSocketTransport.onMessage();
     observable.subscribe({
       // Must use arrow function so that `this` is bound correctly.
       next: message => {
         const index = message.indexOf('\0');
         const tag = message.substring(0, index);
+
         const subject = this._tagToSubject.get(tag);
+
         if (subject != null) {
           const body = message.substring(index + 1);
           subject.next(body);
@@ -71,12 +112,15 @@ class BigDigClient {
           this._logger.warn(`No one listening for tag "${tag}".`);
         }
       },
+
       error(err) {
         this._logger.error('Error received in ConnectionWrapper', err);
       },
+
       complete() {
         this._logger.error('ConnectionWrapper completed()?');
       }
+
     });
   }
 
@@ -88,34 +132,65 @@ class BigDigClient {
     return this._transport.onClose(callback);
   }
 
-  async createTunnel(localPort, remotePort) {
-    return this._tunnelManager.createTunnel(localPort, remotePort);
+  async createTunnel(localPort, remotePort, options = {}) {
+    const useIPv4 = options.useIPv4 || false;
+    const tunnelConfig = {
+      local: {
+        useIPv4,
+        port: localPort
+      },
+      remote: {
+        useIPv4,
+        port: remotePort
+      }
+    };
+
+    if (options.isReverse) {
+      return this._tunnelManager.createReverseTunnel(tunnelConfig);
+    } else {
+      return this._tunnelManager.createTunnel(tunnelConfig);
+    }
+  }
+
+  getOrCreateThriftClient(serviceConfig) {
+    return this._thriftClientManager.createThriftClient(serviceConfig);
   }
 
   close() {
     this._logger.info('close called');
+
     this._tunnelManager.close();
+
+    this._thriftClientManager.close();
+
     if (!this.isClosed()) {
-      this.sendMessage((_BigDigServer || _load_BigDigServer()).CLOSE_TAG, '');
+      this.sendMessage(_BigDigServer().CLOSE_TAG, '');
     }
+
     this._transport.close();
   }
 
   sendMessage(tag, body) {
     const message = `${tag}\0${body}`;
+
     if (this.isClosed()) {
       this._logger.warn(`Attempting to send message to ${this.getAddress()} on closed BigDigClient: ${message}`);
+
       return;
     }
+
     this._transport.send(message);
   }
 
   onMessage(tag) {
     let subject = this._tagToSubject.get(tag);
+
     if (subject == null) {
-      subject = new _rxjsBundlesRxMinJs.Subject();
+      subject = new _rxjsCompatUmdMin.Subject();
+
       this._tagToSubject.set(tag, subject);
     }
+
     return subject.asObservable();
   }
 
@@ -126,5 +201,7 @@ class BigDigClient {
   getAddress() {
     return this._transport.getAddress();
   }
+
 }
+
 exports.BigDigClient = BigDigClient;

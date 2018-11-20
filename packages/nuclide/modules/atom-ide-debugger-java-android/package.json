@@ -1,6 +1,6 @@
 {
   "name": "atom-ide-debugger-java-android",
-  "version": "0.7.1-dev",
+  "version": "0.7.3-dev",
   "main": "./main.js",
   "description": "Android Java Debugger for Atom IDE.",
   "author": "NEEDS OWNER",
@@ -32,20 +32,18 @@
   },
   "dependencies": {
     "async-to-generator": "1.1.0",
-    "atom-ide-debugger-java": "0.7.1-dev",
-    "nuclide-adb": "0.7.1-dev",
-    "nuclide-commons": "0.7.1-dev",
-    "nuclide-commons-atom": "0.7.1-dev",
-    "nuclide-commons-ui": "0.7.1-dev",
-    "nuclide-debugger-common": "0.7.1-dev",
+    "atom-ide-ui": "0.7.3-dev",
+    "idx": "1.2.0",
+    "nuclide-adb": "0.7.3-dev",
+    "nuclide-commons": "0.7.3-dev",
+    "nuclide-commons-atom": "0.7.3-dev",
+    "nuclide-commons-ui": "0.7.3-dev",
+    "nuclide-debugger-common": "0.7.3-dev",
     "nullthrows": "1.0.0",
-    "react": "16.3.2",
-    "rxjs": "5.5.5",
+    "react": "16.5.2",
+    "rxjs-compat": "6.3.3",
     "vscode-chrome-debug-core": "3.17.10",
     "vscode-debugadapter": "1.24.0",
     "vscode-nls": "2.0.2"
-  },
-  "package-deps": [
-    "atom-ide-ui"
-  ]
+  }
 }

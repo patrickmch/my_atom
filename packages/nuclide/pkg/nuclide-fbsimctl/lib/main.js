@@ -1,80 +1,145 @@
-'use strict';
+"use strict";
 
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.getDevices = getDevices;
+exports.observeIosDevices = observeIosDevices;
 
-var _rxjsBundlesRxMinJs = require('rxjs/bundles/Rx.min.js');
+function _expected() {
+  const data = require("../../../modules/nuclide-commons/expected");
 
-var _collection;
+  _expected = function () {
+    return data;
+  };
 
-function _load_collection() {
-  return _collection = require('../../../modules/nuclide-commons/collection');
+  return data;
 }
 
-var _shallowequal;
+var _rxjsCompatUmdMin = require("rxjs-compat/bundles/rxjs-compat.umd.min.js");
 
-function _load_shallowequal() {
-  return _shallowequal = _interopRequireDefault(require('shallowequal'));
+function _collection() {
+  const data = require("../../../modules/nuclide-commons/collection");
+
+  _collection = function () {
+    return data;
+  };
+
+  return data;
 }
 
-var _log4js;
+function _shallowequal() {
+  const data = _interopRequireDefault(require("shallowequal"));
 
-function _load_log4js() {
-  return _log4js = require('log4js');
+  _shallowequal = function () {
+    return data;
+  };
+
+  return data;
 }
 
-var _nuclideAnalytics;
+function _log4js() {
+  const data = require("log4js");
 
-function _load_nuclideAnalytics() {
-  return _nuclideAnalytics = require('../../nuclide-analytics');
+  _log4js = function () {
+    return data;
+  };
+
+  return data;
 }
 
-var _nuclideRemoteConnection;
+function _nuclideAnalytics() {
+  const data = require("../../../modules/nuclide-analytics");
 
-function _load_nuclideRemoteConnection() {
-  return _nuclideRemoteConnection = require('../../nuclide-remote-connection');
+  _nuclideAnalytics = function () {
+    return data;
+  };
+
+  return data;
+}
+
+function _nuclideRemoteConnection() {
+  const data = require("../../nuclide-remote-connection");
+
+  _nuclideRemoteConnection = function () {
+    return data;
+  };
+
+  return data;
 }
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-const poller = createPoller(); /**
-                                * Copyright (c) 2015-present, Facebook, Inc.
-                                * All rights reserved.
-                                *
-                                * This source code is licensed under the license found in the LICENSE file in
-                                * the root directory of this source tree.
-                                *
-                                * 
-                                * @format
-                                */
+/**
+ * Copyright (c) 2015-present, Facebook, Inc.
+ * All rights reserved.
+ *
+ * This source code is licensed under the license found in the LICENSE file in
+ * the root directory of this source tree.
+ *
+ *  strict-local
+ * @format
+ */
+// $FlowIgnore untyped import
+const poller = createPoller();
 
-function getDevices() {
+function observeIosDevices() {
   return poller;
 }
 
-function createPoller() {
-  return _rxjsBundlesRxMinJs.Observable.interval(2000).startWith(0).switchMap(() => _rxjsBundlesRxMinJs.Observable.defer(() => (0, (_nuclideRemoteConnection || _load_nuclideRemoteConnection()).getFbsimctlServiceByNuclideUri)('').getDevices()).catch(error => {
-    const friendlyError = new Error("Can't fetch iOS devices. Make sure that fbsimctl is in your $PATH and that it works properly.");
-    if (error.code !== 'ENOENT') {
-      (0, (_nuclideAnalytics || _load_nuclideAnalytics()).track)('nuclide-fbsimctl:error', { error });
-      (0, (_log4js || _load_log4js()).getLogger)().error(error);
-    } else {
-      // Keep the code so tooling higher up knows this is due to the tool missing.
-      friendlyError.code = 'ENOENT';
+function createPoller(serviceUri = '') {
+  return _rxjsCompatUmdMin.Observable.interval(2000).startWith(0).exhaustMap(() => {
+    const service = (0, _nuclideRemoteConnection().getFbsimctlServiceByNuclideUri)(serviceUri);
+
+    if (service == null) {
+      // Gracefully handle a lost remote connection
+      return _rxjsCompatUmdMin.Observable.of(_expected().Expect.pending());
     }
-    return _rxjsBundlesRxMinJs.Observable.of(friendlyError);
-  })).distinctUntilChanged((a, b) => {
-    if (Array.isArray(a) && Array.isArray(b)) {
-      return (0, (_collection || _load_collection()).arrayEqual)(a, b, (_shallowequal || _load_shallowequal()).default);
-    } else if (a instanceof Error && b instanceof Error) {
-      return a.message === b.message;
-    } else {
-      return false;
+
+    return _rxjsCompatUmdMin.Observable.fromPromise(service.getDevices()).map(devices => _expected().Expect.value(devices)).catch(error => {
+      let message;
+
+      if (error.code === 'ENOENT') {
+        message = "'fbsimctl' not found in $PATH.";
+      } else if (typeof error.message === 'string' && (error.message.includes('plist does not exist') || error.message.includes('No Xcode Directory at'))) {
+        message = "Xcode path is invalid, use 'xcode-select' in a terminal to select path to an Xcode installation.";
+      } else if ( // RPC call timed out
+      error.name === 'RpcTimeoutError' || // RPC call succeeded, but the fbsimctl call itself timed out
+      error.message === 'Timeout has occurred') {
+        message = 'Request timed out, retrying...';
+      } else if (error.message === 'Connection Closed') {
+        return _rxjsCompatUmdMin.Observable.of(_expected().Expect.pending());
+      } else {
+        message = error.message;
+      }
+
+      const newError = new Error("Can't fetch iOS devices. " + message); // $FlowIgnore
+
+      newError.originalError = error;
+      return _rxjsCompatUmdMin.Observable.of(_expected().Expect.error(newError));
+    });
+  }).distinctUntilChanged((a, b) => (0, _expected().expectedEqual)(a, b, (v1, v2) => (0, _collection().arrayEqual)(v1, v2, _shallowequal().default), (e1, e2) => e1.message === e2.message)).do(async value => {
+    if (value.isError) {
+      const {
+        error
+      } = value;
+      const logger = (0, _log4js().getLogger)('nuclide-fbsimctl');
+      let extras = {
+        error
+      };
+
+      try {
+        if ( // $FlowIgnore
+        error.originalError != null && // $FlowIgnore
+        error.originalError.code === 'ENOENT') {
+          const serverEnv = await (0, _nuclideRemoteConnection().getInfoServiceByNuclideUri)(serviceUri).getServerEnvironment();
+          extras = Object.assign({}, extras, {
+            pathEnv: serverEnv.PATH
+          });
+        }
+      } finally {
+        logger.warn(value.error.message);
+        (0, _nuclideAnalytics().track)('nuclide-fbsimctl:device-poller:error', extras);
+      }
     }
-  }).catch(error => {
-    (0, (_log4js || _load_log4js()).getLogger)().error(error);
-    return _rxjsBundlesRxMinJs.Observable.of([]);
   }).publishReplay(1).refCount();
 }

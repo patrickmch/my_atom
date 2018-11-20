@@ -1,27 +1,33 @@
-'use strict';
+"use strict";
 
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
 exports.updateState = updateState;
 exports.sendHttpRequest = sendHttpRequest;
-const UPDATE_STATE = exports.UPDATE_STATE = 'UPDATE_STATE'; /**
-                                                             * Copyright (c) 2015-present, Facebook, Inc.
-                                                             * All rights reserved.
-                                                             *
-                                                             * This source code is licensed under the license found in the LICENSE file in
-                                                             * the root directory of this source tree.
-                                                             *
-                                                             *  strict-local
-                                                             * @format
-                                                             */
+exports.SEND_REQUEST = exports.UPDATE_STATE = void 0;
 
-const SEND_REQUEST = exports.SEND_REQUEST = 'SEND_REQUEST';
+/**
+ * Copyright (c) 2015-present, Facebook, Inc.
+ * All rights reserved.
+ *
+ * This source code is licensed under the license found in the LICENSE file in
+ * the root directory of this source tree.
+ *
+ *  strict-local
+ * @format
+ */
+const UPDATE_STATE = 'UPDATE_STATE';
+exports.UPDATE_STATE = UPDATE_STATE;
+const SEND_REQUEST = 'SEND_REQUEST';
+exports.SEND_REQUEST = SEND_REQUEST;
 
 function updateState(state) {
   return {
     type: UPDATE_STATE,
-    payload: { state }
+    payload: {
+      state
+    }
   };
 }
 

@@ -1,19 +1,23 @@
-'use strict';
+"use strict";
 
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.WORKSPACE_VIEW_URI = undefined;
+exports.default = exports.WORKSPACE_VIEW_URI = void 0;
 
-var _HealthPaneItemComponent;
+function _HealthPaneItemComponent() {
+  const data = _interopRequireDefault(require("./ui/HealthPaneItemComponent"));
 
-function _load_HealthPaneItemComponent() {
-  return _HealthPaneItemComponent = _interopRequireDefault(require('./ui/HealthPaneItemComponent'));
+  _HealthPaneItemComponent = function () {
+    return data;
+  };
+
+  return data;
 }
 
-var _react = _interopRequireWildcard(require('react'));
+var React = _interopRequireWildcard(require("react"));
 
-function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
+function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) { var desc = Object.defineProperty && Object.getOwnPropertyDescriptor ? Object.getOwnPropertyDescriptor(obj, key) : {}; if (desc.get || desc.set) { Object.defineProperty(newObj, key, desc); } else { newObj[key] = obj[key]; } } } } newObj.default = obj; return newObj; } }
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -27,11 +31,10 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
  *  strict-local
  * @format
  */
+const WORKSPACE_VIEW_URI = 'atom://nuclide/health';
+exports.WORKSPACE_VIEW_URI = WORKSPACE_VIEW_URI;
 
-const WORKSPACE_VIEW_URI = exports.WORKSPACE_VIEW_URI = 'atom://nuclide/health';
-
-class HealthPaneItem extends _react.Component {
-
+class HealthPaneItem extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
@@ -56,9 +59,9 @@ class HealthPaneItem extends _react.Component {
 
   getIconName() {
     return 'dashboard';
-  }
+  } // Return false to prevent the tab getting split (since we only update a singleton health pane).
 
-  // Return false to prevent the tab getting split (since we only update a singleton health pane).
+
   copy() {
     return false;
   }
@@ -72,31 +75,34 @@ class HealthPaneItem extends _react.Component {
   }
 
   render() {
-    const { childProcessesTree, stats, domCounters } = this.state;
+    const {
+      childProcessesTree,
+      stats,
+      domCounters
+    } = this.state;
 
     if (stats == null) {
-      return _react.createElement('div', null);
+      return React.createElement("div", null);
     }
 
-    return _react.createElement(
-      'div',
-      {
-        // Need native-key-bindings and tabIndex={-1} to be able to copy paste
-        className: 'pane-item padded nuclide-health-pane-item native-key-bindings',
-        tabIndex: -1 },
-      _react.createElement((_HealthPaneItemComponent || _load_HealthPaneItemComponent()).default, {
-        cpuPercentage: stats.cpuPercentage,
-        heapPercentage: stats.heapPercentage,
-        memory: stats.rss,
-        activeHandles: stats.activeHandles,
-        activeRequests: stats.activeRequests,
-        activeHandlesByType: stats.activeHandlesByType,
-        attachedDomNodes: domCounters && domCounters.attachedNodes,
-        domNodes: domCounters && domCounters.nodes,
-        domListeners: domCounters && domCounters.jsEventListeners,
-        childProcessesTree: childProcessesTree
-      })
-    );
+    return React.createElement("div", {
+      // Need native-key-bindings and tabIndex={-1} to be able to copy paste
+      className: "pane-item padded nuclide-health-pane-item native-key-bindings",
+      tabIndex: -1
+    }, React.createElement(_HealthPaneItemComponent().default, {
+      cpuPercentage: stats.cpuPercentage,
+      heapPercentage: stats.heapPercentage,
+      memory: stats.rss,
+      activeHandles: stats.activeHandles,
+      activeRequests: stats.activeRequests,
+      activeHandlesByType: stats.activeHandlesByType,
+      attachedDomNodes: domCounters && domCounters.attachedNodes,
+      domNodes: domCounters && domCounters.nodes,
+      domListeners: domCounters && domCounters.jsEventListeners,
+      childProcessesTree: childProcessesTree
+    }));
   }
+
 }
+
 exports.default = HealthPaneItem;

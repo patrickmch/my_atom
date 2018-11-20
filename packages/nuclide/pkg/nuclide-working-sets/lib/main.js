@@ -1,52 +1,105 @@
-'use strict';
+"use strict";
 
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-exports.activate = activate;
-exports.deactivate = deactivate;
-exports.provideWorkingSetsStore = provideWorkingSetsStore;
+function _createPackage() {
+  const data = _interopRequireDefault(require("../../../modules/nuclide-commons-atom/createPackage"));
 
-var _UniversalDisposable;
+  _createPackage = function () {
+    return data;
+  };
 
-function _load_UniversalDisposable() {
-  return _UniversalDisposable = _interopRequireDefault(require('../../../modules/nuclide-commons/UniversalDisposable'));
+  return data;
 }
 
-var _nuclideAnalytics;
+function _event() {
+  const data = require("../../../modules/nuclide-commons/event");
 
-function _load_nuclideAnalytics() {
-  return _nuclideAnalytics = require('../../nuclide-analytics');
+  _event = function () {
+    return data;
+  };
+
+  return data;
 }
 
-var _nuclideUri;
+function _UniversalDisposable() {
+  const data = _interopRequireDefault(require("../../../modules/nuclide-commons/UniversalDisposable"));
 
-function _load_nuclideUri() {
-  return _nuclideUri = _interopRequireDefault(require('../../../modules/nuclide-commons/nuclideUri'));
+  _UniversalDisposable = function () {
+    return data;
+  };
+
+  return data;
 }
 
-var _WorkingSetsStore;
+var _rxjsCompatUmdMin = require("rxjs-compat/bundles/rxjs-compat.umd.min.js");
 
-function _load_WorkingSetsStore() {
-  return _WorkingSetsStore = require('./WorkingSetsStore');
+function _nuclideAnalytics() {
+  const data = require("../../../modules/nuclide-analytics");
+
+  _nuclideAnalytics = function () {
+    return data;
+  };
+
+  return data;
 }
 
-var _WorkingSetsConfig;
+function _nuclideUri() {
+  const data = _interopRequireDefault(require("../../../modules/nuclide-commons/nuclideUri"));
 
-function _load_WorkingSetsConfig() {
-  return _WorkingSetsConfig = require('./WorkingSetsConfig');
+  _nuclideUri = function () {
+    return data;
+  };
+
+  return data;
 }
 
-var _PathsObserver;
+function _WorkingSetsStore() {
+  const data = require("./WorkingSetsStore");
 
-function _load_PathsObserver() {
-  return _PathsObserver = require('./PathsObserver');
+  _WorkingSetsStore = function () {
+    return data;
+  };
+
+  return data;
 }
 
-var _constants;
+function _WorkingSetsConfig() {
+  const data = require("./WorkingSetsConfig");
 
-function _load_constants() {
-  return _constants = require('../../nuclide-working-sets-common/lib/constants');
+  _WorkingSetsConfig = function () {
+    return data;
+  };
+
+  return data;
+}
+
+function _PathsObserver() {
+  const data = require("./PathsObserver");
+
+  _PathsObserver = function () {
+    return data;
+  };
+
+  return data;
+}
+
+function _constants() {
+  const data = require("../../nuclide-working-sets-common/lib/constants");
+
+  _constants = function () {
+    return data;
+  };
+
+  return data;
+}
+
+function _extractDefinitionsFromProject() {
+  const data = _interopRequireDefault(require("./extractDefinitionsFromProject"));
+
+  _extractDefinitionsFromProject = function () {
+    return data;
+  };
+
+  return data;
 }
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
@@ -61,76 +114,76 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
  *  strict-local
  * @format
  */
-
+// $FlowFB
 class Activation {
-
   constructor() {
-    this.workingSetsStore = new (_WorkingSetsStore || _load_WorkingSetsStore()).WorkingSetsStore();
-    this._workingSetsConfig = new (_WorkingSetsConfig || _load_WorkingSetsConfig()).WorkingSetsConfig();
-    this._disposables = new (_UniversalDisposable || _load_UniversalDisposable()).default();
+    this._projectManagers = new _rxjsCompatUmdMin.BehaviorSubject();
+    this.workingSetsStore = new (_WorkingSetsStore().WorkingSetsStore)();
+    this._workingSetsConfig = new (_WorkingSetsConfig().WorkingSetsConfig)();
+    this._disposables = new (_UniversalDisposable().default)();
 
     this._disposables.add(this.workingSetsStore.onSaveDefinitions(definitions => {
       this._workingSetsConfig.setDefinitions(definitions);
     }));
 
     this._disposables.add(this._workingSetsConfig.observeDefinitions(definitions => {
-      this.workingSetsStore.updateDefinitions(definitions);
+      this.workingSetsStore.updateUserDefinitions(definitions);
+    }));
+
+    this._disposables.add(this._projectManagers.switchMap(projectManager => projectManager == null ? _rxjsCompatUmdMin.Observable.of(null) : (0, _event().observableFromSubscribeFunction)(cb => projectManager.observeActiveProjectSpec(cb))).subscribe(spec => {
+      this.workingSetsStore.updateProjectDefinitions((0, _extractDefinitionsFromProject().default)(spec));
+    }));
+
+    this._disposables.add(atom.project.onDidChangePaths(() => {
+      this.workingSetsStore.updateApplicability();
     }));
 
     this._disposables.add(atom.commands.add('atom-workspace', 'working-sets:toggle-last-selected', this.workingSetsStore.toggleLastSelected.bind(this.workingSetsStore)));
 
     this._disposables.add(atom.commands.add('atom-workspace', 'working-sets:find-in-active', findInActive));
 
-    this._disposables.add(new (_PathsObserver || _load_PathsObserver()).PathsObserver(this.workingSetsStore));
+    this._disposables.add(new (_PathsObserver().PathsObserver)(this.workingSetsStore));
   }
 
-  deactivate() {
+  dispose() {
     this._disposables.dispose();
   }
-}
 
-let activation = null;
-
-function activate() {
-  if (activation != null) {
-    return;
+  provideWorkingSetsStore() {
+    return this.workingSetsStore;
   }
 
-  activation = new Activation();
-}
+  consumeProjectManager(projectManager) {
+    this._projectManagers.next(projectManager);
 
-function deactivate() {
-  if (activation == null) {
-    return;
+    return new (_UniversalDisposable().default)(() => {
+      if (this._projectManagers.getValue() === projectManager) {
+        this._projectManagers.next(null);
+      }
+    });
   }
 
-  activation.deactivate();
-  activation = null;
-}
-
-function provideWorkingSetsStore() {
-  if (!activation) {
-    throw new Error('Was requested to provide service from a non-activated package');
-  }
-
-  return activation.workingSetsStore;
 }
 
 async function findInActive() {
   const activePane = atom.workspace.getActivePane().element;
   atom.commands.dispatch(activePane, 'project-find:show');
+  const allProjectsRemote = atom.project.getDirectories().every(dir => _nuclideUri().default.isRemote(dir.getPath()));
+  (0, _nuclideAnalytics().track)('find-in-working-set:hotkey', {
+    allProjectsRemote
+  });
 
-  const allProjectsRemote = atom.project.getDirectories().every(dir => (_nuclideUri || _load_nuclideUri()).default.isRemote(dir.getPath()));
-
-  (0, (_nuclideAnalytics || _load_nuclideAnalytics()).track)('find-in-working-set:hotkey', { allProjectsRemote });
   if (!allProjectsRemote) {
-    atom.notifications.addWarning("Working set searches don't yet work in local projects", { dismissable: true });
+    atom.notifications.addWarning("Working set searches don't yet work in local projects", {
+      dismissable: true
+    });
     return;
   }
 
   if (!atom.packages.isPackageActive('find-and-replace')) {
     await atom.packages.activatePackage('find-and-replace');
   }
+
   const findPackage = atom.packages.getActivePackage('find-and-replace');
 
   if (!findPackage) {
@@ -143,5 +196,7 @@ async function findInActive() {
     throw new Error('find-and-replace internals have changed - please update this code');
   }
 
-  view.pathsEditor.setText((_constants || _load_constants()).WORKING_SET_PATH_MARKER);
+  view.pathsEditor.setText(_constants().WORKING_SET_PATH_MARKER);
 }
+
+(0, _createPackage().default)(module.exports, Activation);

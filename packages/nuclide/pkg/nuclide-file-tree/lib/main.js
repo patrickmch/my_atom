@@ -1,107 +1,191 @@
-'use strict';
+"use strict";
 
-var _nuclideUri;
+function Actions() {
+  const data = _interopRequireWildcard(require("./redux/Actions"));
 
-function _load_nuclideUri() {
-  return _nuclideUri = _interopRequireDefault(require('../../../modules/nuclide-commons/nuclideUri'));
+  Actions = function () {
+    return data;
+  };
+
+  return data;
 }
 
-var _UniversalDisposable;
+function _nuclideUri() {
+  const data = _interopRequireDefault(require("../../../modules/nuclide-commons/nuclideUri"));
 
-function _load_UniversalDisposable() {
-  return _UniversalDisposable = _interopRequireDefault(require('../../../modules/nuclide-commons/UniversalDisposable'));
+  _nuclideUri = function () {
+    return data;
+  };
+
+  return data;
 }
 
-var _createPackage;
+function _UniversalDisposable() {
+  const data = _interopRequireDefault(require("../../../modules/nuclide-commons/UniversalDisposable"));
 
-function _load_createPackage() {
-  return _createPackage = _interopRequireDefault(require('../../../modules/nuclide-commons-atom/createPackage'));
+  _UniversalDisposable = function () {
+    return data;
+  };
+
+  return data;
 }
 
-var _event;
+function _createPackage() {
+  const data = _interopRequireDefault(require("../../../modules/nuclide-commons-atom/createPackage"));
 
-function _load_event() {
-  return _event = require('../../../modules/nuclide-commons/event');
+  _createPackage = function () {
+    return data;
+  };
+
+  return data;
 }
 
-var _featureConfig;
+function _event() {
+  const data = require("../../../modules/nuclide-commons/event");
 
-function _load_featureConfig() {
-  return _featureConfig = _interopRequireDefault(require('../../../modules/nuclide-commons-atom/feature-config'));
+  _event = function () {
+    return data;
+  };
+
+  return data;
 }
 
-var _disablePackage;
+function _featureConfig() {
+  const data = _interopRequireDefault(require("../../../modules/nuclide-commons-atom/feature-config"));
 
-function _load_disablePackage() {
-  return _disablePackage = _interopRequireDefault(require('../../commons-atom/disablePackage'));
+  _featureConfig = function () {
+    return data;
+  };
+
+  return data;
 }
 
-var _disablePackage2;
+function _disablePackage() {
+  const data = _interopRequireWildcard(require("../../commons-atom/disablePackage"));
 
-function _load_disablePackage2() {
-  return _disablePackage2 = require('../../commons-atom/disablePackage');
+  _disablePackage = function () {
+    return data;
+  };
+
+  return data;
 }
 
-var _viewableFromReactElement;
+function _observable() {
+  const data = require("../../../modules/nuclide-commons/observable");
 
-function _load_viewableFromReactElement() {
-  return _viewableFromReactElement = require('../../commons-atom/viewableFromReactElement');
+  _observable = function () {
+    return data;
+  };
+
+  return data;
 }
 
-var _observable;
+function _FileTreeContextMenu() {
+  const data = _interopRequireDefault(require("./FileTreeContextMenu"));
 
-function _load_observable() {
-  return _observable = require('../../../modules/nuclide-commons/observable');
+  _FileTreeContextMenu = function () {
+    return data;
+  };
+
+  return data;
 }
 
-var _FileTreeSidebarComponent;
+function Selectors() {
+  const data = _interopRequireWildcard(require("./redux/Selectors"));
 
-function _load_FileTreeSidebarComponent() {
-  return _FileTreeSidebarComponent = _interopRequireDefault(require('../components/FileTreeSidebarComponent'));
+  Selectors = function () {
+    return data;
+  };
+
+  return data;
 }
 
-var _FileTreeController;
+function _nuclideWorkingSetsCommon() {
+  const data = require("../../nuclide-working-sets-common");
 
-function _load_FileTreeController() {
-  return _FileTreeController = _interopRequireDefault(require('./FileTreeController'));
+  _nuclideWorkingSetsCommon = function () {
+    return data;
+  };
+
+  return data;
 }
 
-var _nuclideWorkingSetsCommon;
+function _Constants() {
+  const data = require("./Constants");
 
-function _load_nuclideWorkingSetsCommon() {
-  return _nuclideWorkingSetsCommon = require('../../nuclide-working-sets-common');
+  _Constants = function () {
+    return data;
+  };
+
+  return data;
 }
 
-var _Constants;
+function _destroyItemWhere() {
+  const data = require("../../../modules/nuclide-commons-atom/destroyItemWhere");
 
-function _load_Constants() {
-  return _Constants = require('./Constants');
+  _destroyItemWhere = function () {
+    return data;
+  };
+
+  return data;
 }
 
-var _destroyItemWhere;
+var _rxjsCompatUmdMin = require("rxjs-compat/bundles/rxjs-compat.umd.min.js");
 
-function _load_destroyItemWhere() {
-  return _destroyItemWhere = require('../../../modules/nuclide-commons-atom/destroyItemWhere');
+function _passesGK() {
+  const data = _interopRequireDefault(require("../../../modules/nuclide-commons/passesGK"));
+
+  _passesGK = function () {
+    return data;
+  };
+
+  return data;
 }
 
-var _react = _interopRequireWildcard(require('react'));
+function _registerCommands() {
+  const data = _interopRequireDefault(require("./registerCommands"));
 
-var _rxjsBundlesRxMinJs = require('rxjs/bundles/Rx.min.js');
+  _registerCommands = function () {
+    return data;
+  };
 
-var _passesGK;
-
-function _load_passesGK() {
-  return _passesGK = _interopRequireDefault(require('../../commons-node/passesGK'));
+  return data;
 }
 
-function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
+function _ProjectSelectionManager() {
+  const data = _interopRequireDefault(require("./ProjectSelectionManager"));
+
+  _ProjectSelectionManager = function () {
+    return data;
+  };
+
+  return data;
+}
+
+function _createStore() {
+  const data = _interopRequireDefault(require("./redux/createStore"));
+
+  _createStore = function () {
+    return data;
+  };
+
+  return data;
+}
+
+function _ViewModel() {
+  const data = _interopRequireDefault(require("./ViewModel"));
+
+  _ViewModel = function () {
+    return data;
+  };
+
+  return data;
+}
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-/**
- * Minimum interval (in ms) between onChangeActivePaneItem events before revealing the active pane
- * item in the file tree.
- */
+function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) { var desc = Object.defineProperty && Object.getOwnPropertyDescriptor ? Object.getOwnPropertyDescriptor(obj, key) : {}; if (desc.get || desc.set) { Object.defineProperty(newObj, key, desc); } else { newObj[key] = obj[key]; } } } } newObj.default = obj; return newObj; } }
+
 /**
  * Copyright (c) 2015-present, Facebook, Inc.
  * All rights reserved.
@@ -113,41 +197,50 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
  * @format
  */
 
+/**
+ * Minimum interval (in ms) between onChangeActivePaneItem events before revealing the active pane
+ * item in the file tree.
+ */
 const OPEN_FILES_UPDATE_DEBOUNCE_INTERVAL_MS = 150;
-
 const TERMINAL_CONTEXT_MENU_PRIORITY = 100;
-
 const DESERIALIZER_VERSION = atom.workspace.getLeftDock == null ? 1 : 2;
 
 class Activation {
-
+  // Has the package state been restored from a previous session?
   constructor(rawState) {
     let state = rawState || {};
-    const serializedVersionMatches =
-    // flowlint-next-line sketchy-null-mixed:off
+    const serializedVersionMatches = // flowlint-next-line sketchy-null-mixed:off
     (state.version || 1) === DESERIALIZER_VERSION;
+
     if (!serializedVersionMatches) {
       state = {};
     }
 
-    this._disposables = new (_UniversalDisposable || _load_UniversalDisposable()).default((0, (_disablePackage || _load_disablePackage()).default)('tree-view', { reason: (_disablePackage2 || _load_disablePackage2()).DisabledReason.REIMPLEMENTED }),
-    // This is a horrible hack to work around the fact that the tree view doesn't properly clean
+    this._disposables = new (_UniversalDisposable().default)((0, _disablePackage().default)('tree-view', {
+      reason: _disablePackage().DisabledReason.REIMPLEMENTED
+    }), // This is a horrible hack to work around the fact that the tree view doesn't properly clean
     // up after its views when disabled as soon as it's activated. See atom/tree-view#1136
-    (0, (_event || _load_event()).observableFromSubscribeFunction)(atom.workspace.observePaneItems.bind(atom.workspace))
-    // Wait for any post-addition work to be done by tree-view.
+    (0, _event().observableFromSubscribeFunction)(atom.workspace.observePaneItems.bind(atom.workspace)) // Wait for any post-addition work to be done by tree-view.
     // $FlowFixMe: Add `delayWhen` to RxJS defs
-    .delayWhen(() => (_observable || _load_observable()).macrotask).subscribe(item => {
+    .delayWhen(() => _observable().macrotask).subscribe(item => {
       if (item != null && typeof item.getURI === 'function' && item.getURI() === 'atom://tree-view' && atom.packages.isPackageDisabled('tree-view') && atom.workspace.paneForItem(item) && // Make sure it's still in the workspace.
       typeof item.destroy === 'function') {
         item.destroy();
       }
-    }), () => {
-      this._fileTreeController.destroy();
-    });
+    }));
+    const initialState = state == null ? null : state.tree;
+    this._store = (0, _createStore().default)();
 
-    this._fileTreeController = new (_FileTreeController || _load_FileTreeController()).default(state == null ? null : state.tree);
+    if (initialState != null) {
+      this._store.dispatch(Actions().loadData(initialState));
+    }
+
+    this._disposables.add((0, _registerCommands().default)(this._store));
+
+    this._store.dispatch(Actions().updateRootDirectories());
+
+    this._contextMenu = new (_FileTreeContextMenu().default)(this._store);
     this._restored = state.restored === true;
-
     const excludeVcsIgnoredPathsSetting = 'core.excludeVcsIgnoredPaths';
     const hideVcsIgnoredPathsSetting = 'nuclide-file-tree.hideVcsIgnoredPaths';
     const hideIgnoredNamesSetting = 'nuclide-file-tree.hideIgnoredNames';
@@ -157,89 +250,143 @@ class Activation {
     const autoExpandSingleChild = 'nuclide-file-tree.autoExpandSingleChild';
     const focusEditorOnFileSelection = 'nuclide-file-tree.focusEditorOnFileSelection';
 
-    this._disposables.add(this._fixContextMenuHighlight(), (_featureConfig || _load_featureConfig()).default.observe(prefixKeyNavSetting, x => this._setPrefixKeyNavSetting(x)), (_featureConfig || _load_featureConfig()).default.observeAsStream((_Constants || _load_Constants()).REVEAL_FILE_ON_SWITCH_SETTING).switchMap(shouldReveal => {
-      return shouldReveal ? this._currentActiveFilePath() : _rxjsBundlesRxMinJs.Observable.empty();
-    }).subscribe(filePath => this._fileTreeController.revealFilePath(filePath,
-    /* showIfHidden */false)), atom.config.observe(ignoredNamesSetting, x => this._setIgnoredNames(x)), (_featureConfig || _load_featureConfig()).default.observe(hideIgnoredNamesSetting, x => this._setHideIgnoredNames(x)), (_featureConfig || _load_featureConfig()).default.observe(hideVcsIgnoredPathsSetting, x => this._setHideVcsIgnoredPaths(x)), atom.config.observe(excludeVcsIgnoredPathsSetting, this._setExcludeVcsIgnoredPaths.bind(this)), atom.config.observe(allowPendingPaneItems, this._setUsePreviewTabs.bind(this)), (_featureConfig || _load_featureConfig()).default.observe(autoExpandSingleChild, this._setAutoExpandSingleChild.bind(this)), (_featureConfig || _load_featureConfig()).default.observe(focusEditorOnFileSelection, this._setFocusEditorOnFileSelection.bind(this)), atom.commands.add('atom-workspace', 'tree-view:toggle-focus', () => {
-      const component = this._fileTreeComponent;
-      if (component == null) {
+    this._disposables.add(this._fixContextMenuHighlight(), _featureConfig().default.observe(prefixKeyNavSetting, usePrefixNav => {
+      // config is void during startup, signifying no config yet
+      if (usePrefixNav == null) {
         return;
       }
-      if (component.isFocused()) {
+
+      this._store.dispatch(Actions().setUsePrefixNav(usePrefixNav));
+    }), _featureConfig().default.observeAsStream(_Constants().REVEAL_FILE_ON_SWITCH_SETTING).switchMap(shouldReveal => {
+      return shouldReveal ? this._currentActiveFilePath() : _rxjsCompatUmdMin.Observable.empty();
+    }).subscribe(filePath => {
+      this._store.dispatch(Actions().revealFilePath(filePath,
+      /* showIfHidden */
+      false));
+    }), atom.config.observe(ignoredNamesSetting, ignoredNames => {
+      let normalizedIgnoredNames;
+
+      if (ignoredNames === '') {
+        normalizedIgnoredNames = [];
+      } else if (typeof ignoredNames === 'string') {
+        normalizedIgnoredNames = [ignoredNames];
+      } else {
+        normalizedIgnoredNames = ignoredNames;
+      }
+
+      this._store.dispatch(Actions().setIgnoredNames(normalizedIgnoredNames));
+    }), _featureConfig().default.observe(hideIgnoredNamesSetting, hideIgnoredNames => {
+      this._store.dispatch(Actions().setHideIgnoredNames(hideIgnoredNames));
+    }), _featureConfig().default.observe(hideVcsIgnoredPathsSetting, hideVcsIgnoredPaths => {
+      this._store.dispatch(Actions().setHideVcsIgnoredPaths(hideVcsIgnoredPaths));
+    }), atom.config.observe(excludeVcsIgnoredPathsSetting, excludeVcsIgnoredPaths => {
+      this._store.dispatch(Actions().setExcludeVcsIgnoredPaths(excludeVcsIgnoredPaths));
+    }), atom.config.observe(allowPendingPaneItems, usePreviewTabs => {
+      // config is void during startup, signifying no config yet
+      if (usePreviewTabs == null) {
+        return;
+      }
+
+      this._store.dispatch(Actions().setUsePreviewTabs(usePreviewTabs));
+    }), _featureConfig().default.observe(autoExpandSingleChild, value => {
+      this._store.dispatch(Actions().setAutoExpandSingleChild(value === true));
+    }), _featureConfig().default.observe(focusEditorOnFileSelection, value => {
+      this._store.dispatch(Actions().setFocusEditorOnFileSelection(value));
+    }), atom.commands.add('atom-workspace', 'tree-view:toggle-focus', () => {
+      const viewModel = this._viewModel;
+
+      if (viewModel == null) {
+        return;
+      }
+
+      if (viewModel.isFocused()) {
         // Focus the center.
         const center = atom.workspace.getCenter ? atom.workspace.getCenter() : atom.workspace;
         center.getActivePane().activate();
       } else {
         // Focus the file tree.
-        component.focus();
+        viewModel.focus();
       }
     }), this._registerCommandAndOpener());
-  } // Has the package state been restored from a previous session?
-
+  }
 
   _fixContextMenuHighlight() {
     // Giant hack to fix the context menu highlight
     // For explanation, see https://github.com/atom/atom/pull/13266
-
-    const { showForEvent } = atom.contextMenu;
-    const disposables = new (_UniversalDisposable || _load_UniversalDisposable()).default(() => {
+    const {
+      showForEvent
+    } = atom.contextMenu;
+    const disposables = new (_UniversalDisposable().default)(() => {
       atom.contextMenu.showForEvent = showForEvent;
-    });
-    // $FlowIgnore: Undocumented API
+    }); // $FlowIgnore: Undocumented API
+
     atom.contextMenu.showForEvent = function (event) {
-      const sub = (_observable || _load_observable()).nextAnimationFrame.repeat(3).last().subscribe(() => {
+      const sub = _observable().nextAnimationFrame.repeat(3).last().subscribe(() => {
         showForEvent.call(atom.contextMenu, event);
         disposables.remove(sub);
       });
+
       disposables.add(sub);
     };
 
     return disposables;
+  } // Currently we only support one remoteTransferService at a time.
+
+
+  consumeRemoteFileTransfer(remoteTransferService) {
+    this._store.dispatch(Actions().gotRemoteTransferService(remoteTransferService));
+
+    return new (_UniversalDisposable().default)(() => {
+      this._store.dispatch(Actions().gotRemoteTransferService(null));
+    });
   }
 
   consumeTerminal(terminal) {
-    const contextMenu = this.getContextMenuForFileTree();
-    const terminalMenuSubscription = new (_UniversalDisposable || _load_UniversalDisposable()).default(contextMenu.addItemToShowInSection({
+    const contextMenu = this._contextMenu;
+    const terminalMenuSubscription = new (_UniversalDisposable().default)(contextMenu.addItemToShowInSection({
       label: 'New Terminal Here',
+
       callback() {
         const node = contextMenu.getSingleSelectedNode();
 
         if (!(node != null)) {
-          throw new Error('Invariant violation: "node != null"');
+          throw new Error("Invariant violation: \"node != null\"");
         }
 
-        const cwd = node.isContainer ? node.uri : (_nuclideUri || _load_nuclideUri()).default.dirname(node.uri);
-        terminal.open({ cwd });
+        const cwd = node.isContainer ? node.uri : _nuclideUri().default.dirname(node.uri);
+        terminal.open({
+          cwd
+        });
       },
+
       shouldDisplay() {
         const node = contextMenu.getSingleSelectedNode();
         return node != null && node.uri != null && node.uri.length > 0;
       }
+
     }, TERMINAL_CONTEXT_MENU_PRIORITY));
+
     this._disposables.add(terminalMenuSubscription);
 
     return terminalMenuSubscription;
   }
 
   consumeCwdApi(cwdApi) {
-    if (!this._fileTreeController) {
-      throw new Error('Invariant violation: "this._fileTreeController"');
-    }
-
     if (this._cwdApiSubscription != null) {
       this._cwdApiSubscription.dispose();
     }
-    const controller = this._fileTreeController;
-    controller.setCwdApi(cwdApi);
-    this._cwdApiSubscription = new (_UniversalDisposable || _load_UniversalDisposable()).default(() => controller.setCwdApi(null));
+
+    this._store.dispatch(Actions().setCwdApi(cwdApi));
+
+    this._cwdApiSubscription = new (_UniversalDisposable().default)(() => this._store.dispatch(Actions().setCwdApi(null)));
     return this._cwdApiSubscription;
   }
 
   consumeRemoteProjectsService(service) {
-    const controller = this._fileTreeController;
-    controller.setRemoteProjectsService(service);
-    return new (_UniversalDisposable || _load_UniversalDisposable()).default(() => {
-      controller.setRemoteProjectsService(null);
+    this._store.dispatch(Actions().setRemoteProjectsService(service));
+
+    return new (_UniversalDisposable().default)(() => {
+      this._store.dispatch(Actions().setRemoteProjectsService(null));
     });
   }
 
@@ -249,7 +396,7 @@ class Activation {
 
   serialize() {
     return {
-      tree: this._fileTreeController.serialize(),
+      tree: Selectors().serialize(this._store.getState()),
       restored: true,
       // Scrap our serialization when docks become available. Technically, we only need to scrap
       // the "restored" value, but this is simpler.
@@ -260,116 +407,68 @@ class Activation {
   }
 
   consumeWorkingSetsStore(workingSetsStore) {
-    this._fileTreeController.updateWorkingSetsStore(workingSetsStore);
-    this._fileTreeController.updateWorkingSet(workingSetsStore.getCurrent());
+    this._store.dispatch(Actions().updateWorkingSetsStore(workingSetsStore));
+
+    this._store.dispatch(Actions().updateWorkingSet(workingSetsStore.getCurrent()));
 
     const currentSubscription = workingSetsStore.subscribeToCurrent(currentWorkingSet => {
-      this._fileTreeController.updateWorkingSet(currentWorkingSet);
+      this._store.dispatch(Actions().updateWorkingSet(currentWorkingSet));
     });
+
     this._disposables.add(currentSubscription);
 
-    const rebuildSignals = _rxjsBundlesRxMinJs.Observable.merge(_rxjsBundlesRxMinJs.Observable.of(null), // None of the subscriptions below will trigger at startup.
-    (0, (_event || _load_event()).observableFromSubscribeFunction)(atom.workspace.onDidAddPaneItem.bind(atom.workspace)), (0, (_event || _load_event()).observableFromSubscribeFunction)(atom.workspace.onDidDestroyPaneItem.bind(atom.workspace)), (0, (_event || _load_event()).observableFromSubscribeFunction)(cb => atom.workspace.observeTextEditors(cb)).flatMap(textEditor => {
-      return (0, (_event || _load_event()).observableFromSubscribeFunction)(textEditor.onDidChangePath.bind(textEditor)).takeUntil((0, (_event || _load_event()).observableFromSubscribeFunction)(textEditor.onDidDestroy.bind(textEditor)));
-    })).let((0, (_observable || _load_observable()).fastDebounce)(OPEN_FILES_UPDATE_DEBOUNCE_INTERVAL_MS));
+    const rebuildSignals = _rxjsCompatUmdMin.Observable.merge(_rxjsCompatUmdMin.Observable.of(null), // None of the subscriptions below will trigger at startup.
+    (0, _event().observableFromSubscribeFunction)(atom.workspace.onDidAddPaneItem.bind(atom.workspace)), (0, _event().observableFromSubscribeFunction)(atom.workspace.onDidDestroyPaneItem.bind(atom.workspace)), (0, _event().observableFromSubscribeFunction)(cb => atom.workspace.observeTextEditors(cb)).flatMap(textEditor => {
+      return (0, _event().observableFromSubscribeFunction)(textEditor.onDidChangePath.bind(textEditor)).takeUntil((0, _event().observableFromSubscribeFunction)(textEditor.onDidDestroy.bind(textEditor)));
+    })).let((0, _observable().fastDebounce)(OPEN_FILES_UPDATE_DEBOUNCE_INTERVAL_MS));
 
     this._disposables.add(rebuildSignals.subscribe(() => {
       const openUris = atom.workspace.getTextEditors().filter(te => te.getPath() != null && te.getPath() !== '').map(te => te.getPath());
-      const openFilesWorkingSet = new (_nuclideWorkingSetsCommon || _load_nuclideWorkingSetsCommon()).WorkingSet(openUris);
-      this._fileTreeController.updateOpenFilesWorkingSet(openFilesWorkingSet);
+      const openFilesWorkingSet = new (_nuclideWorkingSetsCommon().WorkingSet)(openUris);
+
+      this._store.dispatch(Actions().updateOpenFilesWorkingSet(openFilesWorkingSet));
     }));
 
-    return new (_UniversalDisposable || _load_UniversalDisposable()).default(() => {
-      this._fileTreeController.updateWorkingSetsStore(null);
-      this._fileTreeController.updateWorkingSet(new (_nuclideWorkingSetsCommon || _load_nuclideWorkingSetsCommon()).WorkingSet());
-      this._fileTreeController.updateOpenFilesWorkingSet(new (_nuclideWorkingSetsCommon || _load_nuclideWorkingSetsCommon()).WorkingSet());
+    return new (_UniversalDisposable().default)(() => {
+      this._store.dispatch(Actions().updateWorkingSetsStore(null));
+
+      this._store.dispatch(Actions().updateWorkingSet(new (_nuclideWorkingSetsCommon().WorkingSet)()));
+
+      this._store.dispatch(Actions().updateOpenFilesWorkingSet(new (_nuclideWorkingSetsCommon().WorkingSet)()));
+
       this._disposables.remove(currentSubscription);
+
       currentSubscription.dispose();
     });
   }
 
-  _setExcludeVcsIgnoredPaths(excludeVcsIgnoredPaths) {
-    this._fileTreeController.setExcludeVcsIgnoredPaths(excludeVcsIgnoredPaths);
-  }
-
-  _setHideVcsIgnoredPaths(hideVcsIgnoredPaths) {
-    this._fileTreeController.setHideVcsIgnoredPaths(hideVcsIgnoredPaths);
-  }
-
-  _setHideIgnoredNames(hideIgnoredNames) {
-    this._fileTreeController.setHideIgnoredNames(hideIgnoredNames);
-  }
-
-  _setIgnoredNames(ignoredNames) {
-    let normalizedIgnoredNames;
-    if (ignoredNames === '') {
-      normalizedIgnoredNames = [];
-    } else if (typeof ignoredNames === 'string') {
-      normalizedIgnoredNames = [ignoredNames];
-    } else {
-      normalizedIgnoredNames = ignoredNames;
-    }
-    this._fileTreeController.setIgnoredNames(normalizedIgnoredNames);
-  }
-
   _currentActiveFilePath() {
-    const rawPathStream = (0, (_event || _load_event()).observableFromSubscribeFunction)(atom.workspace.onDidStopChangingActivePaneItem.bind(atom.workspace)).startWith(null).map(() => {
+    const rawPathStream = (0, _event().observableFromSubscribeFunction)(atom.workspace.onDidStopChangingActivePaneItem.bind(atom.workspace)).startWith(null).map(() => {
       const activePaneItem = atom.workspace.getActivePaneItem();
+
       if (activePaneItem == null || activePaneItem.getPath == null) {
         return null;
       }
 
       return activePaneItem.getPath();
     });
-
-    return (0, (_observable || _load_observable()).compact)(rawPathStream).distinctUntilChanged();
+    return (0, _observable().compact)(rawPathStream).distinctUntilChanged();
   }
 
-  _setPrefixKeyNavSetting(usePrefixNav) {
-    // config is void during startup, signifying no config yet
-    if (usePrefixNav == null || !this._fileTreeController) {
-      return;
-    }
-    this._fileTreeController.setUsePrefixNav(usePrefixNav);
+  provideContextMenuForFileTree() {
+    return this._contextMenu;
   }
 
-  _setUsePreviewTabs(usePreviewTabs) {
-    // config is void during startup, signifying no config yet
-    if (usePreviewTabs == null) {
-      return;
-    }
-    this._fileTreeController.setUsePreviewTabs(usePreviewTabs);
+  provideProjectSelectionManagerForFileTree() {
+    return new (_ProjectSelectionManager().default)(this._store);
   }
 
-  _setAutoExpandSingleChild(autoExpandSingleChild) {
-    this._fileTreeController.setAutoExpandSingleChild(autoExpandSingleChild === true);
-  }
-
-  _setFocusEditorOnFileSelection(focusEditorOnFileSelection) {
-    this._fileTreeController.setFocusEditorOnFileSelection(focusEditorOnFileSelection);
-  }
-
-  getContextMenuForFileTree() {
-    if (!this._fileTreeController) {
-      throw new Error('Invariant violation: "this._fileTreeController"');
-    }
-
-    return this._fileTreeController.getContextMenu();
-  }
-
-  getProjectSelectionManagerForFileTree() {
-    if (!this._fileTreeController) {
-      throw new Error('Invariant violation: "this._fileTreeController"');
-    }
-
-    return this._fileTreeController.getProjectSelectionManager();
-  }
-
-  getFileTreeAdditionalLogFilesProvider() {
+  provideFileTreeAdditionalLogFilesProvider() {
     return {
       id: 'nuclide-file-tree',
       getAdditionalLogFiles: expire => {
-        const fileTreeState = this._fileTreeController.collectDebugState();
+        const fileTreeState = Selectors().collectDebugState(this._store.getState());
+
         try {
           return Promise.resolve([{
             title: 'FileTreeState.json',
@@ -387,32 +486,34 @@ class Activation {
 
   _createView() {
     // Currently, we assume that only one will be created.
-    this._fileTreeComponent = (0, (_viewableFromReactElement || _load_viewableFromReactElement()).viewableFromReactElement)(_react.createElement((_FileTreeSidebarComponent || _load_FileTreeSidebarComponent()).default, null));
-    return this._fileTreeComponent;
+    this._viewModel = new (_ViewModel().default)(this._store);
+    return this._viewModel;
   }
 
   _registerCommandAndOpener() {
-    const disposable = new (_UniversalDisposable || _load_UniversalDisposable()).default(atom.workspace.addOpener(uri => {
-      if (uri === (_Constants || _load_Constants()).WORKSPACE_VIEW_URI) {
+    const disposable = new (_UniversalDisposable().default)(atom.workspace.addOpener(uri => {
+      if (uri === _Constants().WORKSPACE_VIEW_URI) {
         return this._createView();
       }
-    }), () => (0, (_destroyItemWhere || _load_destroyItemWhere()).destroyItemWhere)(item => item instanceof (_FileTreeSidebarComponent || _load_FileTreeSidebarComponent()).default), atom.commands.add('atom-workspace', 'tree-view:toggle', () => {
-      atom.workspace.toggle((_Constants || _load_Constants()).WORKSPACE_VIEW_URI);
+    }), () => (0, _destroyItemWhere().destroyItemWhere)(item => item instanceof _ViewModel().default), atom.commands.add('atom-workspace', 'tree-view:toggle', () => {
+      atom.workspace.toggle(_Constants().WORKSPACE_VIEW_URI);
     }));
-    (0, (_passesGK || _load_passesGK()).default)('nuclide_open_connect_menu_on_clean_startup').then(openConnectMenu => {
+    (0, _passesGK().default)('nuclide_open_connect_menu_on_clean_startup').then(openConnectMenu => {
       if (!this._restored) {
         if (!openConnectMenu) {
           // eslint-disable-next-line nuclide-internal/atom-apis
-          atom.workspace.open((_Constants || _load_Constants()).WORKSPACE_VIEW_URI, { searchAllPanes: true });
+          atom.workspace.open(_Constants().WORKSPACE_VIEW_URI, {
+            searchAllPanes: true
+          });
         } else {
-          (0, (_event || _load_event()).observableFromSubscribeFunction)(atom.project.onDidChangePaths.bind(atom.project)).startWith(null).map(() => atom.project.getPaths().length).pairwise().take(1).subscribe(([oldLength, newLength]) => {
+          disposable.add((0, _event().observableFromSubscribeFunction)(atom.project.onDidChangePaths.bind(atom.project)).startWith(null).map(() => atom.project.getPaths().length).pairwise().take(1).subscribe(([oldLength, newLength]) => {
             if (oldLength === 0 && newLength === 1) {
               // eslint-disable-next-line nuclide-internal/atom-apis
-              atom.workspace.open((_Constants || _load_Constants()).WORKSPACE_VIEW_URI, {
+              atom.workspace.open(_Constants().WORKSPACE_VIEW_URI, {
                 searchAllPanes: true
               });
             }
-          });
+          }));
         }
       }
     });
@@ -420,8 +521,14 @@ class Activation {
   }
 
   deserializeFileTreeSidebarComponent() {
-    return this._fileTreeComponent || this._createView();
+    return this._viewModel || this._createView();
+  } // Exported for testing
+
+
+  __getStore() {
+    return this._store;
   }
+
 }
 
-(0, (_createPackage || _load_createPackage()).default)(module.exports, Activation);
+(0, _createPackage().default)(module.exports, Activation);

@@ -1,24 +1,32 @@
-'use strict';
+"use strict";
 
-var _Dropdown;
+function _Dropdown() {
+  const data = require("../Dropdown");
 
-function _load_Dropdown() {
-  return _Dropdown = require('../Dropdown');
+  _Dropdown = function () {
+    return data;
+  };
+
+  return data;
 }
 
-var _react = _interopRequireWildcard(require('react'));
+var React = _interopRequireWildcard(require("react"));
 
-var _reactDom = _interopRequireDefault(require('react-dom'));
+var _reactDom = _interopRequireDefault(require("react-dom"));
 
-var _testUtils;
+function _testUtils() {
+  const data = _interopRequireDefault(require("react-dom/test-utils"));
 
-function _load_testUtils() {
-  return _testUtils = _interopRequireDefault(require('react-dom/test-utils'));
+  _testUtils = function () {
+    return data;
+  };
+
+  return data;
 }
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
+function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) { var desc = Object.defineProperty && Object.getOwnPropertyDescriptor ? Object.getOwnPropertyDescriptor(obj, key) : {}; if (desc.get || desc.set) { Object.defineProperty(newObj, key, desc); } else { newObj[key] = obj[key]; } } } } newObj.default = obj; return newObj; } }
 
 /**
  * Copyright (c) 2017-present, Facebook, Inc.
@@ -30,20 +38,28 @@ function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj;
  *
  *  strict-local
  * @format
+ * @emails oncall+nuclide
  */
-
-const { renderIntoDocument, scryRenderedDOMComponentsWithTag } = (_testUtils || _load_testUtils()).default;
+const {
+  renderIntoDocument,
+  scryRenderedDOMComponentsWithTag
+} = _testUtils().default;
 
 describe('Dropdown', () => {
   it('honors the value param', () => {
-    const component = renderIntoDocument(_react.createElement((_Dropdown || _load_Dropdown()).Dropdown, {
-      options: [{ label: 'foo', value: 'vfoo' }, { label: 'bar', value: 'vbar' }],
+    const component = renderIntoDocument(React.createElement(_Dropdown().Dropdown, {
+      options: [{
+        label: 'foo',
+        value: 'vfoo'
+      }, {
+        label: 'bar',
+        value: 'vbar'
+      }],
       onChange: newValue => {},
       value: 'vbar'
     }));
+    const button = scryRenderedDOMComponentsWithTag(component, 'button'); // $FlowFixMe
 
-    const button = scryRenderedDOMComponentsWithTag(component, 'button');
-    // $FlowFixMe
     expect(_reactDom.default.findDOMNode(button[0]).innerText).toBe('bar');
   });
 });

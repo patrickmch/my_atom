@@ -1,4 +1,4 @@
-'use strict';
+"use strict";
 
 /**
  * Copyright (c) 2015-present, Facebook, Inc.
@@ -10,13 +10,12 @@
  * 
  * @format
  */
-
 const theFunction = extraProp => {
   return {
     foo: 'bar',
     baz: extraProp
   };
-};
+}; // eslint-disable-next-line nuclide-internal/no-commonjs
 
-// eslint-disable-next-line nuclide-internal/no-commonjs
+
 module.exports = theFunction;

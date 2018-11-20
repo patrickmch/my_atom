@@ -6,25 +6,29 @@
  * the root directory of this source tree.
  *
  * @noflow
+ * @format
  */
 'use strict';
 
-/* eslint
-  comma-dangle: [1, always-multiline],
-  prefer-object-spread/prefer-object-spread: 0,
-  nuclide-internal/no-commonjs: 0,
-  */
+/* eslint nuclide-internal/no-commonjs: 0 */
 
 const path = require('path');
+const p = nuclidePath => path.resolve(__dirname, '..', nuclidePath);
 
 module.exports = {
   displayName: 'node',
-  rootDir: path.resolve(__dirname, '../../../'),
-  roots: ['<rootDir>/xplat/nuclide'],
+  rootDir: p(''),
+  roots: [p('')],
   testMatch: ['**/__tests__/**/*.js?(x)'],
   transform: {
-    '\\.js$': '<rootDir>/xplat/nuclide/modules/nuclide-jest/jestTransformer.js',
+    '\\.js$': p('jest/transform.js'),
   },
-  setupFiles: ['<rootDir>/xplat/nuclide/jest/setup.js'],
+  setupTestFrameworkScriptFile: p('jest/setupTestFrameworkScriptFile.node.js'),
+  setupFiles: [p('jest/setup.js')],
+  testRunner: require.resolve('jest-circus/runner'),
+  moduleNameMapper: {
+    electron: p('jest/__mocks__/emptyObject.js'),
+  },
   testPathIgnorePatterns: ['/node_modules/'],
+  reporters: require('./reporters.config'),
 };

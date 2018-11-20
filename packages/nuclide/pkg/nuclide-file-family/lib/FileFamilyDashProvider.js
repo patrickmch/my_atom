@@ -1,39 +1,65 @@
-'use strict';
+"use strict";
 
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
+exports.default = void 0;
 
-var _fuzzaldrinPlus;
+function _fuzzaldrinPlus() {
+  const data = _interopRequireDefault(require("fuzzaldrin-plus"));
 
-function _load_fuzzaldrinPlus() {
-  return _fuzzaldrinPlus = _interopRequireDefault(require('fuzzaldrin-plus'));
+  _fuzzaldrinPlus = function () {
+    return data;
+  };
+
+  return data;
 }
 
-var _matchIndexesToRanges;
+function _matchIndexesToRanges() {
+  const data = _interopRequireDefault(require("../../../modules/nuclide-commons/matchIndexesToRanges"));
 
-function _load_matchIndexesToRanges() {
-  return _matchIndexesToRanges = _interopRequireDefault(require('../../../modules/nuclide-commons/matchIndexesToRanges'));
+  _matchIndexesToRanges = function () {
+    return data;
+  };
+
+  return data;
 }
 
-var _UniversalDisposable;
+function _UniversalDisposable() {
+  const data = _interopRequireDefault(require("../../../modules/nuclide-commons/UniversalDisposable"));
 
-function _load_UniversalDisposable() {
-  return _UniversalDisposable = _interopRequireDefault(require('../../../modules/nuclide-commons/UniversalDisposable'));
+  _UniversalDisposable = function () {
+    return data;
+  };
+
+  return data;
 }
 
-var _rxjsBundlesRxMinJs = require('rxjs/bundles/Rx.min.js');
+var _rxjsCompatUmdMin = require("rxjs-compat/bundles/rxjs-compat.umd.min.js");
 
-var _FileFamilyUtils;
+function _FileFamilyUtils() {
+  const data = require("./FileFamilyUtils");
 
-function _load_FileFamilyUtils() {
-  return _FileFamilyUtils = require('./FileFamilyUtils');
+  _FileFamilyUtils = function () {
+    return data;
+  };
+
+  return data;
 }
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
+/**
+ * Copyright (c) 2015-present, Facebook, Inc.
+ * All rights reserved.
+ *
+ * This source code is licensed under the license found in the LICENSE file in
+ * the root directory of this source tree.
+ *
+ * 
+ * @format
+ */
 class FileFamilyDashProvider {
-
   constructor(aggregators, cwds) {
     this.debounceDelay = 0;
     this.display = {
@@ -46,55 +72,50 @@ class FileFamilyDashProvider {
     };
     this.prefix = 'alt';
     this.priority = 10;
-
     this._aggregators = aggregators;
     this._cwds = cwds;
   }
 
   executeQuery(query, queryContext, callback) {
     const aggregator = this._aggregators.getValue();
+
     if (aggregator == null) {
       callback([{
         type: 'generic',
         relevance: 1,
         primaryText: 'An error occurred. Please try again.'
       }]);
-      return new (_UniversalDisposable || _load_UniversalDisposable()).default();
+      return new (_UniversalDisposable().default)();
     }
 
     const activeUri = queryContext.focusedUri;
+
     if (activeUri == null) {
       callback([{
         type: 'generic',
         relevance: 1,
         primaryText: 'Open a file to retrieve alternates for it.'
       }]);
-      return new (_UniversalDisposable || _load_UniversalDisposable()).default();
+      return new (_UniversalDisposable().default)();
     }
 
-    const results = _rxjsBundlesRxMinJs.Observable.defer(() => aggregator.getRelatedFiles(activeUri)).map(graph => {
+    const results = _rxjsCompatUmdMin.Observable.defer(() => aggregator.getRelatedFiles(activeUri)).map(graph => {
       const cwd = this._cwds.getValue();
+
       const projectUri = cwd && cwd.getCwd();
-      return (0, (_FileFamilyUtils || _load_FileFamilyUtils()).getAlternatesFromGraph)(graph, activeUri).filter(uri => query === '' || (_fuzzaldrinPlus || _load_fuzzaldrinPlus()).default.score(uri, query) > 0).sort((a, b) => (_fuzzaldrinPlus || _load_fuzzaldrinPlus()).default.score(a, query) - (_fuzzaldrinPlus || _load_fuzzaldrinPlus()).default.score(b, query)).map(alternateUri => ({
+      return (0, _FileFamilyUtils().getAlternatesFromGraph)(graph, activeUri).filter(uri => query === '' || _fuzzaldrinPlus().default.score(uri, query) > 0).sort((a, b) => query === '' ? 0 : _fuzzaldrinPlus().default.score(a, query) - _fuzzaldrinPlus().default.score(b, query)).map(alternateUri => ({
         type: 'openable',
         uri: alternateUri,
-        uriMatchRanges: (0, (_matchIndexesToRanges || _load_matchIndexesToRanges()).default)((_fuzzaldrinPlus || _load_fuzzaldrinPlus()).default.match(alternateUri, query)),
+        uriMatchRanges: (0, _matchIndexesToRanges().default)(_fuzzaldrinPlus().default.match(alternateUri, query)),
         projectUri: projectUri != null && alternateUri.includes(projectUri) ? projectUri : null,
         openOptions: {},
         relevance: 1
       }));
     });
 
-    return new (_UniversalDisposable || _load_UniversalDisposable()).default(results.subscribe(callback));
+    return new (_UniversalDisposable().default)(results.subscribe(callback));
   }
+
 }
-exports.default = FileFamilyDashProvider; /**
-                                           * Copyright (c) 2015-present, Facebook, Inc.
-                                           * All rights reserved.
-                                           *
-                                           * This source code is licensed under the license found in the LICENSE file in
-                                           * the root directory of this source tree.
-                                           *
-                                           * 
-                                           * @format
-                                           */
+
+exports.default = FileFamilyDashProvider;

@@ -1,47 +1,73 @@
-'use strict';
+"use strict";
 
-var _UniversalDisposable;
+function _UniversalDisposable() {
+  const data = _interopRequireDefault(require("../../../modules/nuclide-commons/UniversalDisposable"));
 
-function _load_UniversalDisposable() {
-  return _UniversalDisposable = _interopRequireDefault(require('../../../modules/nuclide-commons/UniversalDisposable'));
+  _UniversalDisposable = function () {
+    return data;
+  };
+
+  return data;
 }
 
-var _createPackage;
+function _createPackage() {
+  const data = _interopRequireDefault(require("../../../modules/nuclide-commons-atom/createPackage"));
 
-function _load_createPackage() {
-  return _createPackage = _interopRequireDefault(require('../../../modules/nuclide-commons-atom/createPackage'));
+  _createPackage = function () {
+    return data;
+  };
+
+  return data;
 }
 
-var _rxjsBundlesRxMinJs = require('rxjs/bundles/Rx.min.js');
+var _rxjsCompatUmdMin = require("rxjs-compat/bundles/rxjs-compat.umd.min.js");
 
-var _StatusBar;
+function _StatusBar() {
+  const data = require("./StatusBar");
 
-function _load_StatusBar() {
-  return _StatusBar = require('./StatusBar');
+  _StatusBar = function () {
+    return data;
+  };
+
+  return data;
 }
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
+/**
+ * Copyright (c) 2015-present, Facebook, Inc.
+ * All rights reserved.
+ *
+ * This source code is licensed under the license found in the LICENSE file in
+ * the root directory of this source tree.
+ *
+ * 
+ * @format
+ */
 class Activation {
-
   constructor(state) {
-    this._disposables = new (_UniversalDisposable || _load_UniversalDisposable()).default();
-    this._navigationStackSubject = new _rxjsBundlesRxMinJs.ReplaySubject(1);
+    this._disposables = new (_UniversalDisposable().default)();
+    this._navigationStackSubject = new _rxjsCompatUmdMin.ReplaySubject(1);
+
     this._disposables.add(this._navigationStackSubject);
   }
 
   consumeNavigationStack(navigationStack) {
     this._navigationStackSubject.next(navigationStack);
-    return new (_UniversalDisposable || _load_UniversalDisposable()).default(() => {
+
+    return new (_UniversalDisposable().default)(() => {
       this._navigationStackSubject.next(null);
     });
   }
 
   consumeStatusBar(statusBar) {
-    const disposable = (0, (_StatusBar || _load_StatusBar()).consumeStatusBar)(statusBar, this._navigationStackSubject);
+    const disposable = (0, _StatusBar().consumeStatusBar)(statusBar, this._navigationStackSubject);
+
     this._disposables.add(disposable);
-    return new (_UniversalDisposable || _load_UniversalDisposable()).default(() => {
+
+    return new (_UniversalDisposable().default)(() => {
       disposable.dispose();
+
       this._disposables.remove(disposable);
     });
   }
@@ -49,15 +75,7 @@ class Activation {
   dispose() {
     this._disposables.dispose();
   }
-} /**
-   * Copyright (c) 2015-present, Facebook, Inc.
-   * All rights reserved.
-   *
-   * This source code is licensed under the license found in the LICENSE file in
-   * the root directory of this source tree.
-   *
-   * 
-   * @format
-   */
 
-(0, (_createPackage || _load_createPackage()).default)(module.exports, Activation);
+}
+
+(0, _createPackage().default)(module.exports, Activation);

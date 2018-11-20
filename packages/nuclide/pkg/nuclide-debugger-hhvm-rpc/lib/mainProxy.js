@@ -36,6 +36,18 @@ module.exports = _client => {
               kind: "number"
             },
             optional: true
+          }, {
+            name: "warnOnInterceptedFunctions",
+            type: {
+              kind: "boolean"
+            },
+            optional: true
+          }, {
+            name: "notifyOnBpCalibration",
+            type: {
+              kind: "boolean"
+            },
+            optional: true
           }]
         }, {
           kind: "object",
@@ -114,6 +126,18 @@ module.exports = _client => {
               kind: "boolean"
             },
             optional: true
+          }, {
+            name: "warnOnInterceptedFunctions",
+            type: {
+              kind: "boolean"
+            },
+            optional: true
+          }, {
+            name: "notifyOnBpCalibration",
+            type: {
+              kind: "boolean"
+            },
+            optional: true
           }]
         }],
         discriminantField: "action"
@@ -152,8 +176,8 @@ module.exports = _client => {
     });
   };
 
-  remoteModule.createLogFilePaste = function () {
-    return _client.callRemoteFunction("HhvmDebuggerService/createLogFilePaste", "promise", _client.marshalArguments(Array.from(arguments), [])).then(value => {
+  remoteModule.getDebugServerLog = function () {
+    return _client.callRemoteFunction("HhvmDebuggerService/getDebugServerLog", "promise", _client.marshalArguments(Array.from(arguments), [])).then(value => {
       return _client.unmarshal(value, {
         kind: "string"
       });
@@ -180,6 +204,19 @@ module.exports = _client => {
             optional: false
           }]
         }
+      });
+    });
+  };
+
+  remoteModule.terminateHhvmWrapperProcesses = function (arg0) {
+    return _client.callRemoteFunction("HhvmDebuggerService/terminateHhvmWrapperProcesses", "promise", _client.marshalArguments(Array.from(arguments), [{
+      name: "pid",
+      type: {
+        kind: "number"
+      }
+    }])).then(value => {
+      return _client.unmarshal(value, {
+        kind: "void"
       });
     });
   };
@@ -250,7 +287,7 @@ Object.defineProperty(module.exports, "defs", {
       location: {
         type: "source",
         fileName: "types.js",
-        line: 28
+        line: 30
       },
       name: "HHVMAttachConfig",
       definition: {
@@ -279,6 +316,18 @@ Object.defineProperty(module.exports, "defs", {
           name: "debugPort",
           type: {
             kind: "number"
+          },
+          optional: true
+        }, {
+          name: "warnOnInterceptedFunctions",
+          type: {
+            kind: "boolean"
+          },
+          optional: true
+        }, {
+          name: "notifyOnBpCalibration",
+          type: {
+            kind: "boolean"
           },
           optional: true
         }]
@@ -369,6 +418,18 @@ Object.defineProperty(module.exports, "defs", {
             kind: "boolean"
           },
           optional: true
+        }, {
+          name: "warnOnInterceptedFunctions",
+          type: {
+            kind: "boolean"
+          },
+          optional: true
+        }, {
+          name: "notifyOnBpCalibration",
+          type: {
+            kind: "boolean"
+          },
+          optional: true
         }]
       }
     },
@@ -378,13 +439,13 @@ Object.defineProperty(module.exports, "defs", {
       location: {
         type: "source",
         fileName: "main.js",
-        line: 29
+        line: 31
       },
       type: {
         location: {
           type: "source",
           fileName: "main.js",
-          line: 29
+          line: 31
         },
         kind: "function",
         argumentTypes: [{
@@ -417,6 +478,18 @@ Object.defineProperty(module.exports, "defs", {
                 name: "debugPort",
                 type: {
                   kind: "number"
+                },
+                optional: true
+              }, {
+                name: "warnOnInterceptedFunctions",
+                type: {
+                  kind: "boolean"
+                },
+                optional: true
+              }, {
+                name: "notifyOnBpCalibration",
+                type: {
+                  kind: "boolean"
                 },
                 optional: true
               }]
@@ -497,6 +570,18 @@ Object.defineProperty(module.exports, "defs", {
                   kind: "boolean"
                 },
                 optional: true
+              }, {
+                name: "warnOnInterceptedFunctions",
+                type: {
+                  kind: "boolean"
+                },
+                optional: true
+              }, {
+                name: "notifyOnBpCalibration",
+                type: {
+                  kind: "boolean"
+                },
+                optional: true
               }]
             }],
             discriminantField: "action"
@@ -517,13 +602,13 @@ Object.defineProperty(module.exports, "defs", {
       location: {
         type: "source",
         fileName: "main.js",
-        line: 55
+        line: 57
       },
       type: {
         location: {
           type: "source",
           fileName: "main.js",
-          line: 55
+          line: 57
         },
         kind: "function",
         argumentTypes: [{
@@ -548,13 +633,13 @@ Object.defineProperty(module.exports, "defs", {
       location: {
         type: "source",
         fileName: "main.js",
-        line: 180
+        line: 188
       },
       type: {
         location: {
           type: "source",
           fileName: "main.js",
-          line: 180
+          line: 188
         },
         kind: "function",
         argumentTypes: [],
@@ -569,19 +654,19 @@ Object.defineProperty(module.exports, "defs", {
         }
       }
     },
-    createLogFilePaste: {
+    getDebugServerLog: {
       kind: "function",
-      name: "createLogFilePaste",
+      name: "getDebugServerLog",
       location: {
         type: "source",
         fileName: "main.js",
-        line: 189
+        line: 197
       },
       type: {
         location: {
           type: "source",
           fileName: "main.js",
-          line: 189
+          line: 197
         },
         kind: "function",
         argumentTypes: [],
@@ -599,13 +684,13 @@ Object.defineProperty(module.exports, "defs", {
       location: {
         type: "source",
         fileName: "main.js",
-        line: 274
+        line: 290
       },
       type: {
         location: {
           type: "source",
           fileName: "main.js",
-          line: 274
+          line: 290
         },
         kind: "function",
         argumentTypes: [],
@@ -629,6 +714,35 @@ Object.defineProperty(module.exports, "defs", {
                 optional: false
               }]
             }
+          }
+        }
+      }
+    },
+    terminateHhvmWrapperProcesses: {
+      kind: "function",
+      name: "terminateHhvmWrapperProcesses",
+      location: {
+        type: "source",
+        fileName: "main.js",
+        line: 313
+      },
+      type: {
+        location: {
+          type: "source",
+          fileName: "main.js",
+          line: 313
+        },
+        kind: "function",
+        argumentTypes: [{
+          name: "pid",
+          type: {
+            kind: "number"
+          }
+        }],
+        returnType: {
+          kind: "promise",
+          type: {
+            kind: "void"
           }
         }
       }

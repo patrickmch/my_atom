@@ -1,44 +1,64 @@
-'use strict';
+"use strict";
 
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.POSIX_TOOLS = exports.WINDOWS_TOOLS = undefined;
 exports.resolveTool = resolveTool;
 exports.searchWithTool = searchWithTool;
+exports.POSIX_TOOLS = exports.WINDOWS_TOOLS = void 0;
 
-var _promise;
+function _promise() {
+  const data = require("../../../modules/nuclide-commons/promise");
 
-function _load_promise() {
-  return _promise = require('../../../modules/nuclide-commons/promise');
+  _promise = function () {
+    return data;
+  };
+
+  return data;
 }
 
-var _os = _interopRequireDefault(require('os'));
+var _os = _interopRequireDefault(require("os"));
 
-var _which;
+function _which() {
+  const data = _interopRequireDefault(require("../../../modules/nuclide-commons/which"));
 
-function _load_which() {
-  return _which = _interopRequireDefault(require('../../../modules/nuclide-commons/which'));
+  _which = function () {
+    return data;
+  };
+
+  return data;
 }
 
-var _rxjsBundlesRxMinJs = require('rxjs/bundles/Rx.min.js');
+var _rxjsCompatUmdMin = require("rxjs-compat/bundles/rxjs-compat.umd.min.js");
 
-var _AckHandler;
+function _AckHandler() {
+  const data = require("./AckHandler");
 
-function _load_AckHandler() {
-  return _AckHandler = require('./AckHandler');
+  _AckHandler = function () {
+    return data;
+  };
+
+  return data;
 }
 
-var _GrepHandler;
+function _GrepHandler() {
+  const data = require("./GrepHandler");
 
-function _load_GrepHandler() {
-  return _GrepHandler = require('./GrepHandler');
+  _GrepHandler = function () {
+    return data;
+  };
+
+  return data;
 }
 
-var _RgHandler;
+function _RgHandler() {
+  const data = require("./RgHandler");
 
-function _load_RgHandler() {
-  return _RgHandler = require('./RgHandler');
+  _RgHandler = function () {
+    return data;
+  };
+
+  return data;
 }
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
@@ -53,29 +73,31 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
  * 
  * @format
  */
-
-const WINDOWS_TOOLS = exports.WINDOWS_TOOLS = ['rg', 'grep'];
-const POSIX_TOOLS = exports.POSIX_TOOLS = ['rg', 'ack', 'grep'];
-
+const WINDOWS_TOOLS = ['rg', 'grep'];
+exports.WINDOWS_TOOLS = WINDOWS_TOOLS;
+const POSIX_TOOLS = ['rg', 'ack', 'grep'];
+exports.POSIX_TOOLS = POSIX_TOOLS;
 const searchToolHandlers = Object.freeze({
-  ack: (_AckHandler || _load_AckHandler()).search,
-  rg: (_RgHandler || _load_RgHandler()).search,
-  grep: (_GrepHandler || _load_GrepHandler()).search
+  ack: _AckHandler().search,
+  rg: _RgHandler().search,
+  grep: _GrepHandler().search
 });
 
 async function resolveTool(tool) {
   if (tool != null) {
     return tool;
   }
-  return (0, (_promise || _load_promise()).asyncFind)(_os.default.platform() === 'win32' ? WINDOWS_TOOLS : POSIX_TOOLS, t => (0, (_which || _load_which()).default)(t).then(cmd => cmd != null ? t : null));
+
+  return (0, _promise().asyncFind)(_os.default.platform() === 'win32' ? WINDOWS_TOOLS : POSIX_TOOLS, t => (0, _which().default)(t).then(cmd => cmd != null ? t : null));
 }
 
 function searchWithTool(tool, params) {
-  return _rxjsBundlesRxMinJs.Observable.defer(() => resolveTool(tool)).switchMap(actualTool => {
+  return _rxjsCompatUmdMin.Observable.defer(() => resolveTool(tool)).switchMap(actualTool => {
     if (actualTool != null) {
       const handler = searchToolHandlers[actualTool];
       return handler(params);
     }
-    return _rxjsBundlesRxMinJs.Observable.empty();
+
+    return _rxjsCompatUmdMin.Observable.empty();
   });
 }

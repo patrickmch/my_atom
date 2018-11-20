@@ -1,16 +1,11 @@
-'use strict';
+"use strict";
 
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
 exports.f = f;
+exports.C = void 0;
 
-
-// Use ImportedType from another file - testing, multiple
-// imports the same file.
-function f(x) {}
-
-// Non-RPC compatible types are fine, as long as they're not used.
 /**
  * Copyright (c) 2015-present, Facebook, Inc.
  * All rights reserved.
@@ -21,6 +16,11 @@ function f(x) {}
  *  strict
  * @format
  */
+// Use ImportedType from another file - testing, multiple
+// imports the same file.
+// Non-RPC compatible types are fine, as long as they're not used.
+function f(x) {}
 
 class C {}
+
 exports.C = C;

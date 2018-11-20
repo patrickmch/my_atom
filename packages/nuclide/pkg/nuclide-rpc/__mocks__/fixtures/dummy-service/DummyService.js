@@ -1,4 +1,4 @@
-'use strict';
+"use strict";
 
 Object.defineProperty(exports, "__esModule", {
   value: true
@@ -11,6 +11,7 @@ exports.c = c;
 exports.d = d;
 exports.error = error;
 exports.kill = kill;
+
 /**
  * Copyright (c) 2015-present, Facebook, Inc.
  * All rights reserved.
@@ -21,7 +22,6 @@ exports.kill = kill;
  *  strict
  * @format
  */
-
 function binarysystems() {
   throw new Error('RPC stub');
 }
@@ -33,12 +33,15 @@ function polarbears() {
 function a() {
   throw new Error('RPC stub');
 }
+
 function b() {
   throw new Error('RPC stub');
 }
+
 function c() {
   throw new Error('RPC stub');
 }
+
 function d() {
   throw new Error('RPC stub');
 }

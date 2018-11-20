@@ -1,37 +1,46 @@
-'use strict';
+"use strict";
 
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.BUFFER_SIZE_LIMIT = undefined;
 exports.observeGrepLikeProcess = observeGrepLikeProcess;
 exports.mergeOutputToResults = mergeOutputToResults;
+exports.BUFFER_SIZE_LIMIT = void 0;
 
-var _collection;
+function _collection() {
+  const data = require("../../../modules/nuclide-commons/collection");
 
-function _load_collection() {
-  return _collection = require('../../../modules/nuclide-commons/collection');
+  _collection = function () {
+    return data;
+  };
+
+  return data;
 }
 
-var _process;
+function _process() {
+  const data = require("../../../modules/nuclide-commons/process");
 
-function _load_process() {
-  return _process = require('../../../modules/nuclide-commons/process');
+  _process = function () {
+    return data;
+  };
+
+  return data;
 }
 
-var _UniversalDisposable;
+function _UniversalDisposable() {
+  const data = _interopRequireDefault(require("../../../modules/nuclide-commons/UniversalDisposable"));
 
-function _load_UniversalDisposable() {
-  return _UniversalDisposable = _interopRequireDefault(require('../../../modules/nuclide-commons/UniversalDisposable'));
+  _UniversalDisposable = function () {
+    return data;
+  };
+
+  return data;
 }
 
-var _rxjsBundlesRxMinJs = require('rxjs/bundles/Rx.min.js');
+var _rxjsCompatUmdMin = require("rxjs-compat/bundles/rxjs-compat.umd.min.js");
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-const BUFFER_SIZE_LIMIT = exports.BUFFER_SIZE_LIMIT = 1000 * 1000 * 50; // 50 MB
-
-// Grep and related tools (ack, rg) have exit code 1 with no results.
 /**
  * Copyright (c) 2015-present, Facebook, Inc.
  * All rights reserved.
@@ -42,51 +51,67 @@ const BUFFER_SIZE_LIMIT = exports.BUFFER_SIZE_LIMIT = 1000 * 1000 * 50; // 50 MB
  * 
  * @format
  */
+const BUFFER_SIZE_LIMIT = 1000 * 1000 * 50; // 50 MB
+// Grep and related tools (ack, rg) have exit code 1 with no results.
+
+exports.BUFFER_SIZE_LIMIT = BUFFER_SIZE_LIMIT;
 
 function observeGrepLikeProcess(command, args, cwd) {
-  return (0, (_process || _load_process()).observeProcess)(command, args, {
+  return (0, _process().observeProcess)(command, args, {
     cwd,
     maxBuffer: BUFFER_SIZE_LIMIT,
     // An exit code of 0 or 1 is normal for grep-like tools.
-    isExitError: ({ exitCode, signal }) => {
-      return (
-        // flowlint-next-line sketchy-null-string:off
+    isExitError: ({
+      exitCode,
+      signal
+    }) => {
+      return (// flowlint-next-line sketchy-null-string:off
         !signal && (exitCode == null || exitCode > 1)
       );
     }
   });
-}
+} // Parse each line of output and construct code search results.
 
-// Parse each line of output and construct code search results.
+
 function mergeOutputToResults(processOutput, parse, regex, leadingLines, trailingLines) {
   const parsedResults = processOutput.concatMap(parse).publish();
-  return _rxjsBundlesRxMinJs.Observable.create(observer => {
-    const subscription = parsedResults.buffer(parsedResults.distinct(result => result.file).concat(_rxjsBundlesRxMinJs.Observable.of(null))).concatMap(results => {
+  return _rxjsCompatUmdMin.Observable.create(observer => {
+    const subscription = parsedResults.buffer(parsedResults.distinct(result => result.file).concat(_rxjsCompatUmdMin.Observable.of(null))).concatMap(results => {
       // Build map from line number to line contents.
-      const lineMap = new Map(results.map(line => [line.row, line.line]));
-      // Return array of line contents for lines [fr, to). Skip undefined lines.
+      const lineMap = new Map(results.map(line => [line.row, line.line])); // Return array of line contents for lines [fr, to). Skip undefined lines.
+
       function getLines(fr, to) {
         const lineContents = [];
+
         for (let _line = fr; _line < to; _line++) {
           const t = lineMap.get(_line);
+
           if (t != null) {
             lineContents.push(t);
           }
         }
+
         return lineContents;
-      }
-      // run input regex on each line and emit CodeSearchResult for each match
-      return _rxjsBundlesRxMinJs.Observable.from((0, (_collection || _load_collection()).arrayFlatten)(results.map(parseResult => {
-        const { file, row, line } = parseResult;
+      } // run input regex on each line and emit CodeSearchResult for each match
+
+
+      return _rxjsCompatUmdMin.Observable.from((0, _collection().arrayFlatten)(results.map(parseResult => {
+        const {
+          file,
+          row,
+          line
+        } = parseResult;
         const allMatches = [];
-        let match;
-        while ((match = regex.exec(line)) != null) {
+        let match = regex.exec(line);
+
+        while (match != null) {
           // Some invalid regex (e.g. /||/g) will always match,
           // but with an empty match string, so the exec loop becomes infinite.
           // Check for this case and abort early.
           if (match[0].length === 0) {
             break;
           }
+
           allMatches.push({
             file,
             row,
@@ -96,16 +121,20 @@ function mergeOutputToResults(processOutput, parse, regex, leadingLines, trailin
             leadingContext: getLines(row - leadingLines, row),
             trailingContext: getLines(row + 1, row + trailingLines + 1)
           });
+
           if (!regex.global) {
             // looping exec on a non-global regex is an infinite loop.
             break;
           }
+
+          match = regex.exec(line);
         }
+
         regex.lastIndex = 0;
         return allMatches;
       })));
     }).subscribe(observer);
     const processSubscription = parsedResults.connect();
-    return new (_UniversalDisposable || _load_UniversalDisposable()).default(subscription, processSubscription);
+    return new (_UniversalDisposable().default)(subscription, processSubscription);
   });
 }
