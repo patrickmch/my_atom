@@ -1,0 +1,431 @@
+diff --git a/nols_website/payment/templates/payment/balance_pay.html b/nols_website/payment/templates/payment/balance_pay.html
+index a41e70bee..187b29eb4 100644
+--- a/nols_website/payment/templates/payment/balance_pay.html
++++ b/nols_website/payment/templates/payment/balance_pay.html
+@@ -1,395 +1,80 @@
+ {% extends "core/account/form_base.html" %}
+ {% load payment_tools %}
+ {% load humanize %}
++{% load static %}
+ 
+ {% block title %}{{ block.super }} - Balance Payment{% endblock %}
+ {% block page_header_text %}Balance Payment{% endblock %}
+ 
+ {% block content %}
+     <div class="row column small-12 medium-8">
+     {% with tution=details.tuition|stringformat:".02f" due_date_str=details.due_date|date:"D M d, Y" tpp_amount=details.tpp_amount|stringformat:".02f" total_with_tpp=details.total_with_tpp|stringformat:".02f" total_without_tpp=details.total_due|stringformat:".02f" %}
+         <h2 class="wmi-balance-pay">{{ details.description }} balance due: $<span
+                 id="total_header">{{ total_with_tpp|floatformat:2|intcomma }}</span></h2>
+         <form action="." method="post" class="widelabel">
+             <fieldset>
+                 <legend>Payment</legend>
+                 <div>
+                     <p>Your balance {% if details.past_due %}was{% else %}is{% endif %}
+                        due <strong>{{ due_date_str }}</strong>
+                     </p>
+                 </div>
+-                {% if details.offers_tpp %}
++                {% if not details.offers_tpp %}
++                <div id="payment_form"
++                    {% if not details.offers_tpp %}style="display:block;"{% endif %}>
++                    {% include "std_form_layout.html" %}
++                    <br/>
++                </div>
++                {% else %}
+                     <table id="line_items">
+                         <tr>
+                             <td id="description">{{ details.description }}</td>
+-                            <td class="tpp_amount">&nbsp;&nbsp;$</td>
+                             <td id="tuition_amt"
+-                                class="tpp_amount">{{ total_without_tpp|floatformat:2|intcomma  }}</td>
+-                        </tr>
+-                        <tr id="tpp_row" class="tpp_data">
+-                            <td>Tuition Protection Plan</td>
+-                            <td class="tpp_amount">&nbsp;&nbsp;$</td>
+-                            <td id="tpp_display" class="tpp_amount">{{ tpp_amount|floatformat:2|intcomma  }}</td>
++                                class="tpp_amount">${{ total_without_tpp|floatformat:2|intcomma  }}</td>
+                         </tr>
+                         <tr id="tpp_subtotal_line" class="tpp_data">
+                             <td colspan="3"><hr/></td>
+                         </tr>
+                         <tr id="tpp_amount_to_pay" class="tpp_data">
+                             <td>Amount to pay:</td>
+-                            <td class="tpp_amount">&nbsp;&nbsp;$</td>
+                             <td id="total_amt"
+-                                class="tpp_amount">{{ total_with_tpp|floatformat:2|intcomma  }}</td>
++                                class="tpp_amount">${{ total_with_tpp|floatformat:2|intcomma  }}</td>
+                         </tr>
+                     </table>
+ 
+-                {% endif %}
+-                <div id="payment_form"
+-                    {% if not details.offers_tpp %}style="display:block;"{% endif %}>
+-                    {% include "std_form_layout.html" %}
+-                    <br/>
+-                </div>
+-                {% if details.offers_tpp %}
+-                    <div id="tpp_text" class="tpp_offered">
+-                        <p>Your balance can be protected with a Tuition Protection Plan.</p>
+-                        <p>Please fill in your information to see if you qualify.</p>
+-                    </div>
+-                    <br>
+-                    {% with form=tpp_form %}
+-                        {% include 'std_form_layout.html' %}
+-                    {% endwith %}
+ 
+-                    <div id="specific_tpp_document" class="tpp_data" style="display:none; margin:2.5em">
+-                        <p>
+-                            The Tuition Protection Plan costs six percent of the total
+-                            tuition and is provided by Aon Affinity. The plan helps to
+-                            protect against tuition loss should you be unable to participate
+-                            or complete your course due to an injury or illness to yourself
+-                            or your immediate family. Additionally, this plan may help to
+-                            pay for evacuation costs from the course location.
+-                        </p>
+-                        <br>
+-                        <p>
+-                            NOLS strongly recommends the Tuition Protection Plan to
+-                            safeguard your investment in&nbsp;tuition.
+-                        </p>
+-                        <br>
+-                        <p>
+-                            AmeriCorps Awards are not reimbursable under this plan nor through NOLS.
+-                        </p>
+-                        <br>
+-                        <p>
+-                        <a id="specific_tpp_link" href="#" target="_">Click to see plan details</a>.
+-                            Please read carefully the exclusions in the plan document for
+-                            activities that may not be covered. The Tuition Protection Plan
+-                            coverage begins at 12:01 a.m. following the date the account
+-                            balance including tuition protection is paid. The Tuition
+-                            Protection Plan payment is non-refundable and not transferable.
+-                        </p>
+-                        <br>
+-                        <p>The cost of this plan is <strong>${{ tpp_amount }}</strong>.</p>
+-                        <p>Your balance with<span id="with_or_without" style="display:inline">out</span>
+-                            the Tuition Protection Plan would be
+-                            <strong>$<span id="tpp_display_cost">{{ total_without_tpp }}</span></strong>.</p>
+-                        <br>
+-                        <div id="tpp_yes" class="button button--medium float-right tpp_action tpp_data yes">
+-                          <span>Accept Tuition Protection</span>
++                      <h2>Tuition Protection Plan</h2>
++                      <div>
++                        The Tuition Protection Plan is only available in certain locations. Please fill in your information to see if you qualify.
++                      </div>
++                      <div class="row column hide" id="ajax-form-wrapper">
++                        <div>
++                          {% with label_columns=-1 input_columns=6 form=tpp_form %}
++                            {% include 'bs_responsive_form_layout.html' %}
++                          {% endwith %}
+                         </div>
+-                        <div id="tpp_no" class="button button--hollow button--medium float-left tpp_action tpp_data no">
+-                          <span>Decline Tuition Protection</span>
+-                       </div>
+-                        <input type="hidden" name="tpp_accepted" id="tpp_accepted" value="DECL">
+-                        <input type="hidden" name="tpp_location" id="tpp_location" value="">
+-                    </div>
+-
+-                    <div id="confirm_dialog" class="tpp_dialog">
+-                        <p>Are you sure you want to decline the Tuition Protection Plan?</p>
+-                        <input type="button" id="no_btn" class="button button--hollow float-left tpp_dialog_btn" value="No"/>
+-                        <input type="button" id="yes_btn" class="button float-right tpp_dialog_btn" value="Yes"/>
+-                    </div>
+-
+-                    <div id="not_qualified_dialog" class="tpp_dialog" style="display:none">
+-                        <p>The Tuition Protection Plan, provided by Aon Affinity, is
+-                            unavailable for students who reside in the
+-                            location&nbsp;selected.
+-                        </p>
+-                        <input type="button" id="confirm_btn" class="button float-center tpp_dialog_btn" value="Confirm"/>
+-                        <br/>
+-                    </div>
++                        <div class="clearfix">
++                        </div>
++                      </div>
++                      {% include 'payment/fragments/wildmed_tpp_modals.html' %}
+                 {% endif %}
+                 <div id="payment_btn" class="text-center"
+                      {% if not details.offers_tpp %}style="display:block;"{% else %}style="display:none;"{% endif %}>
+                     <input class="button float-center" id="make_payment" type="submit" value="Make a payment"/>
+                 </div>
+ 
+             </fieldset>
+         </form>
+     {% endwith %}
+     </div>
+ {% endblock %}
+ {% if details.offers_tpp %}
+-{% block extra_js %}
+-    {{ block.super }}
+-    {% with tpp_status=details.tpp_status tpp_amount=details.tpp_amount|stringformat:".02f" total_with_tpp=details.total_with_tpp|stringformat:".02f" total_without_tpp=details.total_due|stringformat:".02f" %}
+-      <script type="text/javascript">
+-          $(document).ready(function () {
+-              "use strict";
+-              var yes_div = $(".tpp_action.yes"),
+-                  no_div = $(".tpp_action.no"),
+-                  payment_btn = $("#payment_btn"),
+-                  country_select = $("#id_country"),
+-                  country_label = $("label[for='id_country']"),
+-                  state_select = $("#id_state"),
+-                  province_select = $("#id_province"),
+-                  tpp_status = '{{ tpp_status }}',
+-                  confirmed = false,
+-                  includeTpp = true,
+-                  withoutTpp = false,
+-                  usStates = [
+-                      "AL", "AK", "AZ", "AR", "CA", "CO", "CT", "DE", "DC", "FL", "GA",
+-                      "HI", "ID", "IL", "IN", "IA", "KS", "KY", "LA", "ME", "MD", "MA",
+-                      "MI", "MN", "MS", "MO", "MT", "NE", "NV", "NH", "NJ", "NM", "NY",
+-                      "NC", "ND", "OH", "OK", "OR", "PA", "RI", "SC", "SD", "TN", "TX",
+-                      "UT", "VT", "VA", "WA", "WV", "WI", "WY" ],
+-                  canProvs = [
+-                      "AB", "BC", "MB", "NB", "NL", "NS", "NU", "NT", "ON", "PE", "SK",
+-                      "YT"];
+-
+-              // Show/hide TPP info depending on whether they have pre-existing tpp_status
+-              if (tpp_status === 'DECL' || tpp_status === 'DNQ' || tpp_status === 'NA') {
+-                  toggle_state_prov();
+-                  hide_tpp_info();
+-                  update_tpp_amounts(withoutTpp);
+-                  $(".tpp_offered").hide();
+-                  confirmed = true;
+-                  country_select.hide();
+-                  country_label.hide();
+-                  country_select.siblings().hide();
+-                  payment_btn.slideDown();
+-              }
+-              else if (usStates.indexOf(tpp_status) >= 0) {
+-                  toggle_state_prov('states');
+-                  show_tpp_info(tpp_status);
+-                  update_tpp_amounts(includeTpp);
+-              }
+-              else if (canProvs.indexOf(tpp_status) >= 0) {
+-                  toggle_state_prov('provinces');
+-                  show_tpp_info(tpp_status);
+-                  update_tpp_amounts(includeTpp);
+-              }
+-              else {
+-                  toggle_state_prov();
+-                  hide_tpp_info();
+-                  update_tpp_amounts(withoutTpp);
+-              }
+-              $("#make_payment").val("Make a payment");
+-
+-              // manipulate balances, buttons if TPP Accepted button clicked
+-              $("#tpp_yes").on('click', function () {
+-                  update_tpp_amounts(includeTpp);
+-                  yes_div.addClass("yes_chosen");
+-                  no_div.removeClass("no_chosen");
+-                  set_tpp_selection("YES");
+-                  payment_btn.slideDown();
+-              });
+-
+-              // manipulate balances, buttons if TPP Declined button clicked
+-              $("#tpp_no").on('click', function () {
+-                  update_tpp_amounts(withoutTpp);
+-                  no_div.addClass("no_chosen");
+-                  yes_div.removeClass("yes_chosen");
+-                  set_tpp_selection("DECL");
+-                  payment_btn.slideDown();
+-              });
+-
+-              // drive UI based on change of country select
+-              country_select.on('change', function () {
+-                  var selectedCountry = this.value;
+-                  set_tpp_link();
+-                  if (selectedCountry === 'United States') {
+-                      toggle_state_prov('states');
+-                  }
+-                  else if (selectedCountry === 'Canada') {
+-                      toggle_state_prov('provinces');
+-                  }
+-                  else if (selectedCountry === 'Other') {
+-                      confirmed = true;  // Do not ask to confirm no TPP selection
+-                      set_tpp_selection("DNQ");
+-                      handle_not_qualified();
+-                  }
+-                  else if (!selectedCountry) {
+-                      set_tpp_selection("DECL");
+-                      toggle_state_prov();
+-                      unset_selected_values();
+-                      $('#specific_tpp_document').hide();
+-                  }
+-                  else {
+-                      throw TypeError('Invalid country choice.');
+-                  }
+-              });
+-
+-              // drive UI based on change of state or province select
+-              $('#id_province, #id_state').on('change', function () {
+-                  var selectedProvince = this.value;
+-                  if (tpp_is_allowed(selectedProvince)) {
+-                     show_tpp_info(selectedProvince);
+-                  }
+-                  else {
+-                      handle_not_qualified();
+-                  }
+-              });
+-
+-              // Generally only needed if someone uses back button or
+-              // changes their mind from Other to something else
+-              function unset_selected_values() {
+-                  country_select.val('');
+-                  province_select.val('');
+-                  state_select.val('');
+-              }
+-
+-              // Update the DOM elements with the proper balance based on input
+-              // We are updating the hidden django form amount_to_pay because we
+-              // want to force one of two values, unlike non-TPP courses.
+-              function update_tpp_amounts(includeTpp) {
+-                  if (includeTpp) {
+-                      $("input#id_amount_to_pay").val({{ total_with_tpp }});
+-                      $("span#total_header").text("{{ total_with_tpp }}");
+-                      $("td#tpp_display:first").text("{{ tpp_amount }}");
+-                      $("span#tpp_display_cost").text("{{ total_with_tpp }}");
+-                      $("td#total_amt:first").text("{{ total_with_tpp }}");
+-                      $("#make_payment").val("Make a ${{ total_with_tpp }} payment");
+-                      $("#with_or_without").hide();
+-                  }
+-                  else {
+-                      $("input#id_amount_to_pay").val({{ total_without_tpp }});
+-                      $("span#total_header").text("{{ total_without_tpp }}");
+-                      $("td#tpp_display:first").text("0.00");
+-                      $("span#tpp_display_cost").text("{{ total_without_tpp }}");
+-                      $("td#total_amt:first").text("{{ total_without_tpp }}");
+-                      $("#make_payment").val("Make a ${{ total_without_tpp }} payment");
+-                      $("#with_or_without").show();
+-                  }
+-              }
+-
+-              // show / hide state or province selects based on country selection
+-              function toggle_state_prov(states_or_provs) {
+-                  // clear out any province specific link we set earlier
+-                  set_tpp_link();
+-
+-                  if (states_or_provs === 'states') {
+-                      state_select.show();
+-                      state_select.parent().parent().show();
+-                      province_select.hide();
+-                      province_select.parent().parent().hide();
+-                      state_select.focus();
+-                  }
+-                  else if (states_or_provs === 'provinces') {
+-                      state_select.hide();
+-                      state_select.parent().parent().hide();
+-                      province_select.show();
+-                      province_select.parent().parent().show();
+-                      province_select.focus();
+-                  }
+-                  else {
+-                      state_select.hide();
+-                      state_select.parent().parent().hide();
+-                      province_select.hide();
+-                      province_select.parent().parent().hide();
+-                  }
+-              }
+-
+-              // Expose the TPP text, with correct link to the province-specific document
+-              function show_tpp_info(province) {
+-                  $(".tpp_data").show();
+-                  $('#specific_tpp_document').show();
+-                  $('#tpp_location').val(province);
+-                  set_tpp_link(province);
+-              }
+-
+-              // Hide the TPP text and supporting elements
+-              function hide_tpp_info() {
+-                  $('#confirm_dialog').hide();
+-                  $(".tpp_data").hide();
+-                  $('#specific_tpp_document').hide();
+-                  $('#tpp_location').val();
+-                  set_tpp_link();
+-              }
+-
+-              // Manipulate the document href attribute
+-              function set_tpp_link(province) {
+-                  var default_url = "https://www.nols.edu/enrolled/admissionsforms/tuition_protection.pdf",
+-                      url = '{% url "wmi_get_tpp_link_for_region" "XX" %}',
+-                      success = function(data) {
+-                          $("a#specific_tpp_link").attr("href", data['link']);
+-                      };
+-
+-                  if (province) {
+-                      // ugh, is this really the best way to do this?
+-                      url = url.replace("XX", province);
+-                      $.get(url, null, success);
+-                  }
+-                  else {
+-                      $("a#specific_tpp_link").attr("href", default_url);
+-                  }
+-              }
+-
+-              // Hide TPP information and update TPP amounts for non-qualifying residence
+-              function handle_not_qualified() {
+-                  confirmed = true;
+-                  update_tpp_amounts(withoutTpp);
+-                  set_tpp_selection("DNQ");
+-                  toggle_state_prov();
+-                  hide_tpp_info();
+-                  $(".tpp_offered").hide();
+-                  country_select.hide();
+-                  country_label.hide();
+-                  country_select.siblings().hide();
+-                  $.blockUI({ message: $("#not_qualified_dialog")});
+-                  payment_btn.slideDown();
+-                  return false;
+-              }
+-
+-              function set_tpp_selection(choice) {
+-                  if (choice !== "YES" && choice !== "DECL" && choice !== "DNQ") {
+-                      throw TypeError("Choice must be one of: `YES`, `DECL`, `DNQ`");
+-                  }
+-                  $("input#tpp_accepted").val(choice)
+-              }
+-
+-              function tpp_is_allowed(choice) {
+-                  return choice !== "QC";
+-              }
+-
+-              // We can probably drop this and use our hidden input
+-              function tpp_is_accepted() {
+-                  return $("input#tpp_accepted").val() === 'YES';
+-              }
+-
+-              // ----- Confirm Declined TPP Dialog -----
+-              $('input#make_payment').click(function () {
+-                  if (!tpp_is_accepted() && !confirmed) {
+-                      $.blockUI({ message: $('#confirm_dialog')});
+-                      return false;
+-                  } else {
+-                      return true;
+-                  }
+-              });
+-              $('#yes_btn').click(function () {
+-                  confirmed = true;
+-                  $.unblockUI();
+-                  $('form').trigger('submit');
+-                  return true;
+-              });
+-              $('#no_btn').click(function () {
+-                  $.unblockUI();
+-                  return false;
+-              });
+-
+-              $('#confirm_btn').click(function () {
+-                  $.unblockUI();
+-                  return true;
+-              });
+-          });
+-      </script>
+-    {% endwith %}
+-{% endblock %}
++{% block extra_head %}
++{{ block.super }}
++<script> var tuition_protection_cost = {{ details.tpp_amount|stringformat:"f" }};
++         var dashboard_url = "#"; //TODO
++         var coverage_groups = {{ coverage_groups|safe }};
++</script>
++<script src="{% static 'admissions/dashboard/js/tuition_protection_plan.js' %}"></script>
++{% endblock extra_head %}
+ {% endif %}

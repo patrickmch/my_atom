@@ -1,0 +1,246 @@
+diff --git a/nols_website/wmi/forms.py b/nols_website/wmi/forms.py
+index e5abd6cb7..ad6044c1e 100644
+--- a/nols_website/wmi/forms.py
++++ b/nols_website/wmi/forms.py
+@@ -1,237 +1,220 @@
+ import datetime
+ 
+ from django import forms
+ from django.utils.translation import ugettext
+ 
+ from nols.app.common.constants import PROVINCE_CHOICES_MAP
+ from nols.util.formatting import hidezerofrac
++from admissions.dashboard.forms import TuitionProtectionPlanForm
+ from wmi.constants import GRADE_REQUIRED, GRADE_INCOMPLETE, ALLOWABLE_TEST_SCORE
+ from wmi.models import HEARD_ABOUT_CHOICES as MODEL_CHOICES, RosterEntry, Roster
+ 
+ 
+ class CoursePriceChoiceField(forms.ModelChoiceField):
+     def label_from_instance(self, obj):
+         price_str = hidezerofrac('${:,}'.format(obj.amount))
+         return ' - '.join([price_str, obj.description])
+ 
+ 
+ class ApplicationForm(forms.Form):
+     def __init__(self, course, *args, **kwargs):
+         super(ApplicationForm, self).__init__(*args, **kwargs)
+         course_prices = course.courseprice_set.all().order_by('amount')
+ 
+         if len(course_prices) > 1:
+             self.fields['course_price'] = CoursePriceChoiceField(
+                     label='Pricing options',
+                     widget=forms.RadioSelect,
+                     empty_label=None,  # prevent a default choice of None
+                     queryset=course_prices)
+ 
+ 
+ HEARD_ABOUT_CHOICES = [
+     ('', '---------')
+ ]
+ 
+ for choice in MODEL_CHOICES:
+     HEARD_ABOUT_CHOICES.append(choice)
+ 
+ 
+ class WmiExtrasForm(forms.Form):
+     """
+     A simple form for one bit of extra info.
+     """
+     heard_about = forms.ChoiceField(choices=HEARD_ABOUT_CHOICES,
+                                     label="How did you first hear about this course?",
+                                     required=False)
+     possible_duplicate = forms.BooleanField(widget=forms.HiddenInput, required=False)
+ 
+ 
+ class NoShowSelectWidget(forms.NullBooleanSelect):
+     """
+     An widget to get custom text in the django admin's null boolean select widget.
+     """
+     def __init__(self, attrs=None):
+         choices = ((u'1', ugettext('Unknown')), (u'2', ugettext('Yes')), (u'3', ugettext('No Show')))
+         forms.Select.__init__(self, attrs, choices)
+ 
+ 
+ class RosterEntryAdminForm(forms.ModelForm):
+     """
+     Overriding the Admin Inline form. Adding custom validation.
+     """
+     present = forms.NullBooleanField(widget=NoShowSelectWidget(), initial=u'2', label='present')
+ 
+     class Meta:
+         model = RosterEntry
+         fields = ['public_entry', 'present', 'wmi_roster', 'cpr', 'cert_to_issue', 'score',
+                   'letter_grade', 'notes']
+ 
+     def clean(self, finalized=False):
+         super(RosterEntryAdminForm, self).clean()
+ 
+         data = self.cleaned_data
+         if data.get('present') is not True:
+             empty_fields = ['cpr', 'cert_to_issue', 'score', 'letter_grade']
+             for field in empty_fields:
+                 if data.get(field):
+                     self._errors['present'] = self._errors[field] = self.error_class(
+                         ['A student must be "Present" to enter data.']
+                     )
+ 
+         if finalized:
+             if self.empty_permitted and not self.has_changed() or data.get('present') is False:
+                 return
+ 
+             cert = data.get('cert_to_issue')
+             score = data.get('score')
+             grade = data.get('letter_grade')
+ 
+             # Validation intent for matching cert types and grades:
+             #
+             #   cert selected | score required | grade required
+             #   ==============|================|===============
+             #   Do not issue  |       no       |       no
+             #        WFA      |       no       |       no
+             #        WAFA     |       yes      |       yes
+             #        WFR      |       yes      |       yes
+             #        WEMT     |       yes      |       yes
+             #
+             # The old way of validating cert vs. grades was based on the course code, but that
+             # caused lots of problems for instructors. The root issue is that WMI's students
+             # are often enrolled by organizations other than WMI, so it's not uncommon for
+             # students to show up for a course without meeting the prerequisites.
+             #
+             # For example, suppose a student comes to a WFR recert with an expired WFR (beyond
+             # the grace period). They aren't eligible for a WFR, but they might want to go ahead
+             # and do the course to get a WFA. In that case, for the student with the expired WFR,
+             # the instructor would want to select the WFA cert and leave the grades blank. For
+             # other students who did well, the instructor would want to select WFR with a grade.
+             # The form validation needs to allow for those possibilities.
+             #
+             if cert in GRADE_REQUIRED and grade is not GRADE_INCOMPLETE:
+                 # This is a cert type which is supposed to have a grade
+                 required_fields = ['present', 'cert_to_issue', 'cpr', 'score', 'letter_grade']
+             else:
+                 required_fields = ['present', 'cert_to_issue', 'cpr']
+ 
+             for field in required_fields:
+                 if data.get(field) is None:
+                     self._errors[field] = self.error_class(['This field is required.'])
+             # TODO remove instructor_finalized from parent form.
+ 
+             if 'letter_grade' in required_fields:
+                 if score is not None:
+                     if score < 0 or 100 < score:
+                         self._errors['score'] = self.error_class(
+                             ['Please enter a number between 0 and 100.']
+                         )
+ 
+                     try:
+                         valid_score = score in ALLOWABLE_TEST_SCORE[grade]
+                         if not valid_score:
+                             self._errors['letter_grade'] = self.error_class(
+                                 ['Letter grade and test score do not match. Please reference '
+                                  'the Wilderness Medicine grading matrix above, and recall that '
+                                  'you have +/- 5%  discretion based on performance on the '
+                                  'practical exam.']
+                             )
+                     except KeyError as e:
+                         # if the grade(key) isn't in ALLOWABLE_TEST_SCORE, then don't validate it
+                         raise forms.ValidationError(e)
+ 
+         return data
+ 
+ 
+ class RosterAdminForm(forms.ModelForm):
+ 
+     class Meta:
+         model = Roster
+         fields = '__all__'
+ 
+     def clean_wmi_course_id(self):
+         data = self.cleaned_data['wmi_course_id']
+         if self.instance.pk and self.instance.wmi_course_id != data:
+             raise forms.ValidationError("You can't change the course id after roster is created.")
+         return data
+ 
+     def clean_start_form(self):
+         data = self.cleaned_data['start_form']
+         if self.instance.start_form and (self.instance.start_form - data) > datetime.timedelta(seconds=1):
+             if not self.request.user.has_perm('wmi.add_roster'):
+                 # TODO make error visible to user i.e. add to self.errors or something
+                 raise forms.ValidationError("You don't have permission to change start form time.")
+         return data
+ 
+     def clean_stop_form(self):
+         data = self.cleaned_data['stop_form']
+         if self.instance.stop_form and (self.instance.stop_form - data) > datetime.timedelta(seconds=1):
+             if not self.request.user.has_perm('wmi.add_roster'):
+                 # TODO make error visible to user i.e. add to self.errors or something
+                 raise forms.ValidationError("You don't have permission to change stop form time.")
+         return data
+ 
+     def clean(self):
+         cleaned_data = self.cleaned_data
+         finalized = cleaned_data['instructor_finalized']
+         if finalized and self.instance.is_available():
+             cleaned_data['stop_form'] = datetime.datetime.now()
+         return cleaned_data
+ 
+ 
+ class RollCallCourseForm(forms.Form):
+     course = forms.IntegerField(label="Course ID")
+ 
+     def clean_course(self):
+         data = self.cleaned_data['course']
+         if not Roster.objects.filter(wmi_course_id=data).exists():
+             raise forms.ValidationError('The Course ID entered does not have a roster.')
+         return data
+ 
+ 
+-class WmiTppForm(forms.Form):
++class WmiTppForm(TuitionProtectionPlanForm):
+     """Collect information about TPP selection for Wilderness Medicine courses"""
+ 
+     def __init__(self, **kwargs):
+         original = kwargs.get('initial', {})
+         tpp_status = original.get('tpp_status')
+ 
+         # There is pre-existing TPP (via Phone and FMP) ... display the previously chosen values
+         # Which, yes, they can change if they so desire.
+         initial = original
+         us_state_codes = [x[0] for x in PROVINCE_CHOICES_MAP['UNITED STATES']]
+         can_prov_codes = [x[0] for x in PROVINCE_CHOICES_MAP['CANADA']]
+         if tpp_status in us_state_codes:
+             initial.update({'country': 'United States', 'state': tpp_status})
+         elif tpp_status in can_prov_codes:
+             initial.update({'country': 'Canada', 'province': tpp_status})
+         elif tpp_status == 'DNQ':
+             initial.update({'country': 'Other'})
+         # Since they can choose TPP at any time when they have a balance we do not do anything
+-        # if the existing TPP status is DECL
++        # if the existing TPP status is "No"
++        initial.update({'country': 'United States', 'state': 'AL'})
+ 
+         super(WmiTppForm, self).__init__(initial=initial)
+ 
+-    empty_tuple = ('', '')
+-    country = forms.ChoiceField(
+-        label='Select your country of residence',
+-        choices=(
+-            empty_tuple,
+-            ('United States', 'United States'),
+-            ('Canada', 'Canada'),
+-            ('Other', 'Other')))
+-
+-    provinces = list(PROVINCE_CHOICES_MAP['CANADA'])
+-    provinces.insert(0, empty_tuple)
+-    province = forms.ChoiceField(label='Select your province', choices=provinces)
+-
+-    province_blacklist = ['QC']
+-
+-    states = list(PROVINCE_CHOICES_MAP['UNITED STATES'])
+-    states.insert(0, empty_tuple)
+-    states = states[0:52]  # exclude affiliated US territories
+-    state = forms.ChoiceField(label='Select your state', choices=states)
+     decision = forms.ChoiceField(label='Would you like to enroll in the Tuition Protection Plan?',
+                                  choices=(('empty', ''),
+                                           ('Yes', 'Yes'),
+                                           ('No', 'No'),
+                                           ('DNQ', 'Does not qualify')))

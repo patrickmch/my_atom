@@ -1,0 +1,73 @@
+diff --git a/client/js/site/ExpandSessionsView.js b/client/js/site/ExpandSessionsView.js
+index 66b0dc1fd..fe22ca65c 100644
+--- a/client/js/site/ExpandSessionsView.js
++++ b/client/js/site/ExpandSessionsView.js
+@@ -1,63 +1,63 @@
+ 'use strict';
+ 
+ var $ = require('jquery');
+ var Backbone = require('backbone');
+ 
+ /**
+  * Represents the session stage expand/hide toggle.
+  * @module
+  */
+ var ExpandSessionsView = Backbone.View.extend({
+ 
+   /**
+    * @param {string} options.el - the session stage container
+    */
+   events: {
+     'click a#js-session-load': 'toggleSessions',
+   },
+   initialize(options) {
+     this.el = options.el;
+     this.$el = $(this.el);
+     this.$sessionBoxes = this.$el.find('.sessionbox');
+     this.$loadLink = this.$el.find('#js-session-load');
+-    this.$loadSpan = this.$loadLink.find('span');
+     this.sessionCount = this.$sessionBoxes.length;
+     this.collpaseAt = 50;
+     this.showInitial = 10;
+     this.hidden = false;
++    this.pathName = window.location.pathname;
+ 
+     if ($.cookie('showSessions') === 'true'){
+       this.showSessions();
+     } else if (this.sessionCount > this.collpaseAt) {
+       this.hideSessions();
+     }
+   },
+ 
+   // bound to click event
+   toggleSessions(e) {
+     e.preventDefault();
+     if (this.hidden) {
+       this.showSessions();
++      $.cookie('showSessions', 'true', {expires: 1, path: this.pathName});
+     } else {
+       this.hideSessions();
+     }
+   },
+ 
+   showSessions() {
+     this.hidden = false;
+     this.$sessionBoxes.filter(':hidden').show();
+-    this.$loadSpan.html('Show fewer dates');
+-    $.cookie('showSessions', true, {expires: 1});
++    this.$loadLink.text('Show fewer dates');
+   },
+ 
+   hideSessions(){
+     this.hidden = true;
+     this.$sessionBoxes.hide().slice(0, this.showInitial).show();
+     this.$el.find("#js-session-load-wrap").show();
+-    this.$loadSpan.html(`Show all ${this.sessionCount} dates`);
+-    $.cookie('showSessions', false);
++    this.$loadLink.text(`Show all ${this.sessionCount} dates`);
++    $.removeCookie('showSessions', {path: this.pathName});
+   },
+ 
+ });
+ 
+ module.exports = ExpandSessionsView;

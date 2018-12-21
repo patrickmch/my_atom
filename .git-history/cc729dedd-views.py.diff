@@ -1,0 +1,987 @@
+diff --git a/nols_website/admissions/dashboard/views.py b/nols_website/admissions/dashboard/views.py
+index 567bd70ab..286addee0 100644
+--- a/nols_website/admissions/dashboard/views.py
++++ b/nols_website/admissions/dashboard/views.py
+@@ -1,942 +1,952 @@
+ import datetime
+ import json
+ 
+ from django.shortcuts import render, get_object_or_404, redirect
+ from django.contrib.auth.decorators import login_required
+ from django.http import HttpResponseRedirect, Http404, HttpResponse
+ from django.conf import settings
+ from django.core.exceptions import ObjectDoesNotExist
+ from django.core.urlresolvers import reverse
+ from django.core.cache import cache
+ from django.contrib import messages
+ from django.contrib.admin.views.decorators import staff_member_required
+ from django.contrib.auth.decorators import permission_required
+ from django.views.decorators.http import require_http_methods
+ 
+ from collections import OrderedDict
+ 
+ from nols.model.core.entity.interaction import Interaction
+ from nols_email.constants import TEMPLATE
+ from nols_email.utils import send_html_email
+ from nols_registration.models import NolsRegistrationProfile
+ 
++from core.constants import EXPEDITIONS
+ from core.match_maker import MatchMaker
+ from core.models import CourseStatusRecordTab, AccountTab, NolsPerson, CourseTab, ApplicationTab,\
+     User
+ from core.decorators import connect_required
+ from core.forms import PersonForm, EmailAddressForm
+ from core.nmc import da
+-from payment.constants import SURCHARGE_FEE_PERCENTAGE
++from core.utils import get_email_address_from_constant
+ 
+ from admissions.models import OpenApp
+ from admissions.constants import CSR_STATUS, WEMT_LINK
+ from admissions import utils_apply_open
+ from .models import (StudentFormType, StudentForm, AdmissionsOfficer, Invite, SharedUser,
+                      TppOnlineDecline, FinancialOverride, NoReminderEmail, Dashboard,
+                      PinAdmissionsOfficer)
+ from .student_form_views import instantiate_view_from_slug
+ import nolspro
+ 
+ import copy
+ from .forms import TuitionBalanceForm, InviteForm, InternalLinksForm
+ from .decorators import check_csr_allowed
+ from .utils import create_order_and_redirect, tuition_payment_success_callback,\
+     get_applicant_nouns, get_percent_ready, get_readiness_values, clear_emt_form
+ from .student_form_utils import _check_receipt
+ 
+ import logging
+ log = logging.getLogger(__name__)
+ 
+ 
+ @login_required
+ @connect_required
+ def application_dashboard(request):
+     csr = CourseStatusRecordTab.objects.filter(viewable_by_user=request.user)\
+                                        .filter_upcoming_current()
+     if len(csr) == 1:
+         return HttpResponseRedirect(reverse('dashboard:csr_detail',
+                                             args=[csr[0].id]))
+ 
+     return HttpResponseRedirect(reverse('account_home'))
+ 
+ 
+ @login_required
+ def view_app_detail(request, app_id):
+     app = get_object_or_404(OpenApp, pk=app_id)
+     if app.user != request.user and app.proxy_nols_person != request.user.nols_person:
+         return redirect(reverse('account_home'))
+     if app.core_application:
+         all_csrs = CourseStatusRecordTab\
+             .objects.all()\
+                     .filter_upcoming_current(application=app.core_application)
+         if len(all_csrs) == 1:
+             return redirect(reverse('dashboard:csr_detail',
+                                     args=[all_csrs[0].pk]))
+         else:
+             enrolled_csrs = CourseStatusRecordTab\
+                 .objects\
+                 .all()\
+                 .filter_upcoming_current(application=app.core_application,
+                                          status=CSR_STATUS.ENROLLED)
+             if len(enrolled_csrs) == 1:
+                 return redirect(reverse('dashboard:csr_detail',
+                                         args=[enrolled_csrs[0].pk]))
+ 
+     # Just go to account home
+     return redirect(reverse('account_home'))
+ 
+ 
+ @login_required
+ @check_csr_allowed
+ def course_status_record_detail(request, csr_id):
+     """
+     Show the details of a course status record. We show these instead of
+     applications since one application could lead to multiple current
+     course statuses. For example an applicant may be wait-listed on one
+     course and enrolled on another, and both of these statuses reference the
+     same original application.
+     """
+     csr = CourseStatusRecordTab\
+         .objects\
+         .select_related('application__person', 'course')\
+         .get(id=csr_id)
+ 
+     csr.student_first_name = csr.application.person.name.first
+ 
+     if csr.status == CSR_STATUS.TRANSFERRED and csr.destination_id:
+         # Send 'em to the new app.
+         return redirect(reverse('dashboard:csr_detail',
+                                 args=[csr.destination_id]))
+     elif csr.status in (CSR_STATUS.CANCELLED, CSR_STATUS.DROPPED):
+         raise Http404
+     elif csr.course.pro_no_dashboard:
+         raise Http404
+ 
+     applicant_nouns = get_applicant_nouns(request, csr)
+ 
+     days_to_course = csr.days_to_course
+ 
+     student_form_types = StudentFormType.objects.filter(csr=csr)
+ 
+     form_types = {}
+     for student_form_type in student_form_types:
+         key = (student_form_type.due_date(csr),
+                student_form_type.due_in_days(csr))
+         if key not in form_types:
+             form_types[key] = {'completed': None,
+                                'editable': None,
+                                'forms': []}
+         form_types[key]['forms'].append(student_form_type)
+ 
+     student_forms = StudentForm.objects.select_related('type')\
+                                        .filter(application=csr.application)
+ 
+     draft_types = [x.type.slug for x in student_forms.filter(
+         status=StudentForm.DRAFT)]
+     editable_types = [x.type.slug for x in student_forms if x.is_editable]
+ 
+     # Note: _get_readiness_values() includes override checks for tuition_deposit and tuition_paid
+     (final_types, cleared_types, email_verified, tuition_deposit, tuition_paid,
+      forms_cleared, with_hidden_form_types, has_tuition) = get_readiness_values(csr)
+     deposit = {
+         'is_paid': tuition_deposit,
+         'days_due': csr.days_to_deposit,
+         'date_due': csr.date_deposit_due(),
+         'days_allowed': csr.days_for_deposit
+     }
+ 
+     # Need to grab the applicant email.
+     if not email_verified:
+         applicant = da.entity.get_entity(csr.application.person.pk)
+         _e_emailaddress = applicant.get_preferred_email_address()
+         if _e_emailaddress is not None:
+             applicant_email = _e_emailaddress.email_address
+         else:
+             log.warning("PersonID {0} has an application but no email address."
+                         .format(applicant.id))
+             email_verified = True
+             applicant_email = None
+     else:
+         applicant_email = None
+ 
+     for key in form_types:
+         form_types[key]['completed'] = all(
+             [x.slug in final_types for x in form_types[key]['forms']])
+         form_types[key]['cleared'] = all(
+             [x.slug in cleared_types for x in form_types[key]['forms']])
+         form_types[key]['editable'] = any(
+             [x.slug in editable_types for x in form_types[key]['forms']])
+ 
+     if all([x.slug in final_types for x in student_form_types]) and\
+        csr.status == CSR_STATUS.ENROLLED:
+         if forms_cleared:
+             if tuition_paid:
+                 app_status = 'enrolled!'
+             else:
+                 app_status = 'accepted awaiting payment'
+         else:
+             app_status = 'all forms in, awaiting review'
+     elif csr.status == CSR_STATUS.ENROLLED:
+         app_status = u'{noun} spot is reserved!'.format(
+             noun=applicant_nouns['possesive'])
+     elif csr.status == CSR_STATUS.WAITLISTED:
+         app_status = u"{noun} on the waitlist".format(
+             noun=applicant_nouns['with_auxiliary'])
+     else:
+         app_status = u'{noun} application is under review'.format(
+             noun=applicant_nouns['possesive'])
+ 
+     progress_cache_key = 'progress_cache_csr_{0}'.format(csr.pk)
+     prior_progress = cache.get(progress_cache_key, 0)
+     progress = get_percent_ready(
+         finalized_form_types=final_types,
+         email_verified=email_verified,
+         tuition_deposit=tuition_deposit,
+         all_tuition=tuition_paid,
+         forms_cleared=forms_cleared,
+         all_form_types=with_hidden_form_types,
+         has_tuition=csr.course.tuition > 0)
+ 
+     cache.set(progress_cache_key, progress, 60 * 60 * 6)
+ 
+     facebook_url = csr.course.facebook_url
+ 
+     if csr.course.has_deposit:
+         # Add deposit in the right key, if it doesn't exist create new key
+         if (deposit['date_due'], deposit['days_allowed']) not in form_types:
+             form_types[(deposit['date_due'], deposit['days_allowed'])] = {}
+ 
+         form_types[(deposit['date_due'], deposit['days_allowed'])
+                    ]['deposit'] = True
+ 
+     # Order the form types
+     _form_types = OrderedDict()
+     for key in sorted(form_types.keys(),
+                       key=lambda x: x if x[0] is not None
+                       else (datetime.date.today() +
+                             datetime.timedelta(days=1000), 0)):
+         _form_types[key] = form_types[key]
+     form_types = _form_types
+ 
+     if csr.course.has_emt_section:
+         emt_form_types = StudentFormType.emt_form_types()
+         forms = StudentForm.objects.filter(
+             type__in=emt_form_types, application=csr.application)
+         clear_emt_form(csr, forms)
+ 
+     if csr.course.is_ic_application():
+         template_name = 'admissions/dashboard/ic_app_dashboard.html'
+     elif csr.course.course_code == 'DENR':
+         template_name = 'admissions/dashboard/denali_dashboard.html'
+     else:
+         template_name = 'admissions/dashboard/course_status_dashboard.html'
+ 
+     # If this is an ICRV, then we know by definition that all forms have been submitted. However,
+     # when someone mails in a paper IC application, they don't get the digital forms to represent
+     # that they have turned in all of their forms. So just trick the dashboard into thinking that
+     # they are done.
+     if csr.course.course_code == CourseTab.ICRV:
+         progress = 100
+         for due_date, form_group in form_types.iteritems():
+             form_group['completed'] = True
+             form_group['cleared'] = True
+             if 'forms' in form_group:
+                 for form in form_group['forms']:
+                     final_types.add(form.slug)
+ 
+         cleared_types = final_types
+ 
+     # WMR gets a special link because it's the only Admissions course with a WEMT section,
+     # and WEMT has several serious prerequisites for participating in the clinical rotations
+     wmr_wemt_link = WEMT_LINK if csr.course.course_code == 'WMR' else False
+     extra_link_1 = None
+     extra_link_2 = None
+     extra_link_3 = None
+ 
+     policy_text = None
+     show_financial_aid_link = True
+     if csr.course.is_pro_or_lnt:
+         policy_text = nolspro.models.ClientCourseDashboard.combined_policies(
+             csr=csr)
+         if hasattr(csr.course, 'clientcoursedashboard'):
+             ccd = csr.course.clientcoursedashboard
+             show_financial_aid_link = ccd.show_financial_aid_link
+             if ccd.extra_link_1_text and ccd.extra_link_1_url:
+                 extra_link_1 = {'url': ccd.extra_link_1_url,
+                                 'text': ccd.extra_link_1_text}
+             if ccd.extra_link_2_text and ccd.extra_link_2_url:
+                 extra_link_2 = {'url': ccd.extra_link_2_url,
+                                 'text': ccd.extra_link_2_text}
+             if ccd.extra_link_3_text and ccd.extra_link_3_url:
+                 extra_link_3 = {'url': ccd.extra_link_3_url,
+                                 'text': ccd.extra_link_3_text}
+ 
+     try:
+         forms_without_due_dates = form_types[(None, 0)]['forms']
+     except KeyError:
+         forms_without_due_dates = None
+ 
+     tpp_form = None
+     if forms_without_due_dates:
+         for index, form in enumerate(forms_without_due_dates):
+             if form.name == 'Tuition Protection Plan':
+                 tpp_form = forms_without_due_dates.pop(index)
+ 
+     return render(request, template_name,
+                   {'csr': csr,
+                    'now': datetime.date.today(),
+                    'applicant_nouns': applicant_nouns,
+                    'email_verified': email_verified,
+                    'applicant_email': applicant_email,
+                    'prior_progress': prior_progress,
+                    'progress': progress,
+                    'days_to_course': days_to_course,
+                    'deposit': deposit,
+                    'form_types': form_types,
+                    'tpp_form': tpp_form,
+                    'draft_types': draft_types,
+                    'editable_types': editable_types,
+                    'final_types': final_types,
+                    'cleared_types': cleared_types,
+                    'tuition_paid': tuition_paid,
+                    'days_from_status_change': int(
+                        round((datetime.date.today() - csr.admissions_change_date)
+                              .total_seconds() / (60 * 60 * 24))
+                    ),
+                    'cms_session_details': csr.course.cms_session_details,
+                    'show_financial_aid_link': show_financial_aid_link,
+                    'wmr_wemt_link': wmr_wemt_link,
+                    'extra_link_1': extra_link_1,
+                    'extra_link_2': extra_link_2,
+                    'extra_link_3': extra_link_3,
+                    'ao': AdmissionsOfficer.get_for_csr(csr),
+                    'app_status': app_status,
+                    'facebook_url': facebook_url,
+                    'hours': Dashboard.ADMISSIONS_HOURS,
+                    'policy_text': policy_text,
+                    })
+ 
+ 
+ @check_csr_allowed
+ def account_statement(request, csr_id, csr=None):
+     """
+     Show an account statement for a given application id. This is similar
+     to what we print and mail to students.
+     """
+     back_to_url = request.GET.get('back_to_url')
+     if csr is None:
+         csr = get_object_or_404(CourseStatusRecordTab, pk=csr_id)
+ 
+     displayable = csr.application.account_displayable()
+     if displayable:
+         account_lines = AccountTab.viewable_lines.filter(
+             application=csr.application).order_by('pk')
+     else:
+         account_lines = []
+ 
+     return render(request, 'admissions/dashboard/account_statement.html',
+                   {'account_lines': account_lines,
+                    'displayable': displayable,
+                    'csr': csr,
+                    'back_to_url': back_to_url,
+                    'ao': AdmissionsOfficer.get_for_csr(csr)})
+ 
+ 
+ @check_csr_allowed
+ @require_http_methods(["POST"])
+ def use_old_form(request, csr_pk, old_student_form_pk):
+     use_it = request.POST.get('use_it', '')
+     use_it = use_it == 'True'
+ 
+     student_form = get_object_or_404(StudentForm,
+                                      pk=old_student_form_pk)
+     csr = get_object_or_404(CourseStatusRecordTab,
+                             pk=csr_pk)
+     if use_it:
+         student_form.pk = None
+         student_form.application = csr.application
+         student_form.save()
+         _check_receipt(csr, student_form)
+     else:
+         new_student_form = StudentForm(application=csr.application,
+                                        type=student_form.type,
+                                        status=StudentForm.DRAFT)
+         new_student_form.save()
+     if request.is_ajax():
+         return HttpResponse(json.dumps({'status': 'success',
+                                         'use_it': use_it,
+                                         'progress': csr.percent_ready if use_it else None}))
+     else:
+         return redirect(reverse('dashboard:csr_detail', args=(csr.pk,)))
+ 
+ 
+ @check_csr_allowed
+ def student_form(request, csr_pk, student_form_type_slug, csr=None):
+     if csr is None:
+         csr = CourseStatusRecordTab.objects.get(pk=csr_pk)
+     student_form_type = get_object_or_404(StudentFormType,
+                                           slug=student_form_type_slug)
+ 
+     if student_form_type not in StudentFormType.objects.filter(csr=csr):
+-        msg = 'User with entity_id {entity_id} and csr_id {csr_id} tried to access {student_form_type}\
++        log_msg = 'User with entity_id {entity_id} and csr_id {csr_id} tried to access {student_form_type}\
+         but was denied because the student_form_type is not in their current csr'
+-        message = msg.format(entity_id=request.user.entity_id, csr_id=csr.id,
+-                             student_form_type=student_form_type)
++        log_message = log_msg.format(entity_id=request.user.entity_id, csr_id=csr.id,
++                                     student_form_type=student_form_type)
+         if student_form_type.name == 'Tuition Protection Plan':
+             # only send emails for TPP to help track down issue 3236; this can go away once that's resolved
+-            log.error(message)
++            log.error(log_message)
+         else:
+-            log.info(message)
++            log.info(log_message)
+         return handle_dashboard_error(csr.pk)
+ 
+     try:
+         student_form = StudentForm.objects.get(application=csr.application,
+                                                type=student_form_type)
+     except StudentForm.DoesNotExist:
+         # Try and see if there's an old one we can use.
+         old_forms = student_form_type.old_forms(csr.application.person)
+ 
+         # HEADS UP! This doesn't do what it looks like it ought to do. Entered_data is a
+         # JSONField with a default of '{}', so it's always gonna be a non-empty string.
+         # To know if it was empty, you'd need to check `=='{}'`. However, making that
+         # change might have consequences. For now I'm not touching this because I don't
+         # want to go down the rabbit hole of figuring out whether any of our forms depend
+         # on the current behavior.
+         if old_forms.exists() and old_forms[0].entered_data and csr.course.course_code != 'ICAP':
+             student_form = copy.copy(old_forms[0])
+             student_form.pk = None
+             student_form.status = student_form.DRAFT
+             student_form.application = csr.application
+         else:
+             student_form = StudentForm(application=csr.application,
+                                        type=student_form_type)
+ 
+     if not student_form.is_editable and not student_form.draft:
+-        msg = 'User with entity_id {entity_id} and csr_id {csr_id} tried to access {student_form_type}\
+-        but was denied because {student_form_type} is not editable and they had already submitted a response.'
+-        message = msg.format(entity_id=request.user.entity_id, csr_id=csr.id,
+-                             student_form_type=student_form_type)
+-        log.info(message)
+-        return handle_dashboard_error(csr.pk)
++        # They probably hit the back button after submitting a form:
++        return redirect(reverse('dashboard:csr_detail', args=[csr_pk]))
+ 
+     # Add this attribute for use when getting the next form type
+     student_form.csr = csr
+     student_form.save()
+     return instantiate_view_from_slug(student_form_type.slug, student_form, csr, request)
+ 
+ 
+-def handle_dashboard_error(csr_pk):
++def handle_dashboard_error(csr_pk, error_message=None):
+     # This sets a cookie so that the JS on the dashboard will show an error message. The only alternative I thought of
+     # that achieves the same result requires putting parameters in the url string, and since we also don't do that
+     # elsewhere to show errors, and it requires more code, this seemed cleaner.
++    if error_message is not None:
++        error_message = "There was an error and we've been notified. If the error persists, please contact your\
++                        Admissions Officer."
+     response = redirect(reverse('dashboard:csr_detail', args=[csr_pk]))
+     response.set_cookie('dashboard_error', 'true')
+     return response
+ 
+ 
+ @login_required
+ @check_csr_allowed
+ def balance_payment(request, csr_id, csr=None):
+     if csr is None:
+         csr = get_object_or_404(CourseStatusRecordTab, id=csr_id)
+ 
+     if request.method != 'POST':
+         form = TuitionBalanceForm(csr=csr)
+     else:
+         form = TuitionBalanceForm(request.POST, csr=csr)
+         if form.is_valid():
+             amount_selection = int(form.cleaned_data['amount'])
+             amount = 0
+             if amount_selection == form.DEPOSIT:
+                 amount = form.deposit
+             elif amount_selection == form.BALANCE:
+                 amount = form.balance
+             elif amount_selection == form.PARTIAL:
+                 amount = form.cleaned_data['partial_amount']
+ 
+             if csr.course.is_pro:
+                 invoice_name = 'Pro'
+             elif csr.course.is_lnt:
+                 invoice_name = 'LNT'
+             else:
+                 invoice_name = 'NOLS'
+ 
+             return create_order_and_redirect(
+                 request, csr, amount, 'payment/payment.html', invoice_name,
+                 tuition_payment_success_callback,
+                 reverse('dashboard:account_statement',
+                         kwargs={'csr_id': csr.id})
+             )
+ 
+     account_lines = AccountTab.viewable_lines.filter(
+         application=csr.application).order_by('pk')
+     eligible_for_tpp = (csr.course.has_tpp and
+                         csr.still_enrolled() and
+                         not csr.has_active_tpp() and
+                         not csr.application.tuition_protection_decision)
+     context = {'csr': csr,
+                'form': form,
+                'days_to_tuition': csr.days_to_tuition,
+                'ao': AdmissionsOfficer.get_for_csr(csr),
+                'account_lines': account_lines,
+                'eligible_for_tpp': eligible_for_tpp}
+ 
+     return render(request, 'admissions/dashboard/payment/select_amount.html', context)
+ 
+ 
+ @staff_member_required
+ def send_invite(request, app_id):
+     core_app = get_object_or_404(ApplicationTab, pk=app_id)
+     form = None
+ 
+     if request.method == 'POST':
+ 
+         form = InviteForm(request.POST)
+         if form.is_valid():
+             email = form.data['email']
+             inviter = request.user
+             invite = Invite(application=core_app,
+                             invitee_email=email,
+                             inviter=inviter)
+             invite.save()
+ 
+             applicant = da.entity.get_entity(core_app.person.pk)
+ 
+             student_name = applicant.name.preferred if applicant.name.preferred else applicant.name.first
+ 
+             global_merge_vars = {
+                 "STUDENT_NAME": student_name,
+                 "DASHBOARD_URL": u'{site}{url}'.format(site=settings.NOLS_WEB_HOST,
+                                                        url=reverse('dashboard:invite_join',
+                                                                    kwargs={'invite_key': str(invite.invite_key)})),
+             }
+ 
+             send_html_email(TEMPLATE.DASHBOARD_INVITE,
+                             recipients=[form.cleaned_data['email']],
+                             global_merge_vars=global_merge_vars,
+                             subject_context=(student_name, ))
+ 
+             messages.success(request, 'Invite email sent!')
+             form = None
+     if form is None:
+         form = InviteForm()
+ 
+     return render(request, 'admissions/dashboard/send_invite.html',
+                   {'form': form,
+                    'core_app': core_app})
+ 
+ 
+ def invite_join(request, invite_key):
+     get_object_or_404(Invite, invite_key=invite_key)
+     if not request.user.is_authenticated():
+         messages.info(request,
+                       'You must login or create an account to view this dashboard')
+     return redirect(reverse('dashboard:invite_join_authenticated',
+                             args=(invite_key,)))
+ 
+ 
+ @login_required
+ def invite_join_authenticated(request, invite_key):
+     invite = get_object_or_404(Invite, invite_key=invite_key)
+ 
+     SharedUser.objects.get_or_create(
+         application=invite.application, user=request.user)
+ 
+     invite.delete()
+ 
+     csr = CourseStatusRecordTab.objects.all().filter_upcoming_current(
+         application=invite.application)
+     if len(csr) == 1:
+         return redirect(reverse('dashboard:csr_detail', args=[csr[0].id]))
+     else:
+         return redirect(reverse('account_home'))
+ 
+ 
+ @login_required
+ @check_csr_allowed
+ def resend_student_email(request, csr_pk):
+     try:
+         csr = CourseStatusRecordTab.objects\
+                                    .select_related('application__person')\
+                                    .get(pk=csr_pk)
+     except CourseStatusRecordTab.DoesNotExist:
+         raise Http404
+ 
+     fake_app = OpenApp(user=request.user,
+                        proxy_nols_person=csr.application.person)
+     utils_apply_open.send_student_creation_email(request, fake_app)
+ 
+     return HttpResponse('success')
+ 
+ 
+ @login_required
+ @check_csr_allowed
+ def resend_student_activation(request, csr_pk, user_pk):
+     user = User.objects.get(id=user_pk)
+     first_name = user.entity.name.preferred if user.entity.name.preferred \
+         else user.entity.name.first
+ 
+     try:
+         profile = NolsRegistrationProfile.objects.get(user_id=user.id)
+     except ObjectDoesNotExist:
+         profile = NolsRegistrationProfile.objects.create_profile(user)
+ 
+     if profile.activation_key == profile.ACTIVATED:
+         profile.delete()
+         profile = NolsRegistrationProfile.objects.create_profile(user)
+ 
+     profile.send_activation_email(settings.NOLS_WEB_HOST, request, resend=True)
+ 
+     msg = "{first_name}'s account activation email for username: <strong>{username}</strong>" \
+           " has been re-sent to {email}."\
+         .format(first_name=first_name if first_name else "Your Student",
+                 email=user.email,
+                 username=user.username)
+ 
+     return HttpResponse(msg)
+ 
+ 
+ @login_required
+ @staff_member_required
+ @permission_required('dashboard.view_applicant_dashboard', raise_exception=True)
+ def resend_activate_email(request, user_pk):
+     user = User.objects.get(pk=user_pk)
+     try:
+         profile = NolsRegistrationProfile.objects.get(user_id=user_pk)
+     except ObjectDoesNotExist:
+         profile = NolsRegistrationProfile.objects.create_profile(user)
+ 
+     if profile.activation_key == profile.ACTIVATED:
+         profile.delete()
+         profile = NolsRegistrationProfile.objects.create_profile(user)
+ 
+     profile.send_activation_email(settings.NOLS_WEB_HOST, request, resend=True)
+ 
+     return HttpResponse('success')
+ 
+ 
+ @login_required
+ @staff_member_required
+ @permission_required('dashboard.view_applicant_dashboard', raise_exception=True)
+ def resend_reset_email(request, user_pk):
+     user = User.objects.get(pk=user_pk)
+     protocol = 'https' if request.is_secure() else 'http'
+ 
+     if user.has_usable_password():
+         site_name = 'nols.edu'
+         site_domain = settings.NOLS_WEB_HOST
+         user.send_password_reset_email(site_name, site_domain, protocol)
+ 
+     return HttpResponse('success')
+ 
+ 
+ @login_required
+ @check_csr_allowed
+ def payment_receipt(request, csr_id, payment_id, csr=None):
+     if csr is None:
+         csr = get_object_or_404(CourseStatusRecordTab, pk=csr_id)
+ 
+-    (final_types, cleared_types, email_verified, tuition_deposit, tuition_paid,
+-     forms_cleared, with_hidden_form_types, has_tuition) = get_readiness_values(csr)
+-
+-    progress = get_percent_ready(
+-        finalized_form_types=final_types,
+-        email_verified=email_verified,
+-        tuition_deposit=tuition_deposit,
+-        all_tuition=tuition_paid,
+-        forms_cleared=forms_cleared,
+-        all_form_types=with_hidden_form_types,
+-        has_tuition=csr.course.tuition > 0)
+-
+     student_email = request.user.email
+-
+     context = {
+-        'csr': csr,
+-        'progress': progress,
+         'email_address': student_email
+     }
+ 
+-    return render(request, 'admissions/dashboard/payment/receipt.html', context)
++    if csr.course.has_started:
++        template = 'payment_success.html'
++        context['has_payment'] = True
++        context['mailto'] = get_email_address_from_constant(EXPEDITIONS.email)
++
++    else:
++        template = 'admissions/dashboard/payment/receipt.html'
++
++        student_form_types = StudentFormType.objects.filter(csr=csr)
++
++        (final_types, cleared_types, email_verified, tuition_deposit, tuition_paid,
++         forms_cleared, with_hidden_form_types, has_tuition) = get_readiness_values(csr)
++
++        progress = get_percent_ready(
++            finalized_form_types=final_types,
++            email_verified=email_verified,
++            tuition_deposit=tuition_deposit,
++            all_tuition=tuition_paid,
++            forms_cleared=forms_cleared,
++            all_form_types=with_hidden_form_types,
++            has_tuition=csr.course.tuition > 0)
++
++        context['csr'] = csr
++        context['progress'] = progress
++
++    return render(request, template, context)
+ 
+ 
+ @login_required
+ @check_csr_allowed
+ def decline_tuition_protection(request, account_entry_id, csr_id, csr=None):
+     next_url = request.GET.get('next')
+     next_url = next_url or reverse(
+         'dashboard:balance_payment', args=[int(csr_id)])
+ 
+     if csr is None:
+         csr = get_object_or_404(CourseStatusRecordTab, pk=csr_id)
+     account_entry = get_object_or_404(AccountTab, pk=account_entry_id)
+ 
+     if account_entry.cancelled_this_tpp():
+         message = u'The Tuition Protection Plan has already been cancelled for {course}'.format(
+             course=csr.course
+         )
+         messages.error(request, message)
+     else:
+         user = request.user
+ 
+         # create event log entry for cancelling tuition protection.
+         person = da.entity.get_entity(csr.application.person.pk)
+         message = u'Cancel TPP - {first} {last} ({username}) declined online for {course}.'
+         message = message.format(first=user.first_name, last=user.last_name, username=user.username,
+                                  course=account_entry.status)
+         person.current_interaction_id = Interaction.ID.CANCELLED_TPP
+         person.current_interaction_details = message
+         person.update_extra_fields()
+ 
+         entries = csr.application.cancel_and_cleanup_tpp_enrollment(csr, user)
+         tpp_decline = TppOnlineDecline(cancel_line=entries['tpp_line'],
+                                        credit_line=entries['credit_line'],
+                                        declined_by=request.user,
+                                        ftr_id=entries['ftr'].ftr_id)
+         tpp_decline.save()
+ 
+         message = u'The Tuition Protection Plan has been cancelled for {course}.'.format(
+             course=csr.course
+         )
+         messages.success(request, message)
+ 
+     return HttpResponseRedirect(next_url)
+ 
+ 
+ @login_required
+ @staff_member_required
+ @permission_required('dashboard.view_applicant_dashboard', raise_exception=True)
+ def internal_links(request):
+     form = None
+     links = []
+ 
+     app_id = None
+ 
+     if request.method == 'POST':
+         form = InternalLinksForm(request.POST)
+         if form.is_valid():
+             app_id = form.cleaned_data['app_id']
+             links.append(('Invite a Person to view/modify app',
+                           reverse('dashboard:send_invite', args=[app_id])))
+ 
+             links.append(('Troubleshoot User Account',
+                           reverse('dashboard:account_troubleshoot', args=[app_id])))
+ 
+             # No Reminder Email
+             try:
+                 nre = NoReminderEmail.objects.filter(
+                     application__pk=app_id).get()
+                 links.append(('Remove Reminder/Past Due email block',
+                               reverse('admin:dashboard_noreminderemail_delete', args=[nre.pk])))
+             except NoReminderEmail.DoesNotExist:
+                 links.append((
+                     'Prevent Reminder/Past Due emails to this app',
+                     "{}?application={}".format(
+                         reverse('admin:dashboard_noreminderemail_add'), app_id
+                     )
+                 ))
+ 
+             # Pin Admission Officer
+             try:
+                 pao = PinAdmissionsOfficer.objects.filter(
+                     application__pk=app_id).get()
+                 links.append(
+                     ('Edit pinned Admissions Officer for app',
+                      reverse('admin:dashboard_pinadmissionsofficer_change', args=[pao.pk])))
+             except PinAdmissionsOfficer.DoesNotExist:
+                 links.append((
+                     'Pin an Admission Officer for this app (for scholarship students)',
+                     "{}?application={}".format(
+                         reverse(
+                             'admin:dashboard_pinadmissionsofficer_add'), app_id
+                     )
+                 ))
+ 
+             # Financial Override
+             try:
+                 fo = FinancialOverride.objects.filter(
+                     application__pk=app_id).get()
+                 links.append(('Edit Financial Overrides for this app',
+                               reverse('admin:dashboard_financialoverride_change', args=[fo.pk])))
+             except FinancialOverride.DoesNotExist:
+                 links.append((
+                     'Add a financial override for this app (change deposit & balance messages)',
+                     "{}?application={}".format(
+                         reverse('admin:dashboard_financialoverride_add'), app_id
+                     )
+                 ))
+ 
+             csr_objects = CourseStatusRecordTab.objects.select_related('course').filter(
+-                application__pk=app_id).filter_upcoming_current()
++                application__pk=app_id).filter_current_six_months_completed()
+             csr_objects = csr_objects.exclude(
+                 pk__in=[csr.pk for csr in csr_objects if csr.course.pro_no_dashboard]
+             )
+             for csr in csr_objects:
+                 title = 'Dashboard for %s (%s)' % (
+                     unicode(csr.course), csr.verbose_status)
+                 href = reverse('dashboard:csr_detail', args=[csr.pk])
+                 links.append((title, href))
+ 
+     else:
+         links.append(('Prevent Reminder/Past Due emails to an app',
+                       reverse('admin:dashboard_noreminderemail_add')))
+         links.append(('Pin an Admission Officer to an app (for scholarship students)',
+                       reverse('admin:dashboard_pinadmissionsofficer_add')))
+         links.append(('Add a Financial Override (change tuition deposit & balance messages)',
+                       reverse('admin:dashboard_financialoverride_add')))
+         links.append(('Troubleshoot User Account',
+                       reverse('dashboard:account_troubleshoot')))
+ 
+     links.append(('Admissions Reporting', reverse('reporting_home')))
+     links.append(('Admissions Documentation',
+                   r'http://wiki.nols.edu/website/admissions/index.html'))
+ 
+     if form is None:
+         form = InternalLinksForm()
+ 
+     return render(request, 'admissions/dashboard/internal_links.html',
+                   {'form': form,
+                    'app_id': app_id,
+                    'links': links})
+ 
+ 
+ @login_required
+ @staff_member_required
+ @permission_required('dashboard.account_troubleshoot', raise_exception=True)
+ def account_troubleshoot(request, app_id=None):
+     forms = {'email_form': None,
+              'person_form': None}
+     context = {'forms': {'email_form': None, 'person_form': None}}
+ 
+     if app_id:
+         app = ApplicationTab.objects.select_related('person').get(id=app_id)
+ 
+         active_email_addresses = [email.email_address for email in app.person.entity.email_addresses
+                                   if email.status == 'Current']
+         context['best_person'] = app.person
+         context['name'] = '%s %s' % (
+             app.person.entity.name.first, app.person.entity.name.last)
+         context['emails'] = ', '.join(active_email_addresses)
+         context['gender'] = app.person.sex
+         context['birth_date'] = app.person.entity.birth_date
+         context['nexus_server'] = settings.NEXUS_SERVER
+ 
+         context['people_with_users'] = []
+         context['people_no_users'] = []
+ 
+         users = app.person.user_set.get_queryset()
+         if users:
+             context['people_with_users'].append(app.person)
+             if len(users) > 1:
+                 context['status'] = 'The person record was found with multiple connected users.'
+             else:
+                 context['status'] = 'The person record was found with one connected user.'
+ 
+             if users.filter(is_active=True):
+                 context['best_user'] = users.filter(
+                     is_active=True).latest('last_login')
+             else:
+                 context['best_user'] = users.filter(
+                     is_active=False).latest('last_login')
+         else:
+             context['people_no_users'].append(app.person)
+             context['status'] = 'The person record was found with no connected users.'
+ 
+         context['disconnect_users'] = User.objects.filter(email__in=active_email_addresses,
+                                                           first_name=app.person.entity.name.first,
+                                                           last_name=app.person.entity.name.last,
+                                                           nols_person=None)
+         if 'best_user' not in context and context['disconnect_users']:
+             if context['disconnect_users'].filter(is_active=True):
+                 context['best_user'] = context['disconnect_users']\
+                     .filter(is_active=True).latest('last_login')
+             else:
+                 context['best_user'] = context['disconnect_users']\
+                     .filter(is_active=False).latest('last_login')
+ 
+         return render(request, 'admissions/dashboard/account_troubleshoot.html', context)
+ 
+     if request.method == 'POST':
+         context['forms']['email_form'] = EmailAddressForm(request.POST)
+         context['forms']['person_form'] = PersonForm(request.POST,
+                                                      show_minimum_name=True,
+                                                      show_ethnicity=False,
+                                                      use_birthdate_widget=False)
+ 
+         is_valid = True
+         for form in forms:
+             is_valid = is_valid and context['forms'][form].is_valid()
+ 
+         if is_valid:
+             statuses = {
+                 1: "A website user was found connected to a person in the core database.",
+                 2: "Multiple website users were found connected to a person in the core "
+                    "database.",
+                 3: "An unconnected website user was found that matches a person in the "
+                    "core database. The person already has a user connected.",
+                 4: "A website user was found connected to a person in the database, but "
+                    "the person info entered doesn't match the database person info.",
+                 5: "A website user was found connected to person1, yet the entered info "
+                    "matches a person2 in our database.",
+                 6: "An unconnected website user was found that possibly "
+                    "matches a person in the core database.",
+                 7: "A website user was found that has yet to create any information in "
+                    "the core database.",
+                 8: "A person was found in the core database, but no website user is "
+                    "associated with it.",
+                 9: "No website user or core database person found that are best matches to"
+                    " the info entered."
+             }
+ 
+             mm = MatchMaker(context['forms']['person_form'],
+                             context['forms']['email_form'],
+                             create=False)
+             users = mm.matching_users
+             matches = mm.possible_matches
+             best_person = mm.person
+ 
+             context['connected'] = mm.connected
+             context['status'] = statuses[mm.status]
+             context['name'] = '%s %s' % (context['forms']['person_form'].cleaned_data['first_name'],
+                                          context['forms']['person_form'].cleaned_data['last_name'])
+             context['email'] = context['forms']['email_form'].cleaned_data['email_address']
+             context['gender'] = context['forms']['person_form'].cleaned_data['gender']
+             context['birth_date'] = context['forms']['person_form'].cleaned_data['birth_date']
+             context['nexus_server'] = settings.NEXUS_SERVER
+ 
+             context['people_with_users'] = []
+             context['people_no_users'] = []
+             for match in matches:
+                 if match['confidence'] > 3:
+                     _person = NolsPerson.objects.get(
+                         person_id=match['person'].id)
+                     if best_person and _person.person_id == best_person.id:
+                         context['best_person'] = _person
+                         if _person.user_set.get_queryset():
+                             context['people_with_users'].insert(
+                                 0, context['best_person'])
+                         else:
+                             context['people_no_users'].insert(
+                                 0, context['best_person'])
+                     elif _person.user_set.get_queryset():
+                         context['people_with_users'].append(_person)
+                     else:
+                         context['people_no_users'].append(_person)
+ 
+             context['disconnect_users'] = []
+             for user in users:
+                 if not user.entity_id:
+                     context['disconnect_users'].append(user)
+ 
+             if mm.user:
+                 context['best_user'] = mm.user
+ 
+             return render(request, 'admissions/dashboard/account_troubleshoot.html', context)
+ 
+     if context['forms']['person_form'] is None:
+         context['forms']['person_form'] = PersonForm(show_minimum_name=True,
+                                                      show_ethnicity=False,
+                                                      use_birthdate_widget=False)
+     if context['forms']['email_form'] is None:
+         context['forms']['email_form'] = EmailAddressForm()
+ 
+     return render(request, 'admissions/dashboard/account_troubleshoot.html', context)

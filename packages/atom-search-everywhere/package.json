@@ -1,0 +1,121 @@
+{
+  "_from": "https://www.atom.io/api/packages/atom-search-everywhere/versions/1.1.0/tarball",
+  "_id": "atom-search-everywhere@1.1.0",
+  "_inBundle": false,
+  "_integrity": "sha512-x4RIb3gjOF4iYI3H+tVxpoUhp3g9OA8syVEXe5lMI63shYrdOcHZRl0x/kSa+uHJkmF09EKYfBZECQWWGW2Z5Q==",
+  "_location": "/atom-search-everywhere",
+  "_phantomChildren": {},
+  "_requested": {
+    "type": "remote",
+    "raw": "https://www.atom.io/api/packages/atom-search-everywhere/versions/1.1.0/tarball",
+    "rawSpec": "https://www.atom.io/api/packages/atom-search-everywhere/versions/1.1.0/tarball",
+    "saveSpec": "https://www.atom.io/api/packages/atom-search-everywhere/versions/1.1.0/tarball",
+    "fetchSpec": "https://www.atom.io/api/packages/atom-search-everywhere/versions/1.1.0/tarball"
+  },
+  "_requiredBy": [
+    "#USER",
+    "/"
+  ],
+  "_resolved": "https://www.atom.io/api/packages/atom-search-everywhere/versions/1.1.0/tarball",
+  "_shasum": "784ba2d6a22e37b3be10f69e0d3a257ca3aad2c6",
+  "_spec": "https://www.atom.io/api/packages/atom-search-everywhere/versions/1.1.0/tarball",
+  "_where": "/private/var/folders/dp/vj05cwss7pz9mjl62ccqzysm0000gp/T/apm-install-dir-1181118-75478-1eg42bk.31zg",
+  "activationCommands": {
+    "atom-workspace": [
+      "search-everywhere:toggle",
+      "search-everywhere:toggleLastSearch",
+      "search-everywhere:toggleWordUnderCursor"
+    ]
+  },
+  "bugs": {
+    "url": "https://github.com/frapples/atom-search-everywhere/issues"
+  },
+  "bundleDependencies": false,
+  "configSchema": {
+    "minSymbolsToStartSearch": {
+      "type": "number",
+      "default": 3,
+      "order": 0
+    },
+    "maxCandidates": {
+      "type": "number",
+      "default": 100,
+      "description": "If there are too many searches, truncate the search results according to this option.",
+      "order": 1
+    },
+    "searcherPriority": {
+      "type": "array",
+      "default": [
+        "gitgrep",
+        "grep",
+        "builtin"
+      ],
+      "description": "The plugin will look up the first available searcher in order for the search.",
+      "order": 2
+    },
+    "gitGrepCommandString": {
+      "type": "string",
+      "default": "git grep -i --no-color -n -E",
+      "order": 3
+    },
+    "grepCommandString": {
+      "type": "string",
+      "default": "ag -i --nocolor --nogroup --column",
+      "order": 4
+    },
+    "preserveLastSearch": {
+      "type": "boolean",
+      "default": true,
+      "order": 5
+    },
+    "escapeSelectedText": {
+      "type": "boolean",
+      "default": true,
+      "order": 6
+    },
+    "showFullPath": {
+      "type": "boolean",
+      "default": false,
+      "order": 7
+    },
+    "inputThrottle": {
+      "type": "integer",
+      "default": 50,
+      "order": 8
+    },
+    "escapeOnPaste": {
+      "type": "boolean",
+      "default": true,
+      "order": 9
+    }
+  },
+  "dependencies": {
+    "atom-select-list": "^0.7.2",
+    "escape-string-regexp": "^1.0.3",
+    "fuzzaldrin": "^2.1.0",
+    "hasbin": "^1.2.3"
+  },
+  "deprecated": false,
+  "description": "Fuzzy grep project using ag, pt, ack, grep, ripgrep, or git-grep, Converted from atom-fuzzy-gerp.",
+  "engines": {
+    "atom": ">=0.174.0 <2.0.0"
+  },
+  "homepage": "https://github.com/frapples/atom-search-everywhere#readme",
+  "keywords": [
+    "fuzzy",
+    "grep",
+    "ag",
+    "pt",
+    "productivity",
+    "search",
+    "find"
+  ],
+  "license": "MIT",
+  "main": "./lib/main",
+  "name": "atom-search-everywhere",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/frapples/atom-search-everywhere.git"
+  },
+  "version": "1.1.0"
+}

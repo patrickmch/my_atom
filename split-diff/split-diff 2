@@ -1,58 +1,566 @@
-Welcome Back!
+"""WMI view definitions."""
 
-So the rollcall project is not in a terrible state. But you will need to brush up here a little bit.
-This is the spec: https://docs.google.com/document/d/1YuRm9oXDiRfQsOS_bjfTbnceY589E-rqymXUOCS1kiA/edit?pli=1#heading=h.g4bt55icdp8q
+from datetime import date, datetime, timedelta, time
+from logging import getLogger
+import json
 
-Basically, a big part of the work is in a decent (PR-able) state. Ideally, we would reduce the context variables that make a horrible mess in the templates by adding context in to the views. I've started this with two WIP commits that you can ditch but are probably worth keeping. For example:
+from django.conf import settings
+from django.contrib import messages
+from django.contrib.auth.decorators import login_required
+from django.core.cache import cache
+from django.core.urlresolvers import reverse
+from django.http import HttpResponse
+from django.http import HttpResponseNotAllowed
+from django.http import HttpResponseRedirect, Http404
+from django.shortcuts import render, redirect
+from django.template import RequestContext
+from django.views.decorators.cache import never_cache
 
-template.html:
+from core.constants import WILD_MED, GROUP_NAMES
+from core.decorators import check_write_protect, connect_required
+from core.forms import ContactForm, PersonForm
+from core.models import CourseTab, FinCashTab
+from core.nmc import da
+from core.utils import get_email_address_from_constant
+from payment.forms import BalancePaymentForm
+from payment.models import Order, LineItem
+from payment.utils import payment_redirect
+from wmi import utils
+from wmi.constants import WMI_PDF_APPLICATION_URL_TEMPLATE
+from wmi.forms import ApplicationForm
+from wmi.forms import WmiTppForm
+from wmi.models import Course, Application
 
-{# this is shitty: #}\
-{% with "auth_form" as form_id %}\
-  {% with auth_form as form %}\
-      {% url "login"  as form_action %}\
-      {% url "get_started"  event.wmi_course_id as redirect %}\
-      {% with "next" as redirect_name %}\
-      {% with "Login" as modal_title %}\
-          {% include "dataentry/fragments/login_modal.html" %}\
-      {% endwith %}\
-      {% endwith %}\
-  {% endwith %}\
-{% endwith %}\
+log = getLogger(__name__)
 
-{# ah, much better: #}\
-{% with auth_form as form %}\
-    {% url "get_started"  event.wmi_course_id as redirect %}\
-      {% include "dataentry/fragments/login_modal.html" %}\
-{% endwith %ecan achieve this by getting adding context in the view. Currently I'm trying to refactor core/utils_dataentry.py to do this.
+MIME_TYPE_JSON = "text/javascript"
 
-This is currently at the end of core/utils_dataentry.py:\
-def build_auth_form(request=None):\
-    return {\
-            "form": AuthenticationForm(request=request),\
-            "title": "Login",\
-            "form_id": "auth_form",\
-            "redirect_name": "next",\
-            "form_action": reverse("login")\
+MESSAGE_WAITLIST = \
+    'This course is full. However we can collect your ' \
+    'information and contact you if a slot becomes available.'
+MESSAGE_PRE_CHARGE_FAIL = \
+    'This course just filled up. We did not charge your credit card. '\
+    'However we can collect your information and contact you if a slot becomes available.'
+WMI_COURSE_APP_DESC = "Wilderness Medicine Course Application"
+WMI_COURSE_APP_CONTACT_INFO_NS = "wmi_app_"
+
+
+def _populate_course_prices(courses, course_prices):
+    """Populate the cached course prices for C{courses}."""
+
+    if not courses:
+        return courses
+
+    # consume iterable to force django ORM to actually perform the query
+    courses = tuple(courses)
+
+    course_price_dict = {}
+
+    for course_price in course_prices:
+        course_price_list = course_price_dict.setdefault(
+            course_price.course_id, [])
+        course_price_list.append(course_price)
+
+    for course in courses:
+        course_price_list = course_price_dict.get(course.id)
+        if course_price_list is None:
+            course._cached_cached_course_prices = tuple()
+        else:
+            course._cached_cached_course_prices = tuple(course_price_list)
+
+    return courses
+
+
+@never_cache
+def details(request, course_id):
+    """Display course details."""
+    cache_key = "wmi_course_details_data:%s" % course_id
+    context_dict = cache.get(cache_key, None)
+    if context_dict is None:
+        try:
+            course = Course.objects.select_related(
+                'type', 'type__group', '_enroll_status',
+            ).get(pk=course_id)
+        except Course.DoesNotExist:
+            raise Http404
+
+        if course.start_date < date.today():
+            context_dict = {'course': course}
+
+            return render(request, 'wmi/old_course.html', context=context_dict)
+
+        if course.is_enrollable:
+            nols_reg_website = request.build_absolute_uri(
+                reverse('wmi_apply', args=[str(course.id)]))
+        else:
+            nols_reg_website = ''
+
+        if course.wmi_is_registrar:
+            website = nols_reg_website
+        elif course.website:
+            if course.website.startswith('http'):
+                website = course.website
+            else:
+                website = 'http://' + course.website
+        else:
+            website = ''
+        wmi_online_reg = course.is_enrollable and course.wmi_is_registrar
+
+        reg_options = [
+            {'type': 'Online', 'info': website},
+            {'type': 'Email', 'info': course.email},
+            {'type': 'Phone', 'info': course.phone},
+            {'type': 'Fax', 'info': course.fax},
+        ]
+        if course.wmi_is_registrar:
+            reg_options.insert(1, {
+                'type': 'Fax/Mail',
+                'info': WMI_PDF_APPLICATION_URL_TEMPLATE})
+        price_options = tuple(course.courseprice_set.select_related().all().order_by('amount'))
+
+        # Apply button should go away at 5 pm MT on the day before the course starts, but
+        # turn it off a little early just to be sure.
+        five_pm = time(16, 59, 30)
+        app_deadline = datetime.combine(course.start_date-timedelta(days=1), five_pm)
+        past_app_deadline = datetime.now() >= app_deadline
+
+        context_dict = {
+            'past_app_deadline': past_app_deadline,
+            'wmi_online_reg': wmi_online_reg,
+            'course': course,
+            'reg_options': [item for item in reg_options if item['info']],
+            'price_options': price_options,
+        }
+
+    course = context_dict['course']
+    wmi_online_reg = context_dict['wmi_online_reg']
+    page_messages = context_dict.setdefault('page_messages', [])
+    if course.is_waitlist and wmi_online_reg:
+        page_messages.append(MESSAGE_WAITLIST)
+
+    return render(request, 'wmi/details.html', context=context_dict)
+
+
+@check_write_protect
+@login_required
+@connect_required(after_connect_desc=WMI_COURSE_APP_DESC)
+def apply(request, course_id, is_nolsie=False):
+    """Apply for a course."""
+
+    try:
+        course = Course.objects.get(pk=course_id)
+    except Course.DoesNotExist:
+        raise Http404
+
+    if course.start_date < date.today():
+        raise Http404
+
+    user = request.user
+    price_options = course.courseprice_set.all().order_by('amount')
+
+    # The connect_required decorate ensures our connect logic runs, which
+    # ensures we collect the DOB, but DOB could be removed at a later date
+    # Notify customer service about these edge cases.
+    if user.entity.birth_date:
+        age_at_start = user.entity.age_as_of(course.start_date)
+        if age_at_start < course.minimum_age:
+            return redirect(reverse("wmi_requirements"))
+    else:
+        log.exception(
+            'Missing DOB for WildMed course. Person ID ({person_id}) is applying to {course}, but '
+            'we no longer have a birthdate. WildMed should contact them to confirm they meet '
+            'minimum age requirements.'.format(person_id=user.entity.id, course=course.name)
+        )
+
+    # Build the right kind of application (normal or waitlist)
+    if course.is_waitlist:
+        application_type_id = Application.TYPE_ID.WAITLIST
+        application_status_id = Application.STATUS_ID.SUBMITTED
+        app_payment_status_id = Application.PAYMENT_STATUS_ID.NO_PAYMENT_REQUIRED
+    else:
+        # Disallow enrollments on courses that are not enrollable.
+        # We may get here if a user visits the URL explicitly.
+        if is_nolsie:
+            if not course.is_nols_enrollable:
+                raise Http404
+        else:
+            if not course.is_enrollable:
+                raise Http404
+
+        application_type_id = Application.TYPE_ID.ENROLLMENT
+        application_status_id = Application.STATUS_ID.STARTED
+        app_payment_status_id = Application.PAYMENT_STATUS_ID.STARTED
+
+    if request.method != 'POST':
+        # no form data, present initial form.
+        form = {
+            'app_info': ApplicationForm(course=course),
+            'person_info': PersonForm(
+                user=user,
+                show_citizenship=True,
+                citizenship_required=True,
+                show_minimum_name=True,
+                show_gender=True),
+            'contact_info': ContactForm(
+                request,
+                user,
+                prefix=WMI_COURSE_APP_CONTACT_INFO_NS,
+                when_finished_desc=WMI_COURSE_APP_DESC)
+        }
+        already_applied = utils.already_applied_message(request, course)
+        if 'PRE_CHARGE_FAILED' in request.session and request.session['PRE_CHARGE_FAILED']:
+            messages.error(request, MESSAGE_PRE_CHARGE_FAIL)
+            del request.session['PRE_CHARGE_FAILED']
+        elif already_applied:
+            messages.warning(request, already_applied)
+        elif course.is_waitlist:
+            messages.error(request, MESSAGE_WAITLIST)
+
+    else:
+        # Form submitted with data in un-validated state; re-post to the user
+        # if not valid, otherwise create or update application by grabbing the
+        # app_id from the session (stuffed in upon initial display)
+        app_widgets = ApplicationForm(data=request.POST, course=course)
+        person_widgets = PersonForm(
+            data=request.POST,
+            user=user,
+            show_citizenship=True,
+            citizenship_required=True,
+            show_minimum_name=True,
+            show_gender=True)
+        contact_widgets = ContactForm(
+            data=request.POST, request=request, user=request.user,
+            prefix=WMI_COURSE_APP_CONTACT_INFO_NS, when_finished_desc=WMI_COURSE_APP_DESC)
+        redirect_to_url = reverse('wmi_apply_success', args=(course_id,))
+
+        # Be sure that we don't short-circuit form validation calls
+        widgets = (app_widgets, contact_widgets, person_widgets)
+        if not all((w.is_valid() for w in widgets)):
+            form = {
+                'app_info': app_widgets,
+                'person_info': person_widgets,
+                'contact_info': contact_widgets,
             }
+            for f in form.values():
+                f.group_errorlists = True
+            form['errors'] = True
+        else:
+            # posted, clean data ...
+            # ... delete any existing applications and orders, if present
+            existing_apps = Application.objects.filter(
+                user=request.user, status=Application.STATUS_ID.STARTED)
+            for existing_app in existing_apps:
+                if existing_app.order:
+                    existing_app.order.line_items.all().delete()
+                    # TODO: DJANGO_UPGRADE: Some really weird bug related to ordering prevents
+                    # our custom back-end from working consistently in DEBUG vs.
+                    # non-DEBUG mode, so we have to manually delete the app then
+                    # the order
+                    order_id = existing_app.order_id
+                    existing_app.delete()
+                    Order.objects.get(pk=order_id).delete()
 
-**UPDATE**: I've made some headway with this that's a little different than the above. It's in the last two WIP commits if you run a git log. (Look at utils_dataentry.py and find build_form_context(). See it called above in build_initial_form()).
+            # Get contact data objects from form input
+            address_id = contact_widgets.cleaned_data['address_id']
+            address = da.entity.get_address(address_id)
+            if address is None or address.entity_id != request.user.entity_id:
+                raise Http404
 
-Beyond this, the rollcall-account-info-page branch also needs some work. The templates/dataentry/authenticated_form.html file is quite a mess. I've refactored the page somewhat, but make sure that (again) all those damn context variables get factored in to the view. I'd also (obviously) cross-reference what's there with what's on the site right now.
+            addr_rel_id, phone_id = contact_widgets.cleaned_data['phone_id'].split('-')
+            phone = da.entity.get_phone_number(addr_rel_id, phone_id)
+            if phone is None or phone.entity_id != request.user.entity_id:
+                raise Http404
 
-The rollcall-next-steps and rollcall-account-info-page branches are different. I'd rebase rollcall-account-info-page against develop after next-steps has been merged in to develop. Not a huge deal, but might prevent merge conflicts and git hell.
+            email_id = contact_widgets.cleaned_data['email_id']
+            email = da.entity.get_email_address(email_id)
+            if email is None or email.entity_id != request.user.entity_id:
+                raise Http404
 
-Finally, a few commands that recently changed that are great:
+            # Create the base app for enrollment or waitlist, but save later
+            app = Application()
+            app.course_id = course.id
+            app.type_id = application_type_id
+            app.user = request.user
+            app.status_id = application_status_id
+            app.payment_status_id = app_payment_status_id
+            app.is_nolsie = is_nolsie
+            app.address_id = address.location_id
+            app.phone_id = phone.phone_id
+            app.email_id = email.id
 
-In Atom:
-space g d a (git diff all: this will diff all the changes since your last commit)
-space g d d (git diff current file)
-semicolon space (escape)
-semicolon s (save and then escape)
-shift-space (same as cmd-alt)
+            # Finalize the application, simple for waitlist, create an order
+            # and send to payment if an enrollment application
+            if application_type_id == Application.TYPE_ID.WAITLIST:
+                app.submitted_ts = datetime.now()
+                app.clear_fmp_proc_fields()
+                app.save()
+                utils.finalize_application(request, app)
+                return HttpResponseRedirect(redirect_to_url)
+            else:
+                course_price = None
 
-And on the cli:
-git difftool \<branch-or-commit\> \<other branch-or-commit\> (hit :qa to quit both vim tabs at once and move to the next file)
-git rebase -i \<branch-or-commit\> \<other branch-or-commit\> (hit w)
+                if len(price_options) == 1:
+                    course_price = price_options[0]
 
-Finally, don't forget to pull and then rebase the develop branch before you do any PRs or really anything.
+                elif len(price_options) > 1:
+                    course_price = app_widgets.cleaned_data.get('course_price')
+
+                if course.deposit:
+                    amount = course.deposit
+                    app.is_deposit = True
+                elif course_price and course_price.amount:
+                    amount = course_price.amount
+                elif is_nolsie and course.type.default_nols_auth_amount:
+                    amount = course.type.default_nols_auth_amount
+                else:
+                    # This should NEVER happen :-)
+                    message = "Unable to process application. Authorization amount unavailable."
+                    log.error("NOLS Person Id: %s, Course: %s: %s" % (
+                        request.user.entity_id, course.id, message))
+                    messages.error(request, message)
+
+                    return render(request, 'error.html')
+
+                if course_price is not None:
+                    app.course_price_id = course_price.id
+                    app.course_price_description = course_price.description
+                    app.course_price_amount = course_price.amount
+
+                price_description = ', ' + course_price.description if course_price else ''
+                description = '%s%s' % (course.name, price_description)
+                if course.deposit:
+                    description += ' - deposit'
+
+                # Create a blank order, pre-filling required fields. Note the
+                # address saved here is for detail in the payment history. It
+                # is a required field for Order, but the data will be populated
+                # by the payment application
+                order = Order()
+                order.description = description
+                order.ordered_object = course
+                order.user = request.user
+                order.ship_to_first_name = request.user.first_name
+                order.ship_to_last_name = request.user.last_name
+                order.save()
+
+                item = LineItem()
+                item.order = order
+                item.quantity = 1
+                item.item_code = course.id
+                item.description = course.name
+                item.amount = amount
+                item.save()
+
+                app.order = order
+                app.save()
+
+                if is_nolsie:
+                    fail_redirect = reverse('wmi_nols_apply', kwargs={'course_id': course.id})
+                else:
+                    fail_redirect = reverse('wmi_apply', kwargs={'course_id': course.id})
+
+                # Page completed, send user to generic payment form
+                return payment_redirect(
+                    request=request,
+                    login=utils.get_authnet_credentials(),
+                    template='wmi/apply_base.html',
+                    order_id=order.id,
+                    invoice_num="WMI_APP_" + str(app.id),
+                    policies=utils.get_policies(course),
+                    deferred=is_nolsie,
+                    success_callable=utils.course_apply_success,
+                    pre_charge_check=utils.course_pre_charge_check,
+                    fail_redirect=fail_redirect,
+                    redirect_to_url=redirect_to_url,
+                    show_summary=False,
+                    metadata={'group_name': GROUP_NAMES['WMI'],
+                              'source': 'wmi apply'}
+                )
+
+    # Return if initial display or if validation errors exist.
+    return render(request, 'wmi/apply.html', context={
+        'form': form,
+        'course': course,
+        'is_nolsie': is_nolsie
+    })
+
+
+def wmr_redirect(request):
+    """Course description for WMR
+
+    This is admittedly goofy, but it allows us to hook into the Course Types while keeping the
+    course description DRY, stored on the static portion of the website. We do some simple branching
+    so  that the link will work if we're in a dev environment.
+    """
+    host = 'www' if settings.NOLS_WEB_HOST.startswith('localhost') else settings.NOLS_WEB_HOST
+    return HttpResponseRedirect('http://%s/coursefinder/locations/rockymtn/wmr_semester.shtml' % host)
+
+
+@login_required
+@connect_required(after_connect_desc=WMI_COURSE_APP_DESC)
+def apply_success(request, course_id):
+    """Success page for application submission."""
+    app = Application.objects.filter(
+        course_id=course_id,
+        user=request.user).order_by('submitted_ts').last()
+    enrolled = app.type_id == app.TYPE_ID.ENROLLMENT
+    return render(request, "payment_success.html", context={
+        'email_address': request.user.email,
+        'has_payment': enrolled,
+        'mailto': get_email_address_from_constant(WILD_MED.email)
+    })
+
+
+def requirements(request):
+    """Requirements page for applicants."""
+    return render(request, 'wmi/requirements.html')
+
+
+def get_balance_for_course_or_404(entity_id, course_id):
+    balance = da.accounting.get_wmi_balance_for_enrollment(entity_id, course_id)
+    if balance and balance.due_date:
+        # Do this in Python, not in the package because of the lack of a PL/SQL boolean
+        balance.past_due = balance.due_date < date.today()
+        return balance
+    else:
+        raise Http404
+
+
+@check_write_protect
+@login_required
+@connect_required(after_connect_desc="Balance payment")
+def balance_payment(request, course_id):
+    """Display a balance payment form, exposing TPP options if appropriate.
+
+    course_id: The WildMed (not NOLS Core) course id, eg 12390 not 39034042.
+
+    This will display the WildMed balance payment form and, if we get a POST with valid values
+    it will redirect to the Payment module; otherwise, we re-display the form with any errors.
+
+    If the WildMed course offers TPP, it will show that form and require the user to accept or
+    decline TPP. TPP is displayed based on the `tppStatus` column found in flamingo.wmiApplicationsTab.
+
+    This code relies on some painful coordination with the wmiApplicationsTab; specifically, the values
+    for tppStatus need to coordinate.
+
+    """
+
+    course_id = int(course_id)
+    entity_id = request.user.entity.id
+
+    balance = get_balance_for_course_or_404(entity_id, course_id)
+    description = "%s (%s)" % (balance.description, balance.wmi_course_id)
+    total_due = balance.total_due
+    tpp_amount = balance.tpp_amount or 0
+    total_with_tpp = total_due + tpp_amount if tpp_amount else total_due
+
+    if request.method != 'POST':
+        form = BalancePaymentForm(max_payment=total_with_tpp)
+        tpp_form = WmiTppForm(initial={'tpp_status': balance.tpp_status})
+    else:
+        # We should never get a negative balance, but just in case, log it
+        if total_due < 0:
+            log.warning("Negative balance found for WMI online balance payment.")
+            messages.error(request, "There is an error. Please contact NOLS.")
+            return render(request, 'error.html')
+
+        # We may get a zero balance if they submitted payment, used back button and resubmitted
+        elif total_due == 0:
+            messages.error(request, "Payment already processed.")
+            return render(request, 'error.html')
+
+        # else, we have a balance, continue
+        form = BalancePaymentForm(data=request.POST, max_payment=total_with_tpp)
+        tpp_form = WmiTppForm()
+        if form.is_valid():
+
+            tpp_status = request.POST.get('tpp_accepted', 'NA')
+            tpp_location = request.POST.get('tpp_location')
+            tpp_status = tpp_location if tpp_status == 'YES' else tpp_status
+
+            tpp_accepted = tpp_status not in ('DECL', 'DNQ', 'NA')
+            item_code = '%s-%s-TPP_%s' % (entity_id, course_id, tpp_status)
+
+            # Amount to pay is the combined balance w/ TPP (if appropriate).
+            # To create the tuition line item we need to ignore amount_to_pay and use tuition
+            # since TPP will be its own line item. However, let's do a sanity check to ensure
+            # our two methods agree.
+            if tpp_accepted:
+                assert form.cleaned_data['amount_to_pay'] == total_due + tpp_amount
+            else:
+                assert form.cleaned_data['amount_to_pay'] == total_due
+
+            # NOTE: We are using the core course as the ordered object, rather than the wmi/models
+            # Course object because wmi/models Course object only contains enrollable courses, and
+            # it is possible for people to use the online balance payment to pay for courses that
+            # are not publicly enrollable (eg: NOLS staff joining in on an SSR WFR course).
+            core_course = CourseTab.objects.get(id=course_id)
+            course_note = core_course.course_note.split(',')
+            wmi_course_id = int(course_note[0].strip())
+            order = Order()
+            order.description = description
+            order.reference_id = wmi_course_id
+            order.ordered_object = core_course
+            order.user = request.user
+            order.ship_to_first_name = request.user.first_name
+            order.ship_to_last_name = request.user.last_name
+            order.save()
+
+            item = LineItem()
+            item.order = order
+            item.quantity = 1
+            item.item_code = item_code
+            item.description = description
+            item.amount = total_due
+            item.save()
+
+            # Optional TPP line-item
+            if tpp_accepted:
+                item = LineItem()
+                item.order = order
+                item.quantity = 1
+                item.item_code = 'TPP-%s' % tpp_status
+                item.description = 'TPP for %s' % description
+                item.amount = tpp_amount
+                item.save()
+
+            # Page completed, send user to generic payment form
+            return payment_redirect(
+                request=request,
+                login=utils.get_authnet_credentials(),
+                template='base.html',
+                order_id=order.id,
+                invoice_num="WMI_PAY_" + str(course_id),
+                policies=[],
+                deferred=False,
+                success_callable=utils.balance_pay_success,
+                redirect_to_url=reverse('wmi_pmt_success'),
+                show_summary=False,
+                metadata={'group_name': GROUP_NAMES['WMI'],
+                          'source': 'wmi balance'}
+            )
+
+    import bpdb; bpdb.set_trace()
+    return render(request, "payment/balance_pay.html", context={
+        'form': form,
+        'details': balance,
+        'tpp_form': tpp_form,
+    }, context_instance=RequestContext(request))
+
+@login_required
+@connect_required(after_connect_desc="Balance payment")
+def payment_success(request):
+    """Success page for wmi balance payment"""
+    return render(request, "payment_success.html", context={
+        'email_address': request.user.email,
+        'has_payment': True,
+        'mailto': get_email_address_from_constant(WILD_MED.email)
+    }, context_instance=RequestContext(request))
+
+
+def get_tpp_link_for_region(request, region):
+    if request.method == 'GET' and request.is_ajax():
+        data = json.dumps({'link': utils.link_to_tuition_protection_document(region)})
+        return HttpResponse(data, content_type='application/json')
+    else:
+        return HttpResponseNotAllowed(permitted_methods=['GET'])

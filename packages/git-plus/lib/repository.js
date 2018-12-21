@@ -1,6 +1,8 @@
 // @flow
+import * as path from 'path'
 import { GitRepository } from 'atom'
-import git, { getRepo } from './git-es'
+import git, { getRepo, getRepoForPath } from './git-es'
+import type { GitCliResponse } from './git-es'
 
 export type Stash = {
   index: string,
@@ -20,6 +22,27 @@ export const StashCommands: { [label: string]: StashCommand } = {
   Drop: { name: 'drop', pastTense: 'dropped', presentTense: 'dropping' }
 }
 
+export type AddOptions = {
+  update?: boolean
+}
+
+export type FetchOptions = {
+  prune?: boolean
+}
+
+export type PullOptions = {
+  rebase?: boolean,
+  autostash?: boolean,
+  remote?: string,
+  branch?: string
+}
+
+export type PushOptions = {
+  remote?: string,
+  branch?: string,
+  setUpstream?: boolean
+}
+
 export default class Repository {
   repo: GitRepository
 
@@ -28,13 +51,55 @@ export default class Repository {
     return new Repository(repo)
   }
 
+  static async getForPath(path: string): Promise<Repository> {
+    const repo = await getRepoForPath(path)
+    return new Repository(repo)
+  }
+
   constructor(repo: GitRepository) {
     this.repo = repo
   }
 
+  add(path: string, options: AddOptions = { update: false }): Promise<GitCliResponse> {
+    const args = ['add']
+    if (options.update) args.push('--update')
+    else args.push('--all')
+    args.push(path)
+
+    return git(args, { cwd: this.repo.getWorkingDirectory() })
+  }
+
+  getName() {
+    return path.basename(this.repo.getWorkingDirectory())
+  }
+
+  getBranchesForRemote(remote: string): Promise<string[]> {
+    return git(['branch', '-r', '--no-color'], { cwd: this.repo.getWorkingDirectory() }).then(
+      response => {
+        if (!response.failed) {
+          const branches = []
+          response.output.split('\n').forEach(ref => {
+            ref = ref.trim()
+            if (ref.startsWith(`${remote}/`) && !ref.includes('/HEAD')) {
+              branches.push(ref.substring(ref.indexOf('/') + 1))
+            }
+          })
+          return branches
+        } else return []
+      }
+    )
+  }
+
+  getRemoteNames(): Promise<string[]> {
+    return git(['remote'], { cwd: this.repo.getWorkingDirectory() }).then(response => {
+      if (!response.failed) return response.output.split('\n').filter(Boolean)
+      else return []
+    })
+  }
+
   getStashes(): Promise<Stash[]> {
     return git(['stash', 'list'], { cwd: this.repo.getWorkingDirectory() }).then(response => {
-      if (response.success)
+      if (!response.failed)
         return response.output
           .split('\n')
           .filter(Boolean)
@@ -49,8 +114,51 @@ export default class Repository {
     })
   }
 
-  actOnStash(stash: Stash, command: StashCommand): Promise<mixed> {
+  actOnStash(stash: Stash, command: StashCommand): Promise<GitCliResponse> {
     const args = ['stash', command.name, stash.index]
     return git(args, { cwd: this.repo.getWorkingDirectory() })
+  }
+
+  fetch(remote?: string, options: FetchOptions = {}): Promise<GitCliResponse> {
+    const args = ['fetch', remote || '--all']
+    if (options.prune) args.push('--prune')
+    return git(args, { cwd: this.repo.getWorkingDirectory(), color: true })
+  }
+
+  pull(options: PullOptions = {}): Promise<GitCliResponse> {
+    const args = ['pull']
+    if (options.autostash) args.push('--autostash')
+    if (options.rebase) args.push('--rebase')
+    if (options.remote) args.push(options.remote)
+    if (options.branch) args.push(options.branch)
+
+    return git(args, { cwd: this.repo.getWorkingDirectory() })
+  }
+
+  push(options: PushOptions = {}): Promise<GitCliResponse> {
+    const args = ['push']
+    if (options.setUpstream) args.push('--set-upstream')
+    if (options.remote) args.push(options.remote)
+    if (options.branch) args.push(options.branch)
+    return git(args, { cwd: this.repo.getWorkingDirectory() })
+  }
+
+  refresh() {
+    this.repo.refreshIndex()
+    this.repo.refreshStatus()
+  }
+
+  relativize(path: string): string | void {
+    return this.repo.relativize(path)
+  }
+
+  reset(): Promise<GitCliResponse> {
+    return git(['reset', 'HEAD'], { cwd: this.repo.getWorkingDirectory() })
+  }
+
+  async resetChanges(path: string): Promise<GitCliResponse> {
+    const result = await git(['checkout', '--', path], { cwd: this.repo.getWorkingDirectory() })
+    this.refresh()
+    return result
   }
 }

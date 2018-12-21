@@ -11,36 +11,23 @@
   'ctrl-alt-cmd-j': 'window:toggle-dev-tools'
   'cmd-q': 'unset!'
   'cmd-q cmd-q': 'application:quit'
-  'alt-cmd-/': 'nuclide-quick-open:find-anything-via-omni-search'
-  'alt-cmd-j': 'nuclide-fuzzy-filename-provider:toggle-provider'
 
 'atom-text-editor':
-  # 'alt-cmd-enter': 'python-tools:goto-definition'
   'ctrl-enter': 'editor:newline-above'
-  'shift-cmd-enter': 'hey-pane:toggle-focus-of-active-pane'
   'ctrl-k': 'unset!'
-  'ctrl-cmd-o': 'nuclide-open-filenames-provider:toggle-provider'
-  'shift-cmd-j': 'atom-notes:toggle'
-  'shift-cmd-alt-t': 'markdown-writer:toggle-task'
-  'shift-cmd-alt-x': 'markdown-writer:toggle-taskdone'
-
-  # emmet
-  'ctrl-:': 'emmet:remove-tag'
-  'alt-w': 'emmet:wrap-with-abbreviation'
-  'ctrl-space': 'emmet:expand-abbreviation-with-tab'
-
-  # cursor
-  'ctrl-.': 'cursor-history:next-within-editor'
-  'ctrl-,': 'cursor-history:prev-within-editor'
-  'ctrl-<': 'nuclide-navigation-stack:navigate-backwards'
-  'ctrl->': 'nuclide-navigation-stack:navigate-forwards'
+  'alt-cmd-j': 'fuzzy-finder:toggle-file-finder'
+  'alt-cmd-k': 'search-everywhere:toggle'
+  'alt-cmd-w': 'search-everywhere:toggleWordUnderCursor'
+  'alt-cmd-enter': 'python-tools:goto-definition'
+  'shift-cmd-enter': 'hey-pane:toggle-focus-of-active-pane'
+  'ctrl-f': 'hey-pane:toggle-follow-mode'
 
   # custom
   'shift-cmd-space': 'custom:insert-space-keep-cursor-place'
   'ctrl-alt-space': 'custom:insert-tab-keep-cursor-place'
   'alt-enter': 'custom:insert-newline-keep-cursor-place'
 
-
+  # save and escape
   'ctrl-alt-shift-cmd-s': 'keystroke cmd-s escape'
 
 ##############################################################################################
@@ -48,15 +35,6 @@
 ##############################################################################################
 
 'atom-text-editor.vim-mode-plus:not(.visual-mode)':
-
-  # key bindings for multi-cursor-plus
-  'alt-x': 'multi-cursor-plus:mark'
-  'ctrl-alt-k': 'multi-cursor-plus:move-up'
-  'ctrl-alt-j': 'multi-cursor-plus:move-down'
-  'ctrl-alt-h': 'multi-cursor-plus:move-left'
-  'ctrl-alt-l': 'multi-cursor-plus:move-right'
-  'ctrl-alt-cmd-h': 'multi-cursor-plus:move-to-beginning-of-word'
-  'ctrl-alt-cmd-l': 'multi-cursor-plus:move-to-end-of-word'
 
   'alt-k': 'multi-cursor:expandUp'
   'alt-j': 'multi-cursor:expandDown'
@@ -90,8 +68,8 @@
 
 'atom-text-editor.vim-mode-plus:not(.insert-mode)':
   'ctrl-n': 'vim-mode-plus:move-to-next-occurrence'
-  '(': 'vim-mode-plus-user:move-to-previous-symbol'
-  ')': 'vim-mode-plus-user:move-to-next-symbol'
+  'ctrl-u': 'vim-mode-plus:move-to-previous-function'
+  'ctrl-d': 'vim-mode-plus:move-to-next-function'
   'cmd-j': 'vim-mode-plus:join'
   'Y': 'keystroke y i l'
   'cmd-enter': 'editor:newline-below'
@@ -101,7 +79,6 @@
   'ctrl-alt-shift-cmd-j': 'window:focus-pane-below'
   'ctrl-alt-shift-cmd-l': 'window:focus-pane-on-right'
   'ctrl-alt-shift-cmd-h': 'window:focus-pane-on-left'
-
 
   'space left':'window:move-active-item-to-pane-on-left'
   'space right':'window:move-active-item-to-pane-on-right'
@@ -117,10 +94,8 @@
   'ctrl-right':'pane:split-right-and-copy-active-item'
   'ctrl-up':'pane:split-up-and-copy-active-item'
   'ctrl-down':'pane:split-down-and-copy-active-item'
-  'space h': 'hey-pane:toggle-follow-mode'
 
   # space keys!
-  'space p': 'clipboard-plus:toggle'
   'space m': 'application:open-your-keymap'
 
   'space g g': 'git-plus:menu'
@@ -153,7 +128,6 @@
 
   'space 1': 'window:reload'
 
-
   'shift-alt-j': 'vim-mode-plus:move-down-to-edge'
   'shift-alt-k': 'vim-mode-plus:move-up-to-edge'
 
@@ -162,6 +136,10 @@
   'alt-h': 'vim-mode-plus:move-to-previous-word'
   'shift-h': 'vim-mode-plus:move-to-first-character-of-line'
 
+  # Just delete line and don't save it to register
+  'q': 'editor:delete'
+  'Q': 'editor:delete-line'
+  # Delete a line and save to register
   'D': 'vim-mode-plus:delete-line'
   'd x': 'vim-mode-plus:delete-to-last-character-of-line'
   'd X': 'keystroke v ctrl-h x'
@@ -171,25 +149,33 @@
   'g _': 'vim-mode-plus:snake-case'
   'ctrl-z': 'vim-mode-plus:upper-case-first'
   '_': 'vim-mode-plus:replace-with-register'
+  'W': 'vim-mode-plus:move-to-next-subword'
+  'B': 'vim-mode-plus:move-to-previous-subword'
 
 'atom-text-editor.vim-mode-plus.operator-pending-mode':
   'c': 'vim-mode-plus:inner-word'
   'C': 'vim-mode-plus:inner-smart-word'
+  'i q': 'vim-mode-plus:inner-subword'
+
 ###################################-package specific keymaps-##################################
 
+'atom-text-editor:not(.mini):not(.jumpy-jump-mode).vim-mode-plus:not(.insert-mode), .tree-view':
+    'backspace': 'back-jumpy:back'
+    'shift-backspace': 'back-jumpy:forward'
+
 '.tree-view':
-  'ctrl-h': 'focus-pane-or-panel:focus-on-left'
-  'ctrl-l': 'focus-pane-or-panel:focus-on-right'
+  'ctrl-alt-shift-cmd-h': 'focus-pane-or-panel:focus-on-left'
+  'ctrl-alt-shift-cmd-l': 'focus-pane-or-panel:focus-on-right'
 
 # for cmd-f panel
 '.platform-darwin .find-and-replace atom-text-editor':
-  'ctrl-j': 'focus-pane-or-panel:focus-below'
-  'ctrl-k': 'focus-pane-or-panel:focus-above'
+  'ctrl-alt-shift-cmd-j': 'focus-pane-or-panel:focus-below'
+  'ctrl-alt-shift-cmd-k': 'focus-pane-or-panel:focus-above'
 
 # for cmd-shift-f panel
 '.platform-darwin .project-find atom-text-editor':
-  'ctrl-j': 'focus-pane-or-panel:focus-below'
-  'ctrl-k': 'focus-pane-or-panel:focus-above'
+  'ctrl-alt-shift-cmd-j': 'focus-pane-or-panel:focus-below'
+  'ctrl-alt-shift-cmd-k': 'focus-pane-or-panel:focus-above'
 
 '.platform-darwin .advanced-open-file':
   'ctrl-;': 'advanced-open-file:delete-path-component'

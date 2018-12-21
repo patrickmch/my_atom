@@ -1,0 +1,207 @@
+diff --git a/nols_website/wmi/README.md b/nols_website/wmi/README.md
+index e53698265..6ad8375b6 100644
+--- a/nols_website/wmi/README.md
++++ b/nols_website/wmi/README.md
+@@ -1,191 +1,191 @@
+   ## Testing WildMed balance features
+ 
+   Currently (2017-12-12) the WildMed applications work with some non-standard core Oracle tables
+   that are shared by Oracle and FileMaker Pro.
+ 
+   To ge a balance to appear in a testing environment usually requires that someone in the WildMed
+   office move an application out of the "Apps Queue" via FileMaker Pro.
+ 
+   Below is a SQL script that injects the necessary data for a balance to appear. Developers will
+   need to change the < personId > to match their Person ID. Not doing so will result in a SQL
+   error.
+ 
+   These series of scripts can be run all at once; they are designed to clear out an existing app
+   (if it exists) and repopulate the data.
+ 
+     -- -----------------------------------------------------------------------------
+     -- Simple SQL commands to setup WEMT balance payment,
+     -- fascilitates testing TPP payment.
+-    -- You MUST replace <personId> with the personId of the connected portal account
++    -- You MUST replace 10210043 with the personId of the connected portal account
+     -- -----------------------------------------------------------------------------
+-    
++
+     -- ... clean up any previous test data we injected.
+     delete from wmiAccountLinesTab where wmiAppId = 888888;
+     delete from wmiApplicationsTab where wmiAppId = 888888;
+     commit;
+-    
++
+     INSERT INTO WMIAPPLICATIONSTAB (
+         WMIAPPID,
+         NOLSPERSONID,
+         NOLSCOURSEID,
+         WMICOURSEID,
+         PORTALAPPID,
+         STUDENTTYPE,
+         ENROLLSTATUS,
+         NOLSIE,
+         WAITLISTPREFERENCE,
+         WAITLISTTS,
+         NOTESAPPLICATION,
+         NOTESFEEROSTER,
+         CERTIFICATION,
+         CPR,
+         SOURCEHEARDFROM,
+         RECERTIFICATION,
+         RECERTIFICATIONFROM,
+         PRECOURSEINFOSENTTS,
+         TOITYPE,
+         TOIAMOUNTLOOKUP,
+         TOICUSTUMAMOUNT,
+         TOIDISCOUNTRESULT,
+         EMPLOYEE,
+         LINKED_ADDRESSID,
+         LINKED_PHONEID,
+         LINKED_EMAILID,
+         TPPSTATUS,
+         TPPBALANCED,
+         TPPSTATUSMODIFIEDTS,
+         ROSTER_TRANSPORTATION,
+         ROSTER_DIETARY,
+         ROSTER_HOUSING,
+         ROSTER_TEXTBOOKS,
+         ROSTER_TEXTBOOKS_SHIPPED,
+         ROSTER_ADDITIONAL_DETAILS,
+         CREATIONBY,
+         CREATIONTS,
+         MODIFICATIONBY,
+         MODIFICATIONTS,
+         ALASKA_CHECKBOX,
+         CPR_CHECKBOX,
+         CERTIFICATION_CHECKBOX,
+         IS_ENROLLMENT_APP,
+         IS_ENROLL,
+         IS_CERTIFY,
+         IS_RECERTIFICATION,
+         IS_WAITLIST_APP,
+         IS_WAITLIST_ACTIVE,
+         STUDENT_TYPE_GROUPING,
+         SCORE,
+         LETTER_GRADE
+     )  VALUES  (
+         888888,
+-        <personId>, -- personId
+-        39034041, -- NOLS Core WildMed Course Id
+-        12389,   -- Matched to wmi_test_data.json
++        10210043, -- personId
++        39035905, -- NOLS Core WildMed Course Id
++        13521,   -- Matched to wmi_test_data.json
+         115006, -- portalAppId
+         'NOLS HR',
+         'Enrolled',
+         NULL,
+         NULL,
+         NULL,
+         NULL,
+         NULL,
+         'WEMT', -- certification
+         'WMI',
+         NULL,
+         'No', -- recertification
+         NULL,
+         NULL,
+         'No Discount',
+         0,
+         NULL,
+         NULL,
+         NULL,
+         25335766, -- addressId
+         22500098, -- phoneId
+         197043,   -- emailId
+         'Pending',     -- tppStatus
+         NULL,     -- tppBalanced
+         NULL,     -- tppStatusModifiedTs
+         NULL,
+         NULL,
+         NULL,
+         NULL,
+         NULL,
+         'Payment For: Tuition Only',
+         'jennifer pryor',
+         sysTimestamp,
+         'april gustin',
+         sysTimestamp,
+         NULL,
+         NULL,
+         NULL,
+         1,1,0,0,0,0,
+         'Error-StudentType Grouping',
+         NULL, -- score
+         NULL  -- letterGrade
+       );
+-    
++
+     INSERT INTO wmiAccountLinesTab (
+         ACCOUNTLINEID,
+         NOLSPERSONID,
+         NOLSCOURSEID,
+         WMICOURSEID,
+         CREATIONBY,
+         CREATIONTS,
+         MODIFICATIONBY,
+         MODIFICATIONTS,
+         WMICOURSESTARTDATE,
+         WMIAPPID,
+         ACCOUNTLINESTATUS,
+         TRANSACTIONDATETS,
+         STUDENT_ACTION,
+         PAYMENT_METHOD,
+         COURSE_ACTION,
+         CREDIT,
+         SUBSIDY,
+         DEBIT,
+         STUDENT_REFUND,
+         COURSE_REFUND,
+         TPP_TUITION_AMOUNT,
+         TPP_BALANCED_FLAG,
+         LINKED_ADDRESSID,
+         LINKED_PHONEID,
+         LINKED_EMAILID,
+         ACCOUNTLINE_MEMO,
+         APPLY_DISCOUNT_TO,
+         MARKER_FLAG,
+         FILTERID,
+         TRANSACTIONID
+     )  VALUES  (
+         wmi_accountlines_seq.nextVal,
+-        <personId>,  -- personId
+-        39034041, -- NOLS Core WildMed course ID
+-        12389,
++        10210043,  -- personId
++        39035905, -- NOLS Core WildMed course ID
++        13521,
+         'jennifer pryor',
+         sysTimeStamp,
+         'cynthia jorgenson',
+         sysTimeStamp,
+         to_date('11-Nov-2018','DD-MON-YYYY'),
+         888888,  -- wmiAppId
+         'Done',
+         sysTimeStamp,
+         'Course Enrollment',
+         NULL,
+         NULL,
+         NULL,
+         NULL,
+         3000,
+         NULL,
+         NULL,
+         NULL,
+         NULL,
+         NULL,
+         NULL,
+         NULL,
+         NULL,
+         NULL,
+         NULL,
+-        '<personId> 12389',
++        '10210043 13521',
+         NULL
+       );
+     commit;

@@ -17,7 +17,7 @@
   {
     title: "Virtualenvs"
     paths: [
-      "/Users/mchey/code/virtualenvs"
+      "/Users/mchey/code/venvs"
     ]
     icon: "icon-terminal"
   }

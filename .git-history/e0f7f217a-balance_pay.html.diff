@@ -1,0 +1,180 @@
+diff --git a/nols_website/payment/templates/payment/balance_pay.html b/nols_website/payment/templates/payment/balance_pay.html
+index 05f48d795..5a7b80d2c 100644
+--- a/nols_website/payment/templates/payment/balance_pay.html
++++ b/nols_website/payment/templates/payment/balance_pay.html
+@@ -1,143 +1,73 @@
+ {% extends "core/account/form_base.html" %}
+ {% load payment_tools %}
+ {% load humanize %}
+ {% load static %}
+ 
+ {% block title %}{{ block.super }} - Balance Payment{% endblock %}
+ {% block page_header_text %}Balance Payment{% endblock %}
+ 
+ {% block content %}
+     <div class="row column small-12 medium-8">
+     {% with tution=details.tuition|stringformat:".02f" due_date_str=details.due_date|date:"D M d, Y" tpp_amount=details.tpp_amount|stringformat:".02f" total_with_tpp=details.total_with_tpp|stringformat:".02f" total_without_tpp=details.total_due|stringformat:".02f" %}
+         <h2 class="wmi-balance-pay">{{ details.description }} balance due: $<span
+                 id="total_header">{{ total_with_tpp|floatformat:2|intcomma }}</span></h2>
+         <form action="." method="post" class="widelabel">
+             <fieldset>
+                 <legend>Payment</legend>
+                 <div>
+                     <p>Your balance {% if details.past_due %}was{% else %}is{% endif %}
+                        due <strong>{{ due_date_str }}</strong>
+                     </p>
+                 </div>
+-                {% if details.offers_tpp %}
+-                    <table id="line_items">
+-                        <tr>
+-                            <td id="description">{{ details.description }}</td>
+-                            <td class="tpp_amount">&nbsp;&nbsp;$</td>
+-                            <td id="tuition_amt"
+-                                class="tpp_amount">{{ total_without_tpp|floatformat:2|intcomma  }}</td>
+-                        </tr>
+-                        <tr id="tpp_row" class="tpp_data">
+-                            <td>Tuition Protection Plan</td>
+-                            <td class="tpp_amount">&nbsp;&nbsp;$</td>
+-                            <td id="tpp_display" class="tpp_amount">{{ tpp_amount|floatformat:2|intcomma  }}</td>
+-                        </tr>
+-                        <tr id="tpp_subtotal_line" class="tpp_data">
+-                            <td colspan="3"><hr/></td>
+-                        </tr>
+-                        <tr id="tpp_amount_to_pay" class="tpp_data">
+-                            <td>Amount to pay:</td>
+-                            <td class="tpp_amount">&nbsp;&nbsp;$</td>
+-                            <td id="total_amt"
+-                                class="tpp_amount">{{ total_with_tpp|floatformat:2|intcomma  }}</td>
+-                        </tr>
+-                    </table>
+-
+-                {% endif %}
++                {% if not details.offers_tpp %}
+                 <div id="payment_form"
+                     {% if not details.offers_tpp %}style="display:block;"{% endif %}>
+                     {% include "std_form_layout.html" %}
+                     <br/>
+                 </div>
+-                {% if details.offers_tpp %}
+-                    <div id="tpp_text" class="tpp_offered">
+-                        <p>Your balance can be protected with a Tuition Protection Plan.</p>
+-                        <p>Please fill in your information to see if you qualify.</p>
+-                    </div>
+-                    <br>
+-                    {% with form=tpp_form %}
+-                        {% include 'std_form_layout.html' %}
+-                    {% endwith %}
++                {% else %}
++                      {% block extra_head %}
++                      {{ block.super }}
++                      <script> var tuition_protection_cost = {{ csr.course.tuition_protection_plan_cost|stringformat:"f" }}
++                               var dashboard_url = "#" //TODO
++                               var coverage_groups = {{ csr.application.tuition_protection_coverage_groups|safe }}
++                      </script>
++                      <script src="{% static 'admissions/dashboard/js/tuition_protection_plan.js' %}"></script>
++                      {% endblock extra_head %}
+ 
+-                    <div id="specific_tpp_document" class="tpp_data" style="display:none; margin:2.5em">
+-                        <p>
+-                            The Tuition Protection Plan costs six percent of the total
+-                            tuition and is provided by Aon Affinity. The plan helps to
+-                            protect against tuition loss should you be unable to participate
+-                            or complete your course due to an injury or illness to yourself
+-                            or your immediate family. Additionally, this plan may help to
+-                            pay for evacuation costs from the course location.
+-                        </p>
+-                        <br>
+-                        <p>
+-                            NOLS strongly recommends the Tuition Protection Plan to
+-                            safeguard your investment in&nbsp;tuition.
+-                        </p>
+-                        <br>
+-                        <p>
+-                            AmeriCorps Awards are not reimbursable under this plan nor through NOLS.
+-                        </p>
+-                        <br>
+-                        <p>
+-                        <a id="specific_tpp_link" href="#" target="_">Click to see plan details</a>.
+-                            Please read carefully the exclusions in the plan document for
+-                            activities that may not be covered. The Tuition Protection Plan
+-                            coverage begins at 12:01 a.m. following the date the account
+-                            balance including tuition protection is paid. The Tuition
+-                            Protection Plan payment is non-refundable and not transferable.
+-                        </p>
+-                        <br>
+-                        <p>The cost of this plan is <strong>${{ tpp_amount }}</strong>.</p>
+-                        <p>Your balance with<span id="with_or_without" style="display:inline">out</span>
+-                            the Tuition Protection Plan would be
+-                            <strong>$<span id="tpp_display_cost">{{ total_without_tpp }}</span></strong>.</p>
+-                        <br>
+-                        <div id="tpp_yes" class="button button--medium float-right tpp_action tpp_data yes">
+-                          <span>Accept Tuition Protection</span>
++                      {% block top_left_content %}
++                      <h2>Tuition Protection Plan</h2>
++                      <div>
++                        The Tuition Protection Plan is only available in certain locations. Please fill in your information to see if you qualify.
++                      </div>
++                      <div class="row column hide" id="ajax-form-wrapper" style="margin-top:0">
++
++                      <form method="POST" class="form-horizontal">
++                        <div>
++                          {% with label_columns=-1 input_columns=6 form=tpp_form %}
++                            {% include 'bs_responsive_form_layout.html' %}
++                          {% endwith %}
++                        </div>
++                        <div class="clearfix">
+                         </div>
+-                        <div id="tpp_no" class="button button--hollow button--medium float-left tpp_action tpp_data no">
+-                          <span>Decline Tuition Protection</span>
+-                       </div>
+-                        <input type="hidden" name="tpp_accepted" id="tpp_accepted" value="DECL">
+-                        <input type="hidden" name="tpp_location" id="tpp_location" value="">
+-                    </div>
++                      </form>
++
++                      </div>
++                      {% endblock %}
++
++                      {% block bottom_content %}
++                      {% include 'admissions/dashboard/student_form_views/tuition_protection_modals.html' %}
++                      {% endblock %}
+ 
+-                    <div id="confirm_dialog" class="tpp_dialog">
+-                        <p>Are you sure you want to decline the Tuition Protection Plan?</p>
+-                        <input type="button" id="no_btn" class="button button--hollow float-left tpp_dialog_btn" value="No"/>
+-                        <input type="button" id="yes_btn" class="button float-right tpp_dialog_btn" value="Yes"/>
+-                    </div>
+ 
+-                    <div id="not_qualified_dialog" class="tpp_dialog" style="display:none">
+-                        <p>The Tuition Protection Plan, provided by Aon Affinity, is
+-                            unavailable for students who reside in the
+-                            location&nbsp;selected.
+-                        </p>
+-                        <input type="button" id="confirm_btn" class="button float-center tpp_dialog_btn" value="Confirm"/>
+-                        <br/>
+-                    </div>
+                 {% endif %}
+                 <div id="payment_btn" class="text-center"
+                      {% if not details.offers_tpp %}style="display:block;"{% else %}style="display:none;"{% endif %}>
+                     <input class="button float-center" id="make_payment" type="submit" value="Make a payment"/>
+                 </div>
+ 
+             </fieldset>
+         </form>
+     {% endwith %}
+     </div>
+ {% endblock %}
+-{% if details.offers_tpp %}
+-{% block extra_js %}
+-    {{ block.super }}
+-    {% with tpp_status=details.tpp_status tpp_amount=details.tpp_amount|stringformat:".02f" total_with_tpp=details.total_with_tpp|stringformat:".02f" total_without_tpp=details.total_due|stringformat:".02f" %}
+-      <script type="text/javascript">
+-        var tpp_status = '{{ tpp_status }}';
+-            tpp_amount = '{{ tpp_amount }}';
+-            total_with_tpp = {{ total_with_tpp }};
+-            total_without_tpp = {{ total_without_tpp }};
+-      </script>
+-      <script type="text/javascript" src="{% static 'payment/js/wildmed_tpp.js' %}"></script>
+-    {% endwith %}
+-{% endblock %}
+-{% endif %}

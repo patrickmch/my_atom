@@ -38,7 +38,9 @@ type NotificationOptions = {
   icon?: string
 }
 type ErrorNotificationOptions = NotificationOptions & { stack?: string }
-type Notification = {}
+type Notification = {
+  dismiss: () => void
+}
 
 type WorkspaceCenter = {
   getActiveTextEditor(): TextEditor | void
@@ -52,15 +54,39 @@ type ConfigQueryOptions = {
   scope?: ScopeDescriptor
 }
 
+type OpenUriOptions = {}
+
+interface Dock {
+  show(): void;
+}
+
+type URI = string
+interface ViewItem { element: HTMLElement }
+
+type Bindings = {
+  [selector: string]: {
+    [key: string]: string
+  }
+}
+
 type Atom = {
+  clipboard: {
+    write(string): void,
+    read(): string
+  },
   commands: {
-    add(target: string, commandName: string, listener: CommandListener): Disposable,
-    add(target: string, commands: CommandListeners): Disposable
+    add(target: string, commands: CommandListeners): Disposable,
+    add(target: string, commandName: string, listener: CommandListener): Disposable
   },
   config: {
     get(keyPath: string, options?: ConfigQueryOptions): string | boolean | number
   },
+  keymaps: {
+    add(source: string, bindings: Bindings, priority?: number): void,
+    removeBindingsFromSource(string): void
+  },
   notifications: {
+    addInfo(message: string, ?NotificationOptions): Notification,
     addSuccess(message: string, ?NotificationOptions): Notification,
     addError(message: string, ?ErrorNotificationOptions): Notification
   },
@@ -70,9 +96,14 @@ type Atom = {
   },
   workspace: {
     addModalPanel(PanelOptions): Panel,
+    getBottomDock(): Dock,
     getCenter(): WorkspaceCenter,
+    getActiveTextEditor(): TextEditor | void,
     getTextEditors(): TextEditor[],
-    observeActiveTextEditor(callback: (editor: TextEditor | void) => any): Disposable
+    hide(ViewItem | URI): boolean,
+    observeActiveTextEditor(callback: (editor: TextEditor | void) => any): Disposable,
+    open(?URI | ?ViewItem, ?OpenUriOptions): Promise<TextEditor>,
+    toggle(URI | ViewItem): void
   }
 }
 

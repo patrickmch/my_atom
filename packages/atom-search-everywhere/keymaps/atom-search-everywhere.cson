@@ -1,0 +1,25 @@
+# Keybindings require three things to be fully defined: A selector that is
+# matched against the focused element, the keystroke and the command to
+# execute.
+#
+# Below is a basic keybinding which registers on all platforms by applying to
+# the root workspace element.
+
+# For more detailed documentation see
+# https://atom.io/docs/latest/advanced/keymaps
+
+'atom-workspace':
+  'ctrl-alt-g': 'search-everywhere:toggle'
+  'cmd-*': 'search-everywhere:toggleWordUnderCursor'
+
+'body.platform-linux atom-workspace .atom-search-everywhere atom-text-editor, body.platform-win32 atom-workspace .atom-search-everywhere atom-text-editor':
+  'ctrl-v': 'search-everywhere:pasteEscaped'
+
+'body.platform-darwin atom-workspace .atom-search-everywhere atom-text-editor':
+  'cmd-v': 'search-everywhere:pasteEscaped'
+
+'atom-workspace .atom-search-everywhere atom-text-editor':
+  'ctrl-f': 'search-everywhere:toggleFileFilter'
+
+'atom-text-editor.vim-mode:not(.insert-mode)':
+  ', f f': 'search-everywhere:toggle'

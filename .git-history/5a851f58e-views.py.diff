@@ -1,0 +1,1226 @@
+diff --git a/nols_website/payment/views.py b/nols_website/payment/views.py
+index 82095f2a1..66a268458 100644
+--- a/nols_website/payment/views.py
++++ b/nols_website/payment/views.py
+@@ -1,1209 +1,1220 @@
+ from datetime import datetime
+ import pytz
+ import json
+ import time
+ 
+ from django.shortcuts import render
+ import logging
+ from decimal import Decimal
+ from django.views.decorators.csrf import csrf_exempt
+ from django.views.decorators.debug import sensitive_post_parameters, sensitive_variables
+ from django.views.decorators.http import require_POST
+ from django.conf import settings
+ from django.contrib.admin.views.decorators import staff_member_required
+ from django.contrib.auth.decorators import login_required, permission_required
+ from django.http import HttpResponseRedirect, HttpResponse, HttpResponseBadRequest
+ from django.template import RequestContext
+ from django.core.exceptions import ValidationError
+ from django.core.urlresolvers import reverse
+ 
+ # DJ1.11 Move `method_decorators` to the class using a tuple of decorators as explained here:
+ # https://docs.djangoproject.com/en/2.0/topics/class-based-views/intro/#id1
+ from django.utils.decorators import method_decorator
+ 
+ from django.views.generic import View
+ 
+ from alumni.models import Gift
+ from core.constants import ALUMNI, SEMINARS, GROUP_NAMES
+ from core.decorators import check_write_protect, connect_required
+ from core.session_utils import AnonymousAddress
+ from core.nmc import da
+ from core.formhelp import populate_address_attrs
+ from core.forms import ContactForm, AddressForm
+ from core.models import CourseStatusRecordTab, FinCashTab
+ from core.utils import get_email_address_from_constant
+ from nols.util.formatting import attempt_title
+ 
+ from payment.constants import PMT_CONFIG_KEY, ORDER_SUMMARY_REVIEW_TTL, LINE_ITEM_DESCRIPTIONS
+ from payment.decorators import validate_payment_config, validate_authorization
+ from payment.forms import (MainPaymentForm, DiscountForm, StripePaymentsForm,
+                            StripeRefundForm, StripeReceiptForm, AchAuthForm, RecurringDonationAdminForm)
+ from payment.models import LineItem, PaymentGatewayAccount, Payment, AccessToken, RecurringBilling
+ from payment.processors import StripeCreditCardProcessor
+ from payment.stripe_api import StripeError, get_balance_transactions, retrieve_charge_metadata, create_customer, \
+     get_webhook_event, get_paginated_subscriptions, DEFAULT_SUB_STATUS, get_subscriptions, get_customer
+ from payment.stripe_utils import create_order
+ from payment.stripe_webhooks import charge_failed, invoice_success, invoice_failed, subscription_canceled
+ from payment.ach_utils import ach_client, process_ach_error
+ from payment.constants import SURCHARGE_FEE, SURCHARGE_FEE_PERCENTAGE
+ from payment import utils
+ from admissions.utils import get_app_and_course_for_entity
+ from plaid.errors import PlaidError
+ from admissions.dashboard.models import AdmissionsOfficer
+ from admissions.models import OpenApp
+ from admissions.forms_apply_open import ExistingAddressForm
+ from feature_config.models import OnlinePayments
+ 
+ log = logging.getLogger(__name__)
+ 
+ DEFAULT_BASE_TEMPLATE = "form_base.html"
+ DEFAULT_FORM_TEMPLATE = 'std_form_layout.html'
+ 
+ 
+ @sensitive_post_parameters('card_num','card_code','exp_date')
+ @check_write_protect
+ @login_required
+ @validate_payment_config
+ def order_summary(request, pmt_token, pmt_config, order):
+     """"Display order details."""
+     # Get client application configuration from session
+     base_template = pmt_config.get(PMT_CONFIG_KEY.BASE_TEMPLATE, DEFAULT_BASE_TEMPLATE)
+ 
+     # Retrieve detailed line items for multi-item orders
+     items = LineItem.objects.filter(order=order.id).order_by('-amount')
+     items = None if len(items) == 1 else items
+     discount_form = None
+ 
+     if request.method != "POST":
+         order_summary_review_ts = pmt_config.get(PMT_CONFIG_KEY.ORDER_SUMMARY_REVIEW_TS)
+         if (not order_summary_review_ts) or ((datetime.now() -
+                 order_summary_review_ts) > ORDER_SUMMARY_REVIEW_TTL):
+             order.initialize()
+         discount_form = DiscountForm(order)
+     else:
+         if "apply_discount" in request.POST:
+             discount_form = DiscountForm(order, request.POST)
+             pmt_config[PMT_CONFIG_KEY.ORDER_SUMMARY_REVIEW_TS] = datetime.now()
+             request.session.modified = True
+ 
+             if discount_form.is_valid():
+                 return HttpResponseRedirect(".")
+             else:
+                 items = LineItem.objects.filter(order=order.id).order_by('-amount')
+                 items = None if len(items) == 1 else items
+ 
+         elif "continue" in request.POST:
+             pmt_config[PMT_CONFIG_KEY.ORDER_SUMMARY_REVIEW_TS] = datetime.now()
+             request.session.modified = True
+             return HttpResponseRedirect(reverse('pmt_authorize', args=(pmt_token,)))
+ 
+     return render(request, 'payment/order_summary.html', context={
+         'discount_form': discount_form,
+         'order': order,
+         'items': items,
+         'base_template': base_template
+     })
+ 
+ 
+ class PaymentView(View):
+     def __init__(self, **kwargs):
+         super(PaymentView, self).__init__(**kwargs)
+         self.login = None
+         self.deferred = None
+         self.policies = None
+         self.modular_policies = None
+         self.success_callable = None
+         self.pre_charge_check = None
+         self.fail_redirect = None
+         self.redirect_to_url = None
+         self.anon_user = None
+         self.base_template = None
+         self.invoice_num = None
+         self.metadata = None
+         self.order = None
+         self.payment_token = None
+         self.user = None
+         self.items = None
+         self.is_anonymous = None
+         self.has_surcharge = None
+ 
+         self.contact_namespace = "payment_"
+         self.when_finished_desc = "Payment"
+         self.address_label = 'Billing Address'
+ 
+     @method_decorator(sensitive_post_parameters('card_num', 'card_code', 'exp_date'))
+     @method_decorator(check_write_protect)
+     @method_decorator(validate_payment_config)
+     @method_decorator(validate_authorization)
+     def get(self, request, pmt_token, pmt_config, order):
+         if OnlinePayments.feature_set_config()['enabled']:
+             self.set_payment_config(pmt_token, pmt_config, order, request)
++
++            if self.order.has_full_discount():
++                self.order.finalize()
++                utils.payment_reset(request, self.payment_token)
++                if self.success_callable:
++                    success_callable_url = self.success_callable(request, self.order.id)
++                    if success_callable_url:
++                        self.redirect_to_url = success_callable_url
++                    return HttpResponseRedirect(self.redirect_to_url)
++
+             self.set_user(request)
+             if self.fails_pre_charge_check(request):
+                 return HttpResponseRedirect(self.fail_redirect)
+ 
+             context = self.build_forms_for_credit_card_get_requests(request)
+             context.update(self.build_forms_for_ach_get_requests(request))
+ 
+             try:
+                 at = AccessToken.objects.filter(payment_token=pmt_token).last()
+                 context.update({'access_token': at.ach_access_token})
+             except AttributeError:
+                 pass
+ 
+             self.update_context_with_common_attrs(request, context)
+             template = self.get_template()
+ 
+             return render(request, template, context)
+         else:
+             return render(request, 'payment/online_payments_disabled.html')
+ 
+     @method_decorator(sensitive_post_parameters('card_num', 'card_code', 'exp_date'))
+     @method_decorator(check_write_protect)
+     @method_decorator(validate_payment_config)
+     @method_decorator(validate_authorization)
+     def post(self, request, pmt_token, pmt_config, order):
+         self.set_payment_config(pmt_token, pmt_config, order, request)
+         self.set_user(request)
+         if self.fails_pre_charge_check(request):
+             return HttpResponseRedirect(self.fail_redirect)
+ 
+         is_credit_card_payment = False
+         is_ach_payment = False
+ 
+         payment_type = request.POST.get('paymentType')
+ 
+         if payment_type == 'credit_card':
+             is_credit_card_payment = True
+             self.metadata['payment_type'] = FinCashTab.PAYMENT_TYPE['Stripe Credit']
+         elif payment_type == 'ach':
+             is_ach_payment = True
+             self.metadata['payment_type'] = FinCashTab.PAYMENT_TYPE['Stripe Check']
+         else:
+             raise Exception("Unknown payment type")
+ 
+         if is_ach_payment:
+             account_id = request.POST.get('account-options')
+             context = self.build_forms_for_ach_post_requests(request)
+             self.update_context_with_common_attrs(request, context)
+ 
+             try:
+                 at = AccessToken.objects.filter(payment_token=pmt_token).last()
+                 context.update({'access_token': at.ach_access_token})
+             except AttributeError:
+                 context['ach_form'].add_error(None,
+                                               "We were unable to complete your "
+                                               "transaction, please try again")
+ 
+             is_successful = False
+             if at and account_id:
+                 try:
+                     stripe_response = ach_client.Processor.stripeBankAccountTokenCreate(at.ach_access_token, account_id)
+                 except PlaidError as e:
+                     data = process_ach_error(e)
+                     context['ach_form'].add_error(None, data['error_message'])
+                 else:
+                     bank_account_token = stripe_response['stripe_bank_account_token']
+                     self.metadata['stripeSource'] = bank_account_token
+ 
+                     if context['ach_auth_form'].is_valid():
+                         is_successful = self.validate_info_and_submit_payment(request,
+                                                                               context,
+                                                                               context['ach_form'])
+             if is_successful:
+                 return HttpResponseRedirect(self.redirect_to_url)
+             else:
+                 context.update(self.build_forms_for_credit_card_get_requests(request))
+                 template = self.get_template()
+ 
+         elif is_credit_card_payment:
+             self.metadata['stripeSource'] = request.POST['stripeSource']
+             context = self.build_forms_for_credit_card_post_requests(request)
+             self.update_context_with_common_attrs(request, context)
+             is_successful = False
+             # We need to make sure contact_form is valid not just went setting
+             # address but also when assigning it, otherwise no fall through
+             # will occur and errors with the contact form will not be displayed
+             if context['contact_form'].is_valid():
+                 context['credit_card_form'].address = context['address']
+                 is_successful = self.validate_info_and_submit_payment(request,
+                                                                       context,
+                                                                       context['credit_card_form'],
+                                                                       self.has_surcharge)
+             if is_successful:
+                 return HttpResponseRedirect(self.redirect_to_url)
+             else:
+                 context.update(self.build_forms_for_ach_get_requests(request))
+                 template = self.get_template()
+ 
+         context.update({'paymentType': payment_type})
+         return render(request, template, context)
+ 
+     def build_forms_for_ach_post_requests(self, request):
+         req_user = request.user
+         unconnected_user = None if self.is_anonymous or req_user.entity else req_user
+         ach_form = MainPaymentForm(prefix='ach_form',
+                                    data=request.POST,
+                                    order=self.order,
+                                    pmt_token=self.payment_token,
+                                    login=self.login,
+                                    anon_user=self.anon_user,
+                                    invoice_num=self.invoice_num,
+                                    request=request,
+                                    policies=self.policies,
+                                    modular_policies=self.modular_policies,
+                                    unconnected_user=unconnected_user,
+                                    metadata=self.metadata)
+ 
+         return {'ach_form': ach_form,
+                 'ach_auth_form': AchAuthForm(request.POST)}
+ 
+     def build_forms_for_ach_get_requests(self, request):
+         initial = {}
+         if self.order.user:
+             initial['first_name'] = self.order.user.first_name
+             initial['last_name'] = self.order.user.last_name
+ 
+         ach_form = MainPaymentForm(prefix='ach_form',
+                                    order=self.order,
+                                    pmt_token=self.payment_token,
+                                    login=self.login,
+                                    anon_user=self.anon_user,
+                                    invoice_num=self.invoice_num,
+                                    request=request,
+                                    policies=self.policies,
+                                    modular_policies=self.modular_policies,
+                                    initial=initial,
+                                    metadata=self.metadata)
+ 
+         ach_auth_form = AchAuthForm()
+ 
+         return {'ach_form': ach_form,
+                 'ach_auth_form': ach_auth_form}
+ 
+     def get_template(self):
+         if self.metadata['source'] in ['open apply', 'dashboard']:
+             template = 'payment/bootstrapped_authorize.html'
+         else:
+             template = 'payment/payment.html'
+ 
+         return template
+ 
+     def get_email(self):
+         if isinstance(self.order.ordered_object, Gift):
+             email = self.order.ordered_object.email
+         elif self.user and self.user.email:
+             email = self.user.email
+         else:
+             email = None
+         return email
+ 
+     def fails_pre_charge_check(self, request):
+         if self.pre_charge_check is not None and not self.pre_charge_check(request, self.order):
+             request.session['PRE_CHARGE_FAILED'] = True
+             return True
+ 
+     def validate_info_and_submit_payment(self, request, context, payment_form, has_surcharge=None):
+         is_successful = False
+         if payment_form.is_valid():
+             try:
+                 payment_info = payment_form.cleaned_data['payment_info']
+                 metadata = {
+                     'first_name': payment_info['first_name'],
+                     'last_name': payment_info['last_name']
+                 }
+ 
+                 email = self.get_email()
+                 payment_info['customer'] = create_customer(payment_info, email=email, metadata=metadata)
+ 
+                 submitted_card_type = request.POST.get('credit_card_form-card_type')
+                 card = payment_info['customer'].sources.data[0].get('card')
+ 
+                 if submitted_card_type:
+                     if submitted_card_type == 'debit_or_prepaid':
+                         if card and card.funding == 'credit':
+                             payment_form.add_error(None,
+                                                    'You have entered a credit card but '
+                                                    'selected debit or prepaid as your card type.')
+                             raise ValidationError('')
+                     else:
+                         if card and card.funding != 'credit':
+                             payment_form.add_error(None,
+                                                    'You have entered a debit or prepaid card but '
+                                                    'selected credit as your card type.')
+                             raise ValidationError('')
+ 
+                 if card and card.get('funding') != 'credit':
+                     has_surcharge = False
+ 
+                 if self.is_recurring_payment:
+                     utils.create_recurring_donation(payment_info, self.user, self.order)
+                 else:
+                     processor = StripeCreditCardProcessor()
+-                    self.handle_surcharge_line_item(has_surcharge, payment_info, context)
++                    if has_surcharge:
++                        self.handle_surcharge_line_item(has_surcharge, payment_info, context)
+                     payment = processor.auth(self.order, payment_info, capture=(not self.deferred))
+                     if card:
+                         payment.card_type = card.funding
+                         payment.save()
+             except StripeError as e:
+                 payment_form.add_error(None, e.message)
+                 LineItem.objects.filter(
+                     order=self.order,
+                     description=LINE_ITEM_DESCRIPTIONS.SURCHARGE).delete()
+             except ValidationError:
+                 pass
+ 
+             else:
+                 # FIXME: Hacky way to get name for anonymous donations
+                 request.session['PMT_FIRST_NAME'] = payment_form.cleaned_data.get('first_name')
+                 request.session['PMT_LAST_NAME'] = payment_form.cleaned_data.get('last_name')
+                 self.order.finalize()
+                 utils.payment_reset(request, self.payment_token)
+                 if self.success_callable:
+                     success_callable_url = self.success_callable(request, self.order.id, payment.id)
+                     if success_callable_url:
+                         self.redirect_to_url = success_callable_url
+                 is_successful = True
+ 
+         return is_successful
+ 
+     def handle_surcharge_line_item(self, has_surcharge, payment_info, context):
+         surcharge = round(context['surcharge'], 2)
+         app_id = payment_info['application_id']
+         surcharge_line_item = LineItem(
+             order=self.order,
+             description=LINE_ITEM_DESCRIPTIONS.SURCHARGE,
+             quantity=1,
+             amount=surcharge)
+         surcharge_line_item.save()
+         payment_info['amount'] = self.order.total_amount
+         if app_id:
+             surcharge_line_item.item_code = app_id
+             surcharge_line_item.save()
+ 
+     def set_payment_config(self, payment_token, pmt_config, order, request):
+         # Get client application configuration from session transaction
+         self.login = pmt_config.get(PMT_CONFIG_KEY.AUTHNET_LOGIN)
+         if not self.login:
+             raise Exception("Missing payment login information")
+         self.deferred = pmt_config.get(PMT_CONFIG_KEY.DEFERRED, False)
+         self.policies = pmt_config.get(PMT_CONFIG_KEY.POLICIES, ())
+         self.modular_policies = pmt_config.get(PMT_CONFIG_KEY.MODULAR_POLICIES, None)
+         self.success_callable = pmt_config.get(PMT_CONFIG_KEY.SUCCESS_CALLABLE)
+         self.pre_charge_check = pmt_config.get(PMT_CONFIG_KEY.PRE_CHARGE_CHECK)
+         self.fail_redirect = pmt_config.get(PMT_CONFIG_KEY.FAIL_REDIRECT)
+         self.redirect_to_url = pmt_config.get(PMT_CONFIG_KEY.REDIRECT_TO_URL)
+         self.anon_user = pmt_config.get(PMT_CONFIG_KEY.ANON_USER)
+         self.base_template = pmt_config.get(PMT_CONFIG_KEY.BASE_TEMPLATE, DEFAULT_BASE_TEMPLATE)
+         self.invoice_num = pmt_config.get(PMT_CONFIG_KEY.INVOICE_NUM, 'Order_' + str(order.id))
+         self.metadata = pmt_config.get(PMT_CONFIG_KEY.METADATA)
+         self.payment_token = payment_token
+         self.order = order
+         self.is_anonymous = request.user.is_anonymous()
+         self.has_surcharge = pmt_config.get(PMT_CONFIG_KEY.SURCHARGE)
+ 
+         # Grab detailed line items for multi-item orders
+         self.items = LineItem.objects.filter(order=order.id).order_by('-amount')
+         self.items = None if len(self.items) == 1 else self.items
+ 
+         self.is_recurring_payment = isinstance(self.order.ordered_object, Gift) and self.order.ordered_object.is_recurring
+ 
+     def build_forms_for_credit_card_get_requests(self, request):
+         initial = {}
+         if self.order.user:
+             initial['first_name'] = self.order.user.first_name
+             initial['last_name'] = self.order.user.last_name
+ 
+         credit_card_form = MainPaymentForm(prefix='credit_card_form',
+                                            order=self.order,
+                                            pmt_token=self.payment_token,
+                                            login=self.login,
+                                            anon_user=self.anon_user,
+                                            invoice_num=self.invoice_num,
+                                            request=request,
+                                            policies=self.policies,
+                                            modular_policies=self.modular_policies,
+                                            initial=initial,
+                                            metadata=self.metadata)
+ 
+         credit_card_form.fields['first_name'].label = 'Cardholder First Name'
+         credit_card_form.fields['last_name'].label = 'Cardholder Last Name'
+ 
+         source = self.metadata['source']
+ 
+         # Be sure we have a user too! Parents (or others) invited to view/modify an app via internal links
+         # may not have an entity, which can cause some issues.
+         if source == 'dashboard' and self.user and self.user.entity:
+             contact_form = ExistingAddressForm(self.user.entity)
+             contact_form.fields['existing_address_id'].label = 'Billing Address'
+             address_form = AddressForm(show_organization=False, set_type='Billing')
+ 
+         elif source == 'open apply' and self.user and self.user.entity:
+             _initial = {}
+             try:
+                 oa = OpenApp.objects.get(user=self.user, pk=self.order.reference_id)
+                 _initial['existing_address_id'] = oa.mailto_address_id
+                 found = False
+                 for address in self.user.entity.addresses:
+                     if int(address.id) == int(oa.mailto_address_id):
+                         found = True
+                 if not found:
+                     _initial['existing_address_id'] = self.user.entity.get_preferred_address().id
+             except OpenApp.DoesNotExist:
+                 pass
+ 
+             contact_form = ExistingAddressForm(self.user.entity, initial=_initial)
+             contact_form.fields['existing_address_id'].label = 'Billing Address'
+             address_form = AddressForm(show_organization=False, set_type='Billing')
+ 
+         else:
+             address_form = None
+             if self.user:
+                 contact_form = ContactForm(request=request,
+                                            user=self.user,
+                                            prefix=self.contact_namespace,
+                                            show_fields=("address",),
+                                            address_label=self.address_label,
+                                            when_finished_desc=self.when_finished_desc)
+             else:
+                 # I believe this is only used for ANONYMOUS donations
+                 contact_form = AddressForm(show_organization=False, set_type='Billing')
+ 
+         return {
+             'credit_card_form': credit_card_form,
+             'contact_form': contact_form,
+             'address_form': address_form
+         }
+ 
+     def set_user(self, request):
+         if self.is_anonymous:
+             if self.order and self.order.user and self.order.user.entity:
+                 user = self.order.user
+             else:
+                 user = None
+             self.metadata['user'] = 'AnonymousUser'
+         else:
+             user = request.user if request.user.entity else None
+         if user:
+             self.metadata['user'] = user
+             self.order.user = user
+ 
+         self.user = user
+ 
+     def build_forms_for_credit_card_post_requests(self, request):
+         address_form = None
+         address = None
+         req_user = request.user
+         unconnected_user = None if self.is_anonymous or req_user.entity else req_user
+         credit_card_form = MainPaymentForm(prefix='credit_card_form',
+                                            data=request.POST,
+                                            order=self.order,
+                                            pmt_token=self.payment_token,
+                                            login=self.login,
+                                            anon_user=self.anon_user,
+                                            invoice_num=self.invoice_num,
+                                            request=request,
+                                            policies=self.policies,
+                                            modular_policies=self.modular_policies,
+                                            unconnected_user=unconnected_user,
+                                            metadata=self.metadata)
+ 
+         source = self.metadata['source']
+ 
+         if source in ['open apply', 'dashboard'] and self.user and self.user.entity:
+             contact_form = ExistingAddressForm(self.user.entity, request.POST)
+             contact_form.fields['existing_address_id'].label = 'Billing Address'
+             address_form = AddressForm(request.POST, show_organization=False, set_type='Billing')
+             if contact_form.is_valid():
+                 if contact_form.cleaned_data['existing_address_id'] is None:
+                     if address_form.is_valid():
+                         new_address = da.entity.get_new_address(self.user.entity.id)
+                         populate_address_attrs(address_form.cleaned_data, new_address)
+                         da.entity.save_address(new_address, use_orig_on_error=True)
+                         contact_form.cleaned_data['address_id'] = new_address.id
+                 else:
+                     contact_form.cleaned_data['address_id'] = contact_form.cleaned_data['existing_address_id']
+ 
+                 address_id = contact_form.cleaned_data.get("address_id")
+                 if address_id:
+                     address = da.entity.get_address(address_id)
+                     if (not address) or address.entity_id != self.user.entity_id:
+                         raise Exception("Invalid address id: %s" % address_id)
+         else:
+             if self.user:
+                 contact_form = ContactForm(data=request.POST,
+                                            request=request,
+                                            user=self.user,
+                                            prefix=self.contact_namespace,
+                                            show_fields=("address",),
+                                            address_label=self.address_label,
+                                            when_finished_desc=self.when_finished_desc)
+ 
+                 if contact_form.is_valid():
+                     address_id = contact_form.cleaned_data["address_id"]
+                     address = da.entity.get_address(address_id)
+                     if (not address) or address.entity_id != self.user.entity_id:
+                         raise Exception("Invalid address id: %s" % address_id)
+             else:
+                 # I believe this is only used for unauthenticated donations and payments made by unconnected users
+                 # For example: Say parents who are invited to view/modify their student's account).
+                 contact_form = AddressForm(data=request.POST, show_organization=False, set_type='Billing')
+                 if contact_form.is_valid():
+                     line_1 = contact_form.cleaned_data.get('line_1')
+                     line_2 = contact_form.cleaned_data.get('line_2')
+                     city = contact_form.cleaned_data.get('city')
+                     state_prov = contact_form.cleaned_data.get('state_prov')
+                     zip_postal = contact_form.cleaned_data.get('zip_postal')
+                     country = contact_form.cleaned_data.get('country')
+ 
+                     request.session['PMT_LINE_1'] = line_1
+                     request.session['PMT_LINE_2'] = line_2
+                     request.session['PMT_CITY'] = city
+                     request.session['PMT_STATE_PROV'] = state_prov
+                     request.session['PMT_ZIP_POSTAL'] = zip_postal
+                     request.session['PMT_COUNTRY'] = country
+ 
+                     anon_address = AnonymousAddress(
+                         line_1=line_1,
+                         line_2=line_2,
+                         city=city,
+                         state=state_prov,
+                         zip=zip_postal,
+                         country=country
+                     )
+ 
+                     address = anon_address
+                     if not address:
+                         raise Exception("Invalid address: %s" % address.line_1)
+ 
+         return {
+             'credit_card_form': credit_card_form,
+             'address_form': address_form,
+             'contact_form': contact_form,
+             'address': address
+         }
+ 
+     def update_context_with_common_attrs(self, request, context):
+         extra_context = {
+             'order': self.order,
+             'items': self.items,
+             'testmode': utils.get_test_banner(),
+             'is_anonymous': self.is_anonymous,
+             'base_template': self.base_template,
+             'stripe_public_key': settings.STRIPE_PUBLIC_KEY,
+             'payment_token': self.payment_token,
+             'plaid_environment': settings.PLAID_ENV,
+             'plaid_public_key': settings.PLAID_PUBLIC_KEY,
+             'has_surcharge': self.has_surcharge,
+             'surcharge_fee_percent': SURCHARGE_FEE_PERCENTAGE
+         }
+         context.update(extra_context)
+ 
+         if self.has_surcharge:
+             surcharge = self.order.balance * Decimal(SURCHARGE_FEE)
+         else:
+             surcharge = 0
+ 
+         context.update({'surcharge': surcharge,
+                         'total_with_surcharge': self.order.balance + surcharge})
+ 
+         extra_context = {}
+         ordered_object = self.order.ordered_object
+         if hasattr(self.order, 'ordered_object') and isinstance(ordered_object, CourseStatusRecordTab):
+             extra_context.update({'csr': ordered_object,
+                                   'ao': AdmissionsOfficer.get_for_csr(ordered_object),
+                                   'days_to_tuition': ordered_object.days_to_tuition})
+ 
+         context.update(extra_context)
+ 
+ @check_write_protect
+ @login_required
+ @connect_required(after_connect_desc="Balance payment")
+ def pay_balance(request, app_id):
+     """
+     This is used by Alumni and Instructor Seminars to pay for their courses online.
+     """
+     if OnlinePayments.feature_set_config()['enabled']:
+         app_id = int(app_id)
+         entity_id = request.user.entity.id
+ 
+         app, course = get_app_and_course_for_entity(app_id, entity_id)
+         sponsor = course.sponsor
+         if sponsor == SEMINARS.course_type:
+             sponsor = SEMINARS.sponsor_code
+             group_name = GROUP_NAMES['SEM_PAY']
+         elif sponsor == ALUMNI.course_type:
+             sponsor = ALUMNI.sponsor_code
+             group_name = GROUP_NAMES['ALUMNI']
+         else:
+             raise Exception("We should only make this request for Alumni and Instructor Seminar balances. AppID: {}, EntityId: {}".format(app_id, entity_id))
+ 
+         balance = Decimal(app.balance)
+         course_id = app.course_id
+         description = 'Tuition Payment'
+         item_code = "{}-{}".format(entity_id, course_id)
+         order = utils.setup_order(request.user, app, description, balance, item_code)
+ 
+         return utils.payment_redirect(
+             request=request,
+             login=PaymentGatewayAccount(name='AUTO_POST').get_credentials(),
+             template='base.html',
+             order_id=order.id,
+             invoice_num="{}_PAY_{}".format(sponsor, app_id),
+             policies=[],
+             deferred=False,
+             success_callable=utils.payment_success,
+             redirect_to_url=reverse('pmt_success', args=[app_id]),
+             show_summary=False,
+             metadata={'group_name': group_name,
+                       'application_id': app_id,
+                       'source': 'alumni & seminars'}
+         )
+     else:
+         return render(request, 'payment/online_payments_disabled.html')
+ 
+ @login_required
+ @connect_required(after_connect_desc="Balance payment")
+ def payment_success(request, app_id):
+     """Success page for balance payment"""
+     app, course = get_app_and_course_for_entity(int(app_id), request.user.entity.id)
+     sponsor = course.sponsor
+     if sponsor == SEMINARS.course_type:
+         mailto = SEMINARS.email
+     else:
+         mailto = ALUMNI.email
+     return render(request, "payment_success.html", context={
+         'email_address': request.user.email,
+         'has_payment': True,
+         'mailto': get_email_address_from_constant(mailto)
+     }, context_instance=RequestContext(request))
+ 
+ 
+ class StripePaymentView(View):
+ 
+     @method_decorator(login_required)
+     @method_decorator(staff_member_required)
+     @method_decorator(permission_required('payment.stripe_payments', raise_exception=True))
+     def get(self, request):
+         if OnlinePayments.feature_set_config()['enabled']:
+             request.session['customer'] = None
+             form = StripePaymentsForm()
+             return render(request, 'payment/stripe_payments.html',
+                           context={'stripe_payments_form': form,
+                                    'stripe_public_key': settings.STRIPE_PUBLIC_KEY,
+                                    'SURCHARGE_FEE': SURCHARGE_FEE,
+                                    'surcharge_fee_percent': SURCHARGE_FEE_PERCENTAGE})
+         else:
+             return render(request, 'payment/online_payments_disabled.html')
+ 
+     @method_decorator(login_required)
+     @method_decorator(staff_member_required)
+     @method_decorator(permission_required('payment.stripe_payments', raise_exception=True))
+     def post(self, request):
+         form = StripePaymentsForm(request.POST)
+         form.add_new_receiver_fields_to_form()
+ 
+         if 'customer' in request.session and request.session['customer']:
+             customer = request.session['customer']
+         else:
+             try:
+                 metadata = {
+                     'first_name': request.POST.get('first_name'),
+                     'last_name': request.POST.get('last_name')
+                 }
+                 email = request.POST.get('email_address')
+                 customer = create_customer(
+                     {'stripeSource': request.POST['stripeSource']},
+                     email=email,
+                     metadata=metadata)
+             except StripeError as e:
+                 form.add_error(None, e.message)
+                 customer = None
+ 
+         is_debit_or_prepaid = request.POST.get('is_debit_or_prepaid') == 'on'
+         if is_debit_or_prepaid:
+             if customer and customer.sources.data[0].card.funding == 'credit':
+                 form.add_error(None, "This is not a debit or prepaid card.")
+         else:
+             if customer and customer.sources.data[0].card.funding != 'credit':
+                 form.add_error(None, "This is not a credit card.")
+ 
+         if form.is_valid():
+             group_name = form.cleaned_data['group_name']
+             payment_type = FinCashTab.PAYMENT_TYPE['Stripe Credit']
+             payer_first_name = attempt_title(form.cleaned_data['first_name'])
+             payer_last_name = attempt_title(form.cleaned_data['last_name'])
+             receivers = form.cleaned_data['receivers']
+             charge_surcharge = form.cleaned_data['charge_surcharge']
+ 
+             if group_name == 'Donation':
+                 statement_descriptor = 'NOLS Donation'
+             else:
+                 statement_descriptor = 'NOLS'
+ 
+             payments = []
+             payment_data_for_email = []
+             payment_info = {
+                 'customer': customer,
+                 'description': form.cleaned_data['description'],
+                 'group_name': group_name,
+                 'source': 'stripe admin',
+                 'payment_type': payment_type,
+                 'first_name': payer_first_name,
+                 'last_name': payer_last_name,
+                 'statement_descriptor': statement_descriptor,
+                 'user': request.user,
+             }
+             unsuccessful_payments = []
+             for receiver in receivers:
+ 
+                 order = create_order(request, form, receiver)
+                 payment_info['amount'] = order.total_amount
+                 payment_info['application_id'] = receiver['application_id']
+                 payment_info['ship_to_first_name'] = receiver['received_for_first_name']
+                 payment_info['ship_to_last_name'] = receiver['received_for_last_name']
+                 try:
+                     payment = StripeCreditCardProcessor().auth(order, payment_info)
+                 except StripeError as e:
+                     unsuccessful_dict = self.get_receiver_dict(receiver, order)
+                     unsuccessful_dict['error_reason'] = e.message
+                     unsuccessful_payments.append(unsuccessful_dict)
+                 else:
+                     request.session['customer'] = None
+                     payments.append(payment)
+                     payment_data_for_email.append(self.get_receiver_dict(receiver, order))
+                     payment.card_type = customer.sources.data[0].card.funding
+                     payment.save()
+                     if group_name == GROUP_NAMES['GENERAL_ADMISSIONS_PAYMENT'] and \
+                         charge_surcharge:
+                         utils.create_surcharge_account_entry(
+                             receiver['application_id'],
+                             receiver['amount'],
+                             receiver['surcharge']
+                         )
+                     utils.create_roa_and_post(
+                         payment,
+                         group_name=group_name,
+                         core_app_id=receiver['application_id'],
+                         note=form.cleaned_data['description'])
+ 
+                     if group_name not in [GROUP_NAMES['GIFT'],
+                                           GROUP_NAMES['OTHER'],
+                                           GROUP_NAMES['WMI']]:
+                         utils._save_payment_received_elog(
+                             receiver['application_id'],
+                             form.cleaned_data['group_name'],
+                             payment,
+                             form.cleaned_data['description'])
+ 
+             total_amount = 0
+             if len(payments) > 0:
+                 total_amount = reduce(lambda sum, payment: payment + sum, map(lambda payment: payment.amount, payments))
+                 utils.send_stripe_receipt_email(
+                     request,
+                     payment_data_for_email,
+                     payments[0].get_payment_method_str(),
+                     payments[0].address.first_name,
+                     payments[0].address.last_name,
+                     total_amount,
+                     form.cleaned_data['email_address'],
+                     form.cleaned_data['group_name'],
+                     form.cleaned_data['description'])
+ 
+             return render(
+                 request,
+                 'payment/stripe_payments_receipt.html',
+                 context={
+                     'payments': payments,
+                     'total_amount': total_amount,
+                     'email_address': form.cleaned_data['email_address'],
+                     'group_name': form.cleaned_data['group_name'],
+                     'description': form.cleaned_data['description'],
+                     'form': StripeReceiptForm(),
+                     'SURCHARGE_FEE': SURCHARGE_FEE,
+                     'surcharge_fee_percent': SURCHARGE_FEE_PERCENTAGE,
+                     'unsuccessful_payments': unsuccessful_payments
+                 }
+             )
+         if customer:
+             request.session['customer'] = customer
+             card = customer['sources']['data'][0]['card']
+             last_4 = card['last4']
+             exp_date = '{}/{}'.format(card['exp_month'], card['exp_year'])
+         else:
+             last_4 = None
+             exp_date = None
+         return render(request, 'payment/stripe_payments.html',
+                       context={'stripe_payments_form': form,
+                                'stripe_public_key': settings.STRIPE_PUBLIC_KEY,
+                                'form_has_errors': True,
+                                'last_4': last_4,
+                                'exp_date': exp_date,
+                                'SURCHARGE_FEE': SURCHARGE_FEE,
+                                'surcharge_fee_percent': SURCHARGE_FEE_PERCENTAGE},
+                       )
+ 
+     @staticmethod
+     def get_receiver_dict(receiver, order):
+         return {
+             'first_name': receiver['received_for_first_name'],
+             'last_name': receiver['received_for_last_name'],
+             'order_id': order.id,
+             'application_id': receiver['application_id'],
+             'charge': '%.2f' % Decimal(receiver['amount']),
+             'surcharge': receiver['surcharge'],
+             'order_total_amount': '%.2f' % order.total_amount
+         }
+ 
+ def clear_credit_card_from_session(request):
+     request.session['customer'] = None
+     return HttpResponse('')
+ 
+ class StripeAdminView(View):
+ 
+     @method_decorator(login_required)
+     @method_decorator(staff_member_required)
+     @method_decorator(permission_required('payment.stripe_admin', raise_exception=True))
+     def get(self, request):
+         transactions = get_balance_transactions()
+         transactions_grouped_by_day = self.group_transactions_by_day(transactions)
+         result = self.filter_and_aggregate_data(transactions_grouped_by_day)
+ 
+         context = {'data': result,
+                    'stripe_public_key': settings.STRIPE_PUBLIC_KEY}
+ 
+         return render(request, 'payment/stripe_admin.html', context)
+ 
+     @method_decorator(login_required)
+     @method_decorator(staff_member_required)
+     @method_decorator(permission_required('payment.stripe_admin', raise_exception=True))
+     def post(self, request):
+         date_string = request.POST['datepicker']
+         if date_string:
+             filter_date = datetime.strptime(date_string, '%m/%d/%Y')
+             timezone = pytz.timezone("UTC")
+             timezone_aware_date = timezone.localize(filter_date)
+             transactions = get_balance_transactions(date=timezone_aware_date)
+         else:
+             transactions = get_balance_transactions()
+         transactions_grouped_by_day = self.group_transactions_by_day(transactions)
+         result = self.filter_and_aggregate_data(transactions_grouped_by_day)
+ 
+         context = {'data': result,
+                    'date_string': date_string,
+                    'stripe_public_key': settings.STRIPE_PUBLIC_KEY}
+ 
+         return render(request, 'payment/stripe_admin.html', context)
+ 
+     @staticmethod
+     def group_transactions_by_day(transactions):
+         grouped_transactions = {}
+         for transaction in transactions:
+             if transaction['type'] in ['payment', 'payment_refund', 'charge', 'refund']:
+                 timestamp = transaction['created']
+                 time = datetime.date(datetime.utcfromtimestamp(timestamp))
+ 
+                 if time in grouped_transactions:
+                     grouped_transactions[time].append(transaction)
+                 else:
+                     grouped_transactions[time] = [transaction]
+ 
+         return grouped_transactions
+ 
+     @staticmethod
+     def filter_and_aggregate_data(grouped_transactions):
+         result = []
+         for date, transactions in grouped_transactions.iteritems():
+             individual_data = [{'gross': Decimal(txn.amount)/100,
+                                 'net': Decimal(txn.net)/100,
+                                 'fee': Decimal(txn.fee)/100,
+                                 'description': txn.description,
+                                 'user': txn.source.metadata.get('user', ''),
+                                 'group_name': txn.source.metadata.get('group_name', ''),
+                                 'source': txn.source.metadata.get('source', ''),
+                                 'application_id': txn.source.metadata.get('application_id', ''),
+                                 'payment_type': txn.source.metadata.get('payment_type', ''),
+                                 'payer': txn.source.metadata.get('payer',  u'{} {}'.format(txn.source.metadata.get('payer_first_name', ''),txn.source.metadata.get('payer_last_name', ''))),
+                                 'receiver': txn.source.metadata.get('receiver', u'{} {}'.format(txn.source.metadata.get('receiver_first_name', ''),txn.source.metadata.get('receiver_last_name', ''))),
+                                 'stripe_transaction_id': txn.source.id,
+                                 'object_type': txn.source.object}
+                                for txn in transactions]
+             aggregate_data = reduce(lambda x, y: {'gross': x['gross'] + y['gross'],
+                                                   'fee': x['fee'] + y['fee'],
+                                                   'net': x['net'] + y['net']},
+                                     individual_data)
+ 
+             result.append({'date': date,
+                            'transactions': {'individual': individual_data,
+                                             'aggregate': aggregate_data}})
+ 
+         result.sort(key=lambda item: item['date'])
+         return result
+ 
+ 
+ class StripeRefundView(View):
+ 
+     @method_decorator(login_required)
+     @method_decorator(staff_member_required)
+     @method_decorator(permission_required('payment.stripe_admin', raise_exception=True))
+     def get(self, request, transaction_id):
+         payment = Payment.objects.get(stripe_transaction_id=transaction_id)
+         line_items = payment.order.line_items.all().order_by('id')
+         form = StripeRefundForm(payment=payment)
+         charge_metadata = retrieve_charge_metadata(transaction_id)
+         payer = charge_metadata.get(
+             'payer',
+             u'{} {}'.format(charge_metadata.get('payer_first_name', ''), charge_metadata.get('payer_last_name', ''))
+         )
+         receiver = charge_metadata.get(
+             'receiver',
+             u'{} {}'.format(charge_metadata.get('receiver_first_name', ''), charge_metadata.get('receiver_last_name', ''))
+         )
+         context = {
+             'payment': payment,
+             'transaction_id': transaction_id,
+             'refund_form': form,
+             'has_surcharge': payment.surcharge,
+             'line_items': line_items,
+             'payer': payer,
+             'receiver': receiver,
+             'app_id': charge_metadata.get('application_id')
+         }
+         return render(request, 'payment/stripe_refund.html', context)
+ 
+     @method_decorator(login_required)
+     @method_decorator(staff_member_required)
+     @method_decorator(permission_required('payment.stripe_admin', raise_exception=True))
+     def post(self, request, transaction_id):
+         payment = Payment.objects.get(stripe_transaction_id=transaction_id)
+         has_surcharge = payment.surcharge
+         form = StripeRefundForm(request.POST, payment=payment)
+         charge_metadata = retrieve_charge_metadata(transaction_id)
+         if form.is_valid():
+             try:
+                 charge_payment_type = charge_metadata.get('payment_type', '')
+ 
+                 if charge_payment_type == FinCashTab.PAYMENT_TYPE['Stripe Credit']:
+                     refund_payment_type = FinCashTab.PAYMENT_TYPE['Refund Stripe Credit']
+                 elif charge_payment_type == FinCashTab.PAYMENT_TYPE['Stripe Check']:
+                     refund_payment_type = FinCashTab.PAYMENT_TYPE['Refund Stripe Check']
+                 else:
+                     raise Exception("Invalid payment_type: %s" % charge_payment_type)
+ 
+                 if has_surcharge:
+                     refund_on_acct_amt = form.cleaned_data.get('amount')
+                     surcharge_amt = refund_on_acct_amt * Decimal(SURCHARGE_FEE)
+                     refund_total = refund_on_acct_amt + surcharge_amt
+                 else:
+                     refund_total = form.cleaned_data.get('amount')
+ 
+                 metadata = {'source': 'stripe admin',
+                             'user': request.user,
+                             'description': charge_metadata.description,
+                             'group_name': charge_metadata.get('group_name', ''),
+                             'payment_type': refund_payment_type,
+                             'payer': charge_metadata.get('payer', u'{} {}'.format(charge_metadata.get('payer_first_name', ''), charge_metadata.get('payer_last_name', ''))),
+                             'receiver': charge_metadata.get('receiver', u'{} {}'.format(charge_metadata.get('receiver_first_name', ''), charge_metadata.get('receiver_last_name', ''))),
+                             'application_id': charge_metadata.get('application_id', '')}
+                 refund = StripeCreditCardProcessor().credit(payment.id,
+                                                             refund_total,
+                                                             metadata)
+             except StripeError as e:
+                 form.add_error(None, e.message)
+             else:
+                 refund.created_by = request.user
+                 refund.save()
+                 app_id = charge_metadata.get('application_id', '')
+                 if has_surcharge and app_id:
+                     utils.create_surcharge_refund_account_entry(app_id, refund_on_acct_amt, surcharge_amt)
+                 utils.create_roa_and_post(refund,
+                                           charge_metadata['group_name'],
+                                           payment_type=refund_payment_type,
+                                           note=form.cleaned_data.get('note', ''),
+                                           core_app_id=charge_metadata.get('application_id', ''))
+ 
+                 return HttpResponseRedirect(reverse('stripe_refund',
+                                                     kwargs={'transaction_id': transaction_id}))
+ 
+         return render(request, 'payment/stripe_refund.html',
+                       context={'refund_form': form,
+                                'payment': payment,
+                                'transaction_id': transaction_id})
+ 
+ 
+ def save_ach_access_token(request):
+     try:
+         exchange_response = ach_client.Item.public_token.exchange(request.POST['public_token'])
+         access_token = exchange_response['access_token']
+         AccessToken(payment_token=request.POST['payment_token'],
+                     ach_access_token=access_token).save()
+     except PlaidError as e:
+         data = process_ach_error(e)
+         return HttpResponseBadRequest(json.dumps(data), content_type="application/json")
+ 
+     return HttpResponse('')
+ 
+ @sensitive_variables('accounts')
+ def fetch_bank_information(request):
+     access_token = AccessToken.objects.filter(payment_token=request.GET['payment_token']).last()
+     access_token = access_token.ach_access_token
+     try:
+         accounts = ach_client.Auth.get(access_token)
+         institution = ach_client.Institutions.get_by_id(accounts['item']['institution_id'])
+         identity = ach_client.Identity.get(access_token)
+ 
+         data = {
+             'accounts': accounts,
+             'institution': institution,
+             'identity': identity,
+         }
+     except PlaidError as e:
+         data = process_ach_error(e)
+         return HttpResponseBadRequest(json.dumps(data), content_type="application/json")
+ 
+     return HttpResponse(json.dumps(data), content_type="application/json")
+ 
+ @sensitive_variables('accounts', 'account')
+ def verify_balance(request):
+     access_token = AccessToken.objects.filter(payment_token=request.GET['payment_token']).last()
+     access_token = access_token.ach_access_token
+     try:
+         accounts = ach_client.Auth.get(access_token)
+         account_id = request.GET['account_id']
+         amount_due = Decimal(request.GET['payment_amount'].replace(',', ''))
+         account_has_enough = True
+         limit_ok = True
+         for account in accounts['accounts']:
+             if account['account_id'] == account_id:
+                 balances = account['balances']
+                 account_has_enough = Decimal(balances['available']) >= amount_due
+                 limit_ok = not (balances['limit'] and amount_due > Decimal(balances['limit']))
+                 break
+         data = {
+             'account_has_enough': account_has_enough,
+             'limit_ok': limit_ok
+         }
+ 
+     except PlaidError as e:
+         data = process_ach_error(e)
+         return HttpResponseBadRequest(json.dumps(data), content_type="application/json")
+ 
+     return HttpResponse(json.dumps(data), content_type="application/json")
+ 
+ @require_POST
+ @csrf_exempt
+ def handle_stripe_webhooks(request):
+     payload = request.body
+     sig_header = request.META['HTTP_STRIPE_SIGNATURE']
+     (response, event) = get_webhook_event(payload, sig_header)
+     if not event:
+         return HttpResponse(status=response)
+ 
+     try:
+         event_type = event.type # TODO map this
+         if event_type == 'charge.failed':
+             charge_failed(event)
+         elif event_type == 'invoice.payment_succeeded':
+             invoice_success(event)
+         elif event_type == 'invoice.payment_failed':
+             invoice_failed(event)
+         elif event_type == 'customer.subscription.deleted':
+             subscription_canceled(event)
+     except Exception as e:
+         log.exception(e)
+ 
+     return HttpResponse(status=response)
+ 
+ class StripeDonationAdminView(View):
+ 
+     @method_decorator(login_required)
+     @method_decorator(staff_member_required)
+     @method_decorator(permission_required('payment.stripe_donation_admin', raise_exception=True))
+     def get(self, request):
+         form = RecurringDonationAdminForm(request.GET)
+ 
+         subscriptions = None
+         paginate = False
+         ending_before = None
+         starting_after = None
+         if form.is_valid():
+ 
+             status = form.cleaned_data.get('status')
+             if not status:
+                 status = DEFAULT_SUB_STATUS
+ 
+             created_after = form.cleaned_data.get('created_after')
+             if created_after:
+                 created_after = int(time.mktime(created_after.timetuple()))
+             created_before = form.cleaned_data.get('created_before')
+             if created_before:
+                 created_before = int(time.mktime(created_before.timetuple()))
+             created = {
+                 'gt': created_after,
+                 'lt': created_before
+             }
+ 
+             user = form.cleaned_data.get('user')
+             customer_id = None
+             if user:
+                 gift = RecurringBilling.objects.filter(user__username=user, content_type__model='gift').first() # FIXME
+                 if gift:
+                     customer_id = gift.customer_id
+                 else:
+                     context = {
+                         'form': RecurringDonationAdminForm(),
+                         'subscriptions': []
+                     }
+                     return render(request, 'payment/stripe_donation_admin.html', context)
+ 
+             expiring_this_month = form.cleaned_data.get('expiring_this_month')
+             expiring_next_month = form.cleaned_data.get('expiring_next_month')
+             paginate = not expiring_this_month and not expiring_next_month
+ 
+             if paginate:
+                 ending_before = request.GET.get('ending_before')
+                 starting_after = request.GET.get('starting_after')
+                 subscriptions = get_paginated_subscriptions(
+                     status=status,
+                     created=created,
+                     customer=customer_id,
+                     starting_after=starting_after,
+                     ending_before=ending_before
+                 )
+ 
+                 if not starting_after and not ending_before and subscriptions.has_more:
+                     starting_after = subscriptions.data[len(subscriptions.data) - 1].id
+                 elif starting_after:
+                     ending_before = subscriptions.data[0].id
+                     if subscriptions.has_more:
+                         starting_after = subscriptions.data[len(subscriptions.data) - 1].id
+                     else:
+                         starting_after = None
+                 elif ending_before:
+                     starting_after = subscriptions.data[len(subscriptions.data) - 1].id
+                     if subscriptions.has_more:
+                         ending_before = subscriptions.data[0].id
+                     else:
+                         ending_before = None
+             else:
+                 # Don't paginate if getting the expiring subscriptions because we need to process
+                 # the whole list and there shouldn't be that many results once filtered.
+                 subscriptions = get_subscriptions(
+                     status=status,
+                     created=created,
+                     customer=customer_id
+                 )
+                 subscriptions = utils.get_expiring_subscriptions(
+                     subscriptions,
+                     expiring_this_month,
+                     expiring_next_month
+                 )
+ 
+         context = {
+             'form': form,
+             'subscriptions': subscriptions,
+             'paginate': paginate,
+             'starting_after': starting_after if paginate else None,
+             'ending_before': ending_before if paginate else None
+         }
+         return render(request, 'payment/stripe_donation_admin.html', context)

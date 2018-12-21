@@ -1,54 +1,74 @@
 // @flow
-import { BufferedProcess, Directory, GitRepository } from 'atom'
+import { BufferedProcess, Directory, File, GitRepository } from 'atom'
 import chooseRepo from './models/choose-repo'
 
-const reposByDirectory: Map<string, GitRepository> = new Map()
+const reposByDirectory: Map<Directory, GitRepository> = new Map()
+
+const getRepoForDirectory = async (directory: Directory): Promise<GitRepository | void> => {
+  const repo = await atom.project.repositoryForDirectory(directory)
+  if (repo) {
+    reposByDirectory.set(directory, repo)
+    return repo
+  }
+}
+
+const getCachedRepo = (path: string): ?GitRepository => {
+  const iterator = reposByDirectory.entries()
+  let entry = iterator.next()
+  while (!entry.done) {
+    const [directory, repo] = entry.value
+    if (directory.contains(path)) return repo
+
+    entry = iterator.next()
+  }
+}
 
 export async function getRepo(): Promise<GitRepository> {
   const activeEditor = atom.workspace.getCenter().getActiveTextEditor()
   if (activeEditor) {
     const path = activeEditor.getPath()
-    const directory = new Directory(path)
-    let repo = reposByDirectory.get(directory.getPath())
+    let repo = getCachedRepo(path)
     if (repo) return repo
 
-    repo = await atom.project.repositoryForDirectory(directory)
-    if (repo) {
-      reposByDirectory.set(directory.getPath(), repo)
-      return repo
-    }
+    const directory = new File(path).getParent()
+    repo = await getRepoForDirectory(directory)
+    if (repo) return repo
   }
 
-  const getRepoForDirectory: Directory => Promise<
-    GitRepository
-  > = atom.project.repositoryForDirectory.bind(atom.project)
   const repos: GitRepository[] = await Promise.all(
     atom.project.getDirectories().map(getRepoForDirectory)
   ).then(results => results.filter(Boolean))
 
-  if (repos.length === 1) return repos[0]
   if (repos.length === 0) return null
-  if (repos.length > 0) return chooseRepo(repos)
+  if (repos.length === 1) return repos[0]
+  if (repos.length > 1) return chooseRepo(repos)
+}
+
+export const getRepoForPath = async (path: string) => {
+  let repo = getCachedRepo(path)
+  if (repo) return repo
+
+  return await getRepoForDirectory(new File(path).getParent())
 }
 
 const defaultCmdOptions = { color: false, env: process.env }
 
 type GitCliOptions = {
-  color: boolean,
-  env: {}
+  cwd?: string,
+  color?: boolean,
+  env?: {}
 }
-type GitCliResponse = {
+export type GitCliResponse = {
   output: string,
-  success: boolean
+  failed: boolean
 }
 
 export default async function cmd(
   args: string[],
   options: GitCliOptions = defaultCmdOptions
 ): Promise<GitCliResponse> {
-  args = args.slice()
   if (options.color) {
-    args.push('-c', 'color.ui=always')
+    args = ['-c', 'color.ui=always'].concat(args)
     delete options.color
   }
 
@@ -63,8 +83,8 @@ export default async function cmd(
       stderr: data => (output += data.toString()),
       exit: code => {
         resolve({
-          output,
-          success: code === 0
+          output: output.trim(),
+          failed: code !== 0
         })
       }
     })
